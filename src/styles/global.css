@@ -1,0 +1,8 @@
+/* Punto de entrada de estilos. El ORDEN es la cascada:
+   tokens → base → layout → componentes → páginas. */
+@import 'tailwindcss';
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './components.css';
+@import './pages.css';

@@ -1,0 +1,34 @@
+---
+import { NAV } from '../data/site.js';
+const base = import.meta.env.BASE_URL;
+const { active } = Astro.props;
+---
+<nav class="glass-panel relative z-20 border-b border-galaxy-border/80">
+  <div class="w-full px-4 md:px-6 flex items-center justify-between h-16 relative">
+    <a href={base} class="logo-group flex items-center gap-3 z-10" aria-label="Phoenix Evolution Series — Inicio">
+      <span class="w-10 h-10 rounded-full overflow-hidden border border-galaxy-400/50 shadow-[0_0_15px_rgba(0,229,255,0.4)] shrink-0">
+        <img src={`${base}logo.webp`} alt="Logo Phoenix" width="40" height="40" class="w-full h-full object-cover" />
+      </span>
+      <span class="font-display font-extrabold text-xl sm:text-2xl tracking-wider select-none text-white flex items-center whitespace-nowrap">
+        <span class="text-galaxy-400 text-shadow-glow">P</span><span class="logo-expand text-galaxy-400">HOENIX</span>
+        <span class="text-galaxy-600">E</span><span class="logo-expand text-galaxy-600">VOLUTION</span>
+        <span class="text-white">S</span><span class="logo-expand text-white">ERIES</span>
+      </span>
+    </a>
+
+    <div class="hidden lg:flex items-center gap-1 font-display text-sm ml-auto mr-6">
+      {NAV.map((n) => (
+        <a href={`${base}${n.path}`} class="nav-link" aria-current={active === n.id ? 'page' : undefined}>{n.label}</a>
+      ))}
+    </div>
+
+    <div class="flex items-center justify-end shrink-0 gap-3 sm:gap-4 relative z-10">
+      <div id="nav-auth" class="flex items-center h-full gap-3"></div>
+      <span class="w-px h-6 bg-galaxy-border"></span>
+      <button id="btn-menu" type="button" aria-label="Abrir menú" aria-controls="sidebar-menu" aria-expanded="false"
+        class="text-gray-400 hover:text-white transition-colors flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-bars text-2xl"></i>
+      </button>
+    </div>
+  </div>
+</nav>

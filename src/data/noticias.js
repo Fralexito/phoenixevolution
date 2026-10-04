@@ -1,0 +1,26 @@
+// Noticias (contenido editorial). `cuerpo` es una lista de párrafos en TEXTO PLANO: nunca HTML.
+export const NOTICIAS = [
+  { id: 1, categoria: 'OFICIAL', tag: 'Apertura 2026', fecha: 'Hoy',
+    titulo: 'Se Confirma el Calendario Oficial: El Clásico Abrirá la Jornada 3',
+    resumen: 'La directiva de la Phoenix Evolution Series oficializó los cruces para la fase regular de la Galaxy League. El choque entre Barcelona y Real Madrid contará con sala de host dedicada.',
+    cuerpo: [
+      'La directiva técnica y de fiscalización de la Phoenix Evolution Series confirmó la programación oficial de la Galaxy League Apertura 2026.',
+      'El partido más esperado de la primera ronda entre Fralex (FC Barcelona) y Axel (Real Madrid) ha sido fijado para la Jornada 3. Debido a la envergadura del duelo, se implementará un enlace de host simétrico por Parsec con tasa de refresco bloqueada a 60 FPS estables para evitar caídas de frame y desincronizaciones.',
+    ],
+    imagen: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000&auto=format&fit=crop' },
+  { id: 2, categoria: 'TRIBUNAL', tag: 'Reglamento', fecha: 'Ayer',
+    titulo: 'Auditoría Antifraude en la Validación de Actas',
+    resumen: 'Los capitanes deberán adjuntar captura obligatoria del resultado final de PES para procesar los puntos en la tabla.',
+    cuerpo: ['Con el objetivo de erradicar disputas posteriores, todo capitán que reporte un partido finalizado deberá adjuntar la captura del marcador final de PES junto a las estadísticas de tiro. Si un rival no confirma en un plazo de 6 horas, el comisario auditará la evidencia directa.'],
+    imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&auto=format&fit=crop' },
+  { id: 3, categoria: 'JORNADA', tag: 'Infraestructura', fecha: 'Hace 2 días',
+    titulo: 'Nuevos Nodos Smash Soda y Parsec Habilitados',
+    resumen: 'Se integró el selector de conectividad para clasificar hosts verificados con menos de 20ms de latencia local.',
+    cuerpo: ['Los administradores de red finalizaron las pruebas de los servidores Smash Soda y Parsec. Aquellos jugadores que cuenten con conexiones de fibra óptica simétrica podrán solicitar el rol de Host Oficial verificado con insignia de Rango S.'],
+    imagen: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop' },
+  { id: 4, categoria: 'OFICIAL', tag: 'Mercado', fecha: 'Hace 3 días',
+    titulo: 'Congelamiento Financiero Hasta la Fecha 5',
+    resumen: 'Ningún club podrá ejecutar transferencias hasta que concluya la primera mitad de la fase regular.',
+    cuerpo: ['Por resolución de la mesa directiva, las transacciones y traspasos de jugadores libres quedan suspendidos hasta el cierre de la Fecha 5 para garantizar estabilidad de planteles.'],
+    imagen: 'https://images.unsplash.com/photo-1543351611-58f69d7c1781?q=80&w=600&auto=format&fit=crop' },
+];

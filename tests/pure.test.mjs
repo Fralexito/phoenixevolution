@@ -1,0 +1,88 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
+import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
+import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
+
+test('escapeHTML neutraliza HTML', () => {
+  assert.equal(escapeHTML('<img src=x onerror="a()">'), '&lt;img src=x onerror=&quot;a()&quot;&gt;');
+  assert.equal(escapeHTML(null), '');
+});
+test('safeUrl solo https (y parsec si se permite)', () => {
+  assert.equal(safeUrl('javascript:alert(1)'), '');
+  assert.equal(safeUrl('http://x.com'), '');
+  assert.equal(safeUrl('https://x.com'), 'https://x.com');
+  assert.equal(safeUrl('parsec://a'), '');
+  assert.equal(safeUrl('parsec://a', { allowParsec: true }), 'parsec://a');
+  assert.equal(safeUrl('steam://connect/1', { allowParsec: true }), 'steam://connect/1');
+  assert.equal(safeUrl('steam://connect/1'), '');
+});
+test('safeImg acepta https y data:image, rechaza el resto', () => {
+  assert.equal(safeImg('data:image/jpeg;base64,AAAA'), 'data:image/jpeg;base64,AAAA');
+  assert.equal(safeImg('data:text/html;base64,AAAA'), '');
+  assert.equal(safeImg('javascript:x'), '');
+});
+test('toUsername cumple ^[a-z0-9_]{1,20}$', () => {
+  assert.match(toUsername('Fralex FC!! ÁÉ'), /^[a-z0-9_]{1,20}$/);
+  assert.equal(toUsername('A'.repeat(40)).length, 20);
+});
+test('stat y statColor', () => {
+  assert.equal(stat(null), 75); assert.equal(stat(120), 99); assert.equal(stat('88'), 88);
+  assert.equal(statColor(95), '#00e5ff'); assert.equal(statColor(60), '#ff4444');
+});
+const now = new Date(2026, 9, 3, 20, 0, 0); // 3 oct 2026 20:00
+test('slots de madrugada caen en el día calendario siguiente', () => {
+  assert.equal(slotToDate(0, '22:00', now).getDate(), 3);
+  assert.equal(slotToDate(0, '00:00', now).getDate(), 4);
+  assert.equal(slotToDate(1, '01:00', now).getDate(), 5);
+});
+test('isFuture exige 30 min de margen (igual que la BD)', () => {
+  assert.equal(isFuture(slotToDate(0, '14:00', now), now), false);
+  assert.equal(isFuture(new Date(now.getTime() + 29 * 60e3), now), false);
+  assert.equal(isFuture(new Date(now.getTime() + 30 * 60e3), now), true);
+  assert.equal(isFuture(slotToDate(0, '22:00', now), now), true);
+});
+test('presetToReto: ya / 15 / 30 son AHORA, 60 es PROGRAMADO', () => {
+  assert.deepEqual(presetToReto('ya', now), { modalidad: 'AHORA', fecha_programada: null });
+  assert.equal(presetToReto('15', now).modalidad, 'AHORA');
+  assert.equal(new Date(presetToReto('15', now).fecha_programada).getTime() - now.getTime(), 15 * 60e3);
+  assert.equal(presetToReto('60', now).modalidad, 'PROGRAMADO');
+  assert.equal(presetToReto('x', now), null);
+});
+test('confirmPhase: pronto > 30, abierta 30..10, cerrada < 10', () => {
+  const f = (m) => new Date(now.getTime() + m * 60e3);
+  assert.equal(confirmPhase(f(45), now), 'pronto');
+  assert.equal(confirmPhase(f(30), now), 'abierta');
+  assert.equal(confirmPhase(f(10), now), 'abierta');
+  assert.equal(confirmPhase(f(9), now), 'cerrada');
+});
+test('manualToDate rechaza 31 de febrero y fechas pasadas', () => {
+  assert.equal(manualToDate({ day: 31, month: 1, hhmm: '21:00' }, now).ok, false);
+  assert.equal(manualToDate({ day: 3, month: 9, hhmm: '10:00' }, now).ok, false);
+  assert.equal(manualToDate({ day: 10, month: 9, hhmm: '21:00' }, now).ok, true);
+});
+test('manualToDate: mes anterior se entiende como año siguiente', () => {
+  const r = manualToDate({ day: 15, month: 0, hhmm: '21:00' }, now);
+  assert.ok(r.ok); assert.equal(r.date.getFullYear(), 2027);
+});
+test('isStale', () => {
+  const old = new Date(now.getTime() - 3 * 3600e3).toISOString();
+  assert.equal(isStale({ estado: 'BUSCANDO', created_at: old, fecha_programada: null }, now), true);
+  assert.equal(isStale({ estado: 'BUSCANDO', created_at: now.toISOString(), fecha_programada: null }, now), false);
+});
+
+test('equipos: máximo 8 en total y cada lado entre 1 y 7', () => {
+  assert.equal(validTeams(4, 4), true); assert.equal(validTeams(5, 4), false); assert.equal(validTeams(0, 1), false); assert.equal(validTeams(7, 1), true); assert.equal(validTeams(8, 1), false);
+  assert.equal(clampTeam('x'), 1); assert.equal(clampTeam(99), 7); assert.equal(maxFor(4), 4); assert.equal(maxFor(1), 7);
+});
+test('setTeamSize nunca produce un par inválido', () => {
+  assert.deepEqual(setTeamSize({ a: 4, b: 4 }, 'a', 6), { a: 4, b: 4 });
+  assert.deepEqual(setTeamSize({ a: 2, b: 3 }, 'b', 6), { a: 2, b: 6 });
+  assert.deepEqual(setTeamSize({ a: 2, b: 3 }, 'a', 0), { a: 1, b: 3 });
+  for (let a = 0; a < 12; a++) for (let b = 0; b < 12; b++) { const r = setTeamSize({ a: 3, b: 3 }, 'a', a); assert.ok(validTeams(r.a, r.b)); const q = setTeamSize(r, 'b', b); assert.ok(validTeams(q.a, q.b)); }
+});
+test('seats: cuenta confirmados, invitados y libres; ignora a quien salió', () => {
+  const parts = [{ equipo: 'A', estado: 'CONFIRMADO' }, { equipo: 'A', estado: 'INVITADO' }, { equipo: 'A', estado: 'SALIO' }, { equipo: 'B', estado: 'CONFIRMADO' }];
+  assert.deepEqual(seats(3, parts, 'A'), { tam: 3, confirmed: 1, invited: 1, free: 1, missing: 2 });
+  assert.deepEqual(seats(1, parts, 'B'), { tam: 1, confirmed: 1, invited: 0, free: 0, missing: 0 });
+});

@@ -1,0 +1,7 @@
+---
+// Dibuja el ícono de una red: trazo SVG propio (`svg`) o clase de Font Awesome (`icon`).
+const { s } = Astro.props;
+---
+{s.svg
+  ? <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="inline-block h-[1em] w-[1em] align-[-0.125em]"><path d={s.svg} /></svg>
+  : <i class={s.icon}></i>}

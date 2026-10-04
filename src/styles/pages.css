@@ -1,0 +1,23 @@
+/* CAPA 5 · PÁGINAS — estilos que solo usa UNA página. */
+.stat-pill { display: flex; justify-content: space-between; font-size: .65rem; font-family: var(--font-display); letter-spacing: .05em; }
+.pitch-lines { background-image: linear-gradient(rgba(128,0,255,.15) 1px, transparent 1px); background-size: 100% 25%; }
+.toggle-btn[aria-pressed='true'] { background: var(--color-galaxy-600); border-color: var(--color-galaxy-400); color: #fff; }
+.tab-btn[aria-selected='true'] { background: var(--color-galaxy-600); color: #fff; box-shadow: 0 0 10px rgba(128, 0, 255, 0.4); }
+
+/* ---------- Duelos v2 ---------- */
+.chip { min-height: 44px; padding: 0 .9rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: var(--color-galaxy-900); color: #cbd5e1; font-family: var(--font-display); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; transition: all .15s; }
+.chip:hover:not(:disabled) { border-color: var(--color-galaxy-400); color: #fff; }
+.chip:disabled { opacity: .35; cursor: not-allowed; }
+.chip[aria-pressed='true'] { background: var(--color-galaxy-600); border-color: var(--color-galaxy-400); color: #fff; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: .25rem; padding: .25rem; background: #05020a; border: 1px solid var(--color-galaxy-border); border-radius: .75rem; }
+.seg > button { min-height: 44px; border-radius: .5rem; color: #9ca3af; font-weight: 700; font-size: .8rem; font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
+.seg > button[aria-pressed='true'] { background: var(--color-galaxy-600); color: #fff; box-shadow: 0 0 12px rgba(128,0,255,.45); }
+.seg > button:disabled { opacity: .35; cursor: not-allowed; }
+.notif-item { display: flex; gap: .75rem; padding: .75rem 1rem; border-bottom: 1px solid var(--color-galaxy-line); }
+.notif-item.is-new { background: rgba(0,229,255,.06); border-left: 2px solid var(--color-galaxy-400); }
+.notif-item:hover { background: rgba(255,255,255,.04); }
+.holo-wrap { position: fixed; inset: 0; z-index: 900; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(2,0,8,.7); backdrop-filter: blur(4px); }
+.holo-card { position: relative; width: 100%; max-width: 24rem; padding: 1.5rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--color-galaxy-400); background: linear-gradient(160deg, rgba(0,229,255,.12), rgba(128,0,255,.18)), #0a0418; box-shadow: 0 0 40px rgba(0,229,255,.35), inset 0 0 30px rgba(128,0,255,.25); animation: float 3.5s ease-in-out infinite; }
+.holo-scan { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-galaxy-400), transparent); animation: holo-scan 2.2s linear infinite; opacity: .7; }
+@keyframes holo-scan { from { top: 0; } to { top: 100%; } }
+@media (prefers-reduced-motion: reduce) { .holo-card, .holo-scan { animation: none; } }

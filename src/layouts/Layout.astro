@@ -1,0 +1,40 @@
+---
+// PLANTILLA ÚNICA. Cabecera, ticker, menú y pie existen SOLO aquí.
+import '@fontsource/rajdhani/500.css';
+import '@fontsource/rajdhani/600.css';
+import '@fontsource/rajdhani/700.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/600.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Ticker from '../components/Ticker.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Footer from '../components/Footer.astro';
+
+const { title, active = '', description = 'Phoenix Evolution Series — la liga competitiva de PES 2021 y SP Football Life 2026.' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | Phoenix Evolution Series</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#03010f" />
+    <link rel="icon" type="image/png" href={`${base}favicon.png`} />
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <div class="sticky top-0 z-50 flex flex-col shadow-[0_4px_30px_rgba(128,0,255,0.15)]">
+      <Header active={active} />
+      <Ticker />
+    </div>
+    <Sidebar active={active} />
+    <main class="flex-grow w-full"><slot /></main>
+    <Footer />
+    <script>
+      import '../js/boot.js';
+    </script>
+  </body>
+</html>

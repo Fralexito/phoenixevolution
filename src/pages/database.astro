@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Jugadores" active="database">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-galaxy-line pb-6 gap-4">
+      <div>
+        <span class="text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2.5 py-1 rounded border border-galaxy-400/30 inline-block mb-2">REGISTRO OFICIAL</span>
+        <h1 class="text-3xl font-display font-bold text-white uppercase tracking-widest text-shadow-glow">JUGADORES</h1>
+        <p class="text-gray-400 text-sm mt-1">Base de datos global: registro oficial de estadísticas y valoraciones.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+        <button id="btn-add-player" type="button" hidden class="btn btn-primary shrink-0"><i class="fa-solid fa-plus"></i> Añadir Jugador</button>
+        <div class="flex gap-3 w-full sm:w-auto">
+          <select id="player-filter-select" aria-label="Filtrar por equipo" class="field !w-1/2 sm:!w-auto"><option value="ALL">Todos los Equipos</option></select>
+          <div class="relative w-1/2 sm:w-48">
+            <input id="player-search-input" type="search" placeholder="Buscar jugador..." aria-label="Buscar jugador" class="field !pl-8" />
+            <i class="fa-solid fa-search absolute left-3 top-3 text-gray-500 text-xs"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="players-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-2">
+      <div class="col-span-full text-center py-10 text-gray-400 text-sm flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-galaxy-400 mb-3"></i> Descargando registros de la liga...</div>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/database.js';
+</script>

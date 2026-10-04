@@ -1,0 +1,19 @@
+/* CAPA 2 · BASE — estilos del documento (sin clases de componentes). */
+html { background-color: var(--color-galaxy-dark); }
+body {
+  background-color: var(--color-galaxy-dark);
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(128, 0, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--color-galaxy-100);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+::selection { background: var(--color-galaxy-600); color: #fff; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-galaxy-dark); }
+::-webkit-scrollbar-thumb { background: var(--color-galaxy-600); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-galaxy-400); }
+button { cursor: pointer; }

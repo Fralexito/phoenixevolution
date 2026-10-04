@@ -1,0 +1,9 @@
+/* CAPA 3 · LAYOUT — estructura global (cabecera, menú lateral, ticker). */
+.sidebar-panel { transition: transform .3s ease; }
+.ticker-track { display: inline-block; white-space: nowrap; }
+/* El ticker SIEMPRE avanza (es parte del diseño). Antes lo congelábamos si Windows tenía las animaciones
+   desactivadas (prefers-reduced-motion) y por eso se veía quieto. Se pausa al pasar el mouse para poder leerlo. */
+.ticker-track:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-float { animation: none; }
+}
