@@ -6,7 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   site: 'https://fralexito.github.io',
-  base: '/phoenixevolution',
+  // PES_BASE solo la usa la vista previa (/phoenixevolution/borrador); sin ella, la web oficial.
+  base: process.env.PES_BASE || '/phoenixevolution',
   trailingSlash: 'always',
   vite: { plugins: [tailwindcss()] },
 });

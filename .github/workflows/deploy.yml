@@ -1,7 +1,11 @@
 name: Desplegar a GitHub Pages
+# Publica DOS cosas en el mismo sitio:
+#   · /phoenixevolution/            → la rama `main`      (web oficial)
+#   · /phoenixevolution/borrador/   → la rama `borrador`  (vista previa para probar en el celular; no sale en Google)
+# Se ejecuta al subir cambios a cualquiera de las dos ramas, y siempre reconstruye ambas.
 on:
   push:
-    branches: [main]
+    branches: [main, borrador]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,16 +18,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Oficial (main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: oficial
+      - name: Vista previa (borrador)
+        uses: actions/checkout@v4
+        with:
+          ref: borrador
+          path: previa
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+      - name: Compilar oficial
+        working-directory: oficial
+        run: npm ci && npm run build
+      - name: Compilar vista previa
+        working-directory: previa
+        env:
+          PES_BASE: /phoenixevolution/borrador
+          PUBLIC_PREVIEW: "1"
+        run: npm ci && npm run build
+      - name: Juntar ambas
+        run: |
+          mkdir site
+          cp -r oficial/dist/. site/
+          mkdir site/borrador
+          cp -r previa/dist/. site/borrador/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
   deploy:
     needs: build
     runs-on: ubuntu-latest

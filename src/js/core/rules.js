@@ -21,3 +21,16 @@ export function cooldownInfo(profile, now = new Date()) {
   const until = new Date(new Date(profile.username_changed_at).getTime() + USERNAME_COOLDOWN_DAYS * DAY_MS);
   return Number.isNaN(until.getTime()) || now >= until ? { blocked: false, until: null } : { blocked: true, until };
 }
+
+// ---- Sistema Host ----
+/** Velocidades de subida que se ofrecen (Mbps). Se guardan como número en perfiles.ancho_banda_mbps (1–10000). */
+export const SPEED_BUCKETS = [
+  { v: 25, label: '−50' }, { v: 100, label: '100' }, { v: 300, label: '300' }, { v: 500, label: '500' }, { v: 1000, label: '+500' },
+];
+/** Cualquier valor guardado (incluidos los antiguos 5, 10, 50…) → el grupo más cercano hacia abajo. null si no hay dato. */
+export function speedBucket(mbps) {
+  const n = Number(mbps); if (!Number.isFinite(n) || n <= 0) return null;
+  if (n < 100) return 25; if (n < 300) return 100; if (n < 500) return 300; if (n === 500) return 500; return 1000;
+}
+export const JUEGOS = ['PES 2021', 'SP Football Life'];
+export const SP_VERSIONES = ['25', '26', '27'];   // «Otra» se escribe a mano (≤ 20 caracteres) [BD] perfiles_sp_version_ok

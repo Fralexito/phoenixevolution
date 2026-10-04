@@ -84,3 +84,7 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Duelos**: sin pestañas. `#col-mis` (Mis partidos) y `#col-radar` (Retos en el radar) siempre visibles: lado a lado en ≥1280px, uno bajo otro en pantallas medianas, y en móvil dentro de la vista «Partidos».
 - **Menú de 3 rayas**: en PC (≥1024px) solo existe con sesión (`html[data-sesion]`, regla en `components.css`) y solo muestra «Mi cuenta». En móvil queda el menú completo.
 - **Login en localhost**: Supabase solo vuelve a URLs permitidas. Dashboard → Authentication → URL Configuration → Redirect URLs: añadir `http://localhost:4321/**` y `https://fralexito.github.io/phoenixevolution/**`. Si falta la de localhost, te manda al Site URL (la web publicada = `main`).
+
+## Ronda 7 — Host nuevo + vista previa en internet
+- **Sistema Host**: juego `PES 2021 | SP Football Life` (migración 007). Parche solo con PES 2021; con SP aparece «Versión (opcional)» 25/26/27/Otra (`host_sp_version`); velocidad en 5 grupos −50/100/300/500/+500 (`SPEED_BUCKETS`, valores antiguos se agrupan con `speedBucket`); nota libre `host_notas` (≤300).
+- **Vista previa**: `.github/workflows/deploy.yml` publica `main` en `/phoenixevolution/` y `borrador` en `/phoenixevolution/borrador/` (con `noindex`). Requiere una vez: Settings → Environments → github-pages → Deployment branches → añadir `borrador`. Y en Supabase → Redirect URLs: `https://fralexito.github.io/phoenixevolution/borrador/**`.

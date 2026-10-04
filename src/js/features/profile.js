@@ -4,16 +4,14 @@ import { supabase } from '../core/supabase.js';
 import { getState, refreshProfile } from '../core/session.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeUrl, toUsername } from '../core/dom.js';
-import { cooldownInfo, USERNAME_COOLDOWN_DAYS } from '../core/rules.js';
+import { cooldownInfo, USERNAME_COOLDOWN_DAYS, SPEED_BUCKETS, speedBucket, JUEGOS, SP_VERSIONES } from '../core/rules.js';
 import { PAISES } from '../../data/paises.js';
 import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from './avatarPicker.js';
 import { toast } from '../core/toast.js';
 import { switchHTML, segHTML, bindSeg } from './formControls.js';
 import { bindHandle } from './handleCheck.js';
 
-const SPEEDS = [5, 10, 25, 50, 100, 300];                       // Mbps de subida (atajos)
 const PLATAFORMAS = ['Ambos', 'Smash Soda', 'Parsec'];
-const JUEGOS = ['PES 2021', 'SP Football Life 2026'];
 
 export function openProfileModal() {
   const { session, profile: p } = getState();
@@ -24,10 +22,12 @@ export function openProfileModal() {
   const fechaCd = cd.until?.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
 
   // Estado local del formulario (se guarda todo junto al pulsar "Guardar").
-  let speed = prof.ancho_banda_mbps ?? null;
+  let speed = speedBucket(prof.ancho_banda_mbps);
   let soft = PLATAFORMAS.includes(prof.software_host) ? prof.software_host : 'Ambos';
   let game = JUEGOS.includes(prof.host_juego) ? prof.host_juego : JUEGOS[0];
-  const speeds = [...new Set([...SPEEDS, ...(speed ? [speed] : [])])].sort((a, b) => a - b);
+  // Versión de SP Football Life (opcional): '' = sin indicar · '25'/'26'/'27' · 'otra' (texto libre).
+  const verGuardada = prof.host_sp_version || '';
+  let ver = !verGuardada ? '' : SP_VERSIONES.includes(verGuardada) ? verGuardada : 'otra';
 
   const m = openModal(`
     <form id="prof-form" class="p-6 space-y-5" novalidate>
@@ -66,12 +66,22 @@ export function openProfileModal() {
           <div>
             <span class="label">Velocidad de subida (Mbps)</span>
             <div class="seg" id="p-speed" role="group" aria-label="Velocidad de subida en Mbps">
-              ${speeds.map((v) => `<button type="button" data-v="${v}" aria-pressed="${v === speed}">${v}</button>`).join('')}
+              ${SPEED_BUCKETS.map((b) => `<button type="button" data-v="${b.v}" aria-pressed="${b.v === speed}">${b.label}</button>`).join('')}
             </div>
           </div>
           <div><span class="label">Plataforma</span>${segHTML({ id: 'p-soft', options: PLATAFORMAS.map((v) => ({ v, label: v })), current: soft, label: 'Plataforma' })}</div>
           <div><span class="label">Juego</span>${segHTML({ id: 'p-game', options: JUEGOS.map((v) => ({ v, label: v })), current: game, label: 'Juego' })}</div>
-          <div><label class="label" for="p-patch">Parche / Option File</label><input id="p-patch" class="field" maxlength="80" value="${escapeHTML(prof.host_parche)}"></div>
+          <div id="f-patch"><label class="label" for="p-patch">Parche</label><input id="p-patch" class="field" maxlength="80" value="${escapeHTML(prof.host_parche)}"></div>
+          <div id="f-ver" hidden>
+            <span class="label">Versión <span class="text-gray-500 normal-case">(opcional)</span></span>
+            <div class="seg" id="p-ver" role="group" aria-label="Versión de SP Football Life">
+              ${SP_VERSIONES.map((v) => `<button type="button" data-v="${v}" aria-pressed="${v === ver}">${v}</button>`).join('')}
+              <button type="button" data-v="otra" aria-pressed="${ver === 'otra'}">Otra</button>
+            </div>
+            <input id="p-ver-otra" class="field mt-2" maxlength="20" placeholder="¿Cuál? (ej. 24)" value="${ver === 'otra' ? escapeHTML(verGuardada) : ''}" ${ver === 'otra' ? '' : 'hidden'}>
+            <p class="text-[11px] text-gray-500 mt-1">Toca de nuevo la versión elegida para quitarla.</p>
+          </div>
+          <div><label class="label" for="p-hnotas">Aclaraciones sobre tu host <span class="text-gray-500 normal-case">(opcional)</span></label><textarea id="p-hnotas" class="field" rows="3" maxlength="300" placeholder="Horarios, ping, reglas de tu sala…">${escapeHTML(prof.host_notas)}</textarea></div>
         </div>
       </div>
 
@@ -101,7 +111,12 @@ export function openProfileModal() {
   syncHost(); $('#p-host').addEventListener('change', syncHost);
   bindSeg($('#p-speed'), (v) => { speed = Number(v); });
   bindSeg($('#p-soft'), (v) => { soft = v; });
-  bindSeg($('#p-game'), (v) => { game = v; });
+  const syncJuego = () => { $('#f-patch').hidden = game !== 'PES 2021'; $('#f-ver').hidden = game === 'PES 2021'; };
+  bindSeg($('#p-game'), (v) => { game = v; syncJuego(); });
+  syncJuego();
+  // Versión opcional: tocar la elegida otra vez la quita.
+  const pintarVer = () => { m.querySelectorAll('#p-ver button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === ver))); $('#p-ver-otra').hidden = ver !== 'otra'; };
+  $('#p-ver').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (!b) return; ver = ver === b.dataset.v ? '' : b.dataset.v; pintarVer(); if (ver === 'otra') $('#p-ver-otra').focus(); });
 
   /* ---- Guardar ---- */
   $('#prof-form').addEventListener('submit', async (ev) => {
@@ -125,7 +140,10 @@ export function openProfileModal() {
         club_favorito: $('#p-club').value.trim().replace(/[<>]/g, ''),
         bio: $('#p-bio').value.trim(), discord_tag: $('#p-disc').value.trim(), stream_url: stream,
         puede_hostear: $('#p-host').checked, ancho_banda_mbps: speed,
-        software_host: soft, host_juego: game, host_parche: $('#p-patch').value.trim(),
+        software_host: soft, host_juego: game,
+        host_parche: $('#p-patch').value.trim(),
+        host_sp_version: game === 'PES 2021' || !ver ? null : (ver === 'otra' ? $('#p-ver-otra').value.trim().replace(/[<>]/g, '').slice(0, 20) || null : ver),
+        host_notas: $('#p-hnotas').value.trim().replace(/[<>]/g, ''),
       };
       if (cambia) patch.username = username;
       const nuevaFoto = await resolveAvatar(picker.get(), uid);

@@ -23,6 +23,7 @@ const base = import.meta.env.BASE_URL;
     <title>{title} | Phoenix Evolution Series</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#03010f" />
+    {import.meta.env.PUBLIC_PREVIEW && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href={`${base}favicon.png`} />
   </head>
   <body class="flex flex-col min-h-screen">
