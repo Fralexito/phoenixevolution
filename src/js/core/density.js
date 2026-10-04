@@ -7,6 +7,8 @@ export const NIVELES = {
 };
 const cfg = (movil) => (movil ? NIVELES.movil : NIVELES.pc);
 
+/** Tamaño predeterminado de la lista (el que se restablece con el botón del medio). */
+export const nivelPorDefecto = (movil) => cfg(movil).def;
 /** Nivel dentro del rango; si no es un número (dato corrupto o ausente) usa el nivel por defecto. */
 export function nivelValido(n, movil) {
   const c = cfg(movil); const v = n == null || n === '' ? NaN : Math.round(Number(n));

@@ -42,7 +42,7 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = 
     <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-galaxy-400 to-transparent opacity-60 z-10"></div>
     <span class="pc-sheen" aria-hidden="true"></span>
     <div class="pc-in relative z-10">
-      <div class="relative" style="aspect-ratio:1.7">
+      <div class="relative" style="aspect-ratio:1.3">
         <div class="pc-badges">
           <span class="pc-ovr text-shadow-glow">${stat(p.ovr, 0) || '--'}</span>
           <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}26" class="pc-pos">${escapeHTML(p.posicion)}</span>

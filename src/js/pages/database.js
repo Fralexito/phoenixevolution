@@ -10,7 +10,7 @@ import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
 import { MAX_COMPARE } from '../core/compare.js';
 import { norm } from '../core/search.js';
-import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo } from '../core/density.js';
+import { nivelPorDefecto, nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo } from '../core/density.js';
 import { rankPlayers } from '../core/ranking.js';
 import { agruparPorEstilo, agruparPorNivel, ordenar, statsLiga, CRITERIOS } from '../core/destacados.js';
 import { montarReconocimientos } from '../features/reconocimientos.js';
@@ -147,8 +147,12 @@ function aplicarZoom() {
   const box = $('players-container');
   box.style.gridTemplateColumns = `repeat(auto-fill, minmax(${anchoMinimo(nivel, m)}px, 1fr))`; box.style.gap = `${separacion(nivel, m)}rem`; box.dataset.denso = String(esDenso(nivel, m));
   $('dens-mas').disabled = nivel === 0; $('dens-menos').disabled = esUltimo(nivel, m);
+  $('dens-reset').disabled = nivel === nivelPorDefecto(m);          // ya está en el tamaño predeterminado: nada que restablecer
 }
 const moverZoom = (d) => { nivel = cambiarNivel(nivel, d, esMovil()); try { localStorage.setItem(claveZoom(), String(nivel)); } catch { /* sin almacenamiento: solo no se recuerda */ } aplicarZoom(); };
+const restablecerZoom = () => { nivel = nivelPorDefecto(esMovil()); try { localStorage.removeItem(claveZoom()); } catch { /* sin almacenamiento */ } aplicarZoom(); };
+$('dens-reset').addEventListener('click', restablecerZoom);
+document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === '0' && !e.target.closest('input, textarea, select')) { e.preventDefault(); restablecerZoom(); } });   // Ctrl + 0, como en el navegador
 $('dens-menos').addEventListener('click', () => moverZoom(1));    // alejar: tarjetas más pequeñas
 $('dens-mas').addEventListener('click', () => moverZoom(-1));     // acercar: tarjetas más grandes
 // Ctrl + rueda sobre la lista (PC): acerca/aleja igual que en el explorador de archivos.

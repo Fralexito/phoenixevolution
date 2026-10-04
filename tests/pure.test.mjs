@@ -624,3 +624,9 @@ test('copa: validación de resultados y lectura de filas', () => {
   assert.equal(validarResultadoCopa({ ga: '1', gb: '1', pa: '3', pb: '3' }).ok, false); assert.equal(validarResultadoCopa({ ga: '1', gb: '1', pa: '3' }).ok, false);
   assert.deepEqual(resultadosDesdeFilas([{ cruce: 'R1-P1', ga: 2, gb: 1, pa: null, pb: null }, { cruce: 'R1-P2', ga: null, gb: null }, null]), { 'R1-P1': { ga: 2, gb: 1 } }); assert.deepEqual(resultadosDesdeFilas(undefined), {});
 });
+
+test('zoom: el tamaño predeterminado es el nivel por defecto de cada pantalla', async () => {
+  const d = await import('../src/js/core/density.js');
+  assert.equal(d.nivelPorDefecto(false), 2); assert.equal(d.nivelPorDefecto(true), 1);
+  assert.equal(d.cambiarNivel(d.cambiarNivel(2, 3, false), -3, false), 2); assert.equal(d.nivelValido(d.nivelPorDefecto(false), false), 2);
+});

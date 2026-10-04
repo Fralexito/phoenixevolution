@@ -153,15 +153,15 @@
 .pc-badges { position: absolute; left: .9em; bottom: .5em; display: flex; align-items: flex-end; gap: .6em; }
 .pc-ovr { font-family: var(--font-display); font-weight: 800; font-size: 3em; line-height: 1; letter-spacing: -.05em; color: #fff; }
 .pc-pos { font-family: var(--font-display); font-weight: 800; font-size: 1.05em; text-transform: uppercase; letter-spacing: .12em; padding: .1em .5em; border-radius: .3em; border: 1px solid; margin-bottom: .2em; }
-.pc-info { padding: .3em .85em .8em; }
-.pc-head { border-bottom: 1px solid color-mix(in srgb, var(--color-galaxy-border) 80%, transparent); padding-bottom: .45em; text-shadow: 0 1px 6px #000; }
+.pc-info { padding: .45em .9em .9em; }
+.pc-head { border-bottom: 1px solid color-mix(in srgb, var(--color-galaxy-border) 80%, transparent); padding-bottom: .55em; text-shadow: 0 1px 6px #000; }
 .pc-name { font-family: var(--font-display); font-weight: 700; font-size: 1.4em; line-height: 1.2; color: #fff; text-transform: uppercase; letter-spacing: .06em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pc-apodo { display: inline-block; max-width: 100%; padding: .1em .65em; border-radius: 999px; font-size: .9em; font-weight: 800; letter-spacing: .05em; line-height: 1.35; color: #fff; text-transform: none; text-shadow: 0 1px 4px #000;
   background: linear-gradient(90deg, rgb(128 0 255 / .6), rgb(0 229 255 / .38)); border: 1px solid rgb(0 229 255 / .6); box-shadow: 0 0 .9em rgb(0 229 255 / .35); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: top; }
 .pc-sub { display: flex; flex-wrap: wrap; align-items: center; gap: .3em .7em; margin-top: .3em; }
 .pc-club { text-transform: uppercase; display: flex; align-items: center; gap: .45em; min-width: 0; font-size: 1em; font-weight: 700; color: #fff; letter-spacing: .02em; }
 .pc-club i { font-size: .95em; filter: drop-shadow(0 0 .35em rgb(0 229 255 / .7)); }
-.pc-stats { margin-top: .55em; display: grid; grid-template-columns: repeat(3, max-content); justify-content: space-evenly; gap: .35em .5em; padding: .5em .5em; font-variant-numeric: tabular-nums; background: rgb(0 0 0 / .45); border: 1px solid color-mix(in srgb, var(--color-galaxy-border) 60%, transparent); border-radius: .6em; font-size: .95em; }
+.pc-stats { margin-top: .65em; display: grid; grid-template-columns: repeat(3, max-content); justify-content: space-evenly; gap: .5em .55em; padding: .65em .55em; font-variant-numeric: tabular-nums; background: rgb(0 0 0 / .45); border: 1px solid color-mix(in srgb, var(--color-galaxy-border) 60%, transparent); border-radius: .6em; font-size: .95em; }
 .pc-stats > div { display: flex; justify-content: flex-start; align-items: center; gap: .4em; }   /* la sigla y su número van juntos (antes quedaban en extremos opuestos) */
 .pc-stats > div > .pc-k { min-width: 2.1em; }
 .pc-stats > div > span:last-child { min-width: 1.45em; text-align: left; }
@@ -175,6 +175,7 @@
 .dens-btn { width: 1.75rem; height: 1.75rem; display: inline-flex; align-items: center; justify-content: center; border-radius: .4rem; font-size: .7rem; color: inherit; transition: color .2s, background .2s; }
 .dens-btn:hover:not(:disabled), .dens-btn:focus-visible { color: #fff; background: rgb(255 255 255 / .07); outline: none; }
 .dens-btn:disabled { opacity: .3; cursor: default; }
+.dens-btn.dens-reset { width: auto; padding: 0 .45rem; gap: .35rem; font-size: .62rem; font-family: var(--font-display); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 #players-container[data-denso='true'] .cmp-btn, #players-container[data-denso='true'] .card-menu-btn { width: 22px !important; height: 22px !important; top: .3rem; font-size: .6rem; }
 #players-container[data-denso='true'] .cmp-btn { left: .3rem; } #players-container[data-denso='true'] .cmp-btn.perfil-btn { top: 1.7rem; } #players-container[data-denso='true'] .card-menu-btn { right: .3rem; }
 
@@ -187,7 +188,7 @@
 .adv-strip b { color: #00e5ff; } .adv-prom b { color: #ffd700; }
 .adv-seg { padding: .15rem; gap: .1rem; border-radius: .5rem; } .adv-seg > button { min-height: 1.6rem !important; padding: 0 .5rem; font-size: .65rem; border-radius: .35rem; }
 /* Físico (altura · peso · pie): fila visible entre el nombre y las stats. */
-.pc-fis { display: flex; flex-wrap: wrap; gap: .3em; margin-top: .45em; }
+.pc-fis { display: flex; flex-wrap: wrap; gap: .3em; margin-top: .55em; }
 .pc-chip { display: inline-flex; align-items: center; gap: .4em; padding: .2em .7em; border-radius: 999px; font-size: 1em; font-weight: 700; color: #e0f7ff; background: rgb(0 229 255 / .12); border: 1px solid rgb(0 229 255 / .4); text-shadow: none; white-space: nowrap; }
 .pc-chip i { color: var(--color-galaxy-400); font-size: .9em; }
 .pc-chip.pc-chip-pie { color: #ffe8f3; background: rgb(255 0 128 / .14); border-color: rgb(255 0 128 / .5); } .pc-chip.pc-chip-pie i { color: #ff4da6; }
