@@ -3,6 +3,7 @@ import { escapeHTML, safeImg, stat, statColor } from '../core/dom.js';
 import { posInfo } from '../../data/posiciones.js';
 import { ratioDe } from '../core/crop.js';
 import { fisicoPartes } from '../core/fisico.js';
+import { nivelDe } from '../core/destacados.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -33,14 +34,15 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = 
   // La foto es una CAPA detrás de todo (proporción elegida). Un separador 5:4 reserva la zona de la foto y el contenido va encima:
   // con proporción «larga» la foto baja por detrás del nombre y las estadísticas sin agrandar la tarjeta.
   return `
-  <article class="${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
+  <article data-nivel="${nivelDe(p.ovr).id}" class="${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
     <div data-foto-caja style="aspect-ratio:${ratioDe(p.foto_aspecto)}" class="absolute inset-x-0 top-0 bg-black/40 overflow-hidden">
       ${foto}
       <div class="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-galaxy-deep via-galaxy-deep/70 to-transparent pointer-events-none"></div>
     </div>
     <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-galaxy-400 to-transparent opacity-60 z-10"></div>
+    <span class="pc-sheen" aria-hidden="true"></span>
     <div class="pc-in relative z-10">
-      <div class="relative" style="aspect-ratio:1.25">
+      <div class="relative" style="aspect-ratio:1.7">
         <div class="pc-badges">
           <span class="pc-ovr text-shadow-glow">${stat(p.ovr, 0) || '--'}</span>
           <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}26" class="pc-pos">${escapeHTML(p.posicion)}</span>
@@ -49,8 +51,10 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = 
       <div class="pc-info">
         <div class="pc-head">
           <h3 class="pc-name">${escapeHTML(p.nombre)}</h3>
-          ${p.apodo ? `<div><span class="pc-apodo" title="Apodo">«${escapeHTML(p.apodo)}»</span></div>` : ''}
-          <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
+          <div class="pc-sub">
+            <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
+            ${p.apodo ? `<span class="pc-apodo" title="Apodo">«${escapeHTML(p.apodo)}»</span>` : ''}
+          </div>
         </div>
         ${fisicoHTML(p)}
         <div class="pc-stats">${stats}</div>
