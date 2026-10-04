@@ -27,7 +27,7 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
       <div class="flex justify-between items-start">
         <div class="flex flex-col">
           <span class="text-4xl font-display font-extrabold text-white tracking-tighter text-shadow-glow">${stat(p.ovr, 0) || '--'}</span>
-          <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}1f" class="text-[11px] font-display font-bold uppercase tracking-widest px-2 py-0.5 rounded border w-fit mt-1">${escapeHTML(p.posicion)}</span>
+          <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color}" class="text-[11px] font-display font-bold uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30 w-fit mt-1">${escapeHTML(p.posicion)}</span>
         </div>
         <div class="w-12 h-12 rounded-full border-2 border-galaxy-400/50 bg-galaxy-panel overflow-hidden flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.3)]">${avatar}</div>
       </div>

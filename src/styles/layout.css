@@ -1,16 +1,13 @@
 /* CAPA 3 · LAYOUT — estructura global (cabecera, menú lateral, ticker). */
 .sidebar-panel { transition: transform .3s ease; }
-.ticker-track { display: inline-flex; white-space: nowrap; will-change: transform; animation: ticker-scroll var(--ticker-dur, 60s) linear infinite; }
-.ticker-group { display: inline-flex; flex: none; align-items: center; }
-/* Avanza exactamente el ancho de UN grupo y reinicia: como hay copias idénticas, el salto no se nota. */
-@keyframes ticker-scroll { to { transform: translateX(calc(var(--ticker-shift, 50%) * -1)); } }
+/* Una noticia a la vez: nace fuera de la pantalla (derecha) y features/ticker.js la desplaza con Web Animations. */
+.ticker-item { position: absolute; left: 0; white-space: nowrap; will-change: transform; transform: translateX(100vw); }
 /* Al bajar la página el ticker se esconde detrás de la cabecera; al subir, vuelve. No cambia el alto del
    contenedor, así que la página no "salta". El JS solo alterna data-oculto (features/ticker.js). */
 .ticker-wrap { transition: transform .35s ease, visibility 0s linear 0s; }
 .ticker-wrap[data-oculto='true'] { transform: translateY(-100%); visibility: hidden; transition: transform .35s ease, visibility 0s linear .35s; }
-/* El ticker SIEMPRE avanza (es parte del diseño). Antes lo congelábamos si Windows tenía las animaciones
-   desactivadas (prefers-reduced-motion) y por eso se veía quieto. Se pausa al pasar el mouse para poder leerlo. */
-.ticker-track:hover { animation-play-state: paused; }
+/* El ticker SIEMPRE avanza (es parte del diseño; antes lo congelábamos con prefers-reduced-motion y se veía quieto).
+   Se pausa al pasar el mouse o tocarlo para poder leer (features/ticker.js). */
 @media (prefers-reduced-motion: reduce) {
   .animate-float { animation: none; }
 }

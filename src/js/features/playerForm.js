@@ -8,7 +8,7 @@ import { cropSquareJpeg } from '../core/image.js';
 import { clampStat, calcOvr } from '../core/stats.js';
 import { toast } from '../core/toast.js';
 import { STAT_INFO } from '../../data/stats.js';
-import { POSICIONES, GRUPOS, posInfo } from '../../data/posiciones.js';
+import { POSICIONES, posInfo } from '../../data/posiciones.js';
 import { STAT_KEYS } from './playerCard.js';
 
 const LEYENDA_VACIA = 'Toca o desliza una estadística y aquí te explicamos qué significa.';
@@ -63,7 +63,6 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
           ${POSICIONES.map((x) => { const i = posInfo(x.cod); return `<button type="button" class="chip pos-chip !px-0" data-pos="${x.cod}" style="--pc:${i.color}" title="${escapeHTML(i.nombre)}" aria-label="${escapeHTML(i.nombre)}" aria-pressed="${x.cod === (p.posicion ?? 'DC')}">${x.cod}</button>`; }).join('')}
         </div>
         <p id="pos-cap" class="text-[12px] mt-1.5 min-h-5" aria-live="polite"></p>
-        <p class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px] text-gray-500">${Object.values(GRUPOS).map((g) => `<span><i class="inline-block w-2 h-2 rounded-full mr-1" style="background:${g.color}"></i>${g.nombre}</span>`).join('')}</p>
       </div>
 
       ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button></div>` })}

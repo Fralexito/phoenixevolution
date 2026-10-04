@@ -103,3 +103,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Stats** más compactas (~60px por stat en vez de ~118px).
 - **Comparador por equipos** (`features/compare.js` + `core/compare.js`): 2 a 8 jugadores en Equipo A / Equipo B (máx. 4 cada uno; 3 vs 2, 4 vs 3…), se compara el PROMEDIO de cada equipo (radar + barras). Vista «Todos»: tabla con cada jugador y el mejor valor subrayado.
 - **Pulso en vivo**: en PC abajo a la derecha (móvil igual que antes). **Ticker**: más separación entre noticias y 40 px/s en celular.
+
+## Ronda 11 — Menos carga visual
+- **Posiciones**: solo las letras llevan color (el resto del botón/insignia es el estándar); sin mini leyenda.
+- **Comparación 1 vs 1** (`features/compare.js`): vuelve el diseño de la ronda 9 (dos selectores, cabecera, resumen); radar / estadísticas / perfil van en pestañas para bajar menos. **Comparación masiva** (`features/compareMasivo.js`): botón aparte; resultado en mini secciones (Resumen · Radar · Estadísticas · Tabla), una abierta a la vez.
+- **Última hora**: una noticia a la vez cruza la barra (75 px/s en PC, 32 en celular) y hay una pausa (2.5 s / 2 s) antes de la siguiente. Se pausa al pasar el mouse o tocar.

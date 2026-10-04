@@ -6,6 +6,7 @@ import { toast } from '../core/toast.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
+import { openCompareMasivo } from '../features/compareMasivo.js';
 import { MAX_COMPARE } from '../core/compare.js';
 
 const $ = (id) => document.getElementById(id);
@@ -32,7 +33,8 @@ function paint() {
 function paintBar() {
   const bar = $('cmp-bar'); bar.hidden = !sel.length;
   $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige al menos otro` : `${sel.length} jugadores seleccionados`;
-  $('cmp-go').disabled = sel.length < 2;
+  $('cmp-go').disabled = sel.length !== 2;      // 1 vs 1 solo con exactamente 2
+  $('cmp-masivo').disabled = sel.length < 2;
 }
 
 function fillClubs() {
@@ -55,8 +57,10 @@ async function load() {
 
 $('player-filter-select').addEventListener('change', (e) => { club = e.target.value; paint(); });
 $('player-search-input').addEventListener('input', (e) => { term = e.target.value; paint(); });
-$('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel)));
-$('cmp-go').addEventListener('click', () => openCompare(all, sel));
+$('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel[0], sel[1])));
+$('btn-masivo').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompareMasivo(all, sel)));
+$('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1]));
+$('cmp-masivo').addEventListener('click', () => openCompareMasivo(all, sel));
 $('cmp-clear').addEventListener('click', () => { sel.length = 0; paint(); });
 $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 $('players-container').addEventListener('click', async (e) => {
