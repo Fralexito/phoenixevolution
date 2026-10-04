@@ -1,21 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
+import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 const base = import.meta.env.BASE_URL;
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA ÚNICA y compacta: qué es la liga + el siguiente paso según tengas sesión o no -->
-  <header class="group relative overflow-hidden py-14 sm:py-20 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40">
-    <!-- Espacio exterior: se acerca despacio al pasar el mouse -->
-    <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1600&auto=format&fit=crop" alt="" loading="eager" class="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
-    <div class="absolute inset-0 bg-gradient-to-b from-galaxy-dark/70 via-galaxy-900/40 to-galaxy-dark"></div>
+  <header class="relative overflow-hidden py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40">
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="max-w-4xl mx-auto text-center relative z-10 space-y-4 sm:space-y-5">
       <span class="inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
       <h1 class="text-3xl sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase tracking-wider leading-tight">
-        EL CIRCO MÁXIMO DE LA <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 via-galaxy-500 to-galaxy-600 text-shadow-glow">GALAXY LEAGUE</span>
+        PHOENIX EVOLUTION <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 via-galaxy-500 to-galaxy-600 text-shadow-glow">SERIES</span>
       </h1>
-      <p class="text-gray-200 text-sm sm:text-base max-w-2xl mx-auto">Comunidad competitiva de simulación futbolística: matchmaking punto a punto, hosting remoto, mercado de fichajes y honor sobre el campo virtual.</p>
+      <p class="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto">La casa de las ligas competitivas de simulación futbolística: matchmaking punto a punto, hosting remoto, mercado de fichajes y honor sobre el campo virtual.</p>
       <!-- Dos botones: el principal cambia según la sesión (sin cuenta: crear cuenta; con cuenta: la Sala de Duelos). «Jugadores» ya está en el menú. -->
       <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
         <button id="btn-hero-register" type="button" class="hero-cta hero-cta-p"><i class="fa-solid fa-user-plus"></i> Crear cuenta</button>
@@ -25,6 +23,29 @@ const base = import.meta.env.BASE_URL;
   </header>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full space-y-8 sm:space-y-10">
+
+    <!-- 1b. COMPETICIONES: un banner por liga (data/ligas.js). Con una sola liga ocupa todo el ancho; con varias, la primera es grande y el resto comparten la fila. -->
+    <section aria-label="Competiciones" class:list={['grid gap-4 sm:gap-6', LIGAS.length > 1 ? 'lg:grid-cols-2' : '']}>
+      {LIGAS.map((l, i) => (
+        <article class:list={['liga-card group', i === 0 && LIGAS.length > 1 ? 'lg:col-span-2' : '']}>
+          <div class="absolute inset-0 bg-gradient-to-r from-black via-galaxy-900/80 to-transparent z-10"></div>
+          <img src={l.imagen} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
+          <div class="relative z-20 p-6 sm:p-10 flex flex-col justify-center min-h-[260px] sm:min-h-[300px]">
+            <div class="flex items-center gap-3 mb-3">
+              <i class={`fa-solid ${l.icono} text-galaxy-400 text-3xl sm:text-4xl drop-shadow-[0_0_15px_rgba(0,229,255,0.8)] animate-float`}></i>
+              <span class:list={['liga-sello', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
+            </div>
+            <h2 class="text-4xl sm:text-6xl md:text-7xl font-display font-bold text-white mb-1 uppercase leading-none text-shadow-glow">{l.titulo[0]} <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">{l.titulo[1]}</span></h2>
+            <p class="text-base sm:text-2xl font-display font-light tracking-[0.25em] sm:tracking-[0.3em] text-gray-300 mb-5 uppercase">{l.juego}</p>
+            <div class="flex flex-wrap gap-3">
+              {l.acciones.map((a) => (
+                <a href={a.href.startsWith('#') ? a.href : `${base}${a.href}`} class:list={['liga-cta', a.primaria ? 'liga-cta-p' : '']}>{a.label}</a>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
 
     <!-- 2. PULSO DE LA COMUNIDAD: cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
     <section aria-label="Pulso de la comunidad" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
@@ -44,7 +65,7 @@ const base = import.meta.env.BASE_URL;
 
     <!-- 3. CENTRAL DE PARTIDOS (con el partido destacado dentro) + clasificación y XI al costado -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
-      <section class="lg:col-span-2 space-y-4">
+      <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
         <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
           <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
           <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">

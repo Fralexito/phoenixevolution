@@ -212,3 +212,12 @@ html[data-sesion='si'] #btn-hero-register { display: none; }
 .clip-thumb { width: 4.2rem; height: 2.7rem; flex: none; display: grid; place-items: center; border-radius: .5rem; color: #fff; background: linear-gradient(135deg, var(--color-galaxy-600), var(--color-galaxy-900)); font-size: .8rem; transition: transform .2s; }
 .clip-row:hover .clip-thumb { transform: scale(1.06); }
 .clip-tag { display: block; font-size: .6rem; letter-spacing: .1em; color: #f87171; font-family: var(--font-display); }
+
+/* Banner de liga (Central) */
+.liga-card { position: relative; overflow: hidden; border-radius: 1rem; background: var(--color-galaxy-panel); border: 1px solid var(--color-galaxy-border); box-shadow: 0 0 40px rgb(128 0 255 / .25); }
+.liga-sello { font-family: var(--font-display); font-weight: 700; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--color-galaxy-400); background: rgb(0 229 255 / .1); border: 1px solid rgb(0 229 255 / .35); padding: .2rem .65rem; border-radius: 999px; }
+.liga-sello-prox { color: #fbbf24; background: rgb(251 191 36 / .1); border-color: rgb(251 191 36 / .35); }
+.liga-cta { font-family: var(--font-display); font-weight: 700; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; padding: .7rem 1.5rem; border-radius: .5rem; color: #fff; background: rgb(0 0 0 / .5); border: 1px solid var(--color-galaxy-600); backdrop-filter: blur(8px); transition: border-color .2s, color .2s; }
+.liga-cta:hover { border-color: var(--color-galaxy-400); color: var(--color-galaxy-400); }
+.liga-cta-p { background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-700)); border-color: transparent; box-shadow: 0 0 20px rgb(128 0 255 / .5); }
+.liga-cta-p:hover { color: #fff; filter: brightness(1.15); }
