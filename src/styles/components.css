@@ -258,3 +258,4 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
 .liga-tabla tbody tr:hover { background: rgb(255 255 255 / .03); }
 .liga-tabla .liga-lider { background: linear-gradient(90deg, rgb(255 215 0 / .08), transparent 60%); }
 .liga-forma { width: 1.15rem; height: 1.15rem; display: inline-grid; place-items: center; border-radius: .3rem; font-family: var(--font-display); font-size: .6rem; font-weight: 800; }
+@media (min-width: 1024px) { .liga-tabla td { padding-top: .45rem; padding-bottom: .45rem; } }   /* en PC la tabla comparte fila con las fechas: filas más bajas para que todo se vea sin bajar */

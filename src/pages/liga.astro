@@ -58,7 +58,7 @@ const datos = LIGAS.map((l) => ({
         </div>
       </header>
 
-      <div class="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-10 space-y-8 sm:space-y-10 pb-20">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-10 space-y-8 sm:space-y-10 pb-20">
         {ediciones.length === 0 && <p class="text-gray-400 text-sm">Esta liga aún no tiene ediciones cargadas.</p>}
 
         <!-- Historial: cada edición (la más reciente primero) se elige aquí; las terminadas quedan archivadas con su campeón. -->
@@ -75,6 +75,7 @@ const datos = LIGAS.map((l) => ({
           <div data-edicion={e.id} data-liga-ed={l.id} hidden={idx !== 0} class="space-y-8 sm:space-y-10">
             {e.estado === 'finalizada' && <p class="text-sm text-gray-200"><i class="fa-solid fa-crown text-gold-400 mr-1.5"></i>Campeón: <b class="text-white">{e.campeon ?? '—'}</b></p>}
 
+            <div class="grid gap-8 lg:gap-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
             <!-- TABLA -->
             <section class="space-y-3" aria-label="Tabla de posiciones">
               <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Tabla de posiciones</h2>
@@ -83,7 +84,7 @@ const datos = LIGAS.map((l) => ({
                   <thead><tr>
                     <th class="text-left w-8">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
                     <th class="hidden sm:table-cell">G</th><th class="hidden sm:table-cell">E</th><th class="hidden sm:table-cell">P</th>
-                    <th class="hidden md:table-cell">GF</th><th class="hidden md:table-cell">GC</th><th>DIF</th><th class="hidden sm:table-cell">Forma</th>
+                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th class="hidden sm:table-cell lg:hidden xl:table-cell">Forma</th>
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
@@ -92,9 +93,9 @@ const datos = LIGAS.map((l) => ({
                         <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
-                        <td class="hidden md:table-cell">{f.gf}</td><td class="hidden md:table-cell">{f.gc}</td>
+                        <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
                         <td class:list={[f.dg > 0 ? 'text-emerald-400' : f.dg < 0 ? 'text-rose-400' : 'text-gray-400']}>{f.dg > 0 ? `+${f.dg}` : f.dg}</td>
-                        <td class="hidden sm:table-cell"><span class="inline-flex gap-1">{e.formas[f.nombre].map((r) => <span class:list={['liga-forma', CHIP[r]]} title={{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[r]}>{r}</span>)}</span></td>
+                        <td class="hidden sm:table-cell lg:hidden xl:table-cell"><span class="inline-flex gap-1">{e.formas[f.nombre].map((r) => <span class:list={['liga-forma', CHIP[r]]} title={{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[r]}>{r}</span>)}</span></td>
                       </tr>
                     ))}
                   </tbody>
@@ -104,14 +105,14 @@ const datos = LIGAS.map((l) => ({
             </section>
 
             <!-- RESULTADOS por fecha -->
-            <section class="space-y-3" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
+            <section class="space-y-3 lg:sticky lg:top-20" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
               <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
               <div class="flex gap-2 overflow-x-auto pb-2 featured-row" role="tablist" aria-label="Fechas">
                 {e.fechas.map((f) => <button type="button" role="tab" data-fecha-btn={f.n} aria-pressed={String(f.n === e.actual)} class="adv-chip shrink-0 !min-h-9 !px-3">Fecha {f.n}{f.estado !== 'jugada' && <i class="fa-solid fa-circle text-[6px] ml-1.5 align-middle text-amber-300"></i>}</button>)}
               </div>
               {e.fechas.map((f) => (
                 <div data-fecha-panel={f.n} hidden={f.n !== e.actual} class="space-y-3">
-                  <ul class="grid gap-3 sm:grid-cols-2">
+                  <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                     {f.partidos.map((m) => (
                       <li class="rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                         <span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[11px] text-gray-400 truncate">{e.clubes[m.l]}</span>}</span>
@@ -125,6 +126,7 @@ const datos = LIGAS.map((l) => ({
               ))}
               {e.aviso && <p class="text-xs text-amber-300/80">{e.aviso}</p>}
             </section>
+            </div>
           </div>
         ))}
       </div>
