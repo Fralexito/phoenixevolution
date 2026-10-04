@@ -142,6 +142,6 @@
 .cr-frame.cr-grab { cursor: grabbing; }
 .cr-frame img { position: absolute; left: 0; top: 0; max-width: none; transform-origin: 0 0; will-change: transform; pointer-events: none; }
 .cr-grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, transparent 33.2%, rgba(255,255,255,.22) 33.3%, transparent 33.5%, transparent 66.5%, rgba(255,255,255,.22) 66.6%, transparent 66.8%), linear-gradient(to bottom, transparent 33.2%, rgba(255,255,255,.22) 33.3%, transparent 33.5%, transparent 66.5%, rgba(255,255,255,.22) 66.6%, transparent 66.8%); }
-.cr-prev { width: 13rem; max-height: 15.5rem; overflow: hidden; border-radius: .75rem; pointer-events: none; }
+.cr-prev { width: 11rem; overflow: hidden; border-radius: .75rem; pointer-events: none; }
 .cr-prev article { width: 100% !important; }
-@media (min-width: 640px) { .cr-prev { width: 100%; max-height: none; } }
+@media (min-width: 640px) { .cr-prev { width: 100%; } }

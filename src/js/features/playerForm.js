@@ -165,13 +165,14 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
 
   /* ---- Foto: se elige un archivo → recortador (mover, zoom, vista previa de la tarjeta) → recién ahí queda lista para guardar ---- */
   let fotoOriginal = null;   // archivo original, para poder «Reencuadrar» sin volver a elegirlo
+  let fotoAspecto = p.foto_aspecto ?? null;   // proporción elegida en el recortador (si no se cambia la foto, no se toca)
   const ponerVista = (blob) => { $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="" class="w-full h-full object-cover">`; $('#f-reenc').hidden = false; };
-  const jugadorActual = () => ({ nombre: $('#f-nombre').value.trim(), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
+  const jugadorActual = () => ({ foto_aspecto: fotoAspecto, nombre: $('#f-nombre').value.trim(), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
   async function recortar(file) {
     try {
-      const blob = await openPhotoCropper(file, { getPlayer: jugadorActual });
-      if (!blob) return;                                    // canceló: no se cambia nada
-      photo = blob; fotoOriginal = file; ponerVista(blob);
+      const res = await openPhotoCropper(file, { getPlayer: jugadorActual, aspecto: fotoAspecto });
+      if (!res) return;                                     // canceló: no se cambia nada
+      photo = res.blob; fotoAspecto = res.aspecto; fotoOriginal = file; ponerVista(res.blob);
     } catch (ex) { console.error('[ficha] foto:', ex); err.textContent = ex.message || 'No se pudo abrir la imagen.'; }
   }
   $('#f-foto').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) recortar(f); });
@@ -203,6 +204,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
         const up = await supabase.storage.from('fichas').upload(path, photo, { upsert: true, contentType: 'image/jpeg' });
         if (up.error) throw up.error;
         row.foto_url = `${supabase.storage.from('fichas').getPublicUrl(path).data.publicUrl}?v=${Date.now()}`;
+        row.foto_aspecto = fotoAspecto;
       }
       const q = player ? supabase.from('jugadores').update(row).eq('id', id) : supabase.from('jugadores').insert({ id, ...row });
       const { error } = await q;

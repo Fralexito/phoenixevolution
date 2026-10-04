@@ -118,3 +118,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ## Ronda 13 — Recortador de fotos de jugador
 - Al elegir una foto se abre el **recortador** (`features/photoCropper.js`, geometría pura en `core/crop.js`): arrastrar para mover, rueda / deslizador / botones / pellizco para el zoom, flechas del teclado, «Ajustar» para volver al encuadre inicial. La imagen siempre cubre el marco (sin huecos). **Vista previa** = la tarjeta real con el mismo encuadre. Esc o «Cancelar» cierran solo el recortador.
 - Se guarda un JPEG 5:4 (hasta 800×640) recortado de la imagen ORIGINAL, igual que la foto de la tarjeta. «Reencuadrar» reabre el recortador (con la foto recién elegida o descargando la ya guardada).
+
+## Ronda 14 — Proporción de la foto elegible (más alta)
+- El recortador tiene un selector **Horizontal 5:4 · Cuadrada 1:1 · Alta 4:5** (`#cr-asp`). El marco y la vista previa cambian al instante; la foto se guarda a 800 px de ancho y alto según la proporción (Alta = 800×1000).
+- La proporción se guarda en `jugadores.foto_aspecto` (migración `009`, solo admite '5/4', '1/1', '4/5'; por defecto 5/4, así las fotos antiguas no cambian). La tarjeta (`playerCard.js`) usa esa misma proporción en su caja de foto: con «Alta» la foto abarca más hacia abajo.
+- «Reencuadrar» recuerda la proporción elegida. Si una tarjeta Alta comparte fila con otras, la fila se estira a la más alta.

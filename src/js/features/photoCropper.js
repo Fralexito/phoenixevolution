@@ -1,12 +1,13 @@
 // RECORTADOR DE FOTO: arrastra para mover, desliza/rueda/pellizca para el zoom, y mira cómo quedará la tarjeta ANTES de guardar.
-// openPhotoCropper(file, { getPlayer }) → Promise<Blob|null>  (null = canceló). La foto sale en formato 5:4, igual que la tarjeta.
+// openPhotoCropper(file, { getPlayer, aspecto }) → Promise<{ blob, aspecto }|null>  (null = canceló).
+// Se puede elegir la proporción: Horizontal 5:4, Cuadrada 1:1 o Alta 4:5; la tarjeta usa la misma para mostrar la foto.
 import { openModal, closeModal } from '../core/modal.js';
-import { initialState, zoomAt, clampPos, rescale, sourceRect, outSize, coverScale, ASPECT, MAX_ZOOM } from '../core/crop.js';
+import { initialState, zoomAt, clampPos, rescale, sourceRect, outSize, coverScale, ASPECTOS, aspectoValido, ratioDe, MAX_ZOOM } from '../core/crop.js';
 import { playerCardHTML } from './playerCard.js';
 
 const ID = 'crop-modal';
 
-export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
+export async function openPhotoCropper(file, { getPlayer = () => ({}), aspecto: aspecto0 = null } = {}) {
   if (!file?.type?.startsWith('image/')) throw new Error('El archivo no es una imagen.');
   if (file.size > 12 * 1024 * 1024) throw new Error('La imagen supera 12 MB.');
   const bmp = await createImageBitmap(file);                        // respeta la orientación EXIF de los celulares
@@ -14,8 +15,8 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
   const url = URL.createObjectURL(file);
 
   return new Promise((resolve) => {
-    let hecho = false;
-    const fin = (blob) => { if (hecho) return; hecho = true; document.removeEventListener('keydown', onKey, true); ro?.disconnect(); URL.revokeObjectURL(url); bmp.close?.(); closeModal(ID); resolve(blob); };
+    let hecho = false; let aspecto = aspectoValido(aspecto0);
+    const fin = (res) => { if (hecho) return; hecho = true; document.removeEventListener('keydown', onKey, true); ro?.disconnect(); URL.revokeObjectURL(url); bmp.close?.(); closeModal(ID); resolve(res); };
     // Esc cierra SOLO este recortador (captura: llega antes que el Esc del formulario que está debajo).
     const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); fin(null); } };
     document.addEventListener('keydown', onKey, true);
@@ -28,6 +29,7 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
         </div>
         <div class="flex flex-col sm:flex-row gap-4">
           <div class="flex-1 min-w-0 space-y-3">
+            <div class="seg" id="cr-asp" role="group" aria-label="Proporción de la foto">${Object.entries(ASPECTOS).map(([k, a]) => `<button type="button" data-v="${k}" aria-pressed="${k === aspecto}">${a.nombre} <span class="opacity-60">${k.replace('/', ':')}</span></button>`).join('')}</div>
             <div id="cr-frame" class="cr-frame" tabindex="0" role="application" aria-label="Zona de recorte. Arrastra para mover, usa el zoom para acercar. Con teclado: flechas para mover, más y menos para el zoom.">
               <img id="cr-img" src="${url}" alt="" draggable="false">
               <div class="cr-grid" aria-hidden="true"></div>
@@ -54,6 +56,9 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
     const $ = (s) => m.querySelector(s);
     const frame = $('#cr-frame'); const img = $('#cr-img'); const zoom = $('#cr-zoom');
     let fw = 0; let fh = 0; let st = null;
+    // El marco toma la proporción elegida; en celular se limita el alto para que no ocupe toda la pantalla.
+    const ponerMarco = () => { const r = ratioDe(aspecto); frame.style.aspectRatio = String(r); frame.style.width = `min(100%, calc(52vh * ${r}))`; frame.style.marginInline = 'auto'; };
+    ponerMarco();
     const dim = () => ({ nw, nh, fw, fh });
 
     // ---- Vista previa: la tarjeta real con la misma foto y el mismo encuadre ----
@@ -61,10 +66,10 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
     const dibujarPrev = () => {
       if (!st || !fw) return;
       const base = getPlayer() ?? {};
-      prev.innerHTML = playerCardHTML({ nombre: 'Nombre', club: 'Club', posicion: 'DC', ovr: 75, ...Object.fromEntries(Object.entries(base).filter(([, v]) => v !== '' && v != null)), foto_url: 'https://x.invalid/placeholder.jpg' });
-      const caja = prev.querySelector('.aspect-\\[5\\/4\\]'); const pimg = caja?.querySelector('img');
+      prev.innerHTML = playerCardHTML({ nombre: 'Nombre', club: 'Club', posicion: 'DC', ovr: 75, ...Object.fromEntries(Object.entries(base).filter(([, v]) => v !== '' && v != null)), foto_url: 'https://x.invalid/placeholder.jpg', foto_aspecto: aspecto });
+      const caja = prev.querySelector('[data-foto-caja]'); const pimg = caja?.querySelector('img');
       if (!pimg) return;
-      const k = caja.clientWidth / fw;                                // el mismo encuadre, a escala de la tarjeta de muestra
+      const k = caja.clientWidth / fw;   // misma escala horizontal; la caja de la tarjeta tiene la misma proporción                                // el mismo encuadre, a escala de la tarjeta de muestra
       pimg.removeAttribute('loading'); pimg.src = url;
       pimg.className = '';
       Object.assign(pimg.style, { position: 'absolute', left: '0', top: '0', maxWidth: 'none', width: `${nw * st.s * k}px`, height: `${nh * st.s * k}px`, transform: `translate(${st.x * k}px, ${st.y * k}px)` });
@@ -77,7 +82,7 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
     };
     const medir = () => {
       const r = frame.getBoundingClientRect(); if (!r.width) return;
-      const nuevoW = r.width; const nuevoH = nuevoW / ASPECT;
+      const nuevoW = r.width; const nuevoH = nuevoW / ratioDe(aspecto);
       if (!st) { fw = nuevoW; fh = nuevoH; st = initialState(nw, nh, fw, fh); }
       else if (Math.abs(nuevoW - fw) > 0.5) { st = rescale(st, nuevoW / fw); fw = nuevoW; fh = nuevoH; }
       pintar();
@@ -109,6 +114,12 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
     $('#cr-mas').addEventListener('click', () => zoomCentro(1.15));
     $('#cr-menos').addEventListener('click', () => zoomCentro(1 / 1.15));
     zoom.addEventListener('input', () => { const s0 = coverScale(nw, nh, fw, fh); const objetivo = s0 * (1 + (Number(zoom.value) / 100) * (MAX_ZOOM - 1)); st = zoomAt(st, objetivo / st.s, fw / 2, fh / 2, dim()); pintar(); });
+    // Cambiar la proporción: el marco se rehace con el alto nuevo y se vuelve a encuadrar (la foto sigue siendo la misma).
+    $('#cr-asp').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-v]'); if (!b || b.dataset.v === aspecto) return;
+      aspecto = b.dataset.v; $('#cr-asp').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      ponerMarco(); fw = 0; st = null; requestAnimationFrame(medir);
+    });
     $('#cr-reset').addEventListener('click', () => { st = initialState(nw, nh, fw, fh); pintar(); });
     frame.addEventListener('keydown', (e) => {
       const paso = 12; const mv = { ArrowLeft: [paso, 0], ArrowRight: [-paso, 0], ArrowUp: [0, paso], ArrowDown: [0, -paso] }[e.key];
@@ -119,13 +130,13 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}) } = {}) {
     // ---- Confirmar: recorta de verdad la imagen ORIGINAL (no la pantalla) ----
     $('#cr-ok').addEventListener('click', async () => {
       try {
-        const { sx, sy, sw, sh } = sourceRect(st, fw, fh); const { w, h } = outSize(sw);
+        const { sx, sy, sw, sh } = sourceRect(st, fw, fh); const { w, h } = outSize(sw, aspecto);
         const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
         const ctx = cv.getContext('2d'); ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(bmp, sx, sy, sw, sh, 0, 0, w, h);
         const blob = await new Promise((res) => cv.toBlob(res, 'image/jpeg', 0.86));
         if (!blob) throw new Error('No se pudo procesar la imagen.');
-        fin(blob);
+        fin({ blob, aspecto });
       } catch (ex) { console.error('[recorte] confirmar:', ex); $('#cr-ok').textContent = 'No se pudo recortar. Reintenta.'; }
     });
     $('#cr-cancel').addEventListener('click', () => fin(null));

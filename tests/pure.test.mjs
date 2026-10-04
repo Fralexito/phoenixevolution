@@ -4,7 +4,7 @@ import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../sr
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
 import { clampStat, calcOvr } from '../src/js/core/stats.js';
-import { coverScale, clampPos, initialState, zoomAt, rescale, sourceRect, outSize, MAX_ZOOM } from '../src/js/core/crop.js';
+import { coverScale, clampPos, initialState, zoomAt, rescale, sourceRect, outSize, MAX_ZOOM, aspectoValido, ratioDe, ASPECTOS } from '../src/js/core/crop.js';
 import { filterPlayers, norm } from '../src/js/core/search.js';
 import { posInfo, POSICIONES } from '../src/data/posiciones.js';
 import { STAT_INFO } from '../src/data/stats.js';
@@ -226,4 +226,11 @@ test('recorte: la imagen siempre cubre el marco, el zoom respeta límites y el r
   // el recorte real es la parte visible de la ORIGINAL y mantiene el 5:4
   const r = sourceRect(z, D.fw, D.fh); assert.ok(Math.abs(r.sw / r.sh - 1.25) < 1e-9); assert.ok(r.sx >= 0 && r.sy >= 0 && r.sx + r.sw <= 2000 + 1e-6 && r.sy + r.sh <= 1000 + 1e-6);
   assert.deepEqual(outSize(5000), { w: 800, h: 640 }); assert.deepEqual(outSize(100), { w: 320, h: 256 }); assert.deepEqual(rescale({ s: 1, x: -10, y: -4 }, 2), { s: 2, x: -20, y: -8 });
+});
+
+test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la salida respeta la proporción', () => {
+  assert.deepEqual(Object.keys(ASPECTOS), ['5/4', '1/1', '4/5']);
+  assert.equal(aspectoValido('4/5'), '4/5'); assert.equal(aspectoValido(null), '5/4'); assert.equal(aspectoValido('<x>'), '5/4'); assert.equal(aspectoValido('toString'), '5/4');
+  assert.equal(ratioDe('1/1'), 1); assert.equal(ratioDe(undefined), 1.25);
+  assert.deepEqual(outSize(5000, '4/5'), { w: 800, h: 1000 }); assert.deepEqual(outSize(5000, '1/1'), { w: 800, h: 800 }); assert.deepEqual(outSize(5000), { w: 800, h: 640 });
 });

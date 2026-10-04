@@ -1,7 +1,12 @@
 // Geometría pura del recortador de fotos (sin DOM → probable con `npm test`).
 // Estado = { x, y, s }: la imagen se dibuja con su esquina superior izquierda en (x, y) del marco y escalada `s` (px del marco por px de la imagen).
 // Regla de oro: la imagen SIEMPRE cubre el marco (nunca quedan bordes vacíos).
-export const ASPECT = 5 / 4;          // igual que la foto de la tarjeta (aspect-[5/4])
+// Proporciones disponibles (ancho/alto). Deben coincidir con perfiles `jugadores_foto_aspecto_ok` en la BD [BD].
+export const ASPECTOS = { '5/4': { ratio: 5 / 4, nombre: 'Horizontal' }, '1/1': { ratio: 1, nombre: 'Cuadrada' }, '4/5': { ratio: 4 / 5, nombre: 'Alta' } };
+export const ASPECTO_DEF = '5/4';
+/** Valor guardado → proporción válida (si es nulo o desconocido, la de siempre). */
+export const aspectoValido = (a) => (Object.hasOwn(ASPECTOS, a) ? a : ASPECTO_DEF);
+export const ratioDe = (a) => ASPECTOS[aspectoValido(a)].ratio;
 export const OUT_W = 800;             // ancho de la imagen guardada (alto = 640)
 export const MAX_ZOOM = 4;            // hasta 4 veces el tamaño mínimo que cubre el marco
 
@@ -33,8 +38,8 @@ export const rescale = (st, k) => ({ s: st.s * k, x: st.x * k, y: st.y * k });
 /** Zona de la imagen ORIGINAL que queda dentro del marco (para recortar de verdad). */
 export const sourceRect = (st, fw, fh) => ({ sx: -st.x / st.s, sy: -st.y / st.s, sw: fw / st.s, sh: fh / st.s });
 
-/** Tamaño de salida: hasta OUT_W de ancho, sin agrandar más de lo que da la zona recortada (mínimo 320). */
-export function outSize(sw) {
+/** Tamaño de salida: hasta OUT_W de ancho, sin agrandar más de lo que da la zona recortada (mínimo 320). El alto sale de la proporción. */
+export function outSize(sw, aspecto = ASPECTO_DEF) {
   const w = Math.max(320, Math.min(OUT_W, Math.round(sw)));
-  return { w, h: Math.round(w / ASPECT) };
+  return { w, h: Math.round(w / ratioDe(aspecto)) };
 }

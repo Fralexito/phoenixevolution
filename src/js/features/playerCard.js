@@ -1,6 +1,7 @@
 // Tarjeta de jugador estilo FUT, compartida por Central y Base de Datos.
 import { escapeHTML, safeImg, stat, statColor } from '../core/dom.js';
 import { posInfo } from '../../data/posiciones.js';
+import { ratioDe } from '../core/crop.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -24,7 +25,7 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
   return `
   <article class="${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between">
     <div>
-      <div class="relative aspect-[5/4] bg-black/40 overflow-hidden">
+      <div data-foto-caja style="aspect-ratio:${ratioDe(p.foto_aspecto)}" class="relative bg-black/40 overflow-hidden">
         ${foto}
         <div class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-galaxy-deep via-galaxy-deep/60 to-transparent pointer-events-none"></div>
         <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-galaxy-400 to-transparent opacity-60"></div>
