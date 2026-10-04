@@ -9,6 +9,8 @@ import { forma } from '../core/ligaStats.js';
 import { onSession, isAdmin } from '../core/session.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { abrirEditorPerfil } from '../features/perfilEditor.js';
+import { abrirEditorHistorial } from '../features/historialEditor.js';
+import { ordenarHistorial, periodoCorto, medalla, resumenHistorial, partirPremios } from '../core/historial.js';
 import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../core/estilo.js';
 import { radarPoints, axisPoint } from '../core/compare.js';
 import { STAT_INFO } from '../../data/stats.js';
@@ -127,12 +129,32 @@ function montarAnalisis(p) {
   });
 }
 
+// ---- Historial de participación y títulos (filas de la tabla `participaciones` + la edición en curso) ----
+const MEDALLA = { oro: ['#fbbf24', 'Oro'], plata: ['#cbd5e1', 'Plata'], bronce: ['#d97706', 'Bronce'] };
+function seccionHistorial(filas, enCurso) {
+  const l = ordenarHistorial(filas); const r = resumenHistorial(l);
+  const tarjetaFila = (f) => { const md = MEDALLA[medalla(f)]; const prem = partirPremios(f.premios);
+    return `<li class="flex gap-3 rounded-xl border border-galaxy-border/50 bg-black/25 p-3.5">
+      <span class="w-10 h-10 shrink-0 rounded-full grid place-items-center border" style="${md ? `color:${md[0]};border-color:${md[0]}88;background:${md[0]}1f` : 'color:#9ca3af;border-color:#374151;background:#11111a'}" title="${md ? md[1] : 'Participación'}"><i class="fa-solid ${md ? 'fa-trophy' : 'fa-futbol'}"></i></span>
+      <div class="min-w-0 flex-1"><div class="flex flex-wrap items-baseline gap-x-2"><b class="text-white font-display uppercase tracking-wide">${escapeHTML(f.liga)}</b><span class="text-sm text-gray-300">${escapeHTML(f.edicion)}</span>${f.periodo ? `<span class="text-xs text-gray-500">${escapeHTML(periodoCorto(f.periodo))}</span>` : ''}</div>
+        <div class="flex flex-wrap gap-1.5 mt-1.5 text-xs">${f.club ? `<span class="rounded-md border border-galaxy-border/50 px-2 py-0.5 text-gray-200"><i class="fa-solid fa-shield-halved text-galaxy-400 mr-1"></i>${escapeHTML(f.club)}</span>` : ''}${f.puesto ? `<span class="rounded-md border border-galaxy-border/50 px-2 py-0.5 text-gray-200">${escapeHTML(f.puesto)}º puesto</span>` : ''}${f.titulo ? `<span class="rounded-md border px-2 py-0.5 font-bold" style="${md ? `color:${md[0]};border-color:${md[0]}88;background:${md[0]}1a` : 'color:#e5e7eb;border-color:#4b5563'}">${escapeHTML(f.titulo)}</span>` : ''}${prem.map((x) => `<span class="rounded-md border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 text-emerald-200"><i class="fa-solid fa-award mr-1"></i>${escapeHTML(x)}</span>`).join('')}</div></div></li>`; };
+  const actual = enCurso ? `<li class="flex gap-3 rounded-xl border border-galaxy-400/50 bg-galaxy-600/10 p-3.5"><span class="w-10 h-10 shrink-0 rounded-full grid place-items-center border border-galaxy-400/60 text-galaxy-400"><i class="fa-solid fa-circle-play"></i></span><div class="min-w-0"><div class="flex flex-wrap items-baseline gap-x-2"><b class="text-white font-display uppercase tracking-wide">${escapeHTML(enCurso.liga)}</b><span class="text-sm text-gray-300">${escapeHTML(enCurso.edicion)}</span><span class="text-[10px] font-bold uppercase tracking-widest text-galaxy-400">En curso</span></div><p class="text-xs text-gray-400 mt-1">${enCurso.puesto ? `Va ${escapeHTML(enCurso.puesto)}º en la tabla` : 'Participando'}</p></div></li>` : '';
+  const kpis = [[r.ediciones + (enCurso ? 1 : 0), 'Ediciones'], [r.titulos, 'Títulos'], [r.podios, 'Podios'], [r.premios, 'Premios']].map(([v, n]) => `<div class="rounded-xl border border-galaxy-border/60 bg-black/25 px-3 py-3 text-center"><div class="font-display font-bold text-2xl text-white">${v}</div><div class="text-[10px] uppercase tracking-widest text-gray-400 mt-0.5">${n}</div></div>`).join('');
+  return `<section class="rounded-2xl border border-amber-400/30 bg-black/20 p-5 space-y-4"><h2 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300"><i class="fa-solid fa-trophy text-amber-300 mr-1"></i> Historial y títulos</h2>
+    <div class="grid grid-cols-4 gap-2">${kpis}</div>
+    ${l.length || enCurso ? `<ul class="space-y-2">${actual}${l.map(tarjetaFila).join('')}</ul>` : '<p class="text-sm text-gray-400">Todavía no hay participaciones registradas.</p>'}</section>`;
+}
+
 let actual = null;
-function render(p) {
-  actual = p;
+let historial = [];
+function render(p, filasHistorial = []) {
+  actual = p; historial = filasHistorial;
   const pos = posInfo(p.posicion);
   const campanas = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre))
     .map((x) => seccionEdicion(x.l, x.ed, x.nombre)).filter(Boolean);
+  const primera = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre && x.ed.estado === 'en_curso'))[0];
+  const cc = primera ? campana(primera.ed, primera.nombre) : null;
+  const enCurso = primera ? { liga: primera.l.titulo.join(' '), edicion: primera.ed.nombre, puesto: cc?.fila ? cc.puesto : 0 } : null;
   document.title = `${p.nombre} · Perfil · Phoenix Evolution Series`;
   caja(`<div class="grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] gap-8 items-start">
     <div class="w-full max-w-[320px] mx-auto lg:mx-0 lg:sticky lg:top-20">${playerCardHTML(p, 0)}</div>
@@ -150,9 +172,11 @@ function render(p) {
         ${p.descripcion ? `<p class="text-gray-300 text-sm mt-3 leading-relaxed max-w-prose">${escapeHTML(p.descripcion)}</p>` : ''}</header>
       <div><button type="button" id="perfil-analisis-btn" aria-expanded="false" aria-controls="perfil-analisis" class="btn btn-primary"><i class="fa-solid fa-chart-pie"></i> <span>Ver análisis de juego</span></button>
         <button type="button" id="perfil-editar" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-pen"></i> Editar ficha</button>
-        <button type="button" id="perfil-editar-bio" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-book-open"></i> Editar biografía</button></div>
+        <button type="button" id="perfil-editar-bio" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-book-open"></i> Editar biografía</button>
+        <button type="button" id="perfil-editar-hist" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-trophy"></i> Editar historial</button></div>
       <section id="perfil-analisis" hidden class="rounded-2xl border border-galaxy-400/30 bg-black/20 p-5"></section>
       ${datosPerfil(p)}
+      ${seccionHistorial(filasHistorial, enCurso)}
       ${campanas.join('') || '<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5 text-sm text-gray-400">Este jugador todavía no figura en ninguna edición de liga.</section>'}
     </div></div>`);
   montarAnalisis(p); mostrarEditar();
@@ -160,6 +184,7 @@ function render(p) {
 function mostrarEditar() {
   const b = $('perfil-editar'); if (!b) return;
   b.hidden = !isAdmin(); b.onclick = () => openPlayerForm(actual, init);
+  const hist = $('perfil-editar-hist'); if (hist) { hist.hidden = !isAdmin(); hist.onclick = () => abrirEditorHistorial(actual, historial, init); }
   const bio = $('perfil-editar-bio'); if (bio) { bio.hidden = !isAdmin(); bio.onclick = () => abrirEditorPerfil(actual, init); }
 }
 
@@ -170,7 +195,9 @@ async function init() {
     const { data, error } = await supabase.from('jugadores').select('*').eq('id', id).maybeSingle();
     if (error && error.code !== 'PGRST116') throw error;
     if (!data) { aviso('No encontramos a ese jugador', 'Puede que su ficha se haya borrado.'); return; }
-    render(data);
+    let filas = [];
+    try { const h = await supabase.from('participaciones').select('*').eq('jugador_id', id); if (h.error) throw h.error; filas = h.data ?? []; } catch (e2) { console.error('[perfil] historial:', e2); }
+    render(data, filas);
   } catch (e) { console.error('[perfil] cargar:', e); aviso('No se pudo cargar el perfil', 'Revisa tu conexión e intenta de nuevo.'); }
 }
 init();

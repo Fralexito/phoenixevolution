@@ -521,3 +521,19 @@ test('destacados: reconocimientos y semana', () => {
   assert.equal(semanaActual(new Date('2026-10-05T04:30:00Z')), '2026-09-28');       // lunes 5 oct 04:30 UTC = domingo 23:30 en Lima
   assert.equal(semanaActual(new Date('2026-10-05T05:00:00Z')), '2026-10-05');       // lunes 00:00 en Lima
 });
+import { esCampeon, partirPremios, ordenarHistorial, periodoCorto, medalla, resumenHistorial, validarParticipacion } from '../src/js/core/historial.js';
+test('historial: títulos, medallas y resumen', () => {
+  assert.equal(esCampeon('Campeón'), true); assert.equal(esCampeon('Campeón de Copa'), true); assert.equal(esCampeon('Subcampeón'), false); assert.equal(esCampeon(null), false);
+  assert.equal(medalla({ titulo: 'Campeón' }), 'oro'); assert.equal(medalla({ titulo: 'Subcampeón' }), 'plata'); assert.equal(medalla({ titulo: 'Tercer lugar' }), 'bronce');
+  assert.equal(medalla({ puesto: 3 }), 'bronce'); assert.equal(medalla({ puesto: 9 }), null); assert.equal(medalla({ titulo: 'Subcampeón', puesto: 1 }), 'plata');
+  const f = [{ titulo: 'Campeón', premios: 'MVP\nGoleador' }, { puesto: 2 }, { puesto: 7 }];
+  assert.deepEqual(resumenHistorial(f), { ediciones: 3, titulos: 1, podios: 2, premios: 2 }); assert.deepEqual(resumenHistorial(null), { ediciones: 0, titulos: 0, podios: 0, premios: 0 });
+});
+test('historial: orden, periodo, premios y validación', () => {
+  assert.deepEqual(ordenarHistorial([{ periodo: '2024-01-01', e: 1 }, { periodo: '2025-06-01', e: 2 }, { e: 3 }]).map((x) => x.e), [2, 1, 3]);
+  assert.equal(periodoCorto('2025-03-01'), 'mar 2025'); assert.equal(periodoCorto('x'), ''); assert.deepEqual(partirPremios('- MVP\n\n• Goleador'), ['MVP', 'Goleador']);
+  const ok = validarParticipacion({ liga: ' Galaxy <b>League', edicion: 'Apertura 2025', periodo: '2025-03', puesto: '2', club: '', titulo: 'Subcampeón', premios: 'MVP' });
+  assert.equal(ok.ok, true); assert.equal(ok.fila.liga, 'Galaxy bLeague'); assert.equal(ok.fila.periodo, '2025-03-01'); assert.equal(ok.fila.club, null); assert.equal(ok.fila.puesto, 2);
+  assert.equal(validarParticipacion({ liga: '', edicion: '' }).errores.length, 2); assert.equal(validarParticipacion({ liga: 'a', edicion: 'b', puesto: '0' }).ok, false); assert.equal(validarParticipacion({ liga: 'a', edicion: 'b', puesto: '2.5' }).ok, false);
+  assert.equal(validarParticipacion({ liga: 'a', edicion: 'b', periodo: 'ayer' }).ok, false);
+});
