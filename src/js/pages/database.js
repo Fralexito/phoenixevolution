@@ -153,12 +153,9 @@ function aplicarZoom() {
 const moverZoom = (d) => { nivel = cambiarNivel(nivel, d, esMovil()); if (leerAjustes().recordarZoom) { try { localStorage.setItem(claveZoom(), String(nivel)); } catch { /* sin almacenamiento: solo no se recuerda */ } } aplicarZoom(); };
 const restablecerZoom = () => { nivel = nivelPorDefecto(esMovil()); try { localStorage.removeItem(claveZoom()); } catch { /* sin almacenamiento */ } aplicarZoom(); };
 $('dens-reset').addEventListener('click', restablecerZoom);
-document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === '0' && !e.target.closest('input, textarea, select')) { e.preventDefault(); restablecerZoom(); } });   // Ctrl + 0, como en el navegador
+// Sin atajos de teclado ni de rueda: Ctrl + rueda / Ctrl + 0 son del navegador (zoom normal de la página) y NO se tocan. El tamaño de las cartas se cambia solo con los botones − / + / Predeterminado.
 $('dens-menos').addEventListener('click', () => moverZoom(1));    // alejar: tarjetas más pequeñas
 $('dens-mas').addEventListener('click', () => moverZoom(-1));     // acercar: tarjetas más grandes
-// Ctrl + rueda sobre la lista (PC): acerca/aleja igual que en el explorador de archivos.
-let ultimaRueda = 0;
-$('players-container').addEventListener('wheel', (e) => { if (!e.ctrlKey) return; e.preventDefault(); const t = Date.now(); if (t - ultimaRueda < 140) return; ultimaRueda = t; moverZoom(e.deltaY > 0 ? 1 : -1); }, { passive: false });
 window.matchMedia('(max-width: 639px)').addEventListener('change', () => { nivel = leerZoom(); aplicarZoom(); });
 aplicarZoom();
 
