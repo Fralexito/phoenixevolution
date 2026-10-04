@@ -107,8 +107,12 @@ const datos = LIGAS.map((l) => ({
             <!-- RESULTADOS por fecha -->
             <section class="space-y-3 lg:sticky lg:top-20" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
               <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
-              <div class="flex gap-2 overflow-x-auto pb-2 featured-row" role="tablist" aria-label="Fechas">
-                {e.fechas.map((f) => <button type="button" role="tab" data-fecha-btn={f.n} aria-pressed={String(f.n === e.actual)} class="adv-chip shrink-0 !min-h-9 !px-3">Fecha {f.n}{f.estado !== 'jugada' && <i class="fa-solid fa-circle text-[6px] ml-1.5 align-middle text-amber-300"></i>}</button>)}
+              <div class="flex items-stretch gap-2" aria-label="Elegir fecha">
+                <button type="button" data-fecha-paso="-1" aria-label="Fecha anterior" class="adv-chip !min-h-10 !px-4"><i class="fa-solid fa-chevron-left"></i></button>
+                <select data-fecha-select aria-label="Fecha" class="field flex-1 !min-h-10 text-center font-display font-bold uppercase tracking-wider">
+                  {e.fechas.map((f) => <option value={f.n} selected={f.n === e.actual}>Fecha {f.n}{f.estado === 'jugada' ? '' : f.estado === 'en_juego' ? ' · en juego' : ' · pendiente'}</option>)}
+                </select>
+                <button type="button" data-fecha-paso="1" aria-label="Fecha siguiente" class="adv-chip !min-h-10 !px-4"><i class="fa-solid fa-chevron-right"></i></button>
               </div>
               {e.fechas.map((f) => (
                 <div data-fecha-panel={f.n} hidden={f.n !== e.actual} class="space-y-3">

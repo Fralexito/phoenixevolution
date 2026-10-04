@@ -1,6 +1,6 @@
 // Página Liga: solo interacción (los datos ya vienen pintados desde el servidor).
 //  · Selector de edición → muestra una edición y oculta las demás de esa liga.
-//  · Botones de fecha → muestran el panel de esa fecha.
+//  · Selector de fecha + flechas ‹ › → muestran el panel de esa fecha (sin barra de desplazamiento).
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
 function mostrarEdicion(liga, edicion) {
@@ -13,9 +13,20 @@ function mostrarEdicion(liga, edicion) {
 document.addEventListener('change', (e) => {
   const s = e.target.closest('[data-ed-select]'); if (s) mostrarEdicion(s.dataset.edSelect, s.value);
 });
+/** Muestra la fecha `n` de la caja y sincroniza el selector. */
+function mostrarFecha(caja, n) {
+  const sel = caja.querySelector('[data-fecha-select]');
+  const paneles = $$('[data-fecha-panel]', caja);
+  if (!paneles.some((p) => p.dataset.fechaPanel === String(n))) { console.warn('[liga] fecha desconocida:', n); return; }
+  paneles.forEach((p) => { p.hidden = p.dataset.fechaPanel !== String(n); });
+  if (sel) sel.value = String(n);
+}
+document.addEventListener('change', (e) => {
+  const s = e.target.closest('[data-fecha-select]'); if (s) mostrarFecha(s.closest('[data-fechas]'), s.value);
+});
 document.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-fecha-btn]'); if (!b) return;
-  const caja = b.closest('[data-fechas]'); if (!caja) return;
-  $$('[data-fecha-btn]', caja).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-  $$('[data-fecha-panel]', caja).forEach((p) => { p.hidden = p.dataset.fechaPanel !== b.dataset.fechaBtn; });
+  const b = e.target.closest('[data-fecha-paso]'); if (!b) return;
+  const caja = b.closest('[data-fechas]'); const sel = caja?.querySelector('[data-fecha-select]'); if (!sel) return;
+  const i = Math.min(sel.options.length - 1, Math.max(0, sel.selectedIndex + Number(b.dataset.fechaPaso)));
+  mostrarFecha(caja, sel.options[i].value);
 });
