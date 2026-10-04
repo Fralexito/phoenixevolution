@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CartaElite from '../components/CartaElite.astro';
+const base = import.meta.env.BASE_URL;
+const stats: [string, number][] = [['ATQ',92],['FIN',94],['REG',88],['COR',90],['EFE',89],['CRE',93],['DEF',79],['PRE',84],['POS',82],['PAS',87],['RIT',85],['MEN',91]];
+---
+<Layout title="Carta (experimento)" active="">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div><span class="text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2.5 py-1 rounded border border-galaxy-400/30 inline-block mb-2">EXPERIMENTO</span>
+      <h1 class="text-2xl font-display font-bold text-white uppercase tracking-widest">Carta élite dibujada con código</h1>
+      <p class="text-gray-400 text-sm mt-1">Marco, fondo, destellos y textos son CSS. Solo la foto y el escudo son imágenes.</p></div>
+    <div class="flex flex-wrap gap-8 items-end">
+      <div class="w-[min(100%,380px)]"><CartaElite media={91} pos="MCO" nombre="Beto" foto={`${base}experimento/beto.webp`} escudo={`${base}experimento/lfc.webp`} stats={stats} /></div>
+      <div class="w-[200px]"><CartaElite media={91} pos="MCO" nombre="Beto" foto={`${base}experimento/beto.webp`} escudo={`${base}experimento/lfc.webp`} stats={stats} /></div>
+    </div>
+  </div>
+</Layout>
