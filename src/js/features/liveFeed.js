@@ -1,7 +1,7 @@
 // PULSO EN VIVO: mensajitos de actividad («X aceptó el reto de Y», «Z activó el radar»), cada uno con su hora exacta,
 // y un HISTORIAL de las últimas 2 horas (se guarda en el navegador, así sobrevive al cambiar de página).
 // Fuente de eventos: cualquier parte de la web puede avisar con  window.dispatchEvent(new CustomEvent('live:evento', { detail: {...} })).
-// Mientras LIVE_DEMO sea true, además se SIMULAN eventos con nombres ficticios (y se rotula «demo»).
+// Mientras LIVE_DEMO sea true, además se SIMULAN eventos con nombres reales de los jugadores de la liga (y se rotula «demo» porque los eventos son inventados).
 // PC: hasta 5 mensajes a la vez abajo a la derecha. Móvil: hasta 2. Botón «En vivo» = silenciar; botón reloj = historial.
 import { formatEvento, demoDelay, horaExacta, mismoDia, podarHistorial } from '../core/live.js';
 import { DEMO_NOMBRES, DEMO_FORMATOS, DEMO_JUEGOS } from '../../data/liveDemo.js';
