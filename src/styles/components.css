@@ -267,8 +267,11 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
 /* Jugadores: la carta crece suave al pasar el mouse; al hacer clic se destaca y las demás se difuminan. */
 #players-container .pcw { transition: transform .7s cubic-bezier(.22, 1, .36, 1), filter .6s ease, opacity .6s ease; cursor: pointer; will-change: transform; }
 @media (hover: hover) and (pointer: fine) { #players-container .pcw:hover { transform: scale(1.05); z-index: 6; } }
-#players-container .pcw.pcw-foco { transform: scale(1.3); z-index: 20; }
-@media (max-width: 639px) { #players-container .pcw.pcw-foco { transform: scale(1.1); } }
+#players-container .pcw.pcw-foco { transform: scale(1.3); z-index: 20; animation: pcw-zoom 1s cubic-bezier(.16, 1, .3, 1) both; }
+/* Acercamiento: arranca desde su tamaño normal, pasa un poco de largo y se asienta (se siente que «se lanza» hacia ti). */
+@keyframes pcw-zoom { 0% { transform: scale(1.02); } 55% { transform: scale(1.36); } 100% { transform: scale(1.3); } }
+@media (max-width: 639px) { #players-container .pcw.pcw-foco { transform: scale(1.1); animation-name: pcw-zoom-m; } }
+@keyframes pcw-zoom-m { 0% { transform: scale(1.01); } 55% { transform: scale(1.14); } 100% { transform: scale(1.1); } }
 /* Aura: halo de luz del color de la posición que respira alrededor de la carta destacada (puede cubrir a las demás). */
 #players-container .pcw::before { content: ''; position: absolute; inset: -14%; z-index: -1; border-radius: 2rem; pointer-events: none; opacity: 0; transition: opacity .7s ease;
   background: radial-gradient(closest-side, color-mix(in srgb, var(--aura, #00e5ff) 70%, transparent), color-mix(in srgb, var(--aura, #00e5ff) 25%, transparent) 55%, transparent 100%); filter: blur(18px); }
@@ -278,4 +281,4 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
 body:has(#players-container) { overflow-x: clip; }
 #players-container[data-foco='true'] .pcw:not(.pcw-foco) { filter: blur(3px) saturate(.65); opacity: .5; }
 #players-container[data-foco='true'] .pcw:not(.pcw-foco):hover { transform: none; }
-@media (prefers-reduced-motion: reduce) { #players-container .pcw { transition: none; } #players-container .pcw.pcw-foco::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #players-container .pcw { transition: none; } #players-container .pcw.pcw-foco::before, #players-container .pcw.pcw-foco { animation: none; } }

@@ -56,11 +56,23 @@ export function montarReconocimientos(el, jugadores, edicion) {
   if (!el) return;
   const r = reconocimientos(jugadores, edicion); const semana = semanaActual();
   let sesion = false; let votos = { conteo: [], mio: null };
+  let abierto = false;                     // plegado por defecto: una franja sutil; el botón la expande
+  const pastilla = (t, rec) => `<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] leading-none whitespace-nowrap" style="border-color:${t.color}55;color:${t.color}"><i class="fa-solid ${t.icono}"></i><span class="text-gray-100 max-w-[7rem] truncate">${rec ? escapeHTML(rec.p.nombre) : '—'}</span></span>`;
   const pintar = () => {
-    el.innerHTML = `<div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">${TARJETAS.map((t) => tarjeta(t, r[t.k])).join('')}${panelVoto(jugadores, votos, sesion)}</div>`;
+    const por = new Map(jugadores.map((p) => [p.id, p])); const lider = votos.conteo.find((x) => por.has(x.jugador_id));
+    const pVoto = `<span class="inline-flex items-center gap-1.5 rounded-full border border-galaxy-400/50 px-2.5 py-1 text-[11px] leading-none whitespace-nowrap text-galaxy-400"><i class="fa-solid fa-ranking-star"></i><span class="text-gray-100 max-w-[7rem] truncate">${lider ? escapeHTML(por.get(lider.jugador_id).nombre) : 'Vota'}</span></span>`;
+    el.innerHTML = `<div class="rounded-xl border border-galaxy-border/60 bg-black/20">
+      <button type="button" data-recon-toggle aria-expanded="${abierto}" class="w-full flex items-center gap-3 px-3 py-2 text-left">
+        <span class="text-[11px] font-display font-bold uppercase tracking-widest text-gray-300 shrink-0"><i class="fa-solid fa-award text-galaxy-400 mr-1.5"></i>Reconocimientos</span>
+        <span class="flex-1 min-w-0 flex flex-wrap gap-1.5 ${abierto ? 'invisible' : ''}">${TARJETAS.map((t) => pastilla(t, r[t.k])).join('')}${pVoto}</span>
+        <i class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300 ${abierto ? 'rotate-180' : ''}"></i>
+      </button>
+      <div ${abierto ? '' : 'hidden'} class="p-3 pt-1"><div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">${TARJETAS.map((t) => tarjeta(t, r[t.k])).join('')}${panelVoto(jugadores, votos, sesion)}</div></div>
+    </div>`;
   };
   const cargar = async () => { const uid = getState().session?.user?.id; sesion = !!uid; votos = await leerVotos(semana, uid); pintar(); };
   el.addEventListener('click', async (e) => {
+    if (e.target.closest('[data-recon-toggle]')) { abierto = !abierto; pintar(); return; }
     const go = e.target.closest('[data-voto-go]'); if (!go) return;
     const id = el.querySelector('[data-voto-sel]')?.value; if (!id) { toast('Elige primero a un jugador.', 'info'); return; }
     const uid = getState().session?.user?.id; if (!uid) { toast('Inicia sesión para votar.', 'info'); return; }

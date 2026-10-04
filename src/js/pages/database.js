@@ -139,6 +139,8 @@ document.addEventListener('click', (e) => { if (!e.target.closest('[data-menu], 
 function fijarFoco(id) {
   const box = $('players-container'); box.dataset.foco = String(!!id);
   box.querySelectorAll('.pcw').forEach((el) => el.classList.toggle('pcw-foco', !!id && el.dataset.pcw === id));
+  // Acercamiento: la carta se centra en pantalla mientras crece (si el usuario prefiere menos movimiento, sin animar).
+  if (id) { const el = box.querySelector('.pcw-foco'); const calma = window.matchMedia('(prefers-reduced-motion: reduce)').matches; el?.scrollIntoView({ behavior: calma ? 'auto' : 'smooth', block: 'center', inline: 'nearest' }); }
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fijarFoco(null); });
 document.addEventListener('click', (e) => { if (!e.target.closest('#players-container, .modal-card, #cmp-bar')) fijarFoco(null); });
