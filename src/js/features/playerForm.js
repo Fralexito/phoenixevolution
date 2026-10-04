@@ -8,14 +8,16 @@ import { cropSquareJpeg } from '../core/image.js';
 import { clampStat, calcOvr } from '../core/stats.js';
 import { toast } from '../core/toast.js';
 import { STAT_INFO } from '../../data/stats.js';
+import { POSICIONES, GRUPOS, posInfo } from '../../data/posiciones.js';
 import { STAT_KEYS } from './playerCard.js';
 
-const POSICIONES = ['PO', 'DFC', 'LD', 'LI', 'MCD', 'MC', 'MCO', 'EI', 'ED', 'SD', 'DC'];
 const LEYENDA_VACIA = 'Toca o desliza una estadística y aquí te explicamos qué significa.';
 
 const tileHTML = (k, v, { grande = false, extra = '' } = {}) => {
   const nom = escapeHTML(STAT_INFO[k].nombre);
-  const titulo = `<div class="min-w-0"><b class="font-display text-xs uppercase tracking-wider text-white">${k === 'ovr' ? 'OVR' : k}</b><span class="block text-[10px] text-gray-500 leading-tight truncate">${nom}</span></div>`;
+  const titulo = grande
+    ? `<div class="min-w-0"><b class="font-display text-xs uppercase tracking-wider text-white">OVR</b><span class="block text-[10px] text-gray-500 leading-tight truncate">${nom}</span></div>`
+    : `<div class="min-w-0 flex items-baseline gap-1.5"><b class="font-display text-xs uppercase tracking-wider text-white">${k}</b><span class="text-[10px] text-gray-500 truncate">${nom}</span></div>`;
   const menos = `<button type="button" class="step" data-d="-1" aria-label="Bajar ${nom}">−</button>`;
   const mas = `<button type="button" class="step" data-d="1" aria-label="Subir ${nom}">+</button>`;
   const num = (cls) => `<output class="stat-val font-display font-extrabold ${cls} text-center" aria-live="off">${v}</output>`;
@@ -58,8 +60,10 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
       <div>
         <span class="label">Posición</span>
         <div id="f-pos" class="grid grid-cols-6 gap-1.5" role="group" aria-label="Posición">
-          ${POSICIONES.map((x) => `<button type="button" class="chip !px-0" data-pos="${x}" aria-pressed="${x === (p.posicion ?? 'DC')}">${x}</button>`).join('')}
+          ${POSICIONES.map((x) => { const i = posInfo(x.cod); return `<button type="button" class="chip pos-chip !px-0" data-pos="${x.cod}" style="--pc:${i.color}" title="${escapeHTML(i.nombre)}" aria-label="${escapeHTML(i.nombre)}" aria-pressed="${x.cod === (p.posicion ?? 'DC')}">${x.cod}</button>`; }).join('')}
         </div>
+        <p id="pos-cap" class="text-[12px] mt-1.5 min-h-5" aria-live="polite"></p>
+        <p class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px] text-gray-500">${Object.values(GRUPOS).map((g) => `<span><i class="inline-block w-2 h-2 rounded-full mr-1" style="background:${g.color}"></i>${g.nombre}</span>`).join('')}</p>
       </div>
 
       ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button></div>` })}
@@ -145,10 +149,17 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   $('#f-desc').addEventListener('input', contar); contar();
 
   /* ---- Posición ---- */
+  // La línea de abajo dice el nombre completo: al pasar el mouse (PC) o al tocar/elegir (celular); en reposo muestra la elegida.
+  const capPos = (cod) => { const i = posInfo(cod); $('#pos-cap').innerHTML = `<b style="color:${i.color}">${escapeHTML(i.cod)}</b> · ${escapeHTML(i.nombre)} <span class="text-gray-500">· ${escapeHTML(i.grupoNombre)}</span>`; };
+  const elegida = () => $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC';
   $('#f-pos').addEventListener('click', (e) => {
     const b = e.target.closest('[data-pos]'); if (!b) return;
-    m.querySelectorAll('[data-pos]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    m.querySelectorAll('[data-pos]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); capPos(b.dataset.pos);
   });
+  $('#f-pos').addEventListener('pointerover', (e) => { const b = e.target.closest('[data-pos]'); if (b && e.pointerType === 'mouse') capPos(b.dataset.pos); });
+  $('#f-pos').addEventListener('pointerleave', () => capPos(elegida()));
+  $('#f-pos').addEventListener('focusin', (e) => { const b = e.target.closest('[data-pos]'); if (b) capPos(b.dataset.pos); });
+  capPos(elegida());
 
   /* ---- Foto ---- */
   $('#f-foto').addEventListener('change', async (e) => {

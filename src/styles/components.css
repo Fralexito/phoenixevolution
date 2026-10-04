@@ -91,11 +91,20 @@
 .stat-row { display: flex; align-items: center; gap: .4rem; padding: .35rem .6rem; }
 .stat-row .stat-range { margin: 0; flex: 1 1 auto; min-width: 0; }
 .modal-card.modal-wide { max-width: 40rem; }
-.stat-cell { padding: .45rem .55rem .5rem; }
-.stat-cell .step { width: 28px; height: 28px; font-size: 1rem; }
-@media (pointer: coarse) { .stat-cell .step { width: 34px; height: 34px; } }
+.stat-cell { padding: .3rem .5rem .35rem; }
+.stat-cell .step { width: 26px; height: 26px; font-size: .95rem; }
+.stat-cell .stat-range { margin: 0; }
+.stat-cell .stat-val { line-height: 1; }
+@media (pointer: coarse) { .stat-cell .step { width: 32px; height: 32px; } }
 .cmp-btn { position: absolute; top: .5rem; left: .5rem; z-index: 10; width: 28px; height: 28px; border-radius: .4rem; background: rgba(0,0,0,.7); color: #9ca3af; font-size: .75rem; display: grid; place-items: center; transition: color .2s, background .2s; }
 .cmp-btn:hover { color: #fff; background: var(--color-galaxy-600); }
 .cmp-btn[aria-pressed='true'] { color: #fff; background: var(--color-galaxy-600); box-shadow: 0 0 10px rgba(0,229,255,.6); }
 .cmp-sel > article { border-color: var(--color-galaxy-400); box-shadow: 0 0 22px rgba(0,229,255,.35); }
 @media (pointer: coarse) { .cmp-btn { width: 36px; height: 36px; } }
+.chip.pos-chip { color: var(--pc); border-color: color-mix(in srgb, var(--pc) 45%, transparent); background: color-mix(in srgb, var(--pc) 10%, #05020a); }
+.chip.pos-chip:hover:not(:disabled) { border-color: var(--pc); }
+.chip.pos-chip[aria-pressed='true'] { background: var(--pc); color: #05020a; border-color: var(--pc); box-shadow: 0 0 12px color-mix(in srgb, var(--pc) 60%, transparent); }
+.cmp-mini { width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: .4rem; font-size: .7rem; color: #9ca3af; background: #150a2b; }
+.cmp-mini:hover:not(:disabled) { color: #fff; background: var(--color-galaxy-600); }
+.cmp-mini:disabled { opacity: .3; cursor: not-allowed; }
+@media (pointer: coarse) { .cmp-mini { width: 34px; height: 34px; } }

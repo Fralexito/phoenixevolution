@@ -35,8 +35,8 @@ const base = import.meta.env.BASE_URL;
     <main class="flex-grow w-full"><slot /></main>
     <Footer />
     <!-- Pulso en vivo: mensajes sutiles de actividad (features/liveFeed.js). Los mensajes no reciben clics; solo el botón. -->
-    <div id="live-wrap" class="fixed left-3 bottom-3 z-[60] flex flex-col items-start gap-2 pointer-events-none max-w-[calc(100vw-1.5rem)]">
-      <div id="live-feed" aria-hidden="true" class="flex flex-col items-start gap-1.5"></div>
+    <div id="live-wrap" class="fixed left-3 bottom-3 md:left-auto md:right-4 md:bottom-4 z-[60] flex flex-col items-start md:items-end gap-2 pointer-events-none max-w-[calc(100vw-1.5rem)]">
+      <div id="live-feed" aria-hidden="true" class="flex flex-col items-start md:items-end gap-1.5"></div>
       <button id="live-toggle" type="button" aria-pressed="true" class="live-toggle pointer-events-auto"><span class="live-dot"></span><span class="live-toggle-txt">En vivo</span></button>
     </div>
     <script>

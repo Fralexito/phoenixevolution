@@ -5,7 +5,7 @@ const ARRIBA = 80;   // por encima de esta posición (px) siempre se ve
 const UMBRAL = 8;    // movimiento mínimo (px) para reaccionar; evita parpadeos por el "temblor" del scroll
 
 const VEL_PC = 110;      // px por segundo en pantallas ≥ 640px
-const VEL_MOVIL = 55;    // px por segundo en celular (≈ la mitad: da tiempo a leer)
+const VEL_MOVIL = 40;    // px por segundo en celular (más lento que en PC: da tiempo a leer)
 
 /** Calcula cuántas copias del texto hacen falta para cubrir el ancho y fija velocidad y desplazamiento. */
 function ajustarMarquee() {

@@ -1,5 +1,6 @@
 // Tarjeta de jugador estilo FUT, compartida por Central y Base de Datos.
 import { escapeHTML, safeImg, stat, statColor } from '../core/dom.js';
+import { posInfo } from '../../data/posiciones.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -13,6 +14,7 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
   const avatar = img
     ? `<img src="${escapeHTML(img)}" alt="" loading="lazy" class="w-full h-full object-cover">`
     : `<i class="fa-solid fa-user-astronaut text-xl text-galaxy-400/70"></i>`;
+  const pos = posInfo(p.posicion);
   const stats = STAT_KEYS.map((k) => {
     const v = stat(p[k]);
     return `<div class="flex justify-between items-center"><span class="text-gray-400 font-bold uppercase text-[10px]">${k.toUpperCase()}</span><span style="color:${statColor(v)}" class="font-bold">${v}</span></div>`;
@@ -25,7 +27,7 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
       <div class="flex justify-between items-start">
         <div class="flex flex-col">
           <span class="text-4xl font-display font-extrabold text-white tracking-tighter text-shadow-glow">${stat(p.ovr, 0) || '--'}</span>
-          <span class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30 w-fit mt-1">${escapeHTML(p.posicion)}</span>
+          <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}1f" class="text-[11px] font-display font-bold uppercase tracking-widest px-2 py-0.5 rounded border w-fit mt-1">${escapeHTML(p.posicion)}</span>
         </div>
         <div class="w-12 h-12 rounded-full border-2 border-galaxy-400/50 bg-galaxy-panel overflow-hidden flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.3)]">${avatar}</div>
       </div>

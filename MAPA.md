@@ -97,3 +97,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Ficha de jugador**: stats en 2 columnas, botón «Ver completa» (lista de las 14 + OVR), frase opcional y **descripción** (`jugadores.descripcion`, migración 008, ≤600).
 - **Comparador** (`features/compare.js`, cálculos en `core/compare.js`): en Jugadores, botón «Comparar» o la balanza de cada tarjeta (máx. 2). Radar superpuesto (escala 40–99), barras enfrentadas, resumen y textos.
 - **Pulso en vivo** (`features/liveFeed.js`, `core/live.js`): mensajes sutiles abajo a la izquierda; botón «En vivo» para silenciar (se recuerda). Con `LIVE_DEMO = true` simula eventos con nombres ficticios (rotulados «demo», lista en `data/liveDemo.js`). Para conectar actividad real: disparar `window.dispatchEvent(new CustomEvent('live:evento', { detail: {...} }))` y poner `LIVE_DEMO = false`.
+
+## Ronda 10 — Posiciones con color, comparador por equipos, ajustes de pulso y ticker
+- **Posiciones** (`src/data/posiciones.js`, única fuente): 4 grupos con color (Portero amarillo, Defensa azul, Centrocampista verde, Delantero rojo; EI/ED cuentan como delanteros, como LWF/RWF en PES). Nombre completo al pasar el mouse o tocar (línea bajo los botones); el color también se usa en la insignia de la tarjeta y en el comparador.
+- **Stats** más compactas (~60px por stat en vez de ~118px).
+- **Comparador por equipos** (`features/compare.js` + `core/compare.js`): 2 a 8 jugadores en Equipo A / Equipo B (máx. 4 cada uno; 3 vs 2, 4 vs 3…), se compara el PROMEDIO de cada equipo (radar + barras). Vista «Todos»: tabla con cada jugador y el mejor valor subrayado.
+- **Pulso en vivo**: en PC abajo a la derecha (móvil igual que antes). **Ticker**: más separación entre noticias y 40 px/s en celular.

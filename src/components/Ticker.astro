@@ -10,8 +10,8 @@ import { TICKER } from '../data/site.js';
        features/ticker.js ajusta copias y velocidad (en píxeles por segundo) según el ancho de la pantalla. -->
   <div id="ticker-view" class="flex-1 min-w-0 overflow-hidden relative flex items-center">
     <div id="ticker-track" class="ticker-track font-sans text-xs sm:text-sm text-galaxy-50">
-      <span class="ticker-group">{TICKER.map((t) => (<><span class="mx-3 sm:mx-4 text-galaxy-400">◆</span><span>{t}</span></>))}</span>
-      <span class="ticker-group" aria-hidden="true">{TICKER.map((t) => (<><span class="mx-3 sm:mx-4 text-galaxy-400">◆</span><span>{t}</span></>))}</span>
+      <span class="ticker-group">{TICKER.map((t) => (<><span class="mx-6 sm:mx-10 text-galaxy-400">◆</span><span>{t}</span></>))}</span>
+      <span class="ticker-group" aria-hidden="true">{TICKER.map((t) => (<><span class="mx-6 sm:mx-10 text-galaxy-400">◆</span><span>{t}</span></>))}</span>
     </div>
   </div>
 </div>

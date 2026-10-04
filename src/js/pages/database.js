@@ -6,12 +6,13 @@ import { toast } from '../core/toast.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
+import { MAX_COMPARE } from '../core/compare.js';
 
 const $ = (id) => document.getElementById(id);
 let all = [];
 let club = 'ALL';
 let term = '';
-const sel = []; // ids marcados para comparar (máx. 2)
+const sel = []; // ids marcados para comparar (máx. 8; en el comparador se reparten en equipos A y B)
 
 function paint() {
   const t = term.trim().toLowerCase();
@@ -30,7 +31,7 @@ function paint() {
 
 function paintBar() {
   const bar = $('cmp-bar'); bar.hidden = !sel.length;
-  $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige otro jugador` : sel.map((id) => all.find((p) => p.id === id)?.nombre ?? '').join(' vs ');
+  $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige al menos otro` : `${sel.length} jugadores seleccionados`;
   $('cmp-go').disabled = sel.length < 2;
 }
 
@@ -54,13 +55,13 @@ async function load() {
 
 $('player-filter-select').addEventListener('change', (e) => { club = e.target.value; paint(); });
 $('player-search-input').addEventListener('input', (e) => { term = e.target.value; paint(); });
-$('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel[0], sel[1])));
-$('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1]));
+$('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel)));
+$('cmp-go').addEventListener('click', () => openCompare(all, sel));
 $('cmp-clear').addEventListener('click', () => { sel.length = 0; paint(); });
 $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 $('players-container').addEventListener('click', async (e) => {
   const cmp = e.target.closest('[data-cmp]')?.dataset.cmp;
-  if (cmp) { const i = sel.indexOf(cmp); if (i >= 0) sel.splice(i, 1); else { if (sel.length === 2) sel.shift(); sel.push(cmp); } paint(); return; }
+  if (cmp) { const i = sel.indexOf(cmp); if (i >= 0) sel.splice(i, 1); else if (sel.length >= MAX_COMPARE) { toast(`Puedes comparar hasta ${MAX_COMPARE} jugadores a la vez.`, 'info', { key: 'cmp-max' }); return; } else sel.push(cmp); paint(); return; }
   const edit = e.target.closest('[data-edit]')?.dataset.edit;
   const del = e.target.closest('[data-del]')?.dataset.del;
   if (edit) openPlayerForm(all.find((p) => p.id === edit), load);

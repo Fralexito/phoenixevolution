@@ -4,9 +4,10 @@ import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../sr
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
 import { clampStat, calcOvr } from '../src/js/core/stats.js';
+import { posInfo, POSICIONES } from '../src/data/posiciones.js';
 import { STAT_INFO } from '../src/data/stats.js';
 import { STAT_KEYS } from '../src/js/features/playerCard.js';
-import { compareStats, radarPoints, axisPoint } from '../src/js/core/compare.js';
+import { compareStats, radarPoints, axisPoint, autoTeams, moveToTeam, teamProfile, compareTeams, MAX_TEAM } from '../src/js/core/compare.js';
 import { formatEvento, demoDelay } from '../src/js/core/live.js';
 import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
 import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
@@ -161,4 +162,27 @@ test('pulso en vivo: escapa nombres, rechaza eventos inválidos y la pausa queda
   assert.equal(formatEvento({ tipo: 'otro', quien: 'A' }), null);
   assert.equal(formatEvento({ tipo: 'radar_on', quien: 'Neo' }).tone, 'cyan');
   assert.equal(demoDelay(() => 0), 5000); assert.equal(demoDelay(() => 1), 11000);
+});
+
+test('equipos: se reparten alternando, máx. 4 por equipo, y mover respeta el límite', () => {
+  assert.deepEqual(autoTeams(['1', '2', '3']), { a: ['1', '3'], b: ['2'] });
+  assert.deepEqual(autoTeams(['1', '2', '3', '4', '5', '6', '7', '8', '9']), { a: ['1', '3', '5', '7'], b: ['2', '4', '6', '8'] });
+  assert.deepEqual(moveToTeam({ a: ['1', '3'], b: ['2'] }, '3', 'b'), { a: ['1'], b: ['2', '3'] });
+  const lleno = { a: ['1'], b: ['2', '3', '4', '5'] }; assert.equal(moveToTeam(lleno, '1', 'b'), lleno);
+  assert.equal(MAX_TEAM, 4);
+});
+test('equipos: promedio por jugador permite comparar 3 vs 2 de forma justa', () => {
+  const k = ['atq', 'fin'];
+  const A = [{ atq: 90, fin: 80, ovr: 85 }, { atq: 80, fin: 70, ovr: 75 }, { atq: 70, fin: 60, ovr: 65 }];
+  const B = [{ atq: 80, fin: 90, ovr: 85 }, { atq: 80, fin: 80, ovr: 80 }];
+  const pa = teamProfile(A, k); const pb = teamProfile(B, k);
+  assert.deepEqual([pa.n, pa.atq, pa.fin, pa.ovr], [3, 80, 70, 75]); assert.deepEqual([pb.n, pb.atq, pb.fin, pb.ovr], [2, 80, 85, 82.5]);
+  const c = compareTeams(pa, pb, k);
+  assert.deepEqual(c.rows.map((r) => r.win), ['tie', 'b']); assert.equal(c.ovr.diff, -7.5); assert.equal(teamProfile([], k).n, 0);
+});
+test('posiciones: 11 posiciones, 4 grupos con color y nombre completo; código desconocido no rompe', () => {
+  assert.equal(POSICIONES.length, 11);
+  assert.equal(posInfo('DC').grupo, 'delantero'); assert.equal(posInfo('PO').nombre, 'Portero'); assert.equal(posInfo('DFC').grupoNombre, 'Defensa');
+  assert.ok(POSICIONES.every((p) => /^#[0-9a-f]{6}$/.test(posInfo(p.cod).color)));
+  assert.equal(posInfo('ZZ').cod, 'ZZ'); assert.equal(posInfo(null).color, '#9ca3af');
 });
