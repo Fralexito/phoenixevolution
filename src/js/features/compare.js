@@ -33,9 +33,8 @@ function radarSVG(a, b, rows) {
     const [x, y] = axisPoint(i, n, RADAR.cx, RADAR.cy, RADAR.r * t); const gana = ganador[k] === lado;
     return `<circle class="cmp-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${gana ? 3.6 : 2.2}" fill="${c}" stroke="#05020f" stroke-width="1" style="animation-delay:${0.5 + i * 0.03}s"><title>${k.toUpperCase()}: ${escapeHTML(p.nombre)} ${Number(p[k]) || '—'} · ${escapeHTML(otro.nombre)} ${Number(otro[k]) || '—'}</title></circle>`;
   }).join('');
-  return `<svg viewBox="0 0 300 300" role="img" aria-label="Radar comparativo de las 14 estadísticas" class="cmp-radar w-full max-w-[24rem] mx-auto">${rings}${spokes}${poly(a, CA, 'cmp-poly-a')}${poly(b, CB, 'cmp-poly-b')}${dots(a, CA, b, 'a')}${dots(b, CB, a, 'b')}</svg>
-    <div class="flex justify-center gap-4 text-[11px] font-display font-bold uppercase tracking-wider"><span style="color:${CA}">● ${escapeHTML(a.nombre)}</span><span style="color:${CB}">● ${escapeHTML(b.nombre)}</span></div>
-    <p class="text-[10px] text-gray-500 text-center mt-1">Escala 40–99 · el color de cada sigla indica quién gana esa estadística</p>`;
+  return `<svg viewBox="0 0 300 300" role="img" aria-label="Radar comparativo de las 14 estadísticas" class="cmp-radar w-full max-w-[17.5rem] sm:max-w-[19rem] mx-auto">${rings}${spokes}${poly(a, CA, 'cmp-poly-a')}${poly(b, CB, 'cmp-poly-b')}${dots(a, CA, b, 'a')}${dots(b, CB, a, 'b')}</svg>
+    <div class="flex justify-center gap-4 text-[11px] font-display font-bold uppercase tracking-wider -mt-1"><span style="color:${CA}">● ${escapeHTML(a.nombre)}</span><span style="color:${CB}">● ${escapeHTML(b.nombre)}</span><span class="text-gray-500 normal-case tracking-normal font-sans font-normal text-[10px] self-center">escala 40–99</span></div>`;
 }
 
 /** Tarjeta de «luchador»: foto con aura, media general grande, club/posición y su mejor estadística. `lider` la resalta con corona. */
@@ -45,8 +44,8 @@ function headCard(p, color, side, lider) {
   const mejor = STAT_KEYS.map((k) => [k, Number(p[k]) || 0]).sort((x, y) => y[1] - x[1])[0];
   return `<div class="cmp-fighter ${lider ? 'cmp-lider' : ''}" style="--c:${color}" data-side="${side}">
     ${lider ? '<span class="cmp-crown" title="Lidera el duelo"><i class="fa-solid fa-crown"></i></span>' : ''}
-    <span class="cmp-photo">${img ? `<img src="${escapeHTML(img)}" alt="" class="w-full h-full object-cover object-top">` : `<i class="fa-solid fa-user-astronaut text-xl" style="color:${color}"></i>`}</span>
-    <span class="cmp-ovr" data-count="${Number(p.ovr) || 0}">${escapeHTML(p.ovr ?? '--')}</span>
+    <span class="cmp-top"><span class="cmp-photo">${img ? `<img src="${escapeHTML(img)}" alt="" class="w-full h-full object-cover object-top">` : `<i class="fa-solid fa-user-astronaut" style="color:${color}"></i>`}</span>
+    <span class="cmp-ovr" data-count="${Number(p.ovr) || 0}">${escapeHTML(p.ovr ?? '--')}</span></span>
     <b class="cmp-name">${escapeHTML(p.nombre)}</b>
     <span class="cmp-sub">${escapeHTML(String(p.club ?? '').toUpperCase())} · ${escapeHTML(p.posicion)}</span>
     <span class="cmp-best" title="Su mejor estadística"><i class="fa-solid fa-bolt"></i> ${mejor[0].toUpperCase()} ${mejor[1]}</span>
@@ -60,12 +59,12 @@ function marcadorHTML(c, a, b, lider) {
   return `<div class="cmp-score">
     <div class="flex items-end justify-between gap-2">
       <span class="cmp-big" style="color:${CA}" data-count="${c.wins.a}">${c.wins.a}</span>
-      <span class="text-[10px] text-gray-400 uppercase tracking-[0.25em] font-display pb-1 text-center">Duelo · ${total} estadísticas${c.wins.tie ? ` · ${c.wins.tie} empate${c.wins.tie === 1 ? '' : 's'}` : ''}</span>
+      <span class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-display pb-0.5 text-center">${total} estadísticas${c.wins.tie ? ` · ${c.wins.tie} empate${c.wins.tie === 1 ? '' : 's'}` : ''}</span>
       <span class="cmp-big" style="color:${CB}" data-count="${c.wins.b}">${c.wins.b}</span>
     </div>
     <div class="cmp-meter" role="img" aria-label="${c.wins.a} estadísticas a favor de ${escapeHTML(a.nombre)} y ${c.wins.b} a favor de ${escapeHTML(b.nombre)}"><i class="cmp-m-a" style="--w:${pc(c.wins.a)};--c:${CA}"></i><i class="cmp-m-t" style="--w:${pc(c.wins.tie)}"></i><i class="cmp-m-b" style="--w:${pc(c.wins.b)};--c:${CB}"></i><span class="cmp-m-spark"></span></div>
-    <div class="cmp-verdict">${ganador ? `<i class="fa-solid fa-crown" style="color:${ganador.c}"></i> <b style="color:${ganador.c}">${escapeHTML(ganador.p.nombre)}</b> lidera el duelo` : '<i class="fa-solid fa-equals text-gray-400"></i> <b class="text-white">Duelo igualado</b>'}
-      ${c.ovr.diff ? `<span class="block text-[11px] text-gray-400 font-normal mt-0.5">Media general: ${c.ovr.diff > 0 ? escapeHTML(a.nombre) : escapeHTML(b.nombre)} por ${Math.abs(c.ovr.diff)} punto${Math.abs(c.ovr.diff) === 1 ? '' : 's'}</span>` : ''}</div>
+    <div class="cmp-verdict">${ganador ? `<i class="fa-solid fa-crown" style="color:${ganador.c}"></i> <b style="color:${ganador.c}">${escapeHTML(ganador.p.nombre)}</b> lidera` : '<i class="fa-solid fa-equals text-gray-400"></i> <b class="text-white">Duelo igualado</b>'}
+      ${c.ovr.diff ? `<span class="cmp-media">· media ${c.ovr.diff > 0 ? '+' : '−'}${Math.abs(c.ovr.diff)} ${c.ovr.diff > 0 ? escapeHTML(a.nombre) : escapeHTML(b.nombre)}</span>` : ''}</div>
   </div>`;
 }
 
@@ -74,7 +73,7 @@ function rowHTML(r, i = 0) {
   const w = (v) => `${Math.round((v / 99) * 100)}%`;
   const cls = (me) => (r.win === me ? 'font-extrabold' : 'opacity-70');
   const barra = (v, c, gana, der) => `<div class="cmp-bar ${der ? '' : 'justify-end'}"><div class="cmp-fill ${gana ? 'cmp-gana' : ''}" style="--w:${w(v)};--c:${c};animation-delay:${i * 40}ms;opacity:${r.win && !gana ? .45 : 1}"></div></div>`;
-  return `<div class="py-1.5">
+  return `<div class="py-1">
     <div class="text-center text-[10px] text-gray-500 uppercase tracking-wider font-display" title="${escapeHTML(info.texto)}"><b class="text-gray-300">${r.k.toUpperCase()}</b> · ${escapeHTML(info.nombre)}${r.diff ? ` <span class="cmp-chip" style="color:${r.diff > 0 ? CA : CB};border-color:${r.diff > 0 ? CA : CB}66">${r.diff > 0 ? '◀' : ''} +${Math.abs(r.diff)} ${r.diff < 0 ? '▶' : ''}</span>` : ''}</div>
     <div class="flex items-center gap-2 mt-0.5">
       <span class="w-7 text-right font-display text-sm ${cls('a')}" style="color:${statColor(r.a)}">${r.a}</span>
@@ -110,7 +109,7 @@ export function openCompare(players, idA = null, idB = null, masivoIds = null) {
   let intro = true;    // la entrada animada (conteo, tira) solo corre cuando cambia la pareja, no al cambiar de pestaña
 
   const m = openModal(`
-    <div class="p-5 sm:p-6 space-y-4">
+    <div class="p-4 sm:p-5 space-y-2.5">
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-scale-balanced text-galaxy-400 mr-2"></i>Comparar</h2>
         <div class="flex items-center gap-3">
@@ -140,12 +139,12 @@ export function openCompare(players, idA = null, idB = null, masivoIds = null) {
         <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-1.5 sm:gap-3">${headCard(a, CA, 'a', lA)}<div class="cmp-vs-wrap"><span class="cmp-vs">VS</span></div>${headCard(b, CB, 'b', lB)}</div>
         ${marcadorHTML(c, a, b)}
       </div>
-      <div class="seg mt-3" id="cmp-tabs" role="group" aria-label="Vista">
+      <div class="seg mt-2" id="cmp-tabs" role="group" aria-label="Vista">
         <button type="button" data-t="radar" aria-pressed="${tab === 'radar'}">Radar</button>
         <button type="button" data-t="barras" aria-pressed="${tab === 'barras'}">Estadísticas</button>
         ${perfil ? `<button type="button" data-t="perfil" aria-pressed="${tab === 'perfil'}">Perfil</button>` : ''}
       </div>
-      <div class="mt-3 cmp-tab-in">${tab === 'radar' ? radarSVG(a, b, c.rows) : tab === 'barras' ? `<div class="divide-y divide-galaxy-border/40">${c.rows.map(rowHTML).join('')}</div>` : `<div class="flex flex-col sm:flex-row gap-2">${textoJugador(a, CA)}${textoJugador(b, CB)}</div>`}</div>`;
+      <div class="mt-2 cmp-tab-in">${tab === 'radar' ? radarSVG(a, b, c.rows) : tab === 'barras' ? `<div class="divide-y divide-galaxy-border/40">${c.rows.map(rowHTML).join('')}</div>` : `<div class="flex flex-col sm:flex-row gap-2">${textoJugador(a, CA)}${textoJugador(b, CB)}</div>`}</div>`;
     body.querySelectorAll('#cmp-tabs button').forEach((x) => x.addEventListener('click', () => { tab = x.dataset.t; intro = false; paint(); }));
     if (intro) contar(body);
     intro = false;
