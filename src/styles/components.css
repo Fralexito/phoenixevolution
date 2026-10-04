@@ -196,3 +196,19 @@
 #xi-det > summary::-webkit-details-marker { display: none; }
 #xi-det[open] .xi-chev { transform: rotate(180deg); } .xi-chev { transition: transform .2s; }
 .featured-row { scrollbar-width: none; } .featured-row::-webkit-scrollbar { display: none; }
+
+/* Botones de la portada de Central */
+.hero-cta { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-display); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; padding: .8rem 1.8rem; border-radius: .75rem; transition: all .2s; }
+.hero-cta-p { color: #fff; background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-700)); box-shadow: 0 0 25px rgb(128 0 255 / .4); }
+.hero-cta-p:hover { filter: brightness(1.15); }
+.hero-cta-s { color: #fff; background: rgb(8 4 24 / .6); border: 1px solid var(--color-galaxy-border); backdrop-filter: blur(8px); }
+.hero-cta-s:hover { border-color: var(--color-galaxy-400); background: rgb(255 255 255 / .08); }
+/* Con sesión iniciada, la Sala de Duelos pasa a ser el botón principal */
+html[data-sesion='si'] .hero-duelos { background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-700)); border-color: transparent; box-shadow: 0 0 25px rgb(128 0 255 / .4); }
+html[data-sesion='si'] #btn-hero-register { display: none; }
+/* Lista de clips */
+.clip-row { display: flex; align-items: center; gap: .75rem; padding: .55rem; border-radius: .75rem; background: rgb(8 4 24 / .6); border: 1px solid var(--color-galaxy-border); transition: border-color .2s, background .2s; }
+.clip-row:hover, .clip-row:focus-visible { border-color: var(--color-galaxy-400); background: rgb(255 255 255 / .05); outline: none; }
+.clip-thumb { width: 4.2rem; height: 2.7rem; flex: none; display: grid; place-items: center; border-radius: .5rem; color: #fff; background: linear-gradient(135deg, var(--color-galaxy-600), var(--color-galaxy-900)); font-size: .8rem; transition: transform .2s; }
+.clip-row:hover .clip-thumb { transform: scale(1.06); }
+.clip-tag { display: block; font-size: .6rem; letter-spacing: .1em; color: #f87171; font-family: var(--font-display); }

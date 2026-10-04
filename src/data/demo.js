@@ -16,3 +16,9 @@ export const DEMO_XI = [
   { pos: 'ED', nombre: 'ARENS', cls: 'bg-cyan-500 text-white' },
   { pos: 'MCD', nombre: 'ROBERTO', cls: 'bg-yellow-500 text-black' },
 ];
+// Clips de ejemplo para «Highlights» (se reemplazarán por los videos reales del canal).
+export const DEMO_CLIPS = [
+  { tag: 'TOP 5', titulo: 'Mejores atajadas: Jornada 3', dur: '4:12' },
+  { tag: 'RESUMEN', titulo: 'Fralex 3-2 Axel: el partidazo', dur: '6:40' },
+  { tag: 'TOP 5', titulo: 'Mejores goles: Jornada 2', dur: '3:55' },
+];
