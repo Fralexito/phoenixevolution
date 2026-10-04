@@ -1,32 +1,64 @@
-// Página Central: partidos y tabla (demo), XI ideal (demo) y Top 3 REAL desde `jugadores`.
+// Página Central: partidos, posiciones y partido destacado REALES (edición en curso de data/ligaResultados.js), XI ideal (demo) y Top 3 REAL desde `jugadores`.
 import { supabase } from '../core/supabase.js';
 import { escapeHTML } from '../core/dom.js';
 import { playerCardHTML } from '../features/playerCard.js';
-import { DEMO_MATCHES, DEMO_TABLE, DEMO_XI } from '../../data/demo.js';
+import { DEMO_XI } from '../../data/demo.js';
+import { EDICIONES } from '../../data/ligaResultados.js';
+import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
+import { calcularTabla } from '../core/tabla.js';
 import { openAuthModal } from '../features/auth.js';
 import { onSession } from '../core/session.js';
-import { cifra, partirPartidos, ordenPodio } from '../core/central.js';
+import { cifra, ordenPodio, jornadasCentral, partidoDestacado, visualClub } from '../core/central.js';
 
 const $ = (id) => document.getElementById(id);
 
+// Edición en curso de la Galaxy League (la misma fuente que la página Liga). Si no hay ninguna en curso, se muestran estados vacíos.
+const edicion = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;
+const fechas = edicion?.fechas ?? [];
+const clubDe = (n) => edicion?.clubes?.[n] ?? '';
+const jornadas = jornadasCentral(fechas);
+const tabla = calcularTabla(fechas.flatMap((f) => f.partidos)).tabla;
+const club = (n) => escapeHTML(clubDe(n).toUpperCase());
+
 let pestana = 'proximos';
 function pintarPartidos() {
-  const grupos = partirPartidos(DEMO_MATCHES);
-  const lista = grupos[pestana];
-  $('matches-container').innerHTML = lista.length ? lista.map((m) => `
-    <div class="glass-panel rounded-xl p-3 sm:p-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center text-white">
-      <span class="truncate font-semibold text-sm sm:text-base">${escapeHTML(m.local)}</span>
-      <span class="text-center font-display font-bold text-lg sm:text-2xl bg-black/50 py-1 px-3 rounded border border-galaxy-border whitespace-nowrap">${escapeHTML(m.nota || `${m.gl} - ${m.gv}`)}</span>
-      <span class="text-right truncate font-semibold text-sm sm:text-base">${escapeHTML(m.visita)}</span>
-    </div>`).join('') : `<div class="text-center text-gray-500 text-sm py-6 glass-panel rounded-xl">${pestana === 'proximos' ? 'No hay partidos programados todavía.' : 'Aún no hay resultados.'}</div>`;
+  const grupos = pestana === 'proximos' ? (jornadas.proximos ? [jornadas.proximos] : []) : jornadas.resultados;
+  if (!grupos.length) { $('matches-container').innerHTML = `<div class="text-center text-gray-500 text-sm py-6 glass-panel rounded-xl">${pestana === 'proximos' ? 'No hay partidos por jugar por ahora.' : 'Aún no hay resultados.'}</div>`; return; }
+  const lado = (n, gana, der) => `<span class="min-w-0 ${der ? 'text-right' : ''}"><span class="block truncate text-sm sm:text-base ${gana ? 'font-bold text-white' : 'font-semibold text-gray-300'}">${escapeHTML(n)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(n)}</span></span>`;
+  const fila = (m) => {
+    const jugado = Number.isInteger(m.gl);
+    return `<div class="glass-panel rounded-xl p-3 sm:p-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center text-white">
+      ${lado(m.l, jugado && m.gl > m.gv)}
+      <span class="text-center font-display font-bold text-lg sm:text-2xl bg-black/50 py-1 px-3 rounded border border-galaxy-border whitespace-nowrap">${jugado ? `${m.gl} - ${m.gv}` : 'VS'}</span>
+      ${lado(m.v, jugado && m.gv > m.gl, true)}
+    </div>`;
+  };
+  $('matches-container').innerHTML = grupos.map((j) => `<div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${j.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${j.partidos.map(fila).join('')}`).join('');
+}
+
+function pintarDestacado() {
+  const box = $('destacado'); const m = partidoDestacado(jornadas.proximos?.partidos, tabla);
+  if (!m) { box.innerHTML = '<div class="p-6 text-center text-gray-500 text-xs">Aún no hay un partido destacado: no quedan cruces por jugar.</div>'; return; }
+  const pos = (n) => tabla.findIndex((t) => t.nombre === n) + 1;
+  const lado = (n, der) => {
+    const v = visualClub(clubDe(n), CLUBES_VISUAL);
+    const escudo = `<div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 flex items-center justify-center font-display font-bold text-lg sm:text-2xl ${v.oscuro ? 'text-black' : 'text-white'}" style="border-color:${v.a};background:linear-gradient(135deg,${v.a},${v.b});box-shadow:0 0 20px ${v.a}66">${escapeHTML(v.sigla)}</div>`;
+    const txt = `<div class="min-w-0"><div class="inline-flex items-center gap-1.5 px-2 py-0.5 whitespace-nowrap rounded bg-galaxy-600/25 border border-galaxy-400/30 text-[10px] text-galaxy-400 font-bold mb-1">${pos(n) ? `${pos(n)}.º en la tabla` : 'Sin puesto'}</div>
+      <h3 class="font-display font-bold text-xl sm:text-3xl text-white text-shadow-glow truncate uppercase">${escapeHTML(n)}</h3><p class="text-[11px] sm:text-sm text-galaxy-400 uppercase tracking-widest font-bold truncate">${club(n)}</p></div>`;
+    return `<div class="flex flex-col-reverse ${der ? 'sm:flex-row-reverse sm:justify-end text-center sm:text-left' : 'sm:flex-row sm:justify-end text-center sm:text-right'} items-center gap-2 sm:gap-4 min-w-0">${txt}${escudo}</div>`;
+  };
+  box.innerHTML = `<div class="absolute top-0 right-0 bg-galaxy-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-widest z-10"><i class="fa-solid fa-fire mr-1"></i> Partido Destacado</div>
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-white/10"></div>
+    <div class="relative z-10 p-4 sm:p-6 pt-9 sm:pt-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">${lado(m.l, false)}
+      <div class="flex flex-col items-center"><span class="font-display font-bold text-2xl sm:text-4xl text-galaxy-400 italic drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]">VS</span><span class="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-widest mt-1 text-center">Fecha ${jornadas.proximos.n} · Parsec</span></div>${lado(m.v, true)}</div>`;
 }
 
 function renderDemo() {
-  pintarPartidos();
-  $('mini-table-container').innerHTML = DEMO_TABLE.map((t, i) => `
+  pintarPartidos(); pintarDestacado();
+  $('mini-table-container').innerHTML = tabla.length ? tabla.map((t, i) => `
     <tr class="border-b border-galaxy-border/30 text-gray-300 text-sm">
-      <td class="py-2 pl-1">${i + 1}</td><td class="truncate pr-2">${escapeHTML(t.nombre)}</td><td class="text-center font-bold text-white">${t.pts}</td>
-    </tr>`).join('');
+      <td class="py-2 pl-1">${i + 1}</td><td class="pr-2 max-w-[9rem]"><span class="block truncate">${escapeHTML(t.nombre)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(t.nombre)}</span></td><td class="text-center text-gray-400">${t.pj}</td><td class="text-center font-bold text-white">${t.pts}</td>
+    </tr>`).join('') : '<tr><td colspan="4" class="py-4 text-center text-gray-500 text-xs">Aún no hay partidos jugados.</td></tr>';
   const slot = (p) => `<div class="text-center"><div class="w-8 h-8 rounded-full ${p.cls} border border-white mx-auto text-xs font-bold flex items-center justify-center">${p.pos}</div><span class="text-[11px] font-bold text-white uppercase tracking-wider block mt-1">${p.nombre}</span></div>`;
   const [dc, ei, mco, ed, mcd] = DEMO_XI;
   $('xi-container').innerHTML = `

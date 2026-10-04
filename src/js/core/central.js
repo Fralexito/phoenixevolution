@@ -19,3 +19,36 @@ export function ordenPodio(ordenados) {
   const [a, b, c] = l;
   return [b, a, c].filter(Boolean);
 }
+
+const jugado = (m) => Number.isInteger(m?.gl) && Number.isInteger(m?.gv);
+const pendiente = (m) => m && m.gl == null && m.gv == null;
+
+/**
+ * Qué mostrar en «Central de Partidos» a partir de las fechas de la edición en curso:
+ *  · resultados = hasta las 2 ÚLTIMAS fechas con algún partido jugado (la más reciente primero; solo los jugados). Así una fecha recién empezada no deja la lista casi vacía
+ *  · proximos   = la PRIMERA fecha que tenga algún partido sin jugar (solo los pendientes)
+ * Una fecha a medias aparece en las dos pestañas, cada una con su parte. Sin fechas → [] y null.
+ * @returns {{resultados:{n:number,partidos:object[]}[], proximos:{n:number,partidos:object[]}|null}}
+ */
+export function jornadasCentral(fechas) {
+  const f = Array.isArray(fechas) ? fechas : [];
+  const ult = [...f].reverse().filter((x) => x.partidos?.some(jugado)).slice(0, 2);
+  const sig = f.find((x) => x.partidos?.some(pendiente));
+  return {
+    resultados: ult.map((x) => ({ n: x.n, partidos: x.partidos.filter(jugado) })),
+    proximos: sig ? { n: sig.n, partidos: sig.partidos.filter(pendiente) } : null,
+  };
+}
+
+/** Partido destacado: de los pendientes, el que enfrenta a los mejor ubicados de la tabla (menor suma de puestos; a igualdad, el primero listado). */
+export function partidoDestacado(pendientes, tabla) {
+  const pos = new Map((Array.isArray(tabla) ? tabla : []).map((t, i) => [t.nombre, i + 1]));
+  const peso = (m) => (pos.get(m.l) ?? 99) + (pos.get(m.v) ?? 99);
+  return (Array.isArray(pendientes) ? pendientes : []).reduce((mejor, m) => (!mejor || peso(m) < peso(mejor) ? m : mejor), null);
+}
+
+/** Escudo-monograma de un club; los desconocidos reciben uno neutro con sus 3 primeras letras. */
+export function visualClub(club, mapa = {}) {
+  const v = mapa[club]; if (v) return v;
+  return { sigla: String(club ?? '?').replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 3).toUpperCase() || '?', a: '#6b7280', b: '#1f2937' };
+}

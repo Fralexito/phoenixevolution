@@ -680,3 +680,17 @@ test('mis partidos: agendados, historial y pendientes', () => {
   assert.deepEqual(ordenarPartidosJugados(rs).map((r) => r.id), [6, 5]);          // más reciente primero
   assert.deepEqual(pendientes(rs).map((r) => r.id), [1]);                   // cancelados no aparecen en ningún grupo
 });
+
+// ---- central de partidos
+import { jornadasCentral, partidoDestacado, visualClub } from '../src/js/core/central.js';
+test('central: jornadas, destacado y escudo', () => {
+  const F = [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }] }, { n: 2, partidos: [{ l: 'C', v: 'D', gl: 2, gv: 2 }, { l: 'A', v: 'C', gl: null, gv: null }] }, { n: 3, partidos: [{ l: 'B', v: 'D', gl: null, gv: null }, { l: 'A', v: 'D', gl: null, gv: null }] }];
+  const j = jornadasCentral(F);
+  assert.deepEqual(j.resultados.map((r) => [r.n, r.partidos.length]), [[2, 1], [1, 1]]);       // las 2 últimas fechas con algo jugado, la más reciente primero, solo lo jugado
+  assert.equal(j.proximos.n, 2); assert.deepEqual(j.proximos.partidos.map((m) => m.v), ['C']);   // primera fecha con pendientes
+  assert.deepEqual(jornadasCentral([]), { resultados: [], proximos: null }); assert.deepEqual(jornadasCentral(null), { resultados: [], proximos: null });
+  const tabla = [{ nombre: 'A' }, { nombre: 'B' }, { nombre: 'C' }, { nombre: 'D' }];
+  assert.deepEqual(partidoDestacado(F[2].partidos, tabla), { l: 'A', v: 'D', gl: null, gv: null });   // A(1)+D(4)=5 < B(2)+D(4)=6
+  assert.equal(partidoDestacado([], tabla), null);
+  assert.equal(visualClub('Club Raro').sigla, 'CLU'); assert.equal(visualClub('Arsenal', { Arsenal: { sigla: 'ARS' } }).sigla, 'ARS');
+});

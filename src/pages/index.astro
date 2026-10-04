@@ -69,31 +69,9 @@ const base = import.meta.env.BASE_URL;
           </div>
         </div>
 
-        <article class="glass-panel rounded-xl overflow-hidden relative">
-          <div class="absolute top-0 right-0 bg-galaxy-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-widest z-10"><i class="fa-solid fa-fire mr-1"></i> Partido Destacado</div>
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-white/10"></div>
-          <div class="relative z-10 p-4 sm:p-6 pt-9 sm:pt-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">
-            <div class="flex flex-col-reverse sm:flex-row items-center gap-2 sm:gap-4 sm:justify-end text-center sm:text-right min-w-0">
-              <div class="min-w-0">
-                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 whitespace-nowrap rounded bg-emerald-500/20 border border-emerald-500/40 text-[10px] text-emerald-400 font-bold mb-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> HOST ACTIVO</div>
-                <h3 class="font-display font-bold text-xl sm:text-3xl text-white text-shadow-glow truncate">FRALEX</h3>
-                <p class="text-[11px] sm:text-sm text-galaxy-400 uppercase tracking-widest font-bold truncate">FC Barcelona</p>
-              </div>
-              <div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 border-blue-500 bg-gradient-to-br from-blue-800 to-red-800 flex items-center justify-center font-display font-bold text-lg sm:text-2xl text-white shadow-[0_0_20px_rgba(37,99,235,0.5)]">FCB</div>
-            </div>
-            <div class="flex flex-col items-center">
-              <span class="font-display font-bold text-2xl sm:text-4xl text-galaxy-400 italic drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]">VS</span>
-              <span class="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-widest mt-1 text-center">Parsec · Próximamente</span>
-            </div>
-            <div class="flex flex-col-reverse sm:flex-row-reverse items-center gap-2 sm:gap-4 sm:justify-end text-center sm:text-left min-w-0">
-              <div class="min-w-0">
-                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 whitespace-nowrap rounded bg-blue-500/20 border border-blue-500/40 text-[10px] text-blue-400 font-bold mb-1"><i class="fa-solid fa-network-wired text-[9px]"></i> CLIENTE</div>
-                <h3 class="font-display font-bold text-xl sm:text-3xl text-white text-shadow-glow truncate">AXEL</h3>
-                <p class="text-[11px] sm:text-sm text-galaxy-400 uppercase tracking-widest font-bold truncate">Real Madrid</p>
-              </div>
-              <div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 border-gray-300 bg-gradient-to-br from-gray-100 to-gray-400 flex items-center justify-center font-display font-bold text-lg sm:text-2xl text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]">RMA</div>
-            </div>
-          </div>
+        <!-- Partido destacado: lo pinta js/pages/central.js con el próximo cruce entre los mejor ubicados de la tabla real. -->
+        <article id="destacado" class="glass-panel rounded-xl overflow-hidden relative min-h-[9rem]" aria-live="polite">
+          <div class="p-6 text-center text-gray-500 text-xs">Cargando el partido destacado…</div>
         </article>
 
         <div class="grid gap-3" id="matches-container" aria-live="polite"></div>
@@ -107,7 +85,7 @@ const base = import.meta.env.BASE_URL;
           </div>
           <div class="p-4 overflow-auto max-h-[260px]">
             <table class="w-full text-left text-sm">
-              <thead><tr class="text-gray-500 border-b border-galaxy-border/50"><th class="pb-2 font-semibold">Pos</th><th class="pb-2 font-semibold">Club / DT</th><th class="pb-2 text-center font-semibold text-galaxy-400">PTS</th></tr></thead>
+              <thead><tr class="text-gray-500 border-b border-galaxy-border/50"><th class="pb-2 font-semibold">Pos</th><th class="pb-2 font-semibold">DT / Club</th><th class="pb-2 text-center font-semibold">PJ</th><th class="pb-2 text-center font-semibold text-galaxy-400">PTS</th></tr></thead>
               <tbody id="mini-table-container"></tbody>
             </table>
           </div>
