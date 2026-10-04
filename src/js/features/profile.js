@@ -55,7 +55,7 @@ export function openProfileModal() {
           ${cd.blocked ? '' : prof.perfil_completo ? `<p class="text-[11px] text-gray-500">Ojo: después de cambiarlo, no podrás volver a hacerlo hasta pasados ${USERNAME_COOLDOWN_DAYS} días.</p>` : ''}
         </div>
         <div><label class="label" for="p-pais">País</label><select id="p-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>
-        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field" maxlength="60" value="${escapeHTML(prof.club_favorito)}"></div>
+        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}"></div>
       </div>
 
       <div data-pane="social" hidden class="space-y-4">
@@ -152,7 +152,7 @@ export function openProfileModal() {
       if (estado === 'reservado') { err.textContent = 'Ese usuario está reservado. Elige otro.'; return; }
       const patch = {
         nombre_display: nombre, pais_codigo: $('#p-pais').value,
-        club_favorito: $('#p-club').value.trim().replace(/[<>]/g, ''),
+        club_favorito: $('#p-club').value.trim().replace(/[<>]/g, '').toUpperCase(),
         bio: $('#p-bio').value.trim(), discord_tag: $('#p-disc').value.trim(), stream_url: stream,
         puede_hostear: $('#p-host').checked, ancho_banda_mbps: speed,
         software_host: soft, host_juego: game,

@@ -407,7 +407,7 @@ test('noticias: orden, destacada, filtros y ligas', () => {
 test('crónica: borrador de la fecha 8 (victor golea) y casos límite', () => {
   const ed = EDICIONES.galaxy[0]; const c = generarCronica({ fechas: ed.fechas, n: 8, clubes: ed.clubes, nombreLiga: 'Galaxy League', nombreEdicion: 'Apertura 2026' });
   assert.equal(c.titulo, 'Fecha 8: Victor golea a Roberto 9-0'); assert.equal(c.categoria, 'JORNADA'); assert.equal(c.tag, 'Fecha 8');
-  assert.match(c.resumen, /4 partidos y 25 goles/); assert.match(c.cuerpo, /Quedan por jugarse de esta fecha: Degox – Jeremi; Beto – Morgado/); assert.match(c.cuerpo, /Victor \(Bayern Múnich\) ante Roberto/);
+  assert.match(c.resumen, /4 partidos y 25 goles/); assert.match(c.cuerpo, /Quedan por jugarse de esta fecha: Degox – Jeremi; Beto – Morgado/); assert.match(c.cuerpo, /Victor \(BAYERN MÚNICH\) ante Roberto/);
   assert.equal(validar({ ...c, imagen: '', liga: 'galaxy' }).ok, true);   // lo generado cumple los límites de la base
   assert.equal(generarCronica({ fechas: ed.fechas, n: 99 }), null); assert.equal(generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: null, gv: null }] }], n: 1 }), null);
   const empate = generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 1 }] }], n: 1, nombreLiga: 'X' }); assert.match(empate.titulo, /reparto de puntos/);

@@ -5,7 +5,7 @@ import { resumenFecha } from './ligaStats.js';
 
 const hecho = (m) => Number.isInteger(m?.gl) && Number.isInteger(m?.gv);
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
-const club = (clubes, nombre) => (clubes?.[nombre] ? ` (${clubes[nombre]})` : '');
+const club = (clubes, nombre) => (clubes?.[nombre] ? ` (${String(clubes[nombre]).toUpperCase()})` : '');
 
 /**
  * @param {{fechas: {n:number, partidos:object[]}[], n: number, clubes?: object, nombreLiga?: string, nombreEdicion?: string}} datos

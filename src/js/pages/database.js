@@ -48,7 +48,7 @@ function tarjeta(p, i, extra = '') {
 function paint() {
   $('players-container').dataset.foco = 'false';   // al repintar (filtros, orden…) se quita el foco
   const t = norm(term);
-  const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
+  const list = all.filter((p) => (club === 'ALL' || String(p.club ?? '').toUpperCase() === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
   const box = $('players-container');
   if (adv) {
     // Modo ranking: mismos filtros (equipo y nombre), ordenados por el promedio de las stats elegidas.
@@ -74,7 +74,7 @@ function paintBar() {
 
 function fillClubs() {
   const sel = $('player-filter-select');
-  const clubs = [...new Set(all.map((p) => p.club))].sort((a, b) => a.localeCompare(b));
+  const clubs = [...new Set(all.map((p) => String(p.club ?? '').toUpperCase()))].sort((a, b) => a.localeCompare(b));
   sel.innerHTML = `<option value="ALL">Todos los Equipos</option>` + clubs.map((c) => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
   sel.value = clubs.includes(club) ? club : 'ALL'; club = sel.value;
 }

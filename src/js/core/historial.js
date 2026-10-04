@@ -30,5 +30,5 @@ export function validarParticipacion(b) {
   if (puesto !== null && !(Number.isInteger(puesto) && puesto >= 1 && puesto <= 99)) e.push('El puesto debe ser un número entre 1 y 99 (o déjalo vacío).');
   const periodo = String(b.periodo ?? '').trim(); if (periodo && !/^\d{4}-\d{2}(-\d{2})?$/.test(periodo)) e.push('La fecha no es válida.');
   const premios = partirPremios(b.premios).join('\n');
-  return { ok: e.length === 0, errores: e, fila: { liga, edicion, periodo: periodo ? (periodo.length === 7 ? `${periodo}-01` : periodo) : null, club: t(b.club, 60) || null, puesto, titulo: t(b.titulo, 60) || null, premios: premios.slice(0, 300) || null } };
+  return { ok: e.length === 0, errores: e, fila: { liga, edicion, periodo: periodo ? (periodo.length === 7 ? `${periodo}-01` : periodo) : null, club: t(b.club, 60).toUpperCase() || null, puesto, titulo: t(b.titulo, 60) || null, premios: premios.slice(0, 300) || null } };
 }

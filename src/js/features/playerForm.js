@@ -50,7 +50,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
         <div class="flex-1 min-w-0 space-y-3">
           <div><label class="label" for="f-nombre">Nombre</label><input id="f-nombre" class="field" maxlength="40" value="${escapeHTML(p.nombre)}"></div>
           <div><label class="label" for="f-apodo">Apodo <span class="text-gray-500 normal-case">(opcional)</span></label><input id="f-apodo" class="field" maxlength="24" placeholder="Ej: El Cometa" value="${escapeHTML(p.apodo)}"></div>
-          <div><label class="label" for="f-club">Club</label><input id="f-club" class="field" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
+          <div><label class="label" for="f-club">Club</label><input id="f-club" class="field uppercase" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
         </div>
         <div class="flex flex-col items-center gap-1.5 shrink-0">
         <label class="photo-pick" title="Foto (opcional)">
@@ -232,7 +232,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     if (alt.error) { err.textContent = `La altura debe estar entre ${ALTURA.min} y ${ALTURA.max} cm (o déjala vacía).`; return; }
     const row = {
       altura_cm: alt.valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie),
-      nombre, apodo: $('#f-apodo').value.trim().replace(/[<>]/g, '').slice(0, 24) || null, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
+      nombre, apodo: $('#f-apodo').value.trim().replace(/[<>]/g, '').slice(0, 24) || null, club: ($('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre').toUpperCase(),
       posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(), descripcion: $('#f-desc').value.trim().replace(/[<>]/g, '') || null,
       ovr: vals.ovr,
     };

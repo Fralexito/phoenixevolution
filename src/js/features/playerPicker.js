@@ -19,7 +19,7 @@ export function mountPicker(root, { players, selected = null, exclude = () => []
     items = filterPlayers(players, term, exclude());
     act = items.length ? 0 : -1;
     list.innerHTML = items.length
-      ? items.map((p, i) => `<li role="option" data-i="${i}" aria-selected="${i === act}"><span class="truncate">${escapeHTML(p.nombre)}</span><span class="picker-meta">${escapeHTML(p.club)} · <b>${escapeHTML(p.ovr)}</b></span></li>`).join('')
+      ? items.map((p, i) => `<li role="option" data-i="${i}" aria-selected="${i === act}"><span class="truncate">${escapeHTML(p.nombre)}</span><span class="picker-meta uppercase">${escapeHTML(p.club)} · <b>${escapeHTML(p.ovr)}</b></span></li>`).join('')
       : '<li class="picker-empty">Sin resultados</li>';
   };
   const abrir = () => { pintar(); list.hidden = false; abierto = true; input.setAttribute('aria-expanded', 'true'); };

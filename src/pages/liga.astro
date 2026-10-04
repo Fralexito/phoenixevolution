@@ -90,7 +90,7 @@ const datos = LIGAS.map((l) => ({
                     {e.tabla.map((f, i) => (
                       <tr class:list={[i === 0 ? 'liga-lider' : '']}>
                         <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
-                        <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5">{e.clubes[f.nombre]}</span>}</td>
+                        <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
                         <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
@@ -119,9 +119,9 @@ const datos = LIGAS.map((l) => ({
                   <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                     {f.partidos.map((m) => (
                       <li class="rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                        <span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[11px] text-gray-400 truncate">{e.clubes[m.l]}</span>}</span>
+                        <span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.l]}</span>}</span>
                         {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-xs text-gray-500 font-display uppercase">vs</span>}
-                        <span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[11px] text-gray-400 truncate">{e.clubes[m.v]}</span>}</span>
+                        <span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.v]}</span>}</span>
                       </li>
                     ))}
                   </ul>

@@ -23,7 +23,7 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
         <div><label class="label" for="he-liga">Liga</label><input id="he-liga" class="field" maxlength="60" placeholder="Galaxy League"></div>
         <div><label class="label" for="he-ed">Edición</label><input id="he-ed" class="field" maxlength="60" placeholder="Apertura 2025"></div>
         <div><label class="label" for="he-per">Mes de inicio <span class="text-gray-500 normal-case">(para ordenar)</span></label><input id="he-per" type="month" class="field"></div>
-        <div><label class="label" for="he-club">Club</label><input id="he-club" class="field" maxlength="60" placeholder="FC Barcelona"></div>
+        <div><label class="label" for="he-club">Club</label><input id="he-club" class="field uppercase" maxlength="60" placeholder="FC Barcelona"></div>
         <div><label class="label" for="he-puesto">Puesto final</label><input id="he-puesto" inputmode="numeric" class="field" maxlength="2" placeholder="Ej: 3"></div>
         <div><label class="label" for="he-tit">Título</label><input id="he-tit" class="field" maxlength="60" list="he-titulos" placeholder="Campeón, Subcampeón…"><datalist id="he-titulos">${TITULOS.map((t) => `<option value="${t}">`).join('')}</datalist></div>
       </div>

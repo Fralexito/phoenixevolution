@@ -63,7 +63,7 @@ function show(session, prof) {
       const estado = await handle.comprobar();
       if (estado === 'ocupado') { err.textContent = 'Ese usuario ya está en uso. Elige otro.'; return; }
       if (estado === 'reservado') { err.textContent = 'Ese usuario está reservado. Elige otro.'; return; }
-      const patch = { username, nombre_display: nombre, pais_codigo: $('#w-pais').value, club_favorito: $('#w-club').value.trim().replace(/[<>]/g, ''), perfil_completo: true };
+      const patch = { username, nombre_display: nombre, pais_codigo: $('#w-pais').value, club_favorito: $('#w-club').value.trim().replace(/[<>]/g, '').toUpperCase(), perfil_completo: true };
       const foto = await resolveAvatar(picker.get(), uid);
       if (foto !== undefined) patch.avatar_url = foto;
       const { error } = await supabase.from('perfiles').update(patch).eq('id', uid);

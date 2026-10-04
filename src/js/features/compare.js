@@ -34,7 +34,7 @@ function headCard(p, color, side) {
   return `<div class="flex-1 min-w-0 flex flex-col items-center text-center gap-1">
     <span class="w-14 h-14 rounded-full overflow-hidden border-2 bg-galaxy-card grid place-items-center" style="border-color:${color}">${img ? `<img src="${escapeHTML(img)}" alt="" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user-astronaut text-xl" style="color:${color}"></i>`}</span>
     <b class="font-display uppercase tracking-wider text-white text-sm truncate max-w-full">${escapeHTML(p.nombre)}</b>
-    <span class="text-[11px] text-gray-400 truncate max-w-full">${escapeHTML(p.club)} · ${escapeHTML(p.posicion)}</span>
+    <span class="text-[11px] text-gray-400 truncate max-w-full">${escapeHTML(String(p.club ?? '').toUpperCase())} · ${escapeHTML(p.posicion)}</span>
     <span class="font-display font-extrabold text-3xl" style="color:${color}" data-side="${side}">${escapeHTML(p.ovr ?? '--')}</span>
   </div>`;
 }

@@ -203,3 +203,5 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Jugadores: reconocimientos (`features/reconocimientos.js`: de la fecha, en forma, revelación + voto de la semana, migración 014 `votos_semana`), vistas Todos / Por estilo / Por nivel, selector de orden (media, forma, goleador, antigüedad, A–Z, aleatorio). Lógica en `core/destacados.js` (niveles: Élite ≥88, Estrellas ≥83, Titulares ≥77, Promesas).
 - Carta: crece suave al pasar el mouse; al hacer clic se destaca y las demás se difuminan (Esc / clic fuera lo quita).
 - Historial y títulos en el perfil (migración 015 `participaciones`): ediciones anteriores con club, puesto, título (Campeón/Subcampeón…) y premios; la edición en curso sale sola de los datos de la liga. Lógica en `core/historial.js`; botón «Editar historial» (solo admin) abre `features/historialEditor.js`.
+
+- **Equipos en MAYÚSCULAS (ronda 26):** los nombres de club se muestran siempre en mayúsculas (CSS `uppercase` + `.toUpperCase()` en cronica, filtros y formularios); al guardar un club nuevo se almacena ya en mayúsculas.
