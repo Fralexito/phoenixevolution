@@ -8,8 +8,8 @@ import { setRadar, isRadarOn } from '../features/radar.js';
 import { startPresence, stopPresence, setEstado, onPresence, ESTADOS } from '../features/presence.js';
 import { openAuthModal } from '../features/auth.js';
 import { data, me, myProfile, myPart, isMine, isActive, loadPerfiles, loadRetos, visibleRetos } from '../features/duelos/data.js';
-import { card, cardHistorial } from '../features/duelos/cards.js';
-import { ordenarAgendados, ordenarPartidosJugados, pendientes } from '../core/misPartidos.js';
+import { card } from '../features/duelos/cards.js';
+import { ordenarAgendados, pendientes } from '../core/misPartidos.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
@@ -17,35 +17,29 @@ import { openInviteModal } from '../features/duelos/invite.js';
 const $ = (id) => document.getElementById(id);
 
 /* ---------- Vistas ----------
-   PC: todo a la vista. Móvil: «Lanzar reto» y «Mis partidos» se abren/cierran con su botón (solo una a la vez);
-   «Retos en el radar» está siempre visible debajo. data-vista = 'ninguna' | 'lanzar' | 'partidos'. */
+   PC: todo a la vista. Móvil: «Lanzar reto» se abre/cierra con su botón; «Retos en el radar» está siempre visible debajo.
+   data-vista = 'ninguna' | 'lanzar'. («Mis partidos» ahora es la página /mis-partidos/.) */
 function setVista(v) {
   $('duelos-grid').dataset.vista = v;
   $('seg-vista').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
 }
-function irAMisPartidos() { setVista('partidos'); $('col-mis').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
 /* ---------- Pintado ---------- */
 function renderAll() {
   // No repintar mientras el usuario escribe dentro de una tarjeta (perdería lo tecleado).
-  if (document.activeElement?.closest?.('#lista-mis, #lista-retos, #lista-pend') && document.activeElement.matches('input, textarea, select')) return;
+  if (document.activeElement?.closest?.('#lista-retos, #lista-pend') && document.activeElement.matches('input, textarea, select')) return;
   const id = me();
   const visible = visibleRetos();
   const mine = id ? visible.filter((r) => isMine(r, id)) : [];
   const rest = visible.filter((r) => !isMine(r, id));
-  const agendados = ordenarAgendados(mine); const pend = pendientes(mine); const hist = id ? ordenarPartidosJugados(data.historial) : [];
+  const agendados = ordenarAgendados(mine); const pend = pendientes(mine);
   const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
-  $('lista-mis').innerHTML = !id ? vacio('Inicia sesión para ver tus partidos.')
-    : agendados.length ? agendados.map((r) => card(r, id)).join('') : vacio('No tienes partidos agendados.');
-  $('lista-historial').innerHTML = !id ? '' : hist.length ? hist.map((r) => cardHistorial(r, id)).join('') : vacio('Aún no has terminado ningún partido.', 'py-5');
   $('bloque-pend').hidden = !pend.length;
   $('lista-pend').innerHTML = pend.map((r) => card(r, id)).join('');
   $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio('No hay retos públicos activos en este momento.', 'py-10');
-  $('cnt-mis').textContent = agendados.length ? `(${agendados.length})` : '';
-  $('cnt-hist').textContent = hist.length ? `(${hist.length})` : '';
+  $('cnt-agendados').textContent = agendados.length ? `(${agendados.length})` : '';
   $('cnt-pend').textContent = pend.length ? `(${pend.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
-  $('cnt-movil').textContent = agendados.length ? `(${agendados.length})` : '';
 }
 
 async function fetchAll() {
@@ -149,9 +143,7 @@ $('btn-refrescar').addEventListener('click', fetchAll);
 $('seg-vista').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setVista($('duelos-grid').dataset.vista === b.dataset.v ? 'ninguna' : b.dataset.v); });
 // Un reto recién emitido aún no es un «partido» (nadie lo aceptó): se lleva al usuario a «Tus retos pendientes».
 window.addEventListener('duelos:creado', () => { setVista('ninguna'); setTimeout(() => { if (!$('bloque-pend').hidden) $('bloque-pend').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 800); });
-if (location.hash === '#mis-partidos') irAMisPartidos();
-window.addEventListener('hashchange', () => { if (location.hash === '#mis-partidos') irAMisPartidos(); });
-['lista-retos', 'lista-mis', 'lista-pend'].forEach((id) => {
+['lista-retos', 'lista-pend'].forEach((id) => {
   $(id).addEventListener('click', onCardClick);
   $(id).addEventListener('submit', (e) => {
     const f = e.target.closest('[data-form="link"]'); if (!f) return;

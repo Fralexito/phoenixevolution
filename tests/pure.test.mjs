@@ -672,7 +672,7 @@ test('horaExacta con zona y 12 h', () => {
 });
 
 // ---- mis partidos
-import { ordenarAgendados, ordenarPartidosJugados, pendientes } from '../src/js/core/misPartidos.js';
+import { ordenarAgendados, ordenarPartidosJugados, pendientes, rivalesDeDuelos } from '../src/js/core/misPartidos.js';
 test('mis partidos: agendados, historial y pendientes', () => {
   const rs = [{ id: 1, estado: 'BUSCANDO' }, { id: 2, estado: 'ACEPTADO', fecha_programada: '2026-10-06T20:00:00Z' }, { id: 3, estado: 'EN_JUEGO' }, { id: 4, estado: 'ACEPTADO', fecha_programada: '2026-10-05T20:00:00Z' },
     { id: 5, estado: 'FINALIZADO', cerrado_at: '2026-10-01T10:00:00Z' }, { id: 6, estado: 'FINALIZADO', cerrado_at: '2026-10-03T10:00:00Z' }, { id: 7, estado: 'CANCELADO' }];
@@ -693,4 +693,19 @@ test('central: jornadas, destacado y escudo', () => {
   assert.deepEqual(partidoDestacado(F[2].partidos, tabla), { l: 'A', v: 'D', gl: null, gv: null });   // A(1)+D(4)=5 < B(2)+D(4)=6
   assert.equal(partidoDestacado([], tabla), null);
   assert.equal(visualClub('Club Raro').sigla, 'CLU'); assert.equal(visualClub('Arsenal', { Arsenal: { sigla: 'ARS' } }).sigla, 'ARS');
+});
+
+test('rivalesDeDuelos: cuenta partidos terminados contra cada rival (1v1 y equipos)', () => {
+  const retos = [
+    { id: 1, estado: 'FINALIZADO', retador_id: 'yo', rival_id: 'ana', cerrado_at: '2026-01-01T00:00:00Z' },
+    { id: 2, estado: 'FINALIZADO', retador_id: 'luis', rival_id: 'yo', cerrado_at: '2026-02-01T00:00:00Z' },
+    { id: 3, estado: 'FINALIZADO', retador_id: 'yo', rival_id: null, cerrado_at: '2026-03-01T00:00:00Z' },
+    { id: 4, estado: 'BUSCANDO', retador_id: 'yo', rival_id: 'ana' },
+    { id: 5, estado: 'FINALIZADO', retador_id: 'x', rival_id: 'y' },
+  ];
+  const parts = { 3: [{ usuario_id: 'yo', equipo: 'A' }, { usuario_id: 'ana', equipo: 'B' }, { usuario_id: 'zed', equipo: 'B' }] };
+  const r = rivalesDeDuelos(retos, (id) => parts[id] ?? [], 'yo');
+  assert.deepEqual(r.map((x) => [x.id, x.partidos]), [['ana', 2], ['zed', 1], ['luis', 1]]);
+  assert.equal(r[0].ultimo, '2026-03-01T00:00:00Z');
+  assert.deepEqual(rivalesDeDuelos([], () => [], 'yo'), []);
 });

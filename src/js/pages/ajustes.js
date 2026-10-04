@@ -59,7 +59,7 @@ onSession(({ session, profile }) => {
   if (!session) { cuenta.innerHTML = '<p>No has iniciado sesión. Usa el botón «Ingresar» de la cabecera para ver aquí tu perfil.</p>'; return; }
   cuenta.innerHTML = `<p class="mb-3">Sesión iniciada como <b class="text-white">${escapeHTML(profile?.nombre_display || 'Jugador')}</b>${profile?.username ? ` <span class="text-gray-500">@${escapeHTML(profile.username)}</span>` : ''}.</p>
     <div class="flex flex-wrap gap-2"><button type="button" id="aj-perfil" class="btn btn-ghost"><i class="fa-solid fa-user-pen"></i> Editar perfil</button>
-    <a class="btn btn-ghost" href="${escapeHTML(href('duelos/#mis-partidos'))}"><i class="fa-solid fa-gamepad"></i> Mis partidos</a>
+    <a class="btn btn-ghost" href="${escapeHTML(href('mis-partidos/'))}"><i class="fa-solid fa-gamepad"></i> Mis partidos</a>
     <button type="button" id="aj-salir" class="btn btn-ghost !text-bad !border-bad/50"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button></div>`;
   cuenta.querySelector('#aj-perfil').addEventListener('click', openProfileModal);
   cuenta.querySelector('#aj-salir').addEventListener('click', logout);
