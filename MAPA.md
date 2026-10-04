@@ -181,3 +181,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Liga en PC: tabla (izquierda) y resultados por fecha (derecha, fija al hacer scroll) en la misma fila; las columnas de la tabla se adaptan al ancho (GF/GC desde 2xl, Forma desde xl). En celular van una debajo de otra.
 - `pages/liga.astro` pinta todo al construir: cifras, tabla con forma (últimos 5), mejor ataque/defensa, mayores goleadas, resultados por fecha, historial de ediciones, cómo funciona, ficha y parches. `js/pages/liga.js` solo cambia de edición (select) y de fecha.
 - Cada resultado nuevo = agregar/editar el partido en `FECHAS` (gl/gv null = sin jugar). Mantener la prueba «coincide fila por fila con CopaFácil» actualizada con la tabla real del momento.
+
+## Ronda 24 — Noticias (BD + editor + Discord)
+- Tabla `noticias` (migración 012) con RLS: lectura pública de publicadas, escritura solo admin. Bucket `noticias` para portadas.
+- `core/noticias.js` (lógica pura), `core/cronica.js` (crónica automática por plantillas), `features/noticiasAdmin.js` (editor), `pages/noticias.js` (página; si la BD falla usa `data/noticias.js`).
+- Enlace por noticia: `noticias/?n=<slug>`. Filtro de liga aparece con 2+ ligas en las noticias.
+- Edge function `notificar-discord` (solo admin); requiere el secreto `DISCORD_WEBHOOK_URL` en Supabase.

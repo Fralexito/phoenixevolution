@@ -32,7 +32,7 @@ export function fechaRelativa(iso, ahora = new Date()) {
 export function normalizar(f) {
   return {
     id: f.id, slug: f.slug, titulo: f.titulo, resumen: f.resumen, cuerpo: partirCuerpo(f.cuerpo), categoria: f.categoria, tag: f.tag ?? '',
-    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable,
+    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, discordEn: f.discord_en ?? f.discordEn ?? null,
   };
 }
 /** Valida un borrador del editor con los mismos límites que la base. Devuelve { ok, errores: string[] }. */
