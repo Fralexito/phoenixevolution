@@ -23,7 +23,7 @@ function render({ session, profile }) {
   } else {
     const name = profile?.nombre_display || 'Jugador';
     box.innerHTML = `
-      <div class="relative"><button type="button" id="btn-notif" aria-label="Notificaciones" class="relative text-gray-400 hover:text-galaxy-400">
+      <div class="relative mr-2 sm:mr-3"><button type="button" id="btn-notif" aria-label="Notificaciones" class="relative text-gray-400 hover:text-galaxy-400">
         <i class="fa-solid fa-bell text-lg"></i><span id="notif-dot" hidden class="absolute -top-2 -right-2 min-w-4 h-4 px-1 rounded-full bg-bad text-white text-[9px] font-bold leading-4 text-center"></span></button>
         <div id="dropdown-notif" hidden class="fixed left-2 right-2 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-80 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden"></div></div>
       <div class="relative">

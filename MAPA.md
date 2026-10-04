@@ -236,3 +236,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Perfil con tarjeta alta (ronda 49):** `playerCardHTML(p, i, { largo: true })` restituye en el perfil las proporciones altas de antes (foto 5:4, stats en 2 columnas); Jugadores sigue con la compacta (`.pc-largo` en `styles/components.css`).
 - **Logo de la cabecera más adentro (ronda 50):** el escudo y «PES» se separan del borde izquierdo (`Header.astro`: pl-6 móvil / pl-12 PC; antes pegado a ~16-24 px).
 - **Última hora con huecos irregulares (ronda 51):** cada noticia trae su propio hueco de salida entre 0.5× y 2.5× el base (`huecoIrregular` en `features/ticker.js`), para que no se vea simétrica.
+- **Campanita (ronda 52):** se separa un poco más a la izquierda del botón de perfil (`mr-2 sm:mr-3` en `features/navbar.js`).
