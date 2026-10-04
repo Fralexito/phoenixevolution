@@ -1,4 +1,4 @@
-// Datos físicos opcionales (altura, peso, pie dominante). Sin DOM → probable. Los límites deben coincidir con las checks de la BD [011].
+// Datos físicos opcionales (altura y pie dominante; el peso se retiró a propósito: nadie debe sentirse obligado a darlo). Sin DOM → probable. Los límites deben coincidir con las checks de la BD [011].
 export const ALTURA = { min: 120, max: 230 };
 export const PESO = { min: 35, max: 160 };
 export const PIES = ['Derecho', 'Izquierdo'];
@@ -17,7 +17,6 @@ export const pieValido = (p) => (PIES.includes(p) ? p : null);
 export function fisicoTexto(p) {
   const partes = [];
   if (p?.altura_cm) partes.push(`${p.altura_cm} cm`);
-  if (p?.peso_kg) partes.push(`${p.peso_kg} kg`);
   if (p?.pie) partes.push(`Pie ${p.pie === 'Izquierdo' ? 'izq.' : 'der.'}`);
   return partes.join(' · ');
 }
@@ -26,7 +25,6 @@ export function fisicoTexto(p) {
 export function fisicoPartes(p) {
   const x = [];
   if (p?.altura_cm) x.push({ k: 'altura', texto: `${p.altura_cm} cm`, titulo: `Altura: ${p.altura_cm} cm` });
-  if (p?.peso_kg) x.push({ k: 'peso', texto: `${p.peso_kg} kg`, titulo: `Peso: ${p.peso_kg} kg` });
   if (p?.pie) x.push({ k: 'pie', texto: p.pie === 'Izquierdo' ? 'Izq.' : 'Der.', titulo: `Pie dominante: ${p.pie.toLowerCase()}` });
   return x;
 }

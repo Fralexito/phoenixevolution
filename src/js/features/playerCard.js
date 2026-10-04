@@ -11,10 +11,10 @@ const GLOWS = [
   'hover:shadow-[0_0_35px_rgba(255,0,128,0.5)] hover:border-[#ff0080]/70',
 ];
 
-/** Fila visible con altura, peso y pie dominante (solo lo que exista). */
+/** Fila visible con altura y pie dominante (solo lo que exista). */
 function fisicoHTML(p) {
   const x = fisicoPartes(p); if (!x.length) return '';
-  const ico = { altura: 'fa-ruler-vertical', peso: 'fa-weight-hanging', pie: 'fa-shoe-prints' };
+  const ico = { altura: 'fa-ruler-vertical', pie: 'fa-shoe-prints' };
   return `<div class="pc-fis">${x.map((i) => `<span class="pc-chip" title="${escapeHTML(i.titulo)}"><i class="fa-solid ${ico[i.k]}"></i>${escapeHTML(i.texto)}</span>`).join('')}</div>`;
 }
 

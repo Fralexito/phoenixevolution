@@ -4,7 +4,7 @@
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
-import { ALTURA, PESO, PIES, leerMedida, pieValido } from '../core/fisico.js';
+import { ALTURA, PIES, leerMedida, pieValido } from '../core/fisico.js';
 import { openPhotoCropper } from './photoCropper.js';
 import { clampStat, calcOvr } from '../core/stats.js';
 import { toast } from '../core/toast.js';
@@ -89,12 +89,11 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
 
       <div>
         <span class="label">Físico <span class="text-gray-500 normal-case">(opcional)</span></span>
-        <div class="grid grid-cols-3 gap-2 items-start">
+        <div class="grid grid-cols-2 gap-2 items-start">
           <div><input id="f-altura" class="field" type="text" inputmode="numeric" maxlength="3" placeholder="Altura cm" aria-label="Altura en centímetros" value="${escapeHTML(p.altura_cm)}"></div>
-          <div><input id="f-peso" class="field" type="text" inputmode="numeric" maxlength="3" placeholder="Peso kg" aria-label="Peso en kilogramos" value="${escapeHTML(p.peso_kg)}"></div>
           <div class="seg" id="f-pie" role="group" aria-label="Pie dominante">${PIES.map((x) => `<button type="button" data-pie="${x}" aria-pressed="${p.pie === x}" title="Pie ${x.toLowerCase()}">${x === 'Derecho' ? 'Der.' : 'Izq.'}</button>`).join('')}</div>
         </div>
-        <p class="text-[11px] text-gray-500 mt-1">Altura ${ALTURA.min}–${ALTURA.max} cm · peso ${PESO.min}–${PESO.max} kg · toca el pie otra vez para quitarlo.</p>
+        <p class="text-[11px] text-gray-500 mt-1">Altura ${ALTURA.min}–${ALTURA.max} cm · toca el pie otra vez para quitarlo.</p>
       </div>
       <div><label class="label" for="f-quote">Frase <span class="text-gray-500 normal-case">(opcional)</span></label><input id="f-quote" class="field" maxlength="140" placeholder="Una frase que lo represente" value="${escapeHTML(p.quote)}"></div>
       <div>
@@ -179,7 +178,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   let fotoOriginal = null;   // archivo original, para poder «Reencuadrar» sin volver a elegirlo
   let fotoAspecto = p.foto_aspecto ?? null;   // proporción elegida en el recortador (si no se cambia la foto, no se toca)
   const ponerVista = (blob) => { $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="" class="w-full h-full object-cover">`; $('#f-reenc').hidden = false; };
-  const jugadorActual = () => ({ foto_aspecto: fotoAspecto, nombre: $('#f-nombre').value.trim(), apodo: $('#f-apodo').value.trim(), altura_cm: leerMedida($('#f-altura').value, ALTURA).valor, peso_kg: leerMedida($('#f-peso').value, PESO).valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
+  const jugadorActual = () => ({ foto_aspecto: fotoAspecto, nombre: $('#f-nombre').value.trim(), apodo: $('#f-apodo').value.trim(), altura_cm: leerMedida($('#f-altura').value, ALTURA).valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
   async function recortar(file) {
     try {
       const res = await openPhotoCropper(file, { getPlayer: jugadorActual, aspecto: fotoAspecto ?? (p.foto_url ? '5/4' : null) });
@@ -202,11 +201,10 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     const btn = ev.target.querySelector('button[type=submit]');
     const nombre = $('#f-nombre').value.trim().replace(/[<>]/g, '');
     if (!nombre) { err.textContent = 'Escribe el nombre.'; return; }
-    const alt = leerMedida($('#f-altura').value, ALTURA); const pes = leerMedida($('#f-peso').value, PESO);
+    const alt = leerMedida($('#f-altura').value, ALTURA);
     if (alt.error) { err.textContent = `La altura debe estar entre ${ALTURA.min} y ${ALTURA.max} cm (o déjala vacía).`; return; }
-    if (pes.error) { err.textContent = `El peso debe estar entre ${PESO.min} y ${PESO.max} kg (o déjalo vacío).`; return; }
     const row = {
-      altura_cm: alt.valor, peso_kg: pes.valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie),
+      altura_cm: alt.valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie),
       nombre, apodo: $('#f-apodo').value.trim().replace(/[<>]/g, '').slice(0, 24) || null, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
       posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(), descripcion: $('#f-desc').value.trim().replace(/[<>]/g, '') || null,
       ovr: vals.ovr,

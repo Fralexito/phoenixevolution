@@ -237,7 +237,7 @@ test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la s
 
 import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo, NIVELES } from '../src/js/core/density.js';
 import { rankPlayers } from '../src/js/core/ranking.js';
-import { leerMedida, fisicoTexto, fisicoPartes, ALTURA, PESO } from '../src/js/core/fisico.js';
+import { leerMedida, fisicoTexto, fisicoPartes, ALTURA } from '../src/js/core/fisico.js';
 import { puedeEntrar } from '../src/js/features/ticker.js';
 test('zoom: niveles válidos, límites y tamaño', () => {
   assert.equal(nivelValido(99, true), 3); assert.equal(nivelValido(-5, false), 0); assert.equal(nivelValido('x', true), NIVELES.movil.def); assert.equal(nivelValido(null, false), NIVELES.pc.def);
@@ -256,8 +256,8 @@ test('ranking: promedio de varias stats, mínimo, top y empates', () => {
 });
 test('físico: medidas opcionales y texto', () => {
   assert.deepEqual(leerMedida('', ALTURA), { valor: null, error: false }); assert.deepEqual(leerMedida(' 182 ', ALTURA), { valor: 182, error: false });
-  assert.equal(leerMedida('50', ALTURA).error, true); assert.equal(leerMedida('abc', PESO).error, true); assert.equal(leerMedida('75,5', PESO).valor, 76);
-  assert.equal(fisicoTexto({ altura_cm: 182, peso_kg: 78, pie: 'Izquierdo' }), '182 cm · 78 kg · Pie izq.'); assert.equal(fisicoTexto({}), '');
+  assert.equal(leerMedida('50', ALTURA).error, true); assert.equal(leerMedida('abc', ALTURA).error, true); assert.equal(leerMedida('180,5', ALTURA).valor, 181);
+  assert.equal(fisicoTexto({ altura_cm: 182, peso_kg: 78, pie: 'Izquierdo' }), '182 cm · Pie izq.'); assert.equal(fisicoTexto({}), '');
 });
 test('ticker: la siguiente noticia entra cuando queda libre el hueco', () => {
   assert.equal(puedeEntrar(undefined, 0, 800, 90), true);
