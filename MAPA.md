@@ -170,3 +170,6 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ## Ronda 21 — Página Liga
 - `pages/liga.astro` (data-driven con `data/ligas.js`): portada de la liga, cómo funciona, ficha (campos vacíos → «Por definir»), parches reconocidos (`PARCHES_PES`). Botón «Fixture y tabla en CopaFácil» aparece solo si `copafacil` tiene enlace. NAV: nueva entrada «Liga».
 - CopaFácil sigue siendo la fuente oficial; sin API pública confirmada no hay conexión automática. Siguiente fase posible: tablas reales en Supabase (espejo).
+
+## Ronda 22 — Resultados de la liga (espejo, base)
+- `data/ligaResultados.js`: clubes y resultados fecha por fecha copiados de CopaFácil (fecha 1 cargada). `core/tabla.js` → `calcularTabla` (3-1-0; desempate: dif. de goles → goles a favor → nombre). Pendiente: confirmar si el enfrentamiento directo va antes. Aún no se muestra en la web.

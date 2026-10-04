@@ -324,3 +324,16 @@ test('central: podio = 2.º izquierda, 1.º centro, 3.º derecha, sin huecos', (
   assert.deepEqual(ordenPodio(['a']).map((x) => x.puesto), [1]);
   assert.deepEqual(ordenPodio(null), []);
 });
+
+import { calcularTabla } from '../src/js/core/tabla.js';
+import { FECHAS } from '../src/data/ligaResultados.js';
+test('tabla: puntos 3-1-0, desempate por diferencia y goles a favor, y datos inválidos se descartan', () => {
+  const { tabla, descartados } = calcularTabla(FECHAS.flatMap((f) => f.partidos));
+  assert.equal(descartados.length, 0);
+  assert.deepEqual(tabla.map((f) => f.nombre), ['Victor', 'Degox', 'Jeremi', 'Morgado', 'Axel', 'Arens', 'Hugo', 'Jack', 'Roberto', 'Camilo', 'Beto', 'Fralex']);
+  assert.deepEqual([tabla[0].pts, tabla[0].dg, tabla[0].gf], [3, 9, 9]);
+  const emp = calcularTabla([{ l: 'A', v: 'B', gl: 1, gv: 1 }]);
+  assert.deepEqual(emp.tabla.map((f) => f.pts), [1, 1]);
+  const malo = calcularTabla([{ l: 'A', v: 'A', gl: 1, gv: 0 }, { l: 'A', v: 'B', gl: -1, gv: 0 }, { l: 'A', v: 'B', gl: 'x', gv: 0 }, null]);
+  assert.equal(malo.descartados.length, 4); assert.equal(malo.tabla.length, 0);
+});
