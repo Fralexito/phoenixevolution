@@ -1,8 +1,9 @@
 // RECORTADOR DE FOTO: arrastra para mover, desliza/rueda/pellizca para el zoom, y mira cómo quedará la tarjeta ANTES de guardar.
 // openPhotoCropper(file, { getPlayer, aspecto }) → Promise<{ blob, aspecto }|null>  (null = canceló).
-// Se puede elegir la proporción: Horizontal 5:4, Cuadrada 1:1 o Alta 4:5; la tarjeta usa la misma para mostrar la foto.
+// Largo de la foto: Normal 5:4 (solo la zona superior), Media 1:1 (llega al nombre) o Larga 4:5 (llega a las estadísticas).
+// La tarjeta NO cambia de tamaño: la foto es una capa detrás del contenido.
 import { openModal, closeModal } from '../core/modal.js';
-import { initialState, zoomAt, clampPos, rescale, sourceRect, outSize, coverScale, ASPECTOS, aspectoValido, ratioDe, MAX_ZOOM } from '../core/crop.js';
+import { initialState, zoomAt, clampPos, rescale, sourceRect, outSize, coverScale, ASPECTOS, ASPECTO_NUEVA, aspectoValido, ratioDe, MAX_ZOOM } from '../core/crop.js';
 import { playerCardHTML } from './playerCard.js';
 
 const ID = 'crop-modal';
@@ -15,7 +16,7 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}), aspecto: 
   const url = URL.createObjectURL(file);
 
   return new Promise((resolve) => {
-    let hecho = false; let aspecto = aspectoValido(aspecto0);
+    let hecho = false; let aspecto = aspecto0 ? aspectoValido(aspecto0) : ASPECTO_NUEVA;
     const fin = (res) => { if (hecho) return; hecho = true; document.removeEventListener('keydown', onKey, true); ro?.disconnect(); URL.revokeObjectURL(url); bmp.close?.(); closeModal(ID); resolve(res); };
     // Esc cierra SOLO este recortador (captura: llega antes que el Esc del formulario que está debajo).
     const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); fin(null); } };
@@ -29,7 +30,7 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}), aspecto: 
         </div>
         <div class="flex flex-col sm:flex-row gap-4">
           <div class="flex-1 min-w-0 space-y-3">
-            <div class="seg" id="cr-asp" role="group" aria-label="Proporción de la foto">${Object.entries(ASPECTOS).map(([k, a]) => `<button type="button" data-v="${k}" aria-pressed="${k === aspecto}">${a.nombre} <span class="opacity-60">${k.replace('/', ':')}</span></button>`).join('')}</div>
+            <div class="seg" id="cr-asp" role="group" aria-label="Hasta dónde llega la foto en la tarjeta">${Object.entries(ASPECTOS).map(([k, a]) => `<button type="button" data-v="${k}" aria-pressed="${k === aspecto}">${a.nombre} </button>`).join('')}</div>
             <div id="cr-frame" class="cr-frame" tabindex="0" role="application" aria-label="Zona de recorte. Arrastra para mover, usa el zoom para acercar. Con teclado: flechas para mover, más y menos para el zoom.">
               <img id="cr-img" src="${url}" alt="" draggable="false">
               <div class="cr-grid" aria-hidden="true"></div>

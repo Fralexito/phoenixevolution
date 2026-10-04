@@ -2,8 +2,9 @@
 // Estado = { x, y, s }: la imagen se dibuja con su esquina superior izquierda en (x, y) del marco y escalada `s` (px del marco por px de la imagen).
 // Regla de oro: la imagen SIEMPRE cubre el marco (nunca quedan bordes vacíos).
 // Proporciones disponibles (ancho/alto). Deben coincidir con perfiles `jugadores_foto_aspecto_ok` en la BD [BD].
-export const ASPECTOS = { '5/4': { ratio: 5 / 4, nombre: 'Horizontal' }, '1/1': { ratio: 1, nombre: 'Cuadrada' }, '4/5': { ratio: 4 / 5, nombre: 'Alta' } };
-export const ASPECTO_DEF = '5/4';
+export const ASPECTOS = { '5/4': { ratio: 5 / 4, nombre: 'Normal' }, '1/1': { ratio: 1, nombre: 'Media' }, '4/5': { ratio: 4 / 5, nombre: 'Larga' } };
+export const ASPECTO_DEF = '5/4';          // fotos antiguas (sin dato)
+export const ASPECTO_NUEVA = '4/5';        // fotos nuevas: llegan hasta las estadísticas
 /** Valor guardado → proporción válida (si es nulo o desconocido, la de siempre). */
 export const aspectoValido = (a) => (Object.hasOwn(ASPECTOS, a) ? a : ASPECTO_DEF);
 export const ratioDe = (a) => ASPECTOS[aspectoValido(a)].ratio;

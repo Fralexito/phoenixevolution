@@ -170,7 +170,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   const jugadorActual = () => ({ foto_aspecto: fotoAspecto, nombre: $('#f-nombre').value.trim(), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
   async function recortar(file) {
     try {
-      const res = await openPhotoCropper(file, { getPlayer: jugadorActual, aspecto: fotoAspecto });
+      const res = await openPhotoCropper(file, { getPlayer: jugadorActual, aspecto: fotoAspecto ?? (p.foto_url ? '5/4' : null) });
       if (!res) return;                                     // canceló: no se cambia nada
       photo = res.blob; fotoAspecto = res.aspecto; fotoOriginal = file; ponerVista(res.blob);
     } catch (ex) { console.error('[ficha] foto:', ex); err.textContent = ex.message || 'No se pudo abrir la imagen.'; }
