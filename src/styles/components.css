@@ -171,8 +171,6 @@
 .dens-btn:disabled { opacity: .3; cursor: default; }
 #players-container[data-denso='true'] .cmp-btn, #players-container[data-denso='true'] .card-menu-btn { width: 22px !important; height: 22px !important; top: .3rem; font-size: .6rem; }
 #players-container[data-denso='true'] .cmp-btn { left: .3rem; } #players-container[data-denso='true'] .card-menu-btn { right: .3rem; }
-.pc-fis { display: none; margin-left: auto; padding-left: .6em; white-space: nowrap; color: #9ca3af; font-size: .88em; }
-@container (min-width: 215px) { .pc-fis { display: inline; } }
 
 /* Búsqueda avanzada */
 .adv-chip { font-family: var(--font-display); font-weight: 700; font-size: .66rem; letter-spacing: .06em; padding: .2rem .45rem; min-height: 1.65rem; border-radius: .4rem; border: 1px solid var(--color-galaxy-border); color: #cbd5e1; background: rgb(0 0 0 / .25); transition: background .15s, color .15s, border-color .15s; }
@@ -182,3 +180,9 @@
 .adv-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: .15rem .6rem; margin-top: .35rem; font-size: .7rem; color: #9ca3af; font-family: var(--font-display); letter-spacing: .05em; }
 .adv-strip b { color: #00e5ff; } .adv-prom b { color: #ffd700; }
 .adv-seg { padding: .15rem; gap: .1rem; border-radius: .5rem; } .adv-seg > button { min-height: 1.6rem !important; padding: 0 .5rem; font-size: .65rem; border-radius: .35rem; }
+/* Físico (altura · peso · pie): fila visible entre el nombre y las stats. */
+.pc-fis { display: flex; flex-wrap: wrap; gap: .3em; margin-top: .6em; }
+.pc-chip { display: inline-flex; align-items: center; gap: .35em; padding: .15em .55em; border-radius: 999px; font-size: .9em; font-weight: 700; color: #e0f7ff; background: rgb(0 229 255 / .12); border: 1px solid rgb(0 229 255 / .4); text-shadow: none; white-space: nowrap; }
+.pc-chip i { color: var(--color-galaxy-400); font-size: .85em; }
+@container (max-width: 135px) { .pc-fis { display: none; } }
+#players-container > div > article { height: 100%; }

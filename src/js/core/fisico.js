@@ -21,3 +21,12 @@ export function fisicoTexto(p) {
   if (p?.pie) partes.push(`Pie ${p.pie === 'Izquierdo' ? 'izq.' : 'der.'}`);
   return partes.join(' · ');
 }
+
+/** Datos físicos como piezas separadas para dibujarlas: [{k:'altura'|'peso'|'pie', texto, titulo}]. */
+export function fisicoPartes(p) {
+  const x = [];
+  if (p?.altura_cm) x.push({ k: 'altura', texto: `${p.altura_cm} cm`, titulo: `Altura: ${p.altura_cm} cm` });
+  if (p?.peso_kg) x.push({ k: 'peso', texto: `${p.peso_kg} kg`, titulo: `Peso: ${p.peso_kg} kg` });
+  if (p?.pie) x.push({ k: 'pie', texto: p.pie === 'Izquierdo' ? 'Izq.' : 'Der.', titulo: `Pie dominante: ${p.pie.toLowerCase()}` });
+  return x;
+}

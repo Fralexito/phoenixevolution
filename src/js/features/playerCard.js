@@ -2,7 +2,7 @@
 import { escapeHTML, safeImg, stat, statColor } from '../core/dom.js';
 import { posInfo } from '../../data/posiciones.js';
 import { ratioDe } from '../core/crop.js';
-import { fisicoTexto } from '../core/fisico.js';
+import { fisicoPartes } from '../core/fisico.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -10,6 +10,13 @@ const GLOWS = [
   'hover:shadow-[0_0_35px_rgba(0,229,255,0.5)] hover:border-[#00e5ff]/70',
   'hover:shadow-[0_0_35px_rgba(255,0,128,0.5)] hover:border-[#ff0080]/70',
 ];
+
+/** Fila visible con altura, peso y pie dominante (solo lo que exista). */
+function fisicoHTML(p) {
+  const x = fisicoPartes(p); if (!x.length) return '';
+  const ico = { altura: 'fa-ruler-vertical', peso: 'fa-weight-hanging', pie: 'fa-shoe-prints' };
+  return `<div class="pc-fis">${x.map((i) => `<span class="pc-chip" title="${escapeHTML(i.titulo)}"><i class="fa-solid ${ico[i.k]}"></i>${escapeHTML(i.texto)}</span>`).join('')}</div>`;
+}
 
 export function playerCardHTML(p, index = 0, { wide = false } = {}) {
   const img = safeImg(p.foto_url) || safeImg(p.foto);
@@ -42,8 +49,9 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
       <div class="pc-info">
         <div class="pc-head">
           <h3 class="pc-name">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="pc-apodo">«${escapeHTML(p.apodo)}»</span>` : ''}</h3>
-          <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span>${fisicoTexto(p) ? `<span class="pc-fis">${escapeHTML(fisicoTexto(p))}</span>` : ''}</div>
+          <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
         </div>
+        ${fisicoHTML(p)}
         <div class="pc-stats">${stats}</div>
       </div>
       ${p.quote ? `<div class="pc-quote"><p>"${escapeHTML(p.quote)}"</p></div>` : ''}

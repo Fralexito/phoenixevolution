@@ -237,7 +237,7 @@ test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la s
 
 import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo, NIVELES } from '../src/js/core/density.js';
 import { rankPlayers } from '../src/js/core/ranking.js';
-import { leerMedida, fisicoTexto, ALTURA, PESO } from '../src/js/core/fisico.js';
+import { leerMedida, fisicoTexto, fisicoPartes, ALTURA, PESO } from '../src/js/core/fisico.js';
 import { puedeEntrar } from '../src/js/features/ticker.js';
 test('zoom: niveles válidos, límites y tamaño', () => {
   assert.equal(nivelValido(99, true), 3); assert.equal(nivelValido(-5, false), 0); assert.equal(nivelValido('x', true), NIVELES.movil.def); assert.equal(nivelValido(null, false), NIVELES.pc.def);
@@ -283,4 +283,7 @@ test('etiqueta de juego: PES 21 con parche y SP con versión', () => {
   assert.equal(etiquetaJuego({}), ''); assert.equal(etiquetaJuego({ juego: 'PES 2021', parche: '<b>X</b>' }), 'PES 21 (bX/b)');
   const ev = formatEvento({ tipo: 'reto_aceptado', quien: 'A', rival: 'B', formato: '1v1', juego: 'PES 2021', parche: 'Gogosz Patch' });
   assert.ok(ev.html.includes('1v1 · PES 21 (Gogosz Patch)'));
+});
+test('físico: piezas para dibujar', () => {
+  assert.deepEqual(fisicoPartes({ altura_cm: 180, pie: 'Izquierdo' }).map((x) => [x.k, x.texto]), [['altura', '180 cm'], ['pie', 'Izq.']]); assert.deepEqual(fisicoPartes({}), []);
 });
