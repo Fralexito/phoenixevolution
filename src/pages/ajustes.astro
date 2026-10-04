@@ -1,31 +1,45 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { SECCIONES } from '../data/ajustes.js';
 const base = import.meta.env.BASE_URL;
-const proximas = ['Apariencia y temas', 'Jugadores y cartas', 'Liga y temporada', 'Notificaciones', 'Privacidad', 'Cuenta', 'Idioma y región', 'Accesibilidad', 'Datos'];
 ---
 <Layout title="Configuración" active="ajustes">
   <div class="max-w-3xl mx-auto px-4 py-12 space-y-8">
     <header class="space-y-2">
       <h1 class="text-3xl md:text-4xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow"><i class="fa-solid fa-gear text-galaxy-400 mr-2"></i>Configuración</h1>
-      <p class="text-gray-400 text-sm">Se guardan en este navegador y se aplican al instante. Primera versión: más secciones llegarán pronto.</p>
+      <p class="text-gray-400 text-sm">Se guardan en este navegador y se aplican al instante. Si usas otro dispositivo, puedes llevarlos con «Exportar» / «Importar» en la sección Datos.</p>
     </header>
 
-    <section class="rounded-xl border border-galaxy-border bg-galaxy-card/60 divide-y divide-galaxy-border/70">
-      <div class="p-4 flex items-center justify-between gap-4">
-        <div><div class="text-white font-semibold">Movimiento reducido</div><div class="text-xs text-gray-400">Apaga animaciones y transiciones (más fluido en equipos lentos).</div></div>
-        <label class="inline-flex items-center gap-2 cursor-pointer"><input id="aj-movimiento" type="checkbox" class="w-5 h-5 accent-cyan-400" /><span class="sr-only">Movimiento reducido</span></label>
-      </div>
-      <div class="p-4 flex items-center justify-between gap-4">
-        <div><div class="text-white font-semibold">Mostrar panel «En vivo»</div><div class="text-xs text-gray-400">Los avisos flotantes de abajo en pantalla.</div></div>
-        <label class="inline-flex items-center gap-2 cursor-pointer"><input id="aj-vivo" type="checkbox" class="w-5 h-5 accent-cyan-400" /><span class="sr-only">Mostrar panel En vivo</span></label>
-      </div>
-    </section>
-    <p id="aj-estado" class="text-xs text-gray-500" role="status" aria-live="polite"></p>
+    <nav aria-label="Secciones" class="flex flex-wrap gap-2">
+      {SECCIONES.map((s) => <a href={`#${s.id}`} class="text-xs text-gray-300 border border-galaxy-border rounded-full px-3 py-1 hover:text-galaxy-400 hover:border-galaxy-400/50"><i class={`fa-solid ${s.icono} mr-1.5`}></i>{s.titulo}</a>)}
+    </nav>
 
-    <section class="space-y-2">
-      <h2 class="text-xs text-gray-500 tracking-[0.25em] uppercase">Próximamente</h2>
-      <ul class="flex flex-wrap gap-2">{proximas.map((t) => <li class="text-xs text-gray-400 border border-galaxy-border rounded-full px-3 py-1">{t}</li>)}</ul>
-    </section>
+    {SECCIONES.map((s) => (
+      <section id={s.id} class="scroll-mt-40 rounded-xl border border-galaxy-border bg-galaxy-card/60">
+        <header class="p-4 border-b border-galaxy-border/70">
+          <h2 class="font-display font-bold text-xl text-white uppercase tracking-wider"><i class={`fa-solid ${s.icono} text-galaxy-400 mr-2`}></i>{s.titulo}</h2>
+          <p class="text-xs text-gray-400 mt-1">{s.texto}</p>
+        </header>
+        <div class="divide-y divide-galaxy-border/70">
+          {s.ajustes.map((a) => (
+            <div class="p-4 flex items-center justify-between gap-4">
+              <div class="min-w-0"><label class="text-white font-semibold" for={`aj-${a.clave}`}>{a.etiqueta}</label><div class="text-xs text-gray-400">{a.ayuda}</div></div>
+              {a.tipo === 'switch'
+                ? <input id={`aj-${a.clave}`} data-clave={a.clave} data-tipo="switch" type="checkbox" class="w-5 h-5 shrink-0 accent-cyan-400" />
+                : <select id={`aj-${a.clave}`} data-clave={a.clave} data-tipo="opciones" class="field !w-auto max-w-[55%]">{a.opciones.map((o) => <option value={String(o.valor)}>{o.etiqueta}</option>)}</select>}
+            </div>
+          ))}
+          {s.cuenta && <div id="aj-cuenta" class="p-4 text-sm text-gray-400">Cargando tu sesión…</div>}
+          {s.acciones && (
+            <div class="p-4 flex flex-wrap gap-2">
+              {s.acciones.map((x) => <button type="button" data-accion={x.id} class={`btn ${x.peligro ? 'btn-ghost !text-bad !border-bad/50' : 'btn-ghost'}`}><i class={`fa-solid ${x.icono}`}></i> {x.etiqueta}</button>)}
+              {s.id === 'datos' && <input id="aj-archivo" type="file" accept="application/json,.json" hidden />}
+            </div>
+          )}
+        </div>
+      </section>
+    ))}
+    <p id="aj-estado" class="text-xs text-gray-400 min-h-4" role="status" aria-live="polite"></p>
     <a href={base} class="btn btn-primary inline-flex"><i class="fa-solid fa-house"></i> Volver a Central</a>
   </div>
 </Layout>

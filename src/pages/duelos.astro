@@ -160,12 +160,20 @@ import Layout from '../layouts/Layout.astro';
           <div class="flex items-center justify-between gap-3 border-b border-galaxy-border pb-2">
             <h2 id="h-mis" class="text-base font-display font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-gamepad text-galaxy-400"></i> Mis partidos <b id="cnt-mis" class="text-galaxy-400"></b></h2>
           </div>
+          <h3 class="text-[11px] text-gray-400 tracking-[0.2em] uppercase">Agendados</h3>
           <div id="lista-mis" class="grid grid-cols-1 gap-3"></div>
+          <h3 class="text-[11px] text-gray-400 tracking-[0.2em] uppercase pt-2">Historial <b id="cnt-hist" class="text-galaxy-400"></b></h3>
+          <div id="lista-historial" class="grid grid-cols-1 gap-2"></div>
         </section>
         <section id="col-radar" class="min-w-0 space-y-3" aria-labelledby="h-radar">
           <div class="flex items-center justify-between gap-3 border-b border-galaxy-border pb-2">
             <h2 id="h-radar" class="text-base font-display font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-tower-broadcast text-galaxy-400"></i> Retos en el radar <b id="cnt-radar" class="text-galaxy-400"></b></h2>
             <button id="btn-refrescar" type="button" class="text-xs text-galaxy-400 hover:text-white uppercase font-bold flex items-center gap-1 min-h-10 px-2 shrink-0" aria-label="Actualizar"><i class="fa-solid fa-arrows-rotate"></i><span class="hidden sm:inline"> Actualizar</span></button>
+          </div>
+          <div id="bloque-pend" hidden class="space-y-2">
+            <h3 class="text-[11px] text-gray-400 tracking-[0.2em] uppercase">Tus retos pendientes <b id="cnt-pend" class="text-galaxy-400"></b></h3>
+            <div id="lista-pend" class="grid grid-cols-1 gap-3"></div>
+            <h3 class="text-[11px] text-gray-400 tracking-[0.2em] uppercase pt-1">Retos de otros jugadores</h3>
           </div>
           <div id="lista-retos" class="grid grid-cols-1 gap-3"><div class="col-span-full text-center py-10 text-gray-400 text-xs">Cargando retos activos...</div></div>
         </section>

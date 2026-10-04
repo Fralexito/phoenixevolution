@@ -4,10 +4,10 @@
 // Mientras LIVE_DEMO sea true, además se SIMULAN eventos con nombres reales de los jugadores de la liga (y se rotula «demo» porque los eventos son inventados).
 // PC: hasta 5 mensajes a la vez abajo a la derecha. Móvil: hasta 2. Botón «En vivo» = silenciar; botón reloj = historial.
 import { formatEvento, demoDelay, horaExacta, mismoDia, podarHistorial } from '../core/live.js';
+import { leerAjustes, regionAhora } from './ajustes.js';
 import { DEMO_NOMBRES, DEMO_FORMATOS, DEMO_JUEGOS } from '../../data/liveDemo.js';
 
 const LIVE_DEMO = true;          // ← poner en false cuando haya actividad real
-const VISIBLE_MS = 22000;        // cuánto tarda un mensaje en desvanecerse del apilado
 const MAX_VISIBLES = 5;
 const KEY_OFF = 'pes-live-off';
 const KEY_HIST = 'pes-live-hist';
@@ -34,8 +34,8 @@ export function initLiveFeed() {
   let hist = (() => { try { return podarHistorial(JSON.parse(leer(KEY_HIST) ?? '[]')); } catch { return []; } })();
 
   const filaHTML = (ev, f, { fecha = false } = {}) => {
-    const d = fecha && !mismoDia(ev.ts, Date.now()) ? `${new Date(ev.ts).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' })} ` : '';
-    return `<i class="fa-solid ${f.icon} live-ico"></i><span class="live-txt">${f.html}</span><time class="live-time" datetime="${new Date(ev.ts).toISOString()}">${d}${horaExacta(ev.ts)}</time>${ev.demo ? '<em class="live-demo">demo</em>' : ''}`;
+    const d = fecha && !mismoDia(ev.ts, Date.now()) ? `${new Date(ev.ts).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', ...(regionAhora().timeZone ? { timeZone: regionAhora().timeZone } : {}) })} ` : '';
+    return `<i class="fa-solid ${f.icon} live-ico"></i><span class="live-txt">${f.html}</span><time class="live-time" datetime="${new Date(ev.ts).toISOString()}">${d}${horaExacta(ev.ts, regionAhora())}</time>${ev.demo ? '<em class="live-demo">demo</em>' : ''}`;
   };
   const pintarHist = () => {
     hist = podarHistorial(hist);
@@ -55,19 +55,21 @@ export function initLiveFeed() {
     const f = formatEvento(ev); if (!f) return null;
     const e = { ...ev, ts: Number.isFinite(ev.ts) ? ev.ts : Date.now(), demo: LIVE_DEMO && ev.demo !== false };
     hist = podarHistorial([e, ...hist]);
-    escribir(KEY_HIST, JSON.stringify(hist));
+    if (leerAjustes().vivoHistorial) escribir(KEY_HIST, JSON.stringify(hist));   // ajuste de privacidad
     if (!panel.hidden) pintarHist();
     return { e, f };
   }
   function mostrar(ev) {
-    const r = registrar(ev); if (!r || off) return;      // aunque esté silenciado, el historial se sigue llenando
+    const aj = leerAjustes();
+    const r = registrar(ev); if (!r || off) return;
+    if ((ev.tipo === 'reto_aceptado' && !aj.vivoRetos) || (ev.tipo === 'radar_on' && !aj.vivoRadar)) return;   // tipo silenciado por el usuario (el historial sí lo guarda)      // aunque esté silenciado, el historial se sigue llenando
     const el = document.createElement('div');
     el.className = `live-msg live-${r.f.tone}`;
     el.innerHTML = filaHTML(r.e, r.f);
     box.appendChild(el);
     while (box.children.length > MAX_VISIBLES) box.firstElementChild.remove();
     requestAnimationFrame(() => el.classList.add('live-in'));
-    setTimeout(() => { el.classList.remove('live-in'); setTimeout(() => el.remove(), 450); }, VISIBLE_MS);
+    setTimeout(() => { el.classList.remove('live-in'); setTimeout(() => el.remove(), 450); }, Number(aj.vivoDuracion) * 1000);
   }
 
   btn.addEventListener('click', () => { off = !off; escribir(KEY_OFF, off ? '1' : '0'); pintarBoton(); });

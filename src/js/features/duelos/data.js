@@ -9,6 +9,7 @@ export const data = {
   conexion: new Map(),       // reto_id → { link, detalle } (solo si soy participante confirmado)
   parts: new Map(),          // reto_id → filas de reto_participantes (sin las que salieron)
   online: new Set(),         // ids presentes en el radar
+  historial: [],             // MIS partidos ya terminados (FINALIZADO), más reciente primero
 };
 
 export const me = () => getState().session?.user.id ?? null;
@@ -28,6 +29,21 @@ export async function loadPerfiles() {
   data.perfiles = new Map((rows ?? []).map((p) => [p.id, p]));
 }
 
+const HIST_COLS = `${RETO_COLS}, cerrado_at`;
+/** Mis partidos terminados: donde soy líder/destinatario o participante. Máx. 50. */
+async function cargarHistorial() {
+  const id = me(); if (!id) return [];
+  try {
+    const mios = await supabase.from('reto_participantes').select('reto_id').eq('usuario_id', id).neq('estado', 'SALIO').limit(200);
+    if (mios.error) throw mios.error;
+    const ids = (mios.data ?? []).map((x) => x.reto_id);
+    const filtro = [`retador_id.eq.${id}`, `rival_id.eq.${id}`, `destinatario_id.eq.${id}`, ...(ids.length ? [`id.in.(${ids.join(',')})`] : [])].join(',');
+    const { data: rows, error } = await supabase.from('retos_matchmaking').select(HIST_COLS).eq('estado', 'FINALIZADO').or(filtro).order('cerrado_at', { ascending: false, nullsFirst: false }).limit(50);
+    if (error) throw error;
+    return rows ?? [];
+  } catch (e) { console.error('[duelos] historial:', e?.message ?? e); return []; }
+}
+
 /** Lee retos + participantes + enlaces. Lanza si falla la lectura principal. */
 export async function loadRetos() {
   const { data: rows, error } = await supabase.from('retos_matchmaking').select(RETO_COLS)
@@ -35,8 +51,10 @@ export async function loadRetos() {
   if (error) throw error;
   data.retos = rows ?? [];
 
+  data.historial = await cargarHistorial();   // si falla, queda vacío y se registra; no tumba la sala
+
   data.parts = new Map();
-  const ids = data.retos.map((r) => r.id);
+  const ids = [...new Set([...data.retos, ...data.historial].map((r) => r.id))];
   if (ids.length) {
     const p = await supabase.from('reto_participantes').select('reto_id, usuario_id, equipo, estado').in('reto_id', ids).neq('estado', 'SALIO');
     if (p.error) console.error('[duelos] participantes:', p.error.message);

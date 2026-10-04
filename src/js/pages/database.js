@@ -4,6 +4,7 @@ import { onSession, isAdmin } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
 import { posInfo } from '../../data/posiciones.js';
 import { href } from '../core/config.js';
+import { leerAjustes, hayMovimientoReducido } from '../features/ajustes.js';
 import { toast } from '../core/toast.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
@@ -140,7 +141,7 @@ $('vista-seg').addEventListener('click', (e) => {
 // Se recuerda por tipo de pantalla (celular / PC) en este navegador.
 const esMovil = () => window.matchMedia('(max-width: 639px)').matches;
 const claveZoom = () => (esMovil() ? 'pes-zoom-movil' : 'pes-zoom-pc');
-const leerZoom = () => { try { return nivelValido(localStorage.getItem(claveZoom()), esMovil()); } catch { return nivelValido(null, esMovil()); } };
+const leerZoom = () => { try { if (!leerAjustes().recordarZoom) return nivelValido(null, esMovil()); return nivelValido(localStorage.getItem(claveZoom()), esMovil()); } catch { return nivelValido(null, esMovil()); } };
 let nivel = leerZoom();
 function aplicarZoom() {
   const m = esMovil(); nivel = nivelValido(nivel, m);
@@ -149,7 +150,7 @@ function aplicarZoom() {
   $('dens-mas').disabled = nivel === 0; $('dens-menos').disabled = esUltimo(nivel, m);
   $('dens-reset').disabled = nivel === nivelPorDefecto(m);          // ya está en el tamaño predeterminado: nada que restablecer
 }
-const moverZoom = (d) => { nivel = cambiarNivel(nivel, d, esMovil()); try { localStorage.setItem(claveZoom(), String(nivel)); } catch { /* sin almacenamiento: solo no se recuerda */ } aplicarZoom(); };
+const moverZoom = (d) => { nivel = cambiarNivel(nivel, d, esMovil()); if (leerAjustes().recordarZoom) { try { localStorage.setItem(claveZoom(), String(nivel)); } catch { /* sin almacenamiento: solo no se recuerda */ } } aplicarZoom(); };
 const restablecerZoom = () => { nivel = nivelPorDefecto(esMovil()); try { localStorage.removeItem(claveZoom()); } catch { /* sin almacenamiento */ } aplicarZoom(); };
 $('dens-reset').addEventListener('click', restablecerZoom);
 document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === '0' && !e.target.closest('input, textarea, select')) { e.preventDefault(); restablecerZoom(); } });   // Ctrl + 0, como en el navegador
@@ -175,7 +176,7 @@ document.addEventListener('click', (e) => { if (!e.target.closest('[data-menu], 
 // escala = min(máximo, alto libre / alto, ancho libre / ancho). No se mueve el scroll de la página.
 let focoId = null;
 let replica = null;                       // { capa, origen, dx, dy, s }
-const sinMovimiento = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sinMovimiento = () => hayMovimientoReducido();   // ajuste «Animaciones» (por defecto: lo que diga el sistema)
 function destinoReplica(r) {
   const vw = window.innerWidth; const vh = window.innerHeight; const movil = esMovil();
   const barra = Math.min(160, Math.max(0, document.querySelector('body > .sticky')?.getBoundingClientRect().bottom ?? 0));
@@ -213,7 +214,7 @@ function abrirReplica(origen) {
       capa.animate([{ transform: 'translate(0, 0) scale(1)', offset: 0 }, { transform: t(1.07), offset: 0.55 }, { transform: t(0.985), offset: 0.78 }, { transform: t(1), offset: 1 }],
         { duration: 900, easing: 'cubic-bezier(.22, 1, .36, 1)' });
     }
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !sinMovimiento()) {   // inclinación 3D siguiendo el mouse
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !sinMovimiento() && leerAjustes().cartasInclinacion) {   // inclinación 3D siguiendo el mouse
       capa.addEventListener('pointermove', (e) => { const b = capa.getBoundingClientRect(); const x = (e.clientX - b.left) / b.width - 0.5; const y = (e.clientY - b.top) / b.height - 0.5; copia.style.setProperty('--ry', `${(x * 10).toFixed(2)}deg`); copia.style.setProperty('--rx', `${(-y * 10).toFixed(2)}deg`); });
       capa.addEventListener('pointerleave', () => { copia.style.setProperty('--ry', '0deg'); copia.style.setProperty('--rx', '0deg'); });
     }

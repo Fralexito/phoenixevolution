@@ -1,6 +1,8 @@
 // Barra "Última hora": (1) solo se ve en la parte superior de la página (al bajar se esconde y NO reaparece hasta volver arriba;
 // en celular, al bajar queda una versión sutil y compacta justo debajo de la cabecera),
 // (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco IRREGULAR entre ellas (no simétrico); pueden coincidir varias.
+import { factorTicker } from '../core/ajustes.js';
+
 const EL_ID = 'ticker';
 const ARRIBA = 80;   // por encima de esta posición (px) se ve completa; por debajo se esconde (PC) o pasa a versión sutil (celular)
 
@@ -44,7 +46,7 @@ function initMarquee() {
   const cuadro = (t) => {
     const dt = Math.min((t - previo) / 1000, 0.1); previo = t;
     if (!pausa && vw) {
-      const vel = movil() ? VEL_MOVIL : VEL_PC;
+      const vel = (movil() ? VEL_MOVIL : VEL_PC) * factorTicker(document.documentElement.getAttribute('data-aj-ticker-vel'));
       for (const n of vivas) { n.x -= vel * dt; n.el.style.transform = `translateX(${n.x}px)`; }
       while (vivas.length && vivas[0].x + vivas[0].w < -MARGEN_ATRAS) vivas.shift().el.remove();   // se conserva un tramo ya pasado para poder retroceder
       const u = vivas[vivas.length - 1];

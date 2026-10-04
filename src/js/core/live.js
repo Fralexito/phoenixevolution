@@ -30,10 +30,16 @@ export const HIST_MAX_MS = 2 * 60 * 60 * 1000;   // el historial guarda las últ
 export const HIST_MAX_N = 200;                   // y como máximo 200 eventos
 const p2 = (n) => String(n).padStart(2, '0');
 
-/** Hora exacta local «HH:MM:SS» (24 h) de un timestamp en ms. */
-export function horaExacta(ts) {
+/**
+ * Hora exacta «HH:MM:SS». Sin opciones usa la hora local del dispositivo en 24 h.
+ * `{ hour12, timeZone }` (de core/ajustes.js → opcionesRegion) la convierte a otra zona o a 12 horas.
+ */
+export function horaExacta(ts, { hour12 = false, timeZone } = {}) {
   const d = new Date(ts);
-  return Number.isNaN(d.getTime()) ? '--:--:--' : `${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+  if (Number.isNaN(d.getTime())) return '--:--:--';
+  if (!hour12 && !timeZone) return `${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+  try { return new Intl.DateTimeFormat('es', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12, ...(timeZone ? { timeZone } : {}) }).format(d); }
+  catch { return `${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`; }   // zona desconocida: se vuelve a la hora local
 }
 /** ¿Es el mismo día local? (para mostrar la fecha solo cuando el evento no es de hoy). */
 export const mismoDia = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();

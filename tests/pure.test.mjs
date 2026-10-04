@@ -637,15 +637,46 @@ test('ticker: el hueco entre noticias es irregular pero acotado', () => {
 });
 
 // ---- ajustes
-import { normalizarAjustes, cargarAjustes, guardarAjustes, AJUSTES_DEFECTO } from '../src/js/core/ajustes.js';
+import { normalizarAjustes, cargarAjustes, guardarAjustes, AJUSTES_DEFECTO, atributosDe, movimientoReducido, factorTicker, opcionesRegion, exportarAjustes, importarAjustes } from '../src/js/core/ajustes.js';
+import { SECCIONES } from '../src/data/ajustes.js';
+test('ajustes: catálogo coherente (claves únicas, defecto dentro de lo permitido)', () => {
+  const l = SECCIONES.flatMap((x) => x.ajustes); assert.equal(new Set(l.map((a) => a.clave)).size, l.length);
+  for (const a of l) assert.ok(a.tipo === 'switch' ? typeof a.defecto === 'boolean' : a.opciones.some((o) => o.valor === a.defecto), a.clave);
+  assert.deepEqual(normalizarAjustes(AJUSTES_DEFECTO), AJUSTES_DEFECTO);
+});
 test('ajustes: valores raros vuelven al defecto', () => {
-  assert.deepEqual(normalizarAjustes(null), AJUSTES_DEFECTO);
-  assert.deepEqual(normalizarAjustes({ movimiento: 'loco', vivo: 'x', otro: 1 }), AJUSTES_DEFECTO);
-  assert.equal(normalizarAjustes({ movimiento: 'reducido' }).movimiento, 'reducido');
+  assert.deepEqual(normalizarAjustes(null), AJUSTES_DEFECTO); assert.deepEqual(normalizarAjustes([1]), AJUSTES_DEFECTO);
+  assert.deepEqual(normalizarAjustes({ acento: 'fucsia', vivo: 'x', otro: 1, escala: 500 }), AJUSTES_DEFECTO);
+  assert.equal(normalizarAjustes({ acento: 'rojo' }).acento, 'rojo');
 });
 test('ajustes: guardar/cargar y almacén roto', () => {
   const m = new Map(); const alm = { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v) };
   assert.equal(guardarAjustes(alm, { vivo: false }), true); assert.equal(cargarAjustes(alm).vivo, false);
   m.set('pes-ajustes-v1', '{corrupto'); assert.deepEqual(cargarAjustes(alm), AJUSTES_DEFECTO);
   assert.equal(guardarAjustes({ setItem() { throw new Error('lleno'); } }, {}), false);
+});
+test('ajustes: atributos, movimiento, ticker y región', () => {
+  const at = atributosDe({ ...AJUSTES_DEFECTO, vivo: false, ligaCompacta: true });
+  assert.equal(at['data-aj-vivo'], 'no'); assert.equal(at['data-aj-liga-compacta'], 'si'); assert.equal(at['data-aj-acento'], 'cian');
+  assert.equal(movimientoReducido({ movimiento: 'sistema' }, true), true); assert.equal(movimientoReducido({ movimiento: 'normal' }, true), false); assert.equal(movimientoReducido({ movimiento: 'reducido' }, false), true);
+  assert.ok(factorTicker('lenta') < 1 && factorTicker('rapida') > 1 && factorTicker('x') === 1);
+  assert.deepEqual(opcionesRegion({ hora: '12', zona: 'America/Lima' }), { hour12: true, timeZone: 'America/Lima' }); assert.deepEqual(opcionesRegion({ hora: '24', zona: 'auto' }), { hour12: false });
+});
+test('ajustes: exportar/importar y archivo inválido', () => {
+  const r = importarAjustes(exportarAjustes({ ...AJUSTES_DEFECTO, acento: 'verde' })); assert.equal(r.ok, true); assert.equal(r.ajustes.acento, 'verde');
+  assert.equal(importarAjustes('no json').ok, false); assert.equal(importarAjustes('{"a":1}').ok, false);
+});
+test('horaExacta con zona y 12 h', () => {
+  const t = Date.UTC(2026, 0, 1, 23, 30, 5);
+  assert.match(horaExacta(t, { timeZone: 'America/Lima' }), /^18:30:05$/); assert.match(horaExacta(t, { hour12: true, timeZone: 'America/Lima' }), /^0?6:30:05/); assert.equal(horaExacta(t, { timeZone: 'Zona/Falsa' }), horaExacta(t));
+});
+
+// ---- mis partidos
+import { ordenarAgendados, ordenarPartidosJugados, pendientes } from '../src/js/core/misPartidos.js';
+test('mis partidos: agendados, historial y pendientes', () => {
+  const rs = [{ id: 1, estado: 'BUSCANDO' }, { id: 2, estado: 'ACEPTADO', fecha_programada: '2026-10-06T20:00:00Z' }, { id: 3, estado: 'EN_JUEGO' }, { id: 4, estado: 'ACEPTADO', fecha_programada: '2026-10-05T20:00:00Z' },
+    { id: 5, estado: 'FINALIZADO', cerrado_at: '2026-10-01T10:00:00Z' }, { id: 6, estado: 'FINALIZADO', cerrado_at: '2026-10-03T10:00:00Z' }, { id: 7, estado: 'CANCELADO' }];
+  assert.deepEqual(ordenarAgendados(rs).map((r) => r.id), [3, 4, 2]);      // «ya» primero, luego por fecha
+  assert.deepEqual(ordenarPartidosJugados(rs).map((r) => r.id), [6, 5]);          // más reciente primero
+  assert.deepEqual(pendientes(rs).map((r) => r.id), [1]);                   // cancelados no aparecen en ningún grupo
 });

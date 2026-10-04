@@ -4,6 +4,7 @@ import { supabase } from '../core/supabase.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast, beep } from '../core/toast.js';
 import { href } from '../core/config.js';
+import { regionAhora } from './ajustes.js';
 import { isRadarOn } from './radar.js';
 import { showHolo } from './holo.js';
 
@@ -13,7 +14,7 @@ const ICON = {
   PARTIDO_CONFIRMADO: 'fa-circle-check', PARTIDO_CANCELADO: 'fa-circle-xmark', RETO_EXPIRADO: 'fa-hourglass-end',
   INVITACION_RETO: 'fa-user-plus', UNION_RETO: 'fa-users', SALIO_RETO: 'fa-user-minus',
 };
-const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const LIMIT = 30;
 
 export function initNotifications(userId) {

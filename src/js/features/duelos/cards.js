@@ -1,12 +1,13 @@
 // Pinta las tarjetas de reto. Solo devuelve HTML (no toca la red); todo dato de la BD pasa por escapeHTML.
 import { escapeHTML, safeUrl } from '../../core/dom.js';
+import { regionAhora } from '../ajustes.js';
 import { confirmPhase } from '../../core/schedule.js';
 import { CONFIRM_OPEN_MIN, CONFIRM_CLOSE_MIN } from '../../core/rules.js';
 import { seats } from '../../core/teams.js';
 import { data, nm, partsOf, myPart, isLeader, isActive, myProfile } from './data.js';
 
-const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-const hm = (ms) => new Date(ms).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
+const hm = (ms) => new Date(ms).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const badge = (t, cls = 'text-galaxy-400 border-galaxy-400/30 bg-galaxy-600/20') => `<span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${cls}">${t}</span>`;
 const NEUTRAL = 'text-gray-300 border-gray-600/50 bg-black/30';
 
@@ -131,5 +132,16 @@ export function card(r, id) {
     <div class="grid grid-cols-2 gap-2">${teamColumn(r, 'A', id)}${teamColumn(r, 'B', id)}</div>
     ${id ? inviteBanner(r, id) + agreementBlock(r, id) + confirmBlock(r, id) + linkBlock(r, id) : ''}
     ${actions ? `<div class="mt-4 pt-3 border-t border-galaxy-border/60 flex gap-2">${actions}</div>` : ''}
+  </article>`;
+}
+
+/** Fila compacta del historial: quién jugó contra quién, formato, plataforma y cuándo terminó. */
+export function cardHistorial(r, id) {
+  const lado = (eq) => { const ps = partsOf(r.id).filter((p) => p.equipo === eq); const lider = eq === 'A' ? r.retador_id : r.rival_id; const nombres = ps.length ? ps.map((p) => nm(p.usuario_id)) : [lider ? nm(lider) : '—']; return escapeHTML(nombres.join(' + ')); };
+  const cuando = r.cerrado_at ? fmt(r.cerrado_at) : r.fecha_programada ? fmt(r.fecha_programada) : '';
+  return `<article class="rounded-xl px-4 py-3 bg-galaxy-panel border border-galaxy-border/80">
+    <div class="flex flex-wrap items-center gap-1.5 mb-1.5">${badge('Finalizado', NEUTRAL)}${badge(escapeHTML(r.plataforma))}${badge(`${r.tam_a} vs ${r.tam_b}`, 'text-amber-300 border-amber-400/40 bg-amber-400/10')}</div>
+    <p class="font-display font-bold text-white uppercase leading-tight text-sm">${lado('A')} <span class="text-galaxy-400 mx-1">vs</span> ${lado('B')}</p>
+    ${cuando ? `<p class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-calendar-check mr-1"></i>${escapeHTML(cuando)}</p>` : ''}
   </article>`;
 }

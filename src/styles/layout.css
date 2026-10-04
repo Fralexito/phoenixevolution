@@ -79,9 +79,23 @@
 .ticker-ctl button { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; border-radius: .4rem; font-size: .65rem; color: #e5e7eb; background: rgb(3 1 15 / .85); border: 1px solid rgb(0 229 255 / .4); }
 .ticker-ctl button:hover { color: #fff; background: rgb(0 229 255 / .25); }
 
-/* AJUSTES (features/ajustes.js escribe estos atributos en <html>) */
-html[data-vivo='no'] #live-wrap { display: none !important; }
-html[data-movimiento='reducido'] *, html[data-movimiento='reducido'] *::before, html[data-movimiento='reducido'] *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+/* AJUSTES: features/ajustes.js escribe data-aj-* en <html>; aquí SOLO se leen. Catálogo: data/ajustes.js */
+html[data-aj-vivo='no'] #live-wrap { display: none !important; }
+html[data-aj-ticker='no'] #ticker { display: none !important; }
+html[data-aj-mov-efectivo='reducido'] *, html[data-aj-mov-efectivo='reducido'] *::before, html[data-aj-mov-efectivo='reducido'] *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+html[data-aj-acento='violeta'] { --color-galaxy-400: #c084fc; --color-galaxy-500: #a855f7; --color-galaxy-50: #f3e8ff; }
+html[data-aj-acento='dorado'] { --color-galaxy-400: #fbbf24; --color-galaxy-500: #f59e0b; --color-galaxy-50: #fef3c7; }
+html[data-aj-acento='verde'] { --color-galaxy-400: #34d399; --color-galaxy-500: #10b981; --color-galaxy-50: #d1fae5; }
+html[data-aj-acento='rojo'] { --color-galaxy-400: #fb7185; --color-galaxy-500: #f43f5e; --color-galaxy-50: #ffe4e6; }
+html[data-aj-neon='suave'] .text-shadow-glow { text-shadow: none; }
+html[data-aj-contraste='alto'] { --color-galaxy-border: #6d4fe0; --color-galaxy-100: #ffffff; }
+html[data-aj-contraste='alto'] .text-gray-400, html[data-aj-contraste='alto'] .text-gray-500, html[data-aj-contraste='alto'] .text-gray-600 { color: #e2e8f0 !important; }
+html[data-aj-subrayado='si'] main a:not(.btn) { text-decoration: underline; text-underline-offset: 3px; }
+html[data-aj-foco='si'] :focus-visible { outline: 3px solid #fff !important; outline-offset: 3px !important; box-shadow: 0 0 0 6px var(--color-galaxy-600) !important; }
+html[data-aj-cartas-brillo='no'] .pc-sheen { display: none; }
+html[data-aj-cartas-insignia='no'] .div-badge { display: none; }
+html[data-aj-liga-zonas='no'] .tmp-fila, html[data-aj-liga-zonas='no'] .liga-tabla tbody tr.tmp-fila { box-shadow: none; background: none; }
+html[data-aj-liga-compacta='si'] .liga-tabla td { padding-top: .3rem; padding-bottom: .3rem; }
 
 /* Menú lateral: en pantallas bajas se compacta el alto de cada ítem para que quepan Mi cuenta, Configuración y Salir sin tapar nada */
 @media (max-height: 900px) {

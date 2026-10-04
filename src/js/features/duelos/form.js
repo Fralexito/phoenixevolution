@@ -2,6 +2,7 @@
 import { supabase } from '../../core/supabase.js';
 import { toast } from '../../core/toast.js';
 import { escapeHTML } from '../../core/dom.js';
+import { regionAhora } from '../ajustes.js';
 import { SLOT_HOURS, slotToDate, manualToDate, isFuture, presetToReto } from '../../core/schedule.js';
 import { MAX_PLAYERS } from '../../core/rules.js';
 import { setTeamSize, maxFor } from '../../core/teams.js';
@@ -10,7 +11,7 @@ import { needLogin, guard, friendly, refresh, invitar } from './actions.js';
 
 const $ = (id) => document.getElementById(id);
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const pressed = (btns, pred) => btns.forEach((b) => b.setAttribute('aria-pressed', String(pred(b))));
 const all = (sel) => [...document.querySelectorAll(sel)];
 
