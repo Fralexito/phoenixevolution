@@ -328,7 +328,7 @@ test('central: podio = 2.º izquierda, 1.º centro, 3.º derecha, sin huecos', (
 import { calcularTabla } from '../src/js/core/tabla.js';
 import { FECHAS } from '../src/data/ligaResultados.js';
 test('tabla: puntos 3-1-0, desempate por diferencia y goles a favor, y datos inválidos se descartan', () => {
-  const { tabla, descartados } = calcularTabla(FECHAS.flatMap((f) => f.partidos));
+  const { tabla, descartados } = calcularTabla(FECHAS.slice(0, 1).flatMap((f) => f.partidos));   // solo la fecha 1
   assert.equal(descartados.length, 0);
   assert.deepEqual(tabla.map((f) => f.nombre), ['Victor', 'Degox', 'Jeremi', 'Morgado', 'Axel', 'Arens', 'Hugo', 'Jack', 'Roberto', 'Camilo', 'Beto', 'Fralex']);
   assert.deepEqual([tabla[0].pts, tabla[0].dg, tabla[0].gf], [3, 9, 9]);
@@ -336,4 +336,16 @@ test('tabla: puntos 3-1-0, desempate por diferencia y goles a favor, y datos inv
   assert.deepEqual(emp.tabla.map((f) => f.pts), [1, 1]);
   const malo = calcularTabla([{ l: 'A', v: 'A', gl: 1, gv: 0 }, { l: 'A', v: 'B', gl: -1, gv: 0 }, { l: 'A', v: 'B', gl: 'x', gv: 0 }, null]);
   assert.equal(malo.descartados.length, 4); assert.equal(malo.tabla.length, 0);
+});
+
+test('liga: cada fecha cargada tiene 6 partidos y los 12 jugadores aparecen una sola vez; goles de las fechas con total conocido', () => {
+  const goles = (f) => f.partidos.reduce((a, m) => a + m.gl + m.gv, 0);
+  for (const f of FECHAS) {
+    assert.equal(f.partidos.length, 6, `fecha ${f.n}`);
+    const nombres = f.partidos.flatMap((m) => [m.l, m.v]);
+    assert.equal(new Set(nombres).size, 12, `fecha ${f.n}: un jugador repetido o faltante`);
+  }
+  // Totales que muestra CopaFácil en «Estadísticas de la fecha»: fecha 4 = 46 goles, 0 empates; fecha 5 = 37 goles, 1 empate.
+  assert.equal(goles(FECHAS[3]), 46); assert.equal(goles(FECHAS[4]), 37);
+  assert.equal(FECHAS[3].partidos.filter((m) => m.gl === m.gv).length, 0); assert.equal(FECHAS[4].partidos.filter((m) => m.gl === m.gv).length, 1);
 });

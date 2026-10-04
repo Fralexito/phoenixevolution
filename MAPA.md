@@ -172,4 +172,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - CopaFácil sigue siendo la fuente oficial; sin API pública confirmada no hay conexión automática. Siguiente fase posible: tablas reales en Supabase (espejo).
 
 ## Ronda 22 — Resultados de la liga (espejo, base)
-- `data/ligaResultados.js`: clubes y resultados fecha por fecha copiados de CopaFácil (fecha 1 cargada). `core/tabla.js` → `calcularTabla` (3-1-0; desempate: dif. de goles → goles a favor → nombre). Pendiente: confirmar si el enfrentamiento directo va antes. Aún no se muestra en la web.
+- `data/ligaResultados.js`: clubes y resultados fecha por fecha copiados de CopaFácil (fechas 1 a 5 cargadas). `core/tabla.js` → `calcularTabla` (3-1-0; desempate: dif. de goles → goles a favor → nombre). Pendiente: confirmar si el enfrentamiento directo va antes. Aún no se muestra en la web.

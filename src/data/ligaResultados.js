@@ -9,4 +9,20 @@ export const FECHAS = [
     { l: 'Hugo', v: 'Arens', gl: 2, gv: 3 }, { l: 'Degox', v: 'Beto', gl: 7, gv: 1 }, { l: 'Jack', v: 'Morgado', gl: 2, gv: 5 },
     { l: 'Victor', v: 'Fralex', gl: 9, gv: 0 }, { l: 'Camilo', v: 'Jeremi', gl: 0, gv: 4 }, { l: 'Roberto', v: 'Axel', gl: 0, gv: 3 },
   ] },
+  { n: 2, partidos: [
+    { l: 'Beto', v: 'Hugo', gl: 4, gv: 0 }, { l: 'Morgado', v: 'Arens', gl: 1, gv: 0 }, { l: 'Fralex', v: 'Degox', gl: 2, gv: 5 },
+    { l: 'Jeremi', v: 'Jack', gl: 0, gv: 0 }, { l: 'Axel', v: 'Victor', gl: 1, gv: 6 }, { l: 'Roberto', v: 'Camilo', gl: 1, gv: 0 },
+  ] },
+  { n: 3, partidos: [
+    { l: 'Hugo', v: 'Morgado', gl: 3, gv: 1 }, { l: 'Beto', v: 'Fralex', gl: 5, gv: 1 }, { l: 'Arens', v: 'Jeremi', gl: 3, gv: 1 },
+    { l: 'Degox', v: 'Axel', gl: 3, gv: 1 }, { l: 'Jack', v: 'Roberto', gl: 1, gv: 0 }, { l: 'Victor', v: 'Camilo', gl: 10, gv: 0 },
+  ] },
+  { n: 4, partidos: [
+    { l: 'Fralex', v: 'Hugo', gl: 5, gv: 1 }, { l: 'Jeremi', v: 'Morgado', gl: 4, gv: 3 }, { l: 'Axel', v: 'Beto', gl: 2, gv: 6 },
+    { l: 'Roberto', v: 'Arens', gl: 4, gv: 3 }, { l: 'Camilo', v: 'Degox', gl: 0, gv: 9 }, { l: 'Victor', v: 'Jack', gl: 9, gv: 0 },
+  ] },
+  { n: 5, partidos: [
+    { l: 'Hugo', v: 'Jeremi', gl: 2, gv: 2 }, { l: 'Fralex', v: 'Axel', gl: 4, gv: 5 }, { l: 'Morgado', v: 'Roberto', gl: 3, gv: 0 },
+    { l: 'Beto', v: 'Camilo', gl: 9, gv: 1 }, { l: 'Arens', v: 'Victor', gl: 1, gv: 5 }, { l: 'Degox', v: 'Jack', gl: 5, gv: 0 },
+  ] },
 ];
