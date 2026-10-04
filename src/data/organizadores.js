@@ -24,10 +24,10 @@ export const ORG = {
     { icono: 'fa-rocket', t: 'Evolución', d: 'Mejorar siempre: cada temporada mejor que la anterior.' },
   ],
   // Los tres impulsores. `nombre` debe coincidir con el nombre o apodo del jugador en la base para enlazar su perfil automáticamente.
-  impulsoresIntro: 'Tres personas, tres papeles que se complementan. Fralex puso la idea y levantó la plataforma; Jack y Hugo ponen la vida: mueven y entretienen a la comunidad para que cada fecha se sienta como algo propio. Sin los tres, esto no sería lo que es, y los tres son igual de importantes.',
+  impulsoresIntro: 'Un proyecto, tres papeles que se necesitan entre sí. Jack, junto a Hugo, es la cara y la voz de la comunidad; Fralex trabaja detrás de escena, dando forma a la idea y a la plataforma.',
   impulsores: [
-    { nombre: 'Fralex', rol: 'Idea y organización', principal: false, bio: 'Quien concibió la idea, creó la plataforma y lleva la organización de la liga.', frase: '' },
-    { nombre: 'Jack', rol: 'Alma de la comunidad', principal: false, bio: 'Mueve y entretiene a la gente, de la mano de Hugo: la energía con la que se vive cada partido y cada fecha. Impulsor de esta iniciativa junto a Fralex y Hugo.', frase: '' },
-    { nombre: 'Hugo', rol: 'Alma de la comunidad', principal: false, bio: 'Mueve y entretiene a la gente, de la mano de Jack: el ambiente que hace que todos quieran volver a jugar. Impulsor de esta iniciativa junto a Fralex y Jack.', frase: '' },
+    { nombre: 'Jack', rol: 'La cara de la comunidad', principal: true, bio: 'Quien la mueve, la anima y le da vida. Donde hay comunidad, está Jack, y Hugo siempre a su lado.', frase: '' },
+    { nombre: 'Hugo', rol: 'Mano a mano con Jack', principal: false, bio: 'Da la cara junto a Jack y mantiene ese ambiente que invita a volver a jugar, fecha tras fecha.', frase: '' },
+    { nombre: 'Fralex', rol: 'Detrás de escena', principal: false, bio: 'Concibió la idea, construyó la plataforma y sostiene la organización de la liga.', frase: '' },
   ],
 };
