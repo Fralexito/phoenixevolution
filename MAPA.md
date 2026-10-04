@@ -193,3 +193,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Página `jugador/?id=<id>` (`pages/jugador.js`): carta, datos y campaña en cada edición de liga donde aparece (puesto, KPIs, resultados, próximos, contra cada rival). Lógica pura en `core/perfil.js` (tests).
 - El jugador se vincula con la liga por nombre/apodo (sin tildes ni mayúsculas).
 - Botón «Ver perfil» (icono de carnet) en cada carta de Jugadores. Títulos: pendiente hasta que Palmarés tenga datos reales.
+- Perfil ampliado (migración 013): `biografia`, `ciudad`, `miembro_desde`, `estilo_juego`, `logros` (uno por línea) y `redes` (jsonb). Se editan en la ficha (sección plegable «Perfil público», solo admin). Redes validadas en `core/perfil.js` (solo usuario o https://; Discord se muestra como texto).

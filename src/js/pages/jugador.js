@@ -4,7 +4,7 @@ import { escapeHTML } from '../core/dom.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
-import { nombreEnEdicion, campana, contraRivales } from '../core/perfil.js';
+import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
 import { forma } from '../core/ligaStats.js';
 import { posInfo } from '../../data/posiciones.js';
 
@@ -36,6 +36,22 @@ function seccionEdicion(liga, ed, nombre) {
   </section>`;
 }
 
+function datosPerfil(p) {
+  const redes = limpiarRedes(p.redes); const logros = partirLogros(p.logros);
+  const datos = [['fa-location-dot', 'Ciudad', p.ciudad], ['fa-calendar-check', 'Miembro desde', mesAnio(p.miembro_desde)], ['fa-chess-board', 'Estilo de juego', p.estilo_juego]].filter((d) => d[2]);
+  const botones = REDES.filter((r) => redes[r.id]).map((r) => {
+    const url = enlaceRed(r.id, redes[r.id]);
+    const cuerpo = `<i class="${r.icono}"></i><span>${escapeHTML(r.nombre)}${url ? '' : `: ${escapeHTML(redes[r.id])}`}</span>`;
+    return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" class="adv-chip !min-h-9 !px-3 inline-flex items-center gap-2">${cuerpo}</a>` : `<span class="adv-chip !min-h-9 !px-3 inline-flex items-center gap-2 cursor-default">${cuerpo}</span>`;
+  });
+  return `${p.biografia ? `<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5"><h2 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-3"><i class="fa-solid fa-book-open text-galaxy-400 mr-1"></i> Biografía</h2><p class="text-gray-200 text-sm leading-relaxed whitespace-pre-line max-w-prose">${escapeHTML(p.biografia)}</p></section>` : ''}
+  ${datos.length || logros.length || botones.length ? `<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5 space-y-4">
+    ${datos.length ? `<dl class="grid sm:grid-cols-3 gap-3">${datos.map(([ic, l, v]) => `<div class="rounded-xl bg-black/25 border border-galaxy-border/40 px-3 py-2.5"><dt class="text-[10px] uppercase tracking-widest text-gray-400"><i class="fa-solid ${ic} text-galaxy-400 mr-1"></i>${l}</dt><dd class="text-sm text-white mt-0.5">${escapeHTML(v)}</dd></div>`).join('')}</dl>` : ''}
+    ${logros.length ? `<div><h2 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2"><i class="fa-solid fa-medal text-amber-300 mr-1"></i> Logros</h2><ul class="space-y-1.5">${logros.map((l) => `<li class="text-sm text-gray-200 flex gap-2"><i class="fa-solid fa-star text-[9px] text-amber-300 mt-1.5"></i><span>${escapeHTML(l)}</span></li>`).join('')}</ul></div>` : ''}
+    ${botones.length ? `<div class="flex flex-wrap gap-2">${botones.join('')}</div>` : ''}
+  </section>` : ''}`;
+}
+
 function render(p) {
   const pos = posInfo(p.posicion);
   const campanas = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre))
@@ -48,6 +64,7 @@ function render(p) {
         <h1 class="text-3xl font-display font-bold text-white uppercase tracking-widest text-shadow-glow">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="text-lg text-gray-400">«${escapeHTML(p.apodo)}»</span>` : ''}</h1>
         <p class="text-gray-400 text-sm mt-1">${escapeHTML(p.club || 'Sin club')} · <span style="color:${pos.color}">${escapeHTML(pos.nombre)}</span> · Media ${escapeHTML(p.ovr ?? '--')}</p>
         ${p.descripcion ? `<p class="text-gray-300 text-sm mt-3 leading-relaxed max-w-prose">${escapeHTML(p.descripcion)}</p>` : ''}</header>
+      ${datosPerfil(p)}
       ${campanas.join('') || '<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5 text-sm text-gray-400">Este jugador todavía no figura en ninguna edición de liga.</section>'}
     </div></div>`);
 }

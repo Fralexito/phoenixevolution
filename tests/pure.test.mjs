@@ -440,3 +440,22 @@ test('perfil: campaña con jugados, próximos, puesto y club', () => {
 test('perfil: contra cada rival', () => {
   assert.deepEqual(contraRivales(campana(EDP, 'Ana').jugados), [{ rival: 'Beto', g: 1, e: 1, p: 0, gf: 5, gc: 3 }]);
 });
+import { limpiarRed, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../src/js/core/perfil.js';
+test('perfil: redes válidas, enlaces seguros', () => {
+  assert.equal(limpiarRed('youtube', '@Fralex'), 'Fralex');
+  assert.equal(limpiarRed('youtube', 'https://youtube.com/@x'), 'https://youtube.com/@x');
+  assert.equal(limpiarRed('youtube', 'javascript:alert(1)'), '');
+  assert.equal(limpiarRed('youtube', 'http://youtube.com/x'), '');
+  assert.equal(limpiarRed('discord', 'https://discord.gg/x'), '');     // Discord no tiene enlace
+  assert.equal(limpiarRed('kick', 'a b'), ''); assert.equal(limpiarRed('nada', 'x'), '');
+  assert.deepEqual(limpiarRedes({ kick: 'fralex', tiktok: '<b>', x: 'y' }), { kick: 'fralex' });
+  assert.equal(enlaceRed('kick', 'fralex'), 'https://kick.com/fralex');
+  assert.equal(enlaceRed('tiktok', 'fralex'), 'https://www.tiktok.com/@fralex');
+  assert.equal(enlaceRed('instagram', 'https://instagram.com/f'), 'https://instagram.com/f');
+  assert.equal(enlaceRed('discord', 'fralex'), null);
+});
+test('perfil: logros y fecha', () => {
+  assert.deepEqual(partirLogros('- Campeón 2025\n\n• Goleador  \nTercero'), ['Campeón 2025', 'Goleador', 'Tercero']);
+  assert.equal(partirLogros(null).length, 0); assert.equal(partirLogros(Array(30).fill('x').join('\n')).length, 12);
+  assert.equal(mesAnio('2024-03-15'), 'marzo de 2024'); assert.equal(mesAnio('basura'), ''); assert.equal(mesAnio('2024-13-01'), '');
+});
