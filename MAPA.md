@@ -247,3 +247,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Portada más arriba (ronda 60):** menos margen superior (`sm:pt-6`) y alto `calc(100svh-9.5rem)`, para que el título y las 4 cifras suban y las cifras no queden pegadas al borde inferior en pantallas bajas.
 - **Portada, ajuste fino (ronda 61):** la portada vuelve a ocupar toda la primera pantalla (`sm:min-h-[calc(100svh-7rem)]`) con `sm:pb-14` y `sm:pt-6`: cifras un poco más arriba que al inicio, pero ya no tanto como en la ronda 60.
 - **Portada en celular = PC (ronda 62):** también en móvil la portada ocupa toda la primera pantalla (`min-h-[calc(100svh-7rem)]`, `pt-6`, `pb-8`); si el contenido es más alto que la pantalla (móviles bajos) crece sin cortarse.
+- **Barra de última hora más baja en celular (ronda 63):** `h-8` en móvil (`h-11` desde `sm`) en `Ticker.astro`; la portada usa `calc(100svh-6.1rem)` en móvil para seguir ocupando justo la primera pantalla.
