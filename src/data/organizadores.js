@@ -24,9 +24,10 @@ export const ORG = {
     { icono: 'fa-rocket', t: 'Evolución', d: 'Mejorar siempre: cada temporada mejor que la anterior.' },
   ],
   // Los tres impulsores. `nombre` debe coincidir con el nombre o apodo del jugador en la base para enlazar su perfil automáticamente.
+  impulsoresIntro: 'Esta iniciativa nació y se construyó de la mano de tres personas. Fralex es el impulsor principal, pero Jack y Hugo la impulsaron junto a él desde el principio y son igual de relevantes en todo lo que Phoenix Evolution es hoy.',
   impulsores: [
-    { nombre: 'Fralex', rol: 'Impulsor principal', principal: true, bio: 'Principal impulsor de Phoenix Evolution: la idea, el proyecto y el empuje del día a día.', frase: '' },
-    { nombre: 'Jack', rol: 'Co-impulsor', principal: false, bio: '', frase: '' },
-    { nombre: 'Hugo', rol: 'Co-impulsor', principal: false, bio: '', frase: '' },
+    { nombre: 'Fralex', rol: 'Impulsor principal', principal: true, bio: 'Impulsor principal del proyecto: el empuje del día a día y la cara más visible, siempre construyendo de la mano de Jack y Hugo.', frase: '' },
+    { nombre: 'Jack', rol: 'Co-impulsor', principal: false, bio: 'Impulsor de toda esta iniciativa junto a Fralex y Hugo. Tan relevante como cualquiera de los tres en lo que hoy es la comunidad.', frase: '' },
+    { nombre: 'Hugo', rol: 'Co-impulsor', principal: false, bio: 'Impulsor de toda esta iniciativa junto a Fralex y Jack. Tan relevante como cualquiera de los tres en lo que hoy es la comunidad.', frase: '' },
   ],
 };

@@ -8,7 +8,7 @@ const discord = SOCIALS.find((s) => s.label === 'Discord');
 const pilares = [['fa-bullseye', 'Propósito', ORG.proposito], ['fa-fire', 'Motivación', ORG.motivacion], ['fa-binoculars', 'Visión', ORG.vision]].filter((x) => x[2]);
 const inicial = (n) => String(n ?? '?').trim().charAt(0).toUpperCase() || '?';
 ---
-<Layout title="Organizadores" active="central">
+<Layout title="Organizadores" active="organizadores">
   <header class="relative overflow-hidden border-b border-galaxy-border/40">
     <div class="absolute inset-0 bg-gradient-to-b from-galaxy-900/70 to-transparent"></div>
     <div class="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 py-12 sm:py-20 text-center space-y-4">
@@ -50,16 +50,17 @@ const inicial = (n) => String(n ?? '?').trim().charAt(0).toUpperCase() || '?';
     <!-- IMPULSORES -->
     <section class="space-y-5" aria-label="Los impulsores">
       <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-star text-galaxy-400 mr-3"></i>Los impulsores</h2>
-      <div class="grid gap-4 md:grid-cols-2">
+      {ORG.impulsoresIntro && <p class="max-w-3xl text-gray-300 leading-relaxed">{ORG.impulsoresIntro}</p>}
+      <div class="grid gap-4 md:grid-cols-3">
         {ORG.impulsores.map((o) => (
-          <article class:list={['glass-panel rounded-2xl p-6 space-y-3 text-center', o.principal ? 'md:col-span-2 md:flex md:items-center md:gap-8 md:text-left border-galaxy-400/50 shadow-[0_0_30px_rgba(0,229,255,.12)]' : '']} data-org-nombre={o.nombre}>
-            <div class:list={['mx-auto md:mx-0 shrink-0 rounded-full grid place-items-center font-display font-extrabold text-white bg-gradient-to-br from-galaxy-600 to-galaxy-400 shadow-[0_0_25px_rgba(0,229,255,.35)]', o.principal ? 'w-28 h-28 text-5xl' : 'w-20 h-20 text-3xl']} aria-hidden="true">{inicial(o.nombre)}</div>
+          <article class:list={['glass-panel rounded-2xl p-6 space-y-3 text-center', o.principal ? 'border-galaxy-400/50 shadow-[0_0_30px_rgba(0,229,255,.14)] md:-translate-y-1' : '']} data-org-nombre={o.nombre}>
+            <div class:list={['mx-auto shrink-0 rounded-full grid place-items-center font-display font-extrabold text-white bg-gradient-to-br from-galaxy-600 to-galaxy-400 shadow-[0_0_25px_rgba(0,229,255,.35)]', o.principal ? 'w-24 h-24 text-4xl' : 'w-24 h-24 text-4xl']} aria-hidden="true">{inicial(o.nombre)}</div>
             <div class="space-y-2 min-w-0">
               <h3 class="font-display font-extrabold text-white uppercase tracking-wider text-2xl">{o.nombre}</h3>
               <span class="liga-sello">{o.rol}</span>
               {o.bio && <p class="text-sm text-gray-300 leading-relaxed">{o.bio}</p>}
               {o.frase && <blockquote class="text-sm text-galaxy-400 italic">“{o.frase}”</blockquote>}
-              <div data-org-jugador class="flex flex-wrap gap-2 justify-center md:justify-start pt-1"></div>
+              <div data-org-jugador class="flex flex-wrap gap-2 justify-center pt-1"></div>
             </div>
           </article>
         ))}

@@ -9,6 +9,9 @@ export const NAV = [
   { id: 'palmares',  label: 'Palmarés',      path: 'palmares/',  icon: 'fa-trophy' },
 ];
 
+// Enlaces secundarios (no saturan la cabecera de PC): aparecen en el menú de celular y en el pie de página.
+export const NAV_EXTRA = [{ id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' }];
+
 // Menú lateral, grupo "Mi cuenta": solo se muestra con sesión iniciada.
 // Para añadir una sección futura, agrega UNA línea aquí (con `path` para una página o `action` para algo del sistema).
 export const ACCOUNT_NAV = [
