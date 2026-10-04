@@ -341,11 +341,17 @@ test('tabla: puntos 3-1-0, desempate por diferencia y goles a favor, y datos inv
 test('liga: cada fecha cargada tiene 6 partidos y los 12 jugadores aparecen una sola vez; goles de las fechas con total conocido', () => {
   const goles = (f) => f.partidos.reduce((a, m) => a + m.gl + m.gv, 0);
   for (const f of FECHAS) {
-    assert.equal(f.partidos.length, 6, `fecha ${f.n}`);
     const nombres = f.partidos.flatMap((m) => [m.l, m.v]);
-    assert.equal(new Set(nombres).size, 12, `fecha ${f.n}: un jugador repetido o faltante`);
+    assert.equal(new Set(nombres).size, nombres.length, `fecha ${f.n}: un jugador repetido`);
+    if (f.n < 9) { assert.equal(f.partidos.length, 6, `fecha ${f.n}`); assert.equal(new Set(nombres).size, 12, `fecha ${f.n}`); }   // la 9 está incompleta a propósito
   }
   // Totales que muestra CopaFácil en «Estadísticas de la fecha»: fecha 4 = 46 goles, 0 empates; fecha 5 = 37 goles, 1 empate.
   assert.equal(goles(FECHAS[3]), 46); assert.equal(goles(FECHAS[4]), 37);
   assert.equal(FECHAS[3].partidos.filter((m) => m.gl === m.gv).length, 0); assert.equal(FECHAS[4].partidos.filter((m) => m.gl === m.gv).length, 1);
+});
+
+test('tabla: un partido sin jugar (gl y gv null) no suma ni se descarta; solo se cuenta como pendiente', () => {
+  const r = calcularTabla([{ l: 'A', v: 'B', gl: null, gv: null }, { l: 'A', v: 'B', gl: 2, gv: 0 }]);
+  assert.equal(r.pendientes, 1); assert.equal(r.descartados.length, 0); assert.equal(r.tabla.find((f) => f.nombre === 'A').pj, 1);
+  assert.equal(calcularTabla([{ l: 'A', v: 'B', gl: 1, gv: null }]).descartados.length, 1);   // medio marcador = dato inválido
 });

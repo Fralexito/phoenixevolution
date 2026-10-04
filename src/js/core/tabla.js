@@ -5,12 +5,14 @@ const entero = (n) => Number.isInteger(n) && n >= 0;
 
 /**
  * @param {{l:string, v:string, gl:number, gv:number}[]} partidos  l = local, v = visitante, gl/gv = goles.
- * @returns {{tabla: object[], descartados: object[]}} `descartados` = partidos con dato inválido (se ignoran y se avisan, no rompen la tabla).
+ * @returns {{tabla: object[], descartados: object[], pendientes: number}} `descartados` = partidos con dato inválido (se ignoran y se avisan, no rompen la tabla);
+ *   `pendientes` = partidos aún sin jugar (gl y gv en null): no suman nada.
  */
 export function calcularTabla(partidos) {
-  const filas = new Map(); const descartados = [];
+  const filas = new Map(); const descartados = []; let pendientes = 0;
   const fila = (n) => { if (!filas.has(n)) filas.set(n, { nombre: n, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }); return filas.get(n); };
   for (const m of Array.isArray(partidos) ? partidos : []) {
+    if (m && m.l && m.v && m.gl === null && m.gv === null) { pendientes += 1; continue; }   // programado, todavía sin marcador
     if (!m || !m.l || !m.v || m.l === m.v || !entero(m.gl) || !entero(m.gv)) { descartados.push(m); continue; }
     const a = fila(m.l); const b = fila(m.v);
     a.pj += 1; b.pj += 1; a.gf += m.gl; a.gc += m.gv; b.gf += m.gv; b.gc += m.gl;
@@ -18,5 +20,5 @@ export function calcularTabla(partidos) {
   }
   const tabla = [...filas.values()].map((f) => ({ ...f, dg: f.gf - f.gc }))
     .sort((x, y) => y.pts - x.pts || y.dg - x.dg || y.gf - x.gf || x.nombre.localeCompare(y.nombre, 'es'));
-  return { tabla, descartados };
+  return { tabla, descartados, pendientes };
 }

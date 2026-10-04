@@ -1,4 +1,5 @@
 // RESULTADOS de la Galaxy League, copiados de CopaFácil fecha por fecha (l = local, v = visitante, gl/gv = goles).
+// Partido AÚN NO JUGADO: gl y gv en null (la tabla lo ignora hasta que se escriba el marcador).
 // Es la base del «espejo»: la tabla se calcula con core/tabla.js y se compara con la de CopaFácil.
 export const CLUBES = {
   Hugo: 'Arsenal', Arens: 'Manchester City', Degox: 'Atlético de Madrid', Beto: 'Liverpool', Jack: 'Manchester United', Morgado: 'AC Milan',
@@ -24,5 +25,22 @@ export const FECHAS = [
   { n: 5, partidos: [
     { l: 'Hugo', v: 'Jeremi', gl: 2, gv: 2 }, { l: 'Fralex', v: 'Axel', gl: 4, gv: 5 }, { l: 'Morgado', v: 'Roberto', gl: 3, gv: 0 },
     { l: 'Beto', v: 'Camilo', gl: 9, gv: 1 }, { l: 'Arens', v: 'Victor', gl: 1, gv: 5 }, { l: 'Degox', v: 'Jack', gl: 5, gv: 0 },
+  ] },
+  { n: 6, partidos: [
+    { l: 'Axel', v: 'Hugo', gl: 2, gv: 2 }, { l: 'Roberto', v: 'Jeremi', gl: 3, gv: 2 }, { l: 'Camilo', v: 'Fralex', gl: 4, gv: 3 },
+    { l: 'Victor', v: 'Morgado', gl: 4, gv: 1 }, { l: 'Jack', v: 'Beto', gl: 2, gv: 6 }, { l: 'Degox', v: 'Arens', gl: 6, gv: 2 },
+  ] },
+  { n: 7, partidos: [
+    { l: 'Axel', v: 'Camilo', gl: 2, gv: 1 }, { l: 'Jeremi', v: 'Victor', gl: 1, gv: 5 }, { l: 'Fralex', v: 'Jack', gl: 3, gv: 0 },
+    { l: 'Morgado', v: 'Degox', gl: 0, gv: 1 }, { l: 'Beto', v: 'Arens', gl: 6, gv: 1 }, { l: 'Hugo', v: 'Roberto', gl: 1, gv: 1 },
+  ] },
+  { n: 8, partidos: [
+    { l: 'Camilo', v: 'Hugo', gl: 1, gv: 0 }, { l: 'Victor', v: 'Roberto', gl: 9, gv: 0 }, { l: 'Jack', v: 'Axel', gl: 3, gv: 6 },
+    { l: 'Degox', v: 'Jeremi', gl: null, gv: null }, { l: 'Arens', v: 'Fralex', gl: 4, gv: 2 }, { l: 'Beto', v: 'Morgado', gl: null, gv: null },
+  ] },
+  // Fecha 9 INCOMPLETA: el 6.º partido (Morgado – Fralex, por deducción) no se vio en las capturas; falta confirmar quién es local y su marcador.
+  { n: 9, partidos: [
+    { l: 'Hugo', v: 'Victor', gl: null, gv: null }, { l: 'Camilo', v: 'Jack', gl: 4, gv: 1 }, { l: 'Roberto', v: 'Degox', gl: null, gv: null },
+    { l: 'Axel', v: 'Arens', gl: null, gv: null }, { l: 'Jeremi', v: 'Beto', gl: null, gv: null },
   ] },
 ];
