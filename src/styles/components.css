@@ -152,13 +152,14 @@
 .pc-in { font-size: clamp(7px, calc(2.2cqw + 6.5px), 13px); }
 .pc-badges { position: absolute; left: .9em; bottom: .5em; display: flex; align-items: flex-end; gap: .6em; }
 .pc-ovr { font-family: var(--font-display); font-weight: 800; font-size: 3em; line-height: 1; letter-spacing: -.05em; color: #fff; }
-.pc-pos { font-family: var(--font-display); font-weight: 700; font-size: .9em; text-transform: uppercase; letter-spacing: .12em; padding: .1em .5em; border-radius: .3em; border: 1px solid; margin-bottom: .2em; }
+.pc-pos { font-family: var(--font-display); font-weight: 800; font-size: 1.05em; text-transform: uppercase; letter-spacing: .12em; padding: .1em .5em; border-radius: .3em; border: 1px solid; margin-bottom: .2em; }
 .pc-info { padding: .5em .9em .9em; }
 .pc-head { border-bottom: 1px solid color-mix(in srgb, var(--color-galaxy-border) 80%, transparent); padding-bottom: .6em; text-shadow: 0 1px 6px #000; }
 .pc-name { font-family: var(--font-display); font-weight: 700; font-size: 1.4em; line-height: 1.2; color: #fff; text-transform: uppercase; letter-spacing: .06em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pc-apodo { font-size: .7em; font-weight: 600; letter-spacing: .04em; color: var(--color-galaxy-400); text-transform: none; }
-.pc-club { display: flex; align-items: center; gap: .4em; font-size: .9em; color: #e5e7eb; margin-top: .2em; }
-.pc-club i { font-size: .85em; }
+.pc-apodo { display: inline-block; max-width: 100%; margin-top: .3em; padding: .12em .7em; border-radius: 999px; font-size: .95em; font-weight: 800; letter-spacing: .05em; line-height: 1.35; color: #fff; text-transform: none; text-shadow: 0 1px 4px #000;
+  background: linear-gradient(90deg, rgb(128 0 255 / .6), rgb(0 229 255 / .38)); border: 1px solid rgb(0 229 255 / .6); box-shadow: 0 0 .9em rgb(0 229 255 / .35); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: top; }
+.pc-club { display: flex; align-items: center; gap: .45em; font-size: 1em; font-weight: 700; color: #fff; margin-top: .35em; letter-spacing: .02em; }
+.pc-club i { font-size: .95em; filter: drop-shadow(0 0 .35em rgb(0 229 255 / .7)); }
 .pc-stats { margin-top: .7em; display: grid; grid-template-columns: 1fr 1fr; gap: .45em .9em; padding: .7em .8em; background: rgb(0 0 0 / .45); border: 1px solid color-mix(in srgb, var(--color-galaxy-border) 60%, transparent); border-radius: .6em; font-size: .95em; }
 .pc-stats > div { display: flex; justify-content: space-between; align-items: center; }
 .pc-k { color: #d1d5db; font-weight: 700; text-transform: uppercase; font-size: .85em; }
@@ -183,8 +184,10 @@
 .adv-seg { padding: .15rem; gap: .1rem; border-radius: .5rem; } .adv-seg > button { min-height: 1.6rem !important; padding: 0 .5rem; font-size: .65rem; border-radius: .35rem; }
 /* Físico (altura · peso · pie): fila visible entre el nombre y las stats. */
 .pc-fis { display: flex; flex-wrap: wrap; gap: .3em; margin-top: .6em; }
-.pc-chip { display: inline-flex; align-items: center; gap: .35em; padding: .15em .55em; border-radius: 999px; font-size: .9em; font-weight: 700; color: #e0f7ff; background: rgb(0 229 255 / .12); border: 1px solid rgb(0 229 255 / .4); text-shadow: none; white-space: nowrap; }
-.pc-chip i { color: var(--color-galaxy-400); font-size: .85em; }
+.pc-chip { display: inline-flex; align-items: center; gap: .4em; padding: .2em .7em; border-radius: 999px; font-size: 1em; font-weight: 700; color: #e0f7ff; background: rgb(0 229 255 / .12); border: 1px solid rgb(0 229 255 / .4); text-shadow: none; white-space: nowrap; }
+.pc-chip i { color: var(--color-galaxy-400); font-size: .9em; }
+.pc-chip.pc-chip-pie { color: #ffe8f3; background: rgb(255 0 128 / .14); border-color: rgb(255 0 128 / .5); } .pc-chip.pc-chip-pie i { color: #ff4da6; }
+.pc-chip.pc-chip-altura { color: #fff5d6; background: rgb(255 183 0 / .13); border-color: rgb(255 183 0 / .5); } .pc-chip.pc-chip-altura i { color: #ffc933; }
 @container (max-width: 135px) { .pc-fis { display: none; } }
 #players-container > div > article { height: 100%; }
 
@@ -260,3 +263,11 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
 .liga-tabla .liga-lider { background: linear-gradient(90deg, rgb(255 215 0 / .08), transparent 60%); }
 .liga-forma { width: 1.15rem; height: 1.15rem; display: inline-grid; place-items: center; border-radius: .3rem; font-family: var(--font-display); font-size: .6rem; font-weight: 800; }
 @media (min-width: 1024px) { .liga-tabla td { padding-top: .45rem; padding-bottom: .45rem; } }   /* en PC la tabla comparte fila con las fechas: filas más bajas para que todo se vea sin bajar */
+
+/* Jugadores: la carta crece suave al pasar el mouse; al hacer clic se destaca y las demás se difuminan. */
+#players-container .pcw { transition: transform .7s cubic-bezier(.22, 1, .36, 1), filter .6s ease, opacity .6s ease; cursor: pointer; will-change: transform; }
+@media (hover: hover) and (pointer: fine) { #players-container .pcw:hover { transform: scale(1.05); z-index: 6; } }
+#players-container .pcw.pcw-foco { transform: scale(1.07); z-index: 7; }
+#players-container[data-foco='true'] .pcw:not(.pcw-foco) { filter: blur(3px) saturate(.65); opacity: .5; }
+#players-container[data-foco='true'] .pcw:not(.pcw-foco):hover { transform: none; }
+@media (prefers-reduced-motion: reduce) { #players-container .pcw { transition: none; } }

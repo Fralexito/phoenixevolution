@@ -486,3 +486,38 @@ test('perfil: puntos acumulados y rendimiento', () => {
   assert.deepEqual(rendimiento({ pj: 4, g: 2, gf: 10, gc: 6, pts: 7 }), { gfPorPartido: 2.5, gcPorPartido: 1.5, victorias: 50, puntos: 58 });
   assert.equal(rendimiento({ pj: 0 }), null); assert.equal(rendimiento(null), null);
 });
+import { nivelDe, agruparPorNivel, agruparPorEstilo, ejeDominante, statsLiga, ordenar as ordenarJug, mezclar, reconocimientos, semanaActual } from '../src/js/core/destacados.js';
+const J = (id, nombre, ovr, extra = {}) => ({ id, nombre, ovr, posicion: 'DC', atq: 75, fin: 75, pot: 75, efe: 75, reg: 75, cor: 75, cre: 75, def: 75, pre: 75, pos: 75, ant: 75, pas: 75, rit: 75, men: 75, ...extra });
+const EDR = { fechas: [
+  { n: 1, partidos: [{ l: 'Ana', v: 'Beto', gl: 5, gv: 1 }, { l: 'Cris', v: 'Dani', gl: 2, gv: 2 }] },
+  { n: 2, partidos: [{ l: 'Beto', v: 'Cris', gl: 0, gv: 1 }, { l: 'Dani', v: 'Ana', gl: 0, gv: 2 }] },
+  { n: 3, partidos: [{ l: 'Ana', v: 'Cris', gl: 3, gv: 0 }, { l: 'Beto', v: 'Dani', gl: 1, gv: 0 }] },
+  { n: 4, partidos: [{ l: 'Ana', v: 'Dani', gl: null, gv: null }, { l: 'Beto', v: 'Cris', gl: null, gv: null }] },
+] };
+const JS = [J('1', 'Ana', 90), J('2', 'Beto', 80, { miembro_desde: '2022-01-01' }), J('3', 'Cris', 70, { miembro_desde: '2021-05-01' }), J('4', 'Dani', 76), J('5', 'Eva', 85, { def: 99, pos: 99, ant: 99 })];
+test('destacados: niveles y estilos', () => {
+  assert.equal(nivelDe(90).id, 'elite'); assert.equal(nivelDe(88).id, 'elite'); assert.equal(nivelDe(87).id, 'estrellas'); assert.equal(nivelDe(77).id, 'titulares'); assert.equal(nivelDe(60).id, 'promesas'); assert.equal(nivelDe(undefined).id, 'promesas');
+  assert.deepEqual(agruparPorNivel(JS).map((g) => [g.id, g.jugadores.map((p) => p.nombre)]), [['elite', ['Ana']], ['estrellas', ['Eva']], ['titulares', ['Beto']], ['promesas', ['Dani', 'Cris']]]);
+  assert.equal(ejeDominante(JS[4]), 'defensa'); assert.equal(agruparPorEstilo(JS).find((g) => g.id === 'defensa').jugadores[0].nombre, 'Eva');
+  assert.equal(agruparPorEstilo(JS).reduce((s, g) => s + g.jugadores.length, 0), JS.length);       // nadie queda fuera
+});
+test('destacados: ordenar por criterios, datos de liga y mezcla estable', () => {
+  const liga = statsLiga(JS, EDR); assert.equal(liga.size, 4);      // Eva no está en la liga
+  assert.deepEqual(ordenarJug(JS, 'media').map((p) => p.nombre), ['Ana', 'Eva', 'Beto', 'Dani', 'Cris']);
+  assert.deepEqual(ordenarJug(JS, 'az').map((p) => p.nombre), ['Ana', 'Beto', 'Cris', 'Dani', 'Eva']);
+  assert.deepEqual(ordenarJug(JS, 'goleador', { liga }).map((p) => p.nombre).slice(0, 2), ['Ana', 'Cris']);
+  assert.equal(ordenarJug(JS, 'goleador', { liga }).at(-1).nombre, 'Eva');                              // sin datos → al final
+  assert.equal(ordenarJug(JS, 'forma', { liga })[0].nombre, 'Ana');
+  assert.deepEqual(ordenarJug(JS, 'antiguedad').map((p) => p.nombre).slice(0, 2), ['Cris', 'Beto']);
+  assert.deepEqual(mezclar([1, 2, 3, 4, 5, 6], 7), mezclar([1, 2, 3, 4, 5, 6], 7)); assert.deepEqual([...mezclar([1, 2, 3, 4], 3)].sort(), [1, 2, 3, 4]);
+  const antes = JS.map((p) => p.nombre); ordenarJug(JS, 'azar'); assert.deepEqual(JS.map((p) => p.nombre), antes);   // no modifica la lista original
+});
+test('destacados: reconocimientos y semana', () => {
+  const r = reconocimientos(JS, EDR);
+  assert.equal(r.fecha.p.nombre, 'Ana'); assert.match(r.fecha.detalle, /3–0 a Cris en la fecha 3/);
+  assert.equal(r.forma.p.nombre, 'Ana'); assert.ok(r.revelacion.p);
+  assert.deepEqual(reconocimientos(JS, null), { fecha: null, forma: null, revelacion: null }); assert.deepEqual(reconocimientos([], EDR), { fecha: null, forma: null, revelacion: null });
+  assert.equal(semanaActual(new Date('2026-10-04T21:00:00Z')), '2026-09-28');       // domingo 4 oct (Lima) → lunes 28 sep
+  assert.equal(semanaActual(new Date('2026-10-05T04:30:00Z')), '2026-09-28');       // lunes 5 oct 04:30 UTC = domingo 23:30 en Lima
+  assert.equal(semanaActual(new Date('2026-10-05T05:00:00Z')), '2026-10-05');       // lunes 00:00 en Lima
+});

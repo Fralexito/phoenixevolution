@@ -23,6 +23,18 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
     <div id="adv-panel" hidden></div>
+    <!-- Reconocimientos: formas de destacar que no dependen solo de la media -->
+    <section id="reconocimientos" aria-label="Reconocimientos"></section>
+    <!-- Vista y orden -->
+    <div id="vista-bar" class="flex flex-wrap items-center gap-3 -mb-2">
+      <div id="vista-seg" class="flex gap-1 text-xs font-display font-bold uppercase tracking-wider bg-black/40 p-1 rounded-lg border border-galaxy-border/60" role="group" aria-label="Vista">
+        <button type="button" data-vista="plano" aria-pressed="true" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Todos</button>
+        <button type="button" data-vista="estilo" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por estilo</button>
+        <button type="button" data-vista="nivel" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por nivel</button>
+      </div>
+      <label id="orden-wrap" class="flex items-center gap-2 text-xs text-gray-400">Ordenar por
+        <select id="orden-select" class="field !w-auto !min-h-9"></select></label>
+    </div>
     <!-- Herramientas sutiles: leyenda de stats y zoom (tamaño de tarjeta; la cuadrícula acomoda cuántas caben, como el explorador de archivos) -->
     <div class="flex justify-end items-center gap-1 -mb-3 text-gray-500">
       <button id="btn-leyenda" type="button" class="dens-btn" aria-label="Ver leyenda de las stats" title="Leyenda de stats"><i class="fa-solid fa-circle-info"></i></button>

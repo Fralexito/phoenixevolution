@@ -15,7 +15,7 @@ const GLOWS = [
 function fisicoHTML(p) {
   const x = fisicoPartes(p); if (!x.length) return '';
   const ico = { altura: 'fa-ruler-vertical', pie: 'fa-shoe-prints' };
-  return `<div class="pc-fis">${x.map((i) => `<span class="pc-chip" title="${escapeHTML(i.titulo)}"><i class="fa-solid ${ico[i.k]}"></i>${escapeHTML(i.texto)}</span>`).join('')}</div>`;
+  return `<div class="pc-fis">${x.map((i) => `<span class="pc-chip pc-chip-${i.k}" title="${escapeHTML(i.titulo)}"><i class="fa-solid ${ico[i.k]}"></i>${escapeHTML(i.texto)}</span>`).join('')}</div>`;
 }
 
 export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = {}) {
@@ -48,7 +48,8 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = 
       </div>
       <div class="pc-info">
         <div class="pc-head">
-          <h3 class="pc-name">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="pc-apodo">«${escapeHTML(p.apodo)}»</span>` : ''}</h3>
+          <h3 class="pc-name">${escapeHTML(p.nombre)}</h3>
+          ${p.apodo ? `<div><span class="pc-apodo" title="Apodo">«${escapeHTML(p.apodo)}»</span></div>` : ''}
           <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
         </div>
         ${fisicoHTML(p)}

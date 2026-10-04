@@ -138,8 +138,15 @@ function render(p) {
     <div class="w-full max-w-[320px] mx-auto lg:mx-0 lg:sticky lg:top-20">${playerCardHTML(p, 0)}</div>
     <div class="space-y-5 min-w-0">
       <header><span class="text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2.5 py-1 rounded border border-galaxy-400/30 inline-block mb-2">PERFIL DE JUGADOR</span>
-        <h1 class="text-3xl font-display font-bold text-white uppercase tracking-widest text-shadow-glow">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="text-lg text-gray-400">«${escapeHTML(p.apodo)}»</span>` : ''}</h1>
-        <p class="text-gray-400 text-sm mt-1">${escapeHTML(p.club || 'Sin club')} · <span style="color:${pos.color}">${escapeHTML(pos.nombre)}</span> · Media ${escapeHTML(p.ovr ?? '--')}</p>
+        <h1 class="text-4xl sm:text-5xl font-display font-bold text-white uppercase tracking-widest text-shadow-glow leading-tight">${escapeHTML(p.nombre)}</h1>
+        ${p.apodo ? `<p class="mt-2"><span class="inline-block px-4 py-1.5 rounded-full text-lg sm:text-xl font-display font-bold text-white border border-galaxy-400/70 shadow-[0_0_18px_rgba(0,229,255,.35)] bg-gradient-to-r from-galaxy-600/70 to-galaxy-400/40">«${escapeHTML(p.apodo)}»</span></p>` : ''}
+        <ul class="flex flex-wrap gap-2 mt-4">
+          <li class="px-3.5 py-2 rounded-xl border border-galaxy-400/50 bg-galaxy-600/15 text-white font-display font-bold text-sm uppercase tracking-wider inline-flex items-center gap-2"><i class="fa-solid fa-shield-halved text-galaxy-400"></i>${escapeHTML(p.club || 'Sin club')}</li>
+          <li class="px-3.5 py-2 rounded-xl border font-display font-bold text-sm uppercase tracking-wider inline-flex items-center gap-2" style="color:${pos.color};border-color:${pos.color}88;background:${pos.color}22"><i class="fa-solid fa-location-crosshairs"></i>${escapeHTML(p.posicion ?? '')} · ${escapeHTML(pos.nombre)}</li>
+          ${(p.altura_cm ? [`<li class="px-3.5 py-2 rounded-xl border border-amber-400/50 bg-amber-500/10 text-amber-100 font-display font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-ruler-vertical text-amber-300"></i>${escapeHTML(p.altura_cm)} cm</li>`] : []).join('')}
+          ${(p.pie ? [`<li class="px-3.5 py-2 rounded-xl border border-pink-400/50 bg-pink-500/10 text-pink-100 font-display font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-shoe-prints text-pink-300"></i>Pie ${p.pie === 'Izquierdo' ? 'izquierdo' : 'derecho'}</li>`] : []).join('')}
+          <li class="px-3.5 py-2 rounded-xl border border-emerald-400/50 bg-emerald-500/10 text-emerald-100 font-display font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-star text-emerald-300"></i>Media ${escapeHTML(p.ovr ?? '--')}</li>
+        </ul>
         ${p.descripcion ? `<p class="text-gray-300 text-sm mt-3 leading-relaxed max-w-prose">${escapeHTML(p.descripcion)}</p>` : ''}</header>
       <div><button type="button" id="perfil-analisis-btn" aria-expanded="false" aria-controls="perfil-analisis" class="btn btn-primary"><i class="fa-solid fa-chart-pie"></i> <span>Ver análisis de juego</span></button>
         <button type="button" id="perfil-editar" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-pen"></i> Editar ficha</button>

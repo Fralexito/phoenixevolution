@@ -11,6 +11,10 @@ import { MAX_COMPARE } from '../core/compare.js';
 import { norm } from '../core/search.js';
 import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo } from '../core/density.js';
 import { rankPlayers } from '../core/ranking.js';
+import { agruparPorEstilo, agruparPorNivel, ordenar, statsLiga, CRITERIOS } from '../core/destacados.js';
+import { montarReconocimientos } from '../features/reconocimientos.js';
+import { EDICIONES } from '../../data/ligaResultados.js';
+import { LIGAS } from '../../data/ligas.js';
 import { mountAdvanced } from '../features/advancedSearch.js';
 import { openStatLegend } from '../features/statLegend.js';
 
@@ -18,13 +22,19 @@ const $ = (id) => document.getElementById(id);
 let all = [];
 let club = 'ALL';
 let term = '';
+let vista = 'plano';      // 'plano' | 'estilo' | 'nivel'
+let orden = 'media';      // criterio del orden «Todos» (ver CRITERIOS)
+const semilla = Math.floor(Math.random() * 1e9);   // «Aleatorio» se mantiene estable mientras no recargues
+let ligaStats = new Map();
+const edicionActual = () => (EDICIONES[LIGAS[0]?.id] ?? []).at(-1) ?? null;
+const encabezado = (g) => `<div class="col-span-full flex items-center gap-3 pt-3"><i class="fa-solid ${g.icono} text-galaxy-400"></i><h2 class="font-display font-bold text-lg text-white uppercase tracking-widest">${escapeHTML(g.nombre)}</h2><span class="text-xs text-gray-400">${g.jugadores.length}</span><span class="flex-1 h-px bg-galaxy-line"></span></div>`;
 const sel = []; // ids marcados para comparar (máx. 8; en el comparador se reparten en equipos A y B)
 
 let adv = null;   // búsqueda avanzada activa: { keys, min, top } o null
 
 function tarjeta(p, i, extra = '') {
   const admin = isAdmin();
-  return `<div class="relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${extra}
+  return `<div data-pcw="${escapeHTML(p.id)}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${extra}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>
         <a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" aria-label="Ver perfil de ${escapeHTML(p.nombre)}" title="Ver perfil" class="cmp-btn perfil-btn"><i class="fa-solid fa-id-card"></i></a>${admin ? `
         <button type="button" data-menu="${escapeHTML(p.id)}" aria-label="Opciones de la ficha" aria-haspopup="true" class="card-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
@@ -35,6 +45,7 @@ function tarjeta(p, i, extra = '') {
 }
 
 function paint() {
+  $('players-container').dataset.foco = 'false';   // al repintar (filtros, orden…) se quita el foco
   const t = norm(term);
   const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
   const box = $('players-container');
@@ -45,7 +56,11 @@ function paint() {
       .replace(/<\/div>$/, `<div class="adv-strip">${adv.keys.map((k) => `<span>${k === 'ovr' ? 'MEDIA' : k.toUpperCase()} <b>${f.vals[k]}</b></span>`).join('')}${adv.keys.length > 1 ? `<span class="adv-prom">prom <b>${Math.round(f.score * 10) / 10}</b></span>` : ''}</div></div>`)).join('')
       : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">Ningún jugador cumple ese mínimo en todas las stats elegidas.</div>`;
   } else {
-    box.innerHTML = list.length ? list.map((p, i) => tarjeta(p, i)).join('') : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`;
+    let n = 0;
+    const grupos = vista === 'estilo' ? agruparPorEstilo(list) : vista === 'nivel' ? agruparPorNivel(list) : null;
+    box.innerHTML = !list.length ? `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`
+      : grupos ? grupos.map((g) => encabezado(g) + g.jugadores.map((p) => tarjeta(p, n++)).join('')).join('')
+        : ordenar(list, orden, { liga: ligaStats, semilla }).map((p, i) => tarjeta(p, i)).join('');
   }
   paintBar();
 }
@@ -63,11 +78,13 @@ function fillClubs() {
   sel.value = clubs.includes(club) ? club : 'ALL'; club = sel.value;
 }
 
+let reconMontado = false;
 async function load() {
   try {
     const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false });
     if (error) throw error;
-    all = data ?? []; fillClubs(); paint();
+    all = data ?? []; ligaStats = statsLiga(all, edicionActual()); fillClubs(); paint();
+    if (!reconMontado) { reconMontado = true; montarReconocimientos($('reconocimientos'), all, edicionActual()); }
   } catch (e) {
     console.error('[database] cargar:', e);
     $('players-container').innerHTML = `<div class="col-span-full text-center py-10 text-bad text-sm"><i class="fa-solid fa-triangle-exclamation mr-2"></i>No se pudo cargar la base de datos. Reintenta en unos segundos.</div>`;
@@ -79,6 +96,14 @@ $('player-search-input').addEventListener('input', (e) => { term = e.target.valu
 $('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel[0], sel[1])));
 $('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1], sel.length > 2 ? sel : null));
 $('btn-leyenda').addEventListener('click', openStatLegend);
+// Vista (Todos / Por estilo / Por nivel) y orden de la vista «Todos».
+$('orden-select').innerHTML = CRITERIOS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('');
+$('orden-select').addEventListener('change', (e) => { orden = e.target.value; paint(); });
+$('vista-seg').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-vista]'); if (!b) return; vista = b.dataset.vista;
+  $('vista-seg').querySelectorAll('[data-vista]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  $('orden-wrap').hidden = vista !== 'plano'; paint();
+});
 
 // ---- Zoom: el usuario elige el TAMAÑO de tarjeta; la cuadrícula (auto-fill) decide cuántas caben y las reparte parejas. ----
 // Se recuerda por tipo de pantalla (celular / PC) en este navegador.
@@ -109,7 +134,16 @@ $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 // Menú sutil «⋯» de cada ficha (solo admin): se abre al tocarlo y se cierra al tocar fuera.
 const cerrarMenus = () => document.querySelectorAll('.card-menu').forEach((x) => { x.hidden = true; });
 document.addEventListener('click', (e) => { if (!e.target.closest('[data-menu], .card-menu')) cerrarMenus(); });
+// Foco: al hacer clic en una carta, esa se destaca y las demás se difuminan. Otro clic en la misma, clic fuera o Esc lo quitan.
+function fijarFoco(id) {
+  const box = $('players-container'); box.dataset.foco = String(!!id);
+  box.querySelectorAll('.pcw').forEach((el) => el.classList.toggle('pcw-foco', !!id && el.dataset.pcw === id));
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fijarFoco(null); });
+document.addEventListener('click', (e) => { if (!e.target.closest('#players-container, .modal-card, #cmp-bar')) fijarFoco(null); });
 $('players-container').addEventListener('click', async (e) => {
+  const w = e.target.closest('.pcw');
+  if (w && !e.target.closest('button, a, .card-menu')) { fijarFoco(w.classList.contains('pcw-foco') ? null : w.dataset.pcw); return; }
   const menu = e.target.closest('[data-menu]')?.dataset.menu;
   if (menu) { const el = document.querySelector(`.card-menu[data-menu-for="${menu}"]`); const abrir = el.hidden; cerrarMenus(); el.hidden = !abrir; return; }
   const cmp = e.target.closest('[data-cmp]')?.dataset.cmp;

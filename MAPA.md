@@ -196,3 +196,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Perfil ampliado (migración 013): `biografia`, `ciudad`, `miembro_desde`, `estilo_juego`, `logros` (uno por línea) y `redes` (jsonb). Se editan en la ficha (sección plegable «Perfil público», solo admin). Redes validadas en `core/perfil.js` (solo usuario o https://; Discord se muestra como texto).
 - Análisis de juego en el perfil (botón «Ver análisis de juego»): mapa de calor aproximado, radar de estilo + fortalezas/a mejorar y rendimiento real de liga (puntos acumulados). Lógica pura en `core/estilo.js` y `core/perfil.js`. El mapa y el radar son APROXIMADOS (posición + stats), no seguimiento real.
 - Botón «Editar ficha» dentro del perfil (solo admin): abre el mismo formulario de Jugadores y recarga el perfil al guardar.
+
+## Ronda 26 — Jugadores: que nadie quede abajo (experimento)
+- Botón propio «Editar biografía» en el perfil (`features/perfilEditor.js`); el formulario de la ficha ya no lleva esos campos.
+- Más presencia visual: apodo (pastilla con brillo), club, posición, altura y pie en cartas y en el encabezado del perfil.
+- Jugadores: reconocimientos (`features/reconocimientos.js`: de la fecha, en forma, revelación + voto de la semana, migración 014 `votos_semana`), vistas Todos / Por estilo / Por nivel, selector de orden (media, forma, goleador, antigüedad, A–Z, aleatorio). Lógica en `core/destacados.js` (niveles: Élite ≥88, Estrellas ≥83, Titulares ≥77, Promesas).
+- Carta: crece suave al pasar el mouse; al hacer clic se destaca y las demás se difuminan (Esc / clic fuera lo quita).
