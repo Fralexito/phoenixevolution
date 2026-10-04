@@ -108,3 +108,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Posiciones**: solo las letras llevan color (el resto del botón/insignia es el estándar); sin mini leyenda.
 - **Comparación 1 vs 1** (`features/compare.js`): vuelve el diseño de la ronda 9 (dos selectores, cabecera, resumen); radar / estadísticas / perfil van en pestañas para bajar menos. **Comparación masiva** (`features/compareMasivo.js`): botón aparte; resultado en mini secciones (Resumen · Radar · Estadísticas · Tabla), una abierta a la vez.
 - **Última hora**: una noticia a la vez cruza la barra (75 px/s en PC, 32 en celular) y hay una pausa (2.5 s / 2 s) antes de la siguiente. Se pausa al pasar el mouse o tocar.
+
+## Ronda 12 — Tarjetas con foto grande, buscador en comparadores, pulso con hora e historial
+- **Tarjeta de jugador** (`features/playerCard.js`, usada en Jugadores y Destacados): foto grande arriba (5:4), OVR y posición sobre la foto; la insignia de posición vuelve a letra + recuadro del color del grupo. En el formulario de crear jugador solo las letras llevan color. Las fotos nuevas se guardan a 512 px (las antiguas de 256 px se verán algo borrosas hasta volver a subirlas).
+- **Editar/borrar**: botón sutil «⋯» en la esquina de la foto (solo admin) que abre un mini menú.
+- **Buscador por nombre** (`features/playerPicker.js`, `core/search.js`) en el comparador 1 vs 1 y en «Añadir jugador» de la masiva (sin acentos ni mayúsculas).
+- **Pulso en vivo**: hasta 5 mensajes a la vez en PC (2 en móvil), cada uno con hora exacta HH:MM:SS, y botón «Historial» con las últimas 2 horas (máx. 200; se guarda en el navegador y sobrevive a cambiar de página). Silenciar solo oculta los mensajes; el historial se sigue llenando.

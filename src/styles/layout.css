@@ -34,12 +34,24 @@
 @media (max-width: 767.98px) {
   .live-msg { max-width: calc(100vw - 1.5rem); white-space: nowrap; overflow: hidden; }
   .live-txt { overflow: hidden; text-overflow: ellipsis; }
-  #live-feed > .live-msg:not(:last-child) { display: none; }
-  .live-toggle-txt { display: none; }
-  .live-toggle { padding: 0 .6rem; }
+  #live-feed > .live-msg:nth-last-child(n+3) { display: none; }   /* móvil: se ven los 2 más recientes */
 }
 @media (prefers-reduced-motion: reduce) { .live-msg { transform: none; transition: opacity .2s; } .live-dot { animation: none; } }
 /* Si hay una barra flotante propia de la página (p. ej. «Comparar»), el pulso en vivo sube para no taparse. */
-@media (max-width: 767.98px) { body:has(#cmp-bar:not([hidden])) #live-wrap { bottom: 4.75rem; } }
+@media (max-width: 1279.98px) { body:has(#cmp-bar:not([hidden])) #live-wrap { bottom: 4.75rem; } }
 /* PC: el pulso vive abajo a la derecha y los mensajes entran desde ese lado. */
 @media (min-width: 768px) { .live-msg:not(.live-in) { transform: translateX(10px); } }
+/* Hora exacta en cada mensaje + historial. */
+.live-time { flex: none; margin-left: auto; padding-left: .5rem; font-variant-numeric: tabular-nums; font-size: .66rem; color: #94a3b8; }
+.live-msg { max-width: 100%; }
+.live-msg .live-txt { min-width: 0; }
+.live-hist { width: 100%; max-height: min(55vh, 24rem); display: flex; flex-direction: column; border-radius: .8rem; background: rgba(8, 3, 22, .94); backdrop-filter: blur(8px); border: 1px solid rgba(0, 229, 255, .35); box-shadow: 0 12px 34px rgba(0, 0, 0, .65); overflow: hidden; }
+.live-hist[hidden] { display: none; }
+.live-hist > header { display: flex; justify-content: space-between; align-items: center; padding: .6rem .8rem; border-bottom: 1px solid rgba(167, 139, 250, .2); font: 700 .75rem/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: #fff; }
+.live-hist > header button { color: #9ca3af; width: 28px; height: 28px; } .live-hist > header button:hover { color: #fff; }
+.live-hist ul { overflow-y: auto; padding: .35rem; display: flex; flex-direction: column; gap: .25rem; }
+.live-row { display: flex; align-items: center; gap: .5rem; padding: .4rem .55rem; font-size: .74rem; line-height: 1.25; color: #cbd5e1; border-left: 3px solid; border-radius: .4rem; background: rgba(255, 255, 255, .03); }
+.live-row.live-ok { border-left-color: #00ff88; } .live-row.live-cyan { border-left-color: #00e5ff; }
+.live-row b { color: #fff; }
+.live-empty { padding: 1rem; text-align: center; font-size: .75rem; color: #6b7280; }
+#live-hist:not([hidden]) ~ #live-feed { display: none; }   /* con el historial abierto no se repiten los mensajes apilados */

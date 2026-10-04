@@ -4,11 +4,12 @@ import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../sr
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
 import { clampStat, calcOvr } from '../src/js/core/stats.js';
+import { filterPlayers, norm } from '../src/js/core/search.js';
 import { posInfo, POSICIONES } from '../src/data/posiciones.js';
 import { STAT_INFO } from '../src/data/stats.js';
 import { STAT_KEYS } from '../src/js/features/playerCard.js';
 import { compareStats, radarPoints, axisPoint, autoTeams, moveToTeam, teamProfile, compareTeams, MAX_TEAM } from '../src/js/core/compare.js';
-import { formatEvento, demoDelay } from '../src/js/core/live.js';
+import { formatEvento, demoDelay, horaExacta, podarHistorial, mismoDia, HIST_MAX_MS } from '../src/js/core/live.js';
 import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
 import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
 
@@ -185,4 +186,26 @@ test('posiciones: 11 posiciones, 4 grupos con color y nombre completo; código d
   assert.equal(posInfo('DC').grupo, 'delantero'); assert.equal(posInfo('PO').nombre, 'Portero'); assert.equal(posInfo('DFC').grupoNombre, 'Defensa');
   assert.ok(POSICIONES.every((p) => /^#[0-9a-f]{6}$/.test(posInfo(p.cod).color)));
   assert.equal(posInfo('ZZ').cod, 'ZZ'); assert.equal(posInfo(null).color, '#9ca3af');
+});
+
+test('búsqueda de jugadores: sin acentos ni mayúsculas, empieza-con primero, y excluye ids', () => {
+  const L = [{ id: '1', nombre: 'Titán' }, { id: '2', nombre: 'Mirko' }, { id: '3', nombre: 'Kaiser Titanio' }, { id: '4', nombre: 'Neo' }];
+  assert.equal(norm('  ÁÉÍ '), 'aei');
+  assert.deepEqual(filterPlayers(L, 'TITAN').map((p) => p.id), ['1', '3']);
+  assert.deepEqual(filterPlayers(L, 'tan').map((p) => p.id), ['1', '3']);
+  assert.equal(filterPlayers(L, '').length, 4);
+  assert.deepEqual(filterPlayers(L, '', ['2', '4']).map((p) => p.id), ['1', '3']);
+  assert.equal(filterPlayers(L, 'zzz').length, 0); assert.equal(filterPlayers(L, '', [], 2).length, 2);
+});
+
+test('historial en vivo: hora exacta, ventana de 2 horas, orden y tope', () => {
+  const t0 = new Date(2026, 9, 4, 4, 5, 9).getTime();
+  assert.equal(horaExacta(t0), '04:05:09'); assert.equal(horaExacta('x'), '--:--:--');
+  assert.equal(mismoDia(t0, t0 + 1000), true); assert.equal(mismoDia(t0, t0 + 86_400_000 * 2), false);
+  const ev = (ts, quien = 'A') => ({ tipo: 'radar_on', quien, ts });
+  const now = t0 + HIST_MAX_MS;
+  const h = podarHistorial([ev(t0 + 1), ev(t0 - 1), ev(now - 10, 'Nuevo'), ev(now + 3_600_000), { tipo: 'x', quien: 'A', ts: now - 5 }, null, ev(NaN)], now);
+  assert.deepEqual(h.map((e) => e.quien), ['Nuevo', 'A']);              // fuera de ventana, futuro, inválidos y vacíos descartados; más nuevo primero
+  assert.equal(podarHistorial(Array.from({ length: 300 }, (_, i) => ev(now - i * 1000)), now).length, 200);
+  assert.deepEqual(podarHistorial('basura', now), []);
 });

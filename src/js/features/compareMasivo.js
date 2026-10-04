@@ -7,6 +7,7 @@ import { compareTeams, teamProfile, axisPoint, radarPoints, autoTeams, moveToTea
 import { posInfo } from '../../data/posiciones.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from './playerCard.js';
+import { mountPicker } from './playerPicker.js';
 
 const COL = { a: '#00e5ff', b: '#ff2d95' };   // colores fijos: equipo A (cian) y equipo B (magenta)
 const RADAR = { cx: 150, cy: 150, r: 100, min: 40, max: 99 };
@@ -83,7 +84,7 @@ export function openCompareMasivo(players, ids = []) {
       </div>
       <div id="cmp-teams" class="grid grid-cols-2 gap-2"></div>
       <div class="flex items-center gap-2">
-        <select id="cmp-add" class="field flex-1" aria-label="Añadir jugador"></select>
+        <div id="cmp-add" class="flex-1"></div>
         <span id="cmp-count" class="text-[11px] text-gray-400 font-display uppercase tracking-wider shrink-0"></span>
       </div>
       <div id="cmp-body" aria-live="polite"></div>
@@ -101,10 +102,8 @@ export function openCompareMasivo(players, ids = []) {
 
   function paint() {
     $('#cmp-teams').innerHTML = col('a') + col('b');
-    const libres = players.filter((p) => !all().includes(p.id));
     const lleno = all().length >= MAX_COMPARE;
-    $('#cmp-add').disabled = lleno || !libres.length;
-    $('#cmp-add').innerHTML = `<option value="">${lleno ? 'Máximo 8 jugadores' : '+ Añadir jugador…'}</option>${libres.map((p) => `<option value="${escapeHTML(p.id)}">${escapeHTML(p.nombre)} (${escapeHTML(p.ovr)})</option>`).join('')}`;
+    addPicker.setDisabled(lleno, lleno ? 'Máximo 8 jugadores' : '+ Añadir jugador (escribe para buscar)…');
     $('#cmp-count').textContent = `${all().length}/${MAX_COMPARE}`;
     const body = $('#cmp-body');
     if (!all().length) { body.innerHTML = '<p class="text-center text-sm text-gray-400 py-8">Añade jugadores para compararlos.</p>'; return; }
@@ -137,12 +136,13 @@ export function openCompareMasivo(players, ids = []) {
         ${sec === x.k ? `<div class="cmp-sec-b">${x.html}</div>` : ''}</section>`).join('');
   }
 
-  $('#cmp-add').addEventListener('change', (e) => {
-    const id = e.target.value; if (!id || all().length >= MAX_COMPARE) return;
+  // Buscador para añadir: escribe parte del nombre y elige; el jugador entra al equipo con menos integrantes.
+  const addPicker = mountPicker($('#cmp-add'), { players, exclude: all, clearOnPick: true, placeholder: '+ Añadir jugador (escribe para buscar)…', onPick: (p) => {
+    if (!p || all().length >= MAX_COMPARE) return;
     const side = teams.a.length <= teams.b.length ? 'a' : 'b';
     const dest = teams[side].length < MAX_TEAM ? side : (side === 'a' ? 'b' : 'a');
-    teams = { ...teams, [dest]: [...teams[dest], id] }; paint();
-  });
+    teams = { ...teams, [dest]: [...teams[dest], p.id] }; paint();
+  } });
   $('#cmp-teams').addEventListener('click', (e) => {
     const mv = e.target.closest('[data-mover]'); const q = e.target.closest('[data-quitar]');
     if (mv) teams = { ...teams, ...moveToTeam(teams, mv.dataset.mover, mv.dataset.a) };

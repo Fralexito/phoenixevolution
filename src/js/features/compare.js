@@ -5,6 +5,7 @@ import { escapeHTML, safeImg, statColor } from '../core/dom.js';
 import { compareStats, axisPoint, radarPoints } from '../core/compare.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from './playerCard.js';
+import { mountPicker } from './playerPicker.js';
 
 const CA = '#00e5ff'; const CB = '#ff2d95';   // colores fijos: jugador A (cian) y jugador B (magenta)
 const RADAR = { cx: 150, cy: 150, r: 100, min: 40, max: 99 };
@@ -61,7 +62,6 @@ export function openCompare(players, idA = null, idB = null) {
   let a = players.find((p) => p.id === idA) ?? null;
   let b = players.find((p) => p.id === idB) ?? null;
   let tab = 'radar';   // 'radar' | 'barras' | 'perfil'
-  const opts = (sel) => `<option value="">— Elegir —</option>${players.map((p) => `<option value="${escapeHTML(p.id)}" ${p.id === sel?.id ? 'selected' : ''}>${escapeHTML(p.nombre)} (${escapeHTML(p.ovr)})</option>`).join('')}`;
 
   const m = openModal(`
     <div class="p-5 sm:p-6 space-y-4">
@@ -70,8 +70,8 @@ export function openCompare(players, idA = null, idB = null) {
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <div class="grid grid-cols-2 gap-2">
-        <div><label class="label" for="cmp-a" style="color:${CA}">Jugador A</label><select id="cmp-a" class="field">${opts(a)}</select></div>
-        <div><label class="label" for="cmp-b" style="color:${CB}">Jugador B</label><select id="cmp-b" class="field">${opts(b)}</select></div>
+        <div><label class="label" for="cmp-a-in" style="color:${CA}">Jugador A</label><div id="cmp-a"></div></div>
+        <div><label class="label" for="cmp-b-in" style="color:${CB}">Jugador B</label><div id="cmp-b"></div></div>
       </div>
       <div id="cmp-body" aria-live="polite"></div>
     </div>`, { id: 'compare-modal', wide: true });
@@ -98,7 +98,8 @@ export function openCompare(players, idA = null, idB = null) {
       <div class="mt-3">${tab === 'radar' ? radarSVG(a, b) : tab === 'barras' ? `<div class="divide-y divide-galaxy-border/40">${c.rows.map(rowHTML).join('')}</div>` : `<div class="flex flex-col sm:flex-row gap-2">${textoJugador(a, CA)}${textoJugador(b, CB)}</div>`}</div>`;
     body.querySelectorAll('#cmp-tabs button').forEach((x) => x.addEventListener('click', () => { tab = x.dataset.t; paint(); }));
   };
-  m.querySelector('#cmp-a').addEventListener('change', (e) => { a = players.find((p) => p.id === e.target.value) ?? null; paint(); });
-  m.querySelector('#cmp-b').addEventListener('change', (e) => { b = players.find((p) => p.id === e.target.value) ?? null; paint(); });
+  // Cada selector se puede escribir para buscar por nombre; no ofrece al jugador que ya está en el otro lado.
+  mountPicker(m.querySelector('#cmp-a'), { players, selected: a, exclude: () => (b ? [b.id] : []), color: CA, placeholder: 'Buscar por nombre…', onPick: (p) => { a = p; paint(); } });
+  mountPicker(m.querySelector('#cmp-b'), { players, selected: b, exclude: () => (a ? [a.id] : []), color: CB, placeholder: 'Buscar por nombre…', onPick: (p) => { b = p; paint(); } });
   paint();
 }

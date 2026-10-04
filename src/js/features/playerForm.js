@@ -163,7 +163,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   /* ---- Foto ---- */
   $('#f-foto').addEventListener('change', async (e) => {
     try {
-      photo = await cropSquareJpeg(e.target.files[0], 256, 0.82);
+      photo = await cropSquareJpeg(e.target.files[0], 512, 0.85);
       $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(photo)}" alt="" class="w-full h-full object-cover">`;
     } catch (ex) { err.textContent = ex.message; photo = null; }
   });

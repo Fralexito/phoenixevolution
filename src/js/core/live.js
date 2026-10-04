@@ -23,3 +23,24 @@ export function formatEvento(ev) {
 
 /** Pausa (ms) hasta el siguiente evento simulado; `rnd` es una función 0..1 (se inyecta para poder probarla). */
 export const demoDelay = (rnd = Math.random, min = 5000, max = 11000) => Math.round(min + rnd() * (max - min));
+
+// ---- Hora e historial ----
+export const HIST_MAX_MS = 2 * 60 * 60 * 1000;   // el historial guarda las últimas 2 horas
+export const HIST_MAX_N = 200;                   // y como máximo 200 eventos
+const p2 = (n) => String(n).padStart(2, '0');
+
+/** Hora exacta local «HH:MM:SS» (24 h) de un timestamp en ms. */
+export function horaExacta(ts) {
+  const d = new Date(ts);
+  return Number.isNaN(d.getTime()) ? '--:--:--' : `${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+}
+/** ¿Es el mismo día local? (para mostrar la fecha solo cuando el evento no es de hoy). */
+export const mismoDia = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
+
+/** Devuelve el historial limpio: solo eventos válidos, dentro de la ventana de tiempo, más nuevo primero, con tope de cantidad. No muta. */
+export function podarHistorial(hist, now = Date.now(), { maxMs = HIST_MAX_MS, maxN = HIST_MAX_N } = {}) {
+  return (Array.isArray(hist) ? hist : [])
+    .filter((e) => e && Number.isFinite(e.ts) && e.ts <= now + 60_000 && now - e.ts <= maxMs && formatEvento(e))
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, maxN);
+}

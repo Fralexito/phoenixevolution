@@ -22,9 +22,10 @@ function paint() {
   $('players-container').innerHTML = list.length
     ? list.map((p, i) => `<div class="relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>${admin ? `
-        <div class="absolute top-2 right-2 flex gap-1 z-10">
-          <button type="button" data-edit="${escapeHTML(p.id)}" aria-label="Editar" class="w-7 h-7 rounded bg-black/70 text-galaxy-400 hover:bg-galaxy-600 hover:text-white text-xs"><i class="fa-solid fa-pen"></i></button>
-          <button type="button" data-del="${escapeHTML(p.id)}" aria-label="Borrar" class="w-7 h-7 rounded bg-black/70 text-bad hover:bg-bad hover:text-white text-xs"><i class="fa-solid fa-trash"></i></button>
+        <button type="button" data-menu="${escapeHTML(p.id)}" aria-label="Opciones de la ficha" aria-haspopup="true" class="card-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
+        <div class="card-menu" data-menu-for="${escapeHTML(p.id)}" hidden>
+          <button type="button" data-edit="${escapeHTML(p.id)}"><i class="fa-solid fa-pen mr-2"></i>Editar</button>
+          <button type="button" data-del="${escapeHTML(p.id)}" class="text-bad"><i class="fa-solid fa-trash mr-2"></i>Borrar</button>
         </div>` : ''}</div>`).join('')
     : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`;
   paintBar();
@@ -63,7 +64,12 @@ $('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1]));
 $('cmp-masivo').addEventListener('click', () => openCompareMasivo(all, sel));
 $('cmp-clear').addEventListener('click', () => { sel.length = 0; paint(); });
 $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
+// Menú sutil «⋯» de cada ficha (solo admin): se abre al tocarlo y se cierra al tocar fuera.
+const cerrarMenus = () => document.querySelectorAll('.card-menu').forEach((x) => { x.hidden = true; });
+document.addEventListener('click', (e) => { if (!e.target.closest('[data-menu], .card-menu')) cerrarMenus(); });
 $('players-container').addEventListener('click', async (e) => {
+  const menu = e.target.closest('[data-menu]')?.dataset.menu;
+  if (menu) { const el = document.querySelector(`.card-menu[data-menu-for="${menu}"]`); const abrir = el.hidden; cerrarMenus(); el.hidden = !abrir; return; }
   const cmp = e.target.closest('[data-cmp]')?.dataset.cmp;
   if (cmp) { const i = sel.indexOf(cmp); if (i >= 0) sel.splice(i, 1); else if (sel.length >= MAX_COMPARE) { toast(`Puedes comparar hasta ${MAX_COMPARE} jugadores a la vez.`, 'info', { key: 'cmp-max' }); return; } else sel.push(cmp); paint(); return; }
   const edit = e.target.closest('[data-edit]')?.dataset.edit;
