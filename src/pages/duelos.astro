@@ -66,13 +66,13 @@ import Layout from '../layouts/Layout.astro';
 
           <div>
             <span class="label">Tamaño <span class="text-gray-500 normal-case">(máx. 8 en total)</span></span>
-            <div id="tam-presets" class="grid grid-cols-4 gap-1.5 mb-1.5" role="group" aria-label="Formatos rápidos">
-              <button type="button" class="chip" data-t="1-1" aria-pressed="true">1v1</button>
+            <div id="tam-presets" class="grid grid-cols-[1fr_1fr_1fr_auto] gap-1.5 mb-1.5" role="group" aria-label="Formatos rápidos (sin elegir = 1v1)">
               <button type="button" class="chip" data-t="2-2" aria-pressed="false">2v2</button>
               <button type="button" class="chip" data-t="3-3" aria-pressed="false">3v3</button>
               <button type="button" class="chip" data-t="4-4" aria-pressed="false">4v4</button>
+              <button type="button" id="tam-personal" class="chip !px-3 !text-[11px] !font-medium !normal-case !tracking-normal !text-gray-400 !border-dashed" aria-pressed="false" title="Elige cuántos jugadores por equipo">Personalizar</button>
             </div>
-            <div id="tam-custom" hidden class="grid grid-cols-2 gap-2">
+            <div id="tam-custom" class="grid grid-cols-2 gap-2">
               <div class="bg-black/40 border border-galaxy-border rounded-lg px-2 py-1">
                 <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Mi equipo (A)</div>
                 <div class="flex items-center justify-between gap-1">
@@ -90,8 +90,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
               </div>
             </div>
-            <p class="text-[11px] text-gray-400 mt-1 leading-snug">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span>
-              <button type="button" id="tam-toggle" aria-expanded="false" aria-controls="tam-custom" class="ml-1 text-[10px] text-gray-500 hover:text-galaxy-400 underline decoration-dotted underline-offset-2">personalizar</button></p>
+            <p class="text-[11px] text-gray-400 mt-1 leading-snug">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span></p>
           </div>
 
           <div id="bloque-amigos" hidden class="space-y-2 bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40">

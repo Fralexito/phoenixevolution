@@ -40,7 +40,6 @@ export function paintRivales() {
     : `<option disabled>${needHost ? 'Nadie con host coincide' : 'Sin resultados'}</option>`;
 }
 
-function setCustom(open) { $('tam-custom').hidden = !open; $('tam-toggle').setAttribute('aria-expanded', String(open)); $('tam-toggle').textContent = open ? 'ocultar' : 'personalizar'; }
 function paintAmigos() {
   const cupo = ui.a - 1;                                            // yo ocupo uno
   $('bloque-amigos').hidden = cupo < 1;
@@ -78,9 +77,8 @@ export function refreshForm() {
   $('tam-total').textContent = `${ui.a + ui.b}/${MAX_PLAYERS}`;
   $('tam-a-menos').disabled = ui.a <= 1; $('tam-a-mas').disabled = ui.a >= maxFor(ui.b);
   $('tam-b-menos').disabled = ui.b <= 1; $('tam-b-mas').disabled = ui.b >= maxFor(ui.a);
-  pressed(all('#tam-presets .chip'), (b) => b.dataset.t === `${ui.a}-${ui.b}`);
-  // Si el tamaño no coincide con ningún formato rápido, el panel «personalizar» se abre solo (si no, quedaría oculto lo que estás editando).
-  if (!all('#tam-presets .chip').some((b) => b.dataset.t === `${ui.a}-${ui.b}`)) setCustom(true);
+  pressed(all('#tam-presets [data-t]'), (b) => b.dataset.t === `${ui.a}-${ui.b}`);
+  $('tam-personal').setAttribute('aria-pressed', String(!all('#tam-presets [data-t]').some((b) => b.dataset.t === `${ui.a}-${ui.b}`) && !(ui.a === 1 && ui.b === 1)));
   $('hint-equipos').textContent = ui.destino === 'directo'
     ? `Tu rival lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}).`
     : `Quien acepte lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}).`;
@@ -112,10 +110,10 @@ export function initForm() {
   $('presets').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) { ui.preset = b.dataset.p; refreshForm(); } });
 
   const size = (side, d) => { const t = setTeamSize(ui, side, ui[side] + d); ui.a = t.a; ui.b = t.b; refreshForm(); };
-  $('tam-toggle').addEventListener('click', () => setCustom($('tam-custom').hidden));
+  $('tam-personal').addEventListener('click', () => { if (ui.a === ui.b || ui.a + ui.b < 2) { ui.a = 1; ui.b = 2; } refreshForm(); $('tam-b-mas').focus({ preventScroll: true }); });
   $('tam-a-menos').addEventListener('click', () => size('a', -1)); $('tam-a-mas').addEventListener('click', () => size('a', 1));
   $('tam-b-menos').addEventListener('click', () => size('b', -1)); $('tam-b-mas').addEventListener('click', () => size('b', 1));
-  $('tam-presets').addEventListener('click', (e) => { const t = e.target.closest('[data-t]')?.dataset.t; if (!t) return; const [a, b] = t.split('-').map(Number); ui.a = a; ui.b = b; refreshForm(); });
+  $('tam-presets').addEventListener('click', (e) => { const t = e.target.closest('[data-t]')?.dataset.t; if (!t) return; const [a, b] = t.split('-').map(Number); const igual = ui.a === a && ui.b === b; ui.a = igual ? 1 : a; ui.b = igual ? 1 : b; refreshForm(); });
 
   $('buscar-rival').addEventListener('input', paintRivales);
   $('buscar-amigo').addEventListener('input', paintAmigos);
