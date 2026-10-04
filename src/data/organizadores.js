@@ -24,10 +24,10 @@ export const ORG = {
     { icono: 'fa-rocket', t: 'Evolución', d: 'Mejorar siempre: cada temporada mejor que la anterior.' },
   ],
   // Los tres impulsores. `nombre` debe coincidir con el nombre o apodo del jugador en la base para enlazar su perfil automáticamente.
-  impulsoresIntro: 'Esta iniciativa nació y se construyó de la mano de tres personas. Fralex es el impulsor principal, pero Jack y Hugo la impulsaron junto a él desde el principio y son igual de relevantes en todo lo que Phoenix Evolution es hoy.',
+  impulsoresIntro: 'Tres personas, tres papeles que se complementan. Fralex puso la idea y levantó la plataforma; Jack y Hugo ponen la vida: mueven y entretienen a la comunidad para que cada fecha se sienta como algo propio. Sin los tres, esto no sería lo que es, y los tres son igual de importantes.',
   impulsores: [
-    { nombre: 'Fralex', rol: 'Impulsor principal', principal: true, bio: 'Impulsor principal del proyecto: el empuje del día a día y la cara más visible, siempre construyendo de la mano de Jack y Hugo.', frase: '' },
-    { nombre: 'Jack', rol: 'Co-impulsor', principal: false, bio: 'Impulsor de toda esta iniciativa junto a Fralex y Hugo. Tan relevante como cualquiera de los tres en lo que hoy es la comunidad.', frase: '' },
-    { nombre: 'Hugo', rol: 'Co-impulsor', principal: false, bio: 'Impulsor de toda esta iniciativa junto a Fralex y Jack. Tan relevante como cualquiera de los tres en lo que hoy es la comunidad.', frase: '' },
+    { nombre: 'Fralex', rol: 'Idea y organización', principal: false, bio: 'Quien concibió la idea, creó la plataforma y lleva la organización de la liga.', frase: '' },
+    { nombre: 'Jack', rol: 'Alma de la comunidad', principal: false, bio: 'Mueve y entretiene a la gente, de la mano de Hugo: la energía con la que se vive cada partido y cada fecha. Impulsor de esta iniciativa junto a Fralex y Hugo.', frase: '' },
+    { nombre: 'Hugo', rol: 'Alma de la comunidad', principal: false, bio: 'Mueve y entretiene a la gente, de la mano de Jack: el ambiente que hace que todos quieran volver a jugar. Impulsor de esta iniciativa junto a Fralex y Jack.', frase: '' },
   ],
 };
