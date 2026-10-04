@@ -12,6 +12,8 @@ let stopNotif = null;
 function render({ session, profile }) {
   const box = document.getElementById('nav-auth');
   if (!box) return;
+  // CSS (components.css) usa esto: en PC el botón de 3 rayas solo existe con sesión.
+  document.documentElement.dataset.sesion = session ? 'si' : 'no';
   stopNotif?.(); stopNotif = null;
 
   if (!session) {

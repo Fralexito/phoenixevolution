@@ -16,6 +16,8 @@ const { active } = Astro.props;
     </button>
   </div>
   <nav class="flex-1 p-4 flex flex-col gap-1.5 font-display text-base uppercase tracking-wider overflow-y-auto">
+    <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil es el menú completo. -->
+    <div class="flex flex-col gap-1.5 lg:hidden">
     <div class="px-3 pt-1 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Explorar</div>
     {NAV.map((n) => (
       <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined}
@@ -26,7 +28,8 @@ const { active } = Astro.props;
         <i class={`fa-solid ${n.icon} w-5 text-center ${active === n.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i> {n.label}
       </a>
     ))}
-    <div id="sidebar-account" hidden class="flex flex-col gap-1.5 mt-3 pt-3 border-t border-galaxy-border">
+    </div>
+    <div id="sidebar-account" hidden class="flex flex-col gap-1.5 mt-3 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
       <div class="px-3 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
       {ACCOUNT_NAV.map((n) => (
         n.path
@@ -35,7 +38,7 @@ const { active } = Astro.props;
       ))}
     </div>
   </nav>
-  <div class="p-5 border-t border-galaxy-border bg-black/50 text-center">
+  <div class="p-5 border-t border-galaxy-border bg-black/50 text-center lg:hidden">
     <div class="text-[9px] text-gray-500 tracking-widest uppercase mb-3">Redes Sociales</div>
     <div class="flex justify-center gap-4">
       {SOCIALS.map((s) => (<a href={s.href} aria-label={s.label} target="_blank" rel="noopener noreferrer" class={`text-gray-400 ${s.hover} text-lg transition-colors`}><SocialIcon s={s} /></a>))}

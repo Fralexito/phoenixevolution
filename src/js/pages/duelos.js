@@ -16,19 +16,12 @@ import { bindSeg } from '../features/formControls.js';
 
 const $ = (id) => document.getElementById(id);
 
-/* ---------- Vistas: pestañas de listas (Mis partidos / Radar) y, en móvil, Lanzar / Partidos ---------- */
-let lista = 'mis';          // 'mis' | 'radar'
-let listaElegida = false;   // true cuando el usuario (o el enlace #mis-partidos) ya decidió; evita cambiarle la pestaña sola
-function pintarListas() {
-  $('lista-mis').parentElement.hidden = lista !== 'mis'; $('lista-retos').hidden = lista !== 'radar';
-  $('seg-listas').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === lista)));
-}
-function setLista(v, { elegida = true } = {}) { lista = v; if (elegida) listaElegida = true; pintarListas(); }
+/* ---------- Vistas: en PC todo está a la vista; en móvil se alterna Lanzar reto / Partidos (Mis partidos + Retos en el radar) ---------- */
 function setVista(v) {
   $('duelos-grid').dataset.vista = v;
   $('seg-vista').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
 }
-function irAMisPartidos() { setLista('mis'); setVista('partidos'); }
+function irAMisPartidos() { setVista('partidos'); $('col-mis').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
 /* ---------- Pintado ---------- */
 function renderAll() {
@@ -47,8 +40,6 @@ function renderAll() {
   $('cnt-mis').textContent = mine.length ? `(${mine.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
   $('cnt-movil').textContent = visible.length ? `(${mine.length + rest.length})` : '';
-  // La primera vez, abrimos la pestaña con algo que ver: tus partidos si tienes, si no el radar de retos.
-  if (!listaElegida) { lista = mine.length ? 'mis' : 'radar'; pintarListas(); }
 }
 
 async function fetchAll() {
@@ -148,7 +139,6 @@ function syncAuthUI({ session }) {
 initForm(); initRadar(); refreshForm(); loadPerfiles().then(refreshForm);
 $('form-crear-reto').addEventListener('submit', submitReto);
 $('btn-refrescar').addEventListener('click', fetchAll);
-bindSeg($('seg-listas'), (v) => setLista(v));
 bindSeg($('seg-vista'), (v) => setVista(v));
 window.addEventListener('duelos:creado', irAMisPartidos);
 if (location.hash === '#mis-partidos') irAMisPartidos();

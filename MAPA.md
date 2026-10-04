@@ -77,3 +77,10 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Velocidad en píxeles por segundo, no en segundos fijos: `VEL_PC` (110) y `VEL_MOVIL` (55) en `src/js/features/ticker.js`. Para cambiarla, edita esas dos constantes.
 - El texto va repetido (mínimo 2 copias; el JS añade más si la pantalla es muy ancha) para que el bucle no deje huecos.
 - La etiqueta "ÚLTIMA HORA" es más angosta en celular (`Ticker.astro`).
+
+## Ronda 6 — Identidad con cooldown, bienvenida, Duelos sin pestañas, menú
+- **@usuario**: solo cambia 1 vez cada 14 días. Regla real en la BD (`supabase/migrations/006_*`, trigger `perfiles_antes_de_actualizar`); la web solo avisa (`cooldownInfo` en `core/rules.js`). Mientras `perfil_completo = false` el @ se elige libre.
+- **Bienvenida** (`features/welcome.js`): se muestra a quien tenga `perfil_completo = false` (Discord/Google y correo sin formulario). «Lo haré después» la oculta durante esa sesión del navegador. Comparte selector de foto con «Mi perfil» (`features/avatarPicker.js`). Países en `src/data/paises.js`.
+- **Duelos**: sin pestañas. `#col-mis` (Mis partidos) y `#col-radar` (Retos en el radar) siempre visibles: lado a lado en ≥1280px, uno bajo otro en pantallas medianas, y en móvil dentro de la vista «Partidos».
+- **Menú de 3 rayas**: en PC (≥1024px) solo existe con sesión (`html[data-sesion]`, regla en `components.css`) y solo muestra «Mi cuenta». En móvil queda el menú completo.
+- **Login en localhost**: Supabase solo vuelve a URLs permitidas. Dashboard → Authentication → URL Configuration → Redirect URLs: añadir `http://localhost:4321/**` y `https://fralexito.github.io/phoenixevolution/**`. Si falta la de localhost, te manda al Site URL (la web publicada = `main`).

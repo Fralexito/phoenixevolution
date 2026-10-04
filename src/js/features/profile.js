@@ -4,8 +4,9 @@ import { supabase } from '../core/supabase.js';
 import { getState, refreshProfile } from '../core/session.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeUrl, toUsername } from '../core/dom.js';
-import { cropSquareJpeg } from '../core/image.js';
-import { PRESETS, presetId, presetValue, avatarHTML, providerAvatar, providerName } from '../core/avatar.js';
+import { cooldownInfo, USERNAME_COOLDOWN_DAYS } from '../core/rules.js';
+import { PAISES } from '../../data/paises.js';
+import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from './avatarPicker.js';
 import { toast } from '../core/toast.js';
 import { switchHTML, segHTML, bindSeg } from './formControls.js';
 import { bindHandle } from './handleCheck.js';
@@ -19,11 +20,10 @@ export function openProfileModal() {
   if (!session) return;
   const prof = p ?? {};
   const uid = session.user.id;
-  const nombreProv = providerName(session.user);
-  const fotoProv = providerAvatar(session.user);
+  const cd = cooldownInfo(prof);
+  const fechaCd = cd.until?.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
 
   // Estado local del formulario (se guarda todo junto al pulsar "Guardar").
-  let avatar = { kind: 'keep' };                                 // keep | preset | provider | file
   let speed = prof.ancho_banda_mbps ?? null;
   let soft = PLATAFORMAS.includes(prof.software_host) ? prof.software_host : 'Ambos';
   let game = JUEGOS.includes(prof.host_juego) ? prof.host_juego : JUEGOS[0];
@@ -36,17 +36,7 @@ export function openProfileModal() {
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
 
-      <div class="flex items-center gap-4">
-        <span id="p-prev" class="w-16 h-16 shrink-0 rounded-full overflow-hidden border border-galaxy-400/50 bg-galaxy-card flex items-center justify-center">${avatarHTML(prof.avatar_url, prof.nombre_display, 64)}</span>
-        <div class="flex flex-wrap gap-2">
-          <label class="btn btn-ghost cursor-pointer !px-3 !py-2"><i class="fa-solid fa-camera"></i> Subir foto<input id="p-file" type="file" accept="image/*" hidden></label>
-          <button type="button" id="p-btn-gal" class="btn btn-ghost !px-3 !py-2" aria-expanded="false"><i class="fa-solid fa-masks-theater"></i> Avatares</button>
-          ${fotoProv ? `<button type="button" id="p-btn-prov" class="btn btn-ghost !px-3 !py-2"><i class="fa-brands ${nombreProv === 'Discord' ? 'fa-discord' : 'fa-google'}"></i> Usar la de ${escapeHTML(nombreProv)}</button>` : ''}
-        </div>
-      </div>
-      <div id="p-gal" hidden class="grid grid-cols-6 gap-2" role="group" aria-label="Avatares disponibles">
-        ${PRESETS.map((a) => `<button type="button" data-preset="${a.id}" aria-label="${escapeHTML(a.label)}" title="${escapeHTML(a.label)}" class="aspect-square rounded-full overflow-hidden border-2 border-transparent hover:border-galaxy-400 aria-pressed:border-white transition-colors" aria-pressed="false">${avatarHTML(presetValue(a.id), '', 44)}</button>`).join('')}
-      </div>
+      ${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user })}
 
       <div role="tablist" class="flex gap-1 border-b border-galaxy-border font-display text-sm uppercase tracking-wider">
         ${['identidad:Identidad', 'social:Social', 'host:Sistema Host'].map((t, i) => { const [k, l] = t.split(':'); return `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}" class="px-3 py-2 text-gray-400 aria-selected:text-galaxy-400 aria-selected:border-b-2 aria-selected:border-galaxy-400">${l}</button>`; }).join('')}
@@ -56,9 +46,11 @@ export function openProfileModal() {
         <div><label class="label" for="p-name">Apodo (nombre visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[11px] text-gray-500 mt-1">Es como te ven en tus partidos. Puedes poner lo que quieras.</p></div>
         <div>
           <label class="label" for="p-user">Usuario único</label>
-          <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-display font-bold">@</span><input id="p-user" class="field !pl-7" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" value="${escapeHTML(prof.username)}"></div>
+          <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-display font-bold">@</span><input id="p-user" class="field !pl-7" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" value="${escapeHTML(prof.username)}" ${cd.blocked ? 'disabled' : ''}></div>
           <p id="p-user-st" class="text-[11px] mt-1 min-h-4"></p>
+          ${cd.blocked ? '' : prof.perfil_completo ? `<p class="text-[11px] text-gray-500">Ojo: después de cambiarlo, no podrás volver a hacerlo hasta pasados ${USERNAME_COOLDOWN_DAYS} días.</p>` : ''}
         </div>
+        <div><label class="label" for="p-pais">País</label><select id="p-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>
         <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field" maxlength="60" value="${escapeHTML(prof.club_favorito)}"></div>
       </div>
 
@@ -89,28 +81,8 @@ export function openProfileModal() {
 
   const $ = (s) => m.querySelector(s);
   const err = $('#p-err');
-  const prev = (url) => { $('#p-prev').innerHTML = avatarHTML(url, $('#p-name').value || prof.nombre_display, 64); };
-
-  /* ---- Foto: subir / avatares predefinidos / la del proveedor ---- */
-  $('#p-file').addEventListener('change', async (e) => {
-    try {
-      const blob = await cropSquareJpeg(e.target.files[0]);
-      avatar = { kind: 'file', blob }; prev(URL.createObjectURL(blob));
-      m.querySelectorAll('[data-preset]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-    } catch (ex) { console.error('[perfil] imagen:', ex); err.textContent = ex.message; }
-  });
-  $('#p-btn-gal').addEventListener('click', () => {
-    const g = $('#p-gal'); g.hidden = !g.hidden; $('#p-btn-gal').setAttribute('aria-expanded', String(!g.hidden));
-  });
-  $('#p-gal').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-preset]'); if (!b) return;
-    avatar = { kind: 'preset', id: b.dataset.preset }; prev(presetValue(b.dataset.preset));
-    m.querySelectorAll('[data-preset]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-  });
-  $('#p-btn-prov')?.addEventListener('click', () => {
-    avatar = { kind: 'provider', url: fotoProv }; prev(fotoProv);
-    m.querySelectorAll('[data-preset]').forEach((x) => x.setAttribute('aria-pressed', 'false'));
-  });
+  const picker = bindAvatarPicker(m, { user: session.user, getName: () => $('#p-name').value || prof.nombre_display, onError: (t) => { err.textContent = t; }, currentUrl: prof.avatar_url });
+  $('#p-name').addEventListener('input', () => picker.repaint());
 
   /* ---- Pestañas ---- */
   m.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
@@ -119,7 +91,9 @@ export function openProfileModal() {
   }));
 
   /* ---- @usuario con verificación en vivo ---- */
-  const handle = bindHandle($('#p-user'), $('#p-user-st'), { exceptId: uid });
+  let handle = null;
+  if (cd.blocked) { $('#p-user-st').className = 'text-[11px] mt-1 text-warn'; $('#p-user-st').innerHTML = `<i class="fa-solid fa-lock mr-1"></i>Podrás cambiarlo de nuevo el ${escapeHTML(fechaCd)}.`; }
+  else handle = bindHandle($('#p-user'), $('#p-user-st'), { exceptId: uid });
 
   /* ---- Host: interruptor + selectores segmentados ---- */
   const hostFields = $('#host-fields');
@@ -136,30 +110,26 @@ export function openProfileModal() {
     const username = toUsername($('#p-user').value);
     const nombre = $('#p-name').value.trim().replace(/[<>]/g, '');
     const stream = $('#p-stream').value.trim();
-    if (username.length < 3) { err.textContent = 'Tu usuario debe tener al menos 3 caracteres (a-z, 0-9 y _).'; return; }
+    if (!cd.blocked && username.length < 3) { err.textContent = 'Tu usuario debe tener al menos 3 caracteres (a-z, 0-9 y _).'; return; }
     if (!nombre) { err.textContent = 'Escribe tu apodo.'; return; }
     if (stream && !safeUrl(stream)) { err.textContent = 'El enlace de stream debe empezar con https://'; return; }
 
     btn.disabled = true;
     try {
-      const estado = await handle.comprobar();
+      const cambia = !cd.blocked && username !== prof.username;
+      const estado = cambia ? await handle.comprobar() : 'libre';
       if (estado === 'ocupado') { err.textContent = 'Ese usuario ya está en uso. Elige otro.'; return; }
       if (estado === 'reservado') { err.textContent = 'Ese usuario está reservado. Elige otro.'; return; }
       const patch = {
-        username, nombre_display: nombre,
+        nombre_display: nombre, pais_codigo: $('#p-pais').value,
         club_favorito: $('#p-club').value.trim().replace(/[<>]/g, ''),
         bio: $('#p-bio').value.trim(), discord_tag: $('#p-disc').value.trim(), stream_url: stream,
         puede_hostear: $('#p-host').checked, ancho_banda_mbps: speed,
         software_host: soft, host_juego: game, host_parche: $('#p-patch').value.trim(),
       };
-      if (avatar.kind === 'preset' && presetId(presetValue(avatar.id))) patch.avatar_url = presetValue(avatar.id);
-      else if (avatar.kind === 'provider') patch.avatar_url = avatar.url;
-      else if (avatar.kind === 'file') {
-        const path = `${uid}/avatar.jpg`;
-        const up = await supabase.storage.from('avatars').upload(path, avatar.blob, { upsert: true, contentType: 'image/jpeg', cacheControl: '3600' });
-        if (up.error) throw up.error;
-        patch.avatar_url = `${supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl}?v=${Date.now()}`;
-      }
+      if (cambia) patch.username = username;
+      const nuevaFoto = await resolveAvatar(picker.get(), uid);
+      if (nuevaFoto !== undefined) patch.avatar_url = nuevaFoto;
       const { error } = await supabase.from('perfiles').update(patch).eq('id', uid);
       if (error) throw error;
       await refreshProfile();
@@ -167,7 +137,7 @@ export function openProfileModal() {
       toast('Perfil actualizado.', 'ok');
     } catch (ex) {
       console.error('[perfil] guardar:', ex);
-      err.textContent = ex.code === '23505' ? 'Ese usuario ya está en uso. Elige otro.' : (ex.message || 'No se pudo guardar.');
+      err.textContent = identityError(ex);
     } finally { btn.disabled = false; }
   });
 }

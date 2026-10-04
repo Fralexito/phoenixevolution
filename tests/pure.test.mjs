@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
+import { cooldownInfo, USERNAME_COOLDOWN_DAYS } from '../src/js/core/rules.js';
 import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
 import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
 
@@ -107,4 +108,16 @@ test('avatares: el HTML escapa la inicial y no interpreta datos', () => {
   assert.ok(!h.includes('<img'), 'la inicial no debe abrir etiquetas');
   assert.ok(avatarHTML('preset:fenix', 'X', 40).includes('fa-dragon'));
   assert.ok(avatarHTML('https://a.test/f.png', 'ñ', 40).includes('data-av-inicial'));
+});
+
+test('cooldown del @usuario: libre sin completar perfil, bloqueado 14 días tras un cambio', () => {
+  const now = new Date('2026-10-04T12:00:00Z');
+  assert.equal(USERNAME_COOLDOWN_DAYS, 14);
+  assert.deepEqual(cooldownInfo(null, now), { blocked: false, until: null });
+  assert.equal(cooldownInfo({ perfil_completo: false, username_changed_at: '2026-10-03T00:00:00Z' }, now).blocked, false);
+  assert.equal(cooldownInfo({ perfil_completo: true, username_changed_at: null }, now).blocked, false);
+  const r = cooldownInfo({ perfil_completo: true, username_changed_at: '2026-10-04T00:00:00Z' }, now);
+  assert.equal(r.blocked, true); assert.equal(r.until.toISOString(), '2026-10-18T00:00:00.000Z');
+  assert.equal(cooldownInfo({ perfil_completo: true, username_changed_at: '2026-09-20T00:00:00Z' }, now).blocked, false);
+  assert.equal(cooldownInfo({ perfil_completo: true, username_changed_at: 'basura' }, now).blocked, false);
 });

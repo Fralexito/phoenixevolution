@@ -62,3 +62,10 @@
 @media (hover: hover) and (min-width: 1360px) {
   .logo-group:hover .logo-expand { max-width: 9rem; margin-right: .35rem; }
 }
+
+/* Botón de 3 rayas: en PC (≥1024px) solo con sesión iniciada (sin sesión repetiría la barra superior).
+   Mientras no se sabe la sesión (data-sesion ausente) también se oculta en PC → sin parpadeo. */
+@media (min-width: 1024px) {
+  html:not([data-sesion='si']) #btn-menu,
+  html:not([data-sesion='si']) .menu-sep { display: none; }
+}
