@@ -6,7 +6,7 @@ import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
 import { ALTURA, PIES, leerMedida, pieValido } from '../core/fisico.js';
 import { openPhotoCropper } from './photoCropper.js';
-import { clampStat, calcOvr } from '../core/stats.js';
+import { clampStat, calcOvr, distribuirMedia, aleatorias } from '../core/stats.js';
 import { toast } from '../core/toast.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { POSICIONES, posInfo } from '../../data/posiciones.js';
@@ -21,7 +21,7 @@ const tileHTML = (k, v, { grande = false, extra = '' } = {}) => {
     : `<div class="min-w-0 flex items-baseline gap-1.5"><b class="font-display text-xs uppercase tracking-wider text-white">${k}</b><span class="text-[10px] text-gray-500 truncate">${nom}</span></div>`;
   const menos = `<button type="button" class="step" data-d="-1" aria-label="Bajar ${nom}">−</button>`;
   const mas = `<button type="button" class="step" data-d="1" aria-label="Subir ${nom}">+</button>`;
-  const num = (cls) => `<output class="stat-val font-display font-extrabold ${cls} text-center" aria-live="off">${v}</output>`;
+  const num = (cls) => `<input class="stat-val stat-num font-display font-extrabold ${cls} text-center" type="text" inputmode="numeric" maxlength="2" value="${v}" autocomplete="off" aria-label="Valor de ${nom} (1 a 99)">`;
   const rango = `<input type="range" class="stat-range" min="1" max="99" step="1" value="${v}" aria-label="${nom}">`;
   // Grande (OVR): número arriba y deslizador debajo. Normal (celda de 2 columnas): nombre + número arriba, «− deslizador +» abajo.
   return grande
@@ -70,7 +70,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
         <p id="pos-cap" class="text-[12px] mt-1.5 min-h-5" aria-live="polite"></p>
       </div>
 
-      ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button></div>` })}
+      ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><div class="flex items-center gap-3"><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button><button type="button" id="ovr-azar" class="ovr-azar" title="Genera stats al azar que justifican la media que pusiste"><i class="fa-solid fa-dice"></i> Al azar</button></div></div><p class="text-[11px] text-gray-500 mt-1.5">Escribe la media y las stats se ajustan solas, o usa «Al azar» para repartirlas.</p>` })}
 
       <div class="sticky top-0 z-10 bg-galaxy-panel/95 backdrop-blur pb-1 -mx-1 px-1">
         <div class="flex items-center justify-between mb-1">
@@ -112,7 +112,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   /* ---- Pintado de una ficha: número, color y relleno del deslizador ---- */
   const paint = (k) => {
     const t = tile(k); const v = vals[k]; const c = statColor(v);
-    const out = t.querySelector('.stat-val'); out.textContent = v; out.style.color = c;
+    const out = t.querySelector('.stat-val'); if (out.value !== String(v)) out.value = String(v); out.style.color = c;
     const r = t.querySelector('.stat-range'); r.value = v; r.style.setProperty('--p', `${((v - 1) / 98) * 100}%`); r.style.setProperty('--c', c);
   };
   const paintModo = () => {
@@ -120,10 +120,18 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     el.className = `text-[11px] font-display font-bold uppercase tracking-wider ${manual ? 'text-warn' : 'text-ok'}`;
     $('#ovr-auto').hidden = !manual;
   };
+  // «forma» = reparto de las 14 stats al que se le aplica la media cuando cambias el OVR (así subir y bajar la media no deforma tus stats).
+  const forma = { ...vals };
+  const guardarForma = () => STAT_KEYS.forEach((k) => { forma[k] = vals[k]; });
+  const aplicarMedia = (v) => {
+    const nuevos = distribuirMedia(v, STAT_KEYS.map((k) => forma[k]));
+    STAT_KEYS.forEach((k, i) => { vals[k] = nuevos[i]; paint(k); });
+    vals.ovr = clampStat(v, vals.ovr); manual = false; paint('ovr'); paintModo();
+  };
   const set = (k, v) => {
-    vals[k] = clampStat(v, vals[k]);
-    if (k === 'ovr') manual = true;
-    else if (!manual) { vals.ovr = media(); paint('ovr'); }
+    if (k === 'ovr') { aplicarMedia(clampStat(v, vals.ovr)); return; }
+    vals[k] = clampStat(v, vals[k]); guardarForma();
+    if (!manual) { vals.ovr = media(); paint('ovr'); }
     paint(k); paintModo();
   };
   const leyenda = (k) => { $('#leyenda').innerHTML = `<b class="text-galaxy-400 font-display uppercase tracking-wider">${k === 'ovr' ? 'OVR' : k} · ${escapeHTML(STAT_INFO[k].nombre)}</b> — ${escapeHTML(STAT_INFO[k].texto)}`; };
@@ -141,6 +149,25 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => m.addEventListener(ev, parar));
   m.addEventListener('click', (e) => { const b = e.target.closest('.step'); if (b && e.detail === 0) set(b.closest('.stat-tile').dataset.k, vals[b.closest('.stat-tile').dataset.k] + Number(b.dataset.d)); }); // teclado
   m.addEventListener('input', (e) => { const r = e.target.closest('.stat-range'); if (r) { const k = r.closest('.stat-tile').dataset.k; activa(k); set(k, r.value); } });
+  // Escritura manual: se aplica mientras escribes (si es 1-99); al salir del campo se normaliza lo que muestra.
+  m.addEventListener('input', (e) => {
+    const f = e.target.closest('.stat-num'); if (!f) return;
+    f.value = f.value.replace(/\D/g, '').slice(0, 2); const n = Number(f.value);
+    if (f.value !== '' && n >= 1) { const k = f.closest('.stat-tile').dataset.k; activa(k); set(k, n); }
+  });
+  m.addEventListener('focusin', (e) => { if (e.target.matches('.stat-num')) e.target.select(); });
+  m.addEventListener('focusout', (e) => { const f = e.target.closest?.('.stat-num'); if (f) f.value = String(vals[f.closest('.stat-tile').dataset.k]); });
+  m.addEventListener('keydown', (e) => {
+    const f = e.target.closest?.('.stat-num'); if (!f) return;
+    const k = f.closest('.stat-tile').dataset.k;
+    if (e.key === 'Enter') { e.preventDefault(); f.blur(); }                                  // Enter no debe guardar la ficha por accidente
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); set(k, vals[k] + (e.key === 'ArrowUp' ? 1 : -1)); f.select(); }
+  });
+  $('#ovr-azar').addEventListener('click', () => {
+    const n = aleatorias(vals.ovr, STAT_KEYS.length);
+    STAT_KEYS.forEach((k, i) => { vals[k] = n[i]; paint(k); }); guardarForma(); manual = false; paint('ovr'); paintModo();
+    $('#leyenda').innerHTML = `<b class="text-galaxy-400 font-display uppercase tracking-wider">Al azar</b> — repartí las 14 stats para que su promedio sea exactamente <b>${vals.ovr}</b>. Ajusta las que quieras; la media se recalcula sola.`;
+  });
   m.querySelectorAll('.stat-tile').forEach((t) => {
     t.addEventListener('pointerenter', () => { if (!t.matches(':focus-within')) leyenda(t.dataset.k); });
     t.addEventListener('pointerdown', () => activa(t.dataset.k));

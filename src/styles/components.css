@@ -221,3 +221,10 @@ html[data-sesion='si'] #btn-hero-register { display: none; }
 .liga-cta:hover { border-color: var(--color-galaxy-400); color: var(--color-galaxy-400); }
 .liga-cta-p { background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-700)); border-color: transparent; box-shadow: 0 0 20px rgb(128 0 255 / .5); }
 .liga-cta-p:hover { color: #fff; filter: brightness(1.15); }
+
+/* Valor de stat editable a mano */
+.stat-num { background: transparent; border: 0; border-bottom: 1px dashed transparent; border-radius: 0; padding: 0; margin: 0; width: 2.4ch; min-width: 0; outline: none; font-variant-numeric: tabular-nums; }
+.stat-tile-lg .stat-num { width: 2.6ch; }
+.stat-num:hover { border-bottom-color: rgb(255 255 255 / .3); } .stat-num:focus { border-bottom: 1px solid var(--color-galaxy-400); background: rgb(0 229 255 / .08); }
+.ovr-azar { font-family: var(--font-display); font-weight: 700; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--color-galaxy-400); padding: .2rem .6rem; border-radius: 999px; border: 1px solid rgb(0 229 255 / .4); background: rgb(0 229 255 / .08); min-height: 1.7rem; }
+.ovr-azar:hover { color: #fff; background: rgb(0 229 255 / .2); } .ovr-azar:active i { transform: rotate(180deg); } .ovr-azar i { transition: transform .25s; }

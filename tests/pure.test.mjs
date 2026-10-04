@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
-import { clampStat, calcOvr } from '../src/js/core/stats.js';
+import { clampStat, calcOvr, distribuirMedia, aleatorias } from '../src/js/core/stats.js';
 import { coverScale, clampPos, initialState, zoomAt, rescale, sourceRect, outSize, MAX_ZOOM, aspectoValido, ratioDe, ASPECTOS } from '../src/js/core/crop.js';
 import { filterPlayers, norm } from '../src/js/core/search.js';
 import { posInfo, POSICIONES } from '../src/data/posiciones.js';
@@ -293,4 +293,25 @@ test('central: cifras del pulso y partidos próximos/resultados', () => {
   assert.equal(cifra(12), '12'); assert.equal(cifra(0), '0'); assert.equal(cifra(null), '—'); assert.equal(cifra(NaN), '—'); assert.equal(cifra(-3), '—');
   const r = partirPartidos([{ gl: '3', gv: '2' }, { gl: '-', gv: '-', nota: 'HOY 22:00' }, { gl: '1', gv: '1' }]);
   assert.equal(r.proximos.length, 1); assert.equal(r.resultados.length, 2); assert.deepEqual(partirPartidos(null), { proximos: [], resultados: [] });
+});
+
+test('distribuir media: siempre da exactamente la media pedida, dentro de 1-99', () => {
+  let s = 12345; const rnd = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+  for (let objetivo = 1; objetivo <= 99; objetivo += 1) {
+    for (const inicial of [Array(14).fill(75), Array.from({ length: 14 }, () => 1 + Math.floor(rnd() * 99)), Array(14).fill(99), Array(14).fill(1)]) {
+      const r = distribuirMedia(objetivo, inicial);
+      assert.equal(r.length, 14); assert.equal(calcOvr(r), objetivo, `objetivo ${objetivo}`); assert.ok(r.every((v) => Number.isInteger(v) && v >= 1 && v <= 99));
+    }
+  }
+});
+test('distribuir media: conserva la forma cuando no se topa con los límites', () => {
+  const base = [70, 80, 60, 75, 65, 85, 72, 78, 68, 74, 66, 82, 71, 79];
+  const r = distribuirMedia(60, base);
+  const d0 = base[1] - base[2]; const d1 = r[1] - r[2];
+  assert.ok(Math.abs(d0 - d1) <= 1); assert.equal(calcOvr(r), 60); assert.deepEqual(distribuirMedia(50, []), []);
+});
+test('stats al azar: justifican la media y varían', () => {
+  for (const o of [1, 30, 74, 91, 99]) for (let i = 0; i < 20; i += 1) { const r = aleatorias(o); assert.equal(calcOvr(r), o); assert.ok(r.every((v) => v >= 1 && v <= 99)); }
+  const a = aleatorias(80); const b = aleatorias(80); assert.notDeepEqual(a, b);
+  assert.deepEqual(aleatorias(80, 14, () => 0.5), Array(14).fill(80));        // sin ruido, todas iguales a la media
 });
