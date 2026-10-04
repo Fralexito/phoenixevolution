@@ -35,7 +35,7 @@ export function speedBucket(mbps) {
 export const JUEGOS = ['PES 2021', 'SP Football Life'];
 export const SP_VERSIONES = ['25', '26', '27'];   // «Otra» se escribe a mano (≤ 20 caracteres) [BD] perfiles_sp_version_ok
 
-export const PARCHES_PES = ['Dream Patch', 'Conmebol Patch', 'VirtuaRED', 'Sudamerican Patch', 'Gogosz Patch'];   // «Otro» se escribe a mano (≤ 80 caracteres)
+export const PARCHES_PES = ['Dream Patch', 'Conmegol Patch', 'VirtuaRED', 'Sudamerican Patch', 'Gogosz Patch'];   // «Otro» se escribe a mano (≤ 80 caracteres)
 
 /**
  * Nombre corto del juego para mostrar: «PES 21 (Dream Patch)» o «SP Football Life 26». Lo que falte (parche o versión) simplemente no se muestra.

@@ -5,7 +5,7 @@ import { CLUBES } from './ligaResultados.js';
 export const DEMO_NOMBRES = Object.keys(CLUBES);   // Hugo, Arens, Degox, Beto, Jack, Morgado, Victor, Fralex, Camilo, Jeremi, Roberto, Axel
 export const DEMO_FORMATOS = ['1v1', '1v1', '2v2', '3v3'];
 export const DEMO_JUEGOS = [
-  { juego: 'PES 2021', parche: 'Dream Patch' }, { juego: 'PES 2021', parche: 'Conmebol Patch' }, { juego: 'PES 2021', parche: 'VirtuaRED' },
+  { juego: 'PES 2021', parche: 'Dream Patch' }, { juego: 'PES 2021', parche: 'Conmegol Patch' }, { juego: 'PES 2021', parche: 'VirtuaRED' },
   { juego: 'PES 2021', parche: 'Sudamerican Patch' }, { juego: 'PES 2021', parche: 'Gogosz Patch' },
   { juego: 'SP Football Life', version: '25' }, { juego: 'SP Football Life', version: '26' }, { juego: 'SP Football Life', version: '27' },
 ];
