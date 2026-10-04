@@ -232,3 +232,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Quiénes somos (ronda 45):** Fralex y Jack = «Impulsor de todo» (en ese orden, Fralex apenas más elevado), Hugo = «Co-impulsor».
 - **Fotos en Quiénes somos (ronda 46):** cada impulsor usa su foto de la sección Jugadores si la tiene (`foto_url`/`foto`); si no, queda su inicial. Hugo la muestra apenas la tenga cargada; Fralex y Jack cuando suban la suya.
 - **Sin la palabra «impulsor» (ronda 47):** roles Fundador (Fralex, Jack) y Co-fundador (Hugo); título de sección «Las personas detrás»; pie «conoce al equipo». Editable en `data/organizadores.js`.
+- **Insignia de división (ronda 48):** separada del borde (0.7rem/0.8rem) y, al pasar el mouse o en la réplica, se expande hacia la izquierda mostrando el nombre completo («L1 Primera División»). Oculta el texto en zoom denso.

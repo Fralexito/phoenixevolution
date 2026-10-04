@@ -46,7 +46,7 @@ function tirasHist(p) {
 }
 function tarjeta(p, i, extra = '') {
   const admin = isAdmin(); const niv = divPorId.get(p.id); const dv = SISTEMA.divisiones.find((d) => d.nivel === niv);
-  const insignia = dv ? `<span class="div-badge div-${niv} ${admin ? 'div-admin' : ''}" title="${escapeHTML(dv.nombre)}">L${niv}</span>` : '';
+  const insignia = dv ? `<span class="div-badge div-${niv} ${admin ? 'div-admin' : ''}" title="${escapeHTML(dv.nombre)}"><b>L${niv}</b><span>${escapeHTML(dv.nombre)}</span></span>` : '';
   return `<div data-pcw="${escapeHTML(p.id)}" style="--aura:${posInfo(p.posicion).color}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${insignia}${tirasHist(p)}${extra}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>
         <a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" aria-label="Ver perfil de ${escapeHTML(p.nombre)}" title="Ver perfil" class="cmp-btn perfil-btn"><i class="fa-solid fa-id-card"></i></a>${admin ? `

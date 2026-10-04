@@ -335,3 +335,12 @@ body:has(#players-container) { overflow-x: clip; }
 .dens-grupo { padding: .15rem; gap: .15rem; border-radius: .55rem; }
 .dens-grupo .dens-btn { width: 1.6rem; height: 1.6rem; font-size: .7rem; } .dens-grupo .dens-btn.dens-reset { padding: 0 .5rem; font-size: .58rem; }
 @media (max-width: 639px) { .dens-grupo .dens-reset span { display: none; } .dens-grupo .dens-btn.dens-reset { width: 1.6rem; padding: 0; } .leyenda-btn span { font-size: .58rem; } }
+
+/* Insignia de división: separada del borde y, al pasar el mouse (o en la réplica), se EXPANDE hacia la izquierda mostrando el nombre completo. */
+.div-badge { top: .7rem; right: .8rem; display: inline-flex; align-items: center; white-space: nowrap; overflow: hidden; transition: padding .35s cubic-bezier(.22, 1, .36, 1); }
+.div-badge b { font-weight: 800; }
+.div-badge span { max-width: 0; opacity: 0; margin-left: 0; transition: max-width .45s cubic-bezier(.22, 1, .36, 1), opacity .3s ease .05s, margin-left .35s ease; }
+.div-badge.div-admin { right: 3rem; }
+.pcw:hover .div-badge, .pcw-replica .div-badge { padding-left: .55rem; padding-right: .55rem; }
+.pcw:hover .div-badge span, .pcw-replica .div-badge span { max-width: 9.5em; opacity: 1; margin-left: .45em; }
+#players-container[data-denso='true'] .div-badge span { display: none; }
