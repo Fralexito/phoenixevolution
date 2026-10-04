@@ -413,3 +413,9 @@ body:has(#players-container) { overflow-x: clip; }
 @keyframes cmp-poly-in { from { opacity: 0; transform: scale(.15); } }
 @keyframes cmp-glow { to { filter: drop-shadow(0 0 12px currentColor); } }
 @media (max-width: 420px) { .cmp-photo { width: 2.4rem; height: 2.4rem; } .cmp-ovr { font-size: 1.9rem; } .cmp-name { font-size: .78rem; } .cmp-vs { width: 1.9rem; height: 1.9rem; font-size: .75rem; } .cmp-big { font-size: 1.5rem; } .cmp-top { gap: .4rem; } .cmp-verdict { font-size: .75rem; } }
+
+/* Duelos: formulario más compacto en altura (etiquetas y botones con menos aire) */
+#form-crear-reto .label { margin-bottom: .2rem; }
+#form-crear-reto .seg button { min-height: 2.25rem; }
+#form-crear-reto .field { min-height: 2.25rem; padding-top: .35rem; padding-bottom: .35rem; }
+#form-crear-reto .chip { min-height: 2.25rem; }

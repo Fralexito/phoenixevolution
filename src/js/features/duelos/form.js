@@ -79,8 +79,8 @@ export function refreshForm() {
   $('tam-b-menos').disabled = ui.b <= 1; $('tam-b-mas').disabled = ui.b >= maxFor(ui.a);
   pressed(all('#tam-presets .chip'), (b) => b.dataset.t === `${ui.a}-${ui.b}`);
   $('hint-equipos').textContent = ui.destino === 'directo'
-    ? `Tu rival lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}) y puede traer a sus amigos.`
-    : `Quien acepte lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}); los demás pueden unirse.`;
+    ? `Tu rival lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}).`
+    : `Quien acepte lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}).`;
 
   paintRivales(); paintAmigos();
 
