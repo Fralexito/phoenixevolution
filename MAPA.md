@@ -173,3 +173,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 ## Ronda 22 — Resultados de la liga (espejo, base)
 - `data/ligaResultados.js`: clubes y resultados fecha por fecha copiados de CopaFácil (fechas 1 a 9 cargadas; partidos sin jugar = gl/gv null). `core/tabla.js` → `calcularTabla` (3-1-0; desempate: enfrentamiento directo entre los empatados (puntos → dif. → goles, recursivo) → dif. de goles total → goles a favor → nombre). Verificado fila por fila contra la tabla real de CopaFácil (test «coincide fila por fila»). Aún no se muestra en la web.
+
+## Ronda 23 — Página Liga completa con historial
+- Datos: `data/ligaResultados.js` → `EDICIONES[idLiga]` = lista de ediciones (`id, nombre, estado 'en_curso'|'finalizada', campeon, fase, formato, participantes, clubes, fechas, aviso`). Para archivar una edición: `estado:'finalizada'` + `campeon`; para abrir otra: agregar un objeto (idealmente en su propio archivo de fechas).
+- Cálculo (puro, probado): `core/tabla.js` (tabla + desempate directo, igual a CopaFácil) y `core/ligaStats.js` (`resumenFecha/Edicion`, `estadoFecha`, `fechaActual`, `forma`, `mayoresGoleadas`, `ranking`).
+- `pages/liga.astro` pinta todo al construir: cifras, tabla con forma (últimos 5), mejor ataque/defensa, mayores goleadas, resultados por fecha, historial de ediciones, cómo funciona, ficha y parches. `js/pages/liga.js` solo cambia de edición (select o tarjeta del historial) y de fecha.
+- Cada resultado nuevo = agregar/editar el partido en `FECHAS` (gl/gv null = sin jugar). Mantener la prueba «coincide fila por fila con CopaFácil» actualizada con la tabla real del momento.

@@ -1,9 +1,13 @@
 ---
-// Página «Liga»: escaparate de cada competición (datos en data/ligas.js). CopaFácil sigue siendo la fuente oficial del fixture y la tabla.
+// Página «Liga»: cada competición con su HISTORIAL de ediciones. Todo sale de datos (data/ligas.js + data/ligaResultados.js) y se calcula al construir la web.
+// CopaFácil sigue siendo la fuente oficial; aquí se espeja (los resultados se copian fecha por fecha) y se comprueba contra su tabla.
 import Layout from '../layouts/Layout.astro';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
+import { EDICIONES } from '../data/ligaResultados.js';
 import { SOCIALS } from '../data/site.js';
 import { PARCHES_PES } from '../js/core/rules.js';
+import { calcularTabla } from '../js/core/tabla.js';
+import { resumenFecha, resumenEdicion, estadoFecha, fechaActual, forma, mayoresGoleadas, ranking } from '../js/core/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 const discord = SOCIALS.find((s) => s.label === 'Discord')?.href ?? '#';
 const PASOS = [
@@ -12,6 +16,28 @@ const PASOS = [
   { icono: 'fa-display', t: 'Juega en remoto', d: 'El partido se juega con Parsec o Smash Soda, con el parche acordado.' },
   { icono: 'fa-flag-checkered', t: 'Resultado y tabla', d: 'El resultado se registra en CopaFácil y suma a la tabla de posiciones.' },
 ];
+// Clases completas (Tailwind solo detecta nombres escritos enteros).
+const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black', P: 'bg-rose-500/90 text-white' };
+const ESTADO_FECHA = { jugada: 'Jugada', en_juego: 'En juego', pendiente: 'Pendiente' };
+const ESTADO_ED = { en_curso: 'En curso', finalizada: 'Finalizada' };
+const PUESTO = ['text-gold-400', 'text-gray-200', 'text-bronze-400'];
+
+// Todo lo calculado, por liga → por edición.
+const datos = LIGAS.map((l) => {
+  const ediciones = (EDICIONES[l.id] ?? []).map((e) => {
+    const partidos = e.fechas.flatMap((f) => f.partidos);
+    const { tabla } = calcularTabla(partidos);
+    const resumen = resumenEdicion(e.fechas);
+    return {
+      ...e, tabla, resumen, actual: fechaActual(e.fechas),
+      formas: Object.fromEntries(tabla.map((f) => [f.nombre, forma(e.fechas, f.nombre)])),
+      ataque: ranking(tabla, 'gf').slice(0, 5), defensa: ranking(tabla, 'gc', true).slice(0, 5),
+      goleadas: mayoresGoleadas(e.fechas, 3),
+      fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
+    };
+  }).reverse();   // la más reciente primero
+  return { liga: l, ediciones };
+});
 ---
 <Layout title="Liga" active="liga">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-8 pb-16">
@@ -21,8 +47,8 @@ const PASOS = [
       </nav>
     )}
 
-    {LIGAS.map((l) => (
-      <section id={`liga-${l.id}`} class="space-y-6 scroll-mt-24">
+    {datos.map(({ liga: l, ediciones }) => (
+      <section id={`liga-${l.id}`} class="space-y-6 scroll-mt-24" data-liga={l.id}>
         <!-- Portada de la liga -->
         <div class="liga-card group">
           <img src={l.imagen} alt="" loading="eager" class="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
@@ -36,12 +62,129 @@ const PASOS = [
             <p class="text-sm sm:text-lg font-display font-light tracking-[0.25em] text-gray-300 uppercase">{l.juego}</p>
             <p class="text-gray-300 text-sm max-w-xl mx-auto sm:mx-0">{l.descripcion}</p>
             <div class="flex flex-wrap justify-center sm:justify-start gap-3 pt-1">
-              {l.copafacil && <a href={l.copafacil} target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-p"><i class="fa-solid fa-table-list"></i> Fixture y tabla en CopaFácil</a>}
+              {l.copafacil && <a href={l.copafacil} target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-p"><i class="fa-solid fa-table-list"></i> Ver en CopaFácil</a>}
               <a href={`${base}duelos/`} class="hero-cta hero-cta-s"><i class="fa-solid fa-gamepad"></i> Sala de Duelos</a>
               <a href={discord} target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-s"><i class="fa-brands fa-discord"></i> Discord</a>
             </div>
           </div>
         </div>
+
+        {ediciones.length === 0 && <p class="text-gray-400 text-sm">Esta liga aún no tiene ediciones cargadas.</p>}
+
+        {ediciones.length > 0 && (
+          <div class="flex flex-wrap items-center gap-3">
+            <label for={`ed-${l.id}`} class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-widest"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Edición</label>
+            <select id={`ed-${l.id}`} class="field !w-auto !bg-galaxy-900 font-display font-bold uppercase tracking-wider" data-ed-select={l.id} aria-label="Elegir edición">
+              {ediciones.map((e) => <option value={e.id}>{e.nombre} · {ESTADO_ED[e.estado]}</option>)}
+            </select>
+          </div>
+        )}
+
+        {ediciones.map((e, idx) => (
+          <div data-edicion={e.id} data-liga-ed={l.id} hidden={idx !== 0} class="space-y-6">
+            <!-- Cifras de la edición -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[['Partidos jugados', `${e.resumen.jugados}/${e.resumen.total}`, 'fa-futbol'], ['Goles', e.resumen.goles, 'fa-bullseye'], ['Promedio por partido', e.resumen.promedio ?? '—', 'fa-chart-simple'], ['Empates', e.resumen.empates, 'fa-handshake']].map(([k, v, ic]) => (
+                <div class="pulse-tile"><span class="pulse-ico"><i class={`fa-solid ${ic}`}></i></span><span class="pulse-num">{v}</span><span class="pulse-lbl">{k}</span></div>
+              ))}
+            </div>
+            {e.aviso && <p class="text-xs text-amber-300/90 bg-amber-400/10 border border-amber-400/30 rounded-lg px-3 py-2"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>{e.aviso}</p>}
+
+            <div class="grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] items-start">
+              <!-- Tabla de posiciones -->
+              <section class="glass-panel rounded-2xl p-3 sm:p-5 space-y-3" aria-label="Tabla de posiciones">
+                <div class="flex items-center justify-between gap-2">
+                  <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Tabla de posiciones</h2>
+                  <span class="text-[10px] text-gray-400 font-display uppercase tracking-wider">{e.fase} · {e.formato}</span>
+                </div>
+                <div class="overflow-x-auto -mx-1">
+                  <table class="liga-tabla w-full text-sm">
+                    <thead><tr>
+                      <th class="text-left w-7">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
+                      <th class="hidden sm:table-cell">G</th><th class="hidden sm:table-cell">E</th><th class="hidden sm:table-cell">P</th>
+                      <th class="hidden md:table-cell">GF</th><th class="hidden md:table-cell">GC</th><th>DIF</th><th class="hidden sm:table-cell">Forma</th>
+                    </tr></thead>
+                    <tbody>
+                      {e.tabla.map((f, i) => (
+                        <tr class:list={[i === 0 ? 'liga-lider' : '']}>
+                          <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
+                          <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[10px] text-gray-400 leading-tight">{e.clubes[f.nombre]}</span>}</td>
+                          <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
+                          <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
+                          <td class="hidden md:table-cell">{f.gf}</td><td class="hidden md:table-cell">{f.gc}</td>
+                          <td class:list={[f.dg > 0 ? 'text-emerald-400' : f.dg < 0 ? 'text-rose-400' : 'text-gray-400']}>{f.dg > 0 ? `+${f.dg}` : f.dg}</td>
+                          <td class="hidden sm:table-cell"><span class="inline-flex gap-1">{e.formas[f.nombre].map((r) => <span class:list={['liga-forma', CHIP[r]]} title={{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[r]}>{r}</span>)}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p class="text-[10px] text-gray-500">3 puntos por victoria, 1 por empate. Desempate: enfrentamiento directo, diferencia de goles y goles a favor. PJ = partidos jugados · DIF = diferencia de goles.</p>
+              </section>
+
+              <!-- Rankings laterales -->
+              <div class="space-y-4">
+                {[['Mejor ataque', 'fa-fire', e.ataque, 'goles a favor'], ['Mejor defensa', 'fa-shield-halved', e.defensa, 'goles en contra']].map(([titulo, ic, lista, unidad]) => (
+                  <section class="glass-panel rounded-2xl p-4 space-y-2">
+                    <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest flex items-center gap-2"><i class={`fa-solid ${ic} text-galaxy-400`}></i>{titulo}</h2>
+                    <ol class="space-y-1">
+                      {lista.map((r, i) => <li class="flex items-center gap-2 text-sm"><span class:list={['w-5 font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</span><span class="flex-1 text-gray-200">{r.nombre}</span><span class="font-display font-bold text-white tabular-nums">{r.valor}</span></li>)}
+                    </ol>
+                    <p class="text-[10px] text-gray-500">{unidad}</p>
+                  </section>
+                ))}
+                <section class="glass-panel rounded-2xl p-4 space-y-2">
+                  <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-explosion text-galaxy-400"></i>Mayores goleadas</h2>
+                  <ol class="space-y-1.5">
+                    {e.goleadas.map((g) => <li class="text-sm text-gray-200 flex items-baseline gap-2"><span class="text-[10px] text-gray-500 font-display w-8 shrink-0">F{g.fecha}</span><span class="flex-1">{g.l} <b class="font-display text-white">{g.gl}–{g.gv}</b> {g.v}</span></li>)}
+                  </ol>
+                </section>
+              </div>
+            </div>
+
+            <!-- Resultados y calendario, fecha por fecha -->
+            <section class="glass-panel rounded-2xl p-3 sm:p-5 space-y-3" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
+              <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Resultados y calendario</h2>
+              <div class="flex gap-2 overflow-x-auto pb-1 featured-row" role="tablist" aria-label="Fechas">
+                {e.fechas.map((f) => <button type="button" role="tab" data-fecha-btn={f.n} aria-pressed={String(f.n === e.actual)} class="adv-chip shrink-0">Fecha {f.n}{f.estado !== 'jugada' && <i class="fa-solid fa-circle text-[6px] ml-1.5 align-middle text-amber-300"></i>}</button>)}
+              </div>
+              {e.fechas.map((f) => (
+                <div data-fecha-panel={f.n} hidden={f.n !== e.actual} class="space-y-2">
+                  <p class="text-[11px] text-gray-400 font-display uppercase tracking-wider">
+                    Fecha {f.n} · {ESTADO_FECHA[f.estado]}{f.resumen.jugados > 0 && ` · ${f.resumen.goles} goles (${f.resumen.promedio} por partido)`}
+                  </p>
+                  <ul class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    {f.partidos.map((m) => (
+                      <li class="rounded-xl border border-galaxy-border/60 bg-black/25 px-3 py-2.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm">
+                        <span class="text-right text-gray-100 font-display font-bold truncate">{m.l}</span>
+                        {Number.isInteger(m.gl) ? <span class="px-2 py-0.5 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-[11px] text-gray-500 font-display uppercase">vs</span>}
+                        <span class="text-left text-gray-100 font-display font-bold truncate">{m.v}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
+          </div>
+        ))}
+
+        <!-- Historial de ediciones -->
+        <section class="space-y-3" aria-label="Historial de ediciones">
+          <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-landmark text-galaxy-400"></i> Historial de {l.titulo.join(' ')}</h2>
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {ediciones.map((e) => (
+              <button type="button" data-ed-ir={e.id} data-liga-ir={l.id} class="glass-panel rounded-xl p-4 text-left space-y-1.5 hover:border-galaxy-400/60 transition-colors">
+                <span class="flex items-center justify-between gap-2">
+                  <span class="font-display font-bold text-white uppercase tracking-wide">{e.nombre}</span>
+                  <span class:list={['liga-sello', e.estado === 'en_curso' ? '' : 'liga-sello-prox']}>{ESTADO_ED[e.estado]}</span>
+                </span>
+                <span class="block text-xs text-gray-400">{e.participantes} jugadores · {e.resumen.jugados} partidos · {e.resumen.goles} goles</span>
+                <span class="block text-xs text-gray-300">{e.estado === 'finalizada' ? <><i class="fa-solid fa-crown text-gold-400 mr-1"></i>Campeón: <b class="text-white">{e.campeon ?? '—'}</b></> : <><i class="fa-solid fa-flag text-galaxy-400 mr-1"></i>Líder: <b class="text-white">{e.tabla[0]?.nombre ?? '—'}</b> · Fecha {e.actual}</>}</span>
+              </button>
+            ))}
+          </div>
+          <p class="text-[11px] text-gray-500">Cuando una edición termina se archiva aquí con su campeón y su tabla final, y se abre la siguiente. Nada se borra.</p>
+        </section>
 
         <!-- Cómo funciona -->
         <div class="space-y-3">
@@ -56,7 +199,7 @@ const PASOS = [
           </ol>
         </div>
 
-        <!-- Ficha de la competición + parches -->
+        <!-- Ficha + parches -->
         <div class="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
             <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Ficha de la competición</h2>
@@ -72,12 +215,13 @@ const PASOS = [
           <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
             <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Parches reconocidos</h2>
             <p class="text-xs text-gray-400">Los que la comunidad ya usa en PES 21. Al registrarte como host eliges el tuyo (o escribes otro).</p>
-            <ul class="flex flex-wrap gap-2">
-              {PARCHES_PES.map((x) => <li class="pc-chip">{x}</li>)}
-            </ul>
+            <ul class="flex flex-wrap gap-2">{PARCHES_PES.map((x) => <li class="pc-chip">{x}</li>)}</ul>
           </div>
         </div>
       </section>
     ))}
   </div>
 </Layout>
+<script>
+  import '../js/pages/liga.js';
+</script>

@@ -44,3 +44,17 @@ export const FECHAS = [
     { l: 'Axel', v: 'Arens', gl: null, gv: null }, { l: 'Jeremi', v: 'Beto', gl: null, gv: null },
   ] },
 ];
+
+// ---- HISTORIAL: todas las ediciones de cada liga, por id de liga (data/ligas.js). ----
+// Para archivar una edición: cambia su `estado` a 'finalizada' y añade `campeon`. Para abrir otra: agrega un objeto nuevo (su propio archivo de fechas si crece).
+//  estado: 'en_curso' | 'finalizada'    ·  fecha1Incompleta: avisa que falta cargar algún partido
+export const EDICIONES = {
+  galaxy: [
+    {
+      id: 'apertura-2026', nombre: 'Apertura 2026', estado: 'en_curso', fase: '1ª Fase',
+      formato: 'Todos contra todos, a ida y vuelta', participantes: 12,
+      clubes: CLUBES, fechas: FECHAS,
+      aviso: 'Fecha 9 incompleta: falta cargar un partido (Morgado – Fralex, por descarte).',
+    },
+  ],
+};

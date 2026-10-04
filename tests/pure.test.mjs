@@ -365,3 +365,19 @@ test('tabla: coincide fila por fila con la tabla real de CopaFácil (fechas 1-9 
   const { tabla } = calcularTabla(FECHAS.flatMap((f) => f.partidos));
   assert.deepEqual(tabla.map((f) => [f.nombre, f.pts, f.pj, f.g, f.e, f.p, f.gf, f.gc]), esperado);
 });
+
+import { resumenFecha, resumenEdicion, estadoFecha, fechaActual, forma, mayoresGoleadas, ranking } from '../src/js/core/ligaStats.js';
+import { EDICIONES } from '../src/data/ligaResultados.js';
+test('ligaStats: resúmenes, estado de fecha, forma, goleadas y rankings', () => {
+  const fe = EDICIONES.galaxy[0].fechas;
+  assert.deepEqual(resumenFecha(fe[3]), { total: 6, jugados: 6, pendientes: 0, empates: 0, goles: 46, promedio: 7.7 });   // CopaFácil: 46 goles, 7.7 de promedio
+  assert.deepEqual(resumenFecha(fe[4]), { total: 6, jugados: 6, pendientes: 0, empates: 1, goles: 37, promedio: 6.2 });   // CopaFácil: 37 goles, 6.2
+  assert.equal(estadoFecha(fe[0]), 'jugada'); assert.equal(estadoFecha(fe[7]), 'en_juego'); assert.equal(estadoFecha({ partidos: [{ l: 'A', v: 'B', gl: null, gv: null }] }), 'pendiente');
+  assert.equal(fechaActual(fe), 8); assert.equal(fechaActual([]), null);
+  assert.deepEqual(forma(fe, 'Victor'), ['G', 'G', 'G', 'G', 'G']); assert.deepEqual(forma(fe, 'Hugo'), ['P', 'E', 'E', 'E', 'P']);   // fechas 4 a 8
+  assert.deepEqual(forma(fe, 'Hugo', 2), ['E', 'P']);
+  const g = mayoresGoleadas(fe, 1)[0]; assert.deepEqual([g.l, g.v, g.gl, g.gv, g.fecha], ['Victor', 'Camilo', 10, 0, 3]);
+  const tot = resumenEdicion(fe); assert.equal(tot.jugados + tot.pendientes, tot.total);
+  const { tabla } = calcularTabla(fe.flatMap((f) => f.partidos));
+  assert.deepEqual(ranking(tabla, 'gf')[0], { nombre: 'Victor', valor: 57 }); assert.deepEqual(ranking(tabla, 'gc', true)[0], { nombre: 'Victor', valor: 4 });
+});
