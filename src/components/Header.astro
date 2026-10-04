@@ -16,11 +16,14 @@ const { active } = Astro.props;
       </span>
     </a>
 
-    <div class="hidden lg:flex items-center gap-1 font-display text-sm ml-auto mr-6">
+    <div class="hidden lg:flex items-center gap-1 font-display text-sm ml-auto">
       {NAV.map((n) => (
         <a href={`${base}${n.path}`} class="nav-link" aria-current={active === n.id ? 'page' : undefined}>{n.label}</a>
       ))}
     </div>
+
+    <!-- Separador: aleja el menú de "Entrar / Registrarse" para que no se confundan. -->
+    <span class="hidden lg:block w-px h-7 bg-galaxy-border mx-6 xl:mx-10" aria-hidden="true"></span>
 
     <div class="flex items-center justify-end shrink-0 gap-3 sm:gap-4 relative z-10">
       <div id="nav-auth" class="flex items-center h-full gap-3"></div>

@@ -1,12 +1,12 @@
 ---
 import { TICKER } from '../data/site.js';
 ---
-<div class="bg-galaxy-900/95 backdrop-blur-md border-b border-galaxy-600/50 overflow-hidden relative h-9 flex items-center">
-  <div class="absolute left-0 bg-galaxy-600 text-white font-display font-bold px-4 h-full flex items-center z-10 shadow-[5px_0_15px_rgba(0,0,0,0.5)] uppercase tracking-wider text-xs">
+<div class="bg-galaxy-900/95 backdrop-blur-md border-b border-galaxy-600/50 overflow-hidden relative h-11 flex items-center">
+  <div class="absolute left-0 bg-galaxy-600 text-white font-display font-bold px-4 h-full flex items-center z-10 shadow-[5px_0_15px_rgba(0,0,0,0.5)] uppercase tracking-wider text-sm">
     <i class="fa-solid fa-bolt mr-2 animate-pulse text-galaxy-400"></i> ÚLTIMA HORA
   </div>
   <div class="w-full whitespace-nowrap pl-36 pr-4 overflow-hidden relative">
-    <div class="ticker-track animate-marquee font-sans text-xs text-galaxy-50">
+    <div class="ticker-track animate-marquee font-sans text-sm text-galaxy-50">
       {TICKER.map((t) => (<><span class="mx-4 text-galaxy-400">◆</span>{t}</>))}
     </div>
   </div>

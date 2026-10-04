@@ -21,10 +21,10 @@ const KICK_PATH = 'M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H2
 
 // Redes: reemplaza los "#" por los enlaces reales de la comunidad.
 export const SOCIALS = [
-  { label: 'Discord', href: '#', icon: 'fa-brands fa-discord', hover: 'hover:text-[#5865F2]' },
+  { label: 'Discord', href: 'https://discord.gg/jsxZ3mtfwe', icon: 'fa-brands fa-discord', hover: 'hover:text-[#5865F2]' },
   { label: 'Kick',    href: '#', svg: KICK_PATH,            hover: 'hover:text-[#53FC18]' },
   { label: 'YouTube', href: '#', icon: 'fa-brands fa-youtube', hover: 'hover:text-[#FF0000]' },
-  { label: 'TikTok',  href: '#', icon: 'fa-brands fa-tiktok',  hover: 'hover:text-white' },
+  { label: 'TikTok',  href: 'https://www.tiktok.com/@phoenix_evolution', icon: 'fa-brands fa-tiktok',  hover: 'hover:text-white' },
 ];
 
 export const TICKER = [
