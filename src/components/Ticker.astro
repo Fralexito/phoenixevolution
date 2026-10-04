@@ -8,6 +8,10 @@ import { TICKER } from '../data/site.js';
   </div>
   <!-- Zona de lectura: las noticias fluyen una tras otra con un hueco mínimo (varias pueden coincidir). features/ticker.js la anima; las noticias viajan en data-items. -->
   <div id="ticker-view" data-items={JSON.stringify(TICKER)} class="flex-1 min-w-0 overflow-hidden relative flex items-center">
+    <div class="ticker-ctl hidden md:flex" aria-label="Mover las noticias">
+      <button type="button" data-ticker-paso="1" aria-label="Retroceder las noticias" title="Retroceder"><i class="fa-solid fa-chevron-left"></i></button>
+      <button type="button" data-ticker-paso="-1" aria-label="Adelantar las noticias" title="Adelantar"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
     <span id="ticker-item" class="ticker-item font-sans text-xs sm:text-sm text-galaxy-50"><span class="text-galaxy-400 mr-2">◆</span>{TICKER[0]}</span>
   </div>
 </div>

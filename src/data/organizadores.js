@@ -24,10 +24,11 @@ export const ORG = {
     { icono: 'fa-rocket', t: 'Evolución', d: 'Mejorar siempre: cada temporada mejor que la anterior.' },
   ],
   // Los tres impulsores. `nombre` debe coincidir con el nombre o apodo del jugador en la base para enlazar su perfil automáticamente.
-  impulsoresIntro: 'Un proyecto, tres papeles que se necesitan entre sí. Jack, junto a Hugo, es la cara y la voz de la comunidad; Fralex trabaja detrás de escena, dando forma a la idea y a la plataforma.',
+  // `destaque`: 2 = un poquito por encima, 1 = casi igual, 0 = parejo. `orden` = posición en pantallas anchas (en celular van en el orden de la lista).
+  impulsoresIntro: 'Tres personas, un mismo proyecto. Cada una aporta algo distinto, y juntas le dan forma a Phoenix Evolution.',
   impulsores: [
-    { nombre: 'Jack', rol: 'La cara de la comunidad', principal: true, bio: 'Quien la mueve, la anima y le da vida. Donde hay comunidad, está Jack, y Hugo siempre a su lado.', frase: '' },
-    { nombre: 'Hugo', rol: 'Mano a mano con Jack', principal: false, bio: 'Da la cara junto a Jack y mantiene ese ambiente que invita a volver a jugar, fecha tras fecha.', frase: '' },
-    { nombre: 'Fralex', rol: 'Detrás de escena', principal: false, bio: 'Concibió la idea, construyó la plataforma y sostiene la organización de la liga.', frase: '' },
+    { nombre: 'Fralex', rol: 'Impulsor', destaque: 2, orden: 2, bio: 'Detrás de la idea y de la plataforma.', frase: '' },
+    { nombre: 'Jack', rol: 'Cara de la comunidad', destaque: 1, orden: 1, bio: 'Quien le da energía a cada fecha, junto a Hugo.', frase: '' },
+    { nombre: 'Hugo', rol: 'Mano a mano con Jack', destaque: 0, orden: 3, bio: 'Compañero clave para darle vida a la comunidad.', frase: '' },
   ],
 };
