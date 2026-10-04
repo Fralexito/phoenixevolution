@@ -351,3 +351,11 @@ body:has(#players-container) { overflow-x: clip; }
 .pc-largo .pc-sub { display: block; margin-top: .35em; } .pc-largo .pc-sub .pc-apodo { margin-top: .3em; }
 .pc-largo .pc-fis { margin-top: .6em; }
 .pc-largo .pc-stats { margin-top: .7em; grid-template-columns: repeat(2, max-content); gap: .45em .9em; padding: .7em .8em; }
+
+/* Cifras de la portada en celular: más compactas para que toda la portada quepa en la primera pantalla */
+@media (max-width: 639px) {
+  .pulse-tile { padding: .45rem .6rem; column-gap: .5rem; border-radius: .75rem; }
+  .pulse-ico { width: 1.9rem; height: 1.9rem; font-size: .85rem; border-radius: .5rem; }
+  .pulse-num { font-size: 1.25rem; }
+  .pulse-lbl { font-size: .58rem; letter-spacing: .05em; line-height: 1.15; }
+}
