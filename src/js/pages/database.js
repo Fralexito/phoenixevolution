@@ -234,7 +234,8 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fijarFoco(
 document.addEventListener('click', (e) => { if (!e.target.closest('#players-container, .pcw-replica, .modal-card, #cmp-bar')) fijarFoco(null); });
 $('players-container').addEventListener('click', async (e) => {
   const w = e.target.closest('.pcw');
-  if (w && !e.target.closest('button, a, .card-menu')) { fijarFoco(focoId === w.dataset.pcw ? null : w.dataset.pcw); return; }
+  // Con una carta ampliada, cualquier clic en OTRA carta solo la minimiza (no abre la nueva): hace falta un segundo clic para ampliar.
+  if (w && !e.target.closest('button, a, .card-menu')) { fijarFoco(focoId === null ? w.dataset.pcw : null); return; }
   const menu = e.target.closest('[data-menu]')?.dataset.menu;
   if (menu) { const el = document.querySelector(`.card-menu[data-menu-for="${menu}"]`); const abrir = el.hidden; cerrarMenus(); el.hidden = !abrir; return; }
   const cmp = e.target.closest('[data-cmp]')?.dataset.cmp;
