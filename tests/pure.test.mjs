@@ -235,16 +235,41 @@ test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la s
   assert.deepEqual(outSize(5000, '4/5'), { w: 800, h: 1000 }); assert.deepEqual(outSize(5000, '1/1'), { w: 800, h: 800 }); assert.deepEqual(outSize(5000), { w: 800, h: 640 });
 });
 
-import { columnasValidas, cambiarColumnas, separacion } from '../src/js/core/density.js';
+import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo, NIVELES } from '../src/js/core/density.js';
+import { rankPlayers } from '../src/js/core/ranking.js';
+import { leerMedida, fisicoTexto, ALTURA, PESO } from '../src/js/core/fisico.js';
 import { puedeEntrar } from '../src/js/features/ticker.js';
-test('densidad: límites, valores raros y pasos', () => {
-  assert.equal(columnasValidas(99, true), 4); assert.equal(columnasValidas(0, true), 1); assert.equal(columnasValidas('x', true), 2);
-  assert.equal(columnasValidas(99, false), 8); assert.equal(columnasValidas(1, false), 2); assert.equal(columnasValidas(null, false), 4);
-  assert.equal(cambiarColumnas(4, 1, true), 4); assert.equal(cambiarColumnas(1, -1, true), 1); assert.equal(cambiarColumnas(4, 1, false), 5);
-  assert.ok(separacion(8, false) < separacion(2, false));
+test('zoom: niveles válidos, límites y tamaño', () => {
+  assert.equal(nivelValido(99, true), 3); assert.equal(nivelValido(-5, false), 0); assert.equal(nivelValido('x', true), NIVELES.movil.def); assert.equal(nivelValido(null, false), NIVELES.pc.def);
+  assert.equal(cambiarNivel(3, 1, true), 3); assert.equal(cambiarNivel(0, -1, false), 0); assert.equal(cambiarNivel(2, 1, false), 3);
+  assert.ok(anchoMinimo(7, false) < anchoMinimo(0, false)); assert.equal(esUltimo(7, false), true); assert.equal(esUltimo(0, false), false);
+  assert.ok(separacion(7, false) < separacion(0, false)); assert.equal(esDenso(3, true), true); assert.equal(esDenso(0, false), false);
+});
+test('ranking: promedio de varias stats, mínimo, top y empates', () => {
+  const P = [{ nombre: 'A', ovr: 80, men: 90, pot: 60 }, { nombre: 'B', ovr: 85, men: 70, pot: 90 }, { nombre: 'C', ovr: 70, men: 95, pot: 40 }, { nombre: 'D', ovr: 60, men: 70, pot: 90 }];
+  assert.deepEqual(rankPlayers(P, ['men']).map((f) => f.p.nombre), ['C', 'A', 'B', 'D']);
+  assert.deepEqual(rankPlayers(P, ['men', 'pot']).map((f) => f.p.nombre), ['B', 'D', 'A', 'C']);        // B y D empatan en promedio (80); B gana por media general
+  assert.deepEqual(rankPlayers(P, ['men', 'pot']).map((f) => f.rank), [1, 1, 3, 4]);
+  assert.deepEqual(rankPlayers(P, ['men', 'pot'], { min: 65 }).map((f) => f.p.nombre), ['B', 'D']);
+  assert.equal(rankPlayers(P, ['men'], { top: 2 }).length, 2); assert.deepEqual(rankPlayers(P, []), []);
+  assert.equal(rankPlayers([{ nombre: 'X' }], ['men'])[0].score, 0);                                   // stat ausente = 0, sin romper
+});
+test('físico: medidas opcionales y texto', () => {
+  assert.deepEqual(leerMedida('', ALTURA), { valor: null, error: false }); assert.deepEqual(leerMedida(' 182 ', ALTURA), { valor: 182, error: false });
+  assert.equal(leerMedida('50', ALTURA).error, true); assert.equal(leerMedida('abc', PESO).error, true); assert.equal(leerMedida('75,5', PESO).valor, 76);
+  assert.equal(fisicoTexto({ altura_cm: 182, peso_kg: 78, pie: 'Izquierdo' }), '182 cm · 78 kg · Pie izq.'); assert.equal(fisicoTexto({}), '');
 });
 test('ticker: la siguiente noticia entra cuando queda libre el hueco', () => {
   assert.equal(puedeEntrar(undefined, 0, 800, 90), true);
   assert.equal(puedeEntrar(500, 300, 800, 90), false);   // borde derecho 800 + hueco > 800
   assert.equal(puedeEntrar(400, 300, 800, 90), true);    // 790 ≤ 800
+});
+
+import { dockDesdeRect, dockAjustado, dockLeer, MARGEN } from '../src/js/core/dock.js';
+test('dock: lado más cercano, ajuste a la pantalla y lectura segura', () => {
+  assert.deepEqual(dockDesdeRect({ left: 20, right: 120, top: 30, bottom: 66 }, 400, 800), { h: 'l', dx: 20, v: 't', dy: 30 });
+  assert.deepEqual(dockDesdeRect({ left: 280, right: 380, top: 700, bottom: 736 }, 400, 800), { h: 'r', dx: 20, v: 'b', dy: 64 });
+  const a = dockAjustado({ h: 'l', dx: 900, v: 'b', dy: -50 }, 400, 800, 100, 36);   // se salía por la derecha y por abajo
+  assert.equal(a.dx, 400 - 100 - MARGEN); assert.equal(a.dy, MARGEN);
+  assert.equal(dockLeer('basura'), null); assert.equal(dockLeer('{"h":"x","dx":1,"dy":1,"v":"t"}'), null); assert.deepEqual(dockLeer('{"h":"r","dx":5,"dy":9,"v":"t"}'), { h: 'r', dx: 5, v: 't', dy: 9 });
 });

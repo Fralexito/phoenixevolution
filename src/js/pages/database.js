@@ -8,7 +8,9 @@ import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
 import { MAX_COMPARE } from '../core/compare.js';
 import { norm } from '../core/search.js';
-import { columnasValidas, cambiarColumnas, separacion } from '../core/density.js';
+import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo } from '../core/density.js';
+import { rankPlayers } from '../core/ranking.js';
+import { mountAdvanced } from '../features/advancedSearch.js';
 import { openStatLegend } from '../features/statLegend.js';
 
 const $ = (id) => document.getElementById(id);
@@ -17,19 +19,32 @@ let club = 'ALL';
 let term = '';
 const sel = []; // ids marcados para comparar (máx. 8; en el comparador se reparten en equipos A y B)
 
-function paint() {
-  const t = norm(term);
-  const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
+let adv = null;   // búsqueda avanzada activa: { keys, min, top } o null
+
+function tarjeta(p, i, extra = '') {
   const admin = isAdmin();
-  $('players-container').innerHTML = list.length
-    ? list.map((p, i) => `<div class="relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}
+  return `<div class="relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${extra}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>${admin ? `
         <button type="button" data-menu="${escapeHTML(p.id)}" aria-label="Opciones de la ficha" aria-haspopup="true" class="card-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
         <div class="card-menu" data-menu-for="${escapeHTML(p.id)}" hidden>
           <button type="button" data-edit="${escapeHTML(p.id)}"><i class="fa-solid fa-pen mr-2"></i>Editar</button>
           <button type="button" data-del="${escapeHTML(p.id)}" class="text-bad"><i class="fa-solid fa-trash mr-2"></i>Borrar</button>
-        </div>` : ''}</div>`).join('')
-    : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`;
+        </div>` : ''}</div>`;
+}
+
+function paint() {
+  const t = norm(term);
+  const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
+  const box = $('players-container');
+  if (adv) {
+    // Modo ranking: mismos filtros (equipo y nombre), ordenados por el promedio de las stats elegidas.
+    const r = rankPlayers(list, adv.keys, { min: adv.min, top: adv.top });
+    box.innerHTML = r.length ? r.map((f, i) => tarjeta(f.p, i, `<span class="rank-badge" title="Puesto ${f.rank}">#${f.rank}</span>`)
+      .replace(/<\/div>$/, `<div class="adv-strip">${adv.keys.map((k) => `<span>${k === 'ovr' ? 'MEDIA' : k.toUpperCase()} <b>${f.vals[k]}</b></span>`).join('')}${adv.keys.length > 1 ? `<span class="adv-prom">prom <b>${Math.round(f.score * 10) / 10}</b></span>` : ''}</div></div>`)).join('')
+      : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">Ningún jugador cumple ese mínimo en todas las stats elegidas.</div>`;
+  } else {
+    box.innerHTML = list.length ? list.map((p, i) => tarjeta(p, i)).join('') : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`;
+  }
   paintBar();
 }
 
@@ -63,21 +78,30 @@ $('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún n
 $('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1], sel.length > 2 ? sel : null));
 $('btn-leyenda').addEventListener('click', openStatLegend);
 
-// ---- Densidad: tarjetas por fila. Se recuerda por tipo de pantalla (celular / PC) en este navegador. ----
+// ---- Zoom: el usuario elige el TAMAÑO de tarjeta; la cuadrícula (auto-fill) decide cuántas caben y las reparte parejas. ----
+// Se recuerda por tipo de pantalla (celular / PC) en este navegador.
 const esMovil = () => window.matchMedia('(max-width: 639px)').matches;
-const claveDens = () => (esMovil() ? 'pes-dens-movil' : 'pes-dens-pc');
-const leerDens = () => { try { return columnasValidas(localStorage.getItem(claveDens()), esMovil()); } catch { return columnasValidas(null, esMovil()); } };
-let cols = leerDens();
-function aplicarDens() {
-  const m = esMovil(); cols = columnasValidas(cols, m);
-  const box = $('players-container'); box.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`; box.style.gap = `${separacion(cols, m)}rem`; box.dataset.denso = String(cols >= (m ? 3 : 6));
-  $('dens-menos').disabled = cols === columnasValidas(-99, m); $('dens-mas').disabled = cols === columnasValidas(99, m);
+const claveZoom = () => (esMovil() ? 'pes-zoom-movil' : 'pes-zoom-pc');
+const leerZoom = () => { try { return nivelValido(localStorage.getItem(claveZoom()), esMovil()); } catch { return nivelValido(null, esMovil()); } };
+let nivel = leerZoom();
+function aplicarZoom() {
+  const m = esMovil(); nivel = nivelValido(nivel, m);
+  const box = $('players-container');
+  box.style.gridTemplateColumns = `repeat(auto-fill, minmax(${anchoMinimo(nivel, m)}px, 1fr))`; box.style.gap = `${separacion(nivel, m)}rem`; box.dataset.denso = String(esDenso(nivel, m));
+  $('dens-mas').disabled = nivel === 0; $('dens-menos').disabled = esUltimo(nivel, m);
 }
-const moverDens = (d) => { cols = cambiarColumnas(cols, d, esMovil()); try { localStorage.setItem(claveDens(), String(cols)); } catch { /* sin almacenamiento: solo no se recuerda */ } aplicarDens(); };
-$('dens-menos').addEventListener('click', () => moverDens(-1));
-$('dens-mas').addEventListener('click', () => moverDens(1));
-window.matchMedia('(max-width: 639px)').addEventListener('change', () => { cols = leerDens(); aplicarDens(); });
-aplicarDens();
+const moverZoom = (d) => { nivel = cambiarNivel(nivel, d, esMovil()); try { localStorage.setItem(claveZoom(), String(nivel)); } catch { /* sin almacenamiento: solo no se recuerda */ } aplicarZoom(); };
+$('dens-menos').addEventListener('click', () => moverZoom(1));    // alejar: tarjetas más pequeñas
+$('dens-mas').addEventListener('click', () => moverZoom(-1));     // acercar: tarjetas más grandes
+// Ctrl + rueda sobre la lista (PC): acerca/aleja igual que en el explorador de archivos.
+let ultimaRueda = 0;
+$('players-container').addEventListener('wheel', (e) => { if (!e.ctrlKey) return; e.preventDefault(); const t = Date.now(); if (t - ultimaRueda < 140) return; ultimaRueda = t; moverZoom(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+window.matchMedia('(max-width: 639px)').addEventListener('change', () => { nivel = leerZoom(); aplicarZoom(); });
+aplicarZoom();
+
+// ---- Búsqueda avanzada (panel plegable) ----
+mountAdvanced($('adv-panel'), (estado) => { adv = estado; paint(); });
+$('btn-avanzada').addEventListener('click', () => { const abrir = $('adv-panel').hidden; $('adv-panel').hidden = !abrir; $('btn-avanzada').setAttribute('aria-expanded', String(abrir)); });
 $('cmp-clear').addEventListener('click', () => { sel.length = 0; paint(); });
 $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 // Menú sutil «⋯» de cada ficha (solo admin): se abre al tocarlo y se cierra al tocar fuera.

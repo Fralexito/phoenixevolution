@@ -2,6 +2,7 @@
 import { escapeHTML, safeImg, stat, statColor } from '../core/dom.js';
 import { posInfo } from '../../data/posiciones.js';
 import { ratioDe } from '../core/crop.js';
+import { fisicoTexto } from '../core/fisico.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -41,7 +42,7 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
       <div class="pc-info">
         <div class="pc-head">
           <h3 class="pc-name">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="pc-apodo">«${escapeHTML(p.apodo)}»</span>` : ''}</h3>
-          <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
+          <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span>${fisicoTexto(p) ? `<span class="pc-fis">${escapeHTML(fisicoTexto(p))}</span>` : ''}</div>
         </div>
         <div class="pc-stats">${stats}</div>
       </div>

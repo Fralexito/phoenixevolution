@@ -41,7 +41,8 @@ const base = import.meta.env.BASE_URL;
         <ul id="live-hist-list"></ul>
       </section>
       <div id="live-feed" aria-hidden="true" class="flex flex-col items-start md:items-end gap-1.5 max-w-full"></div>
-      <div class="flex items-center gap-2 pointer-events-auto">
+      <div id="live-row" class="flex items-center gap-2 pointer-events-auto">
+        <button id="live-grip" type="button" class="live-toggle live-grip" aria-label="Mover el pulso en vivo. Arrastra, o usa las flechas; Esc lo devuelve a su sitio" title="Arrastra para mover · doble clic para restablecer"><i class="fa-solid fa-grip-vertical"></i></button>
         <button id="live-hist-btn" type="button" class="live-toggle" aria-expanded="false" aria-controls="live-hist" aria-label="Ver historial de actividad"><i class="fa-solid fa-clock-rotate-left"></i><span class="live-toggle-txt">Historial</span></button>
         <button id="live-toggle" type="button" aria-pressed="true" class="live-toggle"><span class="live-dot"></span><span class="live-toggle-txt">En vivo</span></button>
       </div>

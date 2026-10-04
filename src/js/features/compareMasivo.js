@@ -1,7 +1,7 @@
 // Comparación MASIVA: de 2 a 8 jugadores repartidos en dos equipos (A y B, máx. 4 cada uno; admite 3 vs 2, 4 vs 3…).
 // Se compara el PROMEDIO de cada equipo. Para no tener que bajar tanto, el resultado se divide en mini secciones
 // (Resumen · Radar · Barras · Tabla) y solo una está abierta a la vez.
-import { openModal } from '../core/modal.js';
+import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
 import { compareTeams, teamProfile, axisPoint, radarPoints, autoTeams, moveToTeam, MAX_COMPARE, MAX_TEAM } from '../core/compare.js';
 import { posInfo } from '../../data/posiciones.js';
@@ -80,7 +80,10 @@ export function openCompareMasivo(players, ids = []) {
     <div class="p-5 sm:p-6 space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-xl sm:text-2xl text-white uppercase tracking-wider"><i class="fa-solid fa-people-group text-galaxy-400 mr-2"></i>Comparación masiva</h2>
-        <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="flex items-center gap-3">
+          <button type="button" id="cmp-ir-unico" class="text-[11px] text-gray-400 hover:text-white font-display font-bold uppercase tracking-wider" title="Volver a comparar solo dos jugadores"><i class="fa-solid fa-scale-balanced mr-1"></i>1 vs 1</button>
+          <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
       </div>
       <div id="cmp-teams" class="grid grid-cols-2 gap-2"></div>
       <div class="flex items-center gap-2">
@@ -90,6 +93,8 @@ export function openCompareMasivo(players, ids = []) {
       <div id="cmp-body" aria-live="polite"></div>
     </div>`, { id: 'compare-modal', wide: true });
   const $ = (s) => m.querySelector(s);
+  // Volver a 1 vs 1 con los dos primeros jugadores (import dinámico: compare.js ya importa este archivo, así se evita el ciclo).
+  $('#cmp-ir-unico').addEventListener('click', async () => { try { const { openCompare } = await import('./compare.js'); const [x, y] = all(); closeModal('compare-modal'); openCompare(players, x, y); } catch (e) { console.error('[masivo] volver a 1 vs 1:', e); } });
 
   const chip = (id, side) => { const p = byId.get(id); const c = COL[side]; const otro = side === 'a' ? 'b' : 'a';
     const lleno = teams[otro].length >= MAX_TEAM;

@@ -19,15 +19,17 @@ import Layout from '../layouts/Layout.astro';
             <i class="fa-solid fa-search absolute left-3 top-3 text-gray-500 text-xs"></i>
           </div>
         </div>
+        <button id="btn-avanzada" type="button" class="btn btn-ghost shrink-0" aria-expanded="false" aria-controls="adv-panel"><i class="fa-solid fa-sliders"></i> Avanzada</button>
       </div>
     </div>
-    <!-- Herramientas sutiles: leyenda de stats y densidad (tarjetas por fila, como el zoom del explorador de archivos) -->
+    <div id="adv-panel" hidden></div>
+    <!-- Herramientas sutiles: leyenda de stats y zoom (tamaño de tarjeta; la cuadrícula acomoda cuántas caben, como el explorador de archivos) -->
     <div class="flex justify-end items-center gap-1 -mb-3 text-gray-500">
       <button id="btn-leyenda" type="button" class="dens-btn" aria-label="Ver leyenda de las stats" title="Leyenda de stats"><i class="fa-solid fa-circle-info"></i></button>
       <span class="w-px h-4 bg-galaxy-line mx-1"></span>
-      <button id="dens-menos" type="button" class="dens-btn" aria-label="Menos tarjetas por fila (más grandes)" title="Tarjetas más grandes"><i class="fa-solid fa-minus"></i></button>
+      <button id="dens-menos" type="button" class="dens-btn" aria-label="Alejar: tarjetas más pequeñas, caben más" title="Alejar"><i class="fa-solid fa-minus"></i></button>
       <i class="fa-solid fa-table-cells-large text-[11px] opacity-70" aria-hidden="true"></i>
-      <button id="dens-mas" type="button" class="dens-btn" aria-label="Más tarjetas por fila (más pequeñas)" title="Tarjetas más pequeñas"><i class="fa-solid fa-plus"></i></button>
+      <button id="dens-mas" type="button" class="dens-btn" aria-label="Acercar: tarjetas más grandes, caben menos" title="Acercar"><i class="fa-solid fa-plus"></i></button>
     </div>
     <div id="players-container" class="grid pt-2">
       <div class="col-span-full text-center py-10 text-gray-400 text-sm flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-galaxy-400 mb-3"></i> Descargando registros de la liga...</div>

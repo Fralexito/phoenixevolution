@@ -124,10 +124,14 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Se guarda en `jugadores.foto_aspecto` (migración `009`); las fotos antiguas quedan en Normal. «Reencuadrar» recuerda la elección.
 - **Celular**: 2 tarjetas por fila (Jugadores y Destacados), tipografía y márgenes compactos, frase oculta en móvil. PC sin cambios de tamaño.
 
-## Ronda 15 — Densidad, apodo, un solo «Comparar», ticker continuo, leyenda
-- **Densidad de tarjetas** (`core/density.js` + `pages/database.js`): control sutil −/+ sobre la lista (como el zoom del explorador de archivos). Celular 1–4 columnas (por defecto 2), PC 2–8 (por defecto 4); se recuerda por tipo de pantalla en el navegador. La tarjeta escala sola (container queries en `components.css`, todo en «em»); con tarjetas muy pequeñas se ocultan stats y club.
-- **Apodo** (`jugadores.apodo`, migración `010`, máx. 24): campo opcional en editar, aparece junto al nombre en la tarjeta y la búsqueda lo encuentra.
-- **Comparar**: un solo botón (cabecera y barra flotante). Abre 1 vs 1; dentro hay una mini opción «Masiva». Con 3+ marcados abre directo la masiva.
-- **Última hora**: flujo continuo; cada noticia entra cuando la anterior dejó un hueco mínimo (90 px PC, 56 px celular), así pueden verse varias a la vez.
-- **Leyenda de stats**: botón ⓘ sutil sobre la lista de Jugadores (`features/statLegend.js`).
-- **Duelos**: márgenes laterales un poco mayores.
+## Ronda 15 — Zoom, apodo, un solo «Comparar», ticker continuo, leyenda
+- **Zoom de tarjetas** (`core/density.js` + `pages/database.js`): el control −/+ elige el TAMAÑO de tarjeta (ancho mínimo); la cuadrícula `auto-fill` decide sola cuántas caben y las reparte parejas, así que se adapta a cualquier pantalla o giro. Celular 4 tamaños (hasta ~4 por fila), PC 8 (hasta ~10 por fila). − aleja (caben más), + acerca. También Ctrl + rueda sobre la lista en PC. Se recuerda por tipo de pantalla. La tarjeta escala sola con container queries (`components.css`).
+- **Apodo** (`jugadores.apodo`, migración `010`, máx. 24): campo opcional, aparece junto al nombre y la búsqueda lo encuentra.
+- **Comparar**: un solo botón; abre 1 vs 1 con la mini opción «Masiva»; en la masiva hay «1 vs 1» para volver. Con 3+ marcados abre directo la masiva.
+- **Última hora**: flujo continuo con hueco mínimo (90 px PC / 56 px celular); pueden coincidir varias.
+- **Leyenda de stats** (ⓘ sutil sobre la lista) · **Duelos** con más margen lateral.
+
+## Ronda 16 — Búsqueda avanzada, físico, pulso movible
+- **Búsqueda avanzada** (botón «Avanzada», `features/advancedSearch.js` + `core/ranking.js`): eliges una o varias stats (o la media) y la lista se reordena al instante por el **promedio de las elegidas** (puesto #1, #2…; empates comparten puesto). «Mínimo en cada stat» exige que todas lleguen a ese valor; «Top 3/5/10/Todos». Respeta el filtro de equipo y el buscador. Cada tarjeta muestra bajo ella los valores de las stats elegidas.
+- **Físico opcional** (migración `011`: `altura_cm` 120–230, `peso_kg` 35–160, `pie` Derecho/Izquierdo): campos en el formulario; se ven en la tarjeta cuando hay ancho suficiente.
+- **Pulso en vivo movible** (`core/dock.js`, `features/liveDock.js`): asa ⋮⋮ para arrastrarlo a cualquier parte; doble clic o Esc lo restablece; flechas del teclado lo mueven. Se pega al lado más cercano (así se adapta al girar/redimensionar), los mensajes e historial crecen hacia el lado con más espacio, y se recuerda en el navegador.
