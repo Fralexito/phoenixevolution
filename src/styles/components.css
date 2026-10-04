@@ -203,15 +203,13 @@
 /* Zoom al pasar el mouse / tocar: escalonado por puesto (1.º el mayor, 3.º el menor). Variables --z1/--z2/--z3 para ajustarlo en un solo sitio. */
 .podio { --z1: 1.35; --z2: 1.28; --z3: 1.22; }
 .podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { z-index: 20; transition-duration: 2.2s; }  /* al entrar: sube despacio, con una cola larga que se asienta */
-.podio-slot:hover > article, .podio-slot:focus-visible > article, .podio-slot.podio-up > article { transition-duration: 2.2s; }
 .podio-slot[data-puesto='1']:hover, .podio-slot[data-puesto='1']:focus-visible, .podio-slot[data-puesto='1'].podio-up { --s: var(--z1); }
 .podio-slot[data-puesto='2']:hover, .podio-slot[data-puesto='2']:focus-visible, .podio-slot[data-puesto='2'].podio-up { --s: var(--z2); }
 .podio-slot[data-puesto='3']:hover, .podio-slot[data-puesto='3']:focus-visible, .podio-slot[data-puesto='3'].podio-up { --s: var(--z3); }
-/* Luz propia por puesto: 1.º dorado, 2.º cian, 3.º magenta. Se ve tenue en reposo y se enciende con el zoom. */
+/* Color propio por puesto en el borde (1.º dorado, 2.º cian, 3.º magenta). Fijo: el único efecto al pasar el mouse es el zoom. */
 .podio-slot[data-puesto='1'] { --glow: 255 200 40; } .podio-slot[data-puesto='2'] { --glow: 0 229 255; } .podio-slot[data-puesto='3'] { --glow: 255 61 200; }
-.podio-slot > article { border-color: rgb(var(--glow) / .45); box-shadow: 0 0 20px rgb(var(--glow) / .2); }
+.podio-slot > article { border-color: rgb(var(--glow) / .55); box-shadow: none; transition: none; }   /* borde de color fijo: sin destello ni cambio al hacer zoom */
 .podio-slot > article > div[class*='h-[2px]'] { background: linear-gradient(90deg, transparent, rgb(var(--glow)), transparent); }
-.podio-slot:hover > article, .podio-slot:focus-visible > article, .podio-slot.podio-up > article { border-color: rgb(var(--glow) / .9); box-shadow: 0 0 40px rgb(var(--glow) / .5); }
 /* Celular: los tres ocupan todo el ancho, uno al lado del otro. Zoom contenido para que ninguno tape al vecino (hueco de .5 rem). */
 @media (max-width: 639px) {
   .podio { --z1: 1.1; --z2: 1.08; --z3: 1.06; gap: .5rem; padding: 1.6rem .75rem 1rem; overflow: visible; justify-content: center; }
