@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
+import { clampStat, calcOvr } from '../src/js/core/stats.js';
+import { STAT_INFO } from '../src/data/stats.js';
+import { STAT_KEYS } from '../src/js/features/playerCard.js';
 import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
 import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
 
@@ -125,4 +128,13 @@ test('cooldown del @usuario: libre sin completar perfil, bloqueado 14 días tras
 test('velocidad: valores antiguos caen en el grupo correcto', () => {
   assert.deepEqual([null, 0, 5, 50, 99, 100, 250, 300, 499, 500, 501, 900].map(speedBucket), [null, null, 25, 25, 25, 100, 100, 300, 300, 500, 1000, 1000]);
   assert.ok(SPEED_BUCKETS.every((b) => b.v >= 1 && b.v <= 10000), 'dentro de perfiles_ancho_ok');
+});
+
+test('media del jugador: promedio redondeado y limitado a 1-99', () => {
+  assert.equal(calcOvr([75, 75, 76]), 75); assert.equal(calcOvr([80, 90]), 85); assert.equal(calcOvr([]), 75);
+  assert.equal(calcOvr([200, 200]), 99); assert.equal(calcOvr([-5, 0]), 1);
+  assert.equal(clampStat('abc', 60), 60); assert.equal(clampStat(120), 99); assert.equal(clampStat(0), 1);
+});
+test('leyenda: todas las estadísticas (y OVR) tienen nombre y explicación breve', () => {
+  for (const k of [...STAT_KEYS, 'ovr']) { assert.ok(STAT_INFO[k]?.nombre, k); assert.ok(STAT_INFO[k].texto.length > 20 && STAT_INFO[k].texto.length < 200, `${k}: texto breve`); }
 });

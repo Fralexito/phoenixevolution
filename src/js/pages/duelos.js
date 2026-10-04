@@ -12,11 +12,12 @@ import { card } from '../features/duelos/cards.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
-import { bindSeg } from '../features/formControls.js';
 
 const $ = (id) => document.getElementById(id);
 
-/* ---------- Vistas: en PC todo está a la vista; en móvil se alterna Lanzar reto / Partidos (Mis partidos + Retos en el radar) ---------- */
+/* ---------- Vistas ----------
+   PC: todo a la vista. Móvil: «Lanzar reto» y «Mis partidos» se abren/cierran con su botón (solo una a la vez);
+   «Retos en el radar» está siempre visible debajo. data-vista = 'ninguna' | 'lanzar' | 'partidos'. */
 function setVista(v) {
   $('duelos-grid').dataset.vista = v;
   $('seg-vista').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
@@ -39,7 +40,7 @@ function renderAll() {
     : '<div class="col-span-full text-center py-10 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">No hay retos públicos activos en este momento.</div>';
   $('cnt-mis').textContent = mine.length ? `(${mine.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
-  $('cnt-movil').textContent = visible.length ? `(${mine.length + rest.length})` : '';
+  $('cnt-movil').textContent = mine.length ? `(${mine.length})` : '';
 }
 
 async function fetchAll() {
@@ -139,7 +140,8 @@ function syncAuthUI({ session }) {
 initForm(); initRadar(); refreshForm(); loadPerfiles().then(refreshForm);
 $('form-crear-reto').addEventListener('submit', submitReto);
 $('btn-refrescar').addEventListener('click', fetchAll);
-bindSeg($('seg-vista'), (v) => setVista(v));
+// Tocar el botón abierto lo cierra (en móvil).
+$('seg-vista').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setVista($('duelos-grid').dataset.vista === b.dataset.v ? 'ninguna' : b.dataset.v); });
 window.addEventListener('duelos:creado', irAMisPartidos);
 if (location.hash === '#mis-partidos') irAMisPartidos();
 window.addEventListener('hashchange', () => { if (location.hash === '#mis-partidos') irAMisPartidos(); });

@@ -28,14 +28,14 @@ import Layout from '../layouts/Layout.astro';
       <div id="radar-list" class="flex flex-wrap gap-2"></div>
     </section>
 
-    <!-- Solo en móvil: alterna entre "Lanzar reto" y "Partidos" (en PC se ven las dos a la vez). -->
-    <div class="seg lg:!hidden" id="seg-vista" role="group" aria-label="Sección">
-      <button type="button" data-v="lanzar" aria-pressed="true"><i class="fa-solid fa-satellite-dish mr-1"></i>Lanzar reto</button>
-      <button type="button" data-v="partidos" aria-pressed="false"><i class="fa-solid fa-list mr-1"></i>Partidos <b id="cnt-movil" class="text-galaxy-400"></b></button>
+    <!-- Solo en móvil: dos botones que abren/cierran «Lanzar reto» y «Mis partidos». «Retos en el radar» queda siempre visible abajo. En PC no existen. -->
+    <div class="seg lg:!hidden" id="seg-vista" role="group" aria-label="Secciones">
+      <button type="button" data-v="lanzar" aria-pressed="false" aria-controls="col-lanzar"><i class="fa-solid fa-satellite-dish mr-1"></i>Lanzar reto</button>
+      <button type="button" data-v="partidos" aria-pressed="false" aria-controls="col-mis"><i class="fa-solid fa-gamepad mr-1"></i>Mis partidos <b id="cnt-movil" class="text-galaxy-400"></b></button>
     </div>
 
     <!-- 3. Dos columnas en PC: formulario a la izquierda · partidos y retos a la derecha -->
-    <div id="duelos-grid" data-vista="lanzar" class="grid lg:grid-cols-[22rem_minmax(0,1fr)] xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[26rem_minmax(0,1fr)] gap-4 sm:gap-5 items-start">
+    <div id="duelos-grid" data-vista="ninguna" class="grid lg:grid-cols-[22rem_minmax(0,1fr)] xl:grid-cols-[24rem_minmax(0,1fr)] 2xl:grid-cols-[26rem_minmax(0,1fr)] gap-4 sm:gap-5 items-start">
 
       <section id="col-lanzar" class="glass-panel p-4 rounded-2xl space-y-3">
         <h2 class="text-base font-display font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-satellite-dish text-galaxy-400"></i> Lanzar Reto</h2>

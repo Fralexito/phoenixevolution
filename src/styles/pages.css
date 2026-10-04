@@ -15,10 +15,12 @@
 .seg > button:disabled { opacity: .35; cursor: not-allowed; }
 /* En pantallas táctiles los botones vuelven a 44px (tamaño mínimo cómodo para el dedo). */
 @media (pointer: coarse) { .chip { min-height: 44px; } .seg > button { min-height: 44px; } }
-/* Móvil: "Lanzar reto" y "Partidos" se alternan; desde 1024px se ven las dos columnas a la vez. */
+/* Móvil (<1024px): una sola columna en este orden: Lanzar reto → Mis partidos → Retos en el radar.
+   Los dos primeros solo se ven si el usuario los abre con su botón (data-vista); el radar siempre. Desde 1024px todo a la vez. */
 @media (max-width: 1023.98px) {
-  #duelos-grid[data-vista='lanzar'] #col-partidos { display: none; }
-  #duelos-grid[data-vista='partidos'] #col-lanzar { display: none; }
+  #col-partidos { display: contents; }
+  #duelos-grid:not([data-vista='lanzar']) #col-lanzar { display: none; }
+  #duelos-grid:not([data-vista='partidos']) #col-mis { display: none; }
 }
 /* Selector de estado unificado (Inactivo · Activo · Radar): cada nivel tiene su color. */
 .seg-estado > button[data-v='off'][aria-pressed='true'] { background: #374151; box-shadow: none; }

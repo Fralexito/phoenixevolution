@@ -1,53 +1,149 @@
 // Modal para crear/editar una ficha de jugador (solo admin; la BD lo refuerza con RLS).
+// Cada estadística es una «ficha» con − / + (mantén pulsado para repetir), deslizador y número en color.
+// La media (OVR) se calcula sola mientras no la toques; si la mueves queda manual hasta «Volver a automático».
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML } from '../core/dom.js';
+import { escapeHTML, safeImg, statColor } from '../core/dom.js';
 import { cropSquareJpeg } from '../core/image.js';
+import { clampStat, calcOvr } from '../core/stats.js';
 import { toast } from '../core/toast.js';
+import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from './playerCard.js';
 
 const POSICIONES = ['PO', 'DFC', 'LD', 'LI', 'MCD', 'MC', 'MCO', 'EI', 'ED', 'SD', 'DC'];
-const clamp = (v, d = 75) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(99, Math.max(1, n)) : d; };
+const LEYENDA_VACIA = 'Toca o desliza una estadística y aquí te explicamos qué significa.';
+
+const tileHTML = (k, v, { grande = false, extra = '' } = {}) => {
+  const nom = escapeHTML(STAT_INFO[k].nombre);
+  const titulo = `<div class="min-w-0 ${grande ? '' : 'w-[5.2rem] shrink-0'}"><b class="font-display text-xs uppercase tracking-wider text-white">${k === 'ovr' ? 'OVR' : k}</b><span class="block text-[10px] text-gray-500 leading-tight truncate">${nom}</span></div>`;
+  const menos = `<button type="button" class="step" data-d="-1" aria-label="Bajar ${nom}">−</button>`;
+  const mas = `<button type="button" class="step" data-d="1" aria-label="Subir ${nom}">+</button>`;
+  const num = (cls) => `<output class="stat-val font-display font-extrabold ${cls} text-center" aria-live="off">${v}</output>`;
+  const rango = `<input type="range" class="stat-range" min="1" max="99" step="1" value="${v}" aria-label="${nom}">`;
+  // Grande (OVR): número arriba y deslizador debajo. Normal: una sola fila compacta  NOMBRE − ─────── + 75.
+  return grande
+    ? `<div class="stat-tile stat-tile-lg" data-k="${k}"><div class="flex items-center justify-between gap-2">${titulo}<div class="flex items-center gap-1 shrink-0">${menos}${num('text-3xl w-12')}${mas}</div></div>${rango}${extra}</div>`
+    : `<div class="stat-tile stat-row" data-k="${k}">${titulo}${menos}${rango}${mas}${num('text-lg w-8')}</div>`;
+};
 
 export function openPlayerForm(player = null, onSaved = () => {}) {
   const p = player ?? {};
   let photo = null;
+  const vals = Object.fromEntries(STAT_KEYS.map((k) => [k, clampStat(p[k])]));
+  const media = () => calcOvr(STAT_KEYS.map((k) => vals[k]));
+  // Si la ficha ya tenía una media distinta del promedio, se respeta como manual.
+  let manual = p.ovr != null && clampStat(p.ovr) !== media();
+  vals.ovr = manual ? clampStat(p.ovr) : media();
+  const foto0 = safeImg(p.foto_url) || safeImg(p.foto);
+
   const m = openModal(`
-    <form id="pf" class="p-6 space-y-4" novalidate>
+    <form id="pf" class="p-5 sm:p-6 space-y-4" novalidate>
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest">${player ? 'Editar' : 'Añadir'} jugador</h2>
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="col-span-2"><label class="label" for="f-nombre">Nombre</label><input id="f-nombre" class="field" maxlength="40" value="${escapeHTML(p.nombre)}"></div>
-        <div><label class="label" for="f-club">Club</label><input id="f-club" class="field" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
-        <div><label class="label" for="f-pos">Posición</label><select id="f-pos" class="field">${POSICIONES.map((x) => `<option ${x === (p.posicion ?? 'DC') ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
-        <div class="col-span-2"><label class="label" for="f-ovr">OVR (vacío = promedio de las 14 estadísticas)</label><input id="f-ovr" type="number" min="1" max="99" class="field" value="${escapeHTML(p.ovr ?? '')}"></div>
+
+      <div class="flex items-start gap-4">
+        <div class="flex-1 min-w-0 space-y-3">
+          <div><label class="label" for="f-nombre">Nombre</label><input id="f-nombre" class="field" maxlength="40" value="${escapeHTML(p.nombre)}"></div>
+          <div><label class="label" for="f-club">Club</label><input id="f-club" class="field" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
+        </div>
+        <label class="photo-pick" title="Foto (opcional)">
+          <span id="f-prev" class="block w-full h-full">${foto0 ? `<img src="${escapeHTML(foto0)}" alt="" class="w-full h-full object-cover">` : '<i class="fa-solid fa-user-astronaut text-3xl text-galaxy-400/70"></i>'}</span>
+          <span class="photo-pick-badge"><i class="fa-solid fa-camera"></i></span>
+          <input id="f-foto" type="file" accept="image/*" hidden>
+        </label>
       </div>
-      <div class="grid grid-cols-4 gap-2">
-        ${STAT_KEYS.map((k) => `<div><label class="label" for="s-${k}">${k.toUpperCase()}</label><input id="s-${k}" data-stat="${k}" type="number" min="1" max="99" class="field !px-2" value="${escapeHTML(p[k] ?? 75)}"></div>`).join('')}
+
+      <div>
+        <span class="label">Posición</span>
+        <div id="f-pos" class="grid grid-cols-6 gap-1.5" role="group" aria-label="Posición">
+          ${POSICIONES.map((x) => `<button type="button" class="chip !px-0" data-pos="${x}" aria-pressed="${x === (p.posicion ?? 'DC')}">${x}</button>`).join('')}
+        </div>
       </div>
+
+      ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button></div>` })}
+
+      <div id="leyenda" class="sticky top-0 z-10 rounded-lg border border-galaxy-border bg-galaxy-panel/95 backdrop-blur px-3 py-2 text-[13px] leading-snug text-gray-300 h-[6rem] sm:h-[4.75rem] overflow-y-auto" aria-live="polite">${LEYENDA_VACIA}</div>
+
+      <div class="grid grid-cols-1 gap-1.5">
+        ${STAT_KEYS.map((k) => tileHTML(k, vals[k])).join('')}
+      </div>
+
       <div><label class="label" for="f-quote">Frase</label><input id="f-quote" class="field" maxlength="140" value="${escapeHTML(p.quote)}"></div>
-      <label class="btn btn-ghost cursor-pointer w-full"><i class="fa-solid fa-camera"></i> Foto (opcional)<input id="f-foto" type="file" accept="image/*" hidden></label>
       <p id="f-err" class="text-xs text-bad min-h-4" role="alert"></p>
       <button class="btn btn-primary w-full" type="submit">Guardar ficha</button>
     </form>`, { id: 'player-modal' });
 
   const $ = (s) => m.querySelector(s);
   const err = $('#f-err');
-  $('#f-foto').addEventListener('change', async (e) => {
-    try { photo = await cropSquareJpeg(e.target.files[0], 256, 0.82); } catch (ex) { err.textContent = ex.message; photo = null; }
+  const tile = (k) => m.querySelector(`.stat-tile[data-k="${k}"]`);
+
+  /* ---- Pintado de una ficha: número, color y relleno del deslizador ---- */
+  const paint = (k) => {
+    const t = tile(k); const v = vals[k]; const c = statColor(v);
+    const out = t.querySelector('.stat-val'); out.textContent = v; out.style.color = c;
+    const r = t.querySelector('.stat-range'); r.value = v; r.style.setProperty('--p', `${((v - 1) / 98) * 100}%`); r.style.setProperty('--c', c);
+  };
+  const paintModo = () => {
+    const el = $('#ovr-modo'); el.textContent = manual ? 'Manual' : 'Automático · promedio de las 14';
+    el.className = `text-[11px] font-display font-bold uppercase tracking-wider ${manual ? 'text-warn' : 'text-ok'}`;
+    $('#ovr-auto').hidden = !manual;
+  };
+  const set = (k, v) => {
+    vals[k] = clampStat(v, vals[k]);
+    if (k === 'ovr') manual = true;
+    else if (!manual) { vals.ovr = media(); paint('ovr'); }
+    paint(k); paintModo();
+  };
+  const leyenda = (k) => { $('#leyenda').innerHTML = `<b class="text-galaxy-400 font-display uppercase tracking-wider">${k === 'ovr' ? 'OVR' : k} · ${escapeHTML(STAT_INFO[k].nombre)}</b> — ${escapeHTML(STAT_INFO[k].texto)}`; };
+  const activa = (k) => { m.querySelectorAll('.stat-tile').forEach((t) => t.classList.toggle('stat-tile-on', t.dataset.k === k)); leyenda(k); };
+  [...STAT_KEYS, 'ovr'].forEach(paint); paintModo();
+
+  /* ---- Interacción: − / + (con repetición al mantener), deslizador, leyenda ---- */
+  let rep = null; const parar = () => { clearTimeout(rep); clearInterval(rep); rep = null; };
+  m.addEventListener('pointerdown', (e) => {
+    const b = e.target.closest('.step'); if (!b) return;
+    const k = b.closest('.stat-tile').dataset.k; const d = Number(b.dataset.d);
+    activa(k); set(k, vals[k] + d);
+    parar(); rep = setTimeout(() => { rep = setInterval(() => set(k, vals[k] + d), 70); }, 380);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => m.addEventListener(ev, parar));
+  m.addEventListener('click', (e) => { const b = e.target.closest('.step'); if (b && e.detail === 0) set(b.closest('.stat-tile').dataset.k, vals[b.closest('.stat-tile').dataset.k] + Number(b.dataset.d)); }); // teclado
+  m.addEventListener('input', (e) => { const r = e.target.closest('.stat-range'); if (r) { const k = r.closest('.stat-tile').dataset.k; activa(k); set(k, r.value); } });
+  m.querySelectorAll('.stat-tile').forEach((t) => {
+    t.addEventListener('pointerenter', () => { if (!t.matches(':focus-within')) leyenda(t.dataset.k); });
+    t.addEventListener('pointerdown', () => activa(t.dataset.k));
+    t.addEventListener('focusin', () => activa(t.dataset.k));
+  });
+  $('#ovr-auto').addEventListener('click', () => { manual = false; vals.ovr = media(); paint('ovr'); paintModo(); });
+
+  /* ---- Posición ---- */
+  $('#f-pos').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pos]'); if (!b) return;
+    m.querySelectorAll('[data-pos]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   });
 
+  /* ---- Foto ---- */
+  $('#f-foto').addEventListener('change', async (e) => {
+    try {
+      photo = await cropSquareJpeg(e.target.files[0], 256, 0.82);
+      $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(photo)}" alt="" class="w-full h-full object-cover">`;
+    } catch (ex) { err.textContent = ex.message; photo = null; }
+  });
+
+  /* ---- Guardar ---- */
   $('#pf').addEventListener('submit', async (ev) => {
     ev.preventDefault(); err.textContent = '';
     const btn = ev.target.querySelector('button[type=submit]');
     const nombre = $('#f-nombre').value.trim().replace(/[<>]/g, '');
     if (!nombre) { err.textContent = 'Escribe el nombre.'; return; }
-    const row = { nombre, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre', posicion: $('#f-pos').value, quote: $('#f-quote').value.trim() };
-    STAT_KEYS.forEach((k) => { row[k] = clamp($(`[data-stat="${k}"]`).value); });
-    row.ovr = $('#f-ovr').value === '' ? clamp(STAT_KEYS.reduce((s, k) => s + row[k], 0) / STAT_KEYS.length) : clamp($('#f-ovr').value);
-
+    const row = {
+      nombre, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
+      posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(),
+      ovr: vals.ovr,
+    };
+    STAT_KEYS.forEach((k) => { row[k] = vals[k]; });
     btn.disabled = true;
     try {
       const id = player?.id ?? crypto.randomUUID();

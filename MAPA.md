@@ -88,3 +88,7 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ## Ronda 7 — Host nuevo + vista previa en internet
 - **Sistema Host**: juego `PES 2021 | SP Football Life` (migración 007). Parche solo con PES 2021; con SP aparece «Versión (opcional)» 25/26/27/Otra (`host_sp_version`); velocidad en 5 grupos −50/100/300/500/+500 (`SPEED_BUCKETS`, valores antiguos se agrupan con `speedBucket`); nota libre `host_notas` (≤300).
 - **Vista previa**: `.github/workflows/deploy.yml` publica `main` en `/phoenixevolution/` y `borrador` en `/phoenixevolution/borrador/` (con `noindex`). Requiere una vez: Settings → Environments → github-pages → Deployment branches → añadir `borrador`. Y en Supabase → Redirect URLs: `https://fralexito.github.io/phoenixevolution/borrador/**`.
+
+## Ronda 8 — Ficha de jugador interactiva + Duelos móvil
+- **Formulario de jugador** (`features/playerForm.js`): foto a la derecha del nombre, posición en botones, cada estadística con − / + (mantener pulsado repite), deslizador y número en color. **OVR** automático (promedio, `core/stats.js`); si lo mueves queda «Manual» hasta «Volver a automático». **Leyenda dinámica** fija arriba con la explicación breve de cada stat (`src/data/stats.js`, único lugar para editar los textos).
+- **Duelos en móvil**: botones «Lanzar reto» y «Mis partidos» abren/cierran su sección (una a la vez, ninguna al entrar); «Retos en el radar» siempre visible debajo. PC sin cambios.
