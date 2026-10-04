@@ -223,3 +223,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Barra de leyenda y zoom (ronda 37):** botón «Leyenda de stats» con texto e icono ? (píldora cian) y grupo de zoom (− · Predeterminado · +) separado de las tarjetas y de la barra de vistas.
 - **Parche renombrado (ronda 38):** «Conmebol Patch» → «Conmegol Patch» (`core/rules.js` PARCHES_PES y simulación En vivo). Retos ya guardados en Supabase con el nombre antiguo conservan su texto.
 - **Barra discreta (ronda 39):** leyenda de stats y zoom pasan a la misma fila de Vista/Orden, a la derecha y más pequeños (sin fila propia).
+- **Mercado (ronda 40):** el título de la página pasa de «Mercado de Pases» a «Mercado de Fichajes».
