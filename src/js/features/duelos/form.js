@@ -78,6 +78,7 @@ export function refreshForm() {
   $('tam-a-menos').disabled = ui.a <= 1; $('tam-a-mas').disabled = ui.a >= maxFor(ui.b);
   $('tam-b-menos').disabled = ui.b <= 1; $('tam-b-mas').disabled = ui.b >= maxFor(ui.a);
   pressed(all('#tam-presets [data-t]'), (b) => b.dataset.t === `${ui.a}-${ui.b}`);
+  $('tam-reset').hidden = ui.a === 1 && ui.b === 1;
   $('tam-personal').setAttribute('aria-pressed', String(!all('#tam-presets [data-t]').some((b) => b.dataset.t === `${ui.a}-${ui.b}`) && !(ui.a === 1 && ui.b === 1)));
   $('hint-equipos').textContent = ui.destino === 'directo'
     ? `Tu rival lidera el equipo B (${ui.b} cupo${ui.b > 1 ? 's' : ''}).`
@@ -110,6 +111,7 @@ export function initForm() {
   $('presets').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) { ui.preset = b.dataset.p; refreshForm(); } });
 
   const size = (side, d) => { const t = setTeamSize(ui, side, ui[side] + d); ui.a = t.a; ui.b = t.b; refreshForm(); };
+  $('tam-reset').addEventListener('click', () => { ui.a = 1; ui.b = 1; refreshForm(); });
   $('tam-personal').addEventListener('click', () => { if (ui.a === ui.b || ui.a + ui.b < 2) { ui.a = 1; ui.b = 2; } refreshForm(); $('tam-b-mas').focus({ preventScroll: true }); });
   $('tam-a-menos').addEventListener('click', () => size('a', -1)); $('tam-a-mas').addEventListener('click', () => size('a', 1));
   $('tam-b-menos').addEventListener('click', () => size('b', -1)); $('tam-b-mas').addEventListener('click', () => size('b', 1));
