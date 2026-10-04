@@ -6,8 +6,10 @@ import { initTicker } from './features/ticker.js';
 import { initLiveFeed } from './features/liveFeed.js';
 import { initLiveDock } from './features/liveDock.js';
 import { initWelcome } from './features/welcome.js';
+import { initAjustes } from './features/ajustes.js';
 import { initAvatarFallback } from './core/avatar.js';
 
+initAjustes();
 initSidebar();
 initNavbar();
 initTicker();

@@ -635,3 +635,17 @@ test('ticker: el hueco entre noticias es irregular pero acotado', () => {
   assert.equal(huecoIrregular(90, 0), 45); assert.equal(huecoIrregular(90, 0.5), 135); assert.ok(huecoIrregular(90, 0.999) <= 225); assert.equal(huecoIrregular(90, 5), huecoIrregular(90, 0.999)); assert.equal(huecoIrregular(90, -1), 45);
   assert.notEqual(huecoIrregular(90, 0.1), huecoIrregular(90, 0.8));
 });
+
+// ---- ajustes
+import { normalizarAjustes, cargarAjustes, guardarAjustes, AJUSTES_DEFECTO } from '../src/js/core/ajustes.js';
+test('ajustes: valores raros vuelven al defecto', () => {
+  assert.deepEqual(normalizarAjustes(null), AJUSTES_DEFECTO);
+  assert.deepEqual(normalizarAjustes({ movimiento: 'loco', vivo: 'x', otro: 1 }), AJUSTES_DEFECTO);
+  assert.equal(normalizarAjustes({ movimiento: 'reducido' }).movimiento, 'reducido');
+});
+test('ajustes: guardar/cargar y almacén roto', () => {
+  const m = new Map(); const alm = { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v) };
+  assert.equal(guardarAjustes(alm, { vivo: false }), true); assert.equal(cargarAjustes(alm).vivo, false);
+  m.set('pes-ajustes-v1', '{corrupto'); assert.deepEqual(cargarAjustes(alm), AJUSTES_DEFECTO);
+  assert.equal(guardarAjustes({ setItem() { throw new Error('lleno'); } }, {}), false);
+});

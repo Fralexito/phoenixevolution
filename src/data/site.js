@@ -17,7 +17,9 @@ export const NAV_EXTRA = [{ id: 'organizadores', label: 'Quiénes somos', path: 
 export const ACCOUNT_NAV = [
   { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user' },
   { id: 'partidos', label: 'Mis partidos', path: 'duelos/#mis-partidos',  icon: 'fa-gamepad' },
-  { id: 'salir',    label: 'Salir',        action: 'logout',               icon: 'fa-right-from-bracket' },
+  // `abajo: true` = va en el bloque inferior del menú, pegado al fondo del panel.
+  { id: 'ajustes',  label: 'Configuración', path: 'ajustes/',            icon: 'fa-gear',  abajo: true },
+  { id: 'salir',    label: 'Salir',        action: 'logout',               icon: 'fa-right-from-bracket', abajo: true },
 ];
 
 // Font Awesome gratis no trae el logo de Kick, así que usamos su trazo oficial de Simple Icons (licencia CC0).

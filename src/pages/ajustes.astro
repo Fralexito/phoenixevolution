@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL;
+const proximas = ['Apariencia y temas', 'Jugadores y cartas', 'Liga y temporada', 'Notificaciones', 'Privacidad', 'Cuenta', 'Idioma y región', 'Accesibilidad', 'Datos'];
+---
+<Layout title="Configuración" active="ajustes">
+  <div class="max-w-3xl mx-auto px-4 py-12 space-y-8">
+    <header class="space-y-2">
+      <h1 class="text-3xl md:text-4xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow"><i class="fa-solid fa-gear text-galaxy-400 mr-2"></i>Configuración</h1>
+      <p class="text-gray-400 text-sm">Se guardan en este navegador y se aplican al instante. Primera versión: más secciones llegarán pronto.</p>
+    </header>
+
+    <section class="rounded-xl border border-galaxy-border bg-galaxy-card/60 divide-y divide-galaxy-border/70">
+      <div class="p-4 flex items-center justify-between gap-4">
+        <div><div class="text-white font-semibold">Movimiento reducido</div><div class="text-xs text-gray-400">Apaga animaciones y transiciones (más fluido en equipos lentos).</div></div>
+        <label class="inline-flex items-center gap-2 cursor-pointer"><input id="aj-movimiento" type="checkbox" class="w-5 h-5 accent-cyan-400" /><span class="sr-only">Movimiento reducido</span></label>
+      </div>
+      <div class="p-4 flex items-center justify-between gap-4">
+        <div><div class="text-white font-semibold">Mostrar panel «En vivo»</div><div class="text-xs text-gray-400">Los avisos flotantes de abajo en pantalla.</div></div>
+        <label class="inline-flex items-center gap-2 cursor-pointer"><input id="aj-vivo" type="checkbox" class="w-5 h-5 accent-cyan-400" /><span class="sr-only">Mostrar panel En vivo</span></label>
+      </div>
+    </section>
+    <p id="aj-estado" class="text-xs text-gray-500" role="status" aria-live="polite"></p>
+
+    <section class="space-y-2">
+      <h2 class="text-xs text-gray-500 tracking-[0.25em] uppercase">Próximamente</h2>
+      <ul class="flex flex-wrap gap-2">{proximas.map((t) => <li class="text-xs text-gray-400 border border-galaxy-border rounded-full px-3 py-1">{t}</li>)}</ul>
+    </section>
+    <a href={base} class="btn btn-primary inline-flex"><i class="fa-solid fa-house"></i> Volver a Central</a>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/ajustes.js';
+</script>

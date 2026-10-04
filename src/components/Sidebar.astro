@@ -32,13 +32,21 @@ const { active } = Astro.props;
       <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class={`flex items-center gap-4 p-3 rounded-lg transition-all ${active === n.id ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5 border border-dashed border-galaxy-border/70'}`}><i class={`fa-solid ${n.icon} w-5 text-center text-galaxy-400`}></i> {n.label}</a>
     ))}
     </div>
-    <div id="sidebar-account" hidden class="flex flex-col gap-1.5 mt-3 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
+    <div id="sidebar-account" hidden class="flex flex-col flex-1 gap-1.5 mt-3 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
       <div class="px-3 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
-      {ACCOUNT_NAV.map((n) => (
+      {ACCOUNT_NAV.filter((n) => !n.abajo).map((n) => (
         n.path
           ? <a href={`${base}${n.path}`} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</a>
           : <button type="button" data-action={n.action} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-left uppercase"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</button>
       ))}
+      <!-- Bloque inferior: Configuración y Salir, pegados al fondo del panel -->
+      <div class="mt-auto sticky bottom-0 pt-2 border-t border-galaxy-border/70 flex flex-col gap-1.5 bg-galaxy-panel">
+        {ACCOUNT_NAV.filter((n) => n.abajo).map((n) => (
+          n.path
+            ? <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5"><i class={`fa-solid ${n.icon} w-5 text-center text-galaxy-400`}></i> {n.label}</a>
+            : <button type="button" data-action={n.action} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-bad hover:bg-white/5 text-left uppercase"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</button>
+        ))}
+      </div>
     </div>
   </nav>
   <div class="p-5 border-t border-galaxy-border bg-black/50 text-center lg:hidden">

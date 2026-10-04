@@ -78,3 +78,14 @@
 #ticker-view:hover .ticker-ctl, .ticker-ctl:focus-within { opacity: 1; pointer-events: auto; }
 .ticker-ctl button { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; border-radius: .4rem; font-size: .65rem; color: #e5e7eb; background: rgb(3 1 15 / .85); border: 1px solid rgb(0 229 255 / .4); }
 .ticker-ctl button:hover { color: #fff; background: rgb(0 229 255 / .25); }
+
+/* AJUSTES (features/ajustes.js escribe estos atributos en <html>) */
+html[data-vivo='no'] #live-wrap { display: none !important; }
+html[data-movimiento='reducido'] *, html[data-movimiento='reducido'] *::before, html[data-movimiento='reducido'] *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+
+/* Menú lateral: en pantallas bajas se compacta el alto de cada ítem para que quepan Mi cuenta, Configuración y Salir sin tapar nada */
+@media (max-height: 900px) {
+  #sidebar-menu nav { gap: 0.25rem; }
+  #sidebar-menu nav a, #sidebar-menu nav button { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  #sidebar-menu #sidebar-account { margin-top: 0.25rem; padding-top: 0.5rem; gap: 0.25rem; }
+}
