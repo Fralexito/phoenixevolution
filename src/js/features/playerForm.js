@@ -4,7 +4,7 @@
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
-import { cropSquareJpeg } from '../core/image.js';
+import { openPhotoCropper } from './photoCropper.js';
 import { clampStat, calcOvr } from '../core/stats.js';
 import { toast } from '../core/toast.js';
 import { STAT_INFO } from '../../data/stats.js';
@@ -50,11 +50,14 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
           <div><label class="label" for="f-nombre">Nombre</label><input id="f-nombre" class="field" maxlength="40" value="${escapeHTML(p.nombre)}"></div>
           <div><label class="label" for="f-club">Club</label><input id="f-club" class="field" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
         </div>
+        <div class="flex flex-col items-center gap-1.5 shrink-0">
         <label class="photo-pick" title="Foto (opcional)">
           <span id="f-prev" class="block w-full h-full">${foto0 ? `<img src="${escapeHTML(foto0)}" alt="" class="w-full h-full object-cover">` : '<i class="fa-solid fa-user-astronaut text-3xl text-galaxy-400/70"></i>'}</span>
           <span class="photo-pick-badge"><i class="fa-solid fa-camera"></i></span>
           <input id="f-foto" type="file" accept="image/*" hidden>
         </label>
+        <button type="button" id="f-reenc" ${foto0 ? '' : 'hidden'} class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase"><i class="fa-solid fa-crop-simple mr-1"></i>Reencuadrar</button>
+        </div>
       </div>
 
       <div>
@@ -160,12 +163,24 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   $('#f-pos').addEventListener('focusin', (e) => { const b = e.target.closest('[data-pos]'); if (b) capPos(b.dataset.pos); });
   capPos(elegida());
 
-  /* ---- Foto ---- */
-  $('#f-foto').addEventListener('change', async (e) => {
+  /* ---- Foto: se elige un archivo → recortador (mover, zoom, vista previa de la tarjeta) → recién ahí queda lista para guardar ---- */
+  let fotoOriginal = null;   // archivo original, para poder «Reencuadrar» sin volver a elegirlo
+  const ponerVista = (blob) => { $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="" class="w-full h-full object-cover">`; $('#f-reenc').hidden = false; };
+  const jugadorActual = () => ({ nombre: $('#f-nombre').value.trim(), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
+  async function recortar(file) {
     try {
-      photo = await cropSquareJpeg(e.target.files[0], 512, 0.85);
-      $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(photo)}" alt="" class="w-full h-full object-cover">`;
-    } catch (ex) { err.textContent = ex.message; photo = null; }
+      const blob = await openPhotoCropper(file, { getPlayer: jugadorActual });
+      if (!blob) return;                                    // canceló: no se cambia nada
+      photo = blob; fotoOriginal = file; ponerVista(blob);
+    } catch (ex) { console.error('[ficha] foto:', ex); err.textContent = ex.message || 'No se pudo abrir la imagen.'; }
+  }
+  $('#f-foto').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) recortar(f); });
+  $('#f-reenc').addEventListener('click', async () => {
+    try {
+      if (fotoOriginal) return recortar(fotoOriginal);
+      const r = await fetch(foto0); if (!r.ok) throw new Error('No se pudo cargar la foto actual.');   // foto ya guardada: se descarga para reencuadrarla
+      recortar(new File([await r.blob()], 'foto.jpg', { type: 'image/jpeg' }));
+    } catch (ex) { console.error('[ficha] reencuadrar:', ex); err.textContent = 'No se pudo cargar la foto para reencuadrarla. Sube una de nuevo.'; }
   });
 
   /* ---- Guardar ---- */

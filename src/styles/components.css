@@ -136,3 +136,12 @@
 .picker-meta { flex: none; font-size: .7rem; color: #94a3b8; }
 .picker-meta b { color: #fff; }
 .picker-empty { color: #6b7280 !important; cursor: default !important; }
+/* Recortador de foto */
+.cr-frame { position: relative; width: 100%; aspect-ratio: 5 / 4; overflow: hidden; border-radius: .75rem; background: #000; border: 1px solid var(--color-galaxy-400); cursor: grab; touch-action: none; user-select: none; outline: none; }
+.cr-frame:focus-visible { box-shadow: 0 0 0 2px var(--color-galaxy-400); }
+.cr-frame.cr-grab { cursor: grabbing; }
+.cr-frame img { position: absolute; left: 0; top: 0; max-width: none; transform-origin: 0 0; will-change: transform; pointer-events: none; }
+.cr-grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, transparent 33.2%, rgba(255,255,255,.22) 33.3%, transparent 33.5%, transparent 66.5%, rgba(255,255,255,.22) 66.6%, transparent 66.8%), linear-gradient(to bottom, transparent 33.2%, rgba(255,255,255,.22) 33.3%, transparent 33.5%, transparent 66.5%, rgba(255,255,255,.22) 66.6%, transparent 66.8%); }
+.cr-prev { width: 13rem; max-height: 15.5rem; overflow: hidden; border-radius: .75rem; pointer-events: none; }
+.cr-prev article { width: 100% !important; }
+@media (min-width: 640px) { .cr-prev { width: 100%; max-height: none; } }

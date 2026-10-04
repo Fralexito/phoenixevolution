@@ -114,3 +114,7 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Editar/borrar**: botón sutil «⋯» en la esquina de la foto (solo admin) que abre un mini menú.
 - **Buscador por nombre** (`features/playerPicker.js`, `core/search.js`) en el comparador 1 vs 1 y en «Añadir jugador» de la masiva (sin acentos ni mayúsculas).
 - **Pulso en vivo**: hasta 5 mensajes a la vez en PC (2 en móvil), cada uno con hora exacta HH:MM:SS, y botón «Historial» con las últimas 2 horas (máx. 200; se guarda en el navegador y sobrevive a cambiar de página). Silenciar solo oculta los mensajes; el historial se sigue llenando.
+
+## Ronda 13 — Recortador de fotos de jugador
+- Al elegir una foto se abre el **recortador** (`features/photoCropper.js`, geometría pura en `core/crop.js`): arrastrar para mover, rueda / deslizador / botones / pellizco para el zoom, flechas del teclado, «Ajustar» para volver al encuadre inicial. La imagen siempre cubre el marco (sin huecos). **Vista previa** = la tarjeta real con el mismo encuadre. Esc o «Cancelar» cierran solo el recortador.
+- Se guarda un JPEG 5:4 (hasta 800×640) recortado de la imagen ORIGINAL, igual que la foto de la tarjeta. «Reencuadrar» reabre el recortador (con la foto recién elegida o descargando la ya guardada).

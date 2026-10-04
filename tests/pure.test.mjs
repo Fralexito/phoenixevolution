@@ -4,6 +4,7 @@ import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../sr
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
 import { clampStat, calcOvr } from '../src/js/core/stats.js';
+import { coverScale, clampPos, initialState, zoomAt, rescale, sourceRect, outSize, MAX_ZOOM } from '../src/js/core/crop.js';
 import { filterPlayers, norm } from '../src/js/core/search.js';
 import { posInfo, POSICIONES } from '../src/data/posiciones.js';
 import { STAT_INFO } from '../src/data/stats.js';
@@ -208,4 +209,21 @@ test('historial en vivo: hora exacta, ventana de 2 horas, orden y tope', () => {
   assert.deepEqual(h.map((e) => e.quien), ['Nuevo', 'A']);              // fuera de ventana, futuro, inválidos y vacíos descartados; más nuevo primero
   assert.equal(podarHistorial(Array.from({ length: 300 }, (_, i) => ev(now - i * 1000)), now).length, 200);
   assert.deepEqual(podarHistorial('basura', now), []);
+});
+
+test('recorte: la imagen siempre cubre el marco, el zoom respeta límites y el recorte sale en 5:4', () => {
+  const D = { nw: 2000, nh: 1000, fw: 500, fh: 400 };           // foto panorámica en un marco 5:4
+  assert.equal(coverScale(2000, 1000, 500, 400), 0.4);          // limita el alto: 1000*0.4 = 400
+  const st = initialState(D.nw, D.nh, D.fw, D.fh);
+  assert.equal(st.s, 0.4); assert.equal(st.y, 0); assert.equal(st.x, -150);   // centrada en horizontal (2000*0.4=800 → sobran 300)
+  assert.deepEqual(clampPos(50, 50, 0.4, 2000, 1000, 500, 400), { x: 0, y: 0 });          // no se puede dejar hueco
+  assert.deepEqual(clampPos(-9999, -9999, 0.4, 2000, 1000, 500, 400), { x: -300, y: 0 });
+  // zoom: nunca baja del mínimo ni pasa del máximo
+  assert.equal(zoomAt(st, 0.1, 250, 200, D).s, 0.4); assert.equal(zoomAt(st, 1000, 250, 200, D).s, 0.4 * MAX_ZOOM);
+  // el punto bajo el cursor se queda quieto al acercar
+  const z = zoomAt(st, 2, 250, 200, D); const antes = (250 - st.x) / st.s; const despues = (250 - z.x) / z.s;
+  assert.ok(Math.abs(antes - despues) < 1e-9);
+  // el recorte real es la parte visible de la ORIGINAL y mantiene el 5:4
+  const r = sourceRect(z, D.fw, D.fh); assert.ok(Math.abs(r.sw / r.sh - 1.25) < 1e-9); assert.ok(r.sx >= 0 && r.sy >= 0 && r.sx + r.sw <= 2000 + 1e-6 && r.sy + r.sh <= 1000 + 1e-6);
+  assert.deepEqual(outSize(5000), { w: 800, h: 640 }); assert.deepEqual(outSize(100), { w: 320, h: 256 }); assert.deepEqual(rescale({ s: 1, x: -10, y: -4 }, 2), { s: 2, x: -20, y: -8 });
 });
