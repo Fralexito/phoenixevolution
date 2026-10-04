@@ -72,3 +72,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Controles**: `features/formControls.js` (interruptor y selector segmentado) para no repetir HTML. Perfil → pestaña "Sistema Host" los usa.
 - **Duelos en 2 columnas**: formulario a la izquierda, "Mis partidos / Retos en el radar" a la derecha con pestañas. En móvil se alterna
   "Lanzar reto" / "Partidos" (`#seg-vista`). `duelos/#mis-partidos` abre directo esa pestaña.
+
+## Ticker "Última hora" (velocidad y ancho)
+- Velocidad en píxeles por segundo, no en segundos fijos: `VEL_PC` (110) y `VEL_MOVIL` (55) en `src/js/features/ticker.js`. Para cambiarla, edita esas dos constantes.
+- El texto va repetido (mínimo 2 copias; el JS añade más si la pantalla es muy ancha) para que el bucle no deje huecos.
+- La etiqueta "ÚLTIMA HORA" es más angosta en celular (`Ticker.astro`).

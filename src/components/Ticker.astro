@@ -1,13 +1,17 @@
 ---
 import { TICKER } from '../data/site.js';
 ---
-<div id="ticker" class="ticker-wrap pointer-events-auto bg-galaxy-900/95 backdrop-blur-md border-b border-galaxy-600/50 overflow-hidden relative h-11 flex items-center">
-  <div class="absolute left-0 bg-galaxy-600 text-white font-display font-bold px-4 h-full flex items-center z-10 shadow-[5px_0_15px_rgba(0,0,0,0.5)] uppercase tracking-wider text-sm">
-    <i class="fa-solid fa-bolt mr-2 animate-pulse text-galaxy-400"></i> ÚLTIMA HORA
+<div id="ticker" class="ticker-wrap pointer-events-auto bg-galaxy-900/95 backdrop-blur-md border-b border-galaxy-600/50 overflow-hidden relative h-11 flex items-stretch">
+  <!-- Etiqueta: más angosta en celular para dejar espacio a las noticias -->
+  <div class="shrink-0 bg-galaxy-600 text-white font-display font-bold px-2.5 sm:px-4 flex items-center z-10 shadow-[5px_0_15px_rgba(0,0,0,0.5)] uppercase tracking-wide sm:tracking-wider text-[11px] sm:text-sm whitespace-nowrap">
+    <i class="fa-solid fa-bolt mr-1.5 sm:mr-2 animate-pulse text-galaxy-400"></i> ÚLTIMA HORA
   </div>
-  <div class="w-full whitespace-nowrap pl-36 pr-4 overflow-hidden relative">
-    <div class="ticker-track animate-marquee font-sans text-sm text-galaxy-50">
-      {TICKER.map((t) => (<><span class="mx-4 text-galaxy-400">◆</span>{t}</>))}
+  <!-- Zona de lectura. El track lleva el contenido repetido (2 copias mínimo) para que el bucle no tenga huecos;
+       features/ticker.js ajusta copias y velocidad (en píxeles por segundo) según el ancho de la pantalla. -->
+  <div id="ticker-view" class="flex-1 min-w-0 overflow-hidden relative flex items-center">
+    <div id="ticker-track" class="ticker-track font-sans text-xs sm:text-sm text-galaxy-50">
+      <span class="ticker-group">{TICKER.map((t) => (<><span class="mx-3 sm:mx-4 text-galaxy-400">◆</span><span>{t}</span></>))}</span>
+      <span class="ticker-group" aria-hidden="true">{TICKER.map((t) => (<><span class="mx-3 sm:mx-4 text-galaxy-400">◆</span><span>{t}</span></>))}</span>
     </div>
   </div>
 </div>

@@ -1,6 +1,9 @@
 /* CAPA 3 · LAYOUT — estructura global (cabecera, menú lateral, ticker). */
 .sidebar-panel { transition: transform .3s ease; }
-.ticker-track { display: inline-block; white-space: nowrap; }
+.ticker-track { display: inline-flex; white-space: nowrap; will-change: transform; animation: ticker-scroll var(--ticker-dur, 60s) linear infinite; }
+.ticker-group { display: inline-flex; flex: none; align-items: center; }
+/* Avanza exactamente el ancho de UN grupo y reinicia: como hay copias idénticas, el salto no se nota. */
+@keyframes ticker-scroll { to { transform: translateX(calc(var(--ticker-shift, 50%) * -1)); } }
 /* Al bajar la página el ticker se esconde detrás de la cabecera; al subir, vuelve. No cambia el alto del
    contenedor, así que la página no "salta". El JS solo alterna data-oculto (features/ticker.js). */
 .ticker-wrap { transition: transform .35s ease, visibility 0s linear 0s; }

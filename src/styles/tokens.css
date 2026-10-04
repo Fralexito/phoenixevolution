@@ -27,12 +27,10 @@
   --color-warn: #ffb700;
   --color-bad: #ff4444;
 
-  --animate-marquee: marquee 40s linear infinite;
   --animate-fade-in: fadeIn 0.4s ease-out both;
   --animate-float: float 4s ease-in-out infinite;
   --animate-glow: glow 3s ease-in-out infinite alternate;
 
-  @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
   @keyframes glow { 0% { filter: drop-shadow(0 0 10px rgba(245,158,11,0.4)); } 100% { filter: drop-shadow(0 0 20px rgba(245,158,11,0.8)); } }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
