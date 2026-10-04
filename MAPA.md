@@ -149,3 +149,16 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Efecto: página de celular ~2.750 px frente a ~4.100 px.
 - **Ajustes de la Ronda 18**: la portada recupera la foto del espacio exterior que se acerca despacio al pasar el mouse. Los botones son dos y el principal depende de la sesión (sin cuenta: «Crear cuenta»; con cuenta: «Sala de Duelos»); «Jugadores» se quitó porque ya está en el menú. Highlights vuelve a tamaño grande (16:9) con zoom al pasar el mouse, más una lista «Más clips» al costado (`DEMO_CLIPS` en `data/demo.js`; debajo en celular).
 - **Banner de liga** (`data/ligas.js`): vuelve «Competición activa · GALAXY LEAGUE · Pro Evolution Soccer» con la foto del espacio y su zoom. Para no competir con la portada, esta pasó a hablar de la plataforma («PHOENIX EVOLUTION SERIES», sin foto) y el banner presenta la liga. Para sumar una liga nueva se agrega un objeto a `LIGAS` (estado `activa` o `proxima`, título, juego, botones); con 1 liga el banner ocupa todo el ancho, con varias la primera es grande y el resto comparte la fila. Pendiente a futuro: que Central de Partidos/Posiciones se filtren por liga.
+
+## Ronda 19 — Editor de stats y portada única
+
+**Editor de stats (`features/playerForm.js`, `core/stats.js`)**
+- Cada valor se puede escribir a mano (solo dígitos, 1–99), con flechas ↑/↓ (±1) y Enter para confirmar.
+- Escribir la **media (OVR)** reparte las stats con `distribuirMedia`: parte de la "forma" guardada (diferencias entre stats) y desplaza todo por igual hasta que el promedio sea exacto. Así subir y bajar la media no deforma al jugador.
+- Botón **Al azar** (`aleatorias`): genera stats con ruido de ±10 alrededor de la media, y la media final queda exacta. Cada clic da una combinación nueva.
+
+**Portada (`pages/index.astro`)**
+- Hero y banner de liga se fusionaron en UNO: la primera liga de `data/ligas.js` es la portada (foto del espacio con zoom al pasar el mouse).
+- Las demás ligas, cuando existan, salen como tarjetas compactas en "Otras competiciones".
+- Botones: sin sesión → Crear cuenta + Sala de Duelos; con sesión → Sala de Duelos + Partidos y posiciones.
+- Para volver a la base anterior: rama `central-base-v1`.
