@@ -7,6 +7,7 @@ import { logout } from '../features/auth.js';
 import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { toast } from '../core/toast.js';
+import { iniciarVistas } from '../features/ajustesVista.js';
 
 const estado = document.getElementById('aj-estado');
 const avisar = (t) => { if (estado) estado.textContent = t; };
@@ -64,3 +65,14 @@ onSession(({ session, profile }) => {
   cuenta.querySelector('#aj-salir').addEventListener('click', logout);
 });
 pintar();
+
+// Pestañas: una sección a la vez (la de la URL #seccion, o la primera). Sin JS se ven todas.
+const tabs = [...document.querySelectorAll('[data-tab]')]; const paneles = [...document.querySelectorAll('[data-panel]')];
+function abrir(id) {
+  const ok = paneles.some((p) => p.id === `panel-${id}`) ? id : paneles[0]?.id.replace('panel-', '');
+  paneles.forEach((p) => { p.hidden = p.id !== `panel-${ok}`; }); tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === ok)));
+}
+tabs.forEach((t) => t.addEventListener('click', () => { abrir(t.dataset.tab); history.replaceState(null, '', `#${t.dataset.tab}`); }));
+window.addEventListener('hashchange', () => abrir(location.hash.slice(1)));
+abrir(location.hash.slice(1));
+iniciarVistas();

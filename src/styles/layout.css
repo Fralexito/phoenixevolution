@@ -103,3 +103,16 @@ html[data-aj-liga-compacta='si'] .liga-tabla td { padding-top: .3rem; padding-bo
   #sidebar-menu nav a, #sidebar-menu nav button { padding-top: 0.4rem; padding-bottom: 0.4rem; }
   #sidebar-menu #sidebar-account { margin-top: 0.25rem; padding-top: 0.5rem; gap: 0.25rem; }
 }
+
+/* PÁGINA DE AJUSTES: pestañas y vista previa */
+.aj-tab { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.25rem; padding: 0 .85rem; border-radius: 999px; border: 1px solid var(--color-galaxy-border); color: #cbd5e1; font-size: .78rem; background: rgb(255 255 255 / .02); }
+.aj-tab:hover { color: var(--color-galaxy-400); border-color: color-mix(in srgb, var(--color-galaxy-400) 50%, transparent); }
+.aj-tab[aria-selected='true'] { color: #fff; border-color: var(--color-galaxy-400); background: color-mix(in srgb, var(--color-galaxy-400) 16%, transparent); }
+.aj-vp { display: grid; gap: .6rem; }
+.aj-vp .aj-nota { font-size: .68rem; color: #94a3b8; }
+@keyframes aj-ticker { from { left: 100%; transform: none; } to { left: 0; transform: translateX(-100%); } }
+.aj-tk { position: relative; overflow: hidden; height: 1.9rem; border: 1px solid var(--color-galaxy-border); border-radius: .5rem; background: rgb(0 0 0 / .35); }
+.aj-tk > span { position: absolute; top: 0; left: 100%; height: 100%; display: flex; align-items: center; white-space: nowrap; font-size: .75rem; color: var(--color-galaxy-50); animation: aj-ticker var(--aj-dur, 12s) linear infinite; }
+html[data-aj-ticker='no'] .aj-tk { opacity: .35; }
+html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .7rem; color: #fff; background: rgb(0 0 0 / .5); }
+.aj-vp .live-msg { opacity: .92; transform: none; }
