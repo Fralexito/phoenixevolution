@@ -45,7 +45,7 @@ async function renderFeatured() {
     box.dataset.n = String(data.length);
     box.innerHTML = ordenPodio(data).map(({ jugador, puesto }) => `
       <div class="podio-slot" data-puesto="${puesto}" tabindex="0" role="button" aria-pressed="false" aria-label="${escapeHTML(jugador.nombre)}, puesto ${puesto}">
-        ${playerCardHTML(jugador, puesto - 1, { sizeClass: 'w-full' })}
+        <div class="podio-in">${playerCardHTML(jugador, puesto - 1, { sizeClass: 'w-full' })}</div>
       </div>`).join('');
     const c = box.querySelector('[data-puesto="1"]'); if (c) box.scrollLeft = c.offsetLeft - (box.clientWidth - c.offsetWidth) / 2;
   } catch (e) {
