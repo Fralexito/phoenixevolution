@@ -41,7 +41,7 @@ import Layout from '../layouts/Layout.astro';
     <!-- Reconocimientos: formas de destacar que no dependen solo de la media -->
     <section id="reconocimientos" aria-label="Reconocimientos"></section>
     <!-- Vista y orden -->
-    <div id="vista-bar" class="flex flex-wrap items-center gap-3 -mb-2">
+    <div id="vista-bar" class="flex flex-wrap items-center gap-3">
       <div id="vista-seg" class="flex gap-1 text-xs font-display font-bold uppercase tracking-wider bg-black/40 p-1 rounded-lg border border-galaxy-border/60" role="group" aria-label="Vista">
         <button type="button" data-vista="plano" aria-pressed="true" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Todos</button>
         <button type="button" data-vista="estilo" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por estilo</button>
@@ -51,14 +51,15 @@ import Layout from '../layouts/Layout.astro';
         <select id="orden-select" class="field !w-auto !min-h-9"></select></label>
     </div>
     <!-- Herramientas sutiles: leyenda de stats y zoom (tamaño de tarjeta; la cuadrícula acomoda cuántas caben, como el explorador de archivos) -->
-    <div class="flex justify-end items-center gap-1 -mb-3 text-gray-500">
-      <button id="btn-leyenda" type="button" class="dens-btn" aria-label="Ver leyenda de las stats" title="Leyenda de stats"><i class="fa-solid fa-circle-info"></i></button>
-      <span class="w-px h-4 bg-galaxy-line mx-1"></span>
-      <button id="dens-menos" type="button" class="dens-btn" aria-label="Alejar: tarjetas más pequeñas, caben más" title="Alejar"><i class="fa-solid fa-minus"></i></button>
-      <button id="dens-reset" type="button" class="dens-btn dens-reset" aria-label="Restablecer el tamaño predeterminado de las tarjetas" title="Tamaño predeterminado (Ctrl + 0)"><i class="fa-solid fa-table-cells-large"></i><span>Predeterminado</span></button>
-      <button id="dens-mas" type="button" class="dens-btn" aria-label="Acercar: tarjetas más grandes, caben menos" title="Acercar"><i class="fa-solid fa-plus"></i></button>
+    <div class="flex flex-wrap items-center justify-between gap-3 pt-1 pb-2">
+      <button id="btn-leyenda" type="button" class="leyenda-btn" aria-label="Ver la leyenda: qué significa cada stat" title="Qué significa cada sigla (ATQ, FIN, POT…)"><i class="fa-solid fa-circle-question"></i><span>Leyenda de stats</span></button>
+      <div class="dens-grupo" role="group" aria-label="Tamaño de las tarjetas">
+        <button id="dens-menos" type="button" class="dens-btn" aria-label="Alejar: tarjetas más pequeñas, caben más" title="Alejar"><i class="fa-solid fa-minus"></i></button>
+        <button id="dens-reset" type="button" class="dens-btn dens-reset" aria-label="Restablecer el tamaño predeterminado de las tarjetas" title="Tamaño predeterminado (Ctrl + 0)"><i class="fa-solid fa-table-cells-large"></i><span>Predeterminado</span></button>
+        <button id="dens-mas" type="button" class="dens-btn" aria-label="Acercar: tarjetas más grandes, caben menos" title="Acercar"><i class="fa-solid fa-plus"></i></button>
+      </div>
     </div>
-    <div id="players-container" class="grid pt-2">
+    <div id="players-container" class="grid pt-3">
       <div class="col-span-full text-center py-10 text-gray-400 text-sm flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-galaxy-400 mb-3"></i> Descargando registros de la liga...</div>
     </div>
   </div>

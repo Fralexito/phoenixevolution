@@ -321,3 +321,10 @@ body:has(#players-container) { overflow-x: clip; }
 .pc-sheen { position: absolute; inset: 0; z-index: 11; pointer-events: none; background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / .16) 50%, transparent 62%); transform: translateX(-130%); transition: transform .9s cubic-bezier(.22, 1, .36, 1); }
 .pc:hover .pc-sheen, .pcw-replica .pc-sheen { transform: translateX(130%); }
 @media (prefers-reduced-motion: reduce) { .pc-sheen { display: none; } }
+
+/* ---- Barra bajo los filtros: leyenda de stats (visible, con texto) y grupo de zoom con aire respecto a las tarjetas ---- */
+.leyenda-btn { display: inline-flex; align-items: center; gap: .55rem; padding: .4rem .85rem .4rem .5rem; border-radius: 999px; font-family: var(--font-display); font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: #a5f3fc; background: rgb(0 229 255 / .1); border: 1px solid rgb(0 229 255 / .45); transition: background .2s, box-shadow .2s, color .2s; }
+.leyenda-btn i { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 999px; font-size: .95rem; color: #03010f; background: #22d3ee; }
+.leyenda-btn:hover, .leyenda-btn:focus-visible { color: #fff; background: rgb(0 229 255 / .2); box-shadow: 0 0 14px rgb(0 229 255 / .4); outline: none; }
+.dens-grupo { display: inline-flex; align-items: center; gap: .35rem; padding: .25rem; border-radius: .7rem; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .3); color: #9ca3af; }
+.dens-grupo .dens-btn { width: 2rem; height: 2rem; font-size: .8rem; } .dens-grupo .dens-btn.dens-reset { width: auto; padding: 0 .7rem; font-size: .66rem; }
