@@ -283,3 +283,13 @@ body:has(#players-container) { overflow-x: clip; }
 #players-container[data-foco='true'] .pcw:not(.pcw-origen) { filter: blur(3px) saturate(.65); opacity: .5; }
 #players-container[data-foco='true'] .pcw:not(.pcw-origen):hover { transform: none; }
 @media (prefers-reduced-motion: reduce) { #players-container .pcw { transition: none; } .pcw-replica::before { animation: none; } .pcw-replica-in { transition: none; } }
+
+/* ---- Sistema de divisiones (beta): zonas de tabla y cuadro de la copa ---- */
+.tmp-copa { --zona: #00e5ff; } .tmp-sube { --zona: #34d399; } .tmp-baja { --zona: #fb7185; }
+.tmp-fila, .liga-tabla tbody tr.tmp-fila { box-shadow: inset 3px 0 0 var(--zona, transparent); background: linear-gradient(90deg, color-mix(in srgb, var(--zona, transparent) 12%, transparent), transparent 55%); }
+.tmp-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 999px; margin-right: .4rem; vertical-align: -1px; background: var(--zona); box-shadow: 0 0 8px var(--zona); }
+.tmp-tag { display: inline-grid; place-items: center; width: 1.25rem; height: 1.25rem; margin-right: .25rem; border-radius: .35rem; font-size: .6rem; color: #03010f; background: var(--zona); }
+.tmp-cruce { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .5rem; padding: .7rem .8rem; border: 1px solid var(--color-galaxy-border); border-radius: .8rem; background: rgb(0 0 0 / .3); }
+.tmp-cruce .tmp-lado:last-child { text-align: right; } .tmp-marc { color: #cbd5e1; font-size: .85rem; text-align: center; }
+.tmp-gana { position: relative; } .tmp-gana::after { content: ''; position: absolute; left: -.5rem; top: 10%; bottom: 10%; width: 3px; border-radius: 3px; background: #34d399; } .tmp-lado:last-child.tmp-gana::after { left: auto; right: -.5rem; }
+.tmp-libre { opacity: .75; border-style: dashed; }

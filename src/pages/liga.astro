@@ -5,6 +5,8 @@ import Layout from '../layouts/Layout.astro';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
 import { calcularTabla } from '../js/core/tabla.js';
+import { SISTEMA } from '../data/temporada.js';
+import { zonasDivision } from '../js/core/temporada.js';
 import { estadoFecha, fechaActual, forma, resumenFecha } from '../js/core/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 // Clases completas (Tailwind solo detecta nombres escritos enteros).
@@ -12,12 +14,14 @@ const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black
 const ESTADO_ED = { en_curso: 'En curso', finalizada: 'Finalizada' };
 const PUESTO = ['text-gold-400', 'text-gray-200', 'text-bronze-400'];
 
+const divisionDe = (ligaId) => SISTEMA.divisiones.find((d) => d.ligaId === ligaId) ?? null;
 const ESTADO_FECHA = { jugada: 'jugada', en_juego: 'en juego', pendiente: 'por jugar' };
 const datos = LIGAS.map((l) => ({
   liga: l,
   ediciones: (EDICIONES[l.id] ?? []).map((e) => ({
     ...e, tabla: calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla, actual: fechaActual(e.fechas),
     formas: Object.fromEntries(calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla.map((f) => [f.nombre, forma(e.fechas, f.nombre)])),
+    zonas: e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla.map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
     fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
   })).reverse(),   // la más reciente primero
 }));
@@ -88,7 +92,7 @@ const datos = LIGAS.map((l) => ({
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
-                      <tr class:list={[i === 0 ? 'liga-lider' : '']}>
+                      <tr class:list={[i === 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
                         <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
                         <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
@@ -101,6 +105,7 @@ const datos = LIGAS.map((l) => ({
                   </tbody>
                 </table>
               </div>
+              {e.zonas && <p class="text-xs text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1"><span><span class="tmp-dot tmp-copa"></span>Zona de copa</span><span><span class="tmp-dot tmp-baja"></span>Zona de descenso</span><a href={`${base}temporada/`} class="text-galaxy-400 underline">Sistema de divisiones <span class="liga-sello liga-sello-prox !text-[.6rem] !py-0">Beta</span></a></p>}
               <p class="text-xs text-gray-500 leading-relaxed">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles.</p>
             </section>
 

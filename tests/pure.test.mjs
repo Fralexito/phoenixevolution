@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { zonasDivision, resolverAscensos, clasificadosCopa, ordenCuadro, construirCopa, ganadorDe, normalizarConfig } from '../src/js/core/temporada.js';
 import assert from 'node:assert/strict';
 import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
@@ -536,4 +537,35 @@ test('historial: orden, periodo, premios y validación', () => {
   assert.equal(ok.ok, true); assert.equal(ok.fila.liga, 'Galaxy bLeague'); assert.equal(ok.fila.periodo, '2025-03-01'); assert.equal(ok.fila.club, null); assert.equal(ok.fila.puesto, 2);
   assert.equal(validarParticipacion({ liga: '', edicion: '' }).errores.length, 2); assert.equal(validarParticipacion({ liga: 'a', edicion: 'b', puesto: '0' }).ok, false); assert.equal(validarParticipacion({ liga: 'a', edicion: 'b', puesto: '2.5' }).ok, false);
   assert.equal(validarParticipacion({ liga: 'a', edicion: 'b', periodo: 'ayer' }).ok, false);
+});
+
+test('temporada: zonas de copa, ascenso y descenso', () => {
+  const d1 = ['A', 'B', 'C', 'D', 'E', 'F']; const z1 = zonasDivision(d1, 1, { suben: 2, copa1: 3, copa2: 2 });
+  assert.deepEqual(z1.get('A'), ['copa']); assert.deepEqual(z1.get('D'), []); assert.deepEqual(z1.get('F'), ['baja']); assert.deepEqual(z1.get('E'), ['baja']);
+  const z2 = zonasDivision(['X', 'Y', 'Z'], 2, { suben: 2, copa1: 3, copa2: 1 }); assert.deepEqual(z2.get('X'), ['copa', 'sube']); assert.deepEqual(z2.get('Y'), ['sube']); assert.deepEqual(z2.get('Z'), []);
+  assert.deepEqual(zonasDivision(['A', 'B'], 1, { suben: 9, copa1: 0 }).get('B'), ['baja']);   // máximo la mitad de la tabla
+  assert.deepEqual(zonasDivision([], 1, {}).size, 0);
+});
+test('temporada: ascensos y descensos intercambian el mismo número', () => {
+  const r = resolverAscensos(['A', 'B', 'C', 'D', 'E', 'F'], ['X', 'Y', 'Z'], 2);
+  assert.equal(r.k, 2); assert.deepEqual(r.suben, ['X', 'Y']); assert.deepEqual(r.bajan, ['E', 'F']); assert.deepEqual(r.div1, ['A', 'B', 'C', 'D', 'X', 'Y']); assert.deepEqual(r.div2, ['E', 'F', 'Z']); assert.equal(r.avisos.length, 0);
+  const t = resolverAscensos(['A', 'B', 'C', 'D'], ['X'], 3); assert.equal(t.k, 1); assert.equal(t.avisos.length, 1); assert.equal(t.div1.length + t.div2.length, 5);
+  const v = resolverAscensos([], [], 2); assert.equal(v.k, 0); assert.deepEqual(v.div1, []);
+  assert.equal(resolverAscensos(['A', 'B'], ['X'], 0).k, 0);
+});
+test('temporada: clasificados, orden del cuadro y copa con byes', () => {
+  assert.deepEqual(ordenCuadro(4), [1, 4, 2, 3]); assert.deepEqual(ordenCuadro(8), [1, 8, 4, 5, 2, 7, 3, 6]);
+  const c = clasificadosCopa(['A', 'B', 'C'], ['X', 'Y'], 2, 2); assert.deepEqual(c.map((t) => t.nombre), ['A', 'X', 'B', 'Y']); assert.deepEqual(c.map((t) => t.seed), [1, 2, 3, 4]);
+  const k = construirCopa(c); assert.deepEqual(k.rondas.map((r) => r.nombre), ['Semifinales', 'Final']);
+  assert.deepEqual([k.rondas[0].partidos[0].a.nombre, k.rondas[0].partidos[0].b.nombre], ['A', 'Y']); assert.deepEqual([k.rondas[0].partidos[1].a.nombre, k.rondas[0].partidos[1].b.nombre], ['X', 'B']); assert.equal(k.campeon, null);
+  const j = construirCopa(c, { 'R1-P1': { ga: 3, gb: 1 }, 'R1-P2': { ga: 1, gb: 1, pa: 4, pb: 5 }, 'R2-P1': { ga: 0, gb: 2 } });
+  assert.equal(j.rondas[0].partidos[1].ganador.nombre, 'B'); assert.equal(j.rondas[1].partidos[0].a.nombre, 'A'); assert.equal(j.campeon.nombre, 'B');
+  const impar = construirCopa(clasificadosCopa(['A', 'B', 'C'], [], 3, 0)); assert.equal(impar.rondas[0].partidos[0].libre, true); assert.equal(impar.rondas[0].partidos[0].ganador.nombre, 'A'); assert.equal(impar.rondas[1].partidos[0].a.nombre, 'A');
+  assert.equal(construirCopa(clasificadosCopa(['A'], [], 1, 0)).rondas.length, 0); assert.equal(construirCopa([]).avisos.length, 1);
+  assert.equal(ganadorDe({ a: { nombre: 'a' }, b: { nombre: 'b' }, ga: 1, gb: 1 }), null); assert.equal(ganadorDe({ a: null, b: { nombre: 'b' }, ga: 1, gb: 0 }), null);
+  const ocho = construirCopa(clasificadosCopa(['A', 'B', 'C', 'D'], ['W', 'X', 'Y', 'Z'], 4, 4)); assert.deepEqual(ocho.rondas.map((r) => r.partidos.length), [4, 2, 1]); assert.equal(ocho.rondas[0].nombre, 'Cuartos de final');
+});
+test('temporada: la configuración se corrige y se explica', () => {
+  const n = normalizarConfig({ suben: 5, copa1: 20, copa2: 20 }, 6, 3); assert.deepEqual(n.cfg, { suben: 3, copa1: 6, copa2: 3 }); assert.equal(n.avisos.length, 1);
+  assert.equal(normalizarConfig({ copa1: 1, copa2: 0 }, 6, 3).avisos.length, 1); assert.deepEqual(normalizarConfig({}, 12, 8).cfg, { suben: 2, copa1: 4, copa2: 4 });
 });
