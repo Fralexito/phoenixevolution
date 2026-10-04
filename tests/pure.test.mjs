@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
+import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
 import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
 import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
 
@@ -85,4 +86,25 @@ test('seats: cuenta confirmados, invitados y libres; ignora a quien salió', () 
   const parts = [{ equipo: 'A', estado: 'CONFIRMADO' }, { equipo: 'A', estado: 'INVITADO' }, { equipo: 'A', estado: 'SALIO' }, { equipo: 'B', estado: 'CONFIRMADO' }];
   assert.deepEqual(seats(3, parts, 'A'), { tam: 3, confirmed: 1, invited: 1, free: 1, missing: 2 });
   assert.deepEqual(seats(1, parts, 'B'), { tam: 1, confirmed: 1, invited: 0, free: 0, missing: 0 });
+});
+
+test('avatares: solo se aceptan presets conocidos y fotos https', () => {
+  assert.equal(presetId('preset:fenix'), 'fenix');
+  assert.equal(presetId('preset:no-existe'), '');
+  assert.equal(presetId('javascript:alert(1)'), '');
+  assert.equal(presetValue('fenix'), 'preset:fenix');
+  assert.ok(PRESETS.every((p) => /^[a-z0-9-]{1,30}$/.test(p.id)), 'ids válidos para la restricción de la BD');
+});
+test('avatares: foto del proveedor (Discord/Google) y límite de 300 caracteres', () => {
+  assert.equal(providerAvatar({ user_metadata: { avatar_url: 'https://cdn.discordapp.com/a.png' } }), 'https://cdn.discordapp.com/a.png');
+  assert.equal(providerAvatar({ user_metadata: { picture: 'https://lh3.googleusercontent.com/x' } }), 'https://lh3.googleusercontent.com/x');
+  assert.equal(providerAvatar({ user_metadata: { avatar_url: 'http://inseguro.test/x.png' } }), '');
+  assert.equal(providerAvatar({ user_metadata: { avatar_url: 'https://a.test/' + 'x'.repeat(300) } }), '');
+  assert.equal(providerAvatar(null), '');
+});
+test('avatares: el HTML escapa la inicial y no interpreta datos', () => {
+  const h = avatarHTML('', '<img src=x onerror=alert(1)>', 36);
+  assert.ok(!h.includes('<img'), 'la inicial no debe abrir etiquetas');
+  assert.ok(avatarHTML('preset:fenix', 'X', 40).includes('fa-dragon'));
+  assert.ok(avatarHTML('https://a.test/f.png', 'ñ', 40).includes('data-av-inicial'));
 });

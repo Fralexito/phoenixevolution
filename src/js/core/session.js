@@ -1,6 +1,7 @@
 // ÚNICA fuente de verdad de "quién está conectado".
 // Guarda sesión + perfil (tabla `perfiles`) y avisa a quien se suscriba.
 import { supabase } from './supabase.js';
+import { providerAvatar } from './avatar.js';
 
 const state = { session: null, profile: null, ready: false };
 const listeners = new Set();
@@ -14,9 +15,19 @@ async function loadProfile(userId) {
   return data ?? null;
 }
 
+/** Si el perfil no tiene foto y el proveedor (Discord/Google) trae una, la copia al perfil. Solo rellena vacíos. */
+async function syncProviderAvatar(session, profile) {
+  if (!profile || profile.avatar_url) return profile;
+  const url = providerAvatar(session.user);
+  if (!url) return profile;
+  const { error } = await supabase.from('perfiles').update({ avatar_url: url }).eq('id', session.user.id);
+  if (error) { console.error('[session] no se pudo guardar la foto del proveedor:', error.message); return profile; }
+  return { ...profile, avatar_url: url };
+}
+
 async function apply(session) {
   state.session = session;
-  state.profile = session ? await loadProfile(session.user.id) : null;
+  state.profile = session ? await syncProviderAvatar(session, await loadProfile(session.user.id)) : null;
   state.ready = true;
   emit();
 }

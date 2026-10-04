@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout title="Sala de Duelos" active="duelos">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 w-full space-y-5 sm:space-y-6">
+  <div class="max-w-7xl 2xl:max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 w-full space-y-4 sm:space-y-5">
 
     <!-- 1. Cabecera + estado unificado (Inactivo · Activo · Radar) -->
     <section class="glass-panel p-4 sm:p-5 rounded-2xl shadow-[0_0_24px_rgba(128,0,255,0.18)] flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -28,146 +28,147 @@ import Layout from '../layouts/Layout.astro';
       <div id="radar-list" class="flex flex-wrap gap-2"></div>
     </section>
 
-    <!-- 3. Lanzar reto (dos columnas en pantallas anchas para que no se alargue) -->
-    <section class="glass-panel p-4 sm:p-5 rounded-2xl space-y-4">
-      <h2 class="text-base sm:text-lg font-display font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-satellite-dish text-galaxy-400"></i> Lanzar Reto</h2>
-      <form id="form-crear-reto" class="space-y-4" novalidate>
-        <div class="grid lg:grid-cols-2 gap-x-8 gap-y-4">
+    <!-- Solo en móvil: alterna entre "Lanzar reto" y "Partidos" (en PC se ven las dos a la vez). -->
+    <div class="seg lg:!hidden" id="seg-vista" role="group" aria-label="Sección">
+      <button type="button" data-v="lanzar" aria-pressed="true"><i class="fa-solid fa-satellite-dish mr-1"></i>Lanzar reto</button>
+      <button type="button" data-v="partidos" aria-pressed="false"><i class="fa-solid fa-list mr-1"></i>Partidos <b id="cnt-movil" class="text-galaxy-400"></b></button>
+    </div>
 
-          <!-- Columna izquierda: ¿contra quién y de cuántos? -->
-          <div class="space-y-4">
-            <div>
-              <span class="label">¿A quién retas?</span>
-              <div class="seg" id="seg-destino" role="group" aria-label="Destino del reto">
-                <button type="button" data-v="abierto" aria-pressed="true">A toda la red</button>
-                <button type="button" data-v="directo" aria-pressed="false">A un jugador</button>
-              </div>
-            </div>
+    <!-- 3. Dos columnas en PC: formulario a la izquierda · partidos y retos a la derecha -->
+    <div id="duelos-grid" data-vista="lanzar" class="grid lg:grid-cols-[24rem_minmax(0,1fr)] xl:grid-cols-[26rem_minmax(0,1fr)] gap-4 sm:gap-5 items-start">
 
-            <div id="bloque-directo" hidden class="space-y-3 bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40">
-              <div>
-                <label class="label" for="buscar-rival">Rival</label>
-                <input id="buscar-rival" class="field mb-2" type="search" placeholder="Buscar jugador…" autocomplete="off" maxlength="40">
-                <select id="select-rival" class="field" size="5" aria-label="Lista de jugadores"></select>
-              </div>
-              <div>
-                <span class="label">¿Quién ve este reto?</span>
-                <div class="seg" id="seg-vis" role="group" aria-label="Visibilidad">
-                  <button type="button" data-v="privado" aria-pressed="true"><i class="fa-solid fa-lock mr-1"></i>Solo el retado</button>
-                  <button type="button" data-v="publico" aria-pressed="false"><i class="fa-solid fa-eye mr-1"></i>Público</button>
-                </div>
-                <p id="hint-vis" class="text-[11px] text-gray-400 mt-1.5">Solo tu rival verá que lo retaste.</p>
-              </div>
-            </div>
+      <section id="col-lanzar" class="glass-panel p-4 rounded-2xl space-y-3">
+        <h2 class="text-base font-display font-bold text-white uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-satellite-dish text-galaxy-400"></i> Lanzar Reto</h2>
+        <form id="form-crear-reto" class="space-y-3.5" novalidate>
 
-            <div>
-              <span class="label">Tamaño del partido <span class="text-gray-500 normal-case">(máx. 8 en total)</span></span>
-              <div id="tam-presets" class="grid grid-cols-4 gap-2 mb-2" role="group" aria-label="Formatos rápidos">
-                <button type="button" class="chip" data-t="1-1" aria-pressed="true">1v1</button>
-                <button type="button" class="chip" data-t="2-2" aria-pressed="false">2v2</button>
-                <button type="button" class="chip" data-t="3-3" aria-pressed="false">3v3</button>
-                <button type="button" class="chip" data-t="4-4" aria-pressed="false">4v4</button>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <div class="bg-black/40 border border-galaxy-border rounded-lg px-3 py-2">
-                  <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Mi equipo (A)</div>
-                  <div class="flex items-center justify-between gap-2 mt-1">
-                    <button type="button" id="tam-a-menos" aria-label="Quitar un jugador de mi equipo" class="chip !px-0 w-10 !min-h-10">−</button>
-                    <span id="tam-a" class="font-display font-extrabold text-2xl text-white">1</span>
-                    <button type="button" id="tam-a-mas" aria-label="Añadir un jugador a mi equipo" class="chip !px-0 w-10 !min-h-10">+</button>
-                  </div>
-                </div>
-                <div class="bg-black/40 border border-galaxy-border rounded-lg px-3 py-2">
-                  <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Rival (B)</div>
-                  <div class="flex items-center justify-between gap-2 mt-1">
-                    <button type="button" id="tam-b-menos" aria-label="Quitar un jugador del rival" class="chip !px-0 w-10 !min-h-10">−</button>
-                    <span id="tam-b" class="font-display font-extrabold text-2xl text-white">1</span>
-                    <button type="button" id="tam-b-mas" aria-label="Añadir un jugador al rival" class="chip !px-0 w-10 !min-h-10">+</button>
-                  </div>
-                </div>
-              </div>
-              <p class="text-[11px] text-gray-400 mt-1.5">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span></p>
-            </div>
-
-            <div id="bloque-amigos" hidden class="space-y-2 bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40">
-              <span class="label">Invita a tu equipo (opcional)</span>
-              <input id="buscar-amigo" class="field" type="search" placeholder="Buscar jugador…" autocomplete="off" maxlength="40">
-              <ul id="lista-amigos" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto"></ul>
-              <p id="hint-amigos" class="text-[11px] text-gray-400"></p>
+          <div>
+            <span class="label">¿A quién retas?</span>
+            <div class="seg" id="seg-destino" role="group" aria-label="Destino del reto">
+              <button type="button" data-v="abierto" aria-pressed="true">A toda la red</button>
+              <button type="button" data-v="directo" aria-pressed="false">A un jugador</button>
             </div>
           </div>
 
-          <!-- Columna derecha: ¿dónde y cuándo? -->
-          <div class="space-y-4">
+          <div id="bloque-directo" hidden class="space-y-3 bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40">
             <div>
-              <span class="label">¿Quién hostea?</span>
-              <div class="seg" id="seg-host" role="group" aria-label="Host">
-                <button type="button" data-v="yo" aria-pressed="true">Yo tengo host</button>
-                <button type="button" data-v="otro" aria-pressed="false">Necesito host</button>
-              </div>
-              <p id="hint-host" class="text-[11px] text-gray-400 mt-1.5"></p>
+              <label class="label" for="buscar-rival">Rival</label>
+              <input id="buscar-rival" class="field mb-2" type="search" placeholder="Buscar jugador…" autocomplete="off" maxlength="40">
+              <select id="select-rival" class="field" size="5" aria-label="Lista de jugadores"></select>
             </div>
-
             <div>
-              <label class="label" for="select-plataforma">Plataforma</label>
-              <select id="select-plataforma" class="field"><option value="Parsec">Parsec</option><option value="Smash Soda">Smash Soda</option><option value="Steam Remote Play">Steam Remote Play</option></select>
-            </div>
-
-            <div>
-              <span class="label">¿Cuándo?</span>
-              <div id="presets" class="grid grid-cols-2 sm:grid-cols-5 gap-2" role="group" aria-label="Cuándo jugar">
-                <button type="button" class="chip" data-p="ya" aria-pressed="true">Ya</button>
-                <button type="button" class="chip" data-p="15" aria-pressed="false">15 min</button>
-                <button type="button" class="chip" data-p="30" aria-pressed="false">30 min</button>
-                <button type="button" class="chip" data-p="60" aria-pressed="false">1 hora</button>
-                <button type="button" class="chip col-span-2 sm:col-span-1" data-p="manual" aria-pressed="false"><i class="fa-regular fa-calendar mr-1"></i>Hora</button>
+              <span class="label">¿Quién ve este reto?</span>
+              <div class="seg" id="seg-vis" role="group" aria-label="Visibilidad">
+                <button type="button" data-v="privado" aria-pressed="true"><i class="fa-solid fa-lock mr-1"></i>Solo el retado</button>
+                <button type="button" data-v="publico" aria-pressed="false"><i class="fa-solid fa-eye mr-1"></i>Público</button>
               </div>
-              <p id="hint-when" class="text-[11px] text-gray-400 mt-1.5"></p>
-            </div>
-
-            <div id="campo-fecha" hidden class="bg-[#0c051a] p-3 sm:p-4 rounded-xl border border-galaxy-600/40 space-y-3">
-              <div class="seg" role="group" aria-label="Modo de horario">
-                <button type="button" id="tab-modo-rapido" aria-pressed="true">Acceso rápido</button>
-                <button type="button" id="tab-modo-manual" aria-pressed="false">Fecha específica</button>
-              </div>
-              <div id="panel-horario-rapido" class="space-y-3">
-                <div class="seg" role="group" aria-label="Día">
-                  <button type="button" id="btn-dia-hoy" aria-pressed="true">Hoy</button>
-                  <button type="button" id="btn-dia-manana" aria-pressed="false">Mañana</button>
-                </div>
-                <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold block">Hora (00:00 y 01:00 son de madrugada). Mínimo 30 min de antelación.</span>
-                <div id="grid-horas" class="grid grid-cols-4 sm:grid-cols-6 gap-2"></div>
-              </div>
-              <div id="panel-horario-manual" hidden class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div><label class="label" for="manual-dia">Día del mes</label><select id="manual-dia" class="field"></select></div>
-                <div><label class="label" for="manual-mes">Mes</label><select id="manual-mes" class="field"></select></div>
-                <div><label class="label" for="manual-hora">Hora exacta (24H)</label><select id="manual-hora" class="field"></select></div>
-              </div>
+              <p id="hint-vis" class="text-[11px] text-gray-400 mt-1.5">Solo tu rival verá que lo retaste.</p>
             </div>
           </div>
+
+          <div>
+            <span class="label">Tamaño <span class="text-gray-500 normal-case">(máx. 8 en total)</span></span>
+            <div id="tam-presets" class="grid grid-cols-4 gap-1.5 mb-2" role="group" aria-label="Formatos rápidos">
+              <button type="button" class="chip" data-t="1-1" aria-pressed="true">1v1</button>
+              <button type="button" class="chip" data-t="2-2" aria-pressed="false">2v2</button>
+              <button type="button" class="chip" data-t="3-3" aria-pressed="false">3v3</button>
+              <button type="button" class="chip" data-t="4-4" aria-pressed="false">4v4</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-black/40 border border-galaxy-border rounded-lg px-2.5 py-1.5">
+                <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Mi equipo (A)</div>
+                <div class="flex items-center justify-between gap-1 mt-0.5">
+                  <button type="button" id="tam-a-menos" aria-label="Quitar un jugador de mi equipo" class="chip !px-0 w-9 !min-h-9">−</button>
+                  <span id="tam-a" class="font-display font-extrabold text-xl text-white">1</span>
+                  <button type="button" id="tam-a-mas" aria-label="Añadir un jugador a mi equipo" class="chip !px-0 w-9 !min-h-9">+</button>
+                </div>
+              </div>
+              <div class="bg-black/40 border border-galaxy-border rounded-lg px-2.5 py-1.5">
+                <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Rival (B)</div>
+                <div class="flex items-center justify-between gap-1 mt-0.5">
+                  <button type="button" id="tam-b-menos" aria-label="Quitar un jugador del rival" class="chip !px-0 w-9 !min-h-9">−</button>
+                  <span id="tam-b" class="font-display font-extrabold text-xl text-white">1</span>
+                  <button type="button" id="tam-b-mas" aria-label="Añadir un jugador al rival" class="chip !px-0 w-9 !min-h-9">+</button>
+                </div>
+              </div>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-1.5">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span></p>
+          </div>
+
+          <div id="bloque-amigos" hidden class="space-y-2 bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40">
+            <span class="label">Invita a tu equipo (opcional)</span>
+            <input id="buscar-amigo" class="field" type="search" placeholder="Buscar jugador…" autocomplete="off" maxlength="40">
+            <ul id="lista-amigos" class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto"></ul>
+            <p id="hint-amigos" class="text-[11px] text-gray-400"></p>
+          </div>
+
+          <div>
+            <span class="label">¿Quién hostea?</span>
+            <div class="seg" id="seg-host" role="group" aria-label="Host">
+              <button type="button" data-v="yo" aria-pressed="true">Yo tengo host</button>
+              <button type="button" data-v="otro" aria-pressed="false">Necesito host</button>
+            </div>
+            <p id="hint-host" class="text-[11px] text-gray-400 mt-1.5"></p>
+          </div>
+
+          <div>
+            <label class="label" for="select-plataforma">Plataforma</label>
+            <select id="select-plataforma" class="field"><option value="Parsec">Parsec</option><option value="Smash Soda">Smash Soda</option><option value="Steam Remote Play">Steam Remote Play</option></select>
+          </div>
+
+          <div>
+            <span class="label">¿Cuándo?</span>
+            <div id="presets" class="grid grid-cols-5 gap-1.5" role="group" aria-label="Cuándo jugar">
+              <button type="button" class="chip !px-1" data-p="ya" aria-pressed="true">Ya</button>
+              <button type="button" class="chip !px-1" data-p="15" aria-pressed="false">15 min</button>
+              <button type="button" class="chip !px-1" data-p="30" aria-pressed="false">30 min</button>
+              <button type="button" class="chip !px-1" data-p="60" aria-pressed="false">1 hora</button>
+              <button type="button" class="chip !px-1" data-p="manual" aria-pressed="false" aria-label="Elegir hora"><i class="fa-regular fa-calendar"></i></button>
+            </div>
+            <p id="hint-when" class="text-[11px] text-gray-400 mt-1.5"></p>
+          </div>
+
+          <div id="campo-fecha" hidden class="bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40 space-y-3">
+            <div class="seg" role="group" aria-label="Modo de horario">
+              <button type="button" id="tab-modo-rapido" aria-pressed="true">Acceso rápido</button>
+              <button type="button" id="tab-modo-manual" aria-pressed="false">Fecha específica</button>
+            </div>
+            <div id="panel-horario-rapido" class="space-y-3">
+              <div class="seg" role="group" aria-label="Día">
+                <button type="button" id="btn-dia-hoy" aria-pressed="true">Hoy</button>
+                <button type="button" id="btn-dia-manana" aria-pressed="false">Mañana</button>
+              </div>
+              <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold block">Hora (00:00 y 01:00 son de madrugada). Mínimo 30 min de antelación.</span>
+              <div id="grid-horas" class="grid grid-cols-4 gap-1.5"></div>
+            </div>
+            <div id="panel-horario-manual" hidden class="grid grid-cols-3 gap-2">
+              <div><label class="label" for="manual-dia">Día</label><select id="manual-dia" class="field !px-2"></select></div>
+              <div><label class="label" for="manual-mes">Mes</label><select id="manual-mes" class="field !px-2"></select></div>
+              <div><label class="label" for="manual-hora">Hora</label><select id="manual-hora" class="field !px-2"></select></div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-galaxy-border/60 space-y-2.5">
+            <div class="text-xs"><span class="text-gray-400">Resumen: </span><span id="resumen" class="font-display font-bold text-galaxy-400 uppercase tracking-wide">—</span></div>
+            <button type="submit" id="btn-emitir-reto" disabled class="btn btn-primary !min-h-10 w-full"><i class="fa-solid fa-bullhorn"></i> Emitir Reto</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Derecha: Mis partidos / Retos en el radar (pestañas; se ve sin bajar) -->
+      <section id="col-partidos" class="min-w-0 space-y-3">
+        <div class="flex items-center justify-between gap-3 border-b border-galaxy-border pb-2">
+          <div class="seg w-full sm:w-auto sm:min-w-[22rem]" id="seg-listas" role="group" aria-label="Lista">
+            <button type="button" data-v="mis" aria-pressed="true">Mis partidos <b id="cnt-mis" class="text-galaxy-400"></b></button>
+            <button type="button" data-v="radar" aria-pressed="false">Retos en el radar <b id="cnt-radar" class="text-galaxy-400"></b></button>
+          </div>
+          <button id="btn-refrescar" type="button" class="text-xs text-galaxy-400 hover:text-white uppercase font-bold flex items-center gap-1 min-h-10 px-2 shrink-0" aria-label="Actualizar"><i class="fa-solid fa-arrows-rotate"></i><span class="hidden sm:inline"> Actualizar</span></button>
         </div>
-
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-galaxy-border/60">
-          <div class="text-xs"><span class="text-gray-400">Resumen: </span><span id="resumen" class="font-display font-bold text-galaxy-400 uppercase tracking-wide">—</span></div>
-          <button type="submit" id="btn-emitir-reto" disabled class="btn btn-primary !min-h-10 w-full sm:w-auto"><i class="fa-solid fa-bullhorn"></i> Emitir Reto</button>
+        <div id="mis-partidos" class="scroll-mt-28">
+          <div id="lista-mis" class="grid grid-cols-1 2xl:grid-cols-2 gap-3"></div>
         </div>
-      </form>
-    </section>
-
-    <!-- 4. Mis partidos -->
-    <section id="mis-partidos" hidden class="space-y-4 scroll-mt-24">
-      <h2 class="text-lg sm:text-xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow border-b border-galaxy-border pb-2">Mis partidos</h2>
-      <div id="lista-mis" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
-    </section>
-
-    <!-- 5. Retos públicos -->
-    <section class="space-y-4">
-      <div class="flex items-center justify-between border-b border-galaxy-border pb-2">
-        <h2 class="text-lg sm:text-xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Retos en el Radar</h2>
-        <button id="btn-refrescar" type="button" class="text-xs text-galaxy-400 hover:text-white uppercase font-bold flex items-center gap-1 min-h-11 px-2"><i class="fa-solid fa-arrows-rotate"></i> Actualizar</button>
-      </div>
-      <div id="lista-retos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"><div class="col-span-full text-center py-10 text-gray-400 text-xs">Cargando retos activos...</div></div>
-    </section>
+        <div id="lista-retos" hidden class="grid grid-cols-1 2xl:grid-cols-2 gap-3"><div class="col-span-full text-center py-10 text-gray-400 text-xs">Cargando retos activos...</div></div>
+      </section>
+    </div>
   </div>
 </Layout>
 <script>

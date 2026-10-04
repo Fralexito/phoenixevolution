@@ -4,6 +4,7 @@ import { siteHome } from '../core/config.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
+import { bindHandle, MIN_HANDLE } from './handleCheck.js';
 
 const ERRORS = {
   'Invalid login credentials': 'Correo o contraseña incorrectos.',
@@ -26,7 +27,13 @@ export function openAuthModal(mode = 'login') {
       </div>
       <div class="flex items-center gap-3 text-[10px] text-gray-500 uppercase tracking-widest"><span class="flex-1 h-px bg-galaxy-border"></span>o con correo<span class="flex-1 h-px bg-galaxy-border"></span></div>
       <form id="auth-form" class="space-y-4" novalidate>
-        ${isReg ? `<div><label class="label" for="a-tag">Nombre de usuario / apodo</label><input id="a-tag" class="field" maxlength="30" minlength="3" required autocomplete="nickname" placeholder="Ej: Fralex10"><p class="text-[11px] text-gray-500 mt-1">Así te verán en la liga. Podrás cambiarlo después en tu perfil.</p></div>` : ''}
+        ${isReg ? `
+        <div>
+          <label class="label" for="a-user">Usuario único</label>
+          <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-display font-bold">@</span><input id="a-user" class="field !pl-7" maxlength="20" required autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="fralex10"></div>
+          <p id="a-user-st" class="text-[11px] mt-1 min-h-4"></p>
+        </div>
+        <div><label class="label" for="a-tag">Apodo (nombre visible)</label><input id="a-tag" class="field" maxlength="30" required autocomplete="nickname" placeholder="Ej: El Fénix"><p class="text-[11px] text-gray-500 mt-1">El @ es único y es tu identidad (como en TikTok). El apodo es el nombre que verán en tus partidos. Puedes cambiar ambos después.</p></div>` : ''}
         <div><label class="label" for="a-mail">Correo</label><input id="a-mail" type="email" class="field" required autocomplete="email"></div>
         <div><label class="label" for="a-pass">Contraseña</label><input id="a-pass" type="password" class="field" required minlength="8" autocomplete="${isReg ? 'new-password' : 'current-password'}"></div>
         <p id="a-err" class="text-xs text-bad min-h-4" role="alert"></p>
@@ -36,6 +43,7 @@ export function openAuthModal(mode = 'login') {
     </div>`, { id: 'auth-modal' });
 
   const err = m.querySelector('#a-err');
+  const handle = isReg ? bindHandle(m.querySelector('#a-user'), m.querySelector('#a-user-st')) : null;
   m.querySelector('[data-switch]').addEventListener('click', () => openAuthModal(isReg ? 'login' : 'register'));
   m.querySelectorAll('[data-oauth]').forEach((b) => b.addEventListener('click', () => loginSocial(b.dataset.oauth)));
 
@@ -46,13 +54,18 @@ export function openAuthModal(mode = 'login') {
     const email = m.querySelector('#a-mail').value.trim();
     const password = m.querySelector('#a-pass').value;
     const apodo = isReg ? m.querySelector('#a-tag').value.trim().replace(/[<>]/g, '') : '';
+    const usuario = isReg ? m.querySelector('#a-user').value.trim() : '';
     if (!email || password.length < 8) { err.textContent = 'Escribe tu correo y una contraseña de 8+ caracteres.'; return; }
-    if (isReg && apodo.length < 3) { err.textContent = 'Escribe tu nombre de usuario o apodo (mínimo 3 caracteres).'; return; }
+    if (isReg && usuario.length < MIN_HANDLE) { err.textContent = 'Elige tu @usuario (mínimo 3 caracteres: a-z, 0-9 o _).'; return; }
+    if (isReg && apodo.length < 2) { err.textContent = 'Escribe tu apodo (mínimo 2 caracteres).'; return; }
     btn.disabled = true;
     try {
       if (isReg) {
-        // La clave interna sigue llamándose 'gamertag' porque así la lee el trigger handle_new_user de la BD.
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { gamertag: apodo }, emailRedirectTo: siteHome() } });
+        const estado = await handle.comprobar();
+        if (estado === 'ocupado') throw new Error('Ese @usuario ya está en uso. Elige otro.');
+        if (estado === 'reservado') throw new Error('Ese @usuario está reservado. Elige otro.');
+        // El trigger handle_new_user (BD) lee 'usuario' (@) y 'apodo'. 'gamertag' se envía también por compatibilidad.
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { usuario, apodo, gamertag: apodo }, emailRedirectTo: siteHome() } });
         if (error) throw error;
         closeModal('auth-modal');
         toast(data.session ? '¡Cuenta creada! Bienvenido.' : 'Cuenta creada. Revisa tu correo para confirmarla.', 'ok');

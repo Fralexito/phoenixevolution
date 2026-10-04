@@ -12,8 +12,23 @@ import { card } from '../features/duelos/cards.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
+import { bindSeg } from '../features/formControls.js';
 
 const $ = (id) => document.getElementById(id);
+
+/* ---------- Vistas: pestañas de listas (Mis partidos / Radar) y, en móvil, Lanzar / Partidos ---------- */
+let lista = 'mis';          // 'mis' | 'radar'
+let listaElegida = false;   // true cuando el usuario (o el enlace #mis-partidos) ya decidió; evita cambiarle la pestaña sola
+function pintarListas() {
+  $('lista-mis').parentElement.hidden = lista !== 'mis'; $('lista-retos').hidden = lista !== 'radar';
+  $('seg-listas').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === lista)));
+}
+function setLista(v, { elegida = true } = {}) { lista = v; if (elegida) listaElegida = true; pintarListas(); }
+function setVista(v) {
+  $('duelos-grid').dataset.vista = v;
+  $('seg-vista').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+}
+function irAMisPartidos() { setLista('mis'); setVista('partidos'); }
 
 /* ---------- Pintado ---------- */
 function renderAll() {
@@ -21,13 +36,19 @@ function renderAll() {
   if (document.activeElement?.closest?.('#lista-mis, #lista-retos') && document.activeElement.matches('input, textarea, select')) return;
   const id = me();
   const visible = visibleRetos();
-  const mine = visible.filter((r) => isMine(r, id));
+  const mine = id ? visible.filter((r) => isMine(r, id)) : [];
   const rest = visible.filter((r) => !isMine(r, id));
-  $('mis-partidos').hidden = !id;
-  $('lista-mis').innerHTML = mine.length ? mine.map((r) => card(r, id)).join('')
+  $('lista-mis').innerHTML = !id
+    ? '<div class="col-span-full text-center py-8 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">Inicia sesión para ver tus partidos.</div>'
+    : mine.length ? mine.map((r) => card(r, id)).join('')
     : '<div class="col-span-full text-center py-8 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">No tienes partidos activos. ¡Lanza un reto!</div>';
   $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('')
     : '<div class="col-span-full text-center py-10 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">No hay retos públicos activos en este momento.</div>';
+  $('cnt-mis').textContent = mine.length ? `(${mine.length})` : '';
+  $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
+  $('cnt-movil').textContent = visible.length ? `(${mine.length + rest.length})` : '';
+  // La primera vez, abrimos la pestaña con algo que ver: tus partidos si tienes, si no el radar de retos.
+  if (!listaElegida) { lista = mine.length ? 'mis' : 'radar'; pintarListas(); }
 }
 
 async function fetchAll() {
@@ -97,7 +118,7 @@ function initRadar() {
   });
   $('radar-list').addEventListener('click', (e) => {
     const id = e.target.closest('[data-retar]')?.dataset.retar; if (!id) return;
-    targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setVista('lanzar'); targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   $('seg-estado').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setNivel(b.dataset.v); });
 }
@@ -127,6 +148,11 @@ function syncAuthUI({ session }) {
 initForm(); initRadar(); refreshForm(); loadPerfiles().then(refreshForm);
 $('form-crear-reto').addEventListener('submit', submitReto);
 $('btn-refrescar').addEventListener('click', fetchAll);
+bindSeg($('seg-listas'), (v) => setLista(v));
+bindSeg($('seg-vista'), (v) => setVista(v));
+window.addEventListener('duelos:creado', irAMisPartidos);
+if (location.hash === '#mis-partidos') irAMisPartidos();
+window.addEventListener('hashchange', () => { if (location.hash === '#mis-partidos') irAMisPartidos(); });
 ['lista-retos', 'lista-mis'].forEach((id) => {
   $(id).addEventListener('click', onCardClick);
   $(id).addEventListener('submit', (e) => {

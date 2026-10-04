@@ -168,5 +168,6 @@ export async function submitReto(ev) {
   for (const uid of ui.amigos) { if (!(await invitar(createdId, uid, 'A'))) fallidas += 1; }   // si alguna falla, el reto ya existe: se avisa sin deshacerlo
   ui.amigos.clear();
   toast(fallidas ? `Reto emitido, pero ${fallidas} invitación(es) fallaron.` : direct ? `Reto ${ui.a} vs ${ui.b} enviado a ${nm(ui.rival)}.` : '¡Reto emitido a la red!', fallidas ? 'error' : 'ok');
+  window.dispatchEvent(new CustomEvent('duelos:creado'));
   await refresh();
 }
