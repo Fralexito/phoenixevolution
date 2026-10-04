@@ -234,3 +234,17 @@ test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la s
   assert.equal(ratioDe('1/1'), 1); assert.equal(ratioDe(undefined), 1.25);
   assert.deepEqual(outSize(5000, '4/5'), { w: 800, h: 1000 }); assert.deepEqual(outSize(5000, '1/1'), { w: 800, h: 800 }); assert.deepEqual(outSize(5000), { w: 800, h: 640 });
 });
+
+import { columnasValidas, cambiarColumnas, separacion } from '../src/js/core/density.js';
+import { puedeEntrar } from '../src/js/features/ticker.js';
+test('densidad: límites, valores raros y pasos', () => {
+  assert.equal(columnasValidas(99, true), 4); assert.equal(columnasValidas(0, true), 1); assert.equal(columnasValidas('x', true), 2);
+  assert.equal(columnasValidas(99, false), 8); assert.equal(columnasValidas(1, false), 2); assert.equal(columnasValidas(null, false), 4);
+  assert.equal(cambiarColumnas(4, 1, true), 4); assert.equal(cambiarColumnas(1, -1, true), 1); assert.equal(cambiarColumnas(4, 1, false), 5);
+  assert.ok(separacion(8, false) < separacion(2, false));
+});
+test('ticker: la siguiente noticia entra cuando queda libre el hueco', () => {
+  assert.equal(puedeEntrar(undefined, 0, 800, 90), true);
+  assert.equal(puedeEntrar(500, 300, 800, 90), false);   // borde derecho 800 + hueco > 800
+  assert.equal(puedeEntrar(400, 300, 800, 90), true);    // 790 ≤ 800
+});

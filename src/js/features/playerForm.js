@@ -48,6 +48,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
       <div class="flex items-start gap-4">
         <div class="flex-1 min-w-0 space-y-3">
           <div><label class="label" for="f-nombre">Nombre</label><input id="f-nombre" class="field" maxlength="40" value="${escapeHTML(p.nombre)}"></div>
+          <div><label class="label" for="f-apodo">Apodo <span class="text-gray-500 normal-case">(opcional)</span></label><input id="f-apodo" class="field" maxlength="24" placeholder="Ej: El Cometa" value="${escapeHTML(p.apodo)}"></div>
           <div><label class="label" for="f-club">Club</label><input id="f-club" class="field" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
         </div>
         <div class="flex flex-col items-center gap-1.5 shrink-0">
@@ -167,7 +168,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   let fotoOriginal = null;   // archivo original, para poder «Reencuadrar» sin volver a elegirlo
   let fotoAspecto = p.foto_aspecto ?? null;   // proporción elegida en el recortador (si no se cambia la foto, no se toca)
   const ponerVista = (blob) => { $('#f-prev').innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="" class="w-full h-full object-cover">`; $('#f-reenc').hidden = false; };
-  const jugadorActual = () => ({ foto_aspecto: fotoAspecto, nombre: $('#f-nombre').value.trim(), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
+  const jugadorActual = () => ({ foto_aspecto: fotoAspecto, nombre: $('#f-nombre').value.trim(), apodo: $('#f-apodo').value.trim(), club: $('#f-club').value.trim(), posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', ovr: vals.ovr, quote: $('#f-quote').value.trim(), ...vals });
   async function recortar(file) {
     try {
       const res = await openPhotoCropper(file, { getPlayer: jugadorActual, aspecto: fotoAspecto ?? (p.foto_url ? '5/4' : null) });
@@ -191,7 +192,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     const nombre = $('#f-nombre').value.trim().replace(/[<>]/g, '');
     if (!nombre) { err.textContent = 'Escribe el nombre.'; return; }
     const row = {
-      nombre, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
+      nombre, apodo: $('#f-apodo').value.trim().replace(/[<>]/g, '').slice(0, 24) || null, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
       posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(), descripcion: $('#f-desc').value.trim().replace(/[<>]/g, '') || null,
       ovr: vals.ovr,
     };

@@ -10,10 +10,7 @@ import Layout from '../layouts/Layout.astro';
         <p class="text-gray-400 text-sm mt-1">Base de datos global: registro oficial de estadísticas y valoraciones.</p>
       </div>
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-        <div class="flex gap-2 shrink-0">
-          <button id="btn-compare" type="button" class="btn btn-ghost flex-1"><i class="fa-solid fa-scale-balanced"></i> Comparar</button>
-          <button id="btn-masivo" type="button" class="btn btn-ghost flex-1"><i class="fa-solid fa-people-group"></i> Masiva</button>
-        </div>
+        <button id="btn-compare" type="button" class="btn btn-ghost shrink-0"><i class="fa-solid fa-scale-balanced"></i> Comparar</button>
         <button id="btn-add-player" type="button" hidden class="btn btn-primary shrink-0"><i class="fa-solid fa-plus"></i> Añadir Jugador</button>
         <div class="flex gap-3 w-full sm:w-auto">
           <select id="player-filter-select" aria-label="Filtrar por equipo" class="field !w-1/2 sm:!w-auto"><option value="ALL">Todos los Equipos</option></select>
@@ -24,7 +21,15 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </div>
     </div>
-    <div id="players-container" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 pt-2">
+    <!-- Herramientas sutiles: leyenda de stats y densidad (tarjetas por fila, como el zoom del explorador de archivos) -->
+    <div class="flex justify-end items-center gap-1 -mb-3 text-gray-500">
+      <button id="btn-leyenda" type="button" class="dens-btn" aria-label="Ver leyenda de las stats" title="Leyenda de stats"><i class="fa-solid fa-circle-info"></i></button>
+      <span class="w-px h-4 bg-galaxy-line mx-1"></span>
+      <button id="dens-menos" type="button" class="dens-btn" aria-label="Menos tarjetas por fila (más grandes)" title="Tarjetas más grandes"><i class="fa-solid fa-minus"></i></button>
+      <i class="fa-solid fa-table-cells-large text-[11px] opacity-70" aria-hidden="true"></i>
+      <button id="dens-mas" type="button" class="dens-btn" aria-label="Más tarjetas por fila (más pequeñas)" title="Tarjetas más pequeñas"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div id="players-container" class="grid pt-2">
       <div class="col-span-full text-center py-10 text-gray-400 text-sm flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-galaxy-400 mb-3"></i> Descargando registros de la liga...</div>
     </div>
   </div>
@@ -33,8 +38,7 @@ import Layout from '../layouts/Layout.astro';
     <i class="fa-solid fa-scale-balanced text-galaxy-400"></i>
     <span id="cmp-bar-txt" class="flex-1 min-w-0 truncate text-xs text-gray-200 font-display uppercase tracking-wide"></span>
     <button id="cmp-clear" type="button" class="text-[11px] text-gray-400 hover:text-white uppercase font-bold px-2 min-h-9">Limpiar</button>
-    <button id="cmp-go" type="button" class="btn btn-primary !py-1.5 !px-3 !text-xs" disabled>1 vs 1</button>
-    <button id="cmp-masivo" type="button" class="btn btn-ghost !py-1.5 !px-3 !text-xs" disabled>Masiva</button>
+    <button id="cmp-go" type="button" class="btn btn-primary !py-1.5 !px-3 !text-xs" disabled>Comparar</button>
   </div>
 </Layout>
 <script>

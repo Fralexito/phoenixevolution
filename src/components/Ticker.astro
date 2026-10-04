@@ -6,8 +6,7 @@ import { TICKER } from '../data/site.js';
   <div class="shrink-0 bg-galaxy-600 text-white font-display font-bold px-2.5 sm:px-4 flex items-center z-10 shadow-[5px_0_15px_rgba(0,0,0,0.5)] uppercase tracking-wide sm:tracking-wider text-[11px] sm:text-sm whitespace-nowrap">
     <i class="fa-solid fa-bolt mr-1.5 sm:mr-2 animate-pulse text-galaxy-400"></i> ÚLTIMA HORA
   </div>
-  <!-- Zona de lectura: UNA noticia a la vez cruza la barra y, cuando sale, hay una pausa antes de la siguiente
-       (menos carga visual). features/ticker.js la anima; las noticias viajan en data-items. -->
+  <!-- Zona de lectura: las noticias fluyen una tras otra con un hueco mínimo (varias pueden coincidir). features/ticker.js la anima; las noticias viajan en data-items. -->
   <div id="ticker-view" data-items={JSON.stringify(TICKER)} class="flex-1 min-w-0 overflow-hidden relative flex items-center">
     <span id="ticker-item" class="ticker-item font-sans text-xs sm:text-sm text-galaxy-50"><span class="text-galaxy-400 mr-2">◆</span>{TICKER[0]}</span>
   </div>

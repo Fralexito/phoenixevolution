@@ -6,8 +6,10 @@ import { toast } from '../core/toast.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
-import { openCompareMasivo } from '../features/compareMasivo.js';
 import { MAX_COMPARE } from '../core/compare.js';
+import { norm } from '../core/search.js';
+import { columnasValidas, cambiarColumnas, separacion } from '../core/density.js';
+import { openStatLegend } from '../features/statLegend.js';
 
 const $ = (id) => document.getElementById(id);
 let all = [];
@@ -16,8 +18,8 @@ let term = '';
 const sel = []; // ids marcados para comparar (máx. 8; en el comparador se reparten en equipos A y B)
 
 function paint() {
-  const t = term.trim().toLowerCase();
-  const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || p.nombre.toLowerCase().includes(t)));
+  const t = norm(term);
+  const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
   const admin = isAdmin();
   $('players-container').innerHTML = list.length
     ? list.map((p, i) => `<div class="relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}
@@ -34,8 +36,7 @@ function paint() {
 function paintBar() {
   const bar = $('cmp-bar'); bar.hidden = !sel.length;
   $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige al menos otro` : `${sel.length} jugadores seleccionados`;
-  $('cmp-go').disabled = sel.length !== 2;      // 1 vs 1 solo con exactamente 2
-  $('cmp-masivo').disabled = sel.length < 2;
+  $('cmp-go').disabled = sel.length < 2;        // un solo botón: con 2 abre 1 vs 1; con 3 o más, la masiva (se puede cambiar dentro)
 }
 
 function fillClubs() {
@@ -59,9 +60,24 @@ async function load() {
 $('player-filter-select').addEventListener('change', (e) => { club = e.target.value; paint(); });
 $('player-search-input').addEventListener('input', (e) => { term = e.target.value; paint(); });
 $('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel[0], sel[1])));
-$('btn-masivo').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompareMasivo(all, sel)));
-$('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1]));
-$('cmp-masivo').addEventListener('click', () => openCompareMasivo(all, sel));
+$('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1], sel.length > 2 ? sel : null));
+$('btn-leyenda').addEventListener('click', openStatLegend);
+
+// ---- Densidad: tarjetas por fila. Se recuerda por tipo de pantalla (celular / PC) en este navegador. ----
+const esMovil = () => window.matchMedia('(max-width: 639px)').matches;
+const claveDens = () => (esMovil() ? 'pes-dens-movil' : 'pes-dens-pc');
+const leerDens = () => { try { return columnasValidas(localStorage.getItem(claveDens()), esMovil()); } catch { return columnasValidas(null, esMovil()); } };
+let cols = leerDens();
+function aplicarDens() {
+  const m = esMovil(); cols = columnasValidas(cols, m);
+  const box = $('players-container'); box.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`; box.style.gap = `${separacion(cols, m)}rem`; box.dataset.denso = String(cols >= (m ? 3 : 6));
+  $('dens-menos').disabled = cols === columnasValidas(-99, m); $('dens-mas').disabled = cols === columnasValidas(99, m);
+}
+const moverDens = (d) => { cols = cambiarColumnas(cols, d, esMovil()); try { localStorage.setItem(claveDens(), String(cols)); } catch { /* sin almacenamiento: solo no se recuerda */ } aplicarDens(); };
+$('dens-menos').addEventListener('click', () => moverDens(-1));
+$('dens-mas').addEventListener('click', () => moverDens(1));
+window.matchMedia('(max-width: 639px)').addEventListener('change', () => { cols = leerDens(); aplicarDens(); });
+aplicarDens();
 $('cmp-clear').addEventListener('click', () => { sel.length = 0; paint(); });
 $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 // Menú sutil «⋯» de cada ficha (solo admin): se abre al tocarlo y se cierra al tocar fuera.

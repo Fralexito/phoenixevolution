@@ -123,3 +123,11 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **La tarjeta no cambia de tamaño.** La foto es ahora una capa detrás de todo el contenido (`playerCard.js`). El recortador ofrece el largo: **Normal 5:4** (solo la zona superior), **Media 1:1** (llega al nombre) y **Larga 4:5** (por defecto en fotos nuevas: baja hasta las estadísticas, con degradado para que se lean). Marco y vista previa usan exactamente esa proporción.
 - Se guarda en `jugadores.foto_aspecto` (migración `009`); las fotos antiguas quedan en Normal. «Reencuadrar» recuerda la elección.
 - **Celular**: 2 tarjetas por fila (Jugadores y Destacados), tipografía y márgenes compactos, frase oculta en móvil. PC sin cambios de tamaño.
+
+## Ronda 15 — Densidad, apodo, un solo «Comparar», ticker continuo, leyenda
+- **Densidad de tarjetas** (`core/density.js` + `pages/database.js`): control sutil −/+ sobre la lista (como el zoom del explorador de archivos). Celular 1–4 columnas (por defecto 2), PC 2–8 (por defecto 4); se recuerda por tipo de pantalla en el navegador. La tarjeta escala sola (container queries en `components.css`, todo en «em»); con tarjetas muy pequeñas se ocultan stats y club.
+- **Apodo** (`jugadores.apodo`, migración `010`, máx. 24): campo opcional en editar, aparece junto al nombre en la tarjeta y la búsqueda lo encuentra.
+- **Comparar**: un solo botón (cabecera y barra flotante). Abre 1 vs 1; dentro hay una mini opción «Masiva». Con 3+ marcados abre directo la masiva.
+- **Última hora**: flujo continuo; cada noticia entra cuando la anterior dejó un hueco mínimo (90 px PC, 56 px celular), así pueden verse varias a la vez.
+- **Leyenda de stats**: botón ⓘ sutil sobre la lista de Jugadores (`features/statLegend.js`).
+- **Duelos**: márgenes laterales un poco mayores.

@@ -1,41 +1,51 @@
 // Barra "Última hora": (1) se esconde al bajar la página y vuelve al subir (patrón "headroom"),
-// (2) muestra UNA noticia a la vez, a velocidad fija en px/s (más lenta en celular), con una pausa antes de la siguiente.
+// (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco mínimo entre ellas; pueden coincidir varias.
 const EL_ID = 'ticker';
 const ARRIBA = 80;   // por encima de esta posición (px) siempre se ve
 const UMBRAL = 8;    // movimiento mínimo (px) para reaccionar; evita parpadeos por el "temblor" del scroll
 
-const VEL_PC = 75;        // px por segundo en pantallas ≥ 640px
+const VEL_PC = 75;       // px por segundo en pantallas ≥ 640px
 const VEL_MOVIL = 32;    // px por segundo en celular (más lento: da tiempo a leer)
-const PAUSA_PC = 2500;   // ms de barra vacía entre una noticia y la siguiente
-const PAUSA_MOVIL = 2000;
+const HUECO_PC = 90;     // px mínimos entre el final de una noticia y el inicio de la siguiente
+const HUECO_MOVIL = 56;
 
-/** Segundos que tarda una noticia de ancho `w` en cruzar una zona de ancho `vw` a `vel` px/s (entra por la derecha y sale por la izquierda). */
-export const duracionMs = (vw, w, vel) => Math.round(((vw + w) / vel) * 1000);
+/** ¿Ya puede entrar la siguiente noticia? Sí cuando la última dejó libre su hueco: borde derecho + hueco ≤ ancho visible. */
+export const puedeEntrar = (ultimoX, ultimoAncho, vw, hueco) => ultimoX == null || ultimoX + ultimoAncho + hueco <= vw;
 
-/** Muestra UNA noticia a la vez: cruza la barra, pausa, y sigue con la siguiente (en bucle). */
+/** Flujo continuo: las noticias entran una tras otra con un hueco mínimo, y varias pueden verse a la vez. */
 function initMarquee() {
-  const view = document.getElementById('ticker-view'); const item = document.getElementById('ticker-item');
-  if (!view || !item || !item.animate) return;                              // sin Web Animations: queda la primera noticia estática
+  const view = document.getElementById('ticker-view'); const base = document.getElementById('ticker-item');
+  if (!view || !base) return;
   let items; try { items = JSON.parse(view.dataset.items ?? '[]'); } catch { items = []; }
   if (!items.length) return;
-  let i = 0; let anim = null; let timer = null;
   const movil = () => window.matchMedia('(max-width: 639px)').matches;
+  const vivas = []; let i = 0; let pausa = false; let previo = 0; let vw = view.clientWidth;
+  base.remove();                                                          // la noticia estática de respaldo (sin JS) ya no hace falta
 
-  const mostrar = () => {
-    clearTimeout(timer);
-    const diamante = document.createElement('span'); diamante.className = 'text-galaxy-400 mr-2'; diamante.textContent = '◆';
-    item.replaceChildren(diamante, document.createTextNode(items[i % items.length])); i += 1;
-    const vw = view.clientWidth; const w = item.offsetWidth;
-    if (!vw || !w) { timer = setTimeout(mostrar, 300); i -= 1; return; }  // aún sin medidas (fuentes cargando): reintenta
-    anim = item.animate([{ transform: `translateX(${vw}px)` }, { transform: `translateX(${-w}px)` }], { duration: duracionMs(vw, w, movil() ? VEL_MOVIL : VEL_PC), easing: 'linear', fill: 'forwards' });
-    anim.onfinish = () => { timer = setTimeout(mostrar, movil() ? PAUSA_MOVIL : PAUSA_PC); };
+  const crear = () => {
+    const el = document.createElement('span'); el.className = 'ticker-item font-sans text-xs sm:text-sm text-galaxy-50';
+    const d = document.createElement('span'); d.className = 'text-galaxy-400 mr-2'; d.textContent = '◆';
+    el.append(d, document.createTextNode(items[i % items.length])); i += 1;
+    view.append(el); const w = el.offsetWidth;
+    if (!w) { el.remove(); i -= 1; return; }                              // aún sin medidas (fuentes cargando): reintenta en el siguiente cuadro
+    vivas.push({ el, x: vw, w });
   };
-  mostrar();
+  const cuadro = (t) => {
+    const dt = Math.min((t - previo) / 1000, 0.1); previo = t;
+    if (!pausa && vw) {
+      const vel = movil() ? VEL_MOVIL : VEL_PC;
+      for (const n of vivas) { n.x -= vel * dt; n.el.style.transform = `translateX(${n.x}px)`; }
+      while (vivas.length && vivas[0].x + vivas[0].w < 0) vivas.shift().el.remove();
+      const u = vivas[vivas.length - 1];
+      if (puedeEntrar(u?.x, u?.w, vw, movil() ? HUECO_MOVIL : HUECO_PC)) crear();
+    }
+    requestAnimationFrame(cuadro);
+  };
+  requestAnimationFrame((t) => { previo = t; cuadro(t); });
   // Pausa al pasar el mouse o tocar para poder leer; sigue al soltar.
-  view.addEventListener('pointerenter', () => anim?.pause());
-  view.addEventListener('pointerleave', () => anim?.play());
-  // Al cambiar el tamaño de la ventana se reinicia la noticia actual con las medidas nuevas.
-  let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { anim?.cancel(); i = Math.max(0, i - 1); mostrar(); }, 250); });
+  view.addEventListener('pointerenter', () => { pausa = true; });
+  view.addEventListener('pointerleave', () => { pausa = false; });
+  window.addEventListener('resize', () => { vw = view.clientWidth; });
 }
 
 export function initTicker() {

@@ -19,33 +19,33 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
   const pos = posInfo(p.posicion);
   const stats = STAT_KEYS.map((k) => {
     const v = stat(p[k]);
-    return `<div class="flex justify-between items-center"><span class="text-gray-300 font-bold uppercase text-[10px]">${k.toUpperCase()}</span><span style="color:${statColor(v)}" class="font-bold">${v}</span></div>`;
+    return `<div class="flex justify-between items-center"><span class="pc-k">${k.toUpperCase()}</span><span style="color:${statColor(v)}" class="font-bold">${v}</span></div>`;
   }).join('');
   const size = wide ? 'w-[calc(50%-6px)] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]' : 'w-full';
   // La foto es una CAPA detrás de todo (proporción elegida). Un separador 5:4 reserva la zona de la foto y el contenido va encima:
   // con proporción «larga» la foto baja por detrás del nombre y las estadísticas sin agrandar la tarjeta.
   return `
-  <article class="${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between">
+  <article class="${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
     <div data-foto-caja style="aspect-ratio:${ratioDe(p.foto_aspecto)}" class="absolute inset-x-0 top-0 bg-black/40 overflow-hidden">
       ${foto}
       <div class="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-galaxy-deep via-galaxy-deep/70 to-transparent pointer-events-none"></div>
     </div>
     <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-galaxy-400 to-transparent opacity-60 z-10"></div>
-    <div class="relative z-10">
+    <div class="pc-in relative z-10">
       <div class="relative" style="aspect-ratio:1.25">
-        <div class="absolute left-2.5 sm:left-4 bottom-2 flex items-end gap-1.5 sm:gap-2.5">
-          <span class="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tighter text-shadow-glow leading-none">${stat(p.ovr, 0) || '--'}</span>
-          <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}26" class="text-[10px] sm:text-[11px] font-display font-bold uppercase tracking-widest px-1.5 sm:px-2 py-0.5 rounded border mb-0.5">${escapeHTML(p.posicion)}</span>
+        <div class="pc-badges">
+          <span class="pc-ovr text-shadow-glow">${stat(p.ovr, 0) || '--'}</span>
+          <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}26" class="pc-pos">${escapeHTML(p.posicion)}</span>
         </div>
       </div>
-      <div class="px-2.5 sm:px-4 pt-2 pb-2.5 sm:pb-4">
-        <div class="border-b border-galaxy-border/80 pb-2 sm:pb-3">
-          <h3 class="text-sm sm:text-lg font-display font-bold text-white uppercase tracking-wider truncate [text-shadow:0_1px_6px_#000]">${escapeHTML(p.nombre)}</h3>
-          <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-gray-200 mt-0.5 sm:mt-1 [text-shadow:0_1px_4px_#000]"><i class="fa-solid fa-shield-halved text-galaxy-400 text-[10px]"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
+      <div class="pc-info">
+        <div class="pc-head">
+          <h3 class="pc-name">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="pc-apodo">«${escapeHTML(p.apodo)}»</span>` : ''}</h3>
+          <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
         </div>
-        <div class="mt-2 sm:mt-3 grid grid-cols-2 gap-x-2.5 sm:gap-x-4 gap-y-1 sm:gap-y-2 bg-black/45 p-2 sm:p-3 rounded-lg border border-galaxy-border/60 text-[11px] sm:text-xs">${stats}</div>
+        <div class="pc-stats">${stats}</div>
       </div>
-      ${p.quote ? `<div class="border-t border-galaxy-border mx-2.5 sm:mx-4 mb-2.5 sm:mb-4 pt-2 hidden sm:block"><p class="text-[11px] text-[#a78bfa] italic leading-relaxed line-clamp-2">"${escapeHTML(p.quote)}"</p></div>` : ''}
+      ${p.quote ? `<div class="pc-quote"><p>"${escapeHTML(p.quote)}"</p></div>` : ''}
     </div>
   </article>`;
 }

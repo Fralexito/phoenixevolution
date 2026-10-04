@@ -1,6 +1,7 @@
 // Comparador 1 vs 1: cabecera y resumen siempre visibles; radar, barras y perfil en pestañas (menos scroll).
 // (La comparación de varios jugadores por equipos vive en compareMasivo.js.)
-import { openModal } from '../core/modal.js';
+import { openModal, closeModal } from '../core/modal.js';
+import { openCompareMasivo } from './compareMasivo.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
 import { compareStats, axisPoint, radarPoints } from '../core/compare.js';
 import { STAT_INFO } from '../../data/stats.js';
@@ -58,7 +59,8 @@ const textoJugador = (p, color) => p && (p.descripcion || p.quote) ? `<div class
   ${p.descripcion ? `<p class="text-[12px] text-gray-300 leading-relaxed mt-1 whitespace-pre-line">${escapeHTML(p.descripcion)}</p>` : ''}</div>` : '';
 
 /** Abre el comparador. `players` = lista completa; `idA`/`idB` = jugadores preseleccionados (pueden faltar). */
-export function openCompare(players, idA = null, idB = null) {
+export function openCompare(players, idA = null, idB = null, masivoIds = null) {
+  if (masivoIds?.length > 2) { openCompareMasivo(players, masivoIds); return; }   // 3 o más marcados: directo a la masiva
   let a = players.find((p) => p.id === idA) ?? null;
   let b = players.find((p) => p.id === idB) ?? null;
   let tab = 'radar';   // 'radar' | 'barras' | 'perfil'
@@ -67,7 +69,10 @@ export function openCompare(players, idA = null, idB = null) {
     <div class="p-5 sm:p-6 space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-scale-balanced text-galaxy-400 mr-2"></i>Comparar</h2>
+        <div class="flex items-center gap-3">
+          <button type="button" id="cmp-ir-masivo" class="text-[11px] text-gray-400 hover:text-white font-display font-bold uppercase tracking-wider" title="Comparar hasta 8 jugadores en dos equipos"><i class="fa-solid fa-people-group mr-1"></i>Masiva</button>
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div><label class="label" for="cmp-a-in" style="color:${CA}">Jugador A</label><div id="cmp-a"></div></div>
@@ -76,6 +81,7 @@ export function openCompare(players, idA = null, idB = null) {
       <div id="cmp-body" aria-live="polite"></div>
     </div>`, { id: 'compare-modal', wide: true });
 
+  m.querySelector('#cmp-ir-masivo').addEventListener('click', () => { closeModal('compare-modal'); openCompareMasivo(players, [a?.id, b?.id].filter(Boolean)); });
   const body = m.querySelector('#cmp-body');
   const paint = () => {
     if (!a || !b) { body.innerHTML = `<p class="text-center text-sm text-gray-400 py-10">Elige dos jugadores para compararlos.</p>`; return; }
