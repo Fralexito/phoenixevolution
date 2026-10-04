@@ -459,3 +459,30 @@ test('perfil: logros y fecha', () => {
   assert.equal(partirLogros(null).length, 0); assert.equal(partirLogros(Array(30).fill('x').join('\n')).length, 12);
   assert.equal(mesAnio('2024-03-15'), 'marzo de 2024'); assert.equal(mesAnio('basura'), ''); assert.equal(mesAnio('2024-13-01'), '');
 });
+import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../src/js/core/estilo.js';
+import { puntosAcumulados, rendimiento } from '../src/js/core/perfil.js';
+const FICHA = (o = {}) => ({ posicion: 'DC', atq: 90, fin: 92, pot: 85, efe: 70, reg: 80, cor: 80, cre: 70, def: 50, pre: 60, pos: 55, ant: 50, pas: 70, rit: 80, men: 85, ...o });
+test('estilo: ejes, etiquetas y fortalezas', () => {
+  const e = Object.fromEntries(ejesEstilo(FICHA()).map((x) => [x.id, x.valor]));
+  assert.equal(e.ataque, 89); assert.equal(e.defensa, 52); assert.equal(e.mentalidad, 85); assert.equal(EJES.length, 6);
+  assert.deepEqual(arquetipos(FICHA()), ['Finalizador', 'Mente fría']);
+  assert.equal(arquetipos(FICHA(Object.fromEntries(['atq','fin','pot','efe','reg','cor','cre','def','pre','pos','ant','pas','rit','men'].map((k) => [k, 80]))))[0], 'Completo');
+  const fd = fortalezasDebilidades(FICHA(), ['atq', 'fin', 'def', 'ant']); assert.equal(fd.fuertes[0].k, 'fin'); assert.equal(fd.flojas[0].v, 50);
+  assert.match(estiloTexto(FICHA()), /Ofensivo/); assert.match(estiloTexto(FICHA({ atq: 50, fin: 50, pot: 50, def: 90, pos: 90, ant: 90 })), /Conservador/);
+  assert.equal(ejesEstilo({}).every((x) => x.valor === 75), true);                         // ficha vacía → 75, nunca NaN
+});
+test('mapa de calor: depende de la posición y de las stats; los tercios suman 100', () => {
+  const dc = mapaCalor(FICHA()); const dfc = mapaCalor(FICHA({ posicion: 'DFC' })); const po = mapaCalor(FICHA({ posicion: 'PO' }));
+  for (const m of [dc, dfc, po]) assert.equal(m.tercios.defensa + m.tercios.medio + m.tercios.ataque, 100);
+  assert.ok(dc.tercios.ataque > dfc.tercios.ataque); assert.ok(po.tercios.defensa > 60); assert.ok(dc.tercios.ataque > 55);
+  const ofensivo = mapaCalor(FICHA({ posicion: 'MC', atq: 95, fin: 95, pot: 95, def: 40, pos: 40, ant: 40 })); const defensivo = mapaCalor(FICHA({ posicion: 'MC', atq: 40, fin: 40, pot: 40, def: 95, pos: 95, ant: 95 }));
+  assert.ok(ofensivo.zonas[0].x > defensivo.zonas[0].x);                                    // mismo puesto, otro estilo → zona distinta
+  assert.ok(mapaCalor({ posicion: 'XX' }).zonas.length > 0);                                // posición desconocida → mediocentro
+  assert.ok(mapaCalor(FICHA()).zonas.every((z) => z.x >= 4 && z.x <= 96));
+});
+test('perfil: puntos acumulados y rendimiento', () => {
+  assert.deepEqual(puntosAcumulados(EDP, 'Ana'), [{ n: 1, pts: 3 }, { n: 2, pts: 4 }]);
+  assert.deepEqual(puntosAcumulados(EDP, 'Cris'), [{ n: 1, pts: 1 }]); assert.deepEqual(puntosAcumulados(null, 'Ana'), []);
+  assert.deepEqual(rendimiento({ pj: 4, g: 2, gf: 10, gc: 6, pts: 7 }), { gfPorPartido: 2.5, gcPorPartido: 1.5, victorias: 50, puntos: 58 });
+  assert.equal(rendimiento({ pj: 0 }), null); assert.equal(rendimiento(null), null);
+});

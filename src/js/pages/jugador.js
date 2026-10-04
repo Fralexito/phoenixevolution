@@ -6,6 +6,13 @@ import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
 import { forma } from '../core/ligaStats.js';
+import { onSession, isAdmin } from '../core/session.js';
+import { openPlayerForm } from '../features/playerForm.js';
+import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../core/estilo.js';
+import { radarPoints, axisPoint } from '../core/compare.js';
+import { STAT_INFO } from '../../data/stats.js';
+import { STAT_KEYS } from '../features/playerCard.js';
+import { puntosAcumulados, rendimiento } from '../core/perfil.js';
 import { posInfo } from '../../data/posiciones.js';
 
 const $ = (id) => document.getElementById(id);
@@ -52,7 +59,76 @@ function datosPerfil(p) {
   </section>` : ''}`;
 }
 
+// ---- Análisis de juego (se muestra al pulsar el botón) ----
+const NOTA_APROX = '<p class="text-[11px] text-gray-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i>Aproximado: se calcula con la posición y las stats de la ficha. No es un seguimiento real de partidos.</p>';
+function canchaSVG({ zonas }) {
+  const blobs = zonas.map((z) => `<ellipse cx="${(z.x * 1.05).toFixed(1)}" cy="${(z.y * 0.68).toFixed(1)}" rx="${(z.rx * 1.3).toFixed(1)}" ry="${(z.ry * 0.85).toFixed(1)}" fill="url(#calor)" opacity="${Math.min(1, 0.45 + z.peso * 0.55).toFixed(2)}"/>`).join('');
+  const l = 'fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".4"';
+  return `<svg viewBox="0 0 105 68" class="w-full rounded-xl border border-galaxy-border/60" role="img" aria-label="Mapa de calor aproximado">
+    <defs><radialGradient id="calor"><stop offset="0" stop-color="#ff3b30" stop-opacity=".95"/><stop offset=".45" stop-color="#ffb300" stop-opacity=".55"/><stop offset="1" stop-color="#00e5ff" stop-opacity="0"/></radialGradient>
+    <filter id="difuso" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>
+    <rect width="105" height="68" fill="#0b3d2a"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${i * 15}" width="15" height="68" fill="${i % 2 ? 'rgba(255,255,255,.035)' : 'transparent'}"/>`).join('')}
+    <g ${l}><rect x="1" y="1" width="103" height="66"/><line x1="52.5" y1="1" x2="52.5" y2="67"/><circle cx="52.5" cy="34" r="9"/>
+      <rect x="1" y="14" width="16" height="40"/><rect x="1" y="24" width="6" height="20"/><rect x="88" y="14" width="16" height="40"/><rect x="98" y="24" width="6" height="20"/></g>
+    <g filter="url(#difuso)" style="mix-blend-mode:screen">${blobs}</g>
+    <text x="4" y="65" font-size="3" fill="rgba(255,255,255,.55)">Arco propio</text><text x="101" y="65" font-size="3" text-anchor="end" fill="rgba(255,255,255,.55)">Ataque →</text></svg>`;
+}
+function radarSVG(ejes) {
+  const cx = 110; const cy = 105; const r = 70; const o = Object.fromEntries(ejes.map((e) => [e.id, e.valor])); const ids = EJES.map((e) => e.id);
+  const anillos = [0.25, 0.5, 0.75, 1].map((t) => `<polygon points="${ids.map((_, i) => axisPoint(i, ids.length, cx, cy, r * t).map((n) => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="rgba(255,255,255,.12)"/>`).join('');
+  const etiquetas = ejes.map((e, i) => { const [x, y] = axisPoint(i, ids.length, cx, cy, r + 18); return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="9" text-anchor="middle" dominant-baseline="middle" fill="#cbd5e1">${escapeHTML(e.nombre)} <tspan fill="#00e5ff" font-weight="700">${e.valor}</tspan></text>`; }).join('');
+  return `<svg viewBox="0 0 220 210" class="w-full max-w-[340px] mx-auto" role="img" aria-label="Radar de estilo">${anillos}<polygon points="${radarPoints(o, ids, { cx, cy, r })}" fill="rgba(128,0,255,.35)" stroke="#00e5ff" stroke-width="1.6"/>${etiquetas}</svg>`;
+}
+function curvaSVG(pts) {
+  if (pts.length < 2) return '<p class="text-sm text-gray-500">Se necesitan al menos 2 partidos jugados para dibujar la tendencia.</p>';
+  const W = 320; const H = 110; const max = Math.max(3, pts[pts.length - 1].pts); const x = (i) => 12 + (i * (W - 24)) / (pts.length - 1); const y = (v) => H - 14 - (v / max) * (H - 28);
+  const linea = pts.map((p, i) => `${x(i).toFixed(1)},${y(p.pts).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Puntos acumulados por fecha"><polyline points="${linea}" fill="none" stroke="#00e5ff" stroke-width="2"/>${pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.pts).toFixed(1)}" r="2.6" fill="#a855f7"/>`).join('')}
+    <text x="12" y="${H - 2}" font-size="8" fill="#9ca3af">Fecha ${pts[0].n}</text><text x="${W - 12}" y="${H - 2}" font-size="8" text-anchor="end" fill="#9ca3af">Fecha ${pts[pts.length - 1].n}</text>
+    <text x="${W - 12}" y="10" font-size="9" text-anchor="end" fill="#e5e7eb">${pts[pts.length - 1].pts} pts</text></svg>`;
+}
+function tabCalor(p) {
+  const m = mapaCalor(p); const t = m.tercios;
+  const barra = (n, v, c) => `<div><div class="flex justify-between text-xs text-gray-300"><span>${n}</span><b class="text-white">${v}%</b></div><div class="h-2 rounded bg-black/40 overflow-hidden"><div class="h-full rounded" style="width:${v}%;background:${c}"></div></div></div>`;
+  return `<div class="grid md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-5 items-start">${canchaSVG(m)}
+    <div class="space-y-3"><h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300">Dónde actúa más</h3>${barra('Zona defensiva', t.defensa, '#3b82f6')}${barra('Zona media', t.medio, '#22c55e')}${barra('Zona de ataque', t.ataque, '#ef4444')}${NOTA_APROX}</div></div>`;
+}
+function tabEstilo(p) {
+  const ej = ejesEstilo(p); const fd = fortalezasDebilidades(p, STAT_KEYS);
+  const fila = (x, c) => `<li class="flex justify-between text-sm"><span class="text-gray-200">${escapeHTML(STAT_INFO[x.k]?.nombre ?? x.k)}</span><b style="color:${c}">${x.v}</b></li>`;
+  return `<div class="grid md:grid-cols-2 gap-5 items-start">${radarSVG(ej)}
+    <div class="space-y-4"><div><h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2">Perfil</h3><div class="flex flex-wrap gap-2">${arquetipos(p).map((a) => `<span class="text-xs rounded-lg border border-galaxy-400/40 bg-galaxy-600/20 text-galaxy-400 px-3 py-1.5 font-bold">${escapeHTML(a)}</span>`).join('')}</div><p class="text-sm text-gray-300 mt-2">${escapeHTML(estiloTexto(p))}</p></div>
+      <div class="grid grid-cols-2 gap-4"><div><h3 class="text-xs font-display font-bold uppercase tracking-widest text-emerald-300 mb-2">Fortalezas</h3><ul class="space-y-1">${fd.fuertes.map((x) => fila(x, '#34d399')).join('')}</ul></div>
+        <div><h3 class="text-xs font-display font-bold uppercase tracking-widest text-rose-300 mb-2">A mejorar</h3><ul class="space-y-1">${fd.flojas.map((x) => fila(x, '#fb7185')).join('')}</ul></div></div>${NOTA_APROX}</div></div>`;
+}
+function tabLiga(p) {
+  const x = LIGAS.flatMap((l) => (EJES_ED(l.id)).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((q) => q.nombre)).at(-1);
+  if (!x) return '<p class="text-sm text-gray-400">Todavía no hay partidos de liga para analizar.</p>';
+  const c = campana(x.ed, x.nombre); const r = rendimiento(c?.fila); const pts = puntosAcumulados(x.ed, x.nombre);
+  const k = (v, l) => `<div class="rounded-xl border border-galaxy-border/60 bg-black/25 px-3 py-3 text-center"><div class="font-display font-bold text-xl text-white">${escapeHTML(v)}</div><div class="text-[10px] uppercase tracking-widest text-gray-400 mt-0.5">${escapeHTML(l)}</div></div>`;
+  return `<p class="text-xs text-gray-400 mb-3">${escapeHTML(x.l.titulo.join(' '))} · ${escapeHTML(x.ed.nombre)} · datos reales de los resultados</p>
+    ${r ? `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">${k(r.gfPorPartido, 'Goles a favor / partido')}${k(r.gcPorPartido, 'Goles en contra / partido')}${k(`${r.victorias}%`, 'Victorias')}${k(`${r.puntos}%`, 'Puntos posibles')}</div>` : ''}
+    <h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2">Puntos acumulados por fecha</h3>${curvaSVG(pts)}`;
+}
+const EJES_ED = (id) => EDICIONES[id] ?? [];
+const TABS = [['calor', 'fa-fire', 'Mapa de calor', tabCalor], ['estilo', 'fa-chart-pie', 'Estilo de juego', tabEstilo], ['liga', 'fa-chart-line', 'Rendimiento', tabLiga]];
+function montarAnalisis(p) {
+  const btn = $('perfil-analisis-btn'); const panel = $('perfil-analisis'); if (!btn || !panel) return;
+  const pintar = (id) => {
+    const t = TABS.find((x) => x[0] === id) ?? TABS[0];
+    panel.innerHTML = `<div class="flex flex-wrap gap-2 mb-4" role="tablist">${TABS.map(([i, ic, n]) => `<button type="button" role="tab" data-tab="${i}" aria-pressed="${i === t[0]}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${n}</button>`).join('')}</div><div>${t[3](p)}</div>`;
+  };
+  panel.addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) pintar(b.dataset.tab); });
+  btn.addEventListener('click', () => {
+    const abrir = panel.hidden; panel.hidden = !abrir; btn.setAttribute('aria-expanded', String(abrir));
+    btn.querySelector('span').textContent = abrir ? 'Ocultar análisis de juego' : 'Ver análisis de juego';
+    if (abrir && !panel.innerHTML.trim()) pintar('calor');
+  });
+}
+
+let actual = null;
 function render(p) {
+  actual = p;
   const pos = posInfo(p.posicion);
   const campanas = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre))
     .map((x) => seccionEdicion(x.l, x.ed, x.nombre)).filter(Boolean);
@@ -64,9 +140,17 @@ function render(p) {
         <h1 class="text-3xl font-display font-bold text-white uppercase tracking-widest text-shadow-glow">${escapeHTML(p.nombre)}${p.apodo ? ` <span class="text-lg text-gray-400">«${escapeHTML(p.apodo)}»</span>` : ''}</h1>
         <p class="text-gray-400 text-sm mt-1">${escapeHTML(p.club || 'Sin club')} · <span style="color:${pos.color}">${escapeHTML(pos.nombre)}</span> · Media ${escapeHTML(p.ovr ?? '--')}</p>
         ${p.descripcion ? `<p class="text-gray-300 text-sm mt-3 leading-relaxed max-w-prose">${escapeHTML(p.descripcion)}</p>` : ''}</header>
+      <div><button type="button" id="perfil-analisis-btn" aria-expanded="false" aria-controls="perfil-analisis" class="btn btn-primary"><i class="fa-solid fa-chart-pie"></i> <span>Ver análisis de juego</span></button>
+        <button type="button" id="perfil-editar" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-pen"></i> Editar ficha</button></div>
+      <section id="perfil-analisis" hidden class="rounded-2xl border border-galaxy-400/30 bg-black/20 p-5"></section>
       ${datosPerfil(p)}
       ${campanas.join('') || '<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5 text-sm text-gray-400">Este jugador todavía no figura en ninguna edición de liga.</section>'}
     </div></div>`);
+  montarAnalisis(p); mostrarEditar();
+}
+function mostrarEditar() {
+  const b = $('perfil-editar'); if (!b) return;
+  b.hidden = !isAdmin(); b.onclick = () => openPlayerForm(actual, init);
 }
 
 async function init() {
@@ -80,3 +164,4 @@ async function init() {
   } catch (e) { console.error('[perfil] cargar:', e); aviso('No se pudo cargar el perfil', 'Revisa tu conexión e intenta de nuevo.'); }
 }
 init();
+onSession(mostrarEditar);

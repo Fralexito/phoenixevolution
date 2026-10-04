@@ -194,3 +194,5 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - El jugador se vincula con la liga por nombre/apodo (sin tildes ni mayúsculas).
 - Botón «Ver perfil» (icono de carnet) en cada carta de Jugadores. Títulos: pendiente hasta que Palmarés tenga datos reales.
 - Perfil ampliado (migración 013): `biografia`, `ciudad`, `miembro_desde`, `estilo_juego`, `logros` (uno por línea) y `redes` (jsonb). Se editan en la ficha (sección plegable «Perfil público», solo admin). Redes validadas en `core/perfil.js` (solo usuario o https://; Discord se muestra como texto).
+- Análisis de juego en el perfil (botón «Ver análisis de juego»): mapa de calor aproximado, radar de estilo + fortalezas/a mejorar y rendimiento real de liga (puntos acumulados). Lógica pura en `core/estilo.js` y `core/perfil.js`. El mapa y el radar son APROXIMADOS (posición + stats), no seguimiento real.
+- Botón «Editar ficha» dentro del perfil (solo admin): abre el mismo formulario de Jugadores y recarga el perfil al guardar.

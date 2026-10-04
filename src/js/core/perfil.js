@@ -81,3 +81,21 @@ export function mesAnio(iso) {
   const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   const mes = meses[Number(m[2]) - 1]; return mes ? `${mes} de ${m[1]}` : '';
 }
+
+// ---- Rendimiento real en liga ----
+/** Puntos acumulados fecha a fecha, solo con partidos jugados: [{n, pts}]. Sirve para la curva de tendencia. */
+export function puntosAcumulados(edicion, nombre) {
+  let pts = 0; const out = [];
+  for (const f of edicion?.fechas ?? []) {
+    const m = f.partidos.find((x) => (x.l === nombre || x.v === nombre) && jugado(x)); if (!m) continue;
+    const a = m.l === nombre ? m.gl : m.gv; const b = m.l === nombre ? m.gv : m.gl;
+    pts += a > b ? 3 : a === b ? 1 : 0; out.push({ n: f.n, pts });
+  }
+  return out;
+}
+/** Promedios de una fila de tabla (null si no jugó): goles a favor/en contra por partido, % de victorias y de puntos posibles. */
+export function rendimiento(fila) {
+  if (!fila || !fila.pj) return null;
+  const r = (x) => Math.round(x * 100) / 100;
+  return { gfPorPartido: r(fila.gf / fila.pj), gcPorPartido: r(fila.gc / fila.pj), victorias: Math.round((fila.g / fila.pj) * 100), puntos: Math.round((fila.pts / (fila.pj * 3)) * 100) };
+}
