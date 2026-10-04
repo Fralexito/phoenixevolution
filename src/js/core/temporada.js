@@ -96,3 +96,22 @@ export function normalizarConfig(cfg = {}, n1 = 0, n2 = 0) {
   if (copa1 + copa2 < 2) avisos.push('La copa necesita al menos 2 clasificados entre ambas divisiones.');
   return { cfg: { suben, copa1, copa2 }, avisos };
 }
+
+/**
+ * Valida el resultado de un cruce de la copa tal como llega del formulario (textos).
+ * Reglas: goles de ambos o de ninguno (vacío = sin jugar); penales solo si hay empate, y de ambos; todo entero 0–99.
+ * @returns {{ok:boolean, errores:string[], fila:{ga:number|null,gb:number|null,pa:number|null,pb:number|null}}}
+ */
+export function validarResultadoCopa(b = {}) {
+  const e = []; const num = (v, n) => { const t = String(v ?? '').trim(); if (t === '') return null; const x = Number(t); if (!(Number.isInteger(x) && x >= 0 && x <= 99)) { e.push(`${n}: escribe un entero entre 0 y 99 (o déjalo vacío).`); return null; } return x; };
+  const ga = num(b.ga, 'Goles del primero'); const gb = num(b.gb, 'Goles del segundo'); const pa = num(b.pa, 'Penales del primero'); const pb = num(b.pb, 'Penales del segundo');
+  if ((ga === null) !== (gb === null) && !e.length) e.push('Escribe los goles de los dos, o deja ambos vacíos.');
+  if ((pa === null) !== (pb === null) && !e.length) e.push('Escribe los penales de los dos, o deja ambos vacíos.');
+  if (!e.length && pa !== null) { if (ga === null || ga !== gb) e.push('Los penales solo se anotan si el partido terminó empatado.'); else if (pa === pb) e.push('Los penales no pueden terminar empatados.'); }
+  return { ok: e.length === 0, errores: e, fila: { ga, gb, pa, pb } };
+}
+/** Filas de la tabla copa_resultados → mapa por cruce, sin los campos vacíos (formato que espera construirCopa). */
+export function resultadosDesdeFilas(filas) {
+  const m = {}; for (const f of filas ?? []) { if (!f?.cruce) continue; const r = {}; for (const k of ['ga', 'gb', 'pa', 'pb']) if (Number.isInteger(f[k])) r[k] = f[k]; if (Object.keys(r).length) m[f.cruce] = r; }
+  return m;
+}

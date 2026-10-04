@@ -7,13 +7,13 @@ export const SISTEMA = {
   nombre: 'Sistema de Divisiones',
   temporada: '2026',
   divisiones: [
-    { nivel: 1, ligaId: 'galaxy', nombre: 'Primera División', corto: 'Liga 1', icono: 'fa-crown' },
-    { nivel: 2, ligaId: 'ascenso', nombre: 'Segunda División', corto: 'Liga 2', icono: 'fa-seedling' },
+    { nivel: 1, ligaId: 'galaxy', liga: 'Galaxy League', nombre: 'Primera División', corto: 'Liga 1', icono: 'fa-crown' },
+    { nivel: 2, ligaId: 'ascenso', liga: 'Segunda División', nombre: 'Segunda División', corto: 'Liga 2', icono: 'fa-seedling' },
   ],
   // Valores iniciales de los controles (el visitante puede cambiarlos en la página para simular).
   inicial: { suben: 2, copa1: 4, copa2: 4 },
   copa: { nombre: 'Copa Interdivisional', icono: 'fa-trophy', formato: 'Eliminación directa a partido único; si empatan, penales.' },
-  // Resultados reales de la copa por id de cruce (R1-P1 = ronda 1, partido 1). Vacío mientras no se juegue: { 'R1-P1': { ga: 2, gb: 1 } }.
+  // Resultados de la copa: se leen de Supabase (tabla copa_resultados, los edita el admin en /temporada/). Esto es solo el respaldo si la base no responde.
   resultadosCopa: {},
 };
 

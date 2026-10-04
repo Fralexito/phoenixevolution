@@ -22,6 +22,8 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
       <div class="grid sm:grid-cols-2 gap-3">
         <div><label class="label" for="he-liga">Liga</label><input id="he-liga" class="field" maxlength="60" placeholder="Galaxy League"></div>
         <div><label class="label" for="he-ed">Edición</label><input id="he-ed" class="field" maxlength="60" placeholder="Apertura 2025"></div>
+        <div><label class="label" for="he-tor">Torneo</label><input id="he-tor" class="field" maxlength="60" placeholder="Apertura, Clausura, Copa…"></div>
+        <div><label class="label" for="he-temp">Temporada <span class="text-gray-500 normal-case">(año)</span></label><input id="he-temp" inputmode="numeric" class="field" maxlength="4" placeholder="2025"></div>
         <div><label class="label" for="he-per">Mes de inicio <span class="text-gray-500 normal-case">(para ordenar)</span></label><input id="he-per" type="month" class="field"></div>
         <div><label class="label" for="he-club">Club</label><input id="he-club" class="field uppercase" maxlength="60" placeholder="FC Barcelona"></div>
         <div><label class="label" for="he-puesto">Puesto final</label><input id="he-puesto" inputmode="numeric" class="field" maxlength="2" placeholder="Ej: 3"></div>
@@ -40,7 +42,7 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
       : '<li class="text-sm text-gray-500">Aún no hay participaciones registradas.</li>';
   };
   const llenar = (f) => {
-    $('#he-liga').value = f?.liga ?? 'Galaxy League'; $('#he-ed').value = f?.edicion ?? ''; $('#he-per').value = f?.periodo ? f.periodo.slice(0, 7) : ''; $('#he-club').value = f?.club ?? jugador.club ?? '';
+    $('#he-liga').value = f?.liga ?? 'Galaxy League'; $('#he-ed').value = f?.edicion ?? ''; $('#he-per').value = f?.periodo ? f.periodo.slice(0, 7) : ''; $('#he-tor').value = f?.torneo ?? ''; $('#he-temp').value = f?.temporada ?? ''; $('#he-club').value = f?.club ?? jugador.club ?? '';
     $('#he-puesto').value = f?.puesto ?? ''; $('#he-tit').value = f?.titulo ?? ''; $('#he-prem').value = f?.premios ?? '';
     $('#he-titulo').textContent = f ? 'Editar participación' : 'Nueva participación'; $('#he-guardar').textContent = f ? 'Guardar cambios' : 'Añadir al historial'; $('#he-cancelar').hidden = !f; $('#he-err').innerHTML = '';
   };
@@ -62,7 +64,7 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
   });
   $('#he-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const v = validarParticipacion({ liga: $('#he-liga').value, edicion: $('#he-ed').value, periodo: $('#he-per').value, club: $('#he-club').value, puesto: $('#he-puesto').value, titulo: $('#he-tit').value, premios: $('#he-prem').value });
+    const v = validarParticipacion({ liga: $('#he-liga').value, edicion: $('#he-ed').value, torneo: $('#he-tor').value, temporada: $('#he-temp').value, periodo: $('#he-per').value, club: $('#he-club').value, puesto: $('#he-puesto').value, titulo: $('#he-tit').value, premios: $('#he-prem').value });
     $('#he-err').innerHTML = v.errores.map((x) => `<li>${escapeHTML(x)}</li>`).join(''); if (!v.ok) return;
     const btn = $('#he-guardar'); btn.disabled = true;
     try {

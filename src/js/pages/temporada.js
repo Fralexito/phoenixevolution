@@ -1,6 +1,10 @@
 // Página Temporada (beta): lee las tablas que Astro dejó en data-temporada, y con js/core/temporada.js calcula y pinta zonas, ascensos y copa.
 // Cada cambio en un control vuelve a calcular TODO desde cero (sin estado oculto): es más simple de razonar y no puede quedar a medias.
-import { zonasDivision, resolverAscensos, clasificadosCopa, construirCopa, normalizarConfig } from '../core/temporada.js';
+import { zonasDivision, resolverAscensos, clasificadosCopa, construirCopa, normalizarConfig, validarResultadoCopa, resultadosDesdeFilas } from '../core/temporada.js';
+import { supabase } from '../core/supabase.js';
+import { onSession, isAdmin } from '../core/session.js';
+import { openModal, closeModal } from '../core/modal.js';
+import { toast } from '../core/toast.js';
 import { escapeHTML } from '../core/dom.js';
 
 const $ = (id) => document.getElementById(id);
@@ -12,6 +16,8 @@ else iniciar();
 
 function iniciar() {
   const estado = { ...datos.cfg };
+  let resultados = { ...(datos.resultados ?? {}) };           // por cruce; se reemplaza con lo guardado en Supabase al cargar
+  let ultimoCuadro = null;                                    // para el editor: quiénes juegan cada cruce
   const n1 = datos.d1.length; const n2 = datos.d2.length;
   const CONTROLES = [
     { k: 'suben', t: 'Suben y bajan', ayuda: 'Cuántos descienden de Primera y ascienden de Segunda (siempre el mismo número).', max: () => Math.max(0, Math.min(8, Math.floor(n1 / 2), n2)) },
@@ -53,7 +59,8 @@ function iniciar() {
     const cols = k.rondas.map((r, ri) => `<div class="space-y-3"><h3 class="font-display font-bold text-xs text-galaxy-400 uppercase tracking-[.2em]">${escapeHTML(r.nombre)}</h3>
       ${r.partidos.map((p) => { const gan = p.ganador?.nombre; const marc = Number.isInteger(p.ga) && Number.isInteger(p.gb) ? `${p.ga} : ${p.gb}${Number.isInteger(p.pa) ? ` <span class="text-[10px] text-gray-400">(${p.pa}-${p.pb} pen.)</span>` : ''}` : 'vs';
         const ph = ri === 0 ? 'Por definir' : 'Ganador por definir';
-        return `<div class="tmp-cruce ${p.libre ? 'tmp-libre' : ''}"><div class="tmp-lado ${gan && gan === p.a?.nombre ? 'tmp-gana' : ''}">${equipo(p.a, ph)}</div><div class="tmp-marc font-display font-extrabold tabular-nums">${p.libre ? '<span class="text-[10px] text-gray-400 uppercase">pasa libre</span>' : marc}</div><div class="tmp-lado ${gan && gan === p.b?.nombre ? 'tmp-gana' : ''}">${equipo(p.b, ph)}</div></div>`; }).join('')}</div>`).join('');
+        const editar = isAdmin() && p.a && p.b && !p.libre ? `<button type="button" data-cruce="${p.id}" class="adv-chip col-span-full !min-h-7"><i class="fa-solid fa-pen mr-1"></i>Resultado</button>` : '';
+        return `<div class="tmp-cruce ${p.libre ? 'tmp-libre' : ''}"><div class="tmp-lado ${gan && gan === p.a?.nombre ? 'tmp-gana' : ''}">${equipo(p.a, ph)}</div><div class="tmp-marc font-display font-extrabold tabular-nums">${p.libre ? '<span class="text-[10px] text-gray-400 uppercase">pasa libre</span>' : marc}</div><div class="tmp-lado ${gan && gan === p.b?.nombre ? 'tmp-gana' : ''}">${equipo(p.b, ph)}</div>${editar}</div>`; }).join('')}</div>`).join('');
     const camp = k.campeon ? `<p class="text-sm text-gray-200"><i class="fa-solid fa-crown text-gold-400 mr-1.5"></i>Campeón: <b class="text-white">${escapeHTML(k.campeon.nombre)}</b></p>` : '';
     return `<div class="grid gap-6 ${k.rondas.length > 2 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} sm:grid-cols-1">${cols}</div>${camp}`;
   };
@@ -67,7 +74,7 @@ function iniciar() {
       const r = resolverAscensos(nombres(datos.d1), nombres(datos.d2), cfg.suben);
       $('tmp-cierre').innerHTML = cierre(r);
       const clas = clasificadosCopa(nombres(datos.d1), nombres(datos.d2), cfg.copa1, cfg.copa2);
-      const k = construirCopa(clas, datos.resultados ?? {});
+      const k = construirCopa(clas, resultados); ultimoCuadro = k;
       $('tmp-copa').innerHTML = `<h2 class="font-display font-bold text-base text-white uppercase tracking-widest"><i class="fa-solid fa-trophy text-galaxy-400 mr-2"></i>${escapeHTML(datos.nombres.copa)}</h2>${cuadro(k)}`;
       const todos = [...avisos, ...r.avisos, ...k.avisos.filter((a) => clas.length < 2 && a)];
       $('tmp-avisos').innerHTML = [...new Set(todos)].map((a) => `<span class="block"><i class="fa-solid fa-circle-info mr-1.5"></i>${escapeHTML(a)}</span>`).join('');
@@ -82,5 +89,39 @@ function iniciar() {
     const [k, d] = b.dataset.paso.split(':'); const c = CONTROLES.find((x) => x.k === k); if (!c) return;
     estado[k] = Math.min(c.max(), Math.max(0, estado[k] + Number(d))); pintar();
   });
+  // ---- Resultados de la copa: se leen de Supabase (público) y el admin los edita desde el cuadro ----
+  const ID_MODAL = 'copa-resultado';
+  const abrirResultado = (id) => {
+    const p = ultimoCuadro?.rondas.flatMap((r) => r.partidos).find((x) => x.id === id); if (!p?.a || !p?.b) return;
+    const v = (x) => (Number.isInteger(x) ? x : '');
+    const m = openModal(`<form id="cr-form" class="p-5 sm:p-6 space-y-4" novalidate><h3 class="font-display font-bold text-lg text-white uppercase">Resultado · ${escapeHTML(id)}</h3>
+      <div class="grid grid-cols-[1fr_5rem] gap-3 items-center"><span class="font-display font-bold text-white">${escapeHTML(p.a.nombre)}</span><input id="cr-ga" inputmode="numeric" maxlength="2" class="field text-center" value="${v(p.ga)}" aria-label="Goles de ${escapeHTML(p.a.nombre)}">
+        <span class="font-display font-bold text-white">${escapeHTML(p.b.nombre)}</span><input id="cr-gb" inputmode="numeric" maxlength="2" class="field text-center" value="${v(p.gb)}" aria-label="Goles de ${escapeHTML(p.b.nombre)}"></div>
+      <details ${Number.isInteger(p.pa) ? 'open' : ''}><summary class="text-xs text-gray-400 cursor-pointer">Penales (solo si empataron)</summary><div class="grid grid-cols-2 gap-3 pt-2"><input id="cr-pa" inputmode="numeric" maxlength="2" class="field text-center" placeholder="${escapeHTML(p.a.nombre)}" value="${v(p.pa)}"><input id="cr-pb" inputmode="numeric" maxlength="2" class="field text-center" placeholder="${escapeHTML(p.b.nombre)}" value="${v(p.pb)}"></div></details>
+      <ul id="cr-err" class="text-xs text-rose-400 space-y-0.5" role="alert"></ul>
+      <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="button" id="cr-borrar" class="btn btn-ghost text-bad">Borrar resultado</button><button type="submit" id="cr-guardar" class="btn btn-primary">Guardar</button></div></form>`, { id: ID_MODAL });
+    const q = (x) => m.querySelector(x);
+    q('#cr-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); const val = validarResultadoCopa({ ga: q('#cr-ga').value, gb: q('#cr-gb').value, pa: q('#cr-pa').value, pb: q('#cr-pb').value });
+      q('#cr-err').innerHTML = val.errores.map((x) => `<li>${escapeHTML(x)}</li>`).join(''); if (!val.ok) return;
+      const btn = q('#cr-guardar'); btn.disabled = true;
+      try {
+        const { error } = await supabase.from('copa_resultados').upsert({ temporada: datos.temporada, cruce: id, ...val.fila, updated_at: new Date().toISOString() }, { onConflict: 'temporada,cruce' }); if (error) throw error;
+        const r = {}; for (const k of ['ga', 'gb', 'pa', 'pb']) if (val.fila[k] !== null) r[k] = val.fila[k];
+        if (Object.keys(r).length) resultados[id] = r; else delete resultados[id];
+        toast('Resultado guardado.', 'ok'); closeModal(ID_MODAL); pintar();
+      } catch (err) { console.error('[temporada] guardar resultado:', err); q('#cr-err').innerHTML = `<li>${escapeHTML(/row-level security|policy/i.test(err.message) ? 'No tienes permiso (solo administradores).' : (err.message || 'No se pudo guardar.'))}</li>`; } finally { btn.disabled = false; }
+    });
+    q('#cr-borrar').addEventListener('click', async () => {
+      try { const { error } = await supabase.from('copa_resultados').delete().eq('temporada', datos.temporada).eq('cruce', id); if (error) throw error; delete resultados[id]; toast('Resultado borrado.', 'ok'); closeModal(ID_MODAL); pintar(); }
+      catch (err) { console.error('[temporada] borrar resultado:', err); q('#cr-err').innerHTML = `<li>${escapeHTML(err.message || 'No se pudo borrar.')}</li>`; }
+    });
+  };
+  $('tmp-copa').addEventListener('click', (e) => { const b = e.target.closest('[data-cruce]'); if (b) abrirResultado(b.dataset.cruce); });
+  onSession(() => pintar());                                                              // al iniciar/cerrar sesión aparecen o se ocultan los botones de admin
+  (async () => {
+    try { const { data, error } = await supabase.from('copa_resultados').select('cruce, ga, gb, pa, pb').eq('temporada', datos.temporada); if (error) throw error; resultados = resultadosDesdeFilas(data); pintar(); }
+    catch (err) { console.warn('[temporada] no se pudieron leer los resultados de la copa (se usa el respaldo):', err); }
+  })();
   pintarControles(); pintar();
 }

@@ -12,7 +12,7 @@ const filas = (ed) => calcularTabla(ed.fechas.flatMap((f) => f.partidos)).tabla.
 const ed1 = ultima(d1cfg.ligaId); const ed2 = ultima(d2cfg.ligaId);
 const datos = {
   d1: ed1 ? filas(ed1) : [], d2: ed2 ? filas(ed2) : DEMO_SEGUNDA.map((f) => ({ ...f, club: '' })), demo2: !ed2,
-  edicion1: ed1?.nombre ?? '', cfg: SISTEMA.inicial, resultados: SISTEMA.resultadosCopa,
+  edicion1: ed1?.nombre ?? '', temporada: SISTEMA.temporada, cfg: SISTEMA.inicial, resultados: SISTEMA.resultadosCopa,
   nombres: { d1: d1cfg.nombre, d2: d2cfg.nombre, copa: SISTEMA.copa.nombre },
 };
 ---

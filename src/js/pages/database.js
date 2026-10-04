@@ -18,10 +18,15 @@ import { EDICIONES } from '../../data/ligaResultados.js';
 import { LIGAS } from '../../data/ligas.js';
 import { mountAdvanced } from '../features/advancedSearch.js';
 import { openStatLegend } from '../features/statLegend.js';
+import { construirIndice, opcionesFiltro, filtrarJugadores, divisionActual } from '../core/participaciones.js';
+import { SISTEMA } from '../../data/temporada.js';
 
 const $ = (id) => document.getElementById(id);
 let all = [];
 let club = 'ALL';
+let fLiga = ''; let fTorneo = ''; let fTemp = '';   // filtros de participación (liga, torneo, temporada)
+let indice = new Map();                           // jugadorId → participaciones (core/participaciones.js)
+let hitsPorId = new Map(); let divPorId = new Map();
 let term = '';
 let vista = 'plano';      // 'plano' | 'estilo' | 'nivel'
 let orden = 'media';      // criterio del orden «Todos» (ver CRITERIOS)
@@ -33,9 +38,16 @@ const sel = []; // ids marcados para comparar (máx. 8; en el comparador se repa
 
 let adv = null;   // búsqueda avanzada activa: { keys, min, top } o null
 
+/** Etiquetas «club · liga · torneo · temporada» de las participaciones que hicieron aparecer al jugador (para distinguir a quien eligió el mismo equipo en otra temporada). */
+function tirasHist(p) {
+  const hits = hitsPorId.get(p.id) ?? []; if (!hits.length) return '';
+  const una = (h) => `<li><b>${escapeHTML(h.club || '—')}</b><span>${escapeHTML(h.liga)}</span>${h.torneo ? `<span>${escapeHTML(h.torneo)}</span>` : ''}${h.temporada ? `<span class="hist-anio">${escapeHTML(h.temporada)}</span>` : ''}</li>`;
+  return `<ul class="hist-tiras" aria-label="Participaciones que coinciden">${hits.slice(0, 3).map(una).join('')}${hits.length > 3 ? `<li class="hist-mas">+${hits.length - 3} más</li>` : ''}</ul>`;
+}
 function tarjeta(p, i, extra = '') {
-  const admin = isAdmin();
-  return `<div data-pcw="${escapeHTML(p.id)}" style="--aura:${posInfo(p.posicion).color}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${extra}
+  const admin = isAdmin(); const niv = divPorId.get(p.id); const dv = SISTEMA.divisiones.find((d) => d.nivel === niv);
+  const insignia = dv ? `<span class="div-badge div-${niv} ${admin ? 'div-admin' : ''}" title="${escapeHTML(dv.nombre)}">L${niv}</span>` : '';
+  return `<div data-pcw="${escapeHTML(p.id)}" style="--aura:${posInfo(p.posicion).color}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${insignia}${tirasHist(p)}${extra}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>
         <a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" aria-label="Ver perfil de ${escapeHTML(p.nombre)}" title="Ver perfil" class="cmp-btn perfil-btn"><i class="fa-solid fa-id-card"></i></a>${admin ? `
         <button type="button" data-menu="${escapeHTML(p.id)}" aria-label="Opciones de la ficha" aria-haspopup="true" class="card-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
@@ -47,8 +59,9 @@ function tarjeta(p, i, extra = '') {
 
 function paint() {
   try { fijarFoco(null); } catch { $('players-container').dataset.foco = 'false'; }   // al repintar (filtros, orden…) se quita el foco y la réplica
-  const t = norm(term);
-  const list = all.filter((p) => (club === 'ALL' || String(p.club ?? '').toUpperCase() === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
+  const res = filtrarJugadores(all, indice, { liga: fLiga, torneo: fTorneo, temporada: fTemp, club: club === 'ALL' ? '' : club, term });
+  hitsPorId = new Map(res.map((r) => [r.p.id, r.hits])); const list = res.map((r) => r.p);
+  paintResumenHist();
   const box = $('players-container');
   if (adv) {
     // Modo ranking: mismos filtros (equipo y nombre), ordenados por el promedio de las stats elegidas.
@@ -66,15 +79,25 @@ function paint() {
   paintBar();
 }
 
+function paintResumenHist() {
+  const act = [fLiga, fTorneo, fTemp].filter(Boolean); $('hist-resumen').textContent = act.length ? `· ${act.join(' · ')}` : ''; $('hist-limpiar').hidden = !act.length;
+}
+/** Rellena los desplegables de liga, torneo y temporada (y los clubes de TODA la historia) a partir de las participaciones. */
+function fillHist() {
+  const o = opcionesFiltro(indice); const lleno = (id, vacio, vals, cur) => { const s = $(id); s.innerHTML = `<option value="">${vacio}</option>` + vals.map((v) => `<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join(''); s.value = vals.includes(cur) ? cur : ''; return s.value; };
+  fLiga = lleno('f-liga-h', 'Todas', o.ligas, fLiga); fTorneo = lleno('f-torneo-h', 'Todos', o.torneos, fTorneo); fTemp = lleno('f-temp-h', 'Todas', o.temporadas, fTemp);
+  divPorId = new Map(all.map((p) => [p.id, divisionActual(indice.get(p.id), SISTEMA.divisiones)]).filter(([, d]) => d));
+  return o.clubes;
+}
 function paintBar() {
   const bar = $('cmp-bar'); bar.hidden = !sel.length;
   $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige al menos otro` : `${sel.length} jugadores seleccionados`;
   $('cmp-go').disabled = sel.length < 2;        // un solo botón: con 2 abre 1 vs 1; con 3 o más, la masiva (se puede cambiar dentro)
 }
 
-function fillClubs() {
+function fillClubs(historicos = []) {
   const sel = $('player-filter-select');
-  const clubs = [...new Set(all.map((p) => String(p.club ?? '').toUpperCase()))].sort((a, b) => a.localeCompare(b));
+  const clubs = [...new Set([...all.map((p) => String(p.club ?? '').toUpperCase()), ...historicos])].filter(Boolean).sort((a, b) => a.localeCompare(b));
   sel.innerHTML = `<option value="ALL">Todos los Equipos</option>` + clubs.map((c) => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
   sel.value = clubs.includes(club) ? club : 'ALL'; club = sel.value;
 }
@@ -84,7 +107,12 @@ async function load() {
   try {
     const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false });
     if (error) throw error;
-    all = data ?? []; ligaStats = statsLiga(all, edicionActual()); fillClubs(); paint();
+    all = data ?? []; ligaStats = statsLiga(all, edicionActual());
+    let filas = [];
+    try {                                          // participaciones de todos (lectura pública); si falla, el filtro sigue con las ediciones de la web
+      const r = await supabase.from('participaciones').select('jugador_id, liga, edicion, torneo, temporada, club, periodo'); if (r.error) throw r.error; filas = r.data ?? [];
+    } catch (e1) { console.warn('[database] participaciones no disponibles, se usan solo las ediciones de la web:', e1); }
+    indice = construirIndice(all, filas, LIGAS, EDICIONES); fillClubs(fillHist()); paint();
     if (!reconMontado) { reconMontado = true; montarReconocimientos($('reconocimientos'), all, edicionActual()); }
   } catch (e) {
     console.error('[database] cargar:', e);
@@ -93,6 +121,8 @@ async function load() {
 }
 
 $('player-filter-select').addEventListener('change', (e) => { club = e.target.value; paint(); });
+for (const [id, set] of [['f-liga-h', (v) => { fLiga = v; }], ['f-torneo-h', (v) => { fTorneo = v; }], ['f-temp-h', (v) => { fTemp = v; }]]) $(id).addEventListener('change', (e) => { set(e.target.value); paint(); });
+$('hist-limpiar').addEventListener('click', () => { fLiga = ''; fTorneo = ''; fTemp = ''; ['f-liga-h', 'f-torneo-h', 'f-temp-h'].forEach((id) => { $(id).value = ''; }); paint(); });
 $('player-search-input').addEventListener('input', (e) => { term = e.target.value; paint(); });
 $('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel[0], sel[1])));
 $('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1], sel.length > 2 ? sel : null));

@@ -1,5 +1,6 @@
 import test from 'node:test';
-import { zonasDivision, resolverAscensos, clasificadosCopa, ordenCuadro, construirCopa, ganadorDe, normalizarConfig } from '../src/js/core/temporada.js';
+import { normalizarParticipacion, construirIndice, opcionesFiltro, coincidencias, filtrarJugadores, divisionActual, tituloCaso } from '../src/js/core/participaciones.js';
+import { validarResultadoCopa, resultadosDesdeFilas, zonasDivision, resolverAscensos, clasificadosCopa, ordenCuadro, construirCopa, ganadorDe, normalizarConfig } from '../src/js/core/temporada.js';
 import assert from 'node:assert/strict';
 import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
 import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
@@ -568,4 +569,58 @@ test('temporada: clasificados, orden del cuadro y copa con byes', () => {
 test('temporada: la configuración se corrige y se explica', () => {
   const n = normalizarConfig({ suben: 5, copa1: 20, copa2: 20 }, 6, 3); assert.deepEqual(n.cfg, { suben: 3, copa1: 6, copa2: 3 }); assert.equal(n.avisos.length, 1);
   assert.equal(normalizarConfig({ copa1: 1, copa2: 0 }, 6, 3).avisos.length, 1); assert.deepEqual(normalizarConfig({}, 12, 8).cfg, { suben: 2, copa1: 4, copa2: 4 });
+});
+
+test('participaciones: se normalizan y deducen torneo y temporada', () => {
+  const n = normalizarParticipacion({ jugador_id: 'a', liga: ' Galaxy League ', edicion: 'Apertura 2025', club: 'fc barcelona' });
+  assert.equal(n.temporada, '2025'); assert.equal(n.torneo, 'Apertura'); assert.equal(n.club, 'FC BARCELONA'); assert.equal(n.jugadorId, 'a');
+  assert.equal(normalizarParticipacion({ edicion: 'Copa', periodo: '2024-03-01' }).temporada, '2024');
+  assert.equal(normalizarParticipacion({ edicion: 'X', torneo: 'Clausura', temporada: '2023' }).torneo, 'Clausura'); assert.equal(normalizarParticipacion(null).liga, '');
+  assert.equal(tituloCaso('GALAXY LEAGUE'), 'Galaxy League');
+});
+const JPART = [{ id: '1', nombre: 'Fralex', apodo: null, club: 'FC BARCELONA' }, { id: '2', nombre: 'Axel', apodo: 'Axelito', club: 'REAL MADRID' }, { id: '3', nombre: 'Nuevo', apodo: null, club: 'PSG' }];
+const FILASP = [
+  { jugador_id: '2', liga: 'Galaxy League', edicion: 'Clausura 2025', club: 'Fc Barcelona', titulo: 'Campeón' },
+  { jugador_id: '2', liga: 'Segunda División', edicion: 'Apertura 2024', club: 'PSG' },
+  { jugador_id: '9', liga: 'Galaxy League', edicion: 'Apertura 2024', club: 'Inter' },   // jugador que ya no existe: se ignora
+];
+const LGP = [{ id: 'galaxy', titulo: ['GALAXY', 'LEAGUE'] }];
+const EDSP = { galaxy: [{ id: 'a26', nombre: 'Apertura 2026', torneo: 'Apertura', temporada: '2026', clubes: { Fralex: 'FC Barcelona', Axel: 'Real Madrid' }, fechas: [{ n: 1, partidos: [{ l: 'Fralex', v: 'Axel', gl: 1, gv: 0 }] }] }] };
+test('participaciones: el índice mezcla base y ediciones, sin duplicar ni perder', () => {
+  const idx = construirIndice(JPART, FILASP, LGP, EDSP);
+  assert.deepEqual(idx.get('2').map((p) => `${p.temporada}|${p.torneo}|${p.club}|${p.liga}`), ['2026|Apertura|REAL MADRID|Galaxy League', '2025|Clausura|FC BARCELONA|Galaxy League', '2024|Apertura|PSG|Segunda División']);
+  assert.equal(idx.get('1').length, 1); assert.equal(idx.get('3').length, 0); assert.equal(idx.has('9'), false);
+  const o = opcionesFiltro(idx); assert.deepEqual(o.temporadas, ['2026', '2025', '2024']); assert.deepEqual(o.ligas, ['Galaxy League', 'Segunda División']); assert.deepEqual(o.torneos, ['Apertura', 'Clausura']); assert.ok(o.clubes.includes('PSG'));
+  const dup = construirIndice(JPART, [{ jugador_id: '1', liga: 'Galaxy League', edicion: 'Apertura 2026', club: 'Chelsea' }], LGP, EDSP); assert.equal(dup.get('1').length, 1); assert.equal(dup.get('1')[0].club, 'CHELSEA');   // gana la base
+});
+test('participaciones: filtros por liga, torneo, temporada y club histórico', () => {
+  const idx = construirIndice(JPART, FILASP, LGP, EDSP); const nombres = (r) => r.map((x) => x.p.nombre);
+  assert.deepEqual(nombres(filtrarJugadores(JPART, idx, {})), ['Fralex', 'Axel', 'Nuevo']);
+  assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { temporada: '2024' })), ['Axel']); assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { liga: 'segunda division' })), ['Axel']);
+  assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { torneo: 'Apertura', temporada: '2026' })), ['Fralex', 'Axel']); assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { torneo: 'Clausura', temporada: '2026' })), []);
+  // Club con historia: Axel jugó con Barcelona en 2025 aunque hoy use Real Madrid → sale con su etiqueta; Fralex también (club actual y 2026).
+  const bar = filtrarJugadores(JPART, idx, { club: 'FC BARCELONA' }); assert.deepEqual(nombres(bar), ['Fralex', 'Axel']);
+  assert.deepEqual(bar[1].hits.map((h) => `${h.liga}|${h.torneo}|${h.temporada}`), ['Galaxy League|Clausura|2025']);
+  assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { club: 'FC BARCELONA', temporada: '2025' })), ['Axel']);   // con temporada, cuenta el club DE ESA temporada
+  assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { club: 'PSG' })), ['Axel', 'Nuevo']);                       // Nuevo: club actual sin historial
+  assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { term: 'psg' })), ['Axel', 'Nuevo']); assert.deepEqual(nombres(filtrarJugadores(JPART, idx, { term: 'axelito' })), ['Axel']); assert.deepEqual(filtrarJugadores(JPART, idx, { term: 'zzz' }), []);
+  assert.equal(coincidencias(idx.get('2'), { club: 'real madrid' }).length, 1); assert.deepEqual(filtrarJugadores([], idx, { club: 'X' }), []);
+});
+test('participaciones: división actual del jugador', () => {
+  const idx = construirIndice(JPART, FILASP, LGP, EDSP); const dv = [{ nivel: 1, liga: 'Galaxy League' }, { nivel: 2, liga: 'Segunda División' }];
+  assert.equal(divisionActual(idx.get('2'), dv), 1); assert.equal(divisionActual(idx.get('3'), dv), null);
+  assert.equal(divisionActual([{ liga: 'Segunda División' }], dv), 2); assert.equal(divisionActual(undefined, dv), null);
+});
+test('historial: la participación guarda torneo y temporada válidos', () => {
+  const v = validarParticipacion({ liga: 'G', edicion: 'Apertura 2025', torneo: ' Apertura ', temporada: '2025' }); assert.equal(v.ok, true); assert.equal(v.fila.torneo, 'Apertura'); assert.equal(v.fila.temporada, '2025');
+  assert.equal(validarParticipacion({ liga: 'G', edicion: 'E', temporada: '25' }).ok, false); assert.equal(validarParticipacion({ liga: 'G', edicion: 'E' }).fila.temporada, null);
+});
+
+test('copa: validación de resultados y lectura de filas', () => {
+  assert.deepEqual(validarResultadoCopa({ ga: '2', gb: '1' }).fila, { ga: 2, gb: 1, pa: null, pb: null });
+  assert.deepEqual(validarResultadoCopa({ ga: '', gb: '' }), { ok: true, errores: [], fila: { ga: null, gb: null, pa: null, pb: null } });
+  assert.equal(validarResultadoCopa({ ga: '2' }).ok, false); assert.equal(validarResultadoCopa({ ga: '-1', gb: '0' }).ok, false); assert.equal(validarResultadoCopa({ ga: '1.5', gb: '0' }).ok, false);
+  assert.equal(validarResultadoCopa({ ga: '1', gb: '1', pa: '4', pb: '3' }).ok, true); assert.equal(validarResultadoCopa({ ga: '2', gb: '1', pa: '4', pb: '3' }).ok, false);
+  assert.equal(validarResultadoCopa({ ga: '1', gb: '1', pa: '3', pb: '3' }).ok, false); assert.equal(validarResultadoCopa({ ga: '1', gb: '1', pa: '3' }).ok, false);
+  assert.deepEqual(resultadosDesdeFilas([{ cruce: 'R1-P1', ga: 2, gb: 1, pa: null, pb: null }, { cruce: 'R1-P2', ga: null, gb: null }, null]), { 'R1-P1': { ga: 2, gb: 1 } }); assert.deepEqual(resultadosDesdeFilas(undefined), {});
 });
