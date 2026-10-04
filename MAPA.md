@@ -165,5 +165,5 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 ## Ronda 20 — Podio de destacados
 - `core/central.js` → `ordenPodio` (2.º | 1.º | 3.º, sin huecos si hay menos de 3). Probado en `tests/pure.test.mjs`.
-- `pages/central.js` pinta cada carta dentro de `.podio-slot` con medalla (1º dorado, 2º plata, 3º bronce). Mouse: agranda por CSS (`:hover`). Toque/Enter: alterna `.podio-up` (una sola carta agrandada; tocar fuera la baja).
-- Tamaño: `.podio` máx. 40rem; el 1.º con `flex-grow:1.25`. Las cartas pequeñas del celular ocultan stats por la regla `@container (max-width:135px)`.
+- `pages/central.js` pinta cada carta dentro de `.podio-slot` (sin números de puesto visibles; `data-puesto` y el `aria-label` los conservan). Mouse: agranda por CSS (`:hover`). Toque/Enter: alterna `.podio-up` (una sola carta agrandada; tocar fuera la baja).
+- Tamaño: cada carta = tamaño de «Jugadores» (17,5 rem en PC, 172 px en celular). El 1.º: `--s:1.06` y `--y:-.9rem`; hover `--s:1.13/1.15` en .9 s. En celular el podio se desliza de lado y arranca centrado en el 1.º.

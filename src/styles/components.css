@@ -195,18 +195,20 @@
 .pulse-lbl { grid-area: lbl; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #9ca3af; font-weight: 600; }
 #xi-det > summary::-webkit-details-marker { display: none; }
 #xi-det[open] .xi-chev { transform: rotate(180deg); } .xi-chev { transition: transform .2s; }
-/* Podio de destacados: 2.º | 1.º | 3.º. Mismo ancho y misma altura para los tres; el 1.º solo se eleva y crece un 4 % (diferencia sutil). */
-.podio { display: flex; justify-content: center; align-items: stretch; gap: .6rem; max-width: 40rem; margin: 0 auto; padding: 1.6rem .5rem .6rem; }
-.podio-slot { --s: 1; --y: 0rem; position: relative; flex: 1 1 0; min-width: 0; cursor: pointer; outline: none; transform: translateY(var(--y)) scale(var(--s)); transform-origin: center; transition: transform .6s cubic-bezier(.22, 1, .36, 1); }
-.podio-slot > article { height: 100%; transition: border-color .6s ease, box-shadow .6s ease; }
-.podio-slot[data-puesto='1'] { --s: 1.04; --y: -.5rem; z-index: 10; }
-.podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { --s: 1.07; z-index: 20; }
-.podio-slot[data-puesto='1']:hover, .podio-slot[data-puesto='1']:focus-visible, .podio-slot[data-puesto='1'].podio-up { --s: 1.09; }
-.podio-slot:hover article, .podio-slot:focus-visible article, .podio-slot.podio-up article { border-color: rgb(0 229 255 / .7); box-shadow: 0 0 28px rgb(0 229 255 / .3); }
-.podio-medal { position: absolute; top: -.75rem; left: 50%; transform: translateX(-50%); z-index: 30; font-family: var(--font-display); font-weight: 800; font-size: .75rem; padding: .05rem .6rem; border-radius: 999px; color: #0b0620; pointer-events: none; background: linear-gradient(90deg, #cbd5e1, #94a3b8); }
-.podio-slot[data-puesto='1'] .podio-medal { background: linear-gradient(90deg, #ffd700, #ffb300); box-shadow: 0 0 10px rgb(255 215 0 / .5); }
-.podio-slot[data-puesto='3'] .podio-medal { background: linear-gradient(90deg, #d49a6a, #b0723d); }
-@media (min-width: 640px) { .podio { gap: 1rem; } }
+/* Podio de destacados: 2.º | 1.º | 3.º. Cada carta mide lo mismo que en «Jugadores» (≈17,5 rem en PC, 172 px en celular); el 1.º solo se eleva y crece un 6 %.
+   En celular no caben tres de ese tamaño: el podio se desliza de lado y arranca centrado en el 1.º. */
+.podio { display: flex; justify-content: center; align-items: stretch; gap: 1rem; max-width: 60rem; margin: 0 auto; padding: 1.8rem 1rem 1.2rem; }
+.podio-slot { --s: 1; --y: 0rem; position: relative; flex: 0 1 17.5rem; min-width: 0; cursor: pointer; outline: none; transform: translateY(var(--y)) scale(var(--s)); transform-origin: center; transition: transform .9s cubic-bezier(.22, 1, .36, 1); }
+.podio-slot > article { height: 100%; transition: border-color .9s ease, box-shadow .9s ease; }
+.podio-slot[data-puesto='1'] { --s: 1.06; --y: -.9rem; z-index: 10; }
+.podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { --s: 1.13; z-index: 20; }
+.podio-slot[data-puesto='1']:hover, .podio-slot[data-puesto='1']:focus-visible, .podio-slot[data-puesto='1'].podio-up { --s: 1.15; }
+.podio-slot:hover article, .podio-slot:focus-visible article, .podio-slot.podio-up article { border-color: rgb(0 229 255 / .7); box-shadow: 0 0 34px rgb(0 229 255 / .32); }
+@media (max-width: 639px) {
+  .podio { justify-content: flex-start; overflow-x: auto; scroll-snap-type: x proximity; gap: .65rem; padding: 1.8rem 1.5rem 1.2rem; scrollbar-width: none; }
+  .podio::-webkit-scrollbar { display: none; }
+  .podio-slot { flex: 0 0 172px; scroll-snap-align: center; }
+}
 @media (prefers-reduced-motion: reduce) { .podio-slot { transition: none; } }
 
 /* Botones de la portada de Central */

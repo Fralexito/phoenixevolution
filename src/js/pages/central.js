@@ -42,11 +42,12 @@ async function renderFeatured() {
     if (error) throw error;
     if (!data?.length) throw new Error('vacío');
     // Podio: 2.º izquierda, 1.º centro, 3.º derecha. El número de puesto sigue al jugador (no a la posición en pantalla).
+    box.dataset.n = String(data.length);
     box.innerHTML = ordenPodio(data).map(({ jugador, puesto }) => `
       <div class="podio-slot" data-puesto="${puesto}" tabindex="0" role="button" aria-pressed="false" aria-label="${escapeHTML(jugador.nombre)}, puesto ${puesto}">
-        <span class="podio-medal">${puesto}º</span>
         ${playerCardHTML(jugador, puesto - 1, { sizeClass: 'w-full' })}
       </div>`).join('');
+    const c = box.querySelector('[data-puesto="1"]'); if (c) box.scrollLeft = c.offsetLeft - (box.clientWidth - c.offsetWidth) / 2;
   } catch (e) {
     console.error('[central] jugadores destacados:', e);
     box.innerHTML = `<div class="text-center text-gray-500 w-full py-6"><i class="fa-solid fa-users-slash text-2xl mb-2 block text-galaxy-600"></i>Aún no hay jugadores destacados para mostrar.</div>`;
