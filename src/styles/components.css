@@ -197,12 +197,13 @@
 #xi-det[open] .xi-chev { transform: rotate(180deg); } .xi-chev { transition: transform .2s; }
 /* Podio de destacados: 2.º | 1.º | 3.º. En PC cada carta mide lo mismo que en «Jugadores» (≈17,5 rem); el 1.º solo se eleva y crece un 6 %. */
 .podio { display: flex; justify-content: center; align-items: stretch; gap: 1rem; max-width: 60rem; margin: 0 auto; padding: 1.8rem 1rem 1.2rem; }
-.podio-slot { --s: 1; --y: 0rem; position: relative; flex: 0 1 17.5rem; min-width: 0; cursor: pointer; outline: none; transform: translateY(var(--y)) scale(var(--s)); transform-origin: center; transition: transform .9s cubic-bezier(.22, 1, .36, 1); }
-.podio-slot > article { height: 100%; transition: border-color .9s ease, box-shadow .9s ease; }
+.podio-slot { --s: 1; --y: 0rem; position: relative; flex: 0 1 17.5rem; min-width: 0; cursor: pointer; outline: none; transform: translateY(var(--y)) scale(var(--s)); transform-origin: center; will-change: transform; backface-visibility: hidden; transition: transform 1.7s cubic-bezier(.16, 1, .3, 1); }  /* al soltar: regreso largo y lento */
+.podio-slot > article { height: 100%; transition: border-color 1.7s ease, box-shadow 1.7s ease; }
 .podio-slot[data-puesto='1'] { --s: 1.05; --y: -.8rem; z-index: 10; }
 /* Zoom al pasar el mouse / tocar: escalonado por puesto (1.º el mayor, 3.º el menor). Variables --z1/--z2/--z3 para ajustarlo en un solo sitio. */
 .podio { --z1: 1.16; --z2: 1.125; --z3: 1.09; }
-.podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { z-index: 20; }
+.podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { z-index: 20; transition-duration: 1.3s; }  /* al entrar: sube despacio, con una cola larga que se asienta */
+.podio-slot:hover > article, .podio-slot:focus-visible > article, .podio-slot.podio-up > article { transition-duration: 1.3s; }
 .podio-slot[data-puesto='1']:hover, .podio-slot[data-puesto='1']:focus-visible, .podio-slot[data-puesto='1'].podio-up { --s: var(--z1); }
 .podio-slot[data-puesto='2']:hover, .podio-slot[data-puesto='2']:focus-visible, .podio-slot[data-puesto='2'].podio-up { --s: var(--z2); }
 .podio-slot[data-puesto='3']:hover, .podio-slot[data-puesto='3']:focus-visible, .podio-slot[data-puesto='3'].podio-up { --s: var(--z3); }
