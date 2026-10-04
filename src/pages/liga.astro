@@ -12,6 +12,7 @@ const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black
 const ESTADO_ED = { en_curso: 'En curso', finalizada: 'Finalizada' };
 const PUESTO = ['text-gold-400', 'text-gray-200', 'text-bronze-400'];
 
+const ESTADO_FECHA = { jugada: 'jugada', en_juego: 'en juego', pendiente: 'por jugar' };
 const datos = LIGAS.map((l) => ({
   liga: l,
   ediciones: (EDICIONES[l.id] ?? []).map((e) => ({
@@ -27,7 +28,7 @@ const datos = LIGAS.map((l) => ({
       <nav class="flex flex-wrap gap-2" aria-label="Ligas">{LIGAS.map((l) => <a href={`#liga-${l.id}`} class="adv-chip">{l.titulo.join(' ')}</a>)}</nav>
     )}
 
-    {datos.map(({ liga: l, ediciones }) => (
+    {datos.map(({ liga: l, ediciones }) => { const ult = ediciones[0]; const fa = ult?.fechas.find((f) => f.n === ult.actual); return (
       <section id={`liga-${l.id}`} class="space-y-6 sm:space-y-8 scroll-mt-24">
         <!-- Portada compacta -->
         <div class="liga-card group">
@@ -40,6 +41,14 @@ const datos = LIGAS.map((l) => ({
             </div>
             <h1 class="text-4xl sm:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">{l.titulo[0]} <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">{l.titulo[1]}</span></h1>
             <p class="text-xs sm:text-base font-display font-light tracking-[0.25em] text-gray-300 uppercase">{l.juego}</p>
+            {ult && (
+              <ul class="flex flex-wrap justify-center sm:justify-start gap-2 pt-1" aria-label="Estado de la edición">
+                <li class="hidden sm:block"><span class="pc-chip"><i class="fa-solid fa-calendar-day"></i>{ult.nombre}</span></li>
+                {fa && <li class="pc-chip"><i class="fa-solid fa-futbol"></i>Fecha {fa.n} {ESTADO_FECHA[fa.estado]}</li>}
+                {ult.tabla[0] && <li class="pc-chip"><i class="fa-solid fa-crown"></i>Líder: {ult.tabla[0].nombre} · {ult.tabla[0].pts} pts</li>}
+                <li class="hidden sm:block"><span class="pc-chip"><i class="fa-solid fa-users"></i>{ult.participantes} jugadores</span></li>
+              </ul>
+            )}
             <div class="flex flex-wrap justify-center sm:justify-start gap-3 pt-1">
               {l.copafacil && <a href={l.copafacil} target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-p !py-2.5 !px-5 !text-xs"><i class="fa-solid fa-table-list"></i> Ver en CopaFácil</a>}
               <a href={`${base}duelos/`} class="hero-cta hero-cta-s !py-2.5 !px-5 !text-xs"><i class="fa-solid fa-gamepad"></i> Sala de Duelos</a>
@@ -116,7 +125,7 @@ const datos = LIGAS.map((l) => ({
           </div>
         ))}
       </section>
-    ))}
+    ); })}
   </div>
 </Layout>
 <script>

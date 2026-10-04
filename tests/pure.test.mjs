@@ -343,7 +343,7 @@ test('liga: cada fecha cargada tiene 6 partidos y los 12 jugadores aparecen una 
   for (const f of FECHAS) {
     const nombres = f.partidos.flatMap((m) => [m.l, m.v]);
     assert.equal(new Set(nombres).size, nombres.length, `fecha ${f.n}: un jugador repetido`);
-    if (f.n < 9) { assert.equal(f.partidos.length, 6, `fecha ${f.n}`); assert.equal(new Set(nombres).size, 12, `fecha ${f.n}`); }   // la 9 está incompleta a propósito
+    assert.equal(f.partidos.length, 6, `fecha ${f.n}`); assert.equal(new Set(nombres).size, 12, `fecha ${f.n}`);
   }
   // Totales que muestra CopaFácil en «Estadísticas de la fecha»: fecha 4 = 46 goles, 0 empates; fecha 5 = 37 goles, 1 empate.
   assert.equal(goles(FECHAS[3]), 46); assert.equal(goles(FECHAS[4]), 37);

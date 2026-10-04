@@ -38,10 +38,9 @@ export const FECHAS = [
     { l: 'Camilo', v: 'Hugo', gl: 1, gv: 0 }, { l: 'Victor', v: 'Roberto', gl: 9, gv: 0 }, { l: 'Jack', v: 'Axel', gl: 3, gv: 6 },
     { l: 'Degox', v: 'Jeremi', gl: null, gv: null }, { l: 'Arens', v: 'Fralex', gl: 4, gv: 2 }, { l: 'Beto', v: 'Morgado', gl: null, gv: null },
   ] },
-  // Fecha 9 INCOMPLETA: el 6.º partido (Morgado – Fralex, por deducción) no se vio en las capturas; falta confirmar quién es local y su marcador.
   { n: 9, partidos: [
     { l: 'Hugo', v: 'Victor', gl: null, gv: null }, { l: 'Camilo', v: 'Jack', gl: 4, gv: 1 }, { l: 'Roberto', v: 'Degox', gl: null, gv: null },
-    { l: 'Axel', v: 'Arens', gl: null, gv: null }, { l: 'Jeremi', v: 'Beto', gl: null, gv: null },
+    { l: 'Axel', v: 'Arens', gl: null, gv: null }, { l: 'Jeremi', v: 'Beto', gl: null, gv: null }, { l: 'Fralex', v: 'Morgado', gl: null, gv: null },
   ] },
 ];
 
@@ -54,7 +53,6 @@ export const EDICIONES = {
       id: 'apertura-2026', nombre: 'Apertura 2026', estado: 'en_curso', fase: '1ª Fase',
       formato: 'Todos contra todos, a ida y vuelta', participantes: 12,
       clubes: CLUBES, fechas: FECHAS,
-      aviso: 'Fecha 9 incompleta: falta cargar un partido (Morgado – Fralex, por descarte).',
     },
   ],
 };
