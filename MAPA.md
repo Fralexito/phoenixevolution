@@ -230,3 +230,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Última hora arrastrable en PC (ronda 44):** con el mouse se puede arrastrar para retroceder/avanzar (se frena en la noticia más antigua conservada, ~900 px de historia), botones ‹ › al pasar el mouse, y al sacar el mouse sigue sola (`features/ticker.js`, `Ticker.astro`, `layout.css`). En táctil solo pausa.
 - **Quiénes somos (ronda 44):** textos mínimos; Fralex un poquito por encima (centro, ligeramente elevado) y Jack casi igual (a su izquierda), Hugo al otro lado (`destaque`/`orden` en `data/organizadores.js`).
 - **Quiénes somos (ronda 45):** Fralex y Jack = «Impulsor de todo» (en ese orden, Fralex apenas más elevado), Hugo = «Co-impulsor».
+- **Fotos en Quiénes somos (ronda 46):** cada impulsor usa su foto de la sección Jugadores si la tiene (`foto_url`/`foto`); si no, queda su inicial. Hugo la muestra apenas la tenga cargada; Fralex y Jack cuando suban la suya.

@@ -55,7 +55,7 @@ const inicial = (n) => String(n ?? '?').trim().charAt(0).toUpperCase() || '?';
       <div class="grid gap-4 md:grid-cols-3">
         {ORG.impulsores.map((o) => (
           <article class:list={['glass-panel rounded-2xl px-6 py-8 text-center flex flex-col items-center gap-3', o.destaque === 2 ? 'border-galaxy-400/55 shadow-[0_0_34px_rgba(0,229,255,.18)] md:-translate-y-2' : o.destaque === 1 ? 'border-galaxy-400/45 shadow-[0_0_28px_rgba(0,229,255,.14)] md:-translate-y-1.5' : '', ORDEN[o.orden] ?? '']} data-org-nombre={o.nombre}>
-            <div class="rounded-full grid place-items-center w-24 h-24 text-4xl font-display font-extrabold text-white bg-gradient-to-br from-galaxy-600 to-galaxy-400 shadow-[0_0_25px_rgba(0,229,255,.35)]" aria-hidden="true">{inicial(o.nombre)}</div>
+            <div data-org-foto class="rounded-full overflow-hidden grid place-items-center w-24 h-24 text-4xl font-display font-extrabold text-white bg-gradient-to-br from-galaxy-600 to-galaxy-400 shadow-[0_0_25px_rgba(0,229,255,.35)]"><span aria-hidden="true">{inicial(o.nombre)}</span></div>
             <h3 class="font-display font-extrabold text-white uppercase tracking-[.18em] text-2xl mt-1">{o.nombre}</h3>
             <span class="text-[11px] font-display font-bold uppercase tracking-[.28em] text-galaxy-400">{o.rol}</span>
             <span class="block h-px w-10 bg-galaxy-400/50" aria-hidden="true"></span>
