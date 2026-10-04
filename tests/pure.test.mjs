@@ -381,3 +381,35 @@ test('ligaStats: resúmenes, estado de fecha, forma, goleadas y rankings', () =>
   const { tabla } = calcularTabla(fe.flatMap((f) => f.partidos));
   assert.deepEqual(ranking(tabla, 'gf')[0], { nombre: 'Victor', valor: 57 }); assert.deepEqual(ranking(tabla, 'gc', true)[0], { nombre: 'Victor', valor: 4 });
 });
+
+import { slugify, slugUnico, partirCuerpo, fechaRelativa, normalizar, validar, ordenar, elegirDestacada, ligasPresentes, filtrar } from '../src/js/core/noticias.js';
+import { generarCronica } from '../src/js/core/cronica.js';
+test('noticias: slug, párrafos, fecha relativa y validación', () => {
+  assert.equal(slugify('¡Auditoría Antifraude: Actas Nº 3!'), 'auditoria-antifraude-actas-n-3'); assert.equal(slugify('###'), 'noticia'); assert.ok(slugify('a'.repeat(200)).length <= 70);
+  assert.equal(slugUnico('x', []), 'x'); assert.equal(slugUnico('x', ['x']), 'x-2'); assert.equal(slugUnico('x', ['x', 'x-2']), 'x-3');
+  assert.deepEqual(partirCuerpo('uno\n\n  dos \n\n\n tres'), ['uno', 'dos', 'tres']); assert.deepEqual(partirCuerpo(''), []);
+  const ahora = new Date(2026, 9, 4, 8, 0);
+  assert.equal(fechaRelativa(new Date(2026, 9, 4, 1, 0).toISOString(), ahora), 'Hoy'); assert.equal(fechaRelativa(new Date(2026, 9, 3, 23, 0).toISOString(), ahora), 'Ayer');
+  assert.equal(fechaRelativa(new Date(2026, 9, 1, 12, 0).toISOString(), ahora), 'Hace 3 días'); assert.equal(fechaRelativa(new Date(2026, 8, 12, 12, 0).toISOString(), ahora), '12 sep 2026'); assert.equal(fechaRelativa('basura', ahora), '');
+  const bien = { titulo: 'Título ok', resumen: 'Resumen ok', cuerpo: 'Texto ok', categoria: 'OFICIAL', tag: '', imagen: 'https://x.com/a.jpg', liga: 'galaxy' };
+  assert.equal(validar(bien).ok, true);
+  assert.equal(validar({ ...bien, titulo: 'ab' }).ok, false); assert.equal(validar({ ...bien, imagen: 'http://x.com/a.jpg' }).ok, false); assert.equal(validar({ ...bien, categoria: 'X' }).ok, false);
+  assert.equal(validar({ ...bien, resumen: 'r'.repeat(401) }).errores.length, 1); assert.equal(validar({ ...bien, liga: 'Mal Id' }).ok, false);
+});
+test('noticias: orden, destacada, filtros y ligas', () => {
+  const mk = (id, extra) => normalizar({ id, slug: `s${id}`, titulo: `T${id} luna`, resumen: 'r', cuerpo: 'a\n\nb', categoria: 'OFICIAL', tag: 'Mercado', publicada_en: `2026-10-0${id}T10:00:00Z`, ...extra });
+  const l = ordenar([mk(1), mk(3, { liga: 'otra' }), mk(2, { categoria: 'JORNADA', destacada: true })]);
+  assert.deepEqual(l.map((n) => n.id), [3, 2, 1]); assert.equal(elegirDestacada(l).id, 2); assert.equal(elegirDestacada(ordenar([mk(1), mk(3)])).id, 3); assert.equal(elegirDestacada([]), null);
+  assert.deepEqual(ligasPresentes(l), ['otra', 'galaxy']); assert.deepEqual(l[0].cuerpo.length, 2);
+  assert.deepEqual(filtrar(l, { cat: 'JORNADA' }).map((n) => n.id), [2]); assert.deepEqual(filtrar(l, { liga: 'otra' }).map((n) => n.id), [3]);
+  assert.deepEqual(filtrar(l, { term: ' LUNA ' }).length, 3); assert.deepEqual(filtrar(l, { term: 'nada' }), []);
+});
+test('crónica: borrador de la fecha 8 (victor golea) y casos límite', () => {
+  const ed = EDICIONES.galaxy[0]; const c = generarCronica({ fechas: ed.fechas, n: 8, clubes: ed.clubes, nombreLiga: 'Galaxy League', nombreEdicion: 'Apertura 2026' });
+  assert.equal(c.titulo, 'Fecha 8: Victor golea a Roberto 9-0'); assert.equal(c.categoria, 'JORNADA'); assert.equal(c.tag, 'Fecha 8');
+  assert.match(c.resumen, /4 partidos y 25 goles/); assert.match(c.cuerpo, /Quedan por jugarse de esta fecha: Degox – Jeremi; Beto – Morgado/); assert.match(c.cuerpo, /Victor \(Bayern Múnich\) ante Roberto/);
+  assert.equal(validar({ ...c, imagen: '', liga: 'galaxy' }).ok, true);   // lo generado cumple los límites de la base
+  assert.equal(generarCronica({ fechas: ed.fechas, n: 99 }), null); assert.equal(generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: null, gv: null }] }], n: 1 }), null);
+  const empate = generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 1 }] }], n: 1, nombreLiga: 'X' }); assert.match(empate.titulo, /reparto de puntos/);
+  const c4 = generarCronica({ fechas: ed.fechas, n: 1 }); assert.equal(c4.titulo, 'Fecha 1: Victor golea a Fralex 9-0');   // fecha 1: sin tabla previa, no hay «cambio de líder»
+});
