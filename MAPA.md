@@ -135,3 +135,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Búsqueda avanzada** (botón «Avanzada», `features/advancedSearch.js` + `core/ranking.js`): eliges una o varias stats (o la media) y la lista se reordena al instante por el **promedio de las elegidas** (puesto #1, #2…; empates comparten puesto). «Mínimo en cada stat» exige que todas lleguen a ese valor; «Top 3/5/10/Todos». Respeta el filtro de equipo y el buscador. Cada tarjeta muestra bajo ella los valores de las stats elegidas.
 - **Físico opcional** (migración `011`: `altura_cm` 120–230, `peso_kg` 35–160, `pie` Derecho/Izquierdo): campos en el formulario; se ven en la tarjeta cuando hay ancho suficiente.
 - **Pulso en vivo movible** (`core/dock.js`, `features/liveDock.js`): asa ⋮⋮ para arrastrarlo a cualquier parte; doble clic o Esc lo restablece; flechas del teclado lo mueven. Se pega al lado más cercano (así se adapta al girar/redimensionar), los mensajes e historial crecen hacia el lado con más espacio, y se recuerda en el navegador.
+
+## Ronda 17 — Parche/versión en el pulso, búsqueda avanzada compacta
+- **Pulso en vivo**: el juego se muestra como «PES 21 (Dream Patch)» o «SP Football Life 26» (`etiquetaJuego` en `core/rules.js`; el evento lleva `juego` + `parche`/`version`). Sin parche o versión, solo el nombre del juego.
+- **Sistema host**: el parche de PES 2021 se elige entre Dream Patch, Conmebol Patch, VirtuaRED, Sudamerican Patch y Gogosz Patch (`PARCHES_PES`), o «Otro» para escribirlo a mano; tocar el elegido lo quita.
+- **Búsqueda avanzada** más compacta (chips pequeños, mínimo y Top en una sola fila, ancho máximo en PC).

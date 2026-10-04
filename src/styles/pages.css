@@ -23,6 +23,7 @@
   #duelos-grid:not([data-vista='partidos']) #col-mis { display: none; }
 }
 /* Selector de estado unificado (Inactivo · Activo · Radar): cada nivel tiene su color. */
+.seg-wrap { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
 .seg-estado > button[data-v='off'][aria-pressed='true'] { background: #374151; box-shadow: none; }
 .seg-estado > button[data-v='on'][aria-pressed='true'] { background: #059669; box-shadow: 0 0 12px rgba(16,185,129,.45); }
 .notif-item { display: flex; gap: .75rem; padding: .75rem 1rem; border-bottom: 1px solid var(--color-galaxy-line); }

@@ -34,3 +34,18 @@ export function speedBucket(mbps) {
 }
 export const JUEGOS = ['PES 2021', 'SP Football Life'];
 export const SP_VERSIONES = ['25', '26', '27'];   // «Otra» se escribe a mano (≤ 20 caracteres) [BD] perfiles_sp_version_ok
+
+export const PARCHES_PES = ['Dream Patch', 'Conmebol Patch', 'VirtuaRED', 'Sudamerican Patch', 'Gogosz Patch'];   // «Otro» se escribe a mano (≤ 80 caracteres)
+
+/**
+ * Nombre corto del juego para mostrar: «PES 21 (Dream Patch)» o «SP Football Life 26». Lo que falte (parche o versión) simplemente no se muestra.
+ * Acepta el nombre completo guardado en el perfil ('PES 2021' / 'SP Football Life') o variantes ya cortas.
+ */
+export function etiquetaJuego({ juego, parche, version } = {}) {
+  const j = String(juego ?? '').trim().slice(0, 40);
+  if (!j) return '';
+  const limpio = (x, n) => String(x ?? '').replace(/[<>]/g, '').trim().slice(0, n);
+  if (/^pes/i.test(j)) { const pa = limpio(parche, 40); return `PES 21${pa ? ` (${pa})` : ''}`; }
+  if (/^sp/i.test(j)) { const v = limpio(version, 10); return `SP Football Life${v ? ` ${v}` : ''}`; }
+  return j;
+}

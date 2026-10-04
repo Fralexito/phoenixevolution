@@ -4,7 +4,7 @@ import { supabase } from '../core/supabase.js';
 import { getState, refreshProfile } from '../core/session.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeUrl, toUsername } from '../core/dom.js';
-import { cooldownInfo, USERNAME_COOLDOWN_DAYS, SPEED_BUCKETS, speedBucket, JUEGOS, SP_VERSIONES } from '../core/rules.js';
+import { cooldownInfo, USERNAME_COOLDOWN_DAYS, SPEED_BUCKETS, speedBucket, JUEGOS, SP_VERSIONES, PARCHES_PES } from '../core/rules.js';
 import { PAISES } from '../../data/paises.js';
 import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from './avatarPicker.js';
 import { toast } from '../core/toast.js';
@@ -28,6 +28,10 @@ export function openProfileModal() {
   // Versión de SP Football Life (opcional): '' = sin indicar · '25'/'26'/'27' · 'otra' (texto libre).
   const verGuardada = prof.host_sp_version || '';
   let ver = !verGuardada ? '' : SP_VERSIONES.includes(verGuardada) ? verGuardada : 'otra';
+
+  // Parche de PES 2021 (opcional): '' = sin indicar · uno de la lista · 'otro' (texto libre).
+  const parcheGuardado = prof.host_parche || '';
+  let parche = !parcheGuardado ? '' : PARCHES_PES.includes(parcheGuardado) ? parcheGuardado : 'otro';
 
   const m = openModal(`
     <form id="prof-form" class="p-6 space-y-5" novalidate>
@@ -71,7 +75,15 @@ export function openProfileModal() {
           </div>
           <div><span class="label">Plataforma</span>${segHTML({ id: 'p-soft', options: PLATAFORMAS.map((v) => ({ v, label: v })), current: soft, label: 'Plataforma' })}</div>
           <div><span class="label">Juego</span>${segHTML({ id: 'p-game', options: JUEGOS.map((v) => ({ v, label: v })), current: game, label: 'Juego' })}</div>
-          <div id="f-patch"><label class="label" for="p-patch">Parche</label><input id="p-patch" class="field" maxlength="80" value="${escapeHTML(prof.host_parche)}"></div>
+          <div id="f-patch">
+            <span class="label">Parche <span class="text-gray-500 normal-case">(opcional)</span></span>
+            <div class="seg seg-wrap" id="p-parche" role="group" aria-label="Parche de PES 2021">
+              ${PARCHES_PES.map((v) => `<button type="button" data-v="${v}" aria-pressed="${v === parche}">${v}</button>`).join('')}
+              <button type="button" data-v="otro" aria-pressed="${parche === 'otro'}">Otro</button>
+            </div>
+            <input id="p-patch" class="field mt-2" maxlength="80" placeholder="¿Cuál parche?" value="${parche === 'otro' ? escapeHTML(parcheGuardado) : ''}" ${parche === 'otro' ? '' : 'hidden'}>
+            <p class="text-[11px] text-gray-500 mt-1">Toca de nuevo el parche elegido para quitarlo.</p>
+          </div>
           <div id="f-ver" hidden>
             <span class="label">Versión <span class="text-gray-500 normal-case">(opcional)</span></span>
             <div class="seg" id="p-ver" role="group" aria-label="Versión de SP Football Life">
@@ -114,6 +126,9 @@ export function openProfileModal() {
   const syncJuego = () => { $('#f-patch').hidden = game !== 'PES 2021'; $('#f-ver').hidden = game === 'PES 2021'; };
   bindSeg($('#p-game'), (v) => { game = v; syncJuego(); });
   syncJuego();
+  // Parche opcional: tocar el elegido otra vez lo quita.
+  const pintarParche = () => { m.querySelectorAll('#p-parche button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === parche))); $('#p-patch').hidden = parche !== 'otro'; };
+  $('#p-parche').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (!b) return; parche = parche === b.dataset.v ? '' : b.dataset.v; pintarParche(); if (parche === 'otro') $('#p-patch').focus(); });
   // Versión opcional: tocar la elegida otra vez la quita.
   const pintarVer = () => { m.querySelectorAll('#p-ver button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === ver))); $('#p-ver-otra').hidden = ver !== 'otra'; };
   $('#p-ver').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (!b) return; ver = ver === b.dataset.v ? '' : b.dataset.v; pintarVer(); if (ver === 'otra') $('#p-ver-otra').focus(); });
@@ -141,7 +156,7 @@ export function openProfileModal() {
         bio: $('#p-bio').value.trim(), discord_tag: $('#p-disc').value.trim(), stream_url: stream,
         puede_hostear: $('#p-host').checked, ancho_banda_mbps: speed,
         software_host: soft, host_juego: game,
-        host_parche: $('#p-patch').value.trim(),
+        host_parche: parche === 'otro' ? $('#p-patch').value.trim().replace(/[<>]/g, '').slice(0, 80) : parche,
         host_sp_version: game === 'PES 2021' || !ver ? null : (ver === 'otra' ? $('#p-ver-otra').value.trim().replace(/[<>]/g, '').slice(0, 20) || null : ver),
         host_notas: $('#p-hnotas').value.trim().replace(/[<>]/g, ''),
       };

@@ -273,3 +273,14 @@ test('dock: lado más cercano, ajuste a la pantalla y lectura segura', () => {
   assert.equal(a.dx, 400 - 100 - MARGEN); assert.equal(a.dy, MARGEN);
   assert.equal(dockLeer('basura'), null); assert.equal(dockLeer('{"h":"x","dx":1,"dy":1,"v":"t"}'), null); assert.deepEqual(dockLeer('{"h":"r","dx":5,"dy":9,"v":"t"}'), { h: 'r', dx: 5, v: 't', dy: 9 });
 });
+
+import { etiquetaJuego } from '../src/js/core/rules.js';
+test('etiqueta de juego: PES 21 con parche y SP con versión', () => {
+  assert.equal(etiquetaJuego({ juego: 'PES 2021', parche: 'Dream Patch' }), 'PES 21 (Dream Patch)');
+  assert.equal(etiquetaJuego({ juego: 'PES 2021' }), 'PES 21');
+  assert.equal(etiquetaJuego({ juego: 'SP Football Life', version: '26' }), 'SP Football Life 26');
+  assert.equal(etiquetaJuego({ juego: 'SP Football Life' }), 'SP Football Life');
+  assert.equal(etiquetaJuego({}), ''); assert.equal(etiquetaJuego({ juego: 'PES 2021', parche: '<b>X</b>' }), 'PES 21 (bX/b)');
+  const ev = formatEvento({ tipo: 'reto_aceptado', quien: 'A', rival: 'B', formato: '1v1', juego: 'PES 2021', parche: 'Gogosz Patch' });
+  assert.ok(ev.html.includes('1v1 · PES 21 (Gogosz Patch)'));
+});

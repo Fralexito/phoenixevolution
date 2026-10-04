@@ -20,7 +20,7 @@ function eventoDemo() {
   const quien = pick(DEMO_NOMBRES);
   if (Math.random() < 0.45) return { tipo: 'radar_on', quien };
   let rival = pick(DEMO_NOMBRES); while (rival === quien) rival = pick(DEMO_NOMBRES);
-  return { tipo: 'reto_aceptado', quien, rival, formato: pick(DEMO_FORMATOS), juego: pick(DEMO_JUEGOS) };
+  return { tipo: 'reto_aceptado', quien, rival, formato: pick(DEMO_FORMATOS), ...pick(DEMO_JUEGOS) };
 }
 
 export function initLiveFeed() {
