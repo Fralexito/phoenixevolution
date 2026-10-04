@@ -25,7 +25,7 @@ export function resumenHistorial(filas) {
 export function validarParticipacion(b) {
   const e = []; const t = (v, max) => String(v ?? '').trim().replace(/[<>]/g, '').slice(0, max);
   const liga = t(b.liga, 60); const edicion = t(b.edicion, 60);
-  if (!liga) e.push('Escribe el nombre de la liga.'); if (!edicion) e.push('Escribe la edición (ej. Apertura 2025).');
+  if (!liga) e.push('Escribe el nombre de la liga.'); if (!edicion) e.push('Escribe la edición (ej. 1° Edición).');
   const puestoTxt = String(b.puesto ?? '').trim(); const puesto = puestoTxt === '' ? null : Number(puestoTxt);
   if (puesto !== null && !(Number.isInteger(puesto) && puesto >= 1 && puesto <= 99)) e.push('El puesto debe ser un número entre 1 y 99 (o déjalo vacío).');
   const periodo = String(b.periodo ?? '').trim(); if (periodo && !/^\d{4}-\d{2}(-\d{2})?$/.test(periodo)) e.push('La fecha no es válida.');

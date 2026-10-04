@@ -1,10 +1,10 @@
 // Noticias (contenido editorial). `cuerpo` es una lista de párrafos en TEXTO PLANO: nunca HTML.
 export const NOTICIAS = [
-  { id: 1, categoria: 'OFICIAL', tag: 'Apertura 2026', fecha: 'Hoy',
+  { id: 1, categoria: 'OFICIAL', tag: '1° Edición', fecha: 'Hoy',
     titulo: 'Se Confirma el Calendario Oficial: El Clásico Abrirá la Jornada 3',
     resumen: 'La directiva de la Phoenix Evolution Series oficializó los cruces para la fase regular de la Galaxy League. El choque entre Barcelona y Real Madrid contará con sala de host dedicada.',
     cuerpo: [
-      'La directiva técnica y de fiscalización de la Phoenix Evolution Series confirmó la programación oficial de la Galaxy League Apertura 2026.',
+      'La directiva técnica y de fiscalización de la Phoenix Evolution Series confirmó la programación oficial de la Galaxy League 1° Edición.',
       'El partido más esperado de la primera ronda entre Fralex (FC Barcelona) y Axel (Real Madrid) ha sido fijado para la Jornada 3. Debido a la envergadura del duelo, se implementará un enlace de host simétrico por Parsec con tasa de refresco bloqueada a 60 FPS estables para evitar caídas de frame y desincronizaciones.',
     ],
     imagen: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1000&auto=format&fit=crop' },

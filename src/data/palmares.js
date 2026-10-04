@@ -1,4 +1,4 @@
-// Contenido del Palmarés (Apertura 2026). Las clases de color están completas para que Tailwind las detecte.
+// Contenido del Palmarés (1° Edición). Las clases de color están completas para que Tailwind las detecte.
 export const PODIO = [
   { copa: 'Copa Galaxy', dt: 'FRALEX', club: 'FC Barcelona', sigla: 'FCB',
     card: 'border-t border-l border-silver-400/40 p-4 shadow-[0_0_15px_rgba(156,163,175,0.1)]',

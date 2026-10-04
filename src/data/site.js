@@ -30,7 +30,7 @@ export const SOCIALS = [
 
 export const TICKER = [
   'SALA DE DUELOS: Matchmaking activo con salas dedicadas de Parsec y Smash Soda.',
-  'NOTICIAS: Cobertura editorial oficial del Torneo Apertura en marcha.',
+  'NOTICIAS: Cobertura editorial oficial de la 1° Edición en marcha.',
   'FAIR PLAY: Fralex lidera la tabla de reputación con Rango S (100 pts).',
   'MERCADO: Sistema de pases en pausa reglamentaria hasta nuevo aviso.',
 ];

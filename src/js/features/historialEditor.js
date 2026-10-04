@@ -21,8 +21,8 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
       <h4 id="he-titulo" class="text-xs font-display font-bold uppercase tracking-widest text-gray-300"></h4>
       <div class="grid sm:grid-cols-2 gap-3">
         <div><label class="label" for="he-liga">Liga</label><input id="he-liga" class="field" maxlength="60" placeholder="Galaxy League"></div>
-        <div><label class="label" for="he-ed">Edición</label><input id="he-ed" class="field" maxlength="60" placeholder="Apertura 2025"></div>
-        <div><label class="label" for="he-tor">Torneo</label><input id="he-tor" class="field" maxlength="60" placeholder="Apertura, Clausura, Copa…"></div>
+        <div><label class="label" for="he-ed">Edición</label><input id="he-ed" class="field" maxlength="60" placeholder="1° Edición"></div>
+        <div><label class="label" for="he-tor">Torneo</label><input id="he-tor" class="field" maxlength="60" placeholder="1° Edición, Copa…"></div>
         <div><label class="label" for="he-temp">Temporada <span class="text-gray-500 normal-case">(año)</span></label><input id="he-temp" inputmode="numeric" class="field" maxlength="4" placeholder="2025"></div>
         <div><label class="label" for="he-per">Mes de inicio <span class="text-gray-500 normal-case">(para ordenar)</span></label><input id="he-per" type="month" class="field"></div>
         <div><label class="label" for="he-club">Club</label><input id="he-club" class="field uppercase" maxlength="60" placeholder="FC Barcelona"></div>

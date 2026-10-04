@@ -85,12 +85,12 @@ export const FECHAS = [
 
 // ---- HISTORIAL: todas las ediciones de cada liga, por id de liga (data/ligas.js). ----
 // Para archivar una edición: cambia su `estado` a 'finalizada' y añade `campeon`. Para abrir otra: agrega un objeto nuevo (su propio archivo de fechas si crece).
-//  torneo + temporada: sirven al filtro de Jugadores (ej. 'Apertura' + '2026'); si faltan se deducen del nombre.
+//  torneo + temporada: sirven al filtro de Jugadores (ej. '1° Edición' + '2026'); si faltan se deducen del nombre.
 //  estado: 'en_curso' | 'finalizada'    ·  fecha1Incompleta: avisa que falta cargar algún partido
 export const EDICIONES = {
   galaxy: [
     {
-      id: 'apertura-2026', nombre: 'Apertura 2026', torneo: 'Apertura', temporada: '2026', estado: 'en_curso', fase: '1ª Fase',
+      id: 'edicion-1', nombre: '1° Edición', torneo: '1° Edición', temporada: '2026', estado: 'en_curso', fase: '1ª Fase',
       formato: 'Todos contra todos, a ida y vuelta', participantes: 12,
       clubes: CLUBES, fechas: FECHAS,
     },
