@@ -166,5 +166,5 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ## Ronda 20 — Podio de destacados
 - `core/central.js` → `ordenPodio` (2.º | 1.º | 3.º, sin huecos si hay menos de 3). Probado en `tests/pure.test.mjs`.
 - `pages/central.js` pinta cada carta dentro de `.podio-slot` (sin números de puesto visibles; `data-puesto` y el `aria-label` los conservan). Mouse: agranda por CSS (`:hover`). Toque/Enter: alterna `.podio-up` (una sola carta agrandada; tocar fuera la baja).
-- Tamaño: cada carta = tamaño de «Jugadores» (17,5 rem en PC, 172 px en celular). El 1.º: `--s:1.06` y `--y:-.9rem`; hover escalonado `--z1:1.35 · --z2:1.28 · --z3:1.22` en 6 s al entrar y 6 s al soltar, curva `cubic-bezier(.4,0,.6,1)` (suave de principio a fin) (editable en `.podio`). En celular los tres ocupan todo el ancho (zoom contenido 1.1/1.08/1.06 para no tapar al vecino).
+- Tamaño: cada carta = tamaño de «Jugadores» (17,5 rem en PC, 172 px en celular). El 1.º: `--s:1.06` y `--y:-.9rem`; hover escalonado `--z1:1.2 · --z2:1.16 · --z3:1.12` en 1,4 s (igual que la foto de la portada), curva `ease-out` (editable en `.podio`). En celular los tres ocupan todo el ancho (zoom contenido 1.1/1.08/1.06 para no tapar al vecino).
 - Borde de color fijo por puesto (`--glow`): 1.º dorado, 2.º cian, 3.º magenta. Sin destello: al pasar el mouse solo hay zoom.
