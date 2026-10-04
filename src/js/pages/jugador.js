@@ -8,6 +8,7 @@ import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed
 import { forma } from '../core/ligaStats.js';
 import { onSession, isAdmin } from '../core/session.js';
 import { openPlayerForm } from '../features/playerForm.js';
+import { abrirEditorPerfil } from '../features/perfilEditor.js';
 import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../core/estilo.js';
 import { radarPoints, axisPoint } from '../core/compare.js';
 import { STAT_INFO } from '../../data/stats.js';
@@ -141,7 +142,8 @@ function render(p) {
         <p class="text-gray-400 text-sm mt-1">${escapeHTML(p.club || 'Sin club')} · <span style="color:${pos.color}">${escapeHTML(pos.nombre)}</span> · Media ${escapeHTML(p.ovr ?? '--')}</p>
         ${p.descripcion ? `<p class="text-gray-300 text-sm mt-3 leading-relaxed max-w-prose">${escapeHTML(p.descripcion)}</p>` : ''}</header>
       <div><button type="button" id="perfil-analisis-btn" aria-expanded="false" aria-controls="perfil-analisis" class="btn btn-primary"><i class="fa-solid fa-chart-pie"></i> <span>Ver análisis de juego</span></button>
-        <button type="button" id="perfil-editar" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-pen"></i> Editar ficha</button></div>
+        <button type="button" id="perfil-editar" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-pen"></i> Editar ficha</button>
+        <button type="button" id="perfil-editar-bio" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-book-open"></i> Editar biografía</button></div>
       <section id="perfil-analisis" hidden class="rounded-2xl border border-galaxy-400/30 bg-black/20 p-5"></section>
       ${datosPerfil(p)}
       ${campanas.join('') || '<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5 text-sm text-gray-400">Este jugador todavía no figura en ninguna edición de liga.</section>'}
@@ -151,6 +153,7 @@ function render(p) {
 function mostrarEditar() {
   const b = $('perfil-editar'); if (!b) return;
   b.hidden = !isAdmin(); b.onclick = () => openPlayerForm(actual, init);
+  const bio = $('perfil-editar-bio'); if (bio) { bio.hidden = !isAdmin(); bio.onclick = () => abrirEditorPerfil(actual, init); }
 }
 
 async function init() {

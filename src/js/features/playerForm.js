@@ -1,7 +1,6 @@
 // Modal para crear/editar una ficha de jugador (solo admin; la BD lo refuerza con RLS).
 // Cada estadística es una «ficha» con − / + (mantén pulsado para repetir), deslizador y número en color.
 // La media (OVR) se calcula sola mientras no la toques; si la mueves queda manual hasta «Volver a automático».
-import { REDES, limpiarRed, limpiarRedes } from '../core/perfil.js';
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
@@ -102,18 +101,6 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
         <textarea id="f-desc" class="field" rows="4" maxlength="600" placeholder="Su táctica, estrategia, estilo de juego, cómo ataca y defiende…">${escapeHTML(p.descripcion)}</textarea>
         <p class="text-[11px] text-gray-500 mt-1 text-right"><span id="f-desc-n">0</span>/600</p>
       </div>
-      <details class="rounded-xl border border-galaxy-border/60 bg-black/20 p-3 space-y-3" ${p.biografia || p.ciudad || p.logros || p.estilo_juego || p.miembro_desde || Object.keys(p.redes ?? {}).length ? 'open' : ''}>
-        <summary class="cursor-pointer text-xs font-display font-bold uppercase tracking-widest text-galaxy-400">Perfil público <span class="text-gray-500 normal-case font-normal">(opcional)</span></summary>
-        <div><label class="label" for="f-bio">Biografía</label><textarea id="f-bio" class="field" rows="5" maxlength="2000" placeholder="Su historia en la comunidad, cómo empezó, qué lo define…">${escapeHTML(p.biografia)}</textarea></div>
-        <div class="grid sm:grid-cols-2 gap-3">
-          <div><label class="label" for="f-ciudad">Ciudad / país</label><input id="f-ciudad" class="field" maxlength="60" placeholder="Lima, Perú" value="${escapeHTML(p.ciudad)}"></div>
-          <div><label class="label" for="f-desde">Miembro desde</label><input id="f-desde" type="date" class="field" value="${escapeHTML(p.miembro_desde)}"></div>
-        </div>
-        <div><label class="label" for="f-estilo">Estilo de juego</label><input id="f-estilo" class="field" maxlength="120" placeholder="Ej: 4-3-3 · presión alta y contragolpe" value="${escapeHTML(p.estilo_juego)}"></div>
-        <div><label class="label" for="f-logros">Logros <span class="text-gray-500 normal-case">(uno por línea, máx. 12)</span></label><textarea id="f-logros" class="field" rows="3" maxlength="800" placeholder="Campeón Apertura 2026&#10;Máximo goleador">${escapeHTML(p.logros)}</textarea></div>
-        <div><span class="label">Redes <span class="text-gray-500 normal-case">(usuario o enlace https://)</span></span>
-          <div class="grid sm:grid-cols-2 gap-2">${REDES.map((r) => `<div class="flex items-center gap-2"><i class="${r.icono} w-5 text-center text-gray-400" title="${r.nombre}"></i><input data-red="${r.id}" class="field" maxlength="200" aria-label="${r.nombre}" placeholder="${r.ayuda}" value="${escapeHTML(p.redes?.[r.id])}"></div>`).join('')}</div></div>
-      </details>
       <p id="f-err" class="text-xs text-bad min-h-4" role="alert"></p>
       <button class="btn btn-primary w-full" type="submit">Guardar ficha</button>
     </form>`, { id: 'player-modal', wide: true });
@@ -243,16 +230,10 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     if (!nombre) { err.textContent = 'Escribe el nombre.'; return; }
     const alt = leerMedida($('#f-altura').value, ALTURA);
     if (alt.error) { err.textContent = `La altura debe estar entre ${ALTURA.min} y ${ALTURA.max} cm (o déjala vacía).`; return; }
-    const malas = [...m.querySelectorAll('[data-red]')].filter((i) => i.value.trim() && !limpiarRed(i.dataset.red, i.value)).map((i) => i.getAttribute('aria-label'));
-    if (malas.length) { err.textContent = `Revisa estas redes (usuario sin espacios o enlace https://): ${malas.join(', ')}.`; return; }
     const row = {
       altura_cm: alt.valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie),
       nombre, apodo: $('#f-apodo').value.trim().replace(/[<>]/g, '').slice(0, 24) || null, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
       posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(), descripcion: $('#f-desc').value.trim().replace(/[<>]/g, '') || null,
-      biografia: $('#f-bio').value.trim().replace(/[<>]/g, '').slice(0, 2000) || null, ciudad: $('#f-ciudad').value.trim().replace(/[<>]/g, '').slice(0, 60) || null,
-      miembro_desde: $('#f-desde').value || null, estilo_juego: $('#f-estilo').value.trim().replace(/[<>]/g, '').slice(0, 120) || null,
-      logros: $('#f-logros').value.trim().replace(/[<>]/g, '').slice(0, 800) || null,
-      redes: limpiarRedes(Object.fromEntries([...m.querySelectorAll('[data-red]')].map((i) => [i.dataset.red, i.value]))),
       ovr: vals.ovr,
     };
     STAT_KEYS.forEach((k) => { row[k] = vals[k]; });
