@@ -235,3 +235,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Insignia de división (ronda 48):** separada del borde (0.7rem/0.8rem) y, al pasar el mouse o en la réplica, se expande hacia la izquierda mostrando el nombre completo («L1 Primera División»). Oculta el texto en zoom denso.
 - **Perfil con tarjeta alta (ronda 49):** `playerCardHTML(p, i, { largo: true })` restituye en el perfil las proporciones altas de antes (foto 5:4, stats en 2 columnas); Jugadores sigue con la compacta (`.pc-largo` en `styles/components.css`).
 - **Logo de la cabecera más adentro (ronda 50):** el escudo y «PES» se separan del borde izquierdo (`Header.astro`: pl-6 móvil / pl-12 PC; antes pegado a ~16-24 px).
+- **Última hora con huecos irregulares (ronda 51):** cada noticia trae su propio hueco de salida entre 0.5× y 2.5× el base (`huecoIrregular` en `features/ticker.js`), para que no se vea simétrica.

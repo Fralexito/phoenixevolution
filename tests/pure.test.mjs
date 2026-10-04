@@ -240,7 +240,7 @@ test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la s
 import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo, NIVELES } from '../src/js/core/density.js';
 import { rankPlayers } from '../src/js/core/ranking.js';
 import { leerMedida, fisicoTexto, fisicoPartes, ALTURA } from '../src/js/core/fisico.js';
-import { puedeEntrar } from '../src/js/features/ticker.js';
+import { puedeEntrar, huecoIrregular } from '../src/js/features/ticker.js';
 test('zoom: niveles válidos, límites y tamaño', () => {
   assert.equal(nivelValido(99, true), 3); assert.equal(nivelValido(-5, false), 0); assert.equal(nivelValido('x', true), NIVELES.movil.def); assert.equal(nivelValido(null, false), NIVELES.pc.def);
   assert.equal(cambiarNivel(3, 1, true), 3); assert.equal(cambiarNivel(0, -1, false), 0); assert.equal(cambiarNivel(2, 1, false), 3);
@@ -629,4 +629,9 @@ test('zoom: el tamaño predeterminado es el nivel por defecto de cada pantalla',
   const d = await import('../src/js/core/density.js');
   assert.equal(d.nivelPorDefecto(false), 2); assert.equal(d.nivelPorDefecto(true), 1);
   assert.equal(d.cambiarNivel(d.cambiarNivel(2, 3, false), -3, false), 2); assert.equal(d.nivelValido(d.nivelPorDefecto(false), false), 2);
+});
+
+test('ticker: el hueco entre noticias es irregular pero acotado', () => {
+  assert.equal(huecoIrregular(90, 0), 45); assert.equal(huecoIrregular(90, 0.5), 135); assert.ok(huecoIrregular(90, 0.999) <= 225); assert.equal(huecoIrregular(90, 5), huecoIrregular(90, 0.999)); assert.equal(huecoIrregular(90, -1), 45);
+  assert.notEqual(huecoIrregular(90, 0.1), huecoIrregular(90, 0.8));
 });

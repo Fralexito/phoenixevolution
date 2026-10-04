@@ -1,6 +1,6 @@
 // Barra "Última hora": (1) solo se ve en la parte superior de la página (al bajar se esconde y NO reaparece hasta volver arriba;
 // en celular, al bajar queda una versión sutil y compacta justo debajo de la cabecera),
-// (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco mínimo entre ellas; pueden coincidir varias.
+// (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco IRREGULAR entre ellas (no simétrico); pueden coincidir varias.
 const EL_ID = 'ticker';
 const ARRIBA = 80;   // por encima de esta posición (px) se ve completa; por debajo se esconde (PC) o pasa a versión sutil (celular)
 
@@ -11,6 +11,8 @@ const HUECO_MOVIL = 56;
 const MARGEN_ATRAS = 900;  // px de noticias ya pasadas que se conservan fuera de la pantalla (para poder retroceder)
 
 /** ¿Ya puede entrar la siguiente noticia? Sí cuando la última dejó libre su hueco: borde derecho + hueco ≤ ancho visible. */
+/** Hueco IRREGULAR tras una noticia: entre 0.5× y 2.5× el hueco base (`azar` en [0,1)), para que la barra no se vea simétrica. */
+export const huecoIrregular = (base, azar) => Math.round(base * (0.5 + 2 * Math.min(0.999, Math.max(0, azar))));
 export const puedeEntrar = (ultimoX, ultimoAncho, vw, hueco) => ultimoX == null || ultimoX + ultimoAncho + hueco <= vw;
 
 /** Flujo continuo: las noticias entran una tras otra con un hueco mínimo, y varias pueden verse a la vez. */
@@ -29,7 +31,7 @@ function initMarquee() {
     el.append(d, document.createTextNode(items[i % items.length])); i += 1;
     view.append(el); const w = el.offsetWidth;
     if (!w) { el.remove(); i -= 1; return; }                              // aún sin medidas (fuentes cargando): reintenta en el siguiente cuadro
-    vivas.push({ el, x: vw, w });
+    vivas.push({ el, x: vw, w, hueco: huecoIrregular(movil() ? HUECO_MOVIL : HUECO_PC, Math.random()) });   // cada noticia trae su propio hueco de salida
   };
   const pintar = () => { for (const n of vivas) n.el.style.transform = `translateX(${n.x}px)`; };
   /** Mueve todas las noticias `dx` px (dx > 0 = retroceder). Al retroceder no deja un hueco vacío a la izquierda: se frena en la noticia más antigua conservada. */
@@ -46,7 +48,7 @@ function initMarquee() {
       for (const n of vivas) { n.x -= vel * dt; n.el.style.transform = `translateX(${n.x}px)`; }
       while (vivas.length && vivas[0].x + vivas[0].w < -MARGEN_ATRAS) vivas.shift().el.remove();   // se conserva un tramo ya pasado para poder retroceder
       const u = vivas[vivas.length - 1];
-      if (puedeEntrar(u?.x, u?.w, vw, movil() ? HUECO_MOVIL : HUECO_PC)) crear();
+      if (puedeEntrar(u?.x, u?.w, vw, u?.hueco ?? (movil() ? HUECO_MOVIL : HUECO_PC))) crear();
     }
     if (Math.abs(restante) > 0.5) { const paso = restante * 0.2; const hecho = desplazar(paso); restante = hecho === paso ? restante - paso : 0; } else restante = 0;
     requestAnimationFrame(cuadro);
