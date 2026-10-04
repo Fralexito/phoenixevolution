@@ -14,3 +14,33 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-float { animation: none; }
 }
+
+/* ---- Pulso en vivo: mensajitos sutiles de actividad (abajo a la izquierda) ---- */
+.live-msg { display: flex; align-items: center; gap: .5rem; max-width: 19rem; padding: .4rem .65rem; border-radius: .6rem; font-size: .74rem; line-height: 1.25; color: #cbd5e1;
+  background: rgba(8, 3, 22, .78); backdrop-filter: blur(6px); border: 1px solid rgba(167, 139, 250, .22); border-left-width: 3px;
+  opacity: 0; transform: translateX(-10px); transition: opacity .4s ease, transform .4s ease; }
+.live-msg.live-in { opacity: .92; transform: none; }
+.live-msg b { color: #fff; font-weight: 700; }
+.live-ok { border-left-color: #00ff88; } .live-ok .live-ico { color: #00ff88; }
+.live-cyan { border-left-color: #00e5ff; } .live-cyan .live-ico { color: #00e5ff; }
+.live-ico { font-size: .72rem; flex: none; }
+.live-dim { color: #94a3b8; }
+.live-demo { flex: none; font-style: normal; font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); border-radius: 9999px; padding: 0 .35rem; }
+.live-toggle { display: inline-flex; align-items: center; gap: .4rem; min-height: 28px; padding: 0 .65rem; border-radius: 9999px; font: 700 .65rem/1 var(--font-display); text-transform: uppercase; letter-spacing: .08em;
+  color: #cbd5e1; background: rgba(8, 3, 22, .78); border: 1px solid rgba(167, 139, 250, .3); backdrop-filter: blur(6px); }
+.live-toggle:hover { color: #fff; border-color: var(--color-galaxy-400); }
+.live-dot { width: 7px; height: 7px; border-radius: 9999px; background: #00ff88; box-shadow: 0 0 8px #00ff88; animation: live-pulse 1.8s ease-in-out infinite; }
+.live-toggle.live-off { color: #6b7280; } .live-toggle.live-off .live-dot { background: #6b7280; box-shadow: none; animation: none; }
+@keyframes live-pulse { 50% { opacity: .35; } }
+@media (pointer: coarse) { .live-toggle { min-height: 36px; } }
+/* Móvil: un solo mensaje a la vez, en una línea, y el botón queda solo con el puntito. */
+@media (max-width: 767.98px) {
+  .live-msg { max-width: calc(100vw - 1.5rem); white-space: nowrap; overflow: hidden; }
+  .live-txt { overflow: hidden; text-overflow: ellipsis; }
+  #live-feed > .live-msg:not(:last-child) { display: none; }
+  .live-toggle-txt { display: none; }
+  .live-toggle { padding: 0 .6rem; }
+}
+@media (prefers-reduced-motion: reduce) { .live-msg { transform: none; transition: opacity .2s; } .live-dot { animation: none; } }
+/* Si hay una barra flotante propia de la página (p. ej. «Comparar»), el pulso en vivo sube para no taparse. */
+body:has(#cmp-bar:not([hidden])) #live-wrap { bottom: 4.75rem; }

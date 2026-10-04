@@ -10,6 +10,7 @@ import Layout from '../layouts/Layout.astro';
         <p class="text-gray-400 text-sm mt-1">Base de datos global: registro oficial de estadísticas y valoraciones.</p>
       </div>
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+        <button id="btn-compare" type="button" class="btn btn-ghost shrink-0"><i class="fa-solid fa-scale-balanced"></i> Comparar</button>
         <button id="btn-add-player" type="button" hidden class="btn btn-primary shrink-0"><i class="fa-solid fa-plus"></i> Añadir Jugador</button>
         <div class="flex gap-3 w-full sm:w-auto">
           <select id="player-filter-select" aria-label="Filtrar por equipo" class="field !w-1/2 sm:!w-auto"><option value="ALL">Todos los Equipos</option></select>
@@ -23,6 +24,13 @@ import Layout from '../layouts/Layout.astro';
     <div id="players-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-2">
       <div class="col-span-full text-center py-10 text-gray-400 text-sm flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-galaxy-400 mb-3"></i> Descargando registros de la liga...</div>
     </div>
+  </div>
+  <!-- Barra flotante de comparación (aparece al marcar jugadores con la balanza) -->
+  <div id="cmp-bar" hidden class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-md glass-panel rounded-xl border border-galaxy-400/40 shadow-[0_0_24px_rgba(0,229,255,0.25)] px-3 py-2 flex items-center gap-2">
+    <i class="fa-solid fa-scale-balanced text-galaxy-400"></i>
+    <span id="cmp-bar-txt" class="flex-1 min-w-0 truncate text-xs text-gray-200 font-display uppercase tracking-wide"></span>
+    <button id="cmp-clear" type="button" class="text-[11px] text-gray-400 hover:text-white uppercase font-bold px-2 min-h-9">Limpiar</button>
+    <button id="cmp-go" type="button" class="btn btn-primary !py-1.5 !px-3 !text-xs" disabled>Comparar</button>
   </div>
 </Layout>
 <script>

@@ -1,13 +1,13 @@
 // Modal reutilizable: crea, muestra, cierra con Escape/clic fuera y devuelve el nodo.
 // persistent: no se cierra con Escape ni haciendo clic fuera (solo con un botón [data-close]); para formularios importantes.
-export function openModal(html, { id = 'modal', onClose, persistent = false } = {}) {
+export function openModal(html, { id = 'modal', onClose, persistent = false, wide = false } = {}) {
   closeModal(id);
   const wrap = document.createElement('div');
   wrap.id = id;
   wrap.className = 'modal-backdrop';
   wrap.setAttribute('role', 'dialog');
   wrap.setAttribute('aria-modal', 'true');
-  wrap.innerHTML = `<div class="modal-card">${html}</div>`;
+  wrap.innerHTML = `<div class="modal-card${wide ? ' modal-wide' : ''}">${html}</div>`;
   const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); onClose?.(); };
   const onKey = (e) => { if (e.key === 'Escape' && !persistent) close(); };
   wrap.addEventListener('mousedown', (e) => { if (e.target === wrap && !persistent) close(); });

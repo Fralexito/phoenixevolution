@@ -6,6 +6,8 @@ import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from
 import { clampStat, calcOvr } from '../src/js/core/stats.js';
 import { STAT_INFO } from '../src/data/stats.js';
 import { STAT_KEYS } from '../src/js/features/playerCard.js';
+import { compareStats, radarPoints, axisPoint } from '../src/js/core/compare.js';
+import { formatEvento, demoDelay } from '../src/js/core/live.js';
 import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
 import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
 
@@ -137,4 +139,26 @@ test('media del jugador: promedio redondeado y limitado a 1-99', () => {
 });
 test('leyenda: todas las estadísticas (y OVR) tienen nombre y explicación breve', () => {
   for (const k of [...STAT_KEYS, 'ovr']) { assert.ok(STAT_INFO[k]?.nombre, k); assert.ok(STAT_INFO[k].texto.length > 20 && STAT_INFO[k].texto.length < 200, `${k}: texto breve`); }
+});
+
+test('comparar: gana quien tiene más y se cuentan empates', () => {
+  const keys = ['atq', 'fin', 'pas'];
+  const c = compareStats({ atq: 80, fin: 70, pas: 75, ovr: 77 }, { atq: 70, fin: 70, pas: 90, ovr: 80 }, keys);
+  assert.deepEqual(c.wins, { a: 1, b: 1, tie: 1 });
+  assert.deepEqual(c.rows.map((r) => r.win), ['a', 'tie', 'b']);
+  assert.equal(c.rows[2].diff, -15); assert.equal(c.ovr.diff, -3);
+});
+test('radar: el eje 0 apunta arriba, el valor mínimo cae en el centro y el máximo en el borde', () => {
+  const [x, y] = axisPoint(0, 4, 150, 150, 100); assert.equal(Math.round(x), 150); assert.equal(Math.round(y), 50);
+  const o = { cx: 150, cy: 150, r: 100, min: 40, max: 99 };
+  assert.equal(radarPoints({ atq: 40 }, ['atq'], o), '150.0,150.0');
+  assert.equal(radarPoints({ atq: 99 }, ['atq'], o), '150.0,50.0');
+});
+test('pulso en vivo: escapa nombres, rechaza eventos inválidos y la pausa queda en rango', () => {
+  const f = formatEvento({ tipo: 'reto_aceptado', quien: '<b>x</b>', rival: 'Neo', formato: '2v2' });
+  assert.ok(f.html.includes('&lt;b&gt;') && !f.html.includes('<b>x'));
+  assert.equal(formatEvento({ tipo: 'reto_aceptado', quien: 'A' }), null);
+  assert.equal(formatEvento({ tipo: 'otro', quien: 'A' }), null);
+  assert.equal(formatEvento({ tipo: 'radar_on', quien: 'Neo' }).tone, 'cyan');
+  assert.equal(demoDelay(() => 0), 5000); assert.equal(demoDelay(() => 1), 11000);
 });

@@ -5,23 +5,33 @@ import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
+import { openCompare } from '../features/compare.js';
 
 const $ = (id) => document.getElementById(id);
 let all = [];
 let club = 'ALL';
 let term = '';
+const sel = []; // ids marcados para comparar (máx. 2)
 
 function paint() {
   const t = term.trim().toLowerCase();
   const list = all.filter((p) => (club === 'ALL' || p.club === club) && (!t || p.nombre.toLowerCase().includes(t)));
   const admin = isAdmin();
   $('players-container').innerHTML = list.length
-    ? list.map((p, i) => `<div class="relative group/card">${playerCardHTML(p, i)}${admin ? `
+    ? list.map((p, i) => `<div class="relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}
+        <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>${admin ? `
         <div class="absolute top-2 right-2 flex gap-1 z-10">
           <button type="button" data-edit="${escapeHTML(p.id)}" aria-label="Editar" class="w-7 h-7 rounded bg-black/70 text-galaxy-400 hover:bg-galaxy-600 hover:text-white text-xs"><i class="fa-solid fa-pen"></i></button>
           <button type="button" data-del="${escapeHTML(p.id)}" aria-label="Borrar" class="w-7 h-7 rounded bg-black/70 text-bad hover:bg-bad hover:text-white text-xs"><i class="fa-solid fa-trash"></i></button>
         </div>` : ''}</div>`).join('')
     : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`;
+  paintBar();
+}
+
+function paintBar() {
+  const bar = $('cmp-bar'); bar.hidden = !sel.length;
+  $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige otro jugador` : sel.map((id) => all.find((p) => p.id === id)?.nombre ?? '').join(' vs ');
+  $('cmp-go').disabled = sel.length < 2;
 }
 
 function fillClubs() {
@@ -44,8 +54,13 @@ async function load() {
 
 $('player-filter-select').addEventListener('change', (e) => { club = e.target.value; paint(); });
 $('player-search-input').addEventListener('input', (e) => { term = e.target.value; paint(); });
+$('btn-compare').addEventListener('click', () => (all.length < 2 ? toast('Aún no hay suficientes jugadores para comparar.', 'info') : openCompare(all, sel[0], sel[1])));
+$('cmp-go').addEventListener('click', () => openCompare(all, sel[0], sel[1]));
+$('cmp-clear').addEventListener('click', () => { sel.length = 0; paint(); });
 $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 $('players-container').addEventListener('click', async (e) => {
+  const cmp = e.target.closest('[data-cmp]')?.dataset.cmp;
+  if (cmp) { const i = sel.indexOf(cmp); if (i >= 0) sel.splice(i, 1); else { if (sel.length === 2) sel.shift(); sel.push(cmp); } paint(); return; }
   const edit = e.target.closest('[data-edit]')?.dataset.edit;
   const del = e.target.closest('[data-del]')?.dataset.del;
   if (edit) openPlayerForm(all.find((p) => p.id === edit), load);

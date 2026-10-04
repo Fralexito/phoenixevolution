@@ -15,15 +15,15 @@ const LEYENDA_VACIA = 'Toca o desliza una estadística y aquí te explicamos qu�
 
 const tileHTML = (k, v, { grande = false, extra = '' } = {}) => {
   const nom = escapeHTML(STAT_INFO[k].nombre);
-  const titulo = `<div class="min-w-0 ${grande ? '' : 'w-[5.2rem] shrink-0'}"><b class="font-display text-xs uppercase tracking-wider text-white">${k === 'ovr' ? 'OVR' : k}</b><span class="block text-[10px] text-gray-500 leading-tight truncate">${nom}</span></div>`;
+  const titulo = `<div class="min-w-0"><b class="font-display text-xs uppercase tracking-wider text-white">${k === 'ovr' ? 'OVR' : k}</b><span class="block text-[10px] text-gray-500 leading-tight truncate">${nom}</span></div>`;
   const menos = `<button type="button" class="step" data-d="-1" aria-label="Bajar ${nom}">−</button>`;
   const mas = `<button type="button" class="step" data-d="1" aria-label="Subir ${nom}">+</button>`;
   const num = (cls) => `<output class="stat-val font-display font-extrabold ${cls} text-center" aria-live="off">${v}</output>`;
   const rango = `<input type="range" class="stat-range" min="1" max="99" step="1" value="${v}" aria-label="${nom}">`;
-  // Grande (OVR): número arriba y deslizador debajo. Normal: una sola fila compacta  NOMBRE − ─────── + 75.
+  // Grande (OVR): número arriba y deslizador debajo. Normal (celda de 2 columnas): nombre + número arriba, «− deslizador +» abajo.
   return grande
     ? `<div class="stat-tile stat-tile-lg" data-k="${k}"><div class="flex items-center justify-between gap-2">${titulo}<div class="flex items-center gap-1 shrink-0">${menos}${num('text-3xl w-12')}${mas}</div></div>${rango}${extra}</div>`
-    : `<div class="stat-tile stat-row" data-k="${k}">${titulo}${menos}${rango}${mas}${num('text-lg w-8')}</div>`;
+    : `<div class="stat-tile stat-cell" data-k="${k}"><div class="flex items-center justify-between gap-1">${titulo}${num('text-lg')}</div><div class="flex items-center gap-1.5 mt-1">${menos}${rango}${mas}</div></div>`;
 };
 
 export function openPlayerForm(player = null, onSaved = () => {}) {
@@ -64,16 +64,30 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
 
       ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button></div>` })}
 
-      <div id="leyenda" class="sticky top-0 z-10 rounded-lg border border-galaxy-border bg-galaxy-panel/95 backdrop-blur px-3 py-2 text-[13px] leading-snug text-gray-300 h-[6rem] sm:h-[4.75rem] overflow-y-auto" aria-live="polite">${LEYENDA_VACIA}</div>
+      <div class="sticky top-0 z-10 bg-galaxy-panel/95 backdrop-blur pb-1 -mx-1 px-1">
+        <div class="flex items-center justify-between mb-1">
+          <span class="label !mb-0">Leyenda</span>
+          <button type="button" id="ley-toggle" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" aria-expanded="false" aria-controls="ley-full"><i class="fa-solid fa-list-ul mr-1"></i><span>Ver completa</span></button>
+        </div>
+        <div id="leyenda" class="rounded-lg border border-galaxy-border bg-galaxy-panel px-3 py-2 text-[13px] leading-snug text-gray-300 h-[6rem] sm:h-[4.75rem] overflow-y-auto" aria-live="polite">${LEYENDA_VACIA}</div>
+      </div>
+      <div id="ley-full" hidden class="rounded-lg border border-galaxy-border bg-black/30 divide-y divide-galaxy-border/60 max-h-72 overflow-y-auto">
+        ${[...STAT_KEYS, 'ovr'].map((k) => `<button type="button" data-ley="${k}" class="w-full text-left px-3 py-2 hover:bg-white/5"><b class="font-display text-xs uppercase tracking-wider text-galaxy-400">${k === 'ovr' ? 'OVR' : k} · ${escapeHTML(STAT_INFO[k].nombre)}</b><span class="block text-[12px] text-gray-400 leading-snug">${escapeHTML(STAT_INFO[k].texto)}</span></button>`).join('')}
+      </div>
 
-      <div class="grid grid-cols-1 gap-1.5">
+      <div class="grid grid-cols-2 gap-2">
         ${STAT_KEYS.map((k) => tileHTML(k, vals[k])).join('')}
       </div>
 
-      <div><label class="label" for="f-quote">Frase</label><input id="f-quote" class="field" maxlength="140" value="${escapeHTML(p.quote)}"></div>
+      <div><label class="label" for="f-quote">Frase <span class="text-gray-500 normal-case">(opcional)</span></label><input id="f-quote" class="field" maxlength="140" placeholder="Una frase que lo represente" value="${escapeHTML(p.quote)}"></div>
+      <div>
+        <label class="label" for="f-desc">Descripción del jugador <span class="text-gray-500 normal-case">(opcional)</span></label>
+        <textarea id="f-desc" class="field" rows="4" maxlength="600" placeholder="Su táctica, estrategia, estilo de juego, cómo ataca y defiende…">${escapeHTML(p.descripcion)}</textarea>
+        <p class="text-[11px] text-gray-500 mt-1 text-right"><span id="f-desc-n">0</span>/600</p>
+      </div>
       <p id="f-err" class="text-xs text-bad min-h-4" role="alert"></p>
       <button class="btn btn-primary w-full" type="submit">Guardar ficha</button>
-    </form>`, { id: 'player-modal' });
+    </form>`, { id: 'player-modal', wide: true });
 
   const $ = (s) => m.querySelector(s);
   const err = $('#f-err');
@@ -118,6 +132,18 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   });
   $('#ovr-auto').addEventListener('click', () => { manual = false; vals.ovr = media(); paint('ovr'); paintModo(); });
 
+  /* ---- Leyenda completa (lista de las 14 + OVR) ---- */
+  $('#ley-toggle').addEventListener('click', () => {
+    const f = $('#ley-full'); f.hidden = !f.hidden;
+    $('#ley-toggle').setAttribute('aria-expanded', String(!f.hidden)); $('#ley-toggle span').textContent = f.hidden ? 'Ver completa' : 'Ocultar';
+  });
+  $('#ley-full').addEventListener('click', (e) => {
+    const k = e.target.closest('[data-ley]')?.dataset.ley; if (!k) return;
+    activa(k); tile(k).scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+  const contar = () => { $('#f-desc-n').textContent = $('#f-desc').value.length; };
+  $('#f-desc').addEventListener('input', contar); contar();
+
   /* ---- Posición ---- */
   $('#f-pos').addEventListener('click', (e) => {
     const b = e.target.closest('[data-pos]'); if (!b) return;
@@ -140,7 +166,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     if (!nombre) { err.textContent = 'Escribe el nombre.'; return; }
     const row = {
       nombre, club: $('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre',
-      posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(),
+      posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(), descripcion: $('#f-desc').value.trim().replace(/[<>]/g, '') || null,
       ovr: vals.ovr,
     };
     STAT_KEYS.forEach((k) => { row[k] = vals[k]; });

@@ -92,3 +92,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ## Ronda 8 — Ficha de jugador interactiva + Duelos móvil
 - **Formulario de jugador** (`features/playerForm.js`): foto a la derecha del nombre, posición en botones, cada estadística con − / + (mantener pulsado repite), deslizador y número en color. **OVR** automático (promedio, `core/stats.js`); si lo mueves queda «Manual» hasta «Volver a automático». **Leyenda dinámica** fija arriba con la explicación breve de cada stat (`src/data/stats.js`, único lugar para editar los textos).
 - **Duelos en móvil**: botones «Lanzar reto» y «Mis partidos» abren/cierran su sección (una a la vez, ninguna al entrar); «Retos en el radar» siempre visible debajo. PC sin cambios.
+
+## Ronda 9 — Ficha en 2 columnas, descripción, comparador y pulso en vivo (demo)
+- **Ficha de jugador**: stats en 2 columnas, botón «Ver completa» (lista de las 14 + OVR), frase opcional y **descripción** (`jugadores.descripcion`, migración 008, ≤600).
+- **Comparador** (`features/compare.js`, cálculos en `core/compare.js`): en Jugadores, botón «Comparar» o la balanza de cada tarjeta (máx. 2). Radar superpuesto (escala 40–99), barras enfrentadas, resumen y textos.
+- **Pulso en vivo** (`features/liveFeed.js`, `core/live.js`): mensajes sutiles abajo a la izquierda; botón «En vivo» para silenciar (se recuerda). Con `LIVE_DEMO = true` simula eventos con nombres ficticios (rotulados «demo», lista en `data/liveDemo.js`). Para conectar actividad real: disparar `window.dispatchEvent(new CustomEvent('live:evento', { detail: {...} }))` y poner `LIVE_DEMO = false`.
