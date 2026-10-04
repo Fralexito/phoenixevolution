@@ -1,6 +1,7 @@
 // Datos globales del sitio: UNA sola lista de navegación para cabecera y menú lateral.
 export const NAV = [
   { id: 'central',   label: 'Central',       path: '',           icon: 'fa-house' },
+  { id: 'liga',      label: 'Liga',          path: 'liga/',      icon: 'fa-crown' },
   { id: 'noticias',  label: 'Noticias',      path: 'noticias/',  icon: 'fa-newspaper' },
   { id: 'database',  label: 'Jugadores', path: 'database/',  icon: 'fa-database' },
   { id: 'duelos',    label: 'Duelos',        path: 'duelos/',    icon: 'fa-gamepad' },

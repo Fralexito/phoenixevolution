@@ -1,0 +1,83 @@
+---
+// Página «Liga»: escaparate de cada competición (datos en data/ligas.js). CopaFácil sigue siendo la fuente oficial del fixture y la tabla.
+import Layout from '../layouts/Layout.astro';
+import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
+import { SOCIALS } from '../data/site.js';
+import { PARCHES_PES } from '../js/core/rules.js';
+const base = import.meta.env.BASE_URL;
+const discord = SOCIALS.find((s) => s.label === 'Discord')?.href ?? '#';
+const PASOS = [
+  { icono: 'fa-pen-to-square', t: 'Inscríbete', d: 'La inscripción y el calendario oficial se gestionan en CopaFácil.' },
+  { icono: 'fa-gamepad', t: 'Pacta tu partido', d: 'En la Sala de Duelos coordinas hora y host con tu rival.' },
+  { icono: 'fa-display', t: 'Juega en remoto', d: 'El partido se juega con Parsec o Smash Soda, con el parche acordado.' },
+  { icono: 'fa-flag-checkered', t: 'Resultado y tabla', d: 'El resultado se registra en CopaFácil y suma a la tabla de posiciones.' },
+];
+---
+<Layout title="Liga" active="liga">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-8 pb-16">
+    {LIGAS.length > 1 && (
+      <nav class="flex flex-wrap gap-2" aria-label="Ligas">
+        {LIGAS.map((l) => <a href={`#liga-${l.id}`} class="adv-chip">{l.titulo.join(' ')}</a>)}
+      </nav>
+    )}
+
+    {LIGAS.map((l) => (
+      <section id={`liga-${l.id}`} class="space-y-6 scroll-mt-24">
+        <!-- Portada de la liga -->
+        <div class="liga-card group">
+          <img src={l.imagen} alt="" loading="eager" class="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
+          <div class="absolute inset-0 bg-gradient-to-r from-black via-galaxy-900/80 to-transparent"></div>
+          <div class="relative z-10 p-6 sm:p-10 max-w-3xl space-y-3 text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-3">
+              <i class={`fa-solid ${l.icono} text-galaxy-400 text-3xl drop-shadow-[0_0_15px_rgba(0,229,255,0.8)]`}></i>
+              <span class:list={['liga-sello', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">{l.titulo[0]} <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">{l.titulo[1]}</span></h1>
+            <p class="text-sm sm:text-lg font-display font-light tracking-[0.25em] text-gray-300 uppercase">{l.juego}</p>
+            <p class="text-gray-300 text-sm max-w-xl mx-auto sm:mx-0">{l.descripcion}</p>
+            <div class="flex flex-wrap justify-center sm:justify-start gap-3 pt-1">
+              {l.copafacil && <a href={l.copafacil} target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-p"><i class="fa-solid fa-table-list"></i> Fixture y tabla en CopaFácil</a>}
+              <a href={`${base}duelos/`} class="hero-cta hero-cta-s"><i class="fa-solid fa-gamepad"></i> Sala de Duelos</a>
+              <a href={discord} target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-s"><i class="fa-brands fa-discord"></i> Discord</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cómo funciona -->
+        <div class="space-y-3">
+          <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Cómo funciona</h2>
+          <ol class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {PASOS.map((p, i) => (
+              <li class="glass-panel rounded-xl p-4 flex gap-3">
+                <span class="w-10 h-10 rounded-lg grid place-items-center shrink-0 text-galaxy-400 bg-galaxy-400/10"><i class={`fa-solid ${p.icono}`}></i></span>
+                <div><p class="font-display font-bold text-white text-sm uppercase tracking-wide"><span class="text-galaxy-400">{i + 1}.</span> {p.t}</p><p class="text-xs text-gray-400 mt-1">{p.d}</p></div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <!-- Ficha de la competición + parches -->
+        <div class="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
+            <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Ficha de la competición</h2>
+            <dl class="grid gap-3 sm:grid-cols-2">
+              {l.datos.map((d) => (
+                <div class="rounded-xl border border-galaxy-border/60 bg-black/25 p-3">
+                  <dt class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-widest flex items-center gap-1.5"><i class={`fa-solid ${d.icono}`}></i>{d.k}</dt>
+                  <dd class:list={['text-sm mt-1', d.v ? 'text-gray-200' : 'text-gray-500 italic']}>{d.v || 'Por definir'}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3">
+            <h2 class="font-display font-bold text-sm text-white uppercase tracking-widest">Parches reconocidos</h2>
+            <p class="text-xs text-gray-400">Los que la comunidad ya usa en PES 21. Al registrarte como host eliges el tuyo (o escribes otro).</p>
+            <ul class="flex flex-wrap gap-2">
+              {PARCHES_PES.map((x) => <li class="pc-chip">{x}</li>)}
+            </ul>
+          </div>
+        </div>
+      </section>
+    ))}
+  </div>
+</Layout>

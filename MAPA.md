@@ -167,3 +167,6 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - `core/central.js` → `ordenPodio` (2.º | 1.º | 3.º, sin huecos si hay menos de 3). Probado en `tests/pure.test.mjs`.
 - `pages/central.js` pinta cada carta dentro de `.podio-slot` (sin números de puesto visibles; `data-puesto` y el `aria-label` los conservan). Mouse: agranda por CSS (`:hover`). Toque/Enter: alterna `.podio-up` (una sola carta agrandada; tocar fuera la baja).
 - Tamaño: cartas de ≈15,5 rem (como «Jugadores»). `.podio-slot` queda quieto (recibe el mouse) y `.podio-in` hace el zoom: 1.º `--z1:1.1`, 2.º `--z2:1.075`, 3.º `--z3:1.05` en 1,6 s con curva pareja (`cubic-bezier(.45,0,.55,1)`). Borde de color fijo (`--glow`): 1.º dorado, 2.º cian, 3.º magenta, sin destello. Celular: 1.07/1.055/1.04, tres a todo el ancho.
+## Ronda 21 — Página Liga
+- `pages/liga.astro` (data-driven con `data/ligas.js`): portada de la liga, cómo funciona, ficha (campos vacíos → «Por definir»), parches reconocidos (`PARCHES_PES`). Botón «Fixture y tabla en CopaFácil» aparece solo si `copafacil` tiene enlace. NAV: nueva entrada «Liga».
+- CopaFácil sigue siendo la fuente oficial; sin API pública confirmada no hay conexión automática. Siguiente fase posible: tablas reales en Supabase (espejo).

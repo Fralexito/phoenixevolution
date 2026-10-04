@@ -2,6 +2,8 @@
 // - estado: 'activa' | 'proxima'  (cambia la etiqueta y el color del sello)
 // - titulo: [parte en blanco, parte con degradado]
 // - acciones: botones propios de la liga (href relativo al sitio; '#id' = ancla dentro de Central)
+// - copafacil: enlace público del torneo en CopaFácil ('' = el botón no aparece). Mientras CopaFácil gestione la liga, ahí viven el fixture y la tabla oficiales.
+// - datos: ficha de la competición para la página «Liga». Deja v: '' y se muestra «Por definir» (no se inventa nada).
 export const LIGAS = [
   {
     id: 'galaxy',
@@ -10,9 +12,18 @@ export const LIGAS = [
     juego: 'Pro Evolution Soccer',
     icono: 'fa-crown',
     imagen: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1400&auto=format&fit=crop',
+    copafacil: '',   // ← pega aquí el enlace de tu torneo en CopaFácil
+    descripcion: 'La competición oficial de Phoenix Evolution Series. Se organiza en CopaFácil; los partidos se coordinan en la Sala de Duelos y se juegan en remoto con Parsec o Smash Soda.',
+    datos: [
+      { k: 'Formato', icono: 'fa-diagram-project', v: '' },
+      { k: 'Inscripción', icono: 'fa-pen-to-square', v: '' },
+      { k: 'Calendario', icono: 'fa-calendar-days', v: '' },
+      { k: 'Reglamento', icono: 'fa-scale-balanced', v: '' },
+    ],
     acciones: [
       { label: 'Partidos y posiciones', href: '#central-partidos', primaria: true },
       { label: 'Ver jugadores', href: 'database/' },
+      { label: "Ver liga", href: "liga/" },
     ],
   },
 ];
