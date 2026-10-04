@@ -9,7 +9,7 @@ import { startPresence, stopPresence, setEstado, onPresence, ESTADOS } from '../
 import { openAuthModal } from '../features/auth.js';
 import { data, me, myProfile, myPart, isMine, isActive, loadPerfiles, loadRetos, visibleRetos } from '../features/duelos/data.js';
 import { card } from '../features/duelos/cards.js';
-import { ordenarAgendados, pendientes } from '../core/misPartidos.js';
+import { pendientes } from '../core/misPartidos.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
@@ -32,12 +32,11 @@ function renderAll() {
   const visible = visibleRetos();
   const mine = id ? visible.filter((r) => isMine(r, id)) : [];
   const rest = visible.filter((r) => !isMine(r, id));
-  const agendados = ordenarAgendados(mine); const pend = pendientes(mine);
+  const pend = pendientes(mine);
   const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
   $('bloque-pend').hidden = !pend.length;
   $('lista-pend').innerHTML = pend.map((r) => card(r, id)).join('');
   $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio('No hay retos públicos activos en este momento.', 'py-10');
-  $('cnt-agendados').textContent = agendados.length ? `(${agendados.length})` : '';
   $('cnt-pend').textContent = pend.length ? `(${pend.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
 }
