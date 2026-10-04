@@ -27,8 +27,8 @@ export const ORG = {
   // `destaque`: 2 = un poquito por encima, 1 = casi igual, 0 = parejo. `orden` = posición en pantallas anchas (en celular van en el orden de la lista).
   impulsoresIntro: 'Tres personas, un mismo proyecto. Cada una aporta algo distinto, y juntas le dan forma a Phoenix Evolution.',
   impulsores: [
-    { nombre: 'Fralex', rol: 'Impulsor', destaque: 2, orden: 2, bio: 'Detrás de la idea y de la plataforma.', frase: '' },
-    { nombre: 'Jack', rol: 'Cara de la comunidad', destaque: 1, orden: 1, bio: 'Quien le da energía a cada fecha, junto a Hugo.', frase: '' },
-    { nombre: 'Hugo', rol: 'Mano a mano con Jack', destaque: 0, orden: 3, bio: 'Compañero clave para darle vida a la comunidad.', frase: '' },
+    { nombre: 'Fralex', rol: 'Impulsor de todo', destaque: 2, orden: 1, bio: 'Detrás de la idea y de la plataforma.', frase: '' },
+    { nombre: 'Jack', rol: 'Impulsor de todo', destaque: 1, orden: 2, bio: 'Quien le da energía a cada fecha, junto a Hugo.', frase: '' },
+    { nombre: 'Hugo', rol: 'Co-impulsor', destaque: 0, orden: 3, bio: 'Compañero clave de Jack para darle vida a la comunidad.', frase: '' },
   ],
 };
