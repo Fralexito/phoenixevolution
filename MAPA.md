@@ -246,3 +246,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Clic con carta ampliada (ronda 59):** si hay una carta ampliada, un clic en otra carta solo la minimiza; hace falta un segundo clic para ampliar la nueva (`pages/database.js`, handler de `#players-container`).
 - **Portada más arriba (ronda 60):** menos margen superior (`sm:pt-6`) y alto `calc(100svh-9.5rem)`, para que el título y las 4 cifras suban y las cifras no queden pegadas al borde inferior en pantallas bajas.
 - **Portada, ajuste fino (ronda 61):** la portada vuelve a ocupar toda la primera pantalla (`sm:min-h-[calc(100svh-7rem)]`) con `sm:pb-14` y `sm:pt-6`: cifras un poco más arriba que al inicio, pero ya no tanto como en la ronda 60.
+- **Portada en celular = PC (ronda 62):** también en móvil la portada ocupa toda la primera pantalla (`min-h-[calc(100svh-7rem)]`, `pt-6`, `pb-8`); si el contenido es más alto que la pantalla (móviles bajos) crece sin cortarse.
