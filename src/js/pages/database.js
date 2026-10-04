@@ -2,6 +2,7 @@
 import { supabase } from '../core/supabase.js';
 import { onSession, isAdmin } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
+import { posInfo } from '../../data/posiciones.js';
 import { href } from '../core/config.js';
 import { toast } from '../core/toast.js';
 import { playerCardHTML } from '../features/playerCard.js';
@@ -34,7 +35,7 @@ let adv = null;   // búsqueda avanzada activa: { keys, min, top } o null
 
 function tarjeta(p, i, extra = '') {
   const admin = isAdmin();
-  return `<div data-pcw="${escapeHTML(p.id)}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${extra}
+  return `<div data-pcw="${escapeHTML(p.id)}" style="--aura:${posInfo(p.posicion).color}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${extra}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>
         <a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" aria-label="Ver perfil de ${escapeHTML(p.nombre)}" title="Ver perfil" class="cmp-btn perfil-btn"><i class="fa-solid fa-id-card"></i></a>${admin ? `
         <button type="button" data-menu="${escapeHTML(p.id)}" aria-label="Opciones de la ficha" aria-haspopup="true" class="card-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
