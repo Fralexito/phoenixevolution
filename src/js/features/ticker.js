@@ -1,8 +1,8 @@
-// Barra "Última hora": (1) se esconde al bajar la página y vuelve al subir (patrón "headroom"),
+// Barra "Última hora": (1) solo se ve en la parte superior de la página (al bajar se esconde y NO reaparece hasta volver arriba;
+// en celular, al bajar queda una versión sutil y compacta justo debajo de la cabecera),
 // (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco mínimo entre ellas; pueden coincidir varias.
 const EL_ID = 'ticker';
-const ARRIBA = 80;   // por encima de esta posición (px) siempre se ve
-const UMBRAL = 8;    // movimiento mínimo (px) para reaccionar; evita parpadeos por el "temblor" del scroll
+const ARRIBA = 80;   // por encima de esta posición (px) se ve completa; por debajo se esconde (PC) o pasa a versión sutil (celular)
 
 const VEL_PC = 75;       // px por segundo en pantallas ≥ 640px
 const VEL_MOVIL = 32;    // px por segundo en celular (más lento: da tiempo a leer)
@@ -45,25 +45,19 @@ function initMarquee() {
   // Pausa al pasar el mouse o tocar para poder leer; sigue al soltar.
   view.addEventListener('pointerenter', () => { pausa = true; });
   view.addEventListener('pointerleave', () => { pausa = false; });
-  window.addEventListener('resize', () => { vw = view.clientWidth; });
+  new ResizeObserver(() => { vw = view.clientWidth; }).observe(view);     // también cuando el ticker cambia a su versión sutil (la etiqueta desaparece y la zona se ensancha)
 }
 
 export function initTicker() {
   initMarquee();
   const el = document.getElementById(EL_ID);
   if (!el) { console.warn('[ticker] no se encontró #ticker'); return; }
-  let last = window.scrollY;
   let pendiente = false;
-  const poner = (oculto) => { if (el.dataset.oculto !== String(oculto)) el.dataset.oculto = String(oculto); };
-
   const revisar = () => {
     pendiente = false;
-    const y = window.scrollY;
-    if (y < ARRIBA) poner(false);
-    else if (y - last > UMBRAL) poner(true);
-    else if (last - y > UMBRAL) poner(false);
-    else return;               // movimiento diminuto: no actualizamos "last" para acumular
-    last = y;
+    const oculto = window.scrollY >= ARRIBA;
+    if (el.dataset.oculto !== String(oculto)) el.dataset.oculto = String(oculto);
   };
+  revisar();                                                                // por si la página se abre ya desplazada (recarga a mitad de página)
   window.addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } }, { passive: true });
 }
