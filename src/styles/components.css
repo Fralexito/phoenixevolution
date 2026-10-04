@@ -344,3 +344,10 @@ body:has(#players-container) { overflow-x: clip; }
 .pcw:hover .div-badge, .pcw-replica .div-badge { padding-left: .55rem; padding-right: .55rem; }
 .pcw:hover .div-badge span, .pcw-replica .div-badge span { max-width: 9.5em; opacity: 1; margin-left: .45em; }
 #players-container[data-denso='true'] .div-badge span { display: none; }
+
+/* Perfil: la tarjeta conserva el diseño ALTO de antes (stats en 2 columnas y más aire); en Jugadores se usa la compacta. */
+.pc-largo .pc-info { padding: .5em .9em .9em; }
+.pc-largo .pc-head { padding-bottom: .6em; }
+.pc-largo .pc-sub { display: block; margin-top: .35em; } .pc-largo .pc-sub .pc-apodo { margin-top: .3em; }
+.pc-largo .pc-fis { margin-top: .6em; }
+.pc-largo .pc-stats { margin-top: .7em; grid-template-columns: repeat(2, max-content); gap: .45em .9em; padding: .7em .8em; }

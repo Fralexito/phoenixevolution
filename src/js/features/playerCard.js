@@ -19,7 +19,8 @@ function fisicoHTML(p) {
   return `<div class="pc-fis">${x.map((i) => `<span class="pc-chip pc-chip-${i.k}" title="${escapeHTML(i.titulo)}"><i class="fa-solid ${ico[i.k]}"></i>${escapeHTML(i.texto)}</span>`).join('')}</div>`;
 }
 
-export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = {}) {
+/** `largo`: proporciones altas de la tarjeta (foto 5:4 y stats en 2 columnas); se usa en el perfil. En Jugadores la tarjeta es más compacta. */
+export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '', largo = false } = {}) {
   const img = safeImg(p.foto_url) || safeImg(p.foto);
   // La foto ocupa la parte alta de la tarjeta (formato 5:4, enfocada arriba para que se vea la cara).
   const foto = img
@@ -34,7 +35,7 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = 
   // La foto es una CAPA detrás de todo (proporción elegida). Un separador 5:4 reserva la zona de la foto y el contenido va encima:
   // con proporción «larga» la foto baja por detrás del nombre y las estadísticas sin agrandar la tarjeta.
   return `
-  <article data-nivel="${nivelDe(p.ovr).id}" class="${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
+  <article data-nivel="${nivelDe(p.ovr).id}" class="${largo ? 'pc-largo ' : ''}${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
     <div data-foto-caja style="aspect-ratio:${ratioDe(p.foto_aspecto)}" class="absolute inset-x-0 top-0 bg-black/40 overflow-hidden">
       ${foto}
       <div class="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-galaxy-deep via-galaxy-deep/70 to-transparent pointer-events-none"></div>
@@ -42,7 +43,7 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = 
     <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-galaxy-400 to-transparent opacity-60 z-10"></div>
     <span class="pc-sheen" aria-hidden="true"></span>
     <div class="pc-in relative z-10">
-      <div class="relative" style="aspect-ratio:1.3">
+      <div class="relative" style="aspect-ratio:${largo ? 1.25 : 1.3}">
         <div class="pc-badges">
           <span class="pc-ovr text-shadow-glow">${stat(p.ovr, 0) || '--'}</span>
           <span title="${escapeHTML(pos.nombre)}" style="color:${pos.color};border-color:${pos.color}66;background:${pos.color}26" class="pc-pos">${escapeHTML(p.posicion)}</span>
