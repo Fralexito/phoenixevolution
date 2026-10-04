@@ -1,13 +1,14 @@
 ---
 // EXPERIMENTO: carta de jugador "élite" dibujada 100 % con CSS (sin imagen de fondo). Todo escala con el ancho de la carta (unidades cqw).
 // Props: datos de UN jugador. Los textos se escapan solos (Astro escapa las expresiones {…}).
-interface Props { media: number; pos: string; nombre: string; foto?: string; escudo?: string; pais?: 'PE' | string; stats: [string, number][] }
-const { media, pos, nombre, foto, escudo, pais = 'PE', stats } = Astro.props;
+interface Props { fondo?: string; media: number; pos: string; nombre: string; foto?: string; escudo?: string; pais?: 'PE' | string; stats: [string, number][] }
+const { fondo, media, pos, nombre, foto, escudo, pais = 'PE', stats } = Astro.props;
 const izq = stats.slice(0, 6); const der = stats.slice(6, 12);
 ---
-<div class="carta-elite" role="img" aria-label={`${nombre}, media ${media}, ${pos}`}>
+<div class={`carta-elite${fondo ? ' ce-con-imagen' : ''}`} role="img" aria-label={`${nombre}, media ${media}, ${pos}`}>
+  {fondo && <img class="ce-imagen" src={fondo} alt="" />}
   <div class="ce-marco"><div class="ce-fondo">
-    <i class="ce-vetas"></i><i class="ce-brillos"></i>
+    {!fondo && <><i class="ce-vetas"></i><i class="ce-brillos"></i></>}
     {foto && <img class="ce-foto" src={foto} alt="" loading="lazy" />}
     <div class="ce-placa"></div>
     <div class="ce-media">{media}</div>
@@ -73,4 +74,9 @@ const izq = stats.slice(0, 6); const der = stats.slice(6, 12);
   .carta-elite .ce-corona { position: absolute; left: 50%; bottom: 3.6%; width: 6cqw; transform: translateX(-50%); color: var(--oro2); display: block; }
   @media (prefers-reduced-motion: no-preference) { .carta-elite .ce-brillos { animation: ce-brillo 6s ease-in-out infinite alternate; } }
   @keyframes ce-brillo { from { opacity: .75; } to { opacity: 1; } }
+  /* Modo imagen: el marco y el fondo vienen de un PNG/WebP; el código solo coloca encima foto y datos (recortados al interior del marco). */
+  .carta-elite .ce-imagen { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .carta-elite.ce-con-imagen .ce-marco { background: none; }
+  .carta-elite.ce-con-imagen .ce-fondo { inset: 2.3cqw; background: none; }
+  .carta-elite.ce-con-imagen { filter: none; }
 </style>
