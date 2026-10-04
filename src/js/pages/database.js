@@ -46,7 +46,7 @@ function tarjeta(p, i, extra = '') {
 }
 
 function paint() {
-  $('players-container').dataset.foco = 'false';   // al repintar (filtros, orden…) se quita el foco
+  try { fijarFoco(null); } catch { $('players-container').dataset.foco = 'false'; }   // al repintar (filtros, orden…) se quita el foco y la réplica
   const t = norm(term);
   const list = all.filter((p) => (club === 'ALL' || String(p.club ?? '').toUpperCase() === club) && (!t || norm(p.nombre).includes(t) || norm(p.apodo).includes(t)));
   const box = $('players-container');
@@ -135,42 +135,71 @@ $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 // Menú sutil «⋯» de cada ficha (solo admin): se abre al tocarlo y se cierra al tocar fuera.
 const cerrarMenus = () => document.querySelectorAll('.card-menu').forEach((x) => { x.hidden = true; });
 document.addEventListener('click', (e) => { if (!e.target.closest('[data-menu], .card-menu')) cerrarMenus(); });
-// Foco: al hacer clic en una carta, esa se destaca y las demás se difuminan. Otro clic en la misma, clic fuera o Esc lo quitan.
-// La carta destacada se CENTRA en la zona visible (debajo de la barra superior y encima del dock inferior) y se agranda hasta
-// 1.3× (1.1× en celular) sin pasar nunca del alto ni del ancho disponibles: escala = min(máximo, alto libre / alto, ancho libre / ancho).
+// Foco con RÉPLICA: al hacer clic, la carta ORIGINAL se queda en su lugar (atenuada) y una réplica fija viaja desde ella hasta el
+// centro de la zona visible (debajo de la barra superior y encima del dock inferior), crece hasta 1.6× (1.25× en celular) sin
+// superar nunca el alto ni el ancho disponibles, y con el mouse se inclina en 3D. Al cerrar, la réplica vuelve a su carta.
+// escala = min(máximo, alto libre / alto, ancho libre / ancho). No se mueve el scroll de la página.
 let focoId = null;
-function calcularFoco(el, { scroll }) {
+let replica = null;                       // { capa, origen, dx, dy, s }
+const sinMovimiento = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function destinoReplica(r) {
   const vw = window.innerWidth; const vh = window.innerHeight; const movil = esMovil();
   const barra = Math.min(160, Math.max(0, document.querySelector('body > .sticky')?.getBoundingClientRect().bottom ?? 0));
   const arriba = barra + 12; const abajo = movil ? 64 : 16; const libre = vh - arriba - abajo;
-  const w = el.offsetWidth; const h = el.offsetHeight; if (!w || !h || libre <= 0) return;
-  const escala = Math.max(1, Math.min(movil ? 1.1 : 1.3, (libre * 0.98) / h, ((vw - 16) * 0.98) / w));
-  const r = el.getBoundingClientRect(); const cx = r.left + r.width / 2; const cy = r.top + r.height / 2;      // el centro no cambia con la escala
-  let yFinal = cy;
-  if (scroll) {                                                                    // desplaza la página para llevar la carta al centro, si hay recorrido suficiente
-    const objetivo = Math.min(Math.max(0, window.scrollY + cy - (arriba + libre / 2)), document.documentElement.scrollHeight - vh);
-    const calma = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: objetivo, behavior: calma ? 'auto' : 'smooth' }); yFinal = cy - (objetivo - window.scrollY);
-  }
-  el.style.setProperty('--fs', escala.toFixed(3));
-  el.style.setProperty('--fx', `${Math.round(vw / 2 - cx)}px`);
-  el.style.setProperty('--fy', `${Math.round(arriba + libre / 2 - yFinal)}px`);   // si la página no puede bajar/subir más, el resto lo absorbe este desplazamiento
+  if (!r.width || !r.height || libre <= 0) return null;
+  const s = Math.max(1, Math.min(movil ? 1.25 : 1.6, (libre * 0.98) / r.height, ((vw - 16) * 0.98) / r.width));
+  return { s, dx: vw / 2 - (r.left + r.width / 2), dy: arriba + libre / 2 - (r.top + r.height / 2) };
+}
+const transformaDe = (d) => `translate(${d.dx}px, ${d.dy}px) scale(${d.s})`;
+function cerrarReplica(inmediato = false) {
+  const rp = replica; if (!rp) return; replica = null;
+  const quitar = () => rp.capa.remove();
+  if (inmediato || sinMovimiento() || !rp.capa.animate) { quitar(); return; }
+  try {
+    const r0 = rp.rect; const r1 = rp.origen.isConnected ? rp.origen.getBoundingClientRect() : r0;
+    const vuelta = `translate(${r1.left - r0.left}px, ${r1.top - r0.top}px) scale(1)`;
+    rp.capa.classList.add('pcw-replica-sale');
+    const an = rp.capa.animate([{ transform: transformaDe(rp) }, { transform: vuelta, opacity: 1 }], { duration: 520, easing: 'cubic-bezier(.5, 0, .2, 1)', fill: 'forwards' });
+    an.onfinish = quitar; an.oncancel = quitar;
+  } catch (err) { console.warn('[jugadores] no se pudo animar el cierre de la réplica:', err); quitar(); }
+}
+function abrirReplica(origen) {
+  try {
+    const r = origen.getBoundingClientRect(); const d = destinoReplica(r); if (!d) return;
+    const capa = document.createElement('div'); capa.className = 'pcw-replica'; capa.setAttribute('role', 'dialog'); capa.setAttribute('aria-label', 'Jugador destacado');
+    Object.assign(capa.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+    capa.style.setProperty('--aura', origen.style.getPropertyValue('--aura') || '#00e5ff');
+    const copia = origen.cloneNode(true); copia.classList.remove('pcw', 'pcw-origen', 'cmp-sel'); copia.classList.add('pcw-replica-in');
+    copia.querySelectorAll('[data-cmp], [data-menu], .card-menu, .rank-badge').forEach((x) => x.remove());   // la réplica solo muestra la carta y el acceso al perfil
+    copia.removeAttribute('data-pcw'); capa.append(copia); document.body.append(capa);
+    replica = { capa, origen, rect: r, ...d };
+    capa.style.transform = transformaDe(d);
+    if (!sinMovimiento() && capa.animate) {          // viaja, pasa un poco de largo y se asienta
+      const t = (k) => `translate(${d.dx}px, ${d.dy}px) scale(${(d.s * k).toFixed(3)})`;
+      capa.animate([{ transform: 'translate(0, 0) scale(1)', offset: 0 }, { transform: t(1.07), offset: 0.55 }, { transform: t(0.985), offset: 0.78 }, { transform: t(1), offset: 1 }],
+        { duration: 900, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+    }
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !sinMovimiento()) {   // inclinación 3D siguiendo el mouse
+      capa.addEventListener('pointermove', (e) => { const b = capa.getBoundingClientRect(); const x = (e.clientX - b.left) / b.width - 0.5; const y = (e.clientY - b.top) / b.height - 0.5; copia.style.setProperty('--ry', `${(x * 10).toFixed(2)}deg`); copia.style.setProperty('--rx', `${(-y * 10).toFixed(2)}deg`); });
+      capa.addEventListener('pointerleave', () => { copia.style.setProperty('--ry', '0deg'); copia.style.setProperty('--rx', '0deg'); });
+    }
+    capa.addEventListener('click', (e) => { if (!e.target.closest('a, button')) fijarFoco(null); });
+  } catch (err) { console.error('[jugadores] no se pudo abrir la réplica de la carta:', err); fijarFoco(null); }
 }
 function fijarFoco(id) {
-  focoId = id || null;
-  const box = $('players-container'); box.dataset.foco = String(!!id);
-  box.querySelectorAll('.pcw').forEach((el) => {
-    const es = !!id && el.dataset.pcw === id; el.classList.toggle('pcw-foco', es);
-    if (es) calcularFoco(el, { scroll: true }); else ['--fs', '--fx', '--fy'].forEach((v) => el.style.removeProperty(v));
-  });
+  const box = $('players-container');
+  box.querySelectorAll('.pcw-origen').forEach((el) => el.classList.remove('pcw-origen'));
+  const w = id ? box.querySelector(`.pcw[data-pcw="${CSS.escape(id)}"]`) : null;
+  if (!w) { focoId = null; box.dataset.foco = 'false'; cerrarReplica(); return; }
+  cerrarReplica(true); focoId = id; box.dataset.foco = 'true'; w.classList.add('pcw-origen'); abrirReplica(w);
 }
 let ajuste = 0;
-window.addEventListener('resize', () => { clearTimeout(ajuste); ajuste = setTimeout(() => { const el = focoId && $('players-container').querySelector('.pcw-foco'); if (el) calcularFoco(el, { scroll: false }); }, 120); });
+window.addEventListener('resize', () => { clearTimeout(ajuste); ajuste = setTimeout(() => { if (!replica) return; const d = destinoReplica(replica.rect); if (d) { Object.assign(replica, d); replica.capa.style.transform = transformaDe(d); } }, 120); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fijarFoco(null); });
-document.addEventListener('click', (e) => { if (!e.target.closest('#players-container, .modal-card, #cmp-bar')) fijarFoco(null); });
+document.addEventListener('click', (e) => { if (!e.target.closest('#players-container, .pcw-replica, .modal-card, #cmp-bar')) fijarFoco(null); });
 $('players-container').addEventListener('click', async (e) => {
   const w = e.target.closest('.pcw');
-  if (w && !e.target.closest('button, a, .card-menu')) { fijarFoco(w.classList.contains('pcw-foco') ? null : w.dataset.pcw); return; }
+  if (w && !e.target.closest('button, a, .card-menu')) { fijarFoco(focoId === w.dataset.pcw ? null : w.dataset.pcw); return; }
   const menu = e.target.closest('[data-menu]')?.dataset.menu;
   if (menu) { const el = document.querySelector(`.card-menu[data-menu-for="${menu}"]`); const abrir = el.hidden; cerrarMenus(); el.hidden = !abrir; return; }
   const cmp = e.target.closest('[data-cmp]')?.dataset.cmp;

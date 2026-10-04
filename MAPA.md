@@ -205,3 +205,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Historial y títulos en el perfil (migración 015 `participaciones`): ediciones anteriores con club, puesto, título (Campeón/Subcampeón…) y premios; la edición en curso sale sola de los datos de la liga. Lógica en `core/historial.js`; botón «Editar historial» (solo admin) abre `features/historialEditor.js`.
 
 - **Equipos en MAYÚSCULAS (ronda 26):** los nombres de club se muestran siempre en mayúsculas (CSS `uppercase` + `.toUpperCase()` en cronica, filtros y formularios); al guardar un club nuevo se almacena ya en mayúsculas.
+- **Carta destacada = réplica (ronda 27):** al hacer clic, la carta original NO se mueve (queda atenuada); `pages/database.js` crea una réplica fija (`.pcw-replica`) que viaja al centro, crece hasta 1.6× (1.25× en celular, siempre dentro de la pantalla), con aura e inclinación 3D con el mouse. Sin mover el scroll. Se cierra con clic, Esc o clic fuera.
