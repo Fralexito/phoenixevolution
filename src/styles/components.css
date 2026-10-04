@@ -57,8 +57,8 @@
 
 /* Logo acordeón: P→HOENIX, E→VOLUTION, S→ERIES al pasar el cursor */
 .logo-expand { display: inline-block; max-width: 0; overflow: hidden; white-space: nowrap; vertical-align: bottom; transition: max-width .5s ease; }
-/* El logo se despliega SOLO con mouse y en pantallas anchas (xl). El menú va pegado a la derecha (ml-auto en Header),
+/* El logo se despliega SOLO con mouse y en pantallas anchas (1360px o más). El menú va pegado a la derecha (ml-auto en Header),
    así que desplegar el logo nunca lo empuja: queda estático. */
-@media (hover: hover) and (min-width: 1280px) {
+@media (hover: hover) and (min-width: 1360px) {
   .logo-group:hover .logo-expand { max-width: 9rem; margin-right: .35rem; }
 }

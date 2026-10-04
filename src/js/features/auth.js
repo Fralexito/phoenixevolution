@@ -26,7 +26,7 @@ export function openAuthModal(mode = 'login') {
       </div>
       <div class="flex items-center gap-3 text-[10px] text-gray-500 uppercase tracking-widest"><span class="flex-1 h-px bg-galaxy-border"></span>o con correo<span class="flex-1 h-px bg-galaxy-border"></span></div>
       <form id="auth-form" class="space-y-4" novalidate>
-        ${isReg ? `<div><label class="label" for="a-tag">Gamertag</label><input id="a-tag" class="field" maxlength="30" required autocomplete="nickname" placeholder="Tu nombre en la liga"></div>` : ''}
+        ${isReg ? `<div><label class="label" for="a-tag">Nombre de usuario / apodo</label><input id="a-tag" class="field" maxlength="30" minlength="3" required autocomplete="nickname" placeholder="Ej: Fralex10"><p class="text-[11px] text-gray-500 mt-1">Así te verán en la liga. Podrás cambiarlo después en tu perfil.</p></div>` : ''}
         <div><label class="label" for="a-mail">Correo</label><input id="a-mail" type="email" class="field" required autocomplete="email"></div>
         <div><label class="label" for="a-pass">Contraseña</label><input id="a-pass" type="password" class="field" required minlength="8" autocomplete="${isReg ? 'new-password' : 'current-password'}"></div>
         <p id="a-err" class="text-xs text-bad min-h-4" role="alert"></p>
@@ -45,13 +45,14 @@ export function openAuthModal(mode = 'login') {
     const btn = ev.target.querySelector('button[type=submit]');
     const email = m.querySelector('#a-mail').value.trim();
     const password = m.querySelector('#a-pass').value;
-    const gamertag = isReg ? m.querySelector('#a-tag').value.trim().replace(/[<>]/g, '') : '';
+    const apodo = isReg ? m.querySelector('#a-tag').value.trim().replace(/[<>]/g, '') : '';
     if (!email || password.length < 8) { err.textContent = 'Escribe tu correo y una contraseña de 8+ caracteres.'; return; }
-    if (isReg && !gamertag) { err.textContent = 'Escribe tu gamertag.'; return; }
+    if (isReg && apodo.length < 3) { err.textContent = 'Escribe tu nombre de usuario o apodo (mínimo 3 caracteres).'; return; }
     btn.disabled = true;
     try {
       if (isReg) {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { gamertag }, emailRedirectTo: siteHome() } });
+        // La clave interna sigue llamándose 'gamertag' porque así la lee el trigger handle_new_user de la BD.
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { gamertag: apodo }, emailRedirectTo: siteHome() } });
         if (error) throw error;
         closeModal('auth-modal');
         toast(data.session ? '¡Cuenta creada! Bienvenido.' : 'Cuenta creada. Revisa tu correo para confirmarla.', 'ok');

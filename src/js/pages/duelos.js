@@ -36,22 +36,44 @@ async function fetchAll() {
 }
 act.setRefresh(fetchAll);
 
-/* ---------- Interruptor Activo / Inactivo (retos al azar) ---------- */
-function paintAzar() {
-  const p = myProfile(); const btn = $('azar-toggle');
-  btn.disabled = !p;
-  const on = p ? p.acepta_retos_azar !== false : true;
-  btn.setAttribute('aria-checked', String(on));
-  $('azar-text').textContent = !p ? 'Retos al azar: Inicia sesión' : on ? 'Retos al azar: Activo' : 'Retos al azar: Inactivo';
+/* ---------- Estado unificado: Inactivo · Activo · Radar ----------
+   Es UNA sola escala de disponibilidad (cada nivel incluye al anterior):
+   Inactivo = no recibes ni aceptas retos al azar (perfiles.acepta_retos_azar = false)
+   Activo   = recibes y aceptas retos al azar     (acepta_retos_azar = true)
+   Radar    = Activo + apareces en línea y recibes alertas con sonido (Presence, solo en esta sesión) */
+const ESTADO_HINT = {
+  none: 'Inicia sesión para elegir tu estado.',
+  off: 'No recibes ni aceptas retos al azar. Los retos directos sí te llegan.',
+  on: 'Recibes y aceptas retos al azar. Te avisamos por la campana.',
+  radar: 'Apareces en línea en el radar y recibes alertas con sonido al instante.',
+};
+const nivelActual = () => {
+  const p = myProfile(); if (!p) return 'none';
+  if (isRadarOn()) return 'radar';
+  return p.acepta_retos_azar !== false ? 'on' : 'off';
+};
+function paintEstado() {
+  const n = nivelActual();
+  $('seg-estado').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === n)));
+  $('estado-hint').textContent = ESTADO_HINT[n];
 }
-async function toggleAzar() {
-  const p = myProfile(); if (!p) return;
-  const next = !(p.acepta_retos_azar !== false);
+function applyRadar(on) {
+  setRadar(on); $('radar-panel').hidden = !on;
+  if (on) { startPresence({ id: me(), name: myProfile()?.nombre_display || 'Jugador' }); updateEstado(); }
+  else stopPresence();
+}
+async function setNivel(v) {
+  if (!me()) { toast('Inicia sesión para elegir tu estado.', 'error', { key: 'estado' }); openAuthModal('login'); return; }
+  if (v === nivelActual()) return;
   await act.guard(async () => {
-    const { error } = await supabase.from('perfiles').update({ acepta_retos_azar: next }).eq('id', me());
-    if (error) throw new Error('No se pudo cambiar tu estado.');
-    await refreshProfile();
-    toast(next ? 'Estás Activo: recibes y aceptas retos al azar.' : 'Estás Inactivo: no recibirás retos al azar. Los directos sí te llegan.', 'info', { key: 'azar' });
+    const quiereAzar = v !== 'off';
+    if (quiereAzar !== (myProfile()?.acepta_retos_azar !== false)) {
+      const { error } = await supabase.from('perfiles').update({ acepta_retos_azar: quiereAzar }).eq('id', me());
+      if (error) throw new Error('No se pudo cambiar tu estado.');
+      await refreshProfile();
+    }
+    applyRadar(v === 'radar'); paintEstado();
+    toast({ off: 'Estás Inactivo: no recibirás retos al azar. Los directos sí te llegan.', on: 'Estás Activo: recibes y aceptas retos al azar.', radar: 'Radar activado: apareces en línea y recibirás alertas.' }[v], 'info', { key: 'estado' });
   });
 }
 
@@ -77,16 +99,7 @@ function initRadar() {
     const id = e.target.closest('[data-retar]')?.dataset.retar; if (!id) return;
     targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('radar-toggle').addEventListener('click', () => {
-    const turnOn = !isRadarOn();
-    if (turnOn && !me()) { toast('Inicia sesión para activar el radar.', 'error', { key: 'radar' }); openAuthModal('login'); return; }
-    setRadar(turnOn);
-    $('radar-toggle').setAttribute('aria-checked', String(turnOn));
-    $('radar-status-text').textContent = turnOn ? 'Radar Activo (En línea)' : 'Radar Desactivado';
-    $('radar-panel').hidden = !turnOn;
-    if (turnOn) { startPresence({ id: me(), name: myProfile()?.nombre_display || 'Jugador' }); updateEstado(); toast('Radar activado: apareces en línea y recibirás alertas.', 'info', { key: 'radar' }); }
-    else stopPresence();
-  });
+  $('seg-estado').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setNivel(b.dataset.v); });
 }
 
 /* ---------- Clics sobre las tarjetas ---------- */
@@ -107,14 +120,13 @@ function onCardClick(e) {
 /* ---------- Arranque ---------- */
 function syncAuthUI({ session }) {
   $('btn-emitir-reto').disabled = !session;
-  if (!session && isRadarOn()) { setRadar(false); stopPresence(); $('radar-toggle').setAttribute('aria-checked', 'false'); $('radar-panel').hidden = true; $('radar-status-text').textContent = 'Radar Desactivado'; }
-  paintAzar(); refreshForm(); fetchAll();
+  if (!session && isRadarOn()) applyRadar(false);
+  paintEstado(); refreshForm(); fetchAll();
 }
 
 initForm(); initRadar(); refreshForm(); loadPerfiles().then(refreshForm);
 $('form-crear-reto').addEventListener('submit', submitReto);
 $('btn-refrescar').addEventListener('click', fetchAll);
-$('azar-toggle').addEventListener('click', toggleAzar);
 ['lista-retos', 'lista-mis'].forEach((id) => {
   $(id).addEventListener('click', onCardClick);
   $(id).addEventListener('submit', (e) => {

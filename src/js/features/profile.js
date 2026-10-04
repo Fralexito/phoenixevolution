@@ -30,7 +30,7 @@ export function openProfileModal() {
       </div>
 
       <div data-pane="identidad" class="space-y-4">
-        <div><label class="label" for="p-name">Gamertag (nombre visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"></div>
+        <div><label class="label" for="p-name">Nombre de usuario / apodo (visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"></div>
         <div><label class="label" for="p-user">Usuario (@)</label><input id="p-user" class="field" maxlength="20" value="${escapeHTML(prof.username)}"><p class="text-[10px] text-gray-500 mt-1">Solo minúsculas, números y _ (máx. 20). Es público.</p></div>
         <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field" maxlength="60" value="${escapeHTML(prof.club_favorito)}"></div>
       </div>
@@ -78,7 +78,7 @@ export function openProfileModal() {
     const stream = $('#p-stream').value.trim();
     const speed = $('#p-speed').value === '' ? null : Number($('#p-speed').value);
     if (!username) { err.textContent = 'El usuario solo admite a-z, 0-9 y _.'; return; }
-    if (!nombre) { err.textContent = 'Escribe tu gamertag.'; return; }
+    if (!nombre) { err.textContent = 'Escribe tu nombre de usuario o apodo.'; return; }
     if (stream && !safeUrl(stream)) { err.textContent = 'El enlace de stream debe empezar con https://'; return; }
     if (speed !== null && !(speed >= 1 && speed <= 10000)) { err.textContent = 'La velocidad debe estar entre 1 y 10000 Mbps.'; return; }
 

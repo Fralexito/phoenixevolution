@@ -5,14 +5,19 @@
 .tab-btn[aria-selected='true'] { background: var(--color-galaxy-600); color: #fff; box-shadow: 0 0 10px rgba(128, 0, 255, 0.4); }
 
 /* ---------- Duelos v2 ---------- */
-.chip { min-height: 44px; padding: 0 .9rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: var(--color-galaxy-900); color: #cbd5e1; font-family: var(--font-display); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; transition: all .15s; }
+.chip { min-height: 38px; padding: 0 .8rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: var(--color-galaxy-900); color: #cbd5e1; font-family: var(--font-display); font-weight: 700; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; transition: all .15s; }
 .chip:hover:not(:disabled) { border-color: var(--color-galaxy-400); color: #fff; }
 .chip:disabled { opacity: .35; cursor: not-allowed; }
 .chip[aria-pressed='true'] { background: var(--color-galaxy-600); border-color: var(--color-galaxy-400); color: #fff; }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: .25rem; padding: .25rem; background: #05020a; border: 1px solid var(--color-galaxy-border); border-radius: .75rem; }
-.seg > button { min-height: 44px; border-radius: .5rem; color: #9ca3af; font-weight: 700; font-size: .8rem; font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
+.seg > button { min-height: 36px; border-radius: .5rem; color: #9ca3af; font-weight: 700; font-size: .75rem; font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
 .seg > button[aria-pressed='true'] { background: var(--color-galaxy-600); color: #fff; box-shadow: 0 0 12px rgba(128,0,255,.45); }
 .seg > button:disabled { opacity: .35; cursor: not-allowed; }
+/* En pantallas táctiles los botones vuelven a 44px (tamaño mínimo cómodo para el dedo). */
+@media (pointer: coarse) { .chip { min-height: 44px; } .seg > button { min-height: 44px; } }
+/* Selector de estado unificado (Inactivo · Activo · Radar): cada nivel tiene su color. */
+.seg-estado > button[data-v='off'][aria-pressed='true'] { background: #374151; box-shadow: none; }
+.seg-estado > button[data-v='on'][aria-pressed='true'] { background: #059669; box-shadow: 0 0 12px rgba(16,185,129,.45); }
 .notif-item { display: flex; gap: .75rem; padding: .75rem 1rem; border-bottom: 1px solid var(--color-galaxy-line); }
 .notif-item.is-new { background: rgba(0,229,255,.06); border-left: 2px solid var(--color-galaxy-400); }
 .notif-item:hover { background: rgba(255,255,255,.04); }
