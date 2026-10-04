@@ -288,7 +288,7 @@ test('físico: piezas para dibujar', () => {
   assert.deepEqual(fisicoPartes({ altura_cm: 180, pie: 'Izquierdo' }).map((x) => [x.k, x.texto]), [['altura', '180 cm'], ['pie', 'Izq.']]); assert.deepEqual(fisicoPartes({}), []);
 });
 
-import { cifra, partirPartidos } from '../src/js/core/central.js';
+import { cifra, partirPartidos, ordenPodio } from '../src/js/core/central.js';
 test('central: cifras del pulso y partidos próximos/resultados', () => {
   assert.equal(cifra(12), '12'); assert.equal(cifra(0), '0'); assert.equal(cifra(null), '—'); assert.equal(cifra(NaN), '—'); assert.equal(cifra(-3), '—');
   const r = partirPartidos([{ gl: '3', gv: '2' }, { gl: '-', gv: '-', nota: 'HOY 22:00' }, { gl: '1', gv: '1' }]);
@@ -314,4 +314,13 @@ test('stats al azar: justifican la media y varían', () => {
   for (const o of [1, 30, 74, 91, 99]) for (let i = 0; i < 20; i += 1) { const r = aleatorias(o); assert.equal(calcOvr(r), o); assert.ok(r.every((v) => v >= 1 && v <= 99)); }
   const a = aleatorias(80); const b = aleatorias(80); assert.notDeepEqual(a, b);
   assert.deepEqual(aleatorias(80, 14, () => 0.5), Array(14).fill(80));        // sin ruido, todas iguales a la media
+});
+
+test('central: podio = 2.º izquierda, 1.º centro, 3.º derecha, sin huecos', () => {
+  const r = ordenPodio(['a', 'b', 'c', 'd']);
+  assert.deepEqual(r.map((x) => x.jugador), ['b', 'a', 'c']);
+  assert.deepEqual(r.map((x) => x.puesto), [2, 1, 3]);
+  assert.deepEqual(ordenPodio(['a', 'b']).map((x) => x.puesto), [2, 1]);
+  assert.deepEqual(ordenPodio(['a']).map((x) => x.puesto), [1]);
+  assert.deepEqual(ordenPodio(null), []);
 });

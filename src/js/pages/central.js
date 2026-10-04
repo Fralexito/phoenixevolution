@@ -5,7 +5,7 @@ import { playerCardHTML } from '../features/playerCard.js';
 import { DEMO_MATCHES, DEMO_TABLE, DEMO_XI } from '../../data/demo.js';
 import { openAuthModal } from '../features/auth.js';
 import { onSession } from '../core/session.js';
-import { cifra, partirPartidos } from '../core/central.js';
+import { cifra, partirPartidos, ordenPodio } from '../core/central.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -41,7 +41,12 @@ async function renderFeatured() {
     const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false }).limit(3);
     if (error) throw error;
     if (!data?.length) throw new Error('vacío');
-    box.innerHTML = data.map((p, i) => playerCardHTML(p, i, { wide: true, sizeClass: 'w-[72%] shrink-0 snap-center sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]' })).join('');
+    // Podio: 2.º izquierda, 1.º centro, 3.º derecha. El número de puesto sigue al jugador (no a la posición en pantalla).
+    box.innerHTML = ordenPodio(data).map(({ jugador, puesto }) => `
+      <div class="podio-slot" data-puesto="${puesto}" tabindex="0" role="button" aria-pressed="false" aria-label="${escapeHTML(jugador.nombre)}, puesto ${puesto}">
+        <span class="podio-medal">${puesto}º</span>
+        ${playerCardHTML(jugador, puesto - 1, { sizeClass: 'w-full' })}
+      </div>`).join('');
   } catch (e) {
     console.error('[central] jugadores destacados:', e);
     box.innerHTML = `<div class="text-center text-gray-500 w-full py-6"><i class="fa-solid fa-users-slash text-2xl mb-2 block text-galaxy-600"></i>Aún no hay jugadores destacados para mostrar.</div>`;
@@ -50,6 +55,16 @@ async function renderFeatured() {
 
 renderDemo();
 renderFeatured();
+// Podio: el pase del mouse agranda por CSS; en celular (sin mouse) el toque agranda/encoge la carta. Un solo jugador agrandado a la vez.
+const podio = $('featured-players-container');
+function alternarPodio(slot) {
+  const abrir = !slot.classList.contains('podio-up');
+  podio.querySelectorAll('.podio-slot').forEach((x) => { x.classList.remove('podio-up'); x.setAttribute('aria-pressed', 'false'); });
+  if (abrir) { slot.classList.add('podio-up'); slot.setAttribute('aria-pressed', 'true'); }
+}
+podio.addEventListener('click', (e) => { const s = e.target.closest('.podio-slot'); if (s) alternarPodio(s); });
+podio.addEventListener('keydown', (e) => { const s = e.target.closest('.podio-slot'); if (s && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alternarPodio(s); } });
+document.addEventListener('click', (e) => { if (!e.target.closest('#featured-players-container')) podio.querySelectorAll('.podio-up').forEach((x) => { x.classList.remove('podio-up'); x.setAttribute('aria-pressed', 'false'); }); });
 $('btn-hero-register')?.addEventListener('click', () => openAuthModal('register'));
 // Si ya hay sesión, el botón de "Crear Cuenta" sobra.
 onSession(({ session }) => { const b = $('btn-hero-register'); if (b) b.hidden = !!session; });

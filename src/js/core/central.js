@@ -9,3 +9,13 @@ export function partirPartidos(partidos) {
   const jugado = (m) => !m.nota && m.gl !== '-' && m.gv !== '-' && m.gl != null && m.gv != null;
   return { proximos: lista.filter((m) => !jugado(m)), resultados: lista.filter(jugado) };
 }
+
+/**
+ * Orden de podio: recibe los jugadores ya ordenados de mejor a peor y devuelve [{ jugador, puesto }]
+ * con el 2.º a la izquierda, el 1.º en el centro y el 3.º a la derecha. Con menos de 3 jugadores no deja huecos.
+ */
+export function ordenPodio(ordenados) {
+  const l = (Array.isArray(ordenados) ? ordenados : []).slice(0, 3).map((jugador, i) => ({ jugador, puesto: i + 1 }));
+  const [a, b, c] = l;
+  return [b, a, c].filter(Boolean);
+}

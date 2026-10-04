@@ -195,7 +195,17 @@
 .pulse-lbl { grid-area: lbl; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #9ca3af; font-weight: 600; }
 #xi-det > summary::-webkit-details-marker { display: none; }
 #xi-det[open] .xi-chev { transform: rotate(180deg); } .xi-chev { transition: transform .2s; }
-.featured-row { scrollbar-width: none; } .featured-row::-webkit-scrollbar { display: none; }
+/* Podio de destacados: 2.º | 1.º | 3.º. Compacto (máx. 40rem); el 1.º es algo más ancho, por tanto más alto. */
+.podio { display: flex; justify-content: center; align-items: flex-end; gap: .5rem; max-width: 40rem; margin: 0 auto; padding: 1.4rem 0 .4rem; }
+.podio-slot { position: relative; flex: 1 1 0; min-width: 0; cursor: pointer; transform-origin: bottom center; transition: transform .25s ease, filter .25s; outline: none; }
+.podio-slot[data-puesto='1'] { flex-grow: 1.25; }
+.podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { transform: scale(1.1); z-index: 20; }
+.podio-slot:hover article, .podio-slot:focus-visible article, .podio-slot.podio-up article { border-color: var(--color-galaxy-400); box-shadow: 0 0 30px rgb(0 229 255 / .45); }
+.podio-medal { position: absolute; top: -.75rem; left: 50%; transform: translateX(-50%); z-index: 30; font-family: var(--font-display); font-weight: 800; font-size: .75rem; padding: .05rem .6rem; border-radius: 999px; color: #0b0620; pointer-events: none; background: linear-gradient(90deg, #cbd5e1, #94a3b8); }
+.podio-slot[data-puesto='1'] .podio-medal { background: linear-gradient(90deg, #ffd700, #ffb300); box-shadow: 0 0 10px rgb(255 215 0 / .5); }
+.podio-slot[data-puesto='3'] .podio-medal { background: linear-gradient(90deg, #d49a6a, #b0723d); }
+@media (min-width: 640px) { .podio { gap: 1rem; } }
+@media (prefers-reduced-motion: reduce) { .podio-slot { transition: none; } }
 
 /* Botones de la portada de Central */
 .hero-cta { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-display); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; padding: .8rem 1.8rem; border-radius: .75rem; transition: all .2s; }
