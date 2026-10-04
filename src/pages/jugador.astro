@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Perfil de jugador" active="database">
+  <div id="perfil-root" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+    <a id="perfil-volver" href={`${import.meta.env.BASE_URL}database/`} class="inline-flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-galaxy-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i> Jugadores</a>
+    <div id="perfil-contenido" aria-live="polite"><p class="text-gray-400 text-sm py-16 text-center">Cargando perfil…</p></div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/jugador.js';
+</script>

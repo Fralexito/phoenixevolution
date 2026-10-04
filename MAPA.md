@@ -187,3 +187,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - `core/noticias.js` (lógica pura), `core/cronica.js` (crónica automática por plantillas), `features/noticiasAdmin.js` (editor), `pages/noticias.js` (página; si la BD falla usa `data/noticias.js`).
 - Enlace por noticia: `noticias/?n=<slug>`. Filtro de liga aparece con 2+ ligas en las noticias.
 - Edge function `notificar-discord` (solo admin); requiere el secreto `DISCORD_WEBHOOK_URL` en Supabase.
+
+## Ronda 25 — Perfil público de jugador (experimento)
+- Rama `base-v2`: copia de seguridad del estado anterior a esta ronda.
+- Página `jugador/?id=<id>` (`pages/jugador.js`): carta, datos y campaña en cada edición de liga donde aparece (puesto, KPIs, resultados, próximos, contra cada rival). Lógica pura en `core/perfil.js` (tests).
+- El jugador se vincula con la liga por nombre/apodo (sin tildes ni mayúsculas).
+- Botón «Ver perfil» (icono de carnet) en cada carta de Jugadores. Títulos: pendiente hasta que Palmarés tenga datos reales.

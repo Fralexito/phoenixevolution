@@ -413,3 +413,30 @@ test('crónica: borrador de la fecha 8 (victor golea) y casos límite', () => {
   const empate = generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 1 }] }], n: 1, nombreLiga: 'X' }); assert.match(empate.titulo, /reparto de puntos/);
   const c4 = generarCronica({ fechas: ed.fechas, n: 1 }); assert.equal(c4.titulo, 'Fecha 1: Victor golea a Fralex 9-0');   // fecha 1: sin tabla previa, no hay «cambio de líder»
 });
+
+// ---- Perfil público de jugador ----
+import { coincide, nombreEnEdicion, campana, contraRivales } from '../src/js/core/perfil.js';
+const EDP = { clubes: { Ana: 'Club A' }, fechas: [
+  { n: 1, partidos: [{ l: 'Ana', v: 'Beto', gl: 3, gv: 1 }, { l: 'Cris', v: 'Dani', gl: 0, gv: 0 }] },
+  { n: 2, partidos: [{ l: 'Beto', v: 'Ana', gl: 2, gv: 2 }, { l: 'Dani', v: 'Cris', gl: null, gv: null }] },
+  { n: 3, partidos: [{ l: 'Ana', v: 'Cris', gl: null, gv: null }, { l: 'Beto', v: 'Dani', gl: null, gv: null }] },
+] };
+test('perfil: coincide por nombre o apodo, sin tildes ni mayúsculas', () => {
+  assert.equal(coincide({ nombre: 'Ana' }, 'ANA'), true);
+  assert.equal(coincide({ nombre: 'José', apodo: 'Pepe' }, 'pepe'), true);
+  assert.equal(coincide({ nombre: 'José' }, 'jose'), true);
+  assert.equal(coincide({ nombre: 'Ana' }, 'Beto'), false);
+  assert.equal(coincide({}, ''), false);
+  assert.equal(nombreEnEdicion({ nombre: 'Cris' }, EDP), 'Cris');
+  assert.equal(nombreEnEdicion({ nombre: 'Zed' }, EDP), null);
+});
+test('perfil: campaña con jugados, próximos, puesto y club', () => {
+  const c = campana(EDP, 'Ana');
+  assert.deepEqual(c.jugados.map((x) => [x.n, x.rival, x.local, x.gf, x.gc, x.res]), [[1, 'Beto', true, 3, 1, 'G'], [2, 'Beto', false, 2, 2, 'E']]);
+  assert.deepEqual(c.proximos, [{ n: 3, rival: 'Cris', local: true }]);
+  assert.equal(c.puesto, 1); assert.equal(c.fila.pts, 4); assert.equal(c.club, 'Club A'); assert.equal(c.total, 4);
+  assert.equal(campana(EDP, 'Zed'), null); assert.equal(campana(null, 'Ana'), null);
+});
+test('perfil: contra cada rival', () => {
+  assert.deepEqual(contraRivales(campana(EDP, 'Ana').jugados), [{ rival: 'Beto', g: 1, e: 1, p: 0, gf: 5, gc: 3 }]);
+});
