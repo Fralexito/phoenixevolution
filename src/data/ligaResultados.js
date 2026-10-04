@@ -51,6 +51,24 @@ export const FECHAS = [
   { n: 12, partidos: [
     { l: 'Arens', v: 'Hugo', gl: null, gv: null }, { l: 'Beto', v: 'Degox', gl: null, gv: null }, { l: 'Morgado', v: 'Jack', gl: null, gv: null }, { l: 'Fralex', v: 'Victor', gl: null, gv: null }, { l: 'Jeremi', v: 'Camilo', gl: null, gv: null }, { l: 'Axel', v: 'Roberto', gl: null, gv: null },
   ] },
+  { n: 13, partidos: [
+    { l: 'Hugo', v: 'Beto', gl: null, gv: null }, { l: 'Arens', v: 'Morgado', gl: null, gv: null }, { l: 'Degox', v: 'Fralex', gl: null, gv: null }, { l: 'Jack', v: 'Jeremi', gl: null, gv: null }, { l: 'Victor', v: 'Axel', gl: null, gv: null }, { l: 'Camilo', v: 'Roberto', gl: null, gv: null },
+  ] },
+  { n: 14, partidos: [
+    { l: 'Morgado', v: 'Hugo', gl: null, gv: null }, { l: 'Fralex', v: 'Beto', gl: null, gv: null }, { l: 'Jeremi', v: 'Arens', gl: null, gv: null }, { l: 'Axel', v: 'Degox', gl: null, gv: null }, { l: 'Roberto', v: 'Jack', gl: null, gv: null }, { l: 'Camilo', v: 'Victor', gl: null, gv: null },
+  ] },
+  { n: 15, partidos: [
+    { l: 'Hugo', v: 'Fralex', gl: null, gv: null }, { l: 'Morgado', v: 'Jeremi', gl: null, gv: null }, { l: 'Beto', v: 'Axel', gl: null, gv: null }, { l: 'Arens', v: 'Roberto', gl: null, gv: null }, { l: 'Degox', v: 'Camilo', gl: null, gv: null }, { l: 'Jack', v: 'Victor', gl: null, gv: null },
+  ] },
+  { n: 16, partidos: [
+    { l: 'Jeremi', v: 'Hugo', gl: null, gv: null }, { l: 'Axel', v: 'Fralex', gl: null, gv: null }, { l: 'Roberto', v: 'Morgado', gl: null, gv: null }, { l: 'Camilo', v: 'Beto', gl: null, gv: null }, { l: 'Victor', v: 'Arens', gl: null, gv: null }, { l: 'Jack', v: 'Degox', gl: null, gv: null },
+  ] },
+  { n: 17, partidos: [
+    { l: 'Hugo', v: 'Axel', gl: null, gv: null }, { l: 'Jeremi', v: 'Roberto', gl: null, gv: null }, { l: 'Fralex', v: 'Camilo', gl: null, gv: null }, { l: 'Morgado', v: 'Victor', gl: null, gv: null }, { l: 'Beto', v: 'Jack', gl: null, gv: null }, { l: 'Arens', v: 'Degox', gl: null, gv: null },
+  ] },
+  { n: 18, partidos: [
+    { l: 'Roberto', v: 'Hugo', gl: null, gv: null }, { l: 'Camilo', v: 'Axel', gl: null, gv: null }, { l: 'Victor', v: 'Jeremi', gl: null, gv: null }, { l: 'Jack', v: 'Fralex', gl: null, gv: null }, { l: 'Degox', v: 'Morgado', gl: null, gv: null }, { l: 'Arens', v: 'Beto', gl: null, gv: null },
+  ] },
 ];
 
 // ---- HISTORIAL: todas las ediciones de cada liga, por id de liga (data/ligas.js). ----
