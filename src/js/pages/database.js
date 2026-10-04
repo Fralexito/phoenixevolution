@@ -136,12 +136,36 @@ $('btn-add-player').addEventListener('click', () => openPlayerForm(null, load));
 const cerrarMenus = () => document.querySelectorAll('.card-menu').forEach((x) => { x.hidden = true; });
 document.addEventListener('click', (e) => { if (!e.target.closest('[data-menu], .card-menu')) cerrarMenus(); });
 // Foco: al hacer clic en una carta, esa se destaca y las demás se difuminan. Otro clic en la misma, clic fuera o Esc lo quitan.
-function fijarFoco(id) {
-  const box = $('players-container'); box.dataset.foco = String(!!id);
-  box.querySelectorAll('.pcw').forEach((el) => el.classList.toggle('pcw-foco', !!id && el.dataset.pcw === id));
-  // Acercamiento: la carta se centra en pantalla mientras crece (si el usuario prefiere menos movimiento, sin animar).
-  if (id) { const el = box.querySelector('.pcw-foco'); const calma = window.matchMedia('(prefers-reduced-motion: reduce)').matches; el?.scrollIntoView({ behavior: calma ? 'auto' : 'smooth', block: 'center', inline: 'nearest' }); }
+// La carta destacada se CENTRA en la zona visible (debajo de la barra superior y encima del dock inferior) y se agranda hasta
+// 1.3× (1.1× en celular) sin pasar nunca del alto ni del ancho disponibles: escala = min(máximo, alto libre / alto, ancho libre / ancho).
+let focoId = null;
+function calcularFoco(el, { scroll }) {
+  const vw = window.innerWidth; const vh = window.innerHeight; const movil = esMovil();
+  const barra = Math.min(160, Math.max(0, document.querySelector('body > .sticky')?.getBoundingClientRect().bottom ?? 0));
+  const arriba = barra + 12; const abajo = movil ? 64 : 16; const libre = vh - arriba - abajo;
+  const w = el.offsetWidth; const h = el.offsetHeight; if (!w || !h || libre <= 0) return;
+  const escala = Math.max(1, Math.min(movil ? 1.1 : 1.3, (libre * 0.98) / h, ((vw - 16) * 0.98) / w));
+  const r = el.getBoundingClientRect(); const cx = r.left + r.width / 2; const cy = r.top + r.height / 2;      // el centro no cambia con la escala
+  let yFinal = cy;
+  if (scroll) {                                                                    // desplaza la página para llevar la carta al centro, si hay recorrido suficiente
+    const objetivo = Math.min(Math.max(0, window.scrollY + cy - (arriba + libre / 2)), document.documentElement.scrollHeight - vh);
+    const calma = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: objetivo, behavior: calma ? 'auto' : 'smooth' }); yFinal = cy - (objetivo - window.scrollY);
+  }
+  el.style.setProperty('--fs', escala.toFixed(3));
+  el.style.setProperty('--fx', `${Math.round(vw / 2 - cx)}px`);
+  el.style.setProperty('--fy', `${Math.round(arriba + libre / 2 - yFinal)}px`);   // si la página no puede bajar/subir más, el resto lo absorbe este desplazamiento
 }
+function fijarFoco(id) {
+  focoId = id || null;
+  const box = $('players-container'); box.dataset.foco = String(!!id);
+  box.querySelectorAll('.pcw').forEach((el) => {
+    const es = !!id && el.dataset.pcw === id; el.classList.toggle('pcw-foco', es);
+    if (es) calcularFoco(el, { scroll: true }); else ['--fs', '--fx', '--fy'].forEach((v) => el.style.removeProperty(v));
+  });
+}
+let ajuste = 0;
+window.addEventListener('resize', () => { clearTimeout(ajuste); ajuste = setTimeout(() => { const el = focoId && $('players-container').querySelector('.pcw-foco'); if (el) calcularFoco(el, { scroll: false }); }, 120); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fijarFoco(null); });
 document.addEventListener('click', (e) => { if (!e.target.closest('#players-container, .modal-card, #cmp-bar')) fijarFoco(null); });
 $('players-container').addEventListener('click', async (e) => {
