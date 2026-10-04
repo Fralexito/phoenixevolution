@@ -141,3 +141,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Sistema host**: el parche de PES 2021 se elige entre Dream Patch, Conmebol Patch, VirtuaRED, Sudamerican Patch y Gogosz Patch (`PARCHES_PES`), o «Otro» para escribirlo a mano; tocar el elegido lo quita.
 - **Búsqueda avanzada** más compacta (chips pequeños, mínimo y Top en una sola fila, ancho máximo en PC).
 - **Físico más visible** (el peso se retiró después: nadie debe sentirse obligado a darlo): altura y pie dominante se muestran como chips cian entre el nombre y las stats (`pc-fis` / `pc-chip` en `playerCard.js`), solo con lo que exista y ocultos únicamente en tarjetas diminutas. Las tarjetas de una misma fila ahora tienen la misma altura.
+
+## Ronda 18 — Central reorganizada (EXPERIMENTO)
+- **Volver a la versión anterior de Central**: está respaldada en la rama `central-base-v1` (estado exacto antes del experimento). Para restaurarla basta con traer `src/pages/index.astro`, `src/js/pages/central.js` y los estilos «Central» de `components.css` de esa rama.
+- Orden nuevo: portada única compacta (botones según sesión) → **pulso de la comunidad** (4 conteos reales: fichas, jugadores registrados, hosts, retos abiertos; `—` si falla la lectura) → **Central de Partidos** con el Partido Destacado dentro y pestañas Próximos/Resultados + Posiciones y XI al costado (XI plegado en celular) → Jugadores destacados (carrusel en celular) → Highlights compacto sin imágenes externas → invitación a Discord.
+- Lógica pura en `core/central.js` (`cifra`, `partirPartidos`). Partidos, tabla, XI y partido destacado siguen siendo datos demo (`data/demo.js`).
+- Efecto: página de celular ~2.750 px frente a ~4.100 px.

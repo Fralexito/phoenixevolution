@@ -287,3 +287,10 @@ test('etiqueta de juego: PES 21 con parche y SP con versión', () => {
 test('físico: piezas para dibujar', () => {
   assert.deepEqual(fisicoPartes({ altura_cm: 180, pie: 'Izquierdo' }).map((x) => [x.k, x.texto]), [['altura', '180 cm'], ['pie', 'Izq.']]); assert.deepEqual(fisicoPartes({}), []);
 });
+
+import { cifra, partirPartidos } from '../src/js/core/central.js';
+test('central: cifras del pulso y partidos próximos/resultados', () => {
+  assert.equal(cifra(12), '12'); assert.equal(cifra(0), '0'); assert.equal(cifra(null), '—'); assert.equal(cifra(NaN), '—'); assert.equal(cifra(-3), '—');
+  const r = partirPartidos([{ gl: '3', gv: '2' }, { gl: '-', gv: '-', nota: 'HOY 22:00' }, { gl: '1', gv: '1' }]);
+  assert.equal(r.proximos.length, 1); assert.equal(r.resultados.length, 2); assert.deepEqual(partirPartidos(null), { proximos: [], resultados: [] });
+});

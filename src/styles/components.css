@@ -186,3 +186,13 @@
 .pc-chip i { color: var(--color-galaxy-400); font-size: .85em; }
 @container (max-width: 135px) { .pc-fis { display: none; } }
 #players-container > div > article { height: 100%; }
+
+/* ---- Central: pulso de la comunidad, XI plegable, carrusel ---- */
+.pulse-tile { display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'ico num' 'ico lbl'; column-gap: .75rem; align-items: center; padding: .75rem .9rem; border-radius: .9rem; background: linear-gradient(135deg, rgb(26 8 60 / .85), rgb(5 2 15 / .9)); border: 1px solid var(--color-galaxy-border); transition: border-color .2s, box-shadow .2s; }
+.pulse-tile:hover, .pulse-tile:focus-visible { border-color: var(--color-galaxy-400); box-shadow: 0 0 18px rgb(0 229 255 / .25); outline: none; }
+.pulse-ico { grid-area: ico; width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: .6rem; color: var(--color-galaxy-400); background: rgb(0 229 255 / .1); font-size: 1rem; }
+.pulse-num { grid-area: num; font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; line-height: 1.1; color: #fff; font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgb(128 0 255 / .6); }
+.pulse-lbl { grid-area: lbl; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #9ca3af; font-weight: 600; }
+#xi-det > summary::-webkit-details-marker { display: none; }
+#xi-det[open] .xi-chev { transform: rotate(180deg); } .xi-chev { transition: transform .2s; }
+.featured-row { scrollbar-width: none; } .featured-row::-webkit-scrollbar { display: none; }

@@ -18,7 +18,7 @@ function fisicoHTML(p) {
   return `<div class="pc-fis">${x.map((i) => `<span class="pc-chip" title="${escapeHTML(i.titulo)}"><i class="fa-solid ${ico[i.k]}"></i>${escapeHTML(i.texto)}</span>`).join('')}</div>`;
 }
 
-export function playerCardHTML(p, index = 0, { wide = false } = {}) {
+export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '' } = {}) {
   const img = safeImg(p.foto_url) || safeImg(p.foto);
   // La foto ocupa la parte alta de la tarjeta (formato 5:4, enfocada arriba para que se vea la cara).
   const foto = img
@@ -29,7 +29,7 @@ export function playerCardHTML(p, index = 0, { wide = false } = {}) {
     const v = stat(p[k]);
     return `<div class="flex justify-between items-center"><span class="pc-k">${k.toUpperCase()}</span><span style="color:${statColor(v)}" class="font-bold">${v}</span></div>`;
   }).join('');
-  const size = wide ? 'w-[calc(50%-6px)] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]' : 'w-full';
+  const size = sizeClass || (wide ? 'w-[calc(50%-6px)] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]' : 'w-full');
   // La foto es una CAPA detrás de todo (proporción elegida). Un separador 5:4 reserva la zona de la foto y el contenido va encima:
   // con proporción «larga» la foto baja por detrás del nombre y las estadísticas sin agrandar la tarjeta.
   return `
