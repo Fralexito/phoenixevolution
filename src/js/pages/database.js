@@ -178,7 +178,7 @@ let focoId = null;
 const sinMovimiento = () => hayMovimientoReducido();   // ajuste «Animaciones» (por defecto: lo que diga el sistema)
 // La réplica vive en features/replicaCarta.js (compartida con el podio de «Destacados»). Si la carta original es muy angosta (zoom mínimo),
 // la réplica se reconstruye con ancho «normal» para que se vean todas las estadísticas, igual que en el tamaño predeterminado.
-const replica = crearReplica({ esMovil, sinMovimiento, inclinacion: () => leerAjustes().cartasInclinacion, alClicCapa: () => fijarFoco(null) });
+const replica = crearReplica({ esMovil, sinMovimiento, inclinacion: () => leerAjustes().cartasInclinacion, alClicCapa: () => fijarFoco(null), alClicCarta: (w) => { const id = w?.dataset?.pcw; if (id) location.assign(href(`jugador/?id=${encodeURIComponent(id)}`)); else fijarFoco(null); } });
 function fijarFoco(id) {
   const box = $('players-container');
   box.querySelectorAll('.pcw-origen').forEach((el) => el.classList.remove('pcw-origen'));

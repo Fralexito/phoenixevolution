@@ -7,7 +7,7 @@ import { anchoBase, escalaInicial, rectBase, destino, regreso } from '../core/re
  * @param {{esMovil:()=>boolean, sinMovimiento:()=>boolean, inclinacion?:()=>boolean, alClicCapa?:()=>void}} o
  * @returns {{abrir:(origen:Element, op?:{aura?:string, etiqueta?:string})=>boolean, cerrar:(inmediato?:boolean)=>void, reposicionar:()=>void, activa:()=>boolean, contiene:(el:Element)=>boolean}}
  */
-export function crearReplica({ esMovil, sinMovimiento, inclinacion = () => false, alClicCapa = () => {} }) {
+export function crearReplica({ esMovil, sinMovimiento, inclinacion = () => false, alClicCapa = () => {}, alClicCarta = null }) {
   let rp = null;                                     // { capa, fondo, origen, base, k0, s, dx, dy }
   const barra = () => document.querySelector('body > .sticky')?.getBoundingClientRect().bottom ?? 0;
   const geometria = (base) => destino({ base, vw: window.innerWidth, vh: window.innerHeight, barra: barra(), movil: esMovil() });
@@ -56,7 +56,9 @@ export function crearReplica({ esMovil, sinMovimiento, inclinacion = () => false
         capa.addEventListener('pointermove', (e) => { const b = capa.getBoundingClientRect(); const x = (e.clientX - b.left) / b.width - 0.5; const y = (e.clientY - b.top) / b.height - 0.5; copia.style.setProperty('--ry', `${(x * 10).toFixed(2)}deg`); copia.style.setProperty('--rx', `${(-y * 10).toFixed(2)}deg`); });
         capa.addEventListener('pointerleave', () => { copia.style.setProperty('--ry', '0deg'); copia.style.setProperty('--rx', '0deg'); });
       }
-      capa.addEventListener('click', (e) => { if (!e.target.closest('a, button')) alClicCapa(); });
+      // Con `alClicCarta`, un clic sobre la carta ampliada la «abre» (p. ej. va a la biografía); el fondo oscuro sigue cerrándola.
+      if (alClicCarta) { capa.style.cursor = 'pointer'; capa.title = 'Haz clic para ver su biografía'; }
+      capa.addEventListener('click', (e) => { if (e.target.closest('a, button')) return; if (alClicCarta) alClicCarta(origen); else alClicCapa(); });
       return true;
     } catch (err) { console.error('[replica] no se pudo abrir la réplica de la carta:', err); document.querySelectorAll('.pcw-replica-fondo').forEach((x) => x.remove()); cerrar(true); return false; }
   }
