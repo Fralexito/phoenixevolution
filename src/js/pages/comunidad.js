@@ -10,6 +10,7 @@ import * as api from '../features/muro/api.js';
 import { reproductorYT } from '../features/muro/render.js';
 import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';
+import { cargarEncuestas } from '../features/encuestas/estado.js';
 
 const feedEl = document.getElementById('com-feed'); const filtroEl = document.getElementById('com-filtro');
 const S = { yo: null, juego: segmentoParaGuardar(new URLSearchParams(location.search).get('j')) ?? '', items: [], hayMas: false, cargando: false };
@@ -29,6 +30,7 @@ async function cargar({ mas = false } = {}) {
   try {
     const m = await api.comunidad(S.juego || null, mas ? S.items[S.items.length - 1]?.id : null);
     S.items = mas ? [...S.items, ...(m.items ?? [])] : (m.items ?? []); S.hayMas = !!m.hay_mas;
+    await cargarEncuestas(S.items.map((x) => x.id));
     if (S.yo) await cargarEstado('publicacion', S.items.map((x) => x.id));   // marcadores (si falla, la lista se pinta igual)
     pintar();
   } catch (e) {

@@ -9,6 +9,7 @@ import { TIPOS_BUSQUEDA, esTipoBusqueda, validarBusqueda } from '../core/social.
 import * as api from '../features/social/api.js';
 import * as amigosApi from '../features/amigos/api.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';
+import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { reproductorYT } from '../features/muro/render.js';
 import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js';
@@ -72,7 +73,7 @@ async function buscar({ mas = false } = {}) {
     const desp = mas ? S.desp + PAGINA : 0;
     const r = await api.buscarPublicaciones(v.q, desp, PAGINA); if (req !== S.req) return;
     S.desp = desp; S.pubs = mas ? [...S.pubs, ...r.items] : r.items; S.hayMas = r.hayMas;
-    await cargarEstado('publicacion', S.pubs.map((x) => x.id)); if (req !== S.req) return;
+    await Promise.all([cargarEstado('publicacion', S.pubs.map((x) => x.id)), cargarEncuestas(S.pubs.map((x) => x.id))]); if (req !== S.req) return;
     pintar();
   } catch (e) { if (req !== S.req) return; console.error('[buscar]', e); avisar(e.message || 'No se pudo buscar. Inténtalo de nuevo.'); $('bu-res').innerHTML = ''; }
 }

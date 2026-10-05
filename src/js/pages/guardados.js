@@ -7,6 +7,7 @@ import { avatarHTML } from '../core/avatar.js';
 import { tiempoRelativo } from '../core/muro.js';
 import * as api from '../features/social/api.js';
 import { botonGuardarHTML, alternar, cargarEstado } from '../features/social/guardados.js';
+import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { segmentoChipHTML, reproductorYT } from '../features/muro/render.js';
 import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js';
@@ -39,6 +40,7 @@ async function cargar({ mas = false } = {}) {
     const r = await api.listarGuardados({ antes: mas ? S.siguiente : null, limite: 20 });
     S.items = mas ? [...S.items, ...r.items] : r.items; S.siguiente = r.siguiente; S.hayMas = r.hayMas && !!r.siguiente;
     // Todo lo listado está guardado: se marca (la tarjeta compartida pinta el marcador según este estado).
+    await cargarEncuestas(S.items.filter((g) => g.tipo === 'publicacion').map((g) => g.item.id));
     await Promise.all([cargarEstado('publicacion', S.items.filter((g) => g.tipo === 'publicacion').map((g) => g.item.id)), cargarEstado('clip', S.items.filter((g) => g.tipo === 'clip').map((g) => g.item.id))]);
     $('gu-error').hidden = true; pintar();
   } catch (e) { mostrarError(e); }

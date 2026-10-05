@@ -7,6 +7,7 @@ import { avatarHTML } from '../../core/avatar.js';
 import { tiempoRelativo, resumenReacciones } from '../../core/muro.js';
 import { contenidoHTML, segmentoChipHTML } from './render.js';
 import { botonGuardarHTML } from '../social/guardados.js';
+import { encuestaHTML } from '../encuestas/estado.js';
 
 /** Reportar (cualquiera con sesión, salvo lo propio), ocultar (solo moderación) y guardar (con sesión). La base de datos vuelve a comprobar todo. */
 function botonesHTML(it, { yo, puedeOcultar }) {
@@ -27,7 +28,7 @@ export function tarjetaComunidadHTML(it, opciones = {}) {
       <a href="${escapeHTML(perfil)}" class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(a.avatar_url, a.nombre_display, 36)}</a>
       <div class="min-w-0 flex-1"><a href="${escapeHTML(perfil)}" class="font-display font-bold text-white text-sm truncate block hover:text-galaxy-400">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
         <p class="text-[11px] text-gray-500">${tiempoRelativo(it.created_at)} ${segmentoChipHTML(it.juego)}</p></div>${botonesHTML(it, opciones)}</header>
-    ${contenidoHTML(it)}${opciones.extra ?? ''}
+    ${contenidoHTML(it)}${encuestaHTML(it.id)}${opciones.extra ?? ''}
     <footer class="mt-3 pt-2 border-t border-galaxy-border/60 flex flex-wrap items-center gap-1.5">${rx}
       <a href="${escapeHTML(urlMuro)}" class="ml-auto text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'} · ` : ''}Ver en su muro</a></footer></article>`;
 }

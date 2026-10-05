@@ -15,6 +15,8 @@ import { analizarVideo, segmentoParaGuardar, urlCompartir, destinoDeHash, etique
 import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES, PALETA_EMOJIS, SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { logrosDe } from '../features/logros/api.js';
+import { cargarEncuestas, encuestaHTML } from '../features/encuestas/estado.js';
+import { abrirCrearEncuesta } from '../features/encuestas/crearUI.js';
 import { nivelDe } from '../core/logros.js';
 import { estadisticasDe } from '../features/resultados/api.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
@@ -191,6 +193,7 @@ const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
     <button type="button" data-act="elegir-foto" aria-label="Foto" title="Foto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span class="max-sm:hidden">Foto</span></button>
     <button type="button" data-act="elegir-video" aria-label="Subir video" title="Subir video (hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB)" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-film"></i><span class="max-sm:hidden">Video</span></button>
     <button type="button" data-act="alternar-video" aria-label="Enlace de video" title="Enlace de YouTube, TikTok, Kick o Twitch" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-link"></i><span class="max-sm:hidden">Enlace</span></button>
+    <button type="button" data-act="crear-encuesta" aria-label="Encuesta" title="Crear una encuesta" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-square-poll-vertical"></i><span class="max-sm:hidden">Encuesta</span></button>
     <button type="button" data-act="alternar-reto" aria-label="Duelo" title="Adjuntar duelo" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-gamepad"></i><span class="max-sm:hidden">Duelo</span></button>
     <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" aria-label="Publicar" title="Publicar" class="btn btn-primary !min-h-9 !text-xs shrink-0 max-sm:!px-3"><i class="fa-solid fa-paper-plane"></i><span class="max-sm:hidden">Publicar</span></button></div>
   <div class="flex items-center gap-2 text-[11px] text-gray-500"><i class="fa-solid fa-tag"></i><span>Juego (opcional):</span>${selectSegmento('mu-juego')}</div></section>`;
@@ -231,7 +234,7 @@ function tarjeta(it, p) {
   const cuerpo = S.editando === it.id
     ? `<textarea id="mu-edit" rows="3" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${escapeHTML(it.texto)}</textarea>
        <div class="flex gap-2 mt-2"><button type="button" data-act="guardar-edicion" data-id="${it.id}" class="btn btn-primary !min-h-8 !text-xs">Guardar</button><button type="button" data-act="cancelar-edicion" class="btn btn-ghost !min-h-8 !text-xs">Cancelar</button></div>`
-    : contenidoHTML(it);
+    : contenidoHTML(it) + encuestaHTML(it.id);
   const pie = `<footer class="mt-3 pt-2 border-t border-galaxy-border/60">${barraReacciones(it, p)}${S.abiertas.has(it.id) ? seccionRespuestas(it, p) : ''}</footer>`;
   return `<article id="p-${it.id}" class="glass-panel rounded-2xl p-3 sm:p-4 scroll-mt-24 ${it.fijada ? 'border border-galaxy-400/40' : ''}">
     <header class="flex items-center gap-2.5 mb-2">
@@ -339,7 +342,7 @@ async function cargarExtras(p) {
   if (!S.hist && c.status === 'fulfilled') S.hist = { historias: [], destacadas: [], archivo: [] };
 }
 /** Marcadores (guardados) de lo que se ve ahora: publicaciones del muro y clips. Si falla, no se muestran marcados y todo sigue funcionando. */
-async function marcadoresMuro() { if (!S.sesion) return; await Promise.all([cargarGuardados('publicacion', S.items.map((x) => x.id)), cargarGuardados('clip', (S.clips ?? []).map((c) => c.id))]); }
+async function marcadoresMuro() { await cargarEncuestas(S.items.map((x) => x.id)); if (!S.sesion) return; await Promise.all([cargarGuardados('publicacion', S.items.map((x) => x.id)), cargarGuardados('clip', (S.clips ?? []).map((c) => c.id))]); }
 /** Enlace compartido (#p-<id> publicación, #c-<id> clip): al abrir el perfil se lleva a ese contenido. Solo una vez por visita. */
 let destinoUsado = false;
 function irADestino() {
@@ -517,6 +520,7 @@ const ACCIONES = {
       : '<option value="">Aún no tienes duelos aceptados o finalizados para adjuntar.</option>';
   },
   'video-yt': (el) => reproductorYT(el),
+  'crear-encuesta': () => abrirCrearEncuesta({ onListo: () => refrescarMuro() }),
   'subir-banner': () => document.getElementById('est-file').click(),
   'quitar-banner': () => { fijarBannerFoto(''); },
   publicar: async () => {
