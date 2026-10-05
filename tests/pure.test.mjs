@@ -1011,10 +1011,10 @@ import { analizarVideo as analizarVid, archivoDeUrl, rutaVideo, segmentoValido, 
 test('video propio: validarArchivoVideo (tipo, peso, duración)', () => {
   assert.equal(validarArchivoVideo({ type: 'video/avi', size: 10, duracion: 5 }).ok, false);
   assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 0, duracion: 5 }).ok, false);
-  assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 26 * 1024 * 1024, duracion: 5 }).ok, false);
+  assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 11 * 1024 * 1024, duracion: 5 }).ok, false);
   assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 1e6, duracion: NaN }).ok, false);
   assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 1e6, duracion: VIDEO_MAX_SEG + 5 }).ok, false);
-  const v = validarArchivoVideo({ type: 'video/quicktime', size: 5e6, duracion: 30.2 }); assert.ok(v.ok); assert.equal(v.ext, 'mov');
+  const v = validarArchivoVideo({ type: 'video/quicktime', size: 5e6, duracion: VIDEO_MAX_SEG + 0.2 }); assert.ok(v.ok); assert.equal(v.ext, 'mov');
 });
 test('video propio: analizarVideo reconoce solo nuestro Storage y rutas', () => {
   const u = 'https://abcdefghijklmnop.supabase.co/storage/v1/object/public/muro-video/11111111-1111-1111-1111-111111111111/1-x.mp4';
