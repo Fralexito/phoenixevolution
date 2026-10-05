@@ -103,3 +103,13 @@ document.addEventListener('click', (e) => {
   const tr = e.target.closest('tr[data-jug]'); if (!tr) return;
   resaltar(ed, tr.classList.contains('liga-sel-fila') ? null : tr.dataset.jug);
 });
+
+// ---- Organizador → su carta: busca la ficha en Jugadores por nombre/apodo y apunta el enlace a su perfil (si falla, queda el enlace a Jugadores) ----
+(async () => {
+  const enlaces = $$('[data-org-jugador]'); if (!enlaces.length) return;
+  try {
+    const [{ supabase }, { coincide }, { href }] = await Promise.all([import('../core/supabase.js'), import('../core/perfil.js'), import('../core/config.js')]);
+    const { data, error } = await supabase.from('jugadores').select('id, nombre, apodo'); if (error) throw error;
+    for (const a of enlaces) { const j = (data ?? []).find((x) => coincide(x, a.dataset.orgJugador)); if (j) a.href = href(`jugador/?id=${encodeURIComponent(j.id)}`); else console.warn('[liga] organizador sin ficha:', a.dataset.orgJugador); }
+  } catch (e) { console.warn('[liga] no se pudo enlazar al organizador:', e); }
+})();

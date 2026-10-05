@@ -3,6 +3,7 @@
 // - titulo: [parte en blanco, parte con degradado]
 // - acciones: botones propios de la liga (href relativo al sitio; '#id' = ancla dentro de Central)
 // - copafacil: enlace público del torneo en CopaFácil ('' = el botón no aparece). Mientras CopaFácil gestione la liga, ahí viven el fixture y la tabla oficiales.
+// - sede / organizador: texto corto; el organizador (nombre o apodo de una ficha en Jugadores) se enlaza solo a su carta.
 // - datos: ficha de la competición para la página «Liga». Deja v: '' y se muestra «Por definir» (no se inventa nada).
 export const LIGAS = [
   {
@@ -14,6 +15,8 @@ export const LIGAS = [
     imagen: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1400&auto=format&fit=crop',
     copafacil: 'https://copafacil.com/-2vbqe',
     descripcion: 'La competición oficial de Phoenix Evolution Series. Se organiza en CopaFácil; los partidos se coordinan en la Sala de Duelos y se juegan en remoto con Parsec o Smash Soda.',
+    sede: 'Perú',
+    organizador: 'Jack',
     datos: [
       { k: 'Participantes', icono: 'fa-users', v: '12 jugadores' },
       { k: 'Formato', icono: 'fa-diagram-project', v: 'Todos contra todos, a ida y vuelta (1ª Fase)' },
@@ -39,6 +42,8 @@ export const LIGAS = [
     imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400&auto=format&fit=crop',
     copafacil: '',
     descripcion: 'Liga de 12 jugadores, una sola ronda (11 fechas), jugada por Parsec.',
+    sede: 'España',
+    organizador: 'Sudario17',
     datos: [
       { k: 'Participantes', icono: 'fa-users', v: '12 jugadores' },
       { k: 'Formato', icono: 'fa-diagram-project', v: 'Todos contra todos, una sola ronda (11 fechas)' },
