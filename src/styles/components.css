@@ -708,3 +708,20 @@ html[data-fx-reveal].js [data-reveal].visto { opacity: 1; transform: none; }
 .racha-n { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; min-width: 2.2rem; text-align: center; }
 .novedad { display: flex; align-items: center; gap: .6rem; padding: .6rem .9rem; border-radius: .75rem; border: 1px solid rgb(0 229 255 / .35); background: linear-gradient(90deg, rgb(128 0 255 / .25), rgb(0 0 0 / .3)); font-size: .8rem; color: #e5e7eb; }
 html[data-tema='sudario'] .novedad { border-color: rgb(245 197 66 / .45); background: linear-gradient(90deg, rgb(29 78 216 / .3), rgb(0 0 0 / .3)); }
+
+/* ===== MINISECCIONES plegables (components/Plegable.astro): se abren con un clic, para evitar el scroll excesivo ===== */
+.plegable { border: 1px solid var(--color-galaxy-border); border-radius: 1rem; background: linear-gradient(135deg, rgb(255 255 255 / .04), rgb(0 0 0 / .25)); overflow: hidden; transition: border-color .25s, box-shadow .25s; }
+.plegable:hover { border-color: rgb(0 229 255 / .45); }
+.plegable[open] { border-color: rgb(0 229 255 / .5); box-shadow: 0 0 22px rgb(128 0 255 / .18); }
+html[data-tema='sudario'] .plegable:hover, html[data-tema='sudario'] .plegable[open] { border-color: rgb(245 197 66 / .5); }
+.plegable > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .85rem; padding: .85rem 1.1rem; user-select: none; }
+.plegable > summary::-webkit-details-marker { display: none; }
+.plegable-ico { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: .75rem; background: rgb(128 0 255 / .25); border: 1px solid rgb(0 229 255 / .4); color: var(--color-galaxy-400); flex-shrink: 0; }
+.plegable-t { flex: 1; min-width: 0; display: block; line-height: 1.2; }
+.plegable-t b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.plegable-t small { display: block; font-size: .72rem; color: #9ca3af; margin-top: .15rem; }
+.plegable-flecha { color: var(--color-galaxy-400); font-size: .8rem; transition: transform .3s ease; }
+.plegable[open] > summary .plegable-flecha { transform: rotate(180deg); }
+.plegable-cuerpo { padding: .25rem 1.1rem 1.1rem; animation: plegable-abre .35s cubic-bezier(.22, 1, .36, 1); }
+@keyframes plegable-abre { from { opacity: 0; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .plegable-cuerpo { animation: none; } .plegable-flecha { transition: none; } }

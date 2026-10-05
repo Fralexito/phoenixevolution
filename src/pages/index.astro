@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { FX } from '../data/experimento.js';
+import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 const base = import.meta.env.BASE_URL;
@@ -111,11 +112,8 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <!-- 5. HIGHLIGHTS: video principal grande + lista de clips al costado (en celular, debajo) -->
-    <section class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow flex items-center gap-2"><i class="fa-solid fa-video text-galaxy-400 text-lg"></i> Highlights<span class="hidden sm:inline"> de la jornada</span></h2>
-        <a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase flex items-center gap-1.5 whitespace-nowrap"><i class="fa-brands fa-youtube text-red-500 text-sm"></i> Ver canal</a>
-      </div>
+    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver">
+      <p class="mb-3 text-right"><a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase inline-flex items-center gap-1.5"><i class="fa-brands fa-youtube"></i> Ver canal</a></p>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden relative aspect-video w-full flex items-center justify-center group shadow-[0_0_35px_rgba(128,0,255,0.25)]">
           <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400&auto=format&fit=crop" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" />
@@ -138,7 +136,7 @@ const base = import.meta.env.BASE_URL;
           ))}
         </div>
       </div>
-    </section>
+    </Plegable>
 
     <!-- 6. INVITACIÓN FINAL -->
     <section class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">

@@ -48,7 +48,7 @@ function iniciar() {
 
   const nombres = (l) => l.map((f) => f.nombre);
   const lista = (arr, vacio = '—') => (arr.length ? arr.map((x) => `<b class="text-white">${escapeHTML(x)}</b>`).join(', ') : vacio);
-  const cierre = (r) => `<h2 class="font-display font-bold text-base text-white uppercase tracking-widest"><i class="fa-solid fa-flag-checkered text-galaxy-400 mr-2"></i>Si la temporada terminara hoy</h2>
+  const cierre = (r) => `
     <div class="grid gap-3 md:grid-cols-2">
       <div class="glass-panel rounded-xl p-4 text-sm text-gray-300 space-y-1"><p><span class="tmp-tag tmp-sube"><i class="fa-solid fa-arrow-up"></i></span> Suben a ${escapeHTML(datos.nombres.d1)}: ${lista(r.suben, 'nadie')}</p><p><span class="tmp-tag tmp-baja"><i class="fa-solid fa-arrow-down"></i></span> Bajan a ${escapeHTML(datos.nombres.d2)}: ${lista(r.bajan, 'nadie')}</p></div>
       <div class="glass-panel rounded-xl p-4 text-sm text-gray-300 space-y-1"><p><b class="text-galaxy-400 font-display uppercase text-xs tracking-wider">Próxima ${escapeHTML(datos.nombres.d1)}</b><br>${lista(r.div1)}</p><p><b class="text-galaxy-400 font-display uppercase text-xs tracking-wider">Próxima ${escapeHTML(datos.nombres.d2)}</b><br>${lista(r.div2)}</p></div>
@@ -76,7 +76,7 @@ function iniciar() {
       $('tmp-cierre').innerHTML = cierre(r);
       const clas = clasificadosCopa(nombres(datos.d1), nombres(datos.d2), cfg.copa1, cfg.copa2);
       const k = construirCopa(clas, resultados); ultimoCuadro = k;
-      $('tmp-copa').innerHTML = `<h2 class="font-display font-bold text-base text-white uppercase tracking-widest"><i class="fa-solid fa-trophy text-galaxy-400 mr-2"></i>${escapeHTML(datos.nombres.copa)}</h2>${cuadro(k)}`;
+      $('tmp-copa').innerHTML = cuadro(k);
       const todos = [...avisos, ...r.avisos, ...k.avisos.filter((a) => clas.length < 2 && a)];
       $('tmp-avisos').innerHTML = [...new Set(todos)].map((a) => `<span class="block"><i class="fa-solid fa-circle-info mr-1.5"></i>${escapeHTML(a)}</span>`).join('');
     } catch (err) {

@@ -1,0 +1,13 @@
+---
+// MINISECCIÓN que se abre con un clic (para no alargar la página). Es un <details> nativo: funciona sin JS, con teclado y lector de pantalla.
+// Uso: <Plegable titulo="Highlights" icono="fa-video" resumen="Mejores goles y clips"> …contenido… </Plegable>   ·   abierto → empieza desplegada.
+const { titulo, icono = 'fa-layer-group', resumen = '', abierto = false, clase = '', id } = Astro.props;
+---
+<details class={`plegable ${clase}`} open={abierto} id={id}>
+  <summary>
+    <span class="plegable-ico"><i class={`fa-solid ${icono}`}></i></span>
+    <span class="plegable-t"><b>{titulo}</b>{resumen && <small>{resumen}</small>}</span>
+    <i class="fa-solid fa-chevron-down plegable-flecha" aria-hidden="true"></i>
+  </summary>
+  <div class="plegable-cuerpo"><slot /></div>
+</details>

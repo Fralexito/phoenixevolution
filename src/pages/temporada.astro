@@ -2,6 +2,7 @@
 // Página «Temporada» (BETA): el sistema de dos divisiones (ascensos/descensos) y la Copa Interdivisional. Todo se calcula en el navegador
 // con js/core/temporada.js a partir de la tabla REAL de Primera y la de Segunda (real si existe; si no, una de EJEMPLO claramente marcada).
 import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
 import SelectorDivisiones from '../components/SelectorDivisiones.astro';
 import { SISTEMA, DEMO_SEGUNDA } from '../data/temporada.js';
 import { EDICIONES } from '../data/ligaResultados.js';
@@ -36,11 +37,12 @@ const datos = {
   <div id="temporada" data-temporada={JSON.stringify(datos)} class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-10 space-y-8 pb-20">
     <noscript><p class="text-sm text-amber-300">Esta página necesita JavaScript para calcular el sistema.</p></noscript>
     <!-- CONTROLES -->
-    <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" aria-label="Controles de simulación">
-      <h2 class="font-display font-bold text-base text-white uppercase tracking-widest"><i class="fa-solid fa-sliders text-galaxy-400 mr-2"></i>Reglas (prueba valores)</h2>
-      <div class="grid gap-4 sm:grid-cols-3" id="tmp-controles"></div>
-      <p id="tmp-avisos" class="text-xs text-amber-300/90 space-y-1" role="status"></p>
-    </section>
+    <Plegable titulo="Reglas de la simulación" icono="fa-sliders" resumen="Cuántos suben y bajan, cuántos van a la copa · toca para cambiarlos">
+      <section class="space-y-3 pt-2" aria-label="Controles de simulación">
+        <div class="grid gap-4 sm:grid-cols-3" id="tmp-controles"></div>
+        <p id="tmp-avisos" class="text-xs text-amber-300/90 space-y-1" role="status"></p>
+      </section>
+    </Plegable>
     <!-- TABLAS -->
     <section class="grid gap-6 lg:grid-cols-2" aria-label="Divisiones">
       <div id="tmp-d1" class="space-y-3"></div><div id="tmp-d2" class="space-y-3"></div>
@@ -49,9 +51,9 @@ const datos = {
       <li><span class="tmp-dot tmp-copa"></span>Zona de copa</li><li><span class="tmp-dot tmp-sube"></span>Ascenso</li><li><span class="tmp-dot tmp-baja"></span>Descenso</li>
     </ul>
     <!-- RESULTADO AL CIERRE -->
-    <section id="tmp-cierre" class="space-y-3" aria-label="Si la temporada terminara hoy"></section>
+    <Plegable titulo="Si la temporada terminara hoy" icono="fa-flag-checkered" resumen="Quién sube, quién baja y quién va a copa"><section id="tmp-cierre" class="space-y-3 pt-2" aria-label="Si la temporada terminara hoy"></section></Plegable>
     <!-- COPA -->
-    <section id="tmp-copa" class="space-y-3" aria-label="Copa interdivisional"></section>
+    <Plegable titulo="Copa Interdivisional" icono="fa-trophy" resumen="El cuadro entre ambas divisiones"><section id="tmp-copa" class="space-y-3 pt-2" aria-label="Copa interdivisional"></section></Plegable>
     <p class="text-xs text-gray-500 leading-relaxed">BETA: todo es una <b class="text-gray-300">proyección con la tabla de hoy</b> (no hay nada oficial hasta que se cierre la temporada). La Primera División usa los resultados reales de la Liga; la Segunda se llena sola cuando exista la liga real. <a class="text-galaxy-400 underline" href={`${base}liga/`}>Volver a la Liga</a>.</p>
   </div>
 </Layout>

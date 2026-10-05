@@ -2,6 +2,7 @@
 // Página «Organizadores»: propósito, motivación, visión, historia e impulsores. El contenido sale de data/organizadores.js.
 import Layout from '../layouts/Layout.astro';
 import { ORG } from '../data/organizadores.js';
+import Plegable from '../components/Plegable.astro';
 import { SOCIALS } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 const discord = SOCIALS.find((s) => s.label === 'Discord');
@@ -32,9 +33,9 @@ const inicial = (n) => String(n ?? '?').trim().charAt(0).toUpperCase() || '?';
     </section>
 
     <!-- CÓMO SURGIÓ -->
-    <section class="grid gap-8 lg:grid-cols-[1.2fr_1fr] items-start" aria-label="Cómo surgió la idea">
+    <Plegable titulo="Cómo surgió la idea" icono="fa-seedling" resumen="De la Society a Phoenix Evolution Series">
+    <div class="grid gap-8 lg:grid-cols-[1.2fr_1fr] items-start pt-3">
       <div class="space-y-4">
-        <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-seedling text-galaxy-400 mr-3"></i>Cómo surgió la idea</h2>
         {ORG.historia.map((p) => <p class="text-gray-300 leading-relaxed">{p}</p>)}
       </div>
       <ol class="relative border-l border-galaxy-border/70 ml-3 space-y-6" aria-label="Evolución del proyecto">
@@ -46,7 +47,8 @@ const inicial = (n) => String(n ?? '?').trim().charAt(0).toUpperCase() || '?';
           </li>
         ))}
       </ol>
-    </section>
+    </div>
+    </Plegable>
 
     <!-- IMPULSORES -->
     <section class="space-y-5" aria-label="El equipo">
@@ -68,12 +70,13 @@ const inicial = (n) => String(n ?? '?').trim().charAt(0).toUpperCase() || '?';
     </section>
 
     <!-- VALORES -->
-    <section class="space-y-5" aria-label="Valores">
-      <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-gem text-galaxy-400 mr-3"></i>Lo que nos mueve</h2>
+    <Plegable titulo="Lo que nos mueve" icono="fa-gem" resumen="Nuestros valores">
+    <div class="pt-3">
       <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {ORG.valores.map((v) => <li class="rounded-xl border border-galaxy-border/60 bg-black/25 p-4"><i class={`fa-solid ${v.icono} text-galaxy-400`}></i><b class="block mt-2 font-display text-white uppercase tracking-wider text-sm">{v.t}</b><span class="text-xs text-gray-400 leading-relaxed">{v.d}</span></li>)}
       </ul>
-    </section>
+    </div>
+    </Plegable>
 
     <section class="glass-panel rounded-2xl p-6 sm:p-8 text-center space-y-3">
       <h2 class="font-display font-bold text-xl text-white uppercase tracking-widest">¿Quieres ser parte?</h2>
