@@ -79,7 +79,7 @@ begin
   select saldo into s from public.billeteras where usuario_id = p_usuario for update;
   if exists (select 1 from public.movimientos_tokens where clave = p_clave) then return null; end if;
   nuevo := s + p_delta;
-  if nuevo < 0 and p_tipo <> 'reembolso' then raise exception 'Saldo insuficiente.'; end if;
+  if nuevo < 0 and p_delta < 0 and p_tipo <> 'reembolso' then raise exception 'Saldo insuficiente.'; end if;
   insert into public.movimientos_tokens (usuario_id, delta, tipo, fuente, referencia, clave, saldo_despues) values (p_usuario, p_delta, p_tipo, p_fuente, p_referencia, p_clave, nuevo) returning movimientos_tokens.id into id;
   update public.billeteras set saldo = nuevo, updated_at = now() where usuario_id = p_usuario;
   return id;
