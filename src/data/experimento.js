@@ -1,0 +1,7 @@
+// INTERRUPTORES del experimento de diseño «más dinámico». Cada uno es independiente: pon false y esa mejora desaparece (reconstruye la web).
+//   transiciones → fundido suave al cambiar de página (CSS puro, solo navegadores que lo soportan)
+//   reveal       → los bloques aparecen con un deslizamiento suave al hacer scroll
+//   esqueletos   → siluetas que brillan mientras cargan los datos (en vez de «Cargando…»)
+//   rachas       → panel «En racha» en Central
+//   visita       → aviso «novedades desde tu última visita» en Central
+export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true };

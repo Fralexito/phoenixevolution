@@ -692,3 +692,19 @@ html[data-tema='sudario'] .liga-sel-enlaces a[aria-current='page'] { background:
 .liga-volver { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 999px; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .35); color: var(--color-galaxy-400); transition: transform .25s ease, box-shadow .25s ease; }
 .liga-volver:hover { transform: translateX(-3px); box-shadow: 0 0 14px rgb(0 229 255 / .4); }
 html[data-tema='sudario'] .liga-volver:hover { box-shadow: 0 0 14px rgb(245 197 66 / .45); }
+
+/* ===== EXPERIMENTO «más dinámico» (interruptores en src/data/experimento.js) ===== */
+html[data-fx-reveal].js [data-reveal]:not(.visto) { opacity: 0; transform: translateY(16px); }
+html[data-fx-reveal].js [data-reveal] { transition: opacity .55s ease, transform .6s cubic-bezier(.22, 1, .36, 1); }
+html[data-fx-reveal].js [data-reveal].visto { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { html[data-fx-reveal].js [data-reveal] { opacity: 1 !important; transform: none !important; transition: none; } }
+/* Esqueletos de carga */
+.esqueleto { position: relative; overflow: hidden; border-radius: .75rem; background: rgb(255 255 255 / .05); }
+.esqueleto::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgb(255 255 255 / .09), transparent); animation: esq 1.3s infinite; }
+@keyframes esq { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .esqueleto::after { animation: none; } }
+/* Panel «En racha» y aviso de visita */
+.racha-fila { display: flex; align-items: center; gap: .6rem; padding: .45rem .1rem; border-bottom: 1px solid rgb(255 255 255 / .06); }
+.racha-n { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; min-width: 2.2rem; text-align: center; }
+.novedad { display: flex; align-items: center; gap: .6rem; padding: .6rem .9rem; border-radius: .75rem; border: 1px solid rgb(0 229 255 / .35); background: linear-gradient(90deg, rgb(128 0 255 / .25), rgb(0 0 0 / .3)); font-size: .8rem; color: #e5e7eb; }
+html[data-tema='sudario'] .novedad { border-color: rgb(245 197 66 / .45); background: linear-gradient(90deg, rgb(29 78 216 / .3), rgb(0 0 0 / .3)); }
