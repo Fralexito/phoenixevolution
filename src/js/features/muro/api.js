@@ -37,7 +37,7 @@ export async function subirImagen(file, uid, ancho = 1200) {
 export async function subirVideo(file, uid, ext, tipo) {
   const ruta = rutaVideo(uid, ext);
   const { error } = await supabase.storage.from('muro-video').upload(ruta, file, { contentType: tipo || file.type, cacheControl: '31536000' });
-  if (error) { console.error('[muro] subir video:', error.message); throw new Error(/limit|exceed|policy|row-level/i.test(error.message) ? 'No se pudo subir el video (límite de 10 videos por persona o archivo demasiado grande). Borra alguno e intenta de nuevo.' : 'No se pudo subir el video. Intenta de nuevo.'); }
+  if (error) { console.error('[muro] subir video:', error.message); throw new Error(/limit|exceed|policy|row-level/i.test(error.message) ? 'No se pudo subir el video (límite de 3 videos por persona o archivo demasiado grande). Borra alguno e intenta de nuevo.' : 'No se pudo subir el video. Intenta de nuevo.'); }
   return supabase.storage.from('muro-video').getPublicUrl(ruta).data.publicUrl;
 }
 /** Borra un archivo propio (foto o video) del Storage (mejor esfuerzo: si falla solo queda un archivo huérfano, no se rompe nada). */

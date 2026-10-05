@@ -1,6 +1,6 @@
 // Reglas de los VIDEOS que se suben (puro, sin DOM). [BD] El bucket muro-video (migración 027) exige los mismos límites de tamaño y tipo; la duración solo la valida la web.
-export const VIDEO_MAX_MB = 25;       // [BD] file_size_limit del bucket
-export const VIDEO_MAX_SEG = 30;
+export const VIDEO_MAX_MB = 10;       // [BD] file_size_limit del bucket
+export const VIDEO_MAX_SEG = 15;
 export const VIDEO_TIPOS = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov' };   // [BD] allowed_mime_types
 
 /** → { ok, ext, error }. `duracion` en segundos (la lee el navegador); si no se pudo leer, se rechaza (podría no ser un video válido). */

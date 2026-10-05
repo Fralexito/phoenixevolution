@@ -1,12 +1,12 @@
 -- 027 · MURO: (1) subir VIDEOS propios (historias, clips y publicaciones) · (2) SEGMENTO por juego (opcional) · (3) feed «Comunidad» filtrable por juego. Depende de 021-026.
--- Video propio: bucket PÚBLICO `muro-video`, máx. 25 MB, solo mp4/webm/mov. El navegador además exige ≤ 30 s. Solo se sube/borra en TU carpeta y como máximo
---   10 videos a la vez por persona (así nadie llena el almacenamiento). Las RPC aceptan enlaces de YouTube/TikTok/Kick/Twitch O un video de TU carpeta de ese bucket.
+-- Video propio: bucket PÚBLICO `muro-video`, máx. 10 MB, solo mp4/webm/mov. El navegador además exige ≤ 15 s. Solo se sube/borra en TU carpeta y como máximo
+--   3 videos a la vez por persona (así nadie llena el almacenamiento). Las RPC aceptan enlaces de YouTube/TikTok/Kick/Twitch O un video de TU carpeta de ese bucket.
 -- Segmento: pes · sp (SP Football Life) · fifa · eafc · efootball. null = general.
 
 -- 1) Bucket y permisos de Storage.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('muro-video', 'muro-video', true, 26214400, array['video/mp4','video/webm','video/quicktime'])
-on conflict (id) do update set public = true, file_size_limit = 26214400, allowed_mime_types = array['video/mp4','video/webm','video/quicktime'];
+values ('muro-video', 'muro-video', true, 10485760, array['video/mp4','video/webm','video/quicktime'])
+on conflict (id) do update set public = true, file_size_limit = 10485760, allowed_mime_types = array['video/mp4','video/webm','video/quicktime'];
 
 drop policy if exists muro_video_select_propio on storage.objects;
 drop policy if exists muro_video_insert_propio on storage.objects;
@@ -15,7 +15,7 @@ create policy muro_video_select_propio on storage.objects for select to authenti
   using (bucket_id = 'muro-video' and (storage.foldername(name))[1] = ((select auth.uid()))::text);
 create policy muro_video_insert_propio on storage.objects for insert to authenticated
   with check (bucket_id = 'muro-video' and (storage.foldername(name))[1] = ((select auth.uid()))::text
-    and (select count(*) from storage.objects o where o.bucket_id = 'muro-video' and (storage.foldername(o.name))[1] = ((select auth.uid()))::text) < 10);
+    and (select count(*) from storage.objects o where o.bucket_id = 'muro-video' and (storage.foldername(o.name))[1] = ((select auth.uid()))::text) < 3);
 create policy muro_video_delete_propio on storage.objects for delete to authenticated
   using (bucket_id = 'muro-video' and (storage.foldername(name))[1] = ((select auth.uid()))::text);
 
