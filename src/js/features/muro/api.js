@@ -86,5 +86,7 @@ export const publicarClip = (titulo, video, juego = null) => rpc('clip_publicar'
 export async function borrarClip(id) { await limpiarArchivos(await rpc('clip_borrar', { p_id: id })); }
 /** Feed global «Comunidad» (migración 027): publicaciones de todos los muros visibles para mí, con filtro opcional por juego. */
 export const comunidad = (juego = null, antes = null, limite = 20) => rpc('muro_comunidad', { ...(juego ? { p_juego: juego } : {}), p_antes: antes, p_limite: limite });
+export const siguiendo = (antes = null, limite = 20) => rpc('muro_siguiendo', { p_antes: antes, p_limite: limite });
+export const destacado = (desplazamiento = 0, limite = 20) => rpc('muro_destacado', { p_desplazamiento: desplazamiento, p_limite: limite });
 /** Hosting con varios juegos/parches y visibilidad (migración 026). */
 export const guardarHost = (software, catalogo, visible) => rpc('muro_guardar_host', { p_software: software, p_catalogo: catalogo, p_visible: visible });
