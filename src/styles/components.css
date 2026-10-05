@@ -276,6 +276,7 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
 @media (hover: hover) and (pointer: fine) { #players-container .pcw:hover { transform: scale(1.05); z-index: 6; } }
 /* Réplica: capa fija (creada por database.js) que viaja de la carta original al centro de la pantalla. La original queda en su lugar, atenuada. */
 #players-container .pcw.pcw-origen { opacity: .32; filter: saturate(.5); transform: none; }
+.pcw-replica-fondo { position: fixed; inset: 0; z-index: 69; background: transparent; cursor: zoom-out; -webkit-tap-highlight-color: transparent; }   /* absorbe el toque de fuera: solo minimiza la carta */
 .pcw-replica { position: fixed; z-index: 70; transform-origin: center; will-change: transform; cursor: zoom-out; }
 .pcw-replica-in { position: relative; width: 100%; height: 100%; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .18s ease-out; transform-style: preserve-3d; }
 .pcw-replica .pcw-replica-in > article[class] { box-shadow: 0 0 0 1px var(--aura, #00e5ff), 0 0 28px 6px color-mix(in srgb, var(--aura, #00e5ff) 65%, transparent), 0 0 80px 18px color-mix(in srgb, var(--aura, #00e5ff) 35%, transparent), 0 24px 60px rgba(0,0,0,.7); border-color: var(--aura, #00e5ff); }
