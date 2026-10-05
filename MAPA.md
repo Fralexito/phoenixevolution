@@ -138,7 +138,7 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 ## Ronda 17 — Parche/versión en el pulso, búsqueda avanzada compacta
 - **Pulso en vivo**: el juego se muestra como «PES 21 (Dream Patch)» o «SP Football Life 26» (`etiquetaJuego` en `core/rules.js`; el evento lleva `juego` + `parche`/`version`). Sin parche o versión, solo el nombre del juego.
-- **Sistema host**: el parche de PES 2021 se elige entre Dream Patch, Conmebol Patch, VirtuaRED, Sudamerican Patch y Gogosz Patch (`PARCHES_PES`), o «Otro» para escribirlo a mano; tocar el elegido lo quita.
+- **Sistema host**: el parche de PES 2021 se elige entre Dream Patch, Conmegol Patch, VirtuaRED, Sudamerican Patch y Gogosz Patch (`PARCHES_PES`), o «Otro» para escribirlo a mano; tocar el elegido lo quita.
 - **Búsqueda avanzada** más compacta (chips pequeños, mínimo y Top en una sola fila, ancho máximo en PC).
 - **Físico más visible** (el peso se retiró después: nadie debe sentirse obligado a darlo): altura y pie dominante se muestran como chips cian entre el nombre y las stats (`pc-fis` / `pc-chip` en `playerCard.js`), solo con lo que exista y ocultos únicamente en tarjetas diminutas. Las tarjetas de una misma fila ahora tienen la misma altura.
 
