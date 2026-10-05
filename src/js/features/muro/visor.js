@@ -69,10 +69,20 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
     dur = HISTORIA_MS;
     if (foto) medio = `<img src="${escapeHTML(foto)}" alt="Historia de ${escapeHTML(nombre)}" referrerpolicy="no-referrer" draggable="false" class="absolute inset-0 w-full h-full object-contain bg-black">`;
     else if (h.video?.proveedor === 'youtube') { medio = `<iframe src="${ytEmbed(h.video.id)}" title="Video de la historia" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="absolute inset-0 w-full h-full border-0 bg-black"></iframe>`; dur = 0; }
+    else if (h.video?.proveedor === 'propio') { medio = `<video src="${escapeHTML(h.video.url)}" playsinline autoplay class="absolute inset-0 w-full h-full object-contain bg-black"></video>`; dur = 0; }
     else if (h.video) { medio = `<a href="${escapeHTML(h.video.url)}" target="_blank" rel="noopener noreferrer nofollow" class="absolute inset-0 z-[7] flex flex-col items-center justify-center gap-3 text-white"><i class="fa-solid fa-arrow-up-right-from-square text-4xl text-galaxy-400"></i><span class="text-sm">Ver en ${escapeHTML(PROVEEDOR_ETIQUETA[h.video.proveedor] ?? 'el enlace')}</span></a>`; dur = 0; }
     else medio = '<div class="absolute inset-0 bg-gradient-to-br from-galaxy-600 via-galaxy-900 to-black"></div>';   // historia solo de texto
     escena.innerHTML = medio + texto;
-    if (dur === 0) pintarBarras(1);   // los videos no avanzan solos: la barra queda llena
+    if (h.video?.proveedor === 'propio') enlazarVideo(escena.querySelector('video'));   // video propio: la barra sigue al video y al terminar pasa a la siguiente
+    else if (dur === 0) pintarBarras(1);   // los enlaces externos no avanzan solos: la barra queda llena
+  }
+  /** Video subido: intenta reproducir con sonido (el clic que abrió el visor lo permite); si el navegador lo impide, lo reproduce sin sonido. */
+  function enlazarVideo(v) {
+    if (!v) return;
+    const barra = () => barras.children[i]?.firstElementChild;
+    v.addEventListener('timeupdate', () => { const b = barra(); if (b && v.duration) b.style.width = `${Math.round((v.currentTime / v.duration) * 100)}%`; });
+    v.addEventListener('ended', () => ir(i + 1));
+    v.play().catch(() => { v.muted = true; v.play().catch((e) => console.warn('[visor] video:', e?.message)); });
   }
   const ir = (n) => {
     if (n < 0) { transcurrido = 0; ultimo = 0; pintarBarras(0); return; }
@@ -89,7 +99,8 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
     if (frac >= 1) ir(i + 1);
   }
   const caja = el.querySelector('[data-caja]');
-  caja.addEventListener('pointerdown', () => { pausa = true; }); ['pointerup', 'pointercancel', 'pointerleave'].forEach((e) => caja.addEventListener(e, () => { pausa = false; }));
+  const video = () => escena.querySelector('video');
+  caja.addEventListener('pointerdown', () => { pausa = true; video()?.pause(); }); ['pointerup', 'pointercancel', 'pointerleave'].forEach((e) => caja.addEventListener(e, () => { if (pausa) video()?.play().catch(() => {}); pausa = false; }));
   el.querySelector('[data-ant]').addEventListener('click', () => ir(i - 1));
   el.querySelector('[data-sig]').addEventListener('click', () => ir(i + 1));
   el.addEventListener('click', (e) => { if (e.target === el) cerrar(); });
@@ -113,7 +124,7 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
 
 /* ================= CLIPS (reels) ================= */
 /** @param {{clips:Array, inicio?:number, onBorrar?:(id:number)=>Promise<boolean>}} o  clips = infoClip(...) */
-export function abrirClips({ clips, inicio = 0, onBorrar }) {
+export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir }) {
   if (!clips?.length) return;
   let lista = [...clips]; let activo = -1;
   const { el, cerrar } = crearOverlay('Clips', `
@@ -130,6 +141,7 @@ export function abrirClips({ clips, inicio = 0, onBorrar }) {
         <p class="text-[11px] text-gray-300 mt-1">${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? '')}${c.creado ? ` · ${escapeHTML(tiempoRelativo(c.creado))}` : ''} · ${k + 1} / ${lista.length}</p></div>
       <div class="absolute right-3 bottom-20 z-10 flex flex-col gap-2">
         <a href="${escapeHTML(c.url)}" target="_blank" rel="noopener noreferrer nofollow" aria-label="Abrir en ${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? 'su página')}" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        ${onCompartir ? `<button type="button" data-compartir="${c.id}" aria-label="Compartir" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
         ${onBorrar ? `<button type="button" data-borrar="${c.id}" aria-label="Borrar clip" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-bad"><i class="fa-solid fa-trash"></i></button>` : ''}</div></section>`;
   }
   function pintar() { pista.innerHTML = lista.map(slide).join(''); activo = -1; }
@@ -138,6 +150,9 @@ export function abrirClips({ clips, inicio = 0, onBorrar }) {
     pista.querySelectorAll('[data-k]').forEach((s) => {
       const c = lista[Number(s.dataset.k)]; const medio = s.querySelector('[data-medio]'); if (!c || !medio) return;
       const esta = Number(s.dataset.k) === k; const tieneIframe = !!medio.querySelector('iframe');
+      const tieneVideo = !!medio.querySelector('video');
+      if (esta && c.propio && !tieneVideo) medio.insertAdjacentHTML('beforeend', `<video src="${escapeHTML(c.url)}" loop autoplay playsinline controls class="absolute inset-0 w-full h-full object-contain bg-black"></video>`);
+      else if (!esta && tieneVideo) medio.querySelector('video').remove();
       if (esta && c.ytId && !tieneIframe) medio.insertAdjacentHTML('beforeend', `<iframe src="${ytEmbed(c.ytId)}" title="${escapeHTML(c.titulo || 'Clip')}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="absolute inset-0 w-full h-full border-0 bg-black"></iframe>`);
       else if (!esta && tieneIframe) medio.querySelector('iframe').remove();   // los demás se descargan: solo suena el activo
     });
@@ -156,6 +171,8 @@ export function abrirClips({ clips, inicio = 0, onBorrar }) {
   document.addEventListener('keydown', teclas);
   el.addEventListener('visor-cierra', () => { obs?.disconnect(); document.removeEventListener('keydown', teclas); });
   el.addEventListener('click', async (e) => {
+    const sh = e.target.closest('[data-compartir]');
+    if (sh) { const c = lista.find((x) => x.id === Number(sh.dataset.compartir)); if (c) onCompartir?.(c); return; }
     const b = e.target.closest('[data-borrar]');
     if (!b) { if (e.target === el) cerrar(); return; }
     if (!window.confirm('¿Borrar este clip?')) return;

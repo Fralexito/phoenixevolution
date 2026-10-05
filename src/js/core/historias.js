@@ -64,9 +64,9 @@ export function marcarVistas(vistas, ids, max = 300) {
 export const indiceInicial = (historias, vistas) => { const i = historias.findIndex((h) => !vistas?.[h.id]); return i < 0 ? 0 : i; };
 
 /** Miniatura y etiqueta de un clip. Solo YouTube tiene miniatura pública sin pedir nada raro; el resto usa un icono. */
-const ICONOS = { youtube: 'fa-brands fa-youtube', tiktok: 'fa-brands fa-tiktok', twitch: 'fa-brands fa-twitch', kick: 'fa-solid fa-play' };
+const ICONOS = { youtube: 'fa-brands fa-youtube', tiktok: 'fa-brands fa-tiktok', twitch: 'fa-brands fa-twitch', kick: 'fa-solid fa-play', propio: 'fa-solid fa-film' };
 export function infoClip(c) {
   const v = analizarVideo(c?.video_url); if (!v.ok) return null;
-  return { id: Number(c.id), titulo: String(c.titulo ?? '').slice(0, CLIP_TITULO_MAX), proveedor: v.proveedor, ytId: v.proveedor === 'youtube' && /^[A-Za-z0-9_-]{11}$/.test(v.id) ? v.id : '',
+  return { id: Number(c.id), titulo: String(c.titulo ?? '').slice(0, CLIP_TITULO_MAX), proveedor: v.proveedor, propio: v.proveedor === 'propio', juego: String(c.juego ?? ''), ytId: v.proveedor === 'youtube' && /^[A-Za-z0-9_-]{11}$/.test(v.id) ? v.id : '',
     url: v.url, icono: ICONOS[v.proveedor] ?? 'fa-solid fa-play', creado: c.created_at ?? null };
 }

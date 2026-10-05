@@ -23,3 +23,6 @@ export const REACCIONES = [['🔥', 'Fuego'], ['🤝', 'GG'], ['👏', 'Aplauso'
 export const PALETA_EMOJIS = ['🔥', '🤝', '👏', '😂', '❤️', '😮', '😎', '🤩', '😭', '😡', '🤯', '🥶', '🥵', '💀', '🫡', '🙏', '💪', '👑', '🏆', '⚽', '🎯', '🧤', '🥅', '🚀', '💯', '✅', '❌', '👀', '🤡', '😴', '🫶', '👍', '👎', '🍿', '⭐', '💥', '🧠', '🐐', '🔝', '🎮'];
 /** Claves antiguas (antes de la migración 026) → emoji. Solo para leer datos viejos sin romper nada. */
 export const REACCION_ANTIGUA = { fuego: '🔥', gg: '🤝', aplauso: '👏', risa: '😂', corazon: '❤️' };
+
+/** Segmentos por juego (opcionales). El id lo valida la BD (muro_publicaciones.juego / muro_clips.juego, migración 027). Sin segmento = «general». */
+export const SEGMENTOS = [['pes', 'PES 2021'], ['sp', 'SP Football Life'], ['fifa', 'FIFA'], ['eafc', 'EA FC'], ['efootball', 'eFootball']];

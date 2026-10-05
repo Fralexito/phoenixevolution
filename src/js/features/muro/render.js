@@ -2,7 +2,10 @@
 // Todo dato del usuario o de la BD pasa por escapeHTML / safeImg / analizarVideo. Sin acceso a red.
 import { escapeHTML, safeImg } from '../../core/dom.js';
 import { href } from '../../core/config.js';
-import { analizarVideo, PROVEEDOR_ETIQUETA, resumenReto, tiempoRelativo, textoAHTML } from '../../core/muro.js';
+import { analizarVideo, PROVEEDOR_ETIQUETA, resumenReto, tiempoRelativo, textoAHTML, etiquetaSegmento } from '../../core/muro.js';
+
+/** Etiqueta pequeña del segmento (juego) de una publicación o clip; '' si es general. */
+export const segmentoChipHTML = (id) => (etiquetaSegmento(id) ? `<span class="inline-block text-[10px] leading-none rounded-full border border-galaxy-border/80 text-gray-400 px-2 py-1">${escapeHTML(etiquetaSegmento(id))}</span>` : '');
 
 const nombreLink = (p) => (p?.username ? `<a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(p.username)}" class="font-bold text-white hover:text-galaxy-400">${escapeHTML(p.nombre)}</a>` : `<b class="text-white">${escapeHTML(p?.nombre ?? 'Por definir')}</b>`);
 
@@ -27,7 +30,9 @@ export function mediosHTML(it) {
   const img = safeImg(it.imagen_url) ? `<a href="${escapeHTML(safeImg(it.imagen_url))}" target="_blank" rel="noopener noreferrer" class="block mt-2"><img src="${escapeHTML(safeImg(it.imagen_url))}" alt="Foto de la publicación" loading="lazy" referrerpolicy="no-referrer" class="rounded-xl w-full max-h-[28rem] object-cover border border-galaxy-border"></a>` : '';
   const v = it.video_url ? analizarVideo(it.video_url) : null;
   let vid = '';
-  if (v?.ok && v.proveedor === 'youtube') {
+  if (v?.ok && v.proveedor === 'propio') {
+    vid = `<video src="${escapeHTML(v.url)}" controls playsinline preload="metadata" class="mt-2 rounded-xl w-full max-h-[70vh] bg-black border border-galaxy-border"></video>`;
+  } else if (v?.ok && v.proveedor === 'youtube') {
     vid = `<button type="button" data-act="video-yt" data-yt="${escapeHTML(v.id)}" aria-label="Reproducir video de YouTube" class="relative block w-full mt-2 rounded-xl overflow-hidden border border-galaxy-border aspect-video bg-black group">
       <img src="https://i.ytimg.com/vi/${escapeHTML(v.id)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-80 group-hover:opacity-100">
       <span class="absolute inset-0 flex items-center justify-center"><i class="fa-solid fa-circle-play text-5xl text-white drop-shadow"></i></span></button>`;

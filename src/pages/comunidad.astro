@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Comunidad" active="comunidad">
+  <div class="max-w-2xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header>
+      <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl">Comunidad</h1>
+      <p class="text-xs text-gray-400 mt-1">Lo último que publican los jugadores en sus muros. Filtra por juego si quieres ver solo lo de uno.</p>
+    </header>
+    <div id="com-filtro" class="flex flex-wrap items-center gap-1.5 text-[11px]" role="group" aria-label="Filtrar por juego"></div>
+    <div id="com-feed" class="space-y-3" aria-live="polite"><p class="text-gray-400 text-sm py-12 text-center">Cargando…</p></div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/comunidad.js';
+</script>

@@ -7,19 +7,23 @@ import { avatarPickerHTML, bindAvatarPicker, resolveAvatar } from '../features/a
 import { HOST_JUEGOS, HOST_MAX_TEXTO, limpiarOpcion, catalogoDe, alternarJuego, alternarOpcion, lineasHost } from '../core/hostCatalogo.js';
 import { toast } from '../core/toast.js';
 import { escapeHTML, safeUrl, safeImg } from '../core/dom.js';
-import { href } from '../core/config.js';
+import { href, siteHome } from '../core/config.js';
 import { avatarHTML } from '../core/avatar.js';
-import { analizarVideo, etiquetaOpcionReto, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
-import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES, PALETA_EMOJIS } from '../../data/muroEstilo.js';
+import { analizarVideo, segmentoParaGuardar, urlCompartir, destinoDeHash, etiquetaOpcionReto, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
+import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES, PALETA_EMOJIS, SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
-import { contenidoHTML, reproductorYT } from '../features/muro/render.js';
+import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
 import { solicitar } from '../features/amigos/api.js';
-import { normalizarHistorias, validarHistoria, validarTituloDestacada, validarClip, infoClip, hayNuevas, marcarVistas, indiceInicial, HISTORIA_MAX, DESTACADA_TITULO_MAX, CLIP_TITULO_MAX, MAX_DESTACADAS } from '../core/historias.js';
+import { normalizarHistorias, validarClip, infoClip, hayNuevas, marcarVistas, indiceInicial, CLIP_TITULO_MAX } from '../core/historias.js';
 import { abrirHistorias, abrirClips } from '../features/muro/visor.js';
+import { abrirNuevaHistoria, abrirDestacadas } from '../features/muro/historiasUI.js';
+import { prepararVideo } from '../features/muro/media.js';
+import { compartir } from '../features/muro/compartir.js';
+import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/videoSubida.js';
 
 const root = document.getElementById('muro-root');
 const S = { host: null, sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map(),
-  hist: null, paleta: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
+  hist: null, paleta: null, juego: '', juegos: [], clipJuegos: [], vfile: null, cfile: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
 
 /* «Ya vista» de las historias: solo en este navegador. */
 const KEY_VISTAS = 'pes-historias-vistas';
@@ -78,7 +82,7 @@ function cabecera(p) {
         <div class="min-w-0 flex-1 pt-10 sm:pt-12">
           <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl truncate">${escapeHTML(p.nombre_display || 'Jugador')}</h1>
           <p class="text-xs text-gray-400">@${escapeHTML(p.username)}</p></div>
-        <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:pt-12">${acciones}</div>
+        <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:pt-12">${acciones}<button type="button" data-act="compartir" data-tipo="" aria-label="Compartir perfil" title="Compartir perfil" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-share-nodes"></i></button></div>
       </div>
       ${lema ? `<p class="mt-3 text-sm italic" style="color:${acento}">«${escapeHTML(lema)}»</p>` : ''}
       ${p.bio ? `<p class="mt-2 text-sm text-gray-300 whitespace-pre-line">${escapeHTML(p.bio)}</p>` : ''}
@@ -110,16 +114,20 @@ function panelPrivacidad(p) {
     <p class="text-[11px] text-gray-500">Los jugadores que bloqueaste nunca ven tu muro, sea cual sea esta opción.</p>
     <div class="flex gap-2"><button type="button" data-act="guardar-priv" class="btn btn-primary !min-h-9 !text-xs">Guardar</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div></section>`;
 }
+const selectSegmento = (id) => `<select id="${id}" aria-label="Juego de la publicación (opcional)" class="rounded-lg bg-black/30 border border-galaxy-border px-2 py-1.5 text-[11px] text-gray-300 max-w-[9.5rem]"><option value="">General (sin juego)</option>${SEGMENTOS.map(([id, n]) => `<option value="${id}">${n}</option>`).join('')}</select>`;
 const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
   <textarea id="mu-texto" rows="3" maxlength="${MURO_MAX + 200}" placeholder="¿Qué quieres contar? Un resultado, una búsqueda de rivales, un enlace de tu clip…" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
-  <div id="mu-prev" hidden class="relative inline-block"><img id="mu-prev-img" alt="Vista previa de tu foto" class="max-h-40 rounded-lg border border-galaxy-border"><button type="button" data-act="quitar-foto" aria-label="Quitar foto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="mu-prev" hidden class="relative inline-block"><img id="mu-prev-img" alt="Vista previa de tu foto" class="max-h-40 rounded-lg border border-galaxy-border" hidden><video id="mu-prev-vid" muted playsinline controls class="max-h-48 rounded-lg border border-galaxy-border" hidden></video><button type="button" data-act="quitar-foto" aria-label="Quitar adjunto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
   <input id="mu-video" hidden maxlength="300" placeholder="Pega un enlace de YouTube, TikTok, Kick o Twitch" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
   <select id="mu-reto" hidden aria-label="Duelo a adjuntar" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"></select>
-  <input type="file" id="mu-file" accept="image/jpeg,image/png,image/webp" hidden>
-  <div class="flex items-center gap-2"><button type="button" data-act="elegir-foto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span>Foto</span></button>
-    <button type="button" data-act="alternar-video" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-circle-play"></i><span>Video</span></button>
-    <button type="button" data-act="alternar-reto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-gamepad"></i><span>Duelo</span></button>
-    <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" aria-label="Publicar" title="Publicar" class="btn btn-primary !min-h-9 !text-xs shrink-0 max-sm:!px-3"><i class="fa-solid fa-paper-plane"></i><span class="max-sm:hidden">Publicar</span></button></div></section>`;
+  <input type="file" id="mu-file" accept="image/jpeg,image/png,image/webp" hidden><input type="file" id="mu-vfile" accept="video/mp4,video/webm,video/quicktime" hidden>
+  <div class="flex items-center gap-1.5 sm:gap-2">
+    <button type="button" data-act="elegir-foto" aria-label="Foto" title="Foto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span class="max-sm:hidden">Foto</span></button>
+    <button type="button" data-act="elegir-video" aria-label="Subir video" title="Subir video (hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB)" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-film"></i><span class="max-sm:hidden">Video</span></button>
+    <button type="button" data-act="alternar-video" aria-label="Enlace de video" title="Enlace de YouTube, TikTok, Kick o Twitch" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-link"></i><span class="max-sm:hidden">Enlace</span></button>
+    <button type="button" data-act="alternar-reto" aria-label="Duelo" title="Adjuntar duelo" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-gamepad"></i><span class="max-sm:hidden">Duelo</span></button>
+    <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" aria-label="Publicar" title="Publicar" class="btn btn-primary !min-h-9 !text-xs shrink-0 max-sm:!px-3"><i class="fa-solid fa-paper-plane"></i><span class="max-sm:hidden">Publicar</span></button></div>
+  <div class="flex items-center gap-2 text-[11px] text-gray-500"><i class="fa-solid fa-tag"></i><span>Juego (opcional):</span>${selectSegmento('mu-juego')}</div></section>`;
 
 /** Reacciones: las que ya tiene la publicación, de MÁS a MENOS votada (la más popular va primero); con permiso son botones (la mía resaltada) y hay un «+» que abre
  *  la paleta de emojis. Sin ninguna reacción todavía, se ofrecen las 5 rápidas para no dejar la fila vacía. */
@@ -145,6 +153,7 @@ function seccionRespuestas(it, p) {
     : `<p class="text-[11px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
+const compartirBtn = (tipo, id) => `<button type="button" data-act="compartir" data-tipo="${tipo}" data-id="${id}" aria-label="Compartir" title="Compartir" class="w-8 h-8 rounded-lg text-gray-400 hover:text-galaxy-400 shrink-0"><i class="fa-solid fa-share-nodes"></i></button>`;
 function tarjeta(it, p) {
   const mia = p.soy_yo; const puedeBorrar = mia || isAdmin();
   const menu = (mia || puedeBorrar) ? `<div class="flex gap-1 shrink-0">
@@ -156,11 +165,11 @@ function tarjeta(it, p) {
        <div class="flex gap-2 mt-2"><button type="button" data-act="guardar-edicion" data-id="${it.id}" class="btn btn-primary !min-h-8 !text-xs">Guardar</button><button type="button" data-act="cancelar-edicion" class="btn btn-ghost !min-h-8 !text-xs">Cancelar</button></div>`
     : contenidoHTML(it);
   const pie = `<footer class="mt-3 pt-2 border-t border-galaxy-border/60">${barraReacciones(it, p)}${S.abiertas.has(it.id) ? seccionRespuestas(it, p) : ''}</footer>`;
-  return `<article class="glass-panel rounded-2xl p-3 sm:p-4 ${it.fijada ? 'border border-galaxy-400/40' : ''}">
+  return `<article id="p-${it.id}" class="glass-panel rounded-2xl p-3 sm:p-4 scroll-mt-24 ${it.fijada ? 'border border-galaxy-400/40' : ''}">
     <header class="flex items-center gap-2.5 mb-2">
       <span class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(p.avatar_url, p.nombre_display, 36)}</span>
       <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${escapeHTML(p.nombre_display)}</p>
-        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''}</p></div>${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
+        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${compartirBtn('p', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
 }
 function feed(p) {
   if (!S.visible) return `<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm"><i class="fa-solid fa-lock text-2xl text-gray-500 mb-2 block"></i>Este jugador comparte su muro solo con sus amigos.</div>`;
@@ -186,58 +195,42 @@ function barraHistorias(p) {
   const ayuda = p.soy_yo && !archivo.length && !historias.length && !destacadas.length ? '<p class="text-[11px] text-gray-500 mt-1">Las historias duran 24 h. Luego las encuentras en tu archivo para guardarlas como destacadas.</p>' : '';
   return `<section class="glass-panel rounded-2xl p-3" aria-label="Historias y destacadas" style="--acento:${acento}"><div class="flex gap-3 overflow-x-auto pb-1">${mias}${dest}</div>${ayuda}</section>`;
 }
-function panelHistoria() {
-  return `<section id="panel-historia" hidden class="glass-panel rounded-2xl p-4 space-y-3">
-    <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-circle-plus text-galaxy-400 mr-2"></i>Nueva historia <span class="normal-case text-[11px] text-gray-500 font-normal">· dura 24 horas</span></h2>
-    <div id="hi-prev" hidden class="relative inline-block"><img id="hi-prev-img" alt="Vista previa de tu historia" class="max-h-48 rounded-lg border border-galaxy-border"><button type="button" data-act="quitar-foto-historia" aria-label="Quitar foto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
-    <input type="file" id="hi-file" accept="image/jpeg,image/png,image/webp" hidden>
-    <textarea id="hi-texto" rows="2" maxlength="${HISTORIA_MAX + 40}" placeholder="Texto de la historia (opcional con foto o video)" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
-    <input id="hi-video" maxlength="300" placeholder="Enlace de video (YouTube, TikTok, Kick o Twitch) — opcional" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
-    <div class="flex flex-wrap gap-2"><button type="button" data-act="elegir-foto-historia" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span>Foto</span></button>
-      <button type="button" data-act="publicar-historia" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar historia</span></button>
-      <button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div></section>`;
-}
-/** Panel «Nueva destacada»: eliges título y las historias (vigentes + archivo); también gestiona las destacadas que ya tienes. */
-function panelDestacada() {
-  if (!S.hist) return '';
-  const cand = [...normalizarHistorias(S.hist.historias).filter((h) => !h.destacada), ...normalizarHistorias(S.hist.archivo)];
-  const celda = (h) => `<label class="relative block w-20 h-28 rounded-lg overflow-hidden border border-galaxy-border cursor-pointer bg-black/40"><input type="checkbox" data-dest-hist value="${h.id}" class="absolute top-1 left-1 z-10 w-4 h-4 accent-amber-400">
-    ${safeImg(h.imagen) ? `<img src="${escapeHTML(safeImg(h.imagen))}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="absolute inset-0 grid place-items-center p-1 text-[10px] text-gray-300 text-center bg-galaxy-900">${h.video ? '<i class="fa-solid fa-circle-play text-lg"></i>' : escapeHTML(h.texto.slice(0, 40))}</span>`}</label>`;
-  const existentes = S.hist.destacadas.map((d) => `<li class="flex items-center gap-2 text-xs text-gray-200 rounded-lg bg-black/25 px-2.5 py-1.5"><i class="fa-solid fa-star text-amber-300"></i><span class="flex-1 truncate">${escapeHTML(d.titulo)} <span class="text-gray-500">· ${(d.historias ?? []).length}</span></span>
-    <button type="button" data-act="renombrar-destacada" data-id="${Number(d.id)}" title="Cambiar título" class="text-gray-400 hover:text-galaxy-400"><i class="fa-solid fa-pen"></i></button>
-    <button type="button" data-act="borrar-destacada" data-id="${Number(d.id)}" title="Borrar destacada (sus historias vuelven al archivo)" class="text-gray-400 hover:text-bad"><i class="fa-solid fa-trash"></i></button></li>`).join('');
-  return `<section id="panel-destacada" hidden class="glass-panel rounded-2xl p-4 space-y-3">
-    <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-star text-amber-300 mr-2"></i>Destacadas</h2>
-    ${existentes ? `<ul class="space-y-1.5">${existentes}</ul>` : ''}
-    ${S.hist.destacadas.length >= MAX_DESTACADAS ? `<p class="text-[11px] text-gray-500">Llegaste al máximo de ${MAX_DESTACADAS} destacadas: borra alguna para crear otra.</p>`
-      : cand.length ? `<p class="text-[11px] text-gray-400">Elige las historias (activas o de tu archivo) que quieres guardar para siempre:</p><div class="flex flex-wrap gap-2">${cand.map(celda).join('')}</div>
-        <label class="block"><span class="text-[11px] text-gray-400">Título (máx. ${DESTACADA_TITULO_MAX})</span><input id="de-titulo" maxlength="${DESTACADA_TITULO_MAX + 10}" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white" placeholder="Ej.: Mejores goles"></label>
-        <button type="button" data-act="crear-destacada" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-star"></i><span>Crear destacada</span></button>`
-      : '<p class="text-[11px] text-gray-500">Aún no tienes historias para destacar. Publica una y vuelve aquí.</p>'}
-    <button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></section>`;
-}
 const pestanas = () => `<div class="flex gap-2" role="tablist" aria-label="Secciones del perfil">${[['pub', 'fa-newspaper', 'Publicaciones'], ['clips', 'fa-clapperboard', `Clips${S.clips.length ? ` · ${S.clips.length}${S.hayMasClips ? '+' : ''}` : ''}`]].map(([id, ic, t]) =>
   `<button type="button" role="tab" data-act="tab" data-tab="${id}" aria-pressed="${S.tab === id}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${t}</button>`).join('')}</div>`;
+/** Segmentos (juegos) que este perfil usa en publicaciones o clips. */
+const juegosUsados = () => SEGMENTOS.filter(([id]) => S.juegos.includes(id) || S.clipJuegos.includes(id));
+/** Filtro sutil por juego: solo aparece si el perfil usó al menos un segmento. */
+function filtroHTML() {
+  const usados = juegosUsados(); if (!usados.length) return '';
+  return `<div id="filtro-juego" class="flex flex-wrap items-center gap-1.5 text-[11px]" role="group" aria-label="Filtrar por juego"><i class="fa-solid fa-tag text-gray-600"></i>${[['', 'Todo'], ...usados].map(([id, n]) =>
+    `<button type="button" data-act="filtro-juego" data-j="${id}" aria-pressed="${S.juego === id}" class="rounded-full border border-galaxy-border/70 px-2.5 py-1 text-gray-400 aria-pressed:text-white aria-pressed:border-galaxy-400 aria-pressed:bg-galaxy-600/20">${escapeHTML(n)}</button>`).join('')}</div>`;
+}
+const pintarFiltro = () => { const f = document.getElementById('filtro-juego'); if (f) f.outerHTML = filtroHTML() || '<span id="filtro-juego" hidden></span>'; };
+const clipsVisibles = () => S.clips.map(infoClip).filter(Boolean).filter((c) => !S.juego || c.juego === S.juego);
 function seccionClips(p) {
-  const ccc = S.clips.map(infoClip).filter(Boolean);
+  const ccc = clipsVisibles();
   const form = p.soy_yo ? `<section class="glass-panel rounded-2xl p-3 space-y-2">
-      <input id="cl-video" maxlength="300" placeholder="Enlace de tu clip (YouTube, Shorts, TikTok, Kick o Twitch)" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
-      <div class="flex gap-2"><input id="cl-titulo" maxlength="${CLIP_TITULO_MAX + 10}" placeholder="Título (opcional)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
-        <button type="button" data-act="publicar-clip" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-plus"></i><span>Añadir clip</span></button></div></section>` : '';
+      <div class="flex gap-2"><input id="cl-video" maxlength="300" placeholder="Enlace de tu clip (YouTube, Shorts, TikTok, Kick o Twitch)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
+        <input type="file" id="cl-vfile" accept="video/mp4,video/webm,video/quicktime" hidden><button type="button" data-act="elegir-video-clip" aria-label="Subir video" title="Subir video (hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB)" class="btn btn-ghost !min-h-9 !px-3 !text-xs shrink-0"><i class="fa-solid fa-film"></i><span class="max-sm:hidden">Subir</span></button></div>
+      <p id="cl-vinfo" class="text-[11px] text-gray-400" ${S.cfile ? '' : 'hidden'}>${S.cfile ? `<i class="fa-solid fa-film mr-1"></i>${escapeHTML(S.cfile.file.name)} <button type="button" data-act="quitar-video-clip" class="text-gray-500 hover:text-bad ml-1" aria-label="Quitar video"><i class="fa-solid fa-xmark"></i></button>` : ''}</p>
+      <div class="flex gap-2"><input id="cl-titulo" maxlength="${CLIP_TITULO_MAX + 10}" placeholder="Título (opcional)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">${selectSegmento('cl-juego')}
+        <button type="button" data-act="publicar-clip" aria-label="Añadir clip" class="btn btn-primary !min-h-9 !text-xs shrink-0"><i class="fa-solid fa-plus"></i><span class="max-sm:hidden">Añadir</span></button></div></section>` : '';
   if (!S.visible) return `${form}<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm"><i class="fa-solid fa-lock text-2xl text-gray-500 mb-2 block"></i>Este jugador comparte su contenido solo con sus amigos.</div>`;
+  const miniatura = (c) => c.ytId ? `<img src="https://i.ytimg.com/vi/${escapeHTML(c.ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100">`
+    : c.propio ? `<video src="${escapeHTML(c.url)}#t=0.1" preload="metadata" muted playsinline class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-80"></video>` : '<div class="absolute inset-0 bg-gradient-to-br from-galaxy-600/50 to-black"></div>';
   const grilla = ccc.length ? `<div class="grid grid-cols-3 gap-1.5 sm:gap-2">${ccc.map((c, i) => `<button type="button" data-act="ver-clip" data-i="${i}" aria-label="Ver clip: ${escapeHTML(c.titulo || 'Clip')}" class="relative aspect-[9/16] rounded-lg overflow-hidden border border-galaxy-border bg-galaxy-900 group text-left">
-      ${c.ytId ? `<img src="https://i.ytimg.com/vi/${escapeHTML(c.ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100">` : '<div class="absolute inset-0 bg-gradient-to-br from-galaxy-600/50 to-black"></div>'}
+      ${miniatura(c)}
       <i class="${escapeHTML(c.icono)} absolute top-1.5 right-1.5 text-white/90 text-sm drop-shadow"></i><i class="fa-solid fa-play absolute inset-0 m-auto w-fit h-fit text-white/90 text-2xl drop-shadow opacity-80"></i>
       <span class="absolute inset-x-0 bottom-0 p-1.5 pt-6 bg-gradient-to-t from-black/85 to-transparent text-[10px] text-white leading-tight line-clamp-2">${escapeHTML(c.titulo)}</span></button>`).join('')}</div>${S.hayMasClips ? '<button type="button" data-act="mas-clips" class="btn btn-ghost w-full !text-xs mt-2">Cargar más</button>' : ''}`
-    : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${p.soy_yo ? 'Todavía no tienes clips. Pega el enlace de tu mejor jugada.' : 'Aún no ha subido clips.'}</div>`;
+    : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${S.juego ? 'No hay clips de ese juego.' : p.soy_yo ? 'Todavía no tienes clips. Sube un video o pega el enlace de tu mejor jugada.' : 'Aún no ha subido clips.'}</div>`;
   return `<div class="space-y-3">${form}${grilla}</div>`;
 }
 
 function pintar() {
   const p = S.p;
   const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) + (conExtras ? panelHistoria() + panelDestacada() : '') : ''}${barraHistorias(p)}
-    <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}
+  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
+    <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
 }
@@ -252,10 +245,10 @@ async function cargar() {
     if (!p) { root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm">No encontré a ese jugador.</div>'; return; }
     S.p = p; S.items = []; S.editando = null; S.abiertas.clear(); S.resp.clear();
     const m = p.puede_ver_muro ? await api.cargarMuro(p.id) : { visible: false, items: [], hay_mas: false };
-    S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas;
+    S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
     await cargarExtras(p);
     document.title = `${p.nombre_display} · Muro`;
-    pintar();
+    pintar(); irADestino();
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
 }
 /** Historias y clips: si fallan (p. ej. la migración 025 aún no se ejecutó) NO rompen el perfil: simplemente no se muestran. */
@@ -265,17 +258,31 @@ async function cargarExtras(p) {
   const [h, c] = await Promise.allSettled([api.historiasDe(p.id), api.clipsDe(p.id)]);
   if (h.status === 'fulfilled' && h.value) S.hist = { historias: h.value.historias ?? [], destacadas: h.value.destacadas ?? [], archivo: h.value.archivo ?? [] };   // datos crudos: se normalizan al usarlos
   else if (h.status === 'rejected') console.warn('[perfil] historias no disponibles:', h.reason?.message);
-  if (c.status === 'fulfilled' && c.value) { S.clips = c.value.items ?? []; S.hayMasClips = !!c.value.hay_mas; }
+  if (c.status === 'fulfilled' && c.value) { S.clips = c.value.items ?? []; S.hayMasClips = !!c.value.hay_mas; S.clipJuegos = c.value.juegos ?? []; }
   else if (c.status === 'rejected') console.warn('[perfil] clips no disponibles:', c.reason?.message);
   if (!S.hist && c.status === 'fulfilled') S.hist = { historias: [], destacadas: [], archivo: [] };
 }
+/** Enlace compartido (#p-<id> publicación, #c-<id> clip): al abrir el perfil se lleva a ese contenido. Solo una vez por visita. */
+let destinoUsado = false;
+function irADestino() {
+  const d = destinoDeHash(location.hash); if (destinoUsado || !d) return; destinoUsado = true;
+  if (d.tipo === 'p') {
+    const el = document.getElementById(`p-${d.id}`);
+    if (!el) { toast('Esa publicación no está entre las más recientes de este muro.', 'info'); return; }
+    el.scrollIntoView({ block: 'center' }); el.classList.add('ring-2', 'ring-galaxy-400'); setTimeout(() => el.classList.remove('ring-2', 'ring-galaxy-400'), 2500);
+  } else {
+    const i = clipsVisibles().findIndex((c) => c.id === d.id); if (i < 0) { toast('No encontré ese clip.', 'info'); return; }
+    ACCIONES.tab({ dataset: { tab: 'clips' } }); ACCIONES['ver-clip']({ dataset: { i: String(i) } });
+  }
+}
 async function recargarExtras() { await cargarExtras(S.p); pintar(); }
-async function refrescarMuro() { const m = await api.cargarMuro(S.p.id); S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.visible = m.visible; pintarFeed(); }
+async function refrescarMuro() { const m = await api.cargarMuro(S.p.id, null, 20, S.juego); S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.visible = m.visible; if (!S.juego) S.juegos = m.juegos ?? S.juegos; pintarFeed(); pintarFiltro(); }
 
 /* ---------- Ayudantes de fotos ---------- */
 function limpiarFoto() {
-  const f = document.getElementById('mu-file'); if (f) f.value = '';
-  const img = document.getElementById('mu-prev-img'); if (img?.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  for (const id of ['mu-file', 'mu-vfile']) { const f = document.getElementById(id); if (f) f.value = ''; }
+  S.vfile = null;
+  for (const id of ['mu-prev-img', 'mu-prev-vid']) { const el = document.getElementById(id); if (!el) continue; if (el.src?.startsWith('blob:')) URL.revokeObjectURL(el.src); el.removeAttribute('src'); el.hidden = true; }
   const box = document.getElementById('mu-prev'); if (box) box.hidden = true;
 }
 /** Marca (o quita) la foto de banner pendiente del editor de estilo: se apagan los presets y se actualiza el texto de estado. */
@@ -333,17 +340,12 @@ function abrirFoto() {
 }
 
 /* ---------- Visores y paneles ---------- */
-const PANELES = ['estilo', 'privacidad', 'historia', 'destacada', 'host'];
+const PANELES = ['estilo', 'privacidad', 'host'];
 function abrirPanel(nombre) {
   if (nombre === 'host' && document.getElementById('panel-host')?.hidden) {   // al abrirlo se precarga con lo que ya tengo (o con mis datos antiguos de un solo juego)
     S.host = { cat: catalogoDe(S.p), soft: ['Ambos', 'Smash Soda', 'Parsec'].includes(S.p.software_host) ? S.p.software_host : 'Ambos', visible: S.p.host_visible !== false }; pintarPanelHost();
   }
   PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = n !== nombre ? true : !x.hidden; }); }
-function limpiarFotoHistoria() {
-  const f = document.getElementById('hi-file'); if (f) f.value = '';
-  const img = document.getElementById('hi-prev-img'); if (img?.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-  const box = document.getElementById('hi-prev'); if (box) box.hidden = true;
-}
 /** Abre el visor. `vigentes` = las historias de las últimas 24 h (empieza por la primera no vista y las marca como vistas al cerrar). El dueño puede borrarlas. */
 function verHistorias(lista, titulo, { vigentes: sonVigentes = false } = {}) {
   if (!lista.length) { toast('No hay historias para mostrar.', 'info'); return; }
@@ -359,48 +361,28 @@ function verHistorias(lista, titulo, { vigentes: sonVigentes = false } = {}) {
 /* ---------- Eventos ---------- */
 const ACCIONES = {
   panel: (el) => abrirPanel(el.dataset.panel),
-  'panel-historia': () => abrirPanel('historia'),
-  'panel-destacada': () => abrirPanel('destacada'),
+  'panel-historia': () => abrirNuevaHistoria({ uid: S.p.id, onListo: recargarExtras }),
+  'panel-destacada': () => abrirDestacadas({ hist: S.hist, onListo: recargarExtras }),
   'cerrar-panel': () => PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = true; }),
   tab: (el) => { S.tab = el.dataset.tab === 'clips' ? 'clips' : 'pub'; document.getElementById('tab-pub').hidden = S.tab !== 'pub'; document.getElementById('tab-clips').hidden = S.tab !== 'clips';
     document.querySelectorAll('[data-act=tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab))); },
   'ver-historias': () => verHistorias(normalizarHistorias(S.hist?.historias), '', { vigentes: true }),
   'ver-destacada': (el) => { const d = S.hist?.destacadas.find((x) => x.id === Number(el.dataset.id)); if (d) verHistorias(normalizarHistorias(d.historias), d.titulo); },
-  'elegir-foto-historia': () => document.getElementById('hi-file').click(),
-  'quitar-foto-historia': () => limpiarFotoHistoria(),
-  'publicar-historia': async () => {
-    const file = document.getElementById('hi-file').files?.[0] ?? null;
-    const v = validarHistoria({ texto: document.getElementById('hi-texto').value, hayFoto: !!file, video: document.getElementById('hi-video').value });
-    if (!v.ok) { toast(v.error, 'error'); return; }
-    const btn = document.querySelector('[data-act=publicar-historia]'); btn.disabled = true; let url = null;
+  'elegir-video-clip': () => document.getElementById('cl-vfile').click(),
+  'quitar-video-clip': () => { S.cfile = null; const i = document.getElementById('cl-vinfo'); if (i) { i.hidden = true; i.innerHTML = ''; } document.getElementById('cl-vfile').value = ''; },
+  'publicar-clip': async () => {
+    const btn = document.querySelector('[data-act=publicar-clip]'); const juego = segmentoParaGuardar(document.getElementById('cl-juego').value);
+    let url = null;
     try {
-      if (file) url = await api.subirImagen(file, S.p.id, 1080);
-      await api.publicarHistoria(v.texto, url, v.video || null);
-      toast('Historia publicada: se ve durante 24 horas.', 'ok'); await recargarExtras();
-    } catch (e) { toast(msgErr(e), 'error'); if (url) api.quitarImagen(url); }
+      btn.disabled = true;
+      if (S.cfile) url = await api.subirVideo(S.cfile.file, S.p.id, S.cfile.ext, S.cfile.mime);
+      const v = validarClip({ titulo: document.getElementById('cl-titulo').value, video: url ?? document.getElementById('cl-video').value }); if (!v.ok) { toast(v.error, 'error'); if (url) api.quitarArchivo(url); return; }
+      await api.publicarClip(v.titulo, v.video, juego); toast('Clip añadido.', 'ok'); S.cfile = null; await recargarExtras();
+    } catch (e) { toast(msgErr(e), 'error'); if (url) api.quitarArchivo(url); }
     finally { btn.disabled = false; }
   },
-  'crear-destacada': async () => {
-    const t = validarTituloDestacada(document.getElementById('de-titulo').value); if (!t.ok) { toast(t.error, 'error'); return; }
-    const ids = [...document.querySelectorAll('[data-dest-hist]:checked')].map((x) => Number(x.value));
-    if (!ids.length) { toast('Elige al menos una historia.', 'error'); return; }
-    if (await seguro(() => api.crearDestacada(t.titulo, ids), 'Destacada creada.') !== undefined) await recargarExtras();
-  },
-  'renombrar-destacada': async (el) => {
-    const d = S.hist?.destacadas.find((x) => x.id === Number(el.dataset.id)); if (!d) return;
-    const nuevo = window.prompt('Nuevo título de la destacada:', d.titulo); if (nuevo === null) return;
-    const t = validarTituloDestacada(nuevo); if (!t.ok) { toast(t.error, 'error'); return; }
-    if (await seguro(() => api.renombrarDestacada(d.id, t.titulo), 'Título cambiado.') !== undefined) await recargarExtras();
-  },
-  'borrar-destacada': async (el) => {
-    if (!window.confirm('¿Borrar esta destacada? Sus historias no se pierden: vuelven a tu archivo.')) return;
-    if (await seguro(() => api.borrarDestacada(Number(el.dataset.id)), 'Destacada borrada.') !== undefined) await recargarExtras();
-  },
-  'publicar-clip': async () => {
-    const v = validarClip({ titulo: document.getElementById('cl-titulo').value, video: document.getElementById('cl-video').value }); if (!v.ok) { toast(v.error, 'error'); return; }
-    if (await seguro(() => api.publicarClip(v.titulo, v.video), 'Clip añadido.') !== undefined) await recargarExtras();
-  },
-  'ver-clip': (el) => abrirClips({ clips: S.clips.map(infoClip).filter(Boolean), inicio: Number(el.dataset.i) || 0,
+  'ver-clip': (el) => abrirClips({ clips: clipsVisibles(), inicio: Number(el.dataset.i) || 0,
+    onCompartir: (c) => compartir({ url: urlCompartir({ base: siteHome(), usuario: S.p.username, tipo: 'c', id: c.id }), titulo: `${S.p.nombre_display} · clip`, texto: c.titulo }),
     onBorrar: S.p.soy_yo || isAdmin() ? async (id) => { try { await api.borrarClip(id); } catch (e) { toast(msgErr(e), 'error'); return false; } S.clips = S.clips.filter((c) => Number(c.id) !== id); pintar(); return true; } : undefined }),
   'mas-clips': async (el) => {
     el.disabled = true;
@@ -409,6 +391,17 @@ const ACCIONES = {
   },
   amistad: () => seguro(() => solicitar(S.p.id), 'Solicitud enviada.'),
   'elegir-foto': () => document.getElementById('mu-file').click(),
+  'filtro-juego': async (el) => {
+    S.juego = el.dataset.j || ''; pintarFiltro();
+    const c = document.getElementById('tab-clips'); if (c) c.innerHTML = seccionClips(S.p);
+    await seguro(() => refrescarMuro());
+  },
+  compartir: (el) => {
+    const tipo = el.dataset.tipo || ''; const id = el.dataset.id ? Number(el.dataset.id) : null;
+    return compartir({ url: urlCompartir({ base: siteHome(), usuario: S.p.username, tipo, id }), titulo: tipo ? `${S.p.nombre_display} en Phoenix Evolution Series` : `Perfil de ${S.p.nombre_display}`,
+      texto: tipo === 'p' ? (S.items.find((x) => x.id === id)?.texto ?? '').slice(0, 120) : '' });
+  },
+  'elegir-video': () => document.getElementById('mu-vfile').click(),
   'alternar-video': () => { const i = document.getElementById('mu-video'); i.hidden = !i.hidden; if (!i.hidden) i.focus(); else i.value = ''; },
   'quitar-foto': () => limpiarFoto(),
   'alternar-reto': async () => {
@@ -429,22 +422,23 @@ const ACCIONES = {
     const crudo = document.getElementById('mu-texto').value; const file = document.getElementById('mu-file').files?.[0] ?? null;
     const vTxt = document.getElementById('mu-video').value.trim(); const vid = vTxt ? analizarVideo(vTxt) : null;
     if (vid && !vid.ok) { toast(vid.error, 'error'); return; }
-    const reto = Number(document.getElementById('mu-reto').value) || null;
-    const hayMedios = !!file || !!vid || !!reto;
+    const reto = Number(document.getElementById('mu-reto').value) || null; const juego = segmentoParaGuardar(document.getElementById('mu-juego').value);
+    const hayMedios = !!file || !!vid || !!reto || !!S.vfile;
     const v = crudo.trim() ? validarTexto(crudo) : { ok: hayMedios, texto: '', error: 'Escribe algo, sube una foto, pega un enlace de video o adjunta un duelo.' };
     if (!v.ok) { toast(v.error, 'error'); return; }
     const btn = document.querySelector('[data-act=publicar]'); btn.disabled = true;
-    let urlFoto = null;
+    let urlFoto = null; let urlVideo = null;
     try {
       if (file) urlFoto = await api.subirImagen(file, S.p.id);
-      await api.publicar(v.texto, urlFoto, vid?.url ?? null, reto);
+      if (S.vfile) urlVideo = await api.subirVideo(S.vfile.file, S.p.id, S.vfile.ext, S.vfile.mime);
+      await api.publicar(v.texto, urlFoto, urlVideo ?? vid?.url ?? null, reto, juego);
       toast('Publicado.', 'ok');
       document.getElementById('mu-texto').value = ''; document.getElementById('mu-cuenta').textContent = `0 / ${MURO_MAX}`; limpiarFoto();
-      const iv = document.getElementById('mu-video'); iv.value = ''; iv.hidden = true; const sr = document.getElementById('mu-reto'); sr.value = ''; sr.hidden = true;
+      const iv = document.getElementById('mu-video'); iv.value = ''; iv.hidden = true; document.getElementById('mu-juego').value = ''; const sr = document.getElementById('mu-reto'); sr.value = ''; sr.hidden = true;
       await refrescarMuro();
     } catch (e) {
       toast(msgErr(e), 'error');
-      if (urlFoto) api.quitarImagen(urlFoto);   // la publicación falló: no dejar la foto huérfana en el Storage
+      if (urlFoto) api.quitarArchivo(urlFoto); if (urlVideo) api.quitarArchivo(urlVideo);   // la publicación falló: no dejar archivos huérfanos en el Storage
     } finally { btn.disabled = false; }
   },
   fijar: async (el) => { const id = Number(el.dataset.id); const it = S.items.find((x) => x.id === id); if (await seguro(() => api.fijar(id, !it?.fijada)) !== undefined) await refrescarMuro(); },
@@ -501,7 +495,7 @@ const ACCIONES = {
   },
   mas: async (el) => {
     el.disabled = true;
-    try { const m = await api.cargarMuro(S.p.id, S.items[S.items.length - 1]?.id); S.items = [...S.items, ...(m.items ?? [])]; S.hayMas = !!m.hay_mas; pintarFeed(); }
+    try { const m = await api.cargarMuro(S.p.id, S.items[S.items.length - 1]?.id, 20, S.juego); S.items = [...S.items, ...(m.items ?? [])]; S.hayMas = !!m.hay_mas; pintarFeed(); }
     catch (e) { toast(msgErr(e), 'error'); el.disabled = false; }
   },
   'guardar-estilo': async () => {
@@ -530,13 +524,19 @@ root.addEventListener('change', async (e) => {
   if (t.id === 'mu-file') {   // foto del compositor: solo vista previa; se sube al pulsar «Publicar»
     const f = t.files?.[0]; if (!f) return;
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); t.value = ''; return; }
-    const img = document.getElementById('mu-prev-img'); if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-    img.src = URL.createObjectURL(f); document.getElementById('mu-prev').hidden = false;
-  } else if (t.id === 'hi-file') {   // foto de la historia: vista previa; se sube al pulsar «Publicar historia»
+    S.vfile = null; const vv = document.getElementById('mu-prev-vid'); if (vv.src?.startsWith('blob:')) URL.revokeObjectURL(vv.src); vv.removeAttribute('src'); vv.hidden = true; document.getElementById('mu-vfile').value = '';   // foto y video son excluyentes
+    const img = document.getElementById('mu-prev-img'); if (img.src?.startsWith('blob:')) URL.revokeObjectURL(img.src); img.src = URL.createObjectURL(f); img.hidden = false; document.getElementById('mu-prev').hidden = false;
+  } else if (t.id === 'mu-vfile') {   // video del compositor: se valida (tipo, peso y duración) al elegirlo; se sube al pulsar «Publicar»
     const f = t.files?.[0]; if (!f) return;
-    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); t.value = ''; return; }
-    const img = document.getElementById('hi-prev-img'); if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-    img.src = URL.createObjectURL(f); document.getElementById('hi-prev').hidden = false;
+    const r = await prepararVideo(f); if (!r.ok) { toast(r.error, 'error'); t.value = ''; return; }
+    limpiarFoto(); const dt = new DataTransfer(); dt.items.add(f); t.files = dt.files;   // limpiarFoto() también vacía este campo: se vuelve a poner el archivo
+    S.vfile = { file: f, ext: r.ext, mime: r.tipo }; const v = document.getElementById('mu-prev-vid'); v.src = URL.createObjectURL(f); v.hidden = false; document.getElementById('mu-prev').hidden = false;
+    const link = document.getElementById('mu-video'); link.value = ''; link.hidden = true;   // un video subido reemplaza al enlace
+  } else if (t.id === 'cl-vfile') {   // video del clip
+    const f = t.files?.[0]; if (!f) return;
+    const r = await prepararVideo(f); if (!r.ok) { toast(r.error, 'error'); t.value = ''; return; }
+    S.cfile = { file: f, ext: r.ext, mime: r.tipo }; document.getElementById('cl-video').value = '';
+    const i = document.getElementById('cl-vinfo'); i.hidden = false; i.innerHTML = `<i class="fa-solid fa-film mr-1"></i>${escapeHTML(f.name)} <button type="button" data-act="quitar-video-clip" class="text-gray-500 hover:text-bad ml-1" aria-label="Quitar video"><i class="fa-solid fa-xmark"></i></button>`;
   } else if (t.id === 'bn-file') {   // banner desde el propio muro: se sube y se guarda al instante (conserva preset, color y lema)
     const f = t.files?.[0]; t.value = ''; if (!f) return;
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); return; }

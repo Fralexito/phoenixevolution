@@ -1004,3 +1004,33 @@ test('hosting: alternar juegos y opciones (no muta, respeta máximos)', () => {
   let lleno = []; for (const j of ['PES 2021', 'SP Football Life', 'eFootball', 'FIFA', 'EA FC']) lleno = alternarJuego(lleno, j); assert.equal(lleno.length, HOST_MAX_JUEGOS);
   assert.deepEqual(lineasHost(c), [{ juego: 'PES 2021', detalle: 'Dream Patch, VirtuaRED' }]);
 });
+
+// ---- Videos propios, segmentos por juego y enlaces para compartir ----
+import { validarArchivoVideo, VIDEO_MAX_SEG } from '../src/js/core/videoSubida.js';
+import { analizarVideo as analizarVid, archivoDeUrl, rutaVideo, segmentoValido, segmentoParaGuardar, etiquetaSegmento, urlCompartir, destinoDeHash } from '../src/js/core/muro.js';
+test('video propio: validarArchivoVideo (tipo, peso, duración)', () => {
+  assert.equal(validarArchivoVideo({ type: 'video/avi', size: 10, duracion: 5 }).ok, false);
+  assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 0, duracion: 5 }).ok, false);
+  assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 26 * 1024 * 1024, duracion: 5 }).ok, false);
+  assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 1e6, duracion: NaN }).ok, false);
+  assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 1e6, duracion: VIDEO_MAX_SEG + 5 }).ok, false);
+  const v = validarArchivoVideo({ type: 'video/quicktime', size: 5e6, duracion: 30.2 }); assert.ok(v.ok); assert.equal(v.ext, 'mov');
+});
+test('video propio: analizarVideo reconoce solo nuestro Storage y rutas', () => {
+  const u = 'https://abcdefghijklmnop.supabase.co/storage/v1/object/public/muro-video/11111111-1111-1111-1111-111111111111/1-x.mp4';
+  assert.equal(analizarVid(u).proveedor, 'propio');
+  assert.equal(analizarVid('https://evil.com/storage/v1/object/public/muro-video/../a.mp4').ok, false);
+  assert.deepEqual(archivoDeUrl(u), { bucket: 'muro-video', ruta: '11111111-1111-1111-1111-111111111111/1-x.mp4' });
+  assert.equal(archivoDeUrl('https://abcdefghijklmnop.supabase.co/storage/v1/object/public/muro/u/1.jpg').bucket, 'muro');
+  assert.equal(archivoDeUrl('https://otro.com/a.jpg'), null);
+  assert.match(rutaVideo('uid', 'mov', 5, 'ab'), /^uid\/5-ab\.mov$/); assert.match(rutaVideo('uid', 'exe', 5, 'ab'), /\.mp4$/);
+});
+test('segmentos por juego y enlaces para compartir', () => {
+  assert.equal(segmentoValido('pes'), true); assert.equal(segmentoValido('minecraft'), false);
+  assert.equal(segmentoParaGuardar(''), null); assert.equal(segmentoParaGuardar('fifa'), 'fifa'); assert.equal(segmentoParaGuardar('<x>'), null);
+  assert.equal(etiquetaSegmento('sp'), 'SP Football Life'); assert.equal(etiquetaSegmento('zz'), '');
+  assert.equal(urlCompartir({ base: 'https://x.pe/', usuario: 'Fra<>lex', tipo: 'p', id: 12 }), 'https://x.pe/perfil/?u=fralex#p-12');
+  assert.equal(urlCompartir({ base: '/b/', usuario: 'jack' }), '/b/perfil/?u=jack');
+  assert.equal(urlCompartir({ base: '/b/', usuario: 'jack', tipo: 'c', id: -3 }), '/b/perfil/?u=jack');
+  assert.deepEqual(destinoDeHash('#p-12'), { tipo: 'p', id: 12 }); assert.equal(destinoDeHash('#x-1'), null); assert.equal(destinoDeHash('#p-12abc'), null); assert.equal(destinoDeHash(''), null);
+});

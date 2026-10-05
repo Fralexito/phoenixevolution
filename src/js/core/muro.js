@@ -1,6 +1,6 @@
 // Lógica PURA del muro de jugadores (sin DOM ni red → se prueba en tests/pure.test.mjs).
 import { escapeHTML, safeUrl } from './dom.js';
-import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX, RESP_MAX, PALETA_EMOJIS, REACCION_ANTIGUA } from '../../data/muroEstilo.js';
+import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX, RESP_MAX, PALETA_EMOJIS, REACCION_ANTIGUA, SEGMENTOS } from '../../data/muroEstilo.js';
 
 /** Valida el texto de una publicación. → { ok, texto, error }. La BD vuelve a validar: esto solo da el aviso rápido. */
 export function validarTexto(t) {
@@ -92,8 +92,9 @@ const PROVEEDORES = [
   ['tiktok', /^https:\/\/(?:www\.|m\.|vm\.)?tiktok\.com\/\S+/i],
   ['kick', /^https:\/\/(?:www\.)?kick\.com\/\S+/i],
   ['twitch', /^https:\/\/(?:www\.|clips\.)?twitch\.tv\/\S+/i],
+  ['propio', /^https:\/\/[a-z0-9]{8,40}\.supabase\.co\/storage\/v1\/object\/public\/muro-video\/[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,80}$/i],   // video subido por el usuario (bucket muro-video, migración 027)
 ];
-export const PROVEEDOR_ETIQUETA = { youtube: 'YouTube', tiktok: 'TikTok', kick: 'Kick', twitch: 'Twitch' };
+export const PROVEEDOR_ETIQUETA = { youtube: 'YouTube', tiktok: 'TikTok', kick: 'Kick', twitch: 'Twitch', propio: 'Video' };
 export function analizarVideo(texto) {
   const url = String(texto ?? '').trim();
   if (!url) return { ok: false, proveedor: '', id: '', url: '', error: '' };
@@ -106,6 +107,26 @@ export function analizarVideo(texto) {
 export const rutaImagen = (uid, ts = Date.now(), azar = Math.random().toString(36).slice(2, 8)) => `${uid}/${ts}-${String(azar).replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'x'}.jpg`;
 /** URL pública del bucket «muro» → ruta del archivo (para borrarlo del Storage). '' si no es de ese bucket. */
 export const rutaDeUrl = (url) => /\/storage\/v1\/object\/public\/muro\/([^?#]+)/.exec(String(url ?? ''))?.[1] ?? '';
+/** URL pública de nuestro Storage → { bucket, ruta } (solo «muro» y «muro-video»). null si no es nuestra. Sirve para limpiar archivos al borrar. */
+export function archivoDeUrl(url) {
+  const m = /\/storage\/v1\/object\/public\/(muro|muro-video)\/([^?#]+)/.exec(String(url ?? '')); return m ? { bucket: m[1], ruta: m[2] } : null;
+}
+/** Ruta de un video subido: `<uid>/<marca de tiempo>-<aleatorio>.<mp4|webm|mov>`. */
+export const rutaVideo = (uid, ext = 'mp4', ts = Date.now(), azar = Math.random().toString(36).slice(2, 8)) => `${uid}/${ts}-${String(azar).replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'x'}.${['mp4', 'webm', 'mov'].includes(ext) ? ext : 'mp4'}`;
+
+/* ---- Segmentos por juego y enlaces para compartir ---- */
+export const segmentoValido = (id) => SEGMENTOS.some((s) => s[0] === id);
+export const etiquetaSegmento = (id) => SEGMENTOS.find((s) => s[0] === id)?.[1] ?? '';
+/** Lo que se envía a la BD: un segmento conocido o null (general). */
+export const segmentoParaGuardar = (id) => (segmentoValido(id) ? id : null);
+/** Enlace compartible: `<base>perfil/?u=<usuario>#p-<id>` (publicación) o `#c-<id>` (clip). Sin id → el perfil. */
+export function urlCompartir({ base, usuario, tipo = '', id = null }) {
+  const u = String(usuario ?? '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+  const n = Number(id); const ancla = (tipo === 'p' || tipo === 'c') && Number.isFinite(n) && n > 0 ? `#${tipo}-${Math.trunc(n)}` : '';
+  return `${base}perfil/?u=${u}${ancla}`;
+}
+/** '#p-12' → { tipo: 'p', id: 12 }; cualquier otra cosa → null. */
+export function destinoDeHash(hash) { const m = /^#([pc])-(\d{1,12})$/.exec(String(hash ?? '')); return m ? { tipo: m[1], id: Number(m[2]) } : null; }
 
 /** Duelo adjunto (tarjeta que arma el SERVIDOR) → datos listos para pintar. null si no es válido. Nunca lanza. */
 const ETIQUETA_ESTADO = { ACEPTADO: 'Agendado', EN_JUEGO: 'En juego', FINALIZADO: 'Finalizado' };
