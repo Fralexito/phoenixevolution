@@ -333,7 +333,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - **ronda 139** — Vuelta a la identidad original: la portada (`index.astro`, `pages/central.js`) se restauró tal cual estaba antes del rediseño (tag `pre-rediseno-central`). Se conservan el menú de 5 secciones y el buscador global. Se quitaron lanzador, carruseles y tarjeta Hoy (la versión anterior sigue en el commit 2433b97).
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 139)
+- **ronda 141** — Se quitó «Explora la Galaxy» (revert de e961cb3): la portada queda con el diseño base original, con lupa y menú de 5 secciones. Probadas 3 variantes (cinta/fichas/contadores ampliados) solo en pantalla, sin publicar.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 141)
 - **Reglas fijas:** trabajar solo en `borrador`; pasar a `main` solo cuando el usuario diga «Súbelo/Publícalo». Cada cambio: bullet «ronda N» en este archivo (siguiente = **121**), commit con los dos trailers (`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` y `Claude-Session: ...`) y push a `borrador`. Supabase `fiibiyijojkxqlsrhcil`: no usar `apply_migration` ni DDL grande por `execute_sql` (se cancelan); entregar el `.sql` con SendUserFile para que el usuario lo pegue en el SQL Editor, y verificar después con consultas de solo lectura. Idioma: español.
 - **Modo ligero (pedido del usuario el 05/10):** cambios pequeños = cambio + test pertinente + commit, sin Playwright ni capturas salvo que el cambio sea grande o el usuario lo pida; respuestas cortas (qué cambió y qué hacer); no listar carpetas grandes; no repetir el resumen de pasos.
 - **Estado de la BD:** migraciones 001–042 aplicadas y verificadas (039 disputas, 040 encuestas, 041 feed, 042 eventos con el trabajo `recordar-eventos`). No hay migraciones pendientes.
