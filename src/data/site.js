@@ -28,6 +28,7 @@ export const ACCOUNT_NAV = [
   { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass' },
   { id: 'guardados', label: 'Guardados',   path: 'guardados/',     icon: 'fa-bookmark' },
   { id: 'logros',   label: 'Logros',       path: 'logros/',        icon: 'fa-medal' },
+  { id: 'eventos',  label: 'Eventos',      path: 'eventos/',       icon: 'fa-calendar-day' },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria' },
