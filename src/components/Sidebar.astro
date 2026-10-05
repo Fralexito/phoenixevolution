@@ -3,11 +3,13 @@ import SocialIcon from './SocialIcon.astro';
 import { NAV, NAV_EXTRA, ACCOUNT_NAV, SOCIALS } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
+// Ficha de «Mi cuenta»: cuadrada en móvil; desde lg (PC) vuelve a ser una fila de lista.
+const ficha = 'flex flex-col items-center justify-center gap-1.5 rounded-xl border border-galaxy-border/60 bg-white/[0.02] px-2 py-2.5 text-[11px] leading-tight text-center transition-colors lg:flex-row lg:justify-start lg:gap-4 lg:rounded-lg lg:border-transparent lg:bg-transparent lg:p-3 lg:text-base lg:text-left';
 ---
 <div id="sidebar-overlay" hidden class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[400]"></div>
 <aside id="sidebar-menu" aria-label="Red de enlaces" inert
   class="sidebar-panel fixed top-0 right-0 h-full w-64 sm:w-[300px] bg-galaxy-panel border-l border-galaxy-border shadow-[-15px_0_40px_rgba(0,0,0,0.8)] z-[410] translate-x-full flex flex-col">
-  <div class="p-5 border-b border-galaxy-border flex justify-between items-center bg-gradient-to-l from-galaxy-900 to-galaxy-deep">
+  <div class="px-5 py-4 border-b border-galaxy-border flex justify-between items-center bg-gradient-to-l from-galaxy-900 to-galaxy-deep">
     <h3 class="font-display font-black text-lg text-white uppercase tracking-widest flex items-center">
       <i class="fa-solid fa-satellite text-galaxy-400 mr-3"></i> Red de Enlaces
     </h3>
@@ -15,43 +17,43 @@ const { active } = Astro.props;
       <i class="fa-solid fa-xmark text-xl"></i>
     </button>
   </div>
-  <nav class="flex-1 p-4 flex flex-col gap-1.5 font-display text-base uppercase tracking-wider overflow-y-auto">
-    <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil es el menú completo. -->
-    <div class="flex flex-col gap-1.5 lg:hidden">
-    <div class="px-3 pt-1 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Explorar</div>
-    {NAV.map((n) => (
-      <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined}
-        class={`flex items-center gap-4 p-3 rounded-lg transition-all relative overflow-hidden ${active === n.id
-          ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30'
-          : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
-        {active === n.id && <span class="absolute left-0 top-0 bottom-0 w-1 bg-galaxy-400"></span>}
-        <i class={`fa-solid ${n.icon} w-5 text-center ${active === n.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i> {n.label}
-      </a>
-    ))}
-    {NAV_EXTRA.map((n) => (
-      <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class={`flex items-center gap-4 p-3 rounded-lg transition-all ${active === n.id ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5 border border-dashed border-galaxy-border/70'}`}><i class={`fa-solid ${n.icon} w-5 text-center text-galaxy-400`}></i> {n.label}</a>
-    ))}
+  <nav class="flex-1 p-3.5 lg:p-4 flex flex-col gap-2 lg:gap-1.5 font-display uppercase tracking-wider overflow-y-auto">
+    <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil son fichas de 2 columnas (más aire y menos scroll que una lista larga). -->
+    <div class="lg:hidden space-y-1.5">
+      <div class="px-1 text-[10px] text-gray-500 tracking-[0.25em]">Explorar</div>
+      <div class="grid grid-cols-2 gap-2">
+        {[...NAV, ...NAV_EXTRA].map((n) => (
+          <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined}
+            class={`flex flex-col items-center justify-center gap-1.5 rounded-xl border px-2 py-2.5 text-[11px] leading-tight text-center transition-colors ${active === n.id
+              ? 'text-galaxy-400 bg-galaxy-400/10 border-galaxy-400/40'
+              : 'text-gray-300 border-galaxy-border/60 bg-white/[0.02] hover:text-white hover:bg-white/5'}`}>
+            <i class={`fa-solid ${n.icon} text-base ${active === n.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i><span>{n.label}</span>
+          </a>
+        ))}
+      </div>
     </div>
-    <div id="sidebar-account" hidden class="flex flex-col flex-1 gap-1.5 mt-3 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
-      <div class="px-3 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
-      {ACCOUNT_NAV.filter((n) => !n.abajo).map((n) => (
-        n.path
-          ? <a href={`${base}${n.path}`} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</a>
-          : <button type="button" data-action={n.action} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-left uppercase"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</button>
-      ))}
-      <!-- Bloque inferior: Configuración y Salir, pegados al fondo del panel -->
-      <div class="mt-auto sticky bottom-0 pt-2 border-t border-galaxy-border/70 flex flex-col gap-1.5 bg-galaxy-panel">
+    <div id="sidebar-account" hidden class="flex flex-col flex-1 gap-1.5 mt-1 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
+      <div class="px-1 lg:px-3 pb-0.5 text-[10px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
+      <!-- Móvil: fichas de 2 columnas. Desde lg (menú de PC): lista vertical de siempre. -->
+      <div class="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-1.5">
+        {ACCOUNT_NAV.filter((n) => !n.abajo).map((n) => (
+          n.path
+            ? <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class={`${ficha} ${active === n.id ? 'text-galaxy-400 !border-galaxy-400/40 bg-galaxy-400/10' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}><i class={`fa-solid ${n.icon} text-base lg:text-sm lg:w-5 lg:text-center text-gray-500`}></i><span>{n.label}</span></a>
+            : <button type="button" data-action={n.action} class={`${ficha} text-gray-300 hover:text-white hover:bg-white/5 uppercase`}><i class={`fa-solid ${n.icon} text-base lg:text-sm lg:w-5 lg:text-center text-gray-500`}></i><span>{n.label}</span></button>
+        ))}
+      </div>
+      <!-- Bloque inferior: Configuración y Salir, pegados al fondo del panel (lado a lado en móvil) -->
+      <div class="mt-auto sticky bottom-0 pt-2 border-t border-galaxy-border/70 grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-1.5 bg-galaxy-panel">
         {ACCOUNT_NAV.filter((n) => n.abajo).map((n) => (
           n.path
-            ? <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class="flex items-center gap-4 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5"><i class={`fa-solid ${n.icon} w-5 text-center text-galaxy-400`}></i> {n.label}</a>
-            : <button type="button" data-action={n.action} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-bad hover:bg-white/5 text-left uppercase"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</button>
+            ? <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class={`${ficha} text-gray-200 hover:text-white hover:bg-white/5`}><i class={`fa-solid ${n.icon} text-base lg:text-sm lg:w-5 lg:text-center text-galaxy-400`}></i><span>{n.label}</span></a>
+            : <button type="button" data-action={n.action} class={`${ficha} text-gray-400 hover:text-bad hover:bg-white/5 uppercase`}><i class={`fa-solid ${n.icon} text-base lg:text-sm lg:w-5 lg:text-center text-gray-500`}></i><span>{n.label}</span></button>
         ))}
       </div>
     </div>
   </nav>
-  <div class="p-5 border-t border-galaxy-border bg-black/50 text-center lg:hidden">
-    <div class="text-[9px] text-gray-500 tracking-widest uppercase mb-3">Redes Sociales</div>
-    <div class="flex justify-center gap-4">
+  <div class="py-3 px-4 border-t border-galaxy-border bg-black/50 text-center lg:hidden">
+    <div class="flex justify-center gap-5">
       {SOCIALS.map((s) => (<a href={s.href} aria-label={s.label} target="_blank" rel="noopener noreferrer" class={`text-gray-400 ${s.hover} text-lg transition-colors`}><SocialIcon s={s} /></a>))}
     </div>
   </div>
