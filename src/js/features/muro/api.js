@@ -15,3 +15,7 @@ export const borrar = (id) => rpc('muro_borrar', { p_id: id });
 export const fijar = (id, fijada) => rpc('muro_fijar', { p_id: id, p_fijar: fijada });
 export const guardarEstilo = (e) => rpc('muro_guardar_estilo', e);
 export const guardarPrivacidadMuro = (ver, responder) => rpc('muro_guardar_privacidad', { p_ver: ver, p_responder: responder });
+export const respuestasDe = (idPublicacion) => rpc('muro_respuestas_de', { p_publicacion: idPublicacion });
+export const responder = (idPublicacion, texto) => rpc('muro_responder', { p_publicacion: idPublicacion, p_texto: texto });
+export const borrarRespuesta = (id) => rpc('muro_borrar_respuesta', { p_id: id });
+export const reaccionar = (idPublicacion, tipo) => rpc('muro_reaccionar', { p_publicacion: idPublicacion, p_tipo: tipo });   // → mi reacción final o null

@@ -1,6 +1,6 @@
 // Lógica PURA del muro de jugadores (sin DOM ni red → se prueba en tests/pure.test.mjs).
 import { escapeHTML, safeUrl } from './dom.js';
-import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX } from '../../data/muroEstilo.js';
+import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX, RESP_MAX, REACCIONES } from '../../data/muroEstilo.js';
 
 /** Valida el texto de una publicación. → { ok, texto, error }. La BD vuelve a validar: esto solo da el aviso rápido. */
 export function validarTexto(t) {
@@ -52,3 +52,25 @@ export function estiloParaGuardar({ bannerId, acento, lema }) {
 
 /** `?u=fralex` → 'fralex' (solo a-z, 0-9 y _; como exige la BD). Vacío si no hay. */
 export const usuarioDeURL = (search) => String(new URLSearchParams(search).get('u') ?? '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+
+/** Valida una respuesta (máx. RESP_MAX). Misma forma que validarTexto. */
+export function validarRespuesta(t) {
+  const texto = String(t ?? '').replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  if (!texto) return { ok: false, texto, error: 'Escribe tu respuesta.' };
+  if (texto.length > RESP_MAX) return { ok: false, texto, error: `Máximo ${RESP_MAX} caracteres (llevas ${texto.length}).` };
+  return { ok: true, texto, error: '' };
+}
+
+/** {fuego: 3, gg: 1, basura: 9} → [{tipo, emoji, etiqueta, n}] solo de reacciones conocidas con n > 0, en el orden del catálogo. */
+export function resumenReacciones(r) {
+  return REACCIONES.map(([tipo, emoji, etiqueta]) => ({ tipo, emoji, etiqueta, n: Math.max(0, Math.trunc(Number(r?.[tipo]) || 0)) })).filter((x) => x.n > 0);
+}
+
+/** Aplica LOCALMENTE el resultado de reaccionar (para pintar al instante, sin releer): `final` = mi reacción tras la RPC (null = la quité). No muta. */
+export function aplicarReaccion(item, final) {
+  const reacciones = { ...(item.reacciones ?? {}) };
+  if (item.mia) reacciones[item.mia] = Math.max(0, (reacciones[item.mia] ?? 1) - 1);
+  if (final) reacciones[final] = (reacciones[final] ?? 0) + 1;
+  for (const k of Object.keys(reacciones)) if (!reacciones[k]) delete reacciones[k];
+  return { ...item, reacciones, mia: final ?? null };
+}

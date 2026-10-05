@@ -15,4 +15,7 @@ export const ACENTO_DEFECTO = '#00e5ff';
 export const MURO_MAX = 1000;
 export const LEMA_MAX = 80;
 export const MURO_VER = [['PUBLICO', 'Público', 'Cualquiera puede ver mi muro, tenga o no cuenta.'], ['AMIGOS', 'Solo amigos', 'Solo mis amigos (y yo) vemos mis publicaciones.']];
-export const MURO_RESPONDER = [['TODOS', 'Todos', 'Cualquiera con sesión podrá responder.'], ['AMIGOS', 'Solo amigos', 'Solo mis amigos podrán responder.'], ['NADIE', 'Nadie', 'Mi muro será de solo lectura.']];
+export const MURO_RESPONDER = [['TODOS', 'Todos', 'Cualquiera con sesión podrá responder y reaccionar.'], ['AMIGOS', 'Solo amigos', 'Solo mis amigos podrán responder.'], ['NADIE', 'Nadie', 'Mi muro será de solo lectura: nadie podrá responder ni reaccionar.']];
+export const RESP_MAX = 500;
+/** Reacciones disponibles. El id (2.º elemento de la BD: fuego, gg, aplauso, risa, corazon) lo valida la base de datos. */
+export const REACCIONES = [['fuego', '🔥', 'Fuego'], ['gg', '🤝', 'GG'], ['aplauso', '👏', 'Aplauso'], ['risa', '😂', 'Risa'], ['corazon', '❤️', 'Me encanta']];

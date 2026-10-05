@@ -834,3 +834,20 @@ test('muro: validar texto, enlaces seguros, tiempo relativo y estilo', async () 
   assert.deepEqual(estiloParaGuardar({ bannerId: 'x', acento: 'y', lema: ' hola ' }), { p_banner: null, p_acento: null, p_lema: 'hola' });
   assert.equal(usuarioDeURL('?u=Fra<lex>_9'), 'fralex_9');
 });
+
+test('muro fase 2: respuestas, resumen y reacción local', async () => {
+  const { validarRespuesta, resumenReacciones, aplicarReaccion } = await import('../src/js/core/muro.js');
+  assert.equal(validarRespuesta(' ').ok, false);
+  assert.equal(validarRespuesta('x'.repeat(501)).ok, false);
+  assert.equal(validarRespuesta(' GG ').texto, 'GG');
+  assert.deepEqual(resumenReacciones({ gg: 2, fuego: 1, basura: 9, risa: 0 }).map((x) => `${x.tipo}:${x.n}`), ['fuego:1', 'gg:2']);   // orden del catálogo, sin desconocidas ni ceros
+  assert.deepEqual(resumenReacciones(null), []);
+  const it = { id: 1, reacciones: { fuego: 1 }, mia: null };
+  const a = aplicarReaccion(it, 'fuego');   // reacciono 🔥
+  assert.deepEqual([a.reacciones, a.mia], [{ fuego: 2 }, 'fuego']);
+  const b = aplicarReaccion(a, 'gg');       // cambio a GG: baja 🔥, sube GG
+  assert.deepEqual([b.reacciones, b.mia], [{ fuego: 1, gg: 1 }, 'gg']);
+  const c = aplicarReaccion({ ...b, reacciones: { gg: 1 } }, null);   // la quito: el conteo desaparece
+  assert.deepEqual([c.reacciones, c.mia], [{}, null]);
+  assert.deepEqual(it, { id: 1, reacciones: { fuego: 1 }, mia: null });   // no muta
+});
