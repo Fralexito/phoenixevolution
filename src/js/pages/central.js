@@ -1,6 +1,7 @@
 // Página Central: partidos, posiciones y partido destacado REALES (edición en curso de data/ligaResultados.js), XI ideal (demo) y Top 3 REAL desde `jugadores`.
 import { supabase } from '../core/supabase.js';
 import { escapeHTML } from '../core/dom.js';
+import { escudoDe, escudoHTML } from '../core/escudos.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { crearReplica } from '../features/replicaCarta.js';
 import { esIlegible } from '../core/replica.js';
@@ -27,7 +28,7 @@ let pestana = 'proximos';
 function pintarPartidos() {
   const grupos = pestana === 'proximos' ? (jornadas.proximos ? [jornadas.proximos] : []) : jornadas.resultados;
   if (!grupos.length) { $('matches-container').innerHTML = `<div class="text-center text-gray-500 text-sm py-6 glass-panel rounded-xl">${pestana === 'proximos' ? 'No hay partidos por jugar por ahora.' : 'Aún no hay resultados.'}</div>`; return; }
-  const lado = (n, gana, der) => `<span class="min-w-0 ${der ? 'text-right' : ''}"><span class="block truncate text-sm sm:text-base ${gana ? 'font-bold text-white' : 'font-semibold text-gray-300'}">${escapeHTML(n)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(n)}</span></span>`;
+  const lado = (n, gana, der) => `<span class="min-w-0 flex items-center gap-2.5 ${der ? 'flex-row-reverse text-right' : ''}"><span class="shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(clubDe(n), 26)}</span><span class="min-w-0"><span class="block truncate text-sm sm:text-base ${gana ? 'font-bold text-white' : 'font-semibold text-gray-300'}">${escapeHTML(n)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(n)}</span></span></span>`;
   const fila = (m) => {
     const jugado = Number.isInteger(m.gl);
     return `<div class="glass-panel rounded-xl p-3 sm:p-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center text-white">
@@ -45,7 +46,8 @@ function pintarDestacado() {
   const pos = (n) => tabla.findIndex((t) => t.nombre === n) + 1;
   const lado = (n, der) => {
     const v = visualClub(clubDe(n), CLUBES_VISUAL);
-    const escudo = `<div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 flex items-center justify-center font-display font-bold text-lg sm:text-2xl ${v.oscuro ? 'text-black' : 'text-white'}" style="border-color:${v.a};background:linear-gradient(135deg,${v.a},${v.b});box-shadow:0 0 20px ${v.a}66">${escapeHTML(v.sigla)}</div>`;
+    const real = escudoDe(clubDe(n));
+    const escudo = real ? `<div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 grid place-items-center bg-black/40" style="border-color:${v.a};box-shadow:0 0 20px ${v.a}66">${escudoHTML(clubDe(n), 44)}</div>` : `<div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 flex items-center justify-center font-display font-bold text-lg sm:text-2xl ${v.oscuro ? 'text-black' : 'text-white'}" style="border-color:${v.a};background:linear-gradient(135deg,${v.a},${v.b});box-shadow:0 0 20px ${v.a}66">${escapeHTML(v.sigla)}</div>`;
     const txt = `<div class="min-w-0"><div class="inline-flex items-center gap-1.5 px-2 py-0.5 whitespace-nowrap rounded bg-galaxy-600/25 border border-galaxy-400/30 text-[10px] text-galaxy-400 font-bold mb-1">${pos(n) ? `${pos(n)}.º en la tabla` : 'Sin puesto'}</div>
       <h3 class="font-display font-bold text-xl sm:text-3xl text-white text-shadow-glow truncate uppercase">${escapeHTML(n)}</h3><p class="text-[11px] sm:text-sm text-galaxy-400 uppercase tracking-widest font-bold truncate">${club(n)}</p></div>`;
     return `<div class="flex flex-col-reverse ${der ? 'sm:flex-row-reverse sm:justify-end text-center sm:text-left' : 'sm:flex-row sm:justify-end text-center sm:text-right'} items-center gap-2 sm:gap-4 min-w-0">${txt}${escudo}</div>`;
@@ -60,7 +62,7 @@ function renderDemo() {
   pintarPartidos(); pintarDestacado();
   $('mini-table-container').innerHTML = tabla.length ? tabla.map((t, i) => `
     <tr class="border-b border-galaxy-border/30 text-gray-300 text-sm">
-      <td class="py-2 pl-1">${i + 1}</td><td class="pr-2 max-w-[9rem]"><span class="block truncate">${escapeHTML(t.nombre)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(t.nombre)}</span></td><td class="text-center text-gray-400">${t.pj}</td><td class="text-center font-bold text-white">${t.pts}</td>
+      <td class="py-2 pl-1">${i + 1}</td><td class="pr-2 max-w-[10rem]"><span class="flex items-center gap-2"><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(clubDe(t.nombre), 22)}</span><span class="min-w-0"><span class="block truncate">${escapeHTML(t.nombre)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(t.nombre)}</span></span></span></td><td class="text-center text-gray-400">${t.pj}</td><td class="text-center font-bold text-white">${t.pts}</td>
     </tr>`).join('') : '<tr><td colspan="4" class="py-4 text-center text-gray-500 text-xs">Aún no hay partidos jugados.</td></tr>';
   const slot = (p) => `<div class="text-center"><div class="w-8 h-8 rounded-full ${p.cls} border border-white mx-auto text-xs font-bold flex items-center justify-center">${p.pos}</div><span class="text-[11px] font-bold text-white uppercase tracking-wider block mt-1">${p.nombre}</span></div>`;
   const [dc, ei, mco, ed, mcd] = DEMO_XI;
