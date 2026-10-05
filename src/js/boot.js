@@ -9,6 +9,7 @@ import { initWelcome } from './features/welcome.js';
 import { initEdad } from './features/edad.js';
 import { initAjustes } from './features/ajustes.js';
 import { initAvatarFallback } from './core/avatar.js';
+import { initBuscadorGlobal } from './features/buscadorGlobal.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
 
 initAjustes();
@@ -21,4 +22,5 @@ initWelcome();
 initLiveFeed();
 initLiveDock();
 initAvisoSancion();
+initBuscadorGlobal();
 initSession().catch((e) => console.error('[boot] sesión:', e));

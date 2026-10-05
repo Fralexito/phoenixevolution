@@ -45,17 +45,33 @@ const base = import.meta.env.BASE_URL;
     </div>
   </header>
 
-  <!-- Navegación de la portada: te dice dónde estás y te lleva a cada bloque (se queda pegada arriba al bajar). -->
-  <nav id="sec-nav" aria-label="Secciones de la portada" class="sec-nav"><div class="sec-nav-in">
-    <a href="#inicio-espacio" data-sec="inicio-espacio"><i class="fa-solid fa-user-astronaut"></i><span>Tu espacio</span></a>
-    <a href="#sec-ahora" data-sec="sec-ahora"><i class="fa-solid fa-satellite-dish"></i><span>Ahora</span></a>
-    <a href="#central-partidos" data-sec="central-partidos"><i class="fa-solid fa-futbol"></i><span>Partidos</span></a>
-    <a href="#sec-mejor" data-sec="sec-mejor"><i class="fa-solid fa-star"></i><span>Lo mejor</span></a>
-    <a href="#inicio-tienda" data-sec="inicio-tienda"><i class="fa-solid fa-store"></i><span>Tienda</span></a>
-    <a href="#sec-videos" data-sec="sec-videos"><i class="fa-solid fa-video"></i><span>Videos</span></a>
-  </div></nav>
+  <!-- ¿QUÉ QUIERES HACER? Lanzador: las 8 cosas que más busca la gente, a un toque. Cada baldosa dice qué es y, si hay algo vivo, lo muestra. -->
+  <section aria-label="¿Qué quieres hacer?" class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+    <div class="flex items-end justify-between gap-3 mb-3">
+      <div class="sec-head"><span class="sec-ico"><i class="fa-solid fa-compass"></i></span><div><h2>¿Qué quieres hacer?</h2><p>Todo a un toque. También puedes buscar con <kbd class="text-[10px] border border-galaxy-border rounded px-1">/</kbd></p></div></div>
+      <button type="button" data-abrir-buscador class="btn btn-ghost !min-h-9 !px-3 !text-[11px] shrink-0"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+      {[
+        { h: 'duelos/', i: 'fa-gamepad', t: 'Jugar ahora', d: 'Busca rival y entra a una sala', b: 'retos', c: 'fuerte' },
+        { h: 'liga/', i: 'fa-crown', t: 'Ver la liga', d: 'Tabla, calendario y resultados' },
+        { h: 'eventos/', i: 'fa-calendar-day', t: 'Eventos', d: 'Torneos y quedadas', b: 'evento' },
+        { h: 'database/', i: 'fa-id-card', t: 'Jugadores', d: 'Fichas, cartas y comparador' },
+        { h: 'clanes/', i: 'fa-shield-halved', t: 'Clanes', d: 'Juega en equipo' },
+        { h: 'ranking/', i: 'fa-ranking-star', t: 'Ranking', d: 'Mejores del mes y retos' },
+        { h: 'noticias/', i: 'fa-newspaper', t: 'Noticias', d: 'Lo último de la liga' },
+        { h: 'tienda/', i: 'fa-store', t: 'Tienda', d: 'Cosméticos con tus tokens' },
+      ].map((x, n) => (
+        <a href={`${base}${x.h}`} class={`lanza ${x.c ?? ''}`} data-reveal style={`--i:${n}`}>
+          <span class="lanza-ico"><i class={`fa-solid ${x.i}`}></i></span>
+          <span class="min-w-0"><b>{x.t}</b><small>{x.d}</small></span>
+          {x.b && <span class="lanza-bad" data-bad={x.b} hidden></span>}
+        </a>
+      ))}
+    </div>
+  </section>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full space-y-12 sm:space-y-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6 sm:pb-8 w-full space-y-12 sm:space-y-16">
 
     <!-- 0. TU ESPACIO: bienvenida con progreso (visita) o panel personal (con sesión). -->
     <section id="inicio-espacio" aria-label="Tu espacio" class="scroll-mt-32" hidden></section>

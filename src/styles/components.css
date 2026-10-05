@@ -531,3 +531,15 @@ a.slide-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgb(0 
 .subnav a[aria-current='page'] { color: #fff; background: rgb(128 0 255 / .35); border-color: rgb(0 229 255 / .45); box-shadow: 0 0 14px rgb(0 229 255 / .2); }
 @media (max-width: 479px) { .subnav a:not([aria-current='page']) span { display: none; } .subnav a { padding: .45rem .7rem; } }
 @media (prefers-reduced-motion: reduce) { .nav-menu, .nav-item { transition: none; } }
+
+/* ---- Lanzador «¿Qué quieres hacer?» y buscador global ---- */
+.lanza { position: relative; display: flex; align-items: center; gap: .75rem; padding: .85rem .9rem; border-radius: 1rem; background: rgb(255 255 255 / .03); border: 1px solid var(--color-galaxy-border); transition: transform .2s ease, border-color .2s, box-shadow .2s, background .2s; min-height: 4.4rem; }
+.lanza:hover, .lanza:focus-visible { transform: translateY(-3px); border-color: var(--color-galaxy-400); background: rgb(0 229 255 / .06); box-shadow: 0 8px 24px rgb(0 0 0 / .4), 0 0 20px rgb(0 229 255 / .2); outline: none; }
+.lanza.fuerte { background: linear-gradient(135deg, rgb(128 0 255 / .4), rgb(0 229 255 / .1)); border-color: rgb(0 229 255 / .55); }
+.lanza-ico { width: 2.6rem; height: 2.6rem; flex-shrink: 0; display: grid; place-items: center; border-radius: .8rem; color: var(--color-galaxy-400); font-size: 1.05rem; background: rgb(128 0 255 / .3); border: 1px solid rgb(0 229 255 / .3); transition: transform .25s ease; } .lanza:hover .lanza-ico { transform: scale(1.1) rotate(-6deg); }
+.lanza b { display: block; font: 800 .95rem var(--font-display); color: #fff; letter-spacing: .05em; text-transform: uppercase; line-height: 1.15; } .lanza small { display: block; font-size: .68rem; color: #9ca3af; line-height: 1.25; margin-top: .15rem; }
+.lanza-bad { position: absolute; top: -.45rem; right: .6rem; font: 800 .58rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; padding: .15rem .5rem; border-radius: 9999px; color: #04210f; background: #00ff88; box-shadow: 0 0 12px rgb(0 255 136 / .5); animation: latido 2s ease-in-out infinite; }
+.bg-et { font: 800 .6rem var(--font-display); letter-spacing: .2em; text-transform: uppercase; color: #6b7280; padding: .5rem .5rem .25rem; }
+.bg-fila { display: flex; align-items: center; gap: .75rem; padding: .55rem .65rem; border-radius: .8rem; border: 1px solid transparent; } .bg-fila b { font: 700 .95rem var(--font-display); letter-spacing: .03em; }
+.bg-fila:hover, .bg-fila[data-sel] { background: rgb(0 229 255 / .09); border-color: rgb(0 229 255 / .35); }
+@media (prefers-reduced-motion: reduce) { .lanza, .lanza-ico { transition: none; } .lanza-bad { animation: none; } }

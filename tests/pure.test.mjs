@@ -1087,3 +1087,15 @@ test('navegación: secciones, pertenencia y rutas', () => {
   const ids = SECS.flatMap((x) => x.items.map((i) => i.id)); assert.equal(new Set(ids).size, ids.length, 'ids repetidos');
   const paths = SECS.flatMap((x) => x.items.map((i) => i.path)); assert.equal(new Set(paths).size, paths.length, 'rutas repetidas');
 });
+
+import { indicePaginas, buscarPaginas } from '../src/js/core/buscador.js';
+test('buscador: encuentra por nombre, por sinónimo y por varias palabras', () => {
+  const ix = indicePaginas();
+  assert.equal(buscarPaginas('liga', ix)[0].id, 'liga'); assert.equal(buscarPaginas('LIGA', ix)[0].id, 'liga');
+  assert.equal(buscarPaginas('palmares', ix)[0].id, 'palmares'); assert.equal(buscarPaginas('palmarés', ix)[0].id, 'palmares');
+  assert.equal(buscarPaginas('fichajes', ix)[0].id, 'mercado'); assert.equal(buscarPaginas('torneo', ix)[0].id, 'eventos');
+  assert.equal(buscarPaginas('comprar tokens', ix)[0].id, 'tienda'); assert.equal(buscarPaginas('chat', ix)[0].id, 'mensajes');
+  assert.deepEqual(buscarPaginas('', ix), []); assert.deepEqual(buscarPaginas('zzzzqq', ix), []);
+  assert.ok(buscarPaginas('a', ix, 3).length <= 3);
+  assert.ok(ix.some((p) => p.id === 'moderacion' && p.staff));
+});
