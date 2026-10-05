@@ -2,21 +2,23 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout title="Historial de hoy · En vivo" active="">
-  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+  <div class="max-w-6xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
     <header class="glass-panel px-4 py-3 rounded-2xl">
       <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">En vivo</span>
       <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-clock-rotate-left text-galaxy-400 mr-2"></i>Historial de hoy <span id="hv-fecha" class="text-gray-400 text-sm font-normal normal-case tracking-normal"></span></h1>
       <p class="text-gray-300 text-xs mt-0.5">Solo la actividad del día de hoy; al cambiar de día se vacía solo. Toca un nombre para ver su perfil.</p>
     </header>
 
-    <section class="glass-panel rounded-2xl p-3 space-y-3" aria-label="Búsqueda y filtros">
+    <!-- PC: filtros a la IZQUIERDA (fijos al hacer scroll) e historial a la DERECHA. Móvil: filtros arriba, historial debajo. -->
+    <div class="grid gap-4 lg:grid-cols-[19rem_minmax(0,1fr)] lg:items-start">
+    <aside class="glass-panel rounded-2xl p-3 space-y-3 lg:sticky lg:top-28" aria-label="Búsqueda y filtros">
       <div class="relative">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
-        <input id="hv-q" type="search" autocomplete="off" spellcheck="false" placeholder="Busca por jugador, juego, parche, formato… (ej.: camilo 2v2 -radar)" class="w-full rounded-xl bg-black/30 border border-galaxy-border pl-9 pr-3 py-2.5 text-sm text-white">
+        <input id="hv-q" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar… ej.: camilo 2v2 -radar" class="w-full rounded-xl bg-black/30 border border-galaxy-border pl-9 pr-3 py-2.5 text-sm text-white">
       </div>
       <details id="hv-filtros" class="group">
         <summary class="cursor-pointer select-none text-[11px] font-display font-bold uppercase tracking-widest text-galaxy-400"><i class="fa-solid fa-sliders mr-1.5"></i>Filtros avanzados <span id="hv-nfiltros" class="text-gray-400 normal-case tracking-normal font-normal"></span></summary>
-        <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-[11px] text-gray-400">
+        <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5 text-[11px] text-gray-400">
           <label class="block">Tipo<select id="hv-tipo" class="hv-ctl"><option value="todos">Todos</option><option value="reto_aceptado">Retos aceptados</option><option value="radar_on">Radar activado</option></select></label>
           <label class="block">Jugador<select id="hv-jugador" class="hv-ctl"><option value="">Todos</option></select></label>
           <label class="block">Juego<select id="hv-juego" class="hv-ctl"><option value="">Todos</option></select></label>
@@ -39,10 +41,13 @@ import Layout from '../layouts/Layout.astro';
         <p class="text-gray-400"><b id="hv-count" class="text-galaxy-400">0</b> de <span id="hv-total">0</span> aviso(s)</p>
         <button id="hv-limpiar" type="button" hidden class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-eraser"></i><span>Limpiar filtros</span></button>
       </div>
-    </section>
+    </aside>
 
+    <div class="space-y-4 min-w-0">
     <p id="hv-off" hidden class="glass-panel rounded-2xl p-4 text-xs text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Tienes desactivado «Guardar el historial de En vivo» en Ajustes, por eso aquí no se guarda nada.</p>
     <ul id="hv-lista" class="glass-panel rounded-2xl p-2 flex flex-col gap-1"></ul>
+    </div>
+    </div>
   </div>
 </Layout>
 <script>
