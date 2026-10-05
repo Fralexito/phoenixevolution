@@ -3,6 +3,7 @@
 import { onSession, can } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
+import { openModal, closeModal } from '../core/modal.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/economia/api.js';
 import { CATEGORIAS, ORDEN_CATEGORIAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, validarItemAdmin } from '../core/economia.js';
@@ -125,20 +126,44 @@ async function hacer(fn, ok) {
   finally { S.busy = false; }
 }
 
+
+// ── Ventanas propias (en lugar de los cuadros del navegador) ──────────────────────────────────────────────────
+const cabecera = (titulo) => `<div class="flex items-start justify-between border-b border-galaxy-border pb-3"><h3 class="font-display font-bold text-lg text-white uppercase">${escapeHTML(titulo)}</h3><button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button></div>`;
+function modalCompra(i) {
+  const despues = (S.eco?.saldo ?? 0) - i.precio;
+  openModal(`<div class="p-5 sm:p-6 space-y-4">${cabecera('Confirmar compra')}
+    <div class="flex items-center gap-4"><div class="w-20 h-14 flex items-center justify-center shrink-0">${vistaPrevia(i)}</div><div class="min-w-0"><p class="font-display font-bold text-white">${escapeHTML(i.nombre)}</p><p class="text-xs text-gray-400">${escapeHTML(i.descripcion)}</p></div></div>
+    <dl class="text-sm space-y-1"><div class="flex justify-between"><dt class="text-gray-400">Precio</dt><dd class="text-amber-300 font-display font-bold"><i class="fa-solid fa-coins"></i> ${formatoTokens(i.precio)}</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-400">Tu saldo después</dt><dd class="text-white font-display font-bold">${formatoTokens(despues)}</dd></div></dl>
+    <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="button" id="tm-ok" class="btn btn-primary">Comprar</button></div></div>`, { id: 'tienda-modal' })
+    .querySelector('#tm-ok').addEventListener('click', () => { closeModal('tienda-modal'); hacer(() => api.comprar(i.id), (r) => `¡Listo! Te quedan ${r?.saldo ?? ''} tokens.`); });
+}
+function modalAjuste(usuario, nombre) {
+  const m = openModal(`<form id="tm-form" class="p-5 sm:p-6 space-y-4" novalidate>${cabecera('Ajustar tokens')}
+    <p class="text-xs text-gray-400">Persona: <b class="text-white">${escapeHTML(nombre)}</b>. El ajuste queda en la auditoría.</p>
+    <div><label class="label" for="tm-delta">Cantidad (negativa para restar)</label><input id="tm-delta" type="number" step="1" class="field" placeholder="500" required></div>
+    <div><label class="label" for="tm-motivo">Motivo</label><input id="tm-motivo" class="field" maxlength="200" placeholder="Ej: prueba de la tienda"></div>
+    <p id="tm-err" hidden role="alert" class="text-xs text-rose-400"></p>
+    <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="submit" class="btn btn-primary">Aplicar</button></div></form>`, { id: 'tienda-modal' });
+  m.querySelector('#tm-delta').focus();
+  m.querySelector('#tm-form').addEventListener('submit', (ev) => {
+    ev.preventDefault(); const delta = Number(m.querySelector('#tm-delta').value), motivo = m.querySelector('#tm-motivo').value.trim(), err = m.querySelector('#tm-err');
+    if (!Number.isInteger(delta) || delta === 0) { err.textContent = 'Escribe un número entero distinto de cero.'; err.hidden = false; return; }
+    if (!motivo) { err.textContent = 'El motivo es obligatorio.'; err.hidden = false; return; }
+    closeModal('tienda-modal'); hacer(() => api.adminAjustar(usuario, delta, motivo), 'Ajuste aplicado (queda en la auditoría).');
+  });
+}
+
 // ── Eventos ──────────────────────────────────────────────────────────────────────────────────────────────────
 $('ti-contenido').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return; const d = b.dataset;
   if (d.cat) { S.cat = d.cat; pintar(); }
-  else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i && window.confirm(`¿Comprar «${i.nombre}» por ${i.precio} tokens?`)) hacer(() => api.comprar(i.id), (r) => `¡Listo! Te quedan ${r?.saldo ?? ''} tokens.`); }
+  else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i) modalCompra(i); }
   else if (d.equipar) hacer(() => api.equipar(Number(d.equipar), d.valor === 'si'), d.valor === 'si' ? 'Equipado.' : 'Quitado.');
   else if (d.paquete) hacer(() => api.crearOrden(Number(d.paquete)), 'Orden creada. El pago se completará en la pasarela (aún por conectar).');
   else if (d.editarItem) { const i = S.admItems.find((x) => x.id === Number(d.editarItem)); if (i) { S.edit = { id: i.id, clave: i.clave, nombre: i.nombre, descripcion: i.descripcion, categoria: i.categoria, precio: i.precio, nivelMin: i.nivelMin, stock: i.stock, color: i.estilo.color, color2: i.estilo.color2, texto: i.estilo.texto, icono: i.estilo.icono, activo: i.activo }; pintar(); } }
   else if (b.id === 'ai-nuevo') { S.edit = null; pintar(); }
-  else if (d.ajustar) {
-    const delta = Number(window.prompt('Cantidad de tokens a sumar (negativa para restar):')); if (!Number.isInteger(delta) || delta === 0) return;
-    const motivo = (window.prompt('Motivo (queda en la auditoría):') || '').trim(); if (!motivo) return;
-    hacer(() => api.adminAjustar(d.ajustar, delta, motivo), 'Ajuste aplicado (queda en la auditoría).');
-  }
+  else if (d.ajustar) modalAjuste(d.ajustar, d.ajustar === S.yo ? 'Tú' : (S.encontrados.find((u) => u.id === d.ajustar)?.nombre ?? 'esta persona'));
 });
 $('ti-contenido').addEventListener('change', (ev) => { if (ev.target.id === 'ti-pagos') { const v = ev.target.checked; hacer(() => api.adminPagos(v), v ? 'Pagos activados.' : 'Pagos desactivados.'); } });
 $('ti-contenido').addEventListener('submit', async (ev) => {
