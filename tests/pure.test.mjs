@@ -780,3 +780,15 @@ test('espectadores: accionPara decide el botón', () => {
   assert.equal(accionPara(base).tipo, 'pedir'); assert.equal(accionPara({ ...base, modo: 'CUALQUIERA' }).tipo, 'entrar');
   assert.equal(accionPara({ ...base, modo: 'AMIGOS' }).activo, true);
 });
+
+import { sanitizarExtras, resumenExtra, EXTRAS_JUEGOS } from '../src/js/core/hostExtras.js';
+test('hostExtras: solo juegos del catálogo, sin duplicados, sin < >, con límites', () => {
+  assert.deepEqual(EXTRAS_JUEGOS.map((j) => j.id), ['eFootball', 'FIFA']);
+  assert.deepEqual(sanitizarExtras(null), []); assert.deepEqual(sanitizarExtras('hola'), []);
+  const r = sanitizarExtras([{ juego: 'eFootball', version: ' 2025 <b> ', mod: 'x'.repeat(100) }, { juego: 'eFootball', version: 'otra' }, { juego: 'PES 2021' }, { juego: 'FIFA' }, null]);
+  assert.equal(r.length, 2); assert.equal(r[0].version, '2025 b'); assert.equal(r[0].mod.length, 60); assert.deepEqual(r[1], { juego: 'FIFA', version: '', mod: '' });
+  assert.equal(sanitizarExtras([{ juego: 'FIFA', version: 'x'.repeat(50) }])[0].version.length, 20);
+});
+test('hostExtras: resumenExtra', () => {
+  assert.equal(resumenExtra({ juego: 'FIFA', version: '23', mod: 'Realism' }), 'FIFA 23 · Realism'); assert.equal(resumenExtra({ juego: 'eFootball', version: '', mod: '' }), 'eFootball');
+});

@@ -10,6 +10,7 @@ import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from
 import { toast } from '../core/toast.js';
 import { switchHTML, segHTML, bindSeg } from './formControls.js';
 import { bindHandle } from './handleCheck.js';
+import { EXTRAS_JUEGOS, MAX_VERSION, MAX_MOD, sanitizarExtras } from '../core/hostExtras.js';
 
 const PLATAFORMAS = ['Ambos', 'Smash Soda', 'Parsec'];
 
@@ -32,6 +33,16 @@ export function openProfileModal() {
   // Parche de PES 2021 (opcional): '' = sin indicar · uno de la lista · 'otro' (texto libre).
   const parcheGuardado = prof.host_parche || '';
   let parche = !parcheGuardado ? '' : PARCHES_PES.includes(parcheGuardado) ? parcheGuardado : 'otro';
+
+  // Juegos extra (eFootball, FIFA): opcionales, discretos, dentro de un desplegable.
+  const extras = sanitizarExtras(prof.host_extras);
+  const extrasHTML = `<details class="rounded-xl border border-galaxy-border/70 bg-black/20 px-3 py-2" ${extras.length ? 'open' : ''}>
+    <summary class="cursor-pointer text-[11px] text-gray-400 uppercase tracking-widest select-none">Otros juegos que hosteo <span class="normal-case tracking-normal text-gray-500">(extra, opcional)</span></summary>
+    <div class="space-y-2.5 pt-2.5">${EXTRAS_JUEGOS.map((j) => { const e = extras.find((x) => x.juego === j.id);
+      return `<div data-extra="${j.id}" class="space-y-1.5"><label class="flex items-center gap-2 text-sm text-white cursor-pointer"><input type="checkbox" data-extra-on class="w-4 h-4 accent-[#8000ff]" ${e ? 'checked' : ''}>${j.id}</label>
+        <div class="grid grid-cols-[7rem_minmax(0,1fr)] gap-2" ${e ? '' : 'hidden'} data-extra-campos>
+          <input class="field !py-1.5 !text-xs" data-extra-version maxlength="${MAX_VERSION}" placeholder="${j.versionEj}" aria-label="Versión de ${j.id}" value="${escapeHTML(e?.version)}">
+          <input class="field !py-1.5 !text-xs" data-extra-mod maxlength="${MAX_MOD}" placeholder="${j.modEj}" aria-label="Parche o mod de ${j.id}" value="${escapeHTML(e?.mod)}"></div></div>`; }).join('')}</div></details>`;
 
   const m = openModal(`
     <form id="prof-form" class="p-6 space-y-5" novalidate>
@@ -93,6 +104,7 @@ export function openProfileModal() {
             <input id="p-ver-otra" class="field mt-2" maxlength="20" placeholder="¿Cuál? (ej. 24)" value="${ver === 'otra' ? escapeHTML(verGuardada) : ''}" ${ver === 'otra' ? '' : 'hidden'}>
             <p class="text-[11px] text-gray-500 mt-1">Toca de nuevo la versión elegida para quitarla.</p>
           </div>
+          ${extrasHTML}
           <div><label class="label" for="p-hnotas">Aclaraciones sobre tu host <span class="text-gray-500 normal-case">(opcional)</span></label><textarea id="p-hnotas" class="field" rows="3" maxlength="300" placeholder="Horarios, ping, reglas de tu sala…">${escapeHTML(prof.host_notas)}</textarea></div>
         </div>
       </div>
@@ -133,6 +145,11 @@ export function openProfileModal() {
   const pintarVer = () => { m.querySelectorAll('#p-ver button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === ver))); $('#p-ver-otra').hidden = ver !== 'otra'; };
   $('#p-ver').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (!b) return; ver = ver === b.dataset.v ? '' : b.dataset.v; pintarVer(); if (ver === 'otra') $('#p-ver-otra').focus(); });
 
+  // Juegos extra: marcar un juego muestra sus campos de versión y parche/mod.
+  m.querySelectorAll('[data-extra-on]').forEach((c) => c.addEventListener('change', () => { c.closest('[data-extra]').querySelector('[data-extra-campos]').hidden = !c.checked; }));
+  const leerExtras = () => sanitizarExtras([...m.querySelectorAll('[data-extra]')].filter((d) => d.querySelector('[data-extra-on]').checked)
+    .map((d) => ({ juego: d.dataset.extra, version: d.querySelector('[data-extra-version]').value, mod: d.querySelector('[data-extra-mod]').value })));
+
   /* ---- Guardar ---- */
   $('#prof-form').addEventListener('submit', async (ev) => {
     ev.preventDefault(); err.textContent = '';
@@ -159,6 +176,7 @@ export function openProfileModal() {
         host_parche: parche === 'otro' ? $('#p-patch').value.trim().replace(/[<>]/g, '').slice(0, 80) : parche,
         host_sp_version: game === 'PES 2021' || !ver ? null : (ver === 'otra' ? $('#p-ver-otra').value.trim().replace(/[<>]/g, '').slice(0, 20) || null : ver),
         host_notas: $('#p-hnotas').value.trim().replace(/[<>]/g, ''),
+        host_extras: leerExtras(),
       };
       if (cambia) patch.username = username;
       const nuevaFoto = await resolveAvatar(picker.get(), uid);
