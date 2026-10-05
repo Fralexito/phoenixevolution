@@ -27,8 +27,8 @@ export const ORG = {
   // `destaque`: 2 = un poquito por encima, 1 = casi igual, 0 = parejo. `orden` = posición en pantallas anchas (en celular van en el orden de la lista).
   impulsoresIntro: 'Tres personas, un mismo proyecto. Cada una aporta algo distinto, y juntas le dan forma a Phoenix Evolution.',
   impulsores: [
-    { nombre: 'Fralex', rol: 'Fundador', destaque: 2, orden: 1, bio: 'Detrás de la idea y de la plataforma.', frase: '' },
-    { nombre: 'Jack', rol: 'Fundador', destaque: 1, orden: 2, bio: 'Quien le da energía a cada fecha, junto a Hugo.', frase: '' },
-    { nombre: 'Hugo', rol: 'Co-fundador', destaque: 0, orden: 3, bio: 'Compañero clave de Jack para darle vida a la comunidad.', frase: '' },
+    { nombre: 'Fralex', rol: 'CEO', destaque: 2, orden: 1, bio: 'Dirige la visión estratégica de Phoenix Evolution Series y lidera el desarrollo de la plataforma, el sistema de divisiones y la experiencia competitiva de la comunidad.', frase: '' },
+    { nombre: 'Jack', rol: 'Presidente', destaque: 1, orden: 2, bio: 'Preside la organización y garantiza el correcto desarrollo de cada fecha, la aplicación del reglamento y el espíritu de juego limpio en las competiciones.', frase: '' },
+    { nombre: 'Hugo', rol: 'Vicepresidente', destaque: 0, orden: 3, bio: 'Apoya la presidencia en la coordinación de torneos y calendarios, y acompaña a la comunidad para mantener una competición ordenada y participativa.', frase: '' },
   ],
 };
