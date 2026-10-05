@@ -1023,6 +1023,9 @@ test('video propio: analizarVideo reconoce solo nuestro Storage y rutas', () => 
   assert.deepEqual(archivoDeUrl(u), { bucket: 'muro-video', ruta: '11111111-1111-1111-1111-111111111111/1-x.mp4' });
   assert.equal(archivoDeUrl('https://abcdefghijklmnop.supabase.co/storage/v1/object/public/muro/u/1.jpg').bucket, 'muro');
   assert.equal(archivoDeUrl('https://otro.com/a.jpg'), null);
+  const r2 = 'https://pub-0123456789abcdef0123456789abcdef.r2.dev/11111111-1111-1111-1111-111111111111/1-x.mp4';
+  assert.deepEqual(archivoDeUrl(r2), { bucket: 'r2', ruta: '11111111-1111-1111-1111-111111111111/1-x.mp4' });
+  assert.equal(analizarVid(r2).proveedor, 'propio'); assert.equal(analizarVid('https://pub-0123.r2.dev/x/1.mp4').ok, false);
   assert.match(rutaVideo('uid', 'mov', 5, 'ab'), /^uid\/5-ab\.mov$/); assert.match(rutaVideo('uid', 'exe', 5, 'ab'), /\.mp4$/);
 });
 test('segmentos por juego y enlaces para compartir', () => {

@@ -92,7 +92,7 @@ const PROVEEDORES = [
   ['tiktok', /^https:\/\/(?:www\.|m\.|vm\.)?tiktok\.com\/\S+/i],
   ['kick', /^https:\/\/(?:www\.)?kick\.com\/\S+/i],
   ['twitch', /^https:\/\/(?:www\.|clips\.)?twitch\.tv\/\S+/i],
-  ['propio', /^https:\/\/[a-z0-9]{8,40}\.supabase\.co\/storage\/v1\/object\/public\/muro-video\/[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,80}$/i],   // video subido por el usuario (bucket muro-video, migración 027)
+  ['propio', /^https:\/\/(?:[a-z0-9]{8,40}\.supabase\.co\/storage\/v1\/object\/public\/muro-video|pub-[a-f0-9]{32}\.r2\.dev)\/[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,80}$/i],   // video subido por el usuario (bucket muro-video de Supabase —migración 027— o bucket R2 de Cloudflare —migración 028—; la BD acepta solo SU host exacto)
 ];
 export const PROVEEDOR_ETIQUETA = { youtube: 'YouTube', tiktok: 'TikTok', kick: 'Kick', twitch: 'Twitch', propio: 'Video' };
 export function analizarVideo(texto) {
@@ -109,6 +109,7 @@ export const rutaImagen = (uid, ts = Date.now(), azar = Math.random().toString(3
 export const rutaDeUrl = (url) => /\/storage\/v1\/object\/public\/muro\/([^?#]+)/.exec(String(url ?? ''))?.[1] ?? '';
 /** URL pública de nuestro Storage → { bucket, ruta } (solo «muro» y «muro-video»). null si no es nuestra. Sirve para limpiar archivos al borrar. */
 export function archivoDeUrl(url) {
+  const r2 = /^https:\/\/pub-[a-f0-9]{32}\.r2\.dev\/([0-9a-f-]{36}\/[A-Za-z0-9._-]{1,80})$/i.exec(String(url ?? '')); if (r2) return { bucket: 'r2', ruta: r2[1] };   // video en Cloudflare R2
   const m = /\/storage\/v1\/object\/public\/(muro|muro-video)\/([^?#]+)/.exec(String(url ?? '')); return m ? { bucket: m[1], ruta: m[2] } : null;
 }
 /** Ruta de un video subido: `<uid>/<marca de tiempo>-<aleatorio>.<mp4|webm|mov>`. */

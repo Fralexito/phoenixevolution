@@ -2,6 +2,7 @@
 import { supabase } from '../../core/supabase.js';
 import { redimensionarJpeg } from '../../core/image.js';
 import { rutaImagen, rutaVideo, archivoDeUrl } from '../../core/muro.js';
+import { VIDEO_WORKER_URL } from '../../core/config.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);
@@ -33,16 +34,32 @@ export async function subirImagen(file, uid, ancho = 1200) {
   if (error) { console.error('[muro] subir foto:', error.message); throw new Error('No se pudo subir la foto. Intenta de nuevo.'); }
   return supabase.storage.from('muro').getPublicUrl(ruta).data.publicUrl;
 }
-/** Sube un video (ya validado: tipo, tamaño y duración) a MI carpeta del bucket «muro-video». → URL pública. */
+/** Token de la sesión actual (para hablar con el Worker de videos). '' si no hay sesión. */
+async function tokenActual() { const { data } = await supabase.auth.getSession(); return data?.session?.access_token ?? ''; }
+/** Sube un video (ya validado: tipo, tamaño y duración) a MI carpeta. Con Worker configurado va a Cloudflare R2; si no, al bucket «muro-video» de Supabase. → URL pública. */
 export async function subirVideo(file, uid, ext, tipo) {
   const ruta = rutaVideo(uid, ext);
+  if (VIDEO_WORKER_URL) return subirVideoR2(file, ruta.split('/')[1], tipo || file.type);
   const { error } = await supabase.storage.from('muro-video').upload(ruta, file, { contentType: tipo || file.type, cacheControl: '31536000' });
   if (error) { console.error('[muro] subir video:', error.message); throw new Error(/limit|exceed|policy|row-level/i.test(error.message) ? 'No se pudo subir el video (límite de 3 videos por persona o archivo demasiado grande). Borra alguno e intenta de nuevo.' : 'No se pudo subir el video. Intenta de nuevo.'); }
   return supabase.storage.from('muro-video').getPublicUrl(ruta).data.publicUrl;
 }
+async function subirVideoR2(file, nombre, tipo) {
+  const token = await tokenActual(); if (!token) throw new Error('Inicia sesión para subir videos.');
+  let r; try { r = await fetch(`${VIDEO_WORKER_URL}/v/${encodeURIComponent(nombre)}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': tipo }, body: file }); }
+  catch (e) { console.error('[muro] subir video (R2):', e); throw new Error('No se pudo conectar para subir el video. Revisa tu conexión e intenta de nuevo.'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.url) { console.error('[muro] subir video (R2):', r.status, j.error); throw new Error(j.error || 'No se pudo subir el video. Intenta de nuevo.'); }
+  return j.url;
+}
 /** Borra un archivo propio (foto o video) del Storage (mejor esfuerzo: si falla solo queda un archivo huérfano, no se rompe nada). */
 export async function quitarArchivo(url) {
   const a = archivoDeUrl(url); if (!a) return;
+  if (a.bucket === 'r2') {   // video en Cloudflare R2: lo borra el Worker (verifica que sea de mi carpeta)
+    try { const token = await tokenActual(); if (!token || !VIDEO_WORKER_URL) return; const r = await fetch(`${VIDEO_WORKER_URL}/v/${encodeURIComponent(a.ruta.split('/')[1])}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }); if (!r.ok) console.warn('[muro] R2 no borró el archivo:', r.status); }
+    catch (e) { console.warn('[muro] no se pudo limpiar el archivo de R2:', e?.message); }
+    return;
+  }
   const { error } = await supabase.storage.from(a.bucket).remove([a.ruta]);
   if (error) console.warn('[muro] no se pudo limpiar el archivo:', error.message);
 }
