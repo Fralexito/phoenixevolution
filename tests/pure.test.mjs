@@ -792,3 +792,10 @@ test('hostExtras: solo juegos del catálogo, sin duplicados, sin < >, con límit
 test('hostExtras: resumenExtra', () => {
   assert.equal(resumenExtra({ juego: 'FIFA', version: '23', mod: 'Realism' }), 'FIFA 23 · Realism'); assert.equal(resumenExtra({ juego: 'eFootball', version: '', mod: '' }), 'eFootball');
 });
+
+test('etiquetaJuego: FIFA / EA FC / eFootball con mod entre paréntesis', async () => {
+  const { etiquetaJuego } = await import('../src/js/core/rules.js');
+  assert.equal(etiquetaJuego({ juego: 'FIFA', version: '23', parche: 'Realism Mod' }), 'FIFA 23 (Realism Mod)');
+  assert.equal(etiquetaJuego({ juego: 'EA FC', version: '27' }), 'EA FC 27');
+  assert.equal(etiquetaJuego({ juego: 'eFootball', version: '2027', parche: 'Option File' }), 'eFootball 2027 (Option File)');
+});

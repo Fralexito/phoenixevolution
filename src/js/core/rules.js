@@ -47,5 +47,11 @@ export function etiquetaJuego({ juego, parche, version } = {}) {
   const limpio = (x, n) => String(x ?? '').replace(/[<>]/g, '').trim().slice(0, n);
   if (/^pes/i.test(j)) { const pa = limpio(parche, 40); return `PES 21${pa ? ` (${pa})` : ''}`; }
   if (/^sp/i.test(j)) { const v = limpio(version, 10); return `SP Football Life${v ? ` ${v}` : ''}`; }
+  if (/^efoot/i.test(j)) { const v = limpio(version, 10); const pa = limpio(parche, 40); return `eFootball${v ? ` ${v}` : ''}${pa ? ` (${pa})` : ''}`; }
+  if (/^(fifa|ea|fc)/i.test(j)) {
+    const v = limpio(version, 10); const pa = limpio(parche, 40);
+    const base = /^fifa/i.test(j) ? 'FIFA' : 'EA FC';
+    return `${base}${v ? ` ${v}` : ''}${pa ? ` (${pa})` : ''}`;
+  }
   return j;
 }
