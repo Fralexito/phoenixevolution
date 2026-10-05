@@ -5,6 +5,7 @@ import Layout from '../layouts/Layout.astro';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
 import { calcularTabla } from '../js/core/tabla.js';
+import { escudoDe } from '../js/core/escudos.js';
 import { SISTEMA } from '../data/temporada.js';
 import { zonasDivision } from '../js/core/temporada.js';
 import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas } from '../js/core/ligaStats.js';
@@ -105,7 +106,7 @@ const datos = LIGAS.map((l) => ({
                     {e.tabla.map((f, i) => (
                       <tr data-jug={f.nombre} style={`--i:${i}`} class:list={['liga-fila', i === 0 && f.pj > 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
                         <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
-                        <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
+                        <td class="text-left"><span class="inline-flex items-center gap-2">{escudoDe(e.clubes?.[f.nombre]) && <img src={escudoDe(e.clubes[f.nombre])} alt="" width="22" height="22" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:22px;height:22px" onerror="this.style.display='none'" />}<span class="font-display font-bold text-white tracking-wide">{f.nombre}</span></span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
                         <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>

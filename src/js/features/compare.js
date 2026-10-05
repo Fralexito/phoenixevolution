@@ -1,5 +1,6 @@
 // Comparador 1 vs 1: cabecera y resumen siempre visibles; radar, barras y perfil en pestañas (menos scroll).
 // (La comparación de varios jugadores por equipos vive en compareMasivo.js.)
+import { escudoHTML } from '../core/escudos.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { openCompareMasivo } from './compareMasivo.js';
 import { escapeHTML, safeImg, statColor } from '../core/dom.js';
@@ -47,7 +48,7 @@ function headCard(p, color, side, lider) {
     <span class="cmp-top"><span class="cmp-photo">${img ? `<img src="${escapeHTML(img)}" alt="" class="w-full h-full object-cover object-top">` : `<i class="fa-solid fa-user-astronaut" style="color:${color}"></i>`}</span>
     <span class="cmp-ovr" data-count="${Number(p.ovr) || 0}">${escapeHTML(p.ovr ?? '--')}</span></span>
     <b class="cmp-name">${escapeHTML(p.nombre)}</b>
-    <span class="cmp-sub">${escapeHTML(String(p.club ?? '').toUpperCase())} · ${escapeHTML(p.posicion)}</span>
+    <span class="cmp-sub">${escudoHTML(p.club, 14)} ${escapeHTML(String(p.club ?? '').toUpperCase())} · ${escapeHTML(p.posicion)}</span>
     <span class="cmp-best" title="Su mejor estadística"><i class="fa-solid fa-bolt"></i> ${mejor[0].toUpperCase()} ${mejor[1]}</span>
   </div>`;
 }

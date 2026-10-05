@@ -1105,3 +1105,13 @@ test('totalFechas: se deduce del formato', () => {
   assert.equal(totalFechas({ participantes: 5, formato: 'Todos contra todos', fechas: fs(1) }), 5);
   assert.equal(totalFechas({ participantes: 8, formato: 'Eliminatoria', fechas: fs(3) }), 3); assert.equal(totalFechas(null), 0);
 });
+
+import { escudoDe, escudoHTML } from '../src/js/core/escudos.js';
+test('escudos: reconoce el club escrito de varias formas y nunca rompe', () => {
+  const u = escudoDe('Liverpool'); assert.match(u, /^https:\/\/crests\.football-data\.org\/\d+\.png$/);
+  assert.equal(escudoDe('LIVERPOOL'), u); assert.equal(escudoDe('Bayern Múnich'), escudoDe('Bayern Munich')); assert.equal(escudoDe('PSG'), escudoDe('Paris Saint-Germain'));
+  assert.equal(escudoDe('Paris Saint Germain'), escudoDe('PARIS SAINT GERMAIN')); assert.equal(escudoDe('Atlético de Madrid'), escudoDe('atletico madrid'));
+  for (const c of ['Arsenal', 'Chelsea', 'Inter', 'AC Milan', 'Real Madrid', 'FC Barcelona', 'Manchester City', 'Manchester United']) assert.ok(escudoDe(c), c);
+  assert.equal(escudoDe('Agente Libre'), null); assert.equal(escudoDe(null), null);
+  assert.match(escudoHTML('Agente Libre'), /fa-shield-halved/); assert.match(escudoHTML('Arsenal'), /<img /);
+});

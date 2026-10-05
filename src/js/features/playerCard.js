@@ -4,6 +4,7 @@ import { posInfo } from '../../data/posiciones.js';
 import { ratioDe } from '../core/crop.js';
 import { fisicoPartes } from '../core/fisico.js';
 import { nivelDe } from '../core/destacados.js';
+import { escudoHTML } from '../core/escudos.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -53,7 +54,7 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '', lar
         <div class="pc-head">
           <h3 class="pc-name">${escapeHTML(p.nombre)}</h3>
           <div class="pc-sub">
-            <div class="pc-club"><i class="fa-solid fa-shield-halved text-galaxy-400"></i><span class="truncate">${escapeHTML(p.club)}</span></div>
+            <div class="pc-club">${escudoHTML(p.club, 18)}<span class="truncate">${escapeHTML(p.club)}</span></div>
             ${p.apodo ? `<span class="pc-apodo" title="Apodo">«${escapeHTML(p.apodo)}»</span>` : ''}
           </div>
         </div>
