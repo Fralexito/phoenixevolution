@@ -17,5 +17,9 @@ export const LEMA_MAX = 80;
 export const MURO_VER = [['PUBLICO', 'Público', 'Cualquiera puede ver mi muro, tenga o no cuenta.'], ['AMIGOS', 'Solo amigos', 'Solo mis amigos (y yo) vemos mis publicaciones.']];
 export const MURO_RESPONDER = [['TODOS', 'Todos', 'Cualquiera con sesión podrá responder y reaccionar.'], ['AMIGOS', 'Solo amigos', 'Solo mis amigos podrán responder.'], ['NADIE', 'Nadie', 'Mi muro será de solo lectura: nadie podrá responder ni reaccionar.']];
 export const RESP_MAX = 500;
-/** Reacciones disponibles. El id (2.º elemento de la BD: fuego, gg, aplauso, risa, corazon) lo valida la base de datos. */
-export const REACCIONES = [['fuego', '🔥', 'Fuego'], ['gg', '🤝', 'GG'], ['aplauso', '👏', 'Aplauso'], ['risa', '😂', 'Risa'], ['corazon', '❤️', 'Me encanta']];
+/** Reacciones rápidas (las que se ofrecen cuando una publicación aún no tiene ninguna). En la BD el `tipo` ES el emoji (migración 026). */
+export const REACCIONES = [['🔥', 'Fuego'], ['🤝', 'GG'], ['👏', 'Aplauso'], ['😂', 'Risa'], ['❤️', 'Me encanta']];
+/** Paleta completa del botón «+». La BD acepta cualquier emoji (no ASCII, ≤ 16 caracteres); el cliente solo ofrece estos. */
+export const PALETA_EMOJIS = ['🔥', '🤝', '👏', '😂', '❤️', '😮', '😎', '🤩', '😭', '😡', '🤯', '🥶', '🥵', '💀', '🫡', '🙏', '💪', '👑', '🏆', '⚽', '🎯', '🧤', '🥅', '🚀', '💯', '✅', '❌', '👀', '🤡', '😴', '🫶', '👍', '👎', '🍿', '⭐', '💥', '🧠', '🐐', '🔝', '🎮'];
+/** Claves antiguas (antes de la migración 026) → emoji. Solo para leer datos viejos sin romper nada. */
+export const REACCION_ANTIGUA = { fuego: '🔥', gg: '🤝', aplauso: '👏', risa: '😂', corazon: '❤️' };

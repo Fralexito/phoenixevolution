@@ -1,13 +1,16 @@
 // Página /perfil/?u=<usuario>: perfil público + MURO de un jugador (sin ?u= abre el tuyo).
 // Esquema: pages (este archivo, pinta y reparte eventos) → features/muro/api (RPC, migración 021) → core/muro (lógica pura) + data/muroEstilo.
-import { onSession, isAdmin } from '../core/session.js';
+import { onSession, isAdmin, refreshProfile } from '../core/session.js';
+import { supabase } from '../core/supabase.js';
+import { openModal, closeModal } from '../core/modal.js';
+import { avatarPickerHTML, bindAvatarPicker, resolveAvatar } from '../features/avatarPicker.js';
+import { HOST_JUEGOS, HOST_MAX_TEXTO, limpiarOpcion, catalogoDe, alternarJuego, alternarOpcion, lineasHost } from '../core/hostCatalogo.js';
 import { toast } from '../core/toast.js';
 import { escapeHTML, safeUrl, safeImg } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { avatarHTML } from '../core/avatar.js';
-import { sanitizarExtras, resumenExtra } from '../core/hostExtras.js';
 import { analizarVideo, etiquetaOpcionReto, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
-import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES } from '../../data/muroEstilo.js';
+import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES, PALETA_EMOJIS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { contenidoHTML, reproductorYT } from '../features/muro/render.js';
 import { solicitar } from '../features/amigos/api.js';
@@ -15,8 +18,8 @@ import { normalizarHistorias, validarHistoria, validarTituloDestacada, validarCl
 import { abrirHistorias, abrirClips } from '../features/muro/visor.js';
 
 const root = document.getElementById('muro-root');
-const S = { sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map(),
-  hist: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
+const S = { host: null, sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map(),
+  hist: null, paleta: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
 
 /* «Ya vista» de las historias: solo en este navegador. */
 const KEY_VISTAS = 'pes-historias-vistas';
@@ -40,30 +43,35 @@ const vigentes = () => S.hist?.historias ?? [];
 /** Avatar del perfil: con anillo de color si hay historias vigentes (acento si hay nuevas, gris si ya las viste); al tocarlo se abren. */
 function avatarConAnillo(p, acento) {
   const base = `w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border-4 border-galaxy-panel shrink-0`;
-  if (!vigentes().length || !S.visible) return `<span class="${base}" style="box-shadow:0 0 0 2px ${acento}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</span>`;
+  const cam = p.soy_yo ? `<button type="button" data-act="cambiar-foto" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil" class="absolute -bottom-0.5 -right-0.5 z-10 w-8 h-8 rounded-full bg-galaxy-600 hover:bg-galaxy-400 border-2 border-galaxy-panel text-white text-xs grid place-items-center"><i class="fa-solid fa-camera"></i></button>` : '';
+  const envolver = (x) => `<span class="relative shrink-0">${x}${cam}</span>`;
+  if (!vigentes().length || !S.visible) return envolver(`<span class="${base}" style="box-shadow:0 0 0 2px ${acento}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</span>`);
   const nuevo = hayNuevas(vigentes(), S.vistas);
-  return `<button type="button" data-act="ver-historias" aria-label="Ver historias de ${escapeHTML(p.nombre_display)}" class="${base} cursor-pointer" style="box-shadow:0 0 0 3px ${nuevo ? acento : '#6b7280'}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</button>`;
+  return envolver(`<button type="button" data-act="ver-historias" aria-label="Ver historias de ${escapeHTML(p.nombre_display)}" class="${base} cursor-pointer" style="box-shadow:0 0 0 3px ${nuevo ? acento : '#6b7280'}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</button>`);
 }
 
 function cabecera(p) {
   const { banner, acento, lema, foto } = estiloDe(p);
   const fondo = safeImg(foto) ? `url(&quot;${escapeHTML(safeImg(foto))}&quot;) center/cover no-repeat` : banner.css;
-  const extras = sanitizarExtras(p.host_extras).map(resumenExtra);
   const chips = [
     p.club_favorito && ['fa-shield-halved', p.club_favorito], p.posicion_preferida && ['fa-location-crosshairs', p.posicion_preferida],
     p.pais_codigo && ['fa-flag', p.pais_codigo], `${p.partidos_jugados ?? 0}` !== '' && ['fa-gamepad', `${p.partidos_jugados ?? 0} partidos`],
     p.rango_fairplay && ['fa-handshake', p.rango_fairplay],
   ].filter(Boolean).map(([i, t]) => `<span class="inline-flex items-center gap-1.5 text-[11px] text-gray-300 bg-black/30 border border-galaxy-border/70 rounded-full px-2.5 py-1"><i class="fa-solid ${i}" style="color:${acento}"></i>${escapeHTML(t)}</span>`).join('');
-  const host = p.puede_hostear ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-server mr-1.5" style="color:${acento}"></i>Hostea <b class="text-white">${escapeHTML(p.host_juego || 'PES 2021')}</b>${p.host_parche ? ` (${escapeHTML(p.host_parche)})` : ''}${p.host_sp_version ? ` v${escapeHTML(p.host_sp_version)}` : ''} · ${escapeHTML(p.software_host || 'Parsec')}${extras.length ? ` · extras: ${extras.map(escapeHTML).join(', ')}` : ''}</p>` : '';
+  const lineas = p.puede_hostear ? lineasHost(catalogoDe(p)) : [];
+  const detalleHost = lineas.length ? lineas.map((l) => `<b class="text-white">${escapeHTML(l.juego)}</b>${l.detalle ? ` <span class="text-gray-400">(${escapeHTML(l.detalle)})</span>` : ''}`).join(' · ') : '<b class="text-white">PES 2021</b>';
+  const host = p.puede_hostear ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-server mr-1.5" style="color:${acento}"></i>Hostea ${detalleHost} · ${escapeHTML(p.software_host || 'Parsec')}${p.soy_yo && p.host_visible === false ? ' <em class="text-amber-300 not-italic">· oculto para los demás</em>' : ''}</p>` : '';
   const stream = safeUrl(p.stream_url) ? `<a href="${escapeHTML(safeUrl(p.stream_url))}" target="_blank" rel="noopener noreferrer" class="text-xs text-galaxy-400 underline"><i class="fa-solid fa-tower-broadcast mr-1"></i>Ver su canal</a>` : '';
   const acciones = p.soy_yo
     ? `${botonesCartaReto(p)}<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
+       <button type="button" data-act="panel" data-panel="host" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-server"></i><span>Hosting</span></button>
        <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
     : (S.sesion ? `${botonesCartaReto(p)}<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>
        <button type="button" data-act="amistad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-user-plus"></i><span>Agregar</span></button>`
       : `${botonesCartaReto(p)}<span class="text-[11px] text-gray-500">Inicia sesión para escribirle o retarlo.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
-    <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div></div>
+    <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
+      ${p.soy_yo ? `<input type="file" id="bn-file" accept="image/jpeg,image/png,image/webp" hidden><button type="button" data-act="cambiar-banner" aria-label="Cambiar banner" title="Cambiar banner" class="absolute top-2 right-2 z-10 h-9 px-3 rounded-full bg-black/60 hover:bg-black/80 text-white text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-camera"></i><span class="max-sm:hidden">Cambiar banner</span></button>` : ''}</div>
     <div class="px-4 sm:px-6 pb-5 -mt-10 sm:-mt-12 relative">
       <div class="flex flex-wrap items-end gap-3 sm:gap-4">
         ${avatarConAnillo(p, acento)}
@@ -111,16 +119,20 @@ const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
   <div class="flex items-center gap-2"><button type="button" data-act="elegir-foto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span>Foto</span></button>
     <button type="button" data-act="alternar-video" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-circle-play"></i><span>Video</span></button>
     <button type="button" data-act="alternar-reto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-gamepad"></i><span>Duelo</span></button>
-    <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar</span></button></div></section>`;
+    <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" aria-label="Publicar" title="Publicar" class="btn btn-primary !min-h-9 !text-xs shrink-0 max-sm:!px-3"><i class="fa-solid fa-paper-plane"></i><span class="max-sm:hidden">Publicar</span></button></div></section>`;
 
-/** Reacciones: con permiso, los 5 botones (el tuyo resaltado, con su conteo); sin permiso, solo los conteos. Más el botón de respuestas. */
+/** Reacciones: las que ya tiene la publicación, de MÁS a MENOS votada (la más popular va primero); con permiso son botones (la mía resaltada) y hay un «+» que abre
+ *  la paleta de emojis. Sin ninguna reacción todavía, se ofrecen las 5 rápidas para no dejar la fila vacía. */
 function barraReacciones(it, p) {
-  const cuentas = new Map(resumenReacciones(it.reacciones).map((x) => [x.tipo, x.n]));
-  const botones = p.puede_responder
-    ? REACCIONES.map(([t, emoji, tit]) => `<button type="button" data-act="reaccion" data-id="${it.id}" data-tipo="${t}" aria-pressed="${it.mia === t}" title="${tit}" class="rx"><span>${emoji}</span>${cuentas.get(t) ? `<b>${cuentas.get(t)}</b>` : ''}</button>`).join('')
-    : [...cuentas].map(([t, n]) => `<span class="rx" title="${REACCIONES.find((r) => r[0] === t)[2]}"><span>${REACCIONES.find((r) => r[0] === t)[1]}</span><b>${n}</b></span>`).join('');
+  const resumen = resumenReacciones(it.reacciones); const abierta = S.paleta === it.id;
+  const chip = (tipo, n, activo) => p.puede_responder
+    ? `<button type="button" data-act="reaccion" data-id="${it.id}" data-tipo="${escapeHTML(tipo)}" aria-pressed="${activo}" class="rx"><span>${escapeHTML(tipo)}</span>${n ? `<b>${n}</b>` : ''}</button>`
+    : `<span class="rx"><span>${escapeHTML(tipo)}</span><b>${n}</b></span>`;
+  const rapidas = !resumen.length && p.puede_responder ? REACCIONES.map(([t]) => chip(t, 0, false)).join('') : '';
+  const mas = p.puede_responder ? `<button type="button" data-act="paleta" data-id="${it.id}" aria-expanded="${abierta}" aria-label="Más emojis" title="Más emojis" class="rx !px-2"><i class="fa-regular fa-face-smile"></i><i class="fa-solid fa-plus text-[9px]"></i></button>` : '';
   const n = Number(it.respuestas) || 0;
-  return `<div class="flex flex-wrap items-center gap-1.5">${botones}<button type="button" data-act="respuestas" data-id="${it.id}" aria-expanded="${S.abiertas.has(it.id)}" class="ml-auto text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'}` : (p.puede_responder ? 'Responder' : 'Sin respuestas')}</button></div>`;
+  const paleta = abierta ? `<div class="mt-2 p-2 rounded-xl border border-galaxy-border bg-black/40 grid grid-cols-8 gap-1" role="group" aria-label="Elige un emoji">${PALETA_EMOJIS.map((e) => `<button type="button" data-act="reaccion" data-id="${it.id}" data-tipo="${e}" aria-pressed="${it.mia === e}" class="h-9 rounded-lg text-lg hover:bg-white/10 aria-pressed:bg-white/15">${e}</button>`).join('')}</div>` : '';
+  return `<div class="flex flex-wrap items-center gap-1.5">${resumen.map((x) => chip(x.tipo, x.n, it.mia === x.tipo)).join('')}${rapidas}${mas}<button type="button" data-act="respuestas" data-id="${it.id}" aria-expanded="${S.abiertas.has(it.id)}" class="ml-auto text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'}` : (p.puede_responder ? 'Responder' : 'Sin respuestas')}</button></div>${paleta}`;
 }
 function seccionRespuestas(it, p) {
   const lista = S.resp.get(it.id);
@@ -224,7 +236,7 @@ function seccionClips(p) {
 function pintar() {
   const p = S.p;
   const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelPrivacidad(p) + (conExtras ? panelHistoria() + panelDestacada() : '') : ''}${barraHistorias(p)}
+  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) + (conExtras ? panelHistoria() + panelDestacada() : '') : ''}${barraHistorias(p)}
     <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
@@ -275,9 +287,58 @@ function fijarBannerFoto(url) {
   document.getElementById('est-foto-estado').textContent = url ? 'Foto lista: pulsa «Guardar estilo».' : 'JPG, PNG o WebP; se reduce sola a 1600 px.';
 }
 
+/* ---------- Panel «Hosting» (varios juegos y parches + mostrar/ocultar) ---------- */
+const panelHostHTML = () => '<section id="panel-host" hidden class="glass-panel rounded-2xl p-4 space-y-3"></section>';
+function pintarPanelHost() {
+  const box = document.getElementById('panel-host'); const h = S.host; if (!box || !h) return;
+  const juegos = HOST_JUEGOS.map((j) => {
+    const e = h.cat.find((x) => x.juego === j.id); const id = escapeHTML(j.id);
+    const opciones = e ? [...new Set([...j.sugeridas, ...e.opciones])] : [];
+    return `<div class="rounded-xl border ${e ? 'border-galaxy-400/50 bg-galaxy-600/10' : 'border-galaxy-border/60 bg-black/20'} p-2.5">
+      <button type="button" data-act="host-juego" data-juego="${id}" aria-pressed="${!!e}" class="flex items-center gap-2 text-sm text-white font-display font-bold uppercase tracking-wide w-full text-left"><i class="fa-regular ${e ? 'fa-square-check text-galaxy-400' : 'fa-square'}"></i>${id}</button>
+      ${e ? `<p class="text-[11px] text-gray-400 mt-2 mb-1">${escapeHTML(j.opcion)} (puedes elegir varios)</p>
+        <div class="flex flex-wrap gap-1.5">${opciones.map((o) => `<button type="button" data-act="host-opcion" data-juego="${id}" data-o="${escapeHTML(o)}" aria-pressed="${e.opciones.includes(o)}" class="adv-chip !min-h-8 !px-2.5 !text-[11px]">${escapeHTML(o)}</button>`).join('')}</div>
+        <div class="flex gap-1.5 mt-2"><input data-host-otro="${id}" maxlength="${HOST_MAX_TEXTO}" placeholder="Otro (escríbelo)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-2.5 py-1.5 text-xs text-white">
+          <button type="button" data-act="host-agregar" data-juego="${id}" aria-label="Añadir" class="btn btn-ghost !min-h-8 !px-3 !text-xs"><i class="fa-solid fa-plus"></i></button></div>` : ''}</div>`;
+  }).join('');
+  box.innerHTML = `<h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-server text-galaxy-400 mr-2"></i>Mi hosting</h2>
+    <label class="flex items-center gap-2.5 text-sm text-white cursor-pointer"><input type="checkbox" data-act="host-visible" ${h.visible ? 'checked' : ''} class="w-4 h-4 accent-[#8000ff]">Mostrar mi hosting en mi perfil</label>
+    ${S.p.puede_hostear ? '' : '<p class="text-[11px] text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Aún no tienes activado «Puedo ser host» en Mi perfil → Sistema Host: mientras tanto no se mostrará.</p>'}
+    <div><p class="text-[11px] text-gray-400 mb-1.5">Plataforma</p><div class="flex gap-1.5">${['Ambos', 'Smash Soda', 'Parsec'].map((v) => `<button type="button" data-act="host-soft" data-v="${v}" aria-pressed="${h.soft === v}" class="adv-chip !min-h-8 !px-3 !text-[11px]">${v}</button>`).join('')}</div></div>
+    <div class="space-y-2">${juegos}</div>
+    <p class="text-[11px] text-gray-500">Marca todos los juegos que hosteas y, en cada uno, todos los parches o versiones que ofreces. La velocidad, las aclaraciones y «Puedo ser host» siguen en Mi perfil.</p>
+    <div class="flex gap-2"><button type="button" data-act="guardar-host" class="btn btn-primary !min-h-9 !text-xs">Guardar hosting</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div>`;
+}
+
+/** Ventana «Foto de perfil»: la misma de Mi perfil (subir, galería de avatares, la de Discord/Google), pero abierta desde el muro. */
+function abrirFoto() {
+  const user = S.sesion?.user; if (!user) return;
+  const m = openModal(`<div class="p-6 space-y-4"><div class="flex justify-between items-center"><h2 class="font-display font-bold text-xl text-white uppercase tracking-widest">Foto de perfil</h2>
+    <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+    ${avatarPickerHTML({ avatarUrl: S.p.avatar_url, name: S.p.nombre_display, user, ns: 'mf' })}
+    <p id="mf-err" class="text-xs text-bad min-h-4" role="alert"></p><button type="button" id="mf-ok" class="btn btn-primary w-full">Guardar foto</button></div>`, { id: 'foto-modal' });
+  const err = m.querySelector('#mf-err');
+  const picker = bindAvatarPicker(m, { user, getName: () => S.p.nombre_display, onError: (t) => { err.textContent = t; }, currentUrl: S.p.avatar_url, ns: 'mf' });
+  const ok = m.querySelector('#mf-ok');
+  ok.addEventListener('click', async () => {
+    ok.disabled = true; err.textContent = '';
+    try {
+      const url = await resolveAvatar(picker.get(), S.p.id);
+      if (url === undefined) { closeModal('foto-modal'); return; }   // no eligió nada nuevo
+      const { error } = await supabase.from('perfiles').update({ avatar_url: url }).eq('id', S.p.id); if (error) throw error;
+      await refreshProfile(); closeModal('foto-modal'); toast('Foto actualizada.', 'ok'); await cargar();
+    } catch (ex) { console.error('[perfil] foto:', ex); err.textContent = 'No se pudo guardar la foto. Intenta de nuevo.'; }
+    finally { ok.disabled = false; }
+  });
+}
+
 /* ---------- Visores y paneles ---------- */
-const PANELES = ['estilo', 'privacidad', 'historia', 'destacada'];
-function abrirPanel(nombre) { PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = n !== nombre ? true : !x.hidden; }); }
+const PANELES = ['estilo', 'privacidad', 'historia', 'destacada', 'host'];
+function abrirPanel(nombre) {
+  if (nombre === 'host' && document.getElementById('panel-host')?.hidden) {   // al abrirlo se precarga con lo que ya tengo (o con mis datos antiguos de un solo juego)
+    S.host = { cat: catalogoDe(S.p), soft: ['Ambos', 'Smash Soda', 'Parsec'].includes(S.p.software_host) ? S.p.software_host : 'Ambos', visible: S.p.host_visible !== false }; pintarPanelHost();
+  }
+  PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = n !== nombre ? true : !x.hidden; }); }
 function limpiarFotoHistoria() {
   const f = document.getElementById('hi-file'); if (f) f.value = '';
   const img = document.getElementById('hi-prev-img'); if (img?.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
@@ -396,10 +457,27 @@ const ACCIONES = {
     if (await seguro(() => api.editar(Number(el.dataset.id), v.texto), 'Cambios guardados.') !== undefined) { S.editando = null; await refrescarMuro(); }
   },
   borrar: async (el) => { if (!window.confirm('¿Borrar esta publicación? No se puede deshacer.')) return; if (await seguro(() => api.borrar(Number(el.dataset.id)), 'Publicación borrada.') !== undefined) await refrescarMuro(); },
+  'cambiar-foto': () => abrirFoto(),
+  'cambiar-banner': () => document.getElementById('bn-file').click(),
+  'host-juego': (el) => { S.host.cat = alternarJuego(S.host.cat, el.dataset.juego); pintarPanelHost(); },
+  'host-opcion': (el) => { S.host.cat = alternarOpcion(S.host.cat, el.dataset.juego, el.dataset.o); pintarPanelHost(); },
+  'host-agregar': (el) => {
+    const inp = [...document.querySelectorAll('[data-host-otro]')].find((x) => x.dataset.hostOtro === el.dataset.juego); const antes = S.host.cat;
+    if (S.host.cat.find((x) => x.juego === el.dataset.juego)?.opciones.includes(limpiarOpcion(inp?.value))) { toast('Esa opción ya está marcada.', 'info'); return; }
+    S.host.cat = alternarOpcion(S.host.cat, el.dataset.juego, inp?.value); if (S.host.cat === antes) { toast('Escribe el nombre o ya tienes el máximo de opciones.', 'info'); return; }
+    pintarPanelHost();
+  },
+  'host-soft': (el) => { S.host.soft = el.dataset.v; pintarPanelHost(); },
+  'host-visible': (el) => { S.host.visible = el.checked; },
+  'guardar-host': async () => {
+    if (!S.host.cat.length) { toast('Elige al menos un juego (o desmarca «Mostrar mi hosting en mi perfil»).', 'error'); return; }
+    if (await seguro(() => api.guardarHost(S.host.soft, S.host.cat, S.host.visible), 'Hosting guardado.') !== undefined) await cargar();
+  },
+  paleta: (el) => { const id = Number(el.dataset.id); S.paleta = S.paleta === id ? null : id; pintarFeed(); },
   reaccion: async (el) => {
     const id = Number(el.dataset.id); const it = S.items.find((x) => x.id === id); if (!it) return;
     const final = await seguro(() => api.reaccionar(id, el.dataset.tipo)); if (final === undefined) return;   // undefined = falló (ya se avisó); null = quité mi reacción
-    S.items = S.items.map((x) => (x.id === id ? aplicarReaccion(x, final) : x)); pintarFeed();
+    S.paleta = null; S.items = S.items.map((x) => (x.id === id ? aplicarReaccion(x, final) : x)); pintarFeed();
   },
   respuestas: async (el) => {
     const id = Number(el.dataset.id);
@@ -459,6 +537,17 @@ root.addEventListener('change', async (e) => {
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); t.value = ''; return; }
     const img = document.getElementById('hi-prev-img'); if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
     img.src = URL.createObjectURL(f); document.getElementById('hi-prev').hidden = false;
+  } else if (t.id === 'bn-file') {   // banner desde el propio muro: se sube y se guarda al instante (conserva preset, color y lema)
+    const f = t.files?.[0]; t.value = ''; if (!f) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); return; }
+    let url = null;
+    try {
+      const e = estiloDe(S.p); toast('Subiendo banner…', 'info', { key: 'banner' });
+      url = await api.subirImagen(f, S.p.id, 1600);
+      await api.guardarEstilo(estiloParaGuardar({ bannerId: e.banner.id, foto: url, acento: e.acento, lema: e.lema }));
+      if (e.foto) api.quitarImagen(e.foto);   // el banner anterior ya no se usa
+      toast('Banner actualizado.', 'ok'); await cargar();
+    } catch (err) { toast(msgErr(err), 'error'); if (url) api.quitarImagen(url); }
   } else if (t.id === 'est-file') {   // foto de banner: se sube ya (para poder previsualizar) y se guarda con «Guardar estilo»
     const f = t.files?.[0]; t.value = ''; if (!f) return;
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); return; }

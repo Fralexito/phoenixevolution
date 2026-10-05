@@ -840,16 +840,18 @@ test('muro fase 2: respuestas, resumen y reacción local', async () => {
   assert.equal(validarRespuesta(' ').ok, false);
   assert.equal(validarRespuesta('x'.repeat(501)).ok, false);
   assert.equal(validarRespuesta(' GG ').texto, 'GG');
-  assert.deepEqual(resumenReacciones({ gg: 2, fuego: 1, basura: 9, risa: 0 }).map((x) => `${x.tipo}:${x.n}`), ['fuego:1', 'gg:2']);   // orden del catálogo, sin desconocidas ni ceros
+  assert.deepEqual(resumenReacciones({ '🤝': 2, '🔥': 1, basura: 9, '😂': 0 }).map((x) => `${x.tipo}:${x.n}`), ['🤝:2', '🔥:1']);   // la más votada primero; sin letras ni ceros
+  assert.deepEqual(resumenReacciones({ '🔥': 1, fuego: 2, '💀': 3 }).map((x) => `${x.tipo}:${x.n}`), ['🔥:3', '💀:3']);   // claves antiguas suman a su emoji; empate → orden de la paleta
+  assert.deepEqual(resumenReacciones({ '😮': 1, '😎': 1 }).map((x) => x.tipo), ['😮', '😎'])
   assert.deepEqual(resumenReacciones(null), []);
-  const it = { id: 1, reacciones: { fuego: 1 }, mia: null };
-  const a = aplicarReaccion(it, 'fuego');   // reacciono 🔥
-  assert.deepEqual([a.reacciones, a.mia], [{ fuego: 2 }, 'fuego']);
-  const b = aplicarReaccion(a, 'gg');       // cambio a GG: baja 🔥, sube GG
-  assert.deepEqual([b.reacciones, b.mia], [{ fuego: 1, gg: 1 }, 'gg']);
-  const c = aplicarReaccion({ ...b, reacciones: { gg: 1 } }, null);   // la quito: el conteo desaparece
+  const it = { id: 1, reacciones: { '🔥': 1 }, mia: null };
+  const a = aplicarReaccion(it, '🔥');   // reacciono 🔥
+  assert.deepEqual([a.reacciones, a.mia], [{ '🔥': 2 }, '🔥']);
+  const b = aplicarReaccion(a, '🤝');       // cambio a GG: baja 🔥, sube GG
+  assert.deepEqual([b.reacciones, b.mia], [{ '🔥': 1, '🤝': 1 }, '🤝']);
+  const c = aplicarReaccion({ ...b, reacciones: { '🤝': 1 } }, null);   // la quito: el conteo desaparece
   assert.deepEqual([c.reacciones, c.mia], [{}, null]);
-  assert.deepEqual(it, { id: 1, reacciones: { fuego: 1 }, mia: null });   // no muta
+  assert.deepEqual(it, { id: 1, reacciones: { '🔥': 1 }, mia: null });   // no muta
 });
 
 test('muro fase 3: enlaces de video, rutas de imagen y banner con foto', async () => {
@@ -973,4 +975,32 @@ test('historias: infoClip (miniatura solo de YouTube; enlaces raros → null)', 
   assert.equal(infoClip({ id: 2, video_url: 'https://www.tiktok.com/@a/video/1' }).ytId, '');
   assert.equal(infoClip({ id: 3, video_url: 'javascript:alert(1)' }), null);
   assert.equal(infoClip(null), null);
+});
+
+// ---- Hosting con varios juegos y parches (core/hostCatalogo.js) ----
+import { sanitizarCatalogo, catalogoDesdeLegacy, catalogoDe, alternarJuego, alternarOpcion, lineasHost, HOST_MAX_OPCIONES, HOST_MAX_JUEGOS } from '../src/js/core/hostCatalogo.js';
+test('hosting: sanitizarCatalogo (juegos conocidos, sin repetir, opciones limpias, límites)', () => {
+  const c = sanitizarCatalogo([{ juego: 'PES 2021', opciones: ['Dream Patch', ' Dream  Patch ', '<b>X</b>', 5, ''] }, { juego: 'PES 2021', opciones: ['otro'] }, { juego: 'Minecraft', opciones: [] }, null]);
+  assert.deepEqual(c, [{ juego: 'PES 2021', opciones: ['Dream Patch', 'bX/b'] }]);
+  assert.equal(sanitizarCatalogo('basura').length, 0);
+  const muchas = sanitizarCatalogo([{ juego: 'EA FC', opciones: Array.from({ length: 20 }, (_, i) => `v${i}`) }]);
+  assert.equal(muchas[0].opciones.length, HOST_MAX_OPCIONES);
+  assert.equal(sanitizarCatalogo([{ juego: 'EA FC', opciones: ['x'.repeat(100)] }])[0].opciones[0].length, 40);
+});
+test('hosting: precarga desde las columnas antiguas y catalogoDe', () => {
+  assert.deepEqual(catalogoDesdeLegacy({ host_juego: 'PES 2021', host_parche: 'VirtuaRED', host_extras: [{ juego: 'eFootball', version: '2025', mod: 'Opt' }] }),
+    [{ juego: 'PES 2021', opciones: ['VirtuaRED'] }, { juego: 'eFootball', opciones: ['2025', 'Opt'] }]);
+  assert.deepEqual(catalogoDesdeLegacy({ host_juego: 'SP Football Life', host_sp_version: '26' }), [{ juego: 'SP Football Life', opciones: ['26'] }]);
+  assert.deepEqual(catalogoDesdeLegacy(null), []);
+  assert.equal(catalogoDe({ host_catalogo: [{ juego: 'FIFA', opciones: ['FIFA 23'] }], host_juego: 'PES 2021' })[0].juego, 'FIFA');   // el nuevo manda
+  assert.equal(catalogoDe({ host_catalogo: [], host_juego: 'PES 2021' })[0].juego, 'PES 2021');
+});
+test('hosting: alternar juegos y opciones (no muta, respeta máximos)', () => {
+  const vacio = []; const a = alternarJuego(vacio, 'PES 2021'); assert.deepEqual(vacio, []); assert.equal(a.length, 1);
+  assert.equal(alternarJuego(a, 'PES 2021').length, 0); assert.equal(alternarJuego(a, 'Tetris').length, 1);
+  const b = alternarOpcion(a, 'PES 2021', 'Dream Patch'); const c = alternarOpcion(b, 'PES 2021', 'VirtuaRED');
+  assert.deepEqual(c[0].opciones, ['Dream Patch', 'VirtuaRED']); assert.deepEqual(alternarOpcion(c, 'PES 2021', 'Dream Patch')[0].opciones, ['VirtuaRED']);
+  assert.equal(alternarOpcion([], 'SP Football Life', '26')[0].opciones[0], '26');   // marcar una opción añade el juego
+  let lleno = []; for (const j of ['PES 2021', 'SP Football Life', 'eFootball', 'FIFA', 'EA FC']) lleno = alternarJuego(lleno, j); assert.equal(lleno.length, HOST_MAX_JUEGOS);
+  assert.deepEqual(lineasHost(c), [{ juego: 'PES 2021', detalle: 'Dream Patch, VirtuaRED' }]);
 });

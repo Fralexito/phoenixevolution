@@ -1,6 +1,6 @@
 // Lógica PURA del muro de jugadores (sin DOM ni red → se prueba en tests/pure.test.mjs).
 import { escapeHTML, safeUrl } from './dom.js';
-import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX, RESP_MAX, REACCIONES } from '../../data/muroEstilo.js';
+import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX, RESP_MAX, PALETA_EMOJIS, REACCION_ANTIGUA } from '../../data/muroEstilo.js';
 
 /** Valida el texto de una publicación. → { ok, texto, error }. La BD vuelve a validar: esto solo da el aviso rápido. */
 export function validarTexto(t) {
@@ -62,10 +62,20 @@ export function validarRespuesta(t) {
   return { ok: true, texto, error: '' };
 }
 
-/** {fuego: 3, gg: 1, basura: 9} → [{tipo, emoji, etiqueta, n}] solo de reacciones conocidas con n > 0, en el orden del catálogo. */
+/** {'🔥': 3, '🤝': 1, fuego: 2, '<x>': 9, '😂': 0} → [{tipo, n}] ordenado de MÁS a MENOS votada (a igual conteo, el orden de la paleta). Las claves antiguas ('fuego'…) cuentan como su emoji;
+ *  lo que no sea un emoji (letras, símbolos ASCII, > 16 caracteres) y los ceros se descartan. */
+const ES_EMOJI = /^[^ -~]{1,16}$/u;
 export function resumenReacciones(r) {
-  return REACCIONES.map(([tipo, emoji, etiqueta]) => ({ tipo, emoji, etiqueta, n: Math.max(0, Math.trunc(Number(r?.[tipo]) || 0)) })).filter((x) => x.n > 0);
+  const cuentas = new Map();
+  for (const [k, v] of Object.entries(r ?? {})) {
+    const tipo = REACCION_ANTIGUA[k] ?? k; const n = Math.max(0, Math.trunc(Number(v) || 0));
+    if (n > 0 && ES_EMOJI.test(tipo)) cuentas.set(tipo, (cuentas.get(tipo) ?? 0) + n);
+  }
+  const orden = (t) => { const i = PALETA_EMOJIS.indexOf(t); return i < 0 ? 999 : i; };
+  return [...cuentas].map(([tipo, n]) => ({ tipo, n })).sort((x, y) => y.n - x.n || orden(x.tipo) - orden(y.tipo));
 }
+/** ¿Es un emoji que la web ofrece (paleta)? */
+export const esReaccionValida = (t) => PALETA_EMOJIS.includes(t);
 
 /** Aplica LOCALMENTE el resultado de reaccionar (para pintar al instante, sin releer): `final` = mi reacción tras la RPC (null = la quité). No muta. */
 export function aplicarReaccion(item, final) {

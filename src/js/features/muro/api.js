@@ -57,3 +57,4 @@ export const borrarDestacada = (id) => rpc('destacada_borrar', { p_id: id });
 export const clipsDe = (id, antes = null, limite = 24) => rpc('clips_de', { p_usuario: id, p_antes: antes, p_limite: limite });
 export const publicarClip = (titulo, video) => rpc('clip_publicar', { p_titulo: titulo ?? '', p_video: video });
 export const borrarClip = (id) => rpc('clip_borrar', { p_id: id });
+export const guardarHost = (software, catalogo, visible) => rpc('muro_guardar_host', { p_software: software, p_catalogo: catalogo, p_visible: visible });   // migración 026
