@@ -39,3 +39,21 @@ export async function quitarImagen(url) {
   const { error } = await supabase.storage.from('muro').remove([ruta]);
   if (error) console.warn('[muro] no se pudo limpiar el archivo:', error.message);
 }
+
+/* ---------- Historias, destacadas y clips (migración 025) ---------- */
+export const historiasDe = (id) => rpc('historias_de', { p_usuario: id });   // { visible, historias, destacadas, archivo }
+/** → { id, purgadas:[urls] }: las historias de >30 días sin destacar se borraron en el servidor; aquí limpio sus fotos del Storage. */
+export async function publicarHistoria(texto, imagen = null, video = null) {
+  const r = await rpc('historia_publicar', { p_texto: texto ?? '', ...(imagen ? { p_imagen: imagen } : {}), ...(video ? { p_video: video } : {}) });
+  for (const u of Array.isArray(r?.purgadas) ? r.purgadas : []) await quitarImagen(u);
+  return r;
+}
+export async function borrarHistoria(id) { const url = await rpc('historia_borrar', { p_id: id }); if (typeof url === 'string' && url) await quitarImagen(url); }
+export const crearDestacada = (titulo, ids) => rpc('destacada_crear', { p_titulo: titulo, p_historias: ids });
+export const agregarADestacada = (idDestacada, ids) => rpc('destacada_agregar', { p_destacada: idDestacada, p_historias: ids });
+export const quitarDeDestacada = (idHistoria) => rpc('destacada_quitar_historia', { p_historia: idHistoria });
+export const renombrarDestacada = (id, titulo) => rpc('destacada_renombrar', { p_id: id, p_titulo: titulo });
+export const borrarDestacada = (id) => rpc('destacada_borrar', { p_id: id });
+export const clipsDe = (id, antes = null, limite = 24) => rpc('clips_de', { p_usuario: id, p_antes: antes, p_limite: limite });
+export const publicarClip = (titulo, video) => rpc('clip_publicar', { p_titulo: titulo ?? '', p_video: video });
+export const borrarClip = (id) => rpc('clip_borrar', { p_id: id });

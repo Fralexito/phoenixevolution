@@ -134,7 +134,15 @@ function syncAuthUI({ session }) {
   paintEstado(); refreshForm(); fetchAll();
 }
 
-initForm(); initRadar(); refreshForm(); loadPerfiles().then(refreshForm);
+initForm(); initRadar(); refreshForm();
+/** Enlace «Retar a duelo» desde un perfil: /duelos/?retar=<id>. Cuando cargan los perfiles se abre «Lanzar reto» con ese rival ya elegido. Un id inválido se ignora. */
+function retoDesdeEnlace() {
+  const id = new URLSearchParams(location.search).get('retar') ?? '';
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) || id === me()) return;
+  if (!data.perfiles.has(id)) { if (me()) toast('No encontré a ese jugador para retarlo.', 'error', { key: 'retar-enlace' }); return; }
+  setVista('lanzar'); targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+loadPerfiles().then(refreshForm).then(retoDesdeEnlace).catch((e) => console.error('[duelos] perfiles:', e));
 $('form-crear-reto').addEventListener('submit', submitReto);
 $('btn-refrescar').addEventListener('click', fetchAll);
 // Tocar el botón abierto lo cierra (en móvil).

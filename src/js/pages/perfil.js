@@ -11,9 +11,17 @@ import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MA
 import * as api from '../features/muro/api.js';
 import { contenidoHTML, reproductorYT } from '../features/muro/render.js';
 import { solicitar } from '../features/amigos/api.js';
+import { normalizarHistorias, validarHistoria, validarTituloDestacada, validarClip, infoClip, hayNuevas, marcarVistas, indiceInicial, HISTORIA_MAX, DESTACADA_TITULO_MAX, CLIP_TITULO_MAX, MAX_DESTACADAS } from '../core/historias.js';
+import { abrirHistorias, abrirClips } from '../features/muro/visor.js';
 
 const root = document.getElementById('muro-root');
-const S = { sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map() };
+const S = { sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map(),
+  hist: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
+
+/* «Ya vista» de las historias: solo en este navegador. */
+const KEY_VISTAS = 'pes-historias-vistas';
+function leerVistas() { try { const o = JSON.parse(localStorage.getItem(KEY_VISTAS) ?? '{}'); return o && typeof o === 'object' ? o : {}; } catch { return {}; } }
+function guardarVistas(ids) { S.vistas = marcarVistas(S.vistas, ids); try { localStorage.setItem(KEY_VISTAS, JSON.stringify(S.vistas)); } catch { /* sin almacenamiento: solo se pierde el «ya vista» */ } }
 
 const msgErr = (e) => String(e?.message ?? e ?? 'Algo salió mal.').replace(/^.*?:\s*/, (m) => (m.length > 40 ? '' : m));
 async function seguro(fn, ok) {
@@ -21,6 +29,22 @@ async function seguro(fn, ok) {
 }
 
 /* ---------- Pintado ---------- */
+const urlCarta = (p) => `${href('jugador/')}?id=${encodeURIComponent(p.ficha_id)}`;
+/** «Ver carta» (si su cuenta está vinculada a una ficha) y «Retar a duelo» (si no soy yo; exige sesión para enviarse). */
+function botonesCartaReto(p, conReto = true) {
+  const carta = p.ficha_id ? `<a href="${escapeHTML(urlCarta(p))}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-amber-300 !border-amber-400/50"><i class="fa-solid fa-id-card"></i><span>${p.soy_yo ? 'Ver mi carta' : 'Ver su carta'}</span></a>` : '';
+  const reto = conReto && !p.soy_yo ? `<a href="${escapeHTML(href('duelos/'))}?retar=${escapeHTML(p.id)}" class="btn btn-primary !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-gamepad"></i><span>Retar a duelo</span></a>` : '';
+  return carta + reto;
+}
+const vigentes = () => S.hist?.historias ?? [];
+/** Avatar del perfil: con anillo de color si hay historias vigentes (acento si hay nuevas, gris si ya las viste); al tocarlo se abren. */
+function avatarConAnillo(p, acento) {
+  const base = `w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border-4 border-galaxy-panel shrink-0`;
+  if (!vigentes().length || !S.visible) return `<span class="${base}" style="box-shadow:0 0 0 2px ${acento}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</span>`;
+  const nuevo = hayNuevas(vigentes(), S.vistas);
+  return `<button type="button" data-act="ver-historias" aria-label="Ver historias de ${escapeHTML(p.nombre_display)}" class="${base} cursor-pointer" style="box-shadow:0 0 0 3px ${nuevo ? acento : '#6b7280'}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</button>`;
+}
+
 function cabecera(p) {
   const { banner, acento, lema, foto } = estiloDe(p);
   const fondo = safeImg(foto) ? `url(&quot;${escapeHTML(safeImg(foto))}&quot;) center/cover no-repeat` : banner.css;
@@ -33,16 +57,16 @@ function cabecera(p) {
   const host = p.puede_hostear ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-server mr-1.5" style="color:${acento}"></i>Hostea <b class="text-white">${escapeHTML(p.host_juego || 'PES 2021')}</b>${p.host_parche ? ` (${escapeHTML(p.host_parche)})` : ''}${p.host_sp_version ? ` v${escapeHTML(p.host_sp_version)}` : ''} · ${escapeHTML(p.software_host || 'Parsec')}${extras.length ? ` · extras: ${extras.map(escapeHTML).join(', ')}` : ''}</p>` : '';
   const stream = safeUrl(p.stream_url) ? `<a href="${escapeHTML(safeUrl(p.stream_url))}" target="_blank" rel="noopener noreferrer" class="text-xs text-galaxy-400 underline"><i class="fa-solid fa-tower-broadcast mr-1"></i>Ver su canal</a>` : '';
   const acciones = p.soy_yo
-    ? `<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
+    ? `${botonesCartaReto(p)}<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
        <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
-    : (S.sesion ? `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>
+    : (S.sesion ? `${botonesCartaReto(p)}<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>
        <button type="button" data-act="amistad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-user-plus"></i><span>Agregar</span></button>`
-      : `<span class="text-[11px] text-gray-500">Inicia sesión para escribirle.</span>`);
+      : `${botonesCartaReto(p)}<span class="text-[11px] text-gray-500">Inicia sesión para escribirle o retarlo.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
     <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div></div>
     <div class="px-4 sm:px-6 pb-5 -mt-10 sm:-mt-12 relative">
       <div class="flex flex-wrap items-end gap-3 sm:gap-4">
-        <span class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border-4 border-galaxy-panel shrink-0" style="box-shadow:0 0 0 2px ${acento}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</span>
+        ${avatarConAnillo(p, acento)}
         <div class="min-w-0 flex-1 pt-10 sm:pt-12">
           <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl truncate">${escapeHTML(p.nombre_display || 'Jugador')}</h1>
           <p class="text-xs text-gray-400">@${escapeHTML(p.username)}</p></div>
@@ -131,10 +155,79 @@ function feed(p) {
   if (!S.items.length) return `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${p.soy_yo ? 'Tu muro está vacío. ¡Publica lo primero!' : 'Aún no ha publicado nada.'}</div>`;
   return S.items.map((it) => tarjeta(it, p)).join('') + (S.hayMas ? `<button type="button" data-act="mas" class="btn btn-ghost w-full !text-xs">Cargar más</button>` : '');
 }
+/* ---------- Historias, destacadas y clips ---------- */
+const bolita = (inner, etiqueta, acc, extra = '') => `<button type="button" ${acc} class="flex flex-col items-center gap-1 w-16 shrink-0 group" aria-label="${escapeHTML(etiqueta)}"><span class="w-14 h-14 rounded-full grid place-items-center overflow-hidden bg-galaxy-card ${extra}">${inner}</span><span class="text-[10px] text-gray-300 truncate w-full text-center group-hover:text-white">${escapeHTML(etiqueta)}</span></button>`;
+function barraHistorias(p) {
+  if (!S.hist || (!S.visible && !p.soy_yo)) return '';
+  const { historias, destacadas, archivo } = S.hist; const acento = estiloDe(p).acento;
+  const mias = p.soy_yo
+    ? bolita('<i class="fa-solid fa-plus text-galaxy-400 text-lg"></i>', 'Nueva historia', 'data-act="panel-historia"', 'border-2 border-dashed border-galaxy-400/60')
+      + (historias.length ? bolita(avatarHTML(p.avatar_url, p.nombre_display, 56), 'Mi historia', 'data-act="ver-historias"', 'ring-2 ring-offset-2 ring-offset-galaxy-panel') : '')
+      + bolita('<i class="fa-solid fa-star text-amber-300 text-lg"></i>', 'Destacada', 'data-act="panel-destacada"', 'border-2 border-dashed border-amber-400/50')
+    : '';
+  const dest = destacadas.map((d) => {
+    const hs = normalizarHistorias(d.historias); const portada = safeImg(hs.find((h) => h.imagen)?.imagen);
+    const cuerpo = portada ? `<img src="${escapeHTML(portada)}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : '<i class="fa-solid fa-star text-amber-300"></i>';
+    return bolita(cuerpo, d.titulo, `data-act="ver-destacada" data-id="${Number(d.id)}"`, 'border-2 border-amber-400/70');
+  }).join('');
+  if (!mias && !dest) return '';
+  const ayuda = p.soy_yo && !archivo.length && !historias.length && !destacadas.length ? '<p class="text-[11px] text-gray-500 mt-1">Las historias duran 24 h. Luego las encuentras en tu archivo para guardarlas como destacadas.</p>' : '';
+  return `<section class="glass-panel rounded-2xl p-3" aria-label="Historias y destacadas" style="--acento:${acento}"><div class="flex gap-3 overflow-x-auto pb-1">${mias}${dest}</div>${ayuda}</section>`;
+}
+function panelHistoria() {
+  return `<section id="panel-historia" hidden class="glass-panel rounded-2xl p-4 space-y-3">
+    <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-circle-plus text-galaxy-400 mr-2"></i>Nueva historia <span class="normal-case text-[11px] text-gray-500 font-normal">· dura 24 horas</span></h2>
+    <div id="hi-prev" hidden class="relative inline-block"><img id="hi-prev-img" alt="Vista previa de tu historia" class="max-h-48 rounded-lg border border-galaxy-border"><button type="button" data-act="quitar-foto-historia" aria-label="Quitar foto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
+    <input type="file" id="hi-file" accept="image/jpeg,image/png,image/webp" hidden>
+    <textarea id="hi-texto" rows="2" maxlength="${HISTORIA_MAX + 40}" placeholder="Texto de la historia (opcional con foto o video)" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
+    <input id="hi-video" maxlength="300" placeholder="Enlace de video (YouTube, TikTok, Kick o Twitch) — opcional" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
+    <div class="flex flex-wrap gap-2"><button type="button" data-act="elegir-foto-historia" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span>Foto</span></button>
+      <button type="button" data-act="publicar-historia" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar historia</span></button>
+      <button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div></section>`;
+}
+/** Panel «Nueva destacada»: eliges título y las historias (vigentes + archivo); también gestiona las destacadas que ya tienes. */
+function panelDestacada() {
+  if (!S.hist) return '';
+  const cand = [...normalizarHistorias(S.hist.historias).filter((h) => !h.destacada), ...normalizarHistorias(S.hist.archivo)];
+  const celda = (h) => `<label class="relative block w-20 h-28 rounded-lg overflow-hidden border border-galaxy-border cursor-pointer bg-black/40"><input type="checkbox" data-dest-hist value="${h.id}" class="absolute top-1 left-1 z-10 w-4 h-4 accent-amber-400">
+    ${safeImg(h.imagen) ? `<img src="${escapeHTML(safeImg(h.imagen))}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="absolute inset-0 grid place-items-center p-1 text-[10px] text-gray-300 text-center bg-galaxy-900">${h.video ? '<i class="fa-solid fa-circle-play text-lg"></i>' : escapeHTML(h.texto.slice(0, 40))}</span>`}</label>`;
+  const existentes = S.hist.destacadas.map((d) => `<li class="flex items-center gap-2 text-xs text-gray-200 rounded-lg bg-black/25 px-2.5 py-1.5"><i class="fa-solid fa-star text-amber-300"></i><span class="flex-1 truncate">${escapeHTML(d.titulo)} <span class="text-gray-500">· ${(d.historias ?? []).length}</span></span>
+    <button type="button" data-act="renombrar-destacada" data-id="${Number(d.id)}" title="Cambiar título" class="text-gray-400 hover:text-galaxy-400"><i class="fa-solid fa-pen"></i></button>
+    <button type="button" data-act="borrar-destacada" data-id="${Number(d.id)}" title="Borrar destacada (sus historias vuelven al archivo)" class="text-gray-400 hover:text-bad"><i class="fa-solid fa-trash"></i></button></li>`).join('');
+  return `<section id="panel-destacada" hidden class="glass-panel rounded-2xl p-4 space-y-3">
+    <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-star text-amber-300 mr-2"></i>Destacadas</h2>
+    ${existentes ? `<ul class="space-y-1.5">${existentes}</ul>` : ''}
+    ${S.hist.destacadas.length >= MAX_DESTACADAS ? `<p class="text-[11px] text-gray-500">Llegaste al máximo de ${MAX_DESTACADAS} destacadas: borra alguna para crear otra.</p>`
+      : cand.length ? `<p class="text-[11px] text-gray-400">Elige las historias (activas o de tu archivo) que quieres guardar para siempre:</p><div class="flex flex-wrap gap-2">${cand.map(celda).join('')}</div>
+        <label class="block"><span class="text-[11px] text-gray-400">Título (máx. ${DESTACADA_TITULO_MAX})</span><input id="de-titulo" maxlength="${DESTACADA_TITULO_MAX + 10}" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white" placeholder="Ej.: Mejores goles"></label>
+        <button type="button" data-act="crear-destacada" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-star"></i><span>Crear destacada</span></button>`
+      : '<p class="text-[11px] text-gray-500">Aún no tienes historias para destacar. Publica una y vuelve aquí.</p>'}
+    <button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></section>`;
+}
+const pestanas = () => `<div class="flex gap-2" role="tablist" aria-label="Secciones del perfil">${[['pub', 'fa-newspaper', 'Publicaciones'], ['clips', 'fa-clapperboard', `Clips${S.clips.length ? ` · ${S.clips.length}${S.hayMasClips ? '+' : ''}` : ''}`]].map(([id, ic, t]) =>
+  `<button type="button" role="tab" data-act="tab" data-tab="${id}" aria-pressed="${S.tab === id}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${t}</button>`).join('')}</div>`;
+function seccionClips(p) {
+  const ccc = S.clips.map(infoClip).filter(Boolean);
+  const form = p.soy_yo ? `<section class="glass-panel rounded-2xl p-3 space-y-2">
+      <input id="cl-video" maxlength="300" placeholder="Enlace de tu clip (YouTube, Shorts, TikTok, Kick o Twitch)" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
+      <div class="flex gap-2"><input id="cl-titulo" maxlength="${CLIP_TITULO_MAX + 10}" placeholder="Título (opcional)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
+        <button type="button" data-act="publicar-clip" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-plus"></i><span>Añadir clip</span></button></div></section>` : '';
+  if (!S.visible) return `${form}<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm"><i class="fa-solid fa-lock text-2xl text-gray-500 mb-2 block"></i>Este jugador comparte su contenido solo con sus amigos.</div>`;
+  const grilla = ccc.length ? `<div class="grid grid-cols-3 gap-1.5 sm:gap-2">${ccc.map((c, i) => `<button type="button" data-act="ver-clip" data-i="${i}" aria-label="Ver clip: ${escapeHTML(c.titulo || 'Clip')}" class="relative aspect-[9/16] rounded-lg overflow-hidden border border-galaxy-border bg-galaxy-900 group text-left">
+      ${c.ytId ? `<img src="https://i.ytimg.com/vi/${escapeHTML(c.ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100">` : '<div class="absolute inset-0 bg-gradient-to-br from-galaxy-600/50 to-black"></div>'}
+      <i class="${escapeHTML(c.icono)} absolute top-1.5 right-1.5 text-white/90 text-sm drop-shadow"></i><i class="fa-solid fa-play absolute inset-0 m-auto w-fit h-fit text-white/90 text-2xl drop-shadow opacity-80"></i>
+      <span class="absolute inset-x-0 bottom-0 p-1.5 pt-6 bg-gradient-to-t from-black/85 to-transparent text-[10px] text-white leading-tight line-clamp-2">${escapeHTML(c.titulo)}</span></button>`).join('')}</div>${S.hayMasClips ? '<button type="button" data-act="mas-clips" class="btn btn-ghost w-full !text-xs mt-2">Cargar más</button>' : ''}`
+    : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${p.soy_yo ? 'Todavía no tienes clips. Pega el enlace de tu mejor jugada.' : 'Aún no ha subido clips.'}</div>`;
+  return `<div class="space-y-3">${form}${grilla}</div>`;
+}
+
 function pintar() {
   const p = S.p;
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelPrivacidad(p) : ''}
-    <div class="space-y-3 max-w-2xl mx-auto w-full">${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div></div>`;
+  const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
+  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelPrivacidad(p) + (conExtras ? panelHistoria() + panelDestacada() : '') : ''}${barraHistorias(p)}
+    <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}
+      <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
+      ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
 }
 const pintarFeed = () => { const f = document.getElementById('mu-feed'); if (f) f.innerHTML = feed(S.p); };
 
@@ -148,10 +241,23 @@ async function cargar() {
     S.p = p; S.items = []; S.editando = null; S.abiertas.clear(); S.resp.clear();
     const m = p.puede_ver_muro ? await api.cargarMuro(p.id) : { visible: false, items: [], hay_mas: false };
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas;
+    await cargarExtras(p);
     document.title = `${p.nombre_display} · Muro`;
     pintar();
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
 }
+/** Historias y clips: si fallan (p. ej. la migración 025 aún no se ejecutó) NO rompen el perfil: simplemente no se muestran. */
+async function cargarExtras(p) {
+  S.vistas = leerVistas(); S.hist = null; S.clips = []; S.hayMasClips = false;
+  if (!p.puede_ver_muro) return;
+  const [h, c] = await Promise.allSettled([api.historiasDe(p.id), api.clipsDe(p.id)]);
+  if (h.status === 'fulfilled' && h.value) S.hist = { historias: h.value.historias ?? [], destacadas: h.value.destacadas ?? [], archivo: h.value.archivo ?? [] };   // datos crudos: se normalizan al usarlos
+  else if (h.status === 'rejected') console.warn('[perfil] historias no disponibles:', h.reason?.message);
+  if (c.status === 'fulfilled' && c.value) { S.clips = c.value.items ?? []; S.hayMasClips = !!c.value.hay_mas; }
+  else if (c.status === 'rejected') console.warn('[perfil] clips no disponibles:', c.reason?.message);
+  if (!S.hist && c.status === 'fulfilled') S.hist = { historias: [], destacadas: [], archivo: [] };
+}
+async function recargarExtras() { await cargarExtras(S.p); pintar(); }
 async function refrescarMuro() { const m = await api.cargarMuro(S.p.id); S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.visible = m.visible; pintarFeed(); }
 
 /* ---------- Ayudantes de fotos ---------- */
@@ -169,10 +275,77 @@ function fijarBannerFoto(url) {
   document.getElementById('est-foto-estado').textContent = url ? 'Foto lista: pulsa «Guardar estilo».' : 'JPG, PNG o WebP; se reduce sola a 1600 px.';
 }
 
+/* ---------- Visores y paneles ---------- */
+const PANELES = ['estilo', 'privacidad', 'historia', 'destacada'];
+function abrirPanel(nombre) { PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = n !== nombre ? true : !x.hidden; }); }
+function limpiarFotoHistoria() {
+  const f = document.getElementById('hi-file'); if (f) f.value = '';
+  const img = document.getElementById('hi-prev-img'); if (img?.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  const box = document.getElementById('hi-prev'); if (box) box.hidden = true;
+}
+/** Abre el visor. `vigentes` = las historias de las últimas 24 h (empieza por la primera no vista y las marca como vistas al cerrar). El dueño puede borrarlas. */
+function verHistorias(lista, titulo, { vigentes: sonVigentes = false } = {}) {
+  if (!lista.length) { toast('No hay historias para mostrar.', 'info'); return; }
+  const p = S.p; const duenyo = p.soy_yo;
+  abrirHistorias({
+    historias: lista, nombre: p.nombre_display || 'Jugador', avatar: avatarHTML(p.avatar_url, p.nombre_display, 32), titulo,
+    inicio: sonVigentes ? indiceInicial(lista, S.vistas) : 0,
+    onVistas: (ids) => { if (!sonVigentes) return; guardarVistas(ids); const av = document.querySelector('[data-act=ver-historias][aria-label^="Ver historias"]'); if (av) av.style.boxShadow = '0 0 0 3px #6b7280'; },
+    onBorrar: duenyo ? async (id) => { try { await api.borrarHistoria(id); } catch (e) { toast(msgErr(e), 'error'); return false; } await recargarExtras(); return true; } : undefined,
+  });
+}
+
 /* ---------- Eventos ---------- */
 const ACCIONES = {
-  panel: (el) => { ['estilo', 'privacidad'].forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = n !== el.dataset.panel ? true : !x.hidden; }); },
-  'cerrar-panel': () => { document.getElementById('panel-estilo').hidden = true; document.getElementById('panel-privacidad').hidden = true; },
+  panel: (el) => abrirPanel(el.dataset.panel),
+  'panel-historia': () => abrirPanel('historia'),
+  'panel-destacada': () => abrirPanel('destacada'),
+  'cerrar-panel': () => PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = true; }),
+  tab: (el) => { S.tab = el.dataset.tab === 'clips' ? 'clips' : 'pub'; document.getElementById('tab-pub').hidden = S.tab !== 'pub'; document.getElementById('tab-clips').hidden = S.tab !== 'clips';
+    document.querySelectorAll('[data-act=tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab))); },
+  'ver-historias': () => verHistorias(normalizarHistorias(S.hist?.historias), '', { vigentes: true }),
+  'ver-destacada': (el) => { const d = S.hist?.destacadas.find((x) => x.id === Number(el.dataset.id)); if (d) verHistorias(normalizarHistorias(d.historias), d.titulo); },
+  'elegir-foto-historia': () => document.getElementById('hi-file').click(),
+  'quitar-foto-historia': () => limpiarFotoHistoria(),
+  'publicar-historia': async () => {
+    const file = document.getElementById('hi-file').files?.[0] ?? null;
+    const v = validarHistoria({ texto: document.getElementById('hi-texto').value, hayFoto: !!file, video: document.getElementById('hi-video').value });
+    if (!v.ok) { toast(v.error, 'error'); return; }
+    const btn = document.querySelector('[data-act=publicar-historia]'); btn.disabled = true; let url = null;
+    try {
+      if (file) url = await api.subirImagen(file, S.p.id, 1080);
+      await api.publicarHistoria(v.texto, url, v.video || null);
+      toast('Historia publicada: se ve durante 24 horas.', 'ok'); await recargarExtras();
+    } catch (e) { toast(msgErr(e), 'error'); if (url) api.quitarImagen(url); }
+    finally { btn.disabled = false; }
+  },
+  'crear-destacada': async () => {
+    const t = validarTituloDestacada(document.getElementById('de-titulo').value); if (!t.ok) { toast(t.error, 'error'); return; }
+    const ids = [...document.querySelectorAll('[data-dest-hist]:checked')].map((x) => Number(x.value));
+    if (!ids.length) { toast('Elige al menos una historia.', 'error'); return; }
+    if (await seguro(() => api.crearDestacada(t.titulo, ids), 'Destacada creada.') !== undefined) await recargarExtras();
+  },
+  'renombrar-destacada': async (el) => {
+    const d = S.hist?.destacadas.find((x) => x.id === Number(el.dataset.id)); if (!d) return;
+    const nuevo = window.prompt('Nuevo título de la destacada:', d.titulo); if (nuevo === null) return;
+    const t = validarTituloDestacada(nuevo); if (!t.ok) { toast(t.error, 'error'); return; }
+    if (await seguro(() => api.renombrarDestacada(d.id, t.titulo), 'Título cambiado.') !== undefined) await recargarExtras();
+  },
+  'borrar-destacada': async (el) => {
+    if (!window.confirm('¿Borrar esta destacada? Sus historias no se pierden: vuelven a tu archivo.')) return;
+    if (await seguro(() => api.borrarDestacada(Number(el.dataset.id)), 'Destacada borrada.') !== undefined) await recargarExtras();
+  },
+  'publicar-clip': async () => {
+    const v = validarClip({ titulo: document.getElementById('cl-titulo').value, video: document.getElementById('cl-video').value }); if (!v.ok) { toast(v.error, 'error'); return; }
+    if (await seguro(() => api.publicarClip(v.titulo, v.video), 'Clip añadido.') !== undefined) await recargarExtras();
+  },
+  'ver-clip': (el) => abrirClips({ clips: S.clips.map(infoClip).filter(Boolean), inicio: Number(el.dataset.i) || 0,
+    onBorrar: S.p.soy_yo || isAdmin() ? async (id) => { try { await api.borrarClip(id); } catch (e) { toast(msgErr(e), 'error'); return false; } S.clips = S.clips.filter((c) => Number(c.id) !== id); pintar(); return true; } : undefined }),
+  'mas-clips': async (el) => {
+    el.disabled = true;
+    try { const m = await api.clipsDe(S.p.id, S.clips[S.clips.length - 1]?.id); S.clips = [...S.clips, ...(m.items ?? [])]; S.hayMasClips = !!m.hay_mas; pintar(); }
+    catch (e) { toast(msgErr(e), 'error'); el.disabled = false; }
+  },
   amistad: () => seguro(() => solicitar(S.p.id), 'Solicitud enviada.'),
   'elegir-foto': () => document.getElementById('mu-file').click(),
   'alternar-video': () => { const i = document.getElementById('mu-video'); i.hidden = !i.hidden; if (!i.hidden) i.focus(); else i.value = ''; },
@@ -281,6 +454,11 @@ root.addEventListener('change', async (e) => {
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); t.value = ''; return; }
     const img = document.getElementById('mu-prev-img'); if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
     img.src = URL.createObjectURL(f); document.getElementById('mu-prev').hidden = false;
+  } else if (t.id === 'hi-file') {   // foto de la historia: vista previa; se sube al pulsar «Publicar historia»
+    const f = t.files?.[0]; if (!f) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); t.value = ''; return; }
+    const img = document.getElementById('hi-prev-img'); if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+    img.src = URL.createObjectURL(f); document.getElementById('hi-prev').hidden = false;
   } else if (t.id === 'est-file') {   // foto de banner: se sube ya (para poder previsualizar) y se guarda con «Guardar estilo»
     const f = t.files?.[0]; t.value = ''; if (!f) return;
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); return; }

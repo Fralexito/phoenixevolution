@@ -927,3 +927,50 @@ test('muro fase 4: tarjeta de duelo adjunto', async () => {
   assert.match(etiquetaOpcionReto({ id: 5, estado: 'EN_JUEGO', tam_a: 1, tam_b: 1, retador: { nombre: 'Fralex' }, rival: { nombre: 'Jack' }, fecha: '2026-10-03T20:00:00Z' }), /^Fralex vs Jack · 1 vs 1 · En juego/);
   assert.equal(etiquetaOpcionReto(null), '');
 });
+
+// ---- Historias, destacadas y clips (core/historias.js) ----
+import { validarHistoria, validarTituloDestacada, validarClip, caducaEn, normalizarHistoria, normalizarHistorias, hayNuevas, marcarVistas, indiceInicial, infoClip, HISTORIA_MAX } from '../src/js/core/historias.js';
+test('historias: validarHistoria exige algo, limpia < > y valida el video', () => {
+  assert.equal(validarHistoria({}).ok, false);
+  assert.equal(validarHistoria({ hayFoto: true }).ok, true);
+  assert.equal(validarHistoria({ texto: '<b>Hola</b>' }).texto, 'bHola/b');
+  assert.equal(validarHistoria({ texto: 'x'.repeat(HISTORIA_MAX + 1) }).ok, false);
+  assert.equal(validarHistoria({ video: 'http://youtube.com/watch?v=abcdefghijk' }).ok, false);
+  const v = validarHistoria({ video: 'https://youtu.be/abcdefghijk' }); assert.ok(v.ok); assert.equal(v.video, 'https://youtu.be/abcdefghijk');
+});
+test('historias: título de destacada y clip', () => {
+  assert.equal(validarTituloDestacada('  ').ok, false);
+  assert.equal(validarTituloDestacada('x'.repeat(25)).ok, false);
+  assert.equal(validarTituloDestacada(' Goles ').titulo, 'Goles');
+  assert.equal(validarClip({ video: '' }).ok, false);
+  assert.equal(validarClip({ titulo: 'x'.repeat(81), video: 'https://kick.com/a/clips/1' }).ok, false);
+  assert.equal(validarClip({ titulo: 'Golazo', video: 'https://www.tiktok.com/@a/video/1' }).ok, true);
+});
+test('historias: caducaEn', () => {
+  const now = Date.parse('2026-10-04T12:00:00Z');
+  assert.equal(caducaEn('2026-10-04T17:30:00Z', now), 'Caduca en 5 h');
+  assert.equal(caducaEn('2026-10-04T12:40:00Z', now), 'Caduca en 40 min');
+  assert.equal(caducaEn('2026-10-04T11:00:00Z', now), 'Caducada');
+  assert.equal(caducaEn('basura', now), '');
+});
+test('historias: normalizar descarta lo inválido y no acepta fotos http', () => {
+  assert.equal(normalizarHistoria({ id: 'x' }), null);
+  const h = normalizarHistoria({ id: 3, texto: 'a', imagen_url: 'http://x/y.jpg', video_url: 'https://youtu.be/abcdefghijk' });
+  assert.equal(h.imagen, ''); assert.equal(h.video.proveedor, 'youtube');
+  assert.equal(normalizarHistorias(null).length, 0);
+  assert.equal(normalizarHistorias([{ id: 1 }, { id: 'no' }, { id: 2 }]).length, 2);
+});
+test('historias: «ya vista» (marcar, nuevas, índice inicial, poda)', () => {
+  const hs = [{ id: 1 }, { id: 2 }, { id: 3 }];
+  assert.equal(hayNuevas(hs, {}), true);
+  const v = marcarVistas({}, [1, 2]); assert.equal(hayNuevas(hs, v), true); assert.equal(indiceInicial(hs, v), 2);
+  assert.equal(hayNuevas(hs, marcarVistas(v, [3])), false); assert.equal(indiceInicial(hs, marcarVistas(v, [3])), 0);
+  const grande = marcarVistas({}, Array.from({ length: 10 }, (_, i) => i + 1), 4); assert.deepEqual(Object.keys(grande).map(Number), [7, 8, 9, 10]);
+  const orig = { 1: 1 }; marcarVistas(orig, [2]); assert.deepEqual(orig, { 1: 1 });   // no muta
+});
+test('historias: infoClip (miniatura solo de YouTube; enlaces raros → null)', () => {
+  assert.equal(infoClip({ id: 1, video_url: 'https://youtube.com/shorts/abcdefghijk' }).ytId, 'abcdefghijk');
+  assert.equal(infoClip({ id: 2, video_url: 'https://www.tiktok.com/@a/video/1' }).ytId, '');
+  assert.equal(infoClip({ id: 3, video_url: 'javascript:alert(1)' }), null);
+  assert.equal(infoClip(null), null);
+});
