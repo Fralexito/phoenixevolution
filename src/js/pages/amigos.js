@@ -28,10 +28,12 @@ function avatar(p) {
     : `<span class="w-10 h-10 rounded-full bg-galaxy-900 border border-galaxy-border flex items-center justify-center font-display font-bold text-galaxy-400">${escapeHTML((p.nombre_display || '?').trim().charAt(0).toUpperCase())}</span>`;
 }
 const msg = (id) => `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>`;
+/** Botón visible «Muro» (antes solo se podía entrar pulsando el nombre, y no era evidente). Sin @usuario no hay muro al que ir. */
+const muro = (p) => (p.username ? `<a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(p.username)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-newspaper"></i><span>Muro</span></a>` : '');
 const fila = (id, acciones, extra = '') => { const p = perfil(id);
   return `<div class="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-galaxy-panel border border-galaxy-border/80">${avatar(p)}
     <div class="min-w-0 flex-1"><p class="font-display font-bold text-white uppercase text-sm truncate">${p.username ? `<a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(p.username)}" class="hover:text-galaxy-400">${escapeHTML(p.nombre_display || 'Jugador')}</a>` : escapeHTML(p.nombre_display || 'Jugador')}</p>${extra ? `<p class="text-[11px] text-gray-400 truncate">${extra}</p>` : ''}</div>
-    <div class="flex flex-wrap justify-end gap-1.5 shrink-0">${acciones}</div></div>`; };
+    <div class="flex flex-wrap justify-end gap-1.5 shrink-0">${muro(p)}${acciones}</div></div>`; };
 
 /** Botones según mi relación con la persona (misma lógica en Buscar, Seguidores, etc.). */
 function accionesPara(id) {
