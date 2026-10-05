@@ -34,8 +34,7 @@ function renderAll() {
   const rest = visible.filter((r) => !isMine(r, id));
   const pend = pendientes(mine);
   const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
-  $('bloque-pend').hidden = !pend.length;
-  $('lista-pend').innerHTML = pend.map((r) => card(r, id)).join('');
+  $('lista-pend').innerHTML = !id ? vacio('Inicia sesión para ver los retos que lanzaste.', 'py-10') : pend.length ? pend.map((r) => card(r, id)).join('') : vacio('No tienes retos pendientes. Lanza uno desde el formulario.', 'py-10');
   $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio('No hay retos públicos activos en este momento.', 'py-10');
   $('cnt-pend').textContent = pend.length ? `(${pend.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
@@ -141,7 +140,7 @@ $('btn-refrescar').addEventListener('click', fetchAll);
 // Tocar el botón abierto lo cierra (en móvil).
 $('seg-vista').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setVista($('duelos-grid').dataset.vista === b.dataset.v ? 'ninguna' : b.dataset.v); });
 // Un reto recién emitido aún no es un «partido» (nadie lo aceptó): se lleva al usuario a «Tus retos pendientes».
-window.addEventListener('duelos:creado', () => { setVista('ninguna'); setTimeout(() => { if (!$('bloque-pend').hidden) $('bloque-pend').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 800); });
+window.addEventListener('duelos:creado', () => { setVista('ninguna'); setTimeout(() => $('col-lanzados').scrollIntoView({ behavior: 'smooth', block: 'start' }), 800); });
 ['lista-retos', 'lista-pend'].forEach((id) => {
   $(id).addEventListener('click', onCardClick);
   $(id).addEventListener('submit', (e) => {
