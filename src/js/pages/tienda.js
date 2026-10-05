@@ -159,6 +159,7 @@ $('ti-tabs').addEventListener('click', (ev) => { const b = ev.target.closest('[d
 $('ti-reintentar').addEventListener('click', cargar);
 onSession(({ session }) => {
   const id = session?.user?.id ?? null;
-  if (S.listo && id === S.yo) { pintar(); return; }
-  S.listo = true; S.yo = id; S.eco = null; cargar();
+  const adm = esAdmin();
+  if (S.listo && id === S.yo && adm === S.adminVisto) { pintar(); return; }
+  S.listo = true; S.yo = id; S.adminVisto = adm; S.eco = null; cargar();
 });
