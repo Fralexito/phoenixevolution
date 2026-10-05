@@ -161,7 +161,12 @@ $('seg-partidos').addEventListener('click', (e) => {
   pestana = b.dataset.v; $('seg-partidos').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); pintarPartidos();
 });
 // ---- XI plegado en celular, abierto en PC ----
-$('xi-det').open = window.matchMedia('(min-width: 1024px)').matches;
+$('seg-mejor').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-m]'); if (!b) return; const xi = b.dataset.m === 'xi';
+  $('seg-mejor').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  $('featured-players-container').hidden = xi; $('xi-wrap').hidden = !xi;
+  if (xi) { const w = $('xi-wrap'); w.classList.remove('xi-entra'); void w.offsetWidth; w.classList.add('xi-entra'); } else cerrarPodio();
+});
 
 // ---- Pulso de la comunidad: cuatro conteos reales (head:true no descarga filas, solo el número). Si uno falla se queda en «—». ----
 async function contar(consulta, id) {

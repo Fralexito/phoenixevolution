@@ -1065,3 +1065,15 @@ test('central: partidoDe, recorteTabla y pasoCuenta', () => {
   assert.equal(recorteTabla([], ['x']).length, 0);
   assert.equal(pasoCuenta(100, 0), 0); assert.equal(pasoCuenta(100, 1), 100); assert.ok(pasoCuenta(100, 0.5) > 50); assert.equal(pasoCuenta(-5, 1), 0);
 });
+
+import { saludo, horaLima, pasosBienvenida, porcentajePasos, siguientePaso, arcoAnillo } from '../src/js/core/inicio.js';
+test('inicio: saludo, pasos con progreso regalado y anillo', () => {
+  assert.equal(saludo(8), 'Buenos días'); assert.equal(saludo(15), 'Buenas tardes'); assert.equal(saludo(23), 'Buenas noches'); assert.equal(saludo(3), 'Buenas noches');
+  assert.equal(horaLima(Date.UTC(2026, 9, 5, 12, 0)), 7);
+  const v = pasosBienvenida({}); assert.equal(v[0].hecho, true); assert.equal(porcentajePasos(v), 17); assert.equal(siguientePaso(v).id, 'cuenta');
+  const t = pasosBienvenida({ sesion: true, foto: true, club: true, jugo: true, clan: true }); assert.equal(porcentajePasos(t), 100); assert.equal(siguientePaso(t), null);
+  const m = pasosBienvenida({ sesion: true, foto: false, club: true }); assert.equal(siguientePaso(m).id, 'foto');
+  assert.equal(pasosBienvenida({ foto: true }).find((p) => p.id === 'foto').hecho, false);
+  assert.equal(porcentajePasos(null), 0);
+  assert.deepEqual(arcoAnillo(100, 10).falta, 0); assert.equal(arcoAnillo(0, 10).falta, arcoAnillo(0, 10).total); assert.ok(arcoAnillo(50, 10).falta < arcoAnillo(0, 10).total);
+});
