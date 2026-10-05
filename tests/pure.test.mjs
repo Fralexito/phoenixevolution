@@ -872,3 +872,47 @@ test('muro fase 3: enlaces de video, rutas de imagen y banner con foto', async (
   assert.equal(estiloParaGuardar({ bannerId: 'oro', foto: 'https://x/y.jpg', acento: '#00e5ff', lema: '' }).p_banner, 'https://x/y.jpg');   // la foto manda sobre el preset
   assert.equal(estiloParaGuardar({ bannerId: 'oro', foto: '', acento: '#00e5ff', lema: '' }).p_banner, 'preset:oro');
 });
+
+test('historial en vivo: búsqueda avanzada, filtros y enlaces a perfil', async () => {
+  const { parsearBusqueda, filtrarEventos, facetas, hayFiltros, minutosDe, rangoDe } = await import('../src/js/core/liveFiltro.js');
+  const { formatEvento } = await import('../src/js/core/live.js');
+  const t = (h, m = 0) => new Date(2026, 9, 5, h, m).getTime();
+  const H = [
+    { tipo: 'reto_aceptado', quien: 'Camilo', rival: 'Jack', formato: '2v2', juego: 'PES 2021', parche: 'Dream Patch', ts: t(19, 30), demo: true },
+    { tipo: 'reto_aceptado', quien: 'Beto', rival: 'Axel', formato: '1v1', juego: 'SP Football Life', version: '26', ts: t(20, 15), demo: true },
+    { tipo: 'radar_on', quien: 'Jack', ts: t(21, 5), demo: true },
+    { tipo: 'reto_aceptado', quien: 'Hugo', rival: 'Titán', formato: '1v1', juego: 'EA FC', version: '27', ts: t(23, 50) },
+  ];
+  const q = (c) => filtrarEventos(H, c).map((e) => e.quien);
+  assert.deepEqual(q({}), ['Hugo', 'Jack', 'Beto', 'Camilo']);                                       // más nuevo primero
+  assert.deepEqual(q({ orden: 'asc' }), ['Camilo', 'Beto', 'Jack', 'Hugo']);
+  assert.deepEqual(q({ texto: 'jack' }), ['Jack', 'Camilo']);                                        // jugador o rival
+  assert.deepEqual(q({ texto: 'titan' }), ['Hugo']);                                                 // sin acentos
+  assert.deepEqual(q({ texto: 'jugador:jack tipo:radar' }), ['Jack']);
+  assert.deepEqual(q({ texto: 'camilo 2v2' }), ['Camilo']);                                          // AND
+  assert.deepEqual(q({ texto: 'parche:dream' }), ['Camilo']);
+  assert.deepEqual(q({ texto: 'juego:sp' }), ['Beto']);
+  assert.deepEqual(q({ texto: 'reto -camilo' }), ['Hugo', 'Beto']);                                  // exclusión
+  assert.deepEqual(q({ texto: '"aceptó el reto" -hugo' }), ['Beto', 'Camilo']);                       // frase exacta
+  assert.deepEqual(q({ texto: 'hora:20:00-21:30' }), ['Jack', 'Beto']);
+  assert.deepEqual(q({ texto: 'hora:23-1' }), ['Hugo']);                                             // cruza medianoche
+  assert.deepEqual(q({ desde: '20:00', hasta: '21:00' }), ['Beto']);
+  assert.deepEqual(q({ tipo: 'radar_on' }), ['Jack']);
+  assert.deepEqual(q({ juego: 'EA FC' }), ['Hugo']);
+  assert.deepEqual(q({ origen: 'real' }), ['Hugo']);
+  assert.deepEqual(q({ origen: 'demo', formato: '1v1' }), ['Beto']);
+  assert.deepEqual(q({ jugador: 'Jack' }), ['Jack', 'Camilo']);
+  assert.deepEqual(q({ texto: 'zzz' }), []);
+  assert.deepEqual(filtrarEventos('basura', {}), []);                                                // nunca lanza
+  assert.deepEqual(parsearBusqueda('jugador:Ana -x "a b" hola'), { libres: ['hola'], frases: ['a b'], excluir: ['x'], campos: { jugador: ['ana'] } });
+  assert.equal(hayFiltros({ texto: ' ', tipo: 'todos' }), false);
+  assert.equal(hayFiltros({ tipo: 'radar_on' }), true);
+  assert.equal(minutosDe('25:00'), null); assert.deepEqual(rangoDe('19-21'), [1140, 1260]);
+  const f = facetas(H); assert.equal(f.jugadores[0].valor, 'Jack'); assert.equal(f.jugadores[0].n, 2);
+  assert.deepEqual(f.juegos.map((x) => x.valor).sort(), ['EA FC', 'PES 21', 'SP Football Life']);
+  // enlaces a perfil: el @usuario sale del nombre (o de quienUser) y todo va escapado; sin `perfil` no hay enlaces
+  assert.match(formatEvento(H[0], { perfil: '/p/perfil/' }).html, /<a href="\/p\/perfil\/\?u=camilo" class="live-nom">Camilo<\/a>/);
+  assert.match(formatEvento({ ...H[2], quien: 'Zed Pro', quienUser: 'zedpro' }, { perfil: '/p/perfil/' }).html, /\?u=zedpro/);
+  assert.equal(/<a /.test(formatEvento(H[0]).html), false);
+  assert.equal(/<a /.test(formatEvento({ tipo: 'radar_on', quien: '!!!' }, { perfil: '/p/' }).html), false);   // sin @usuario válido no hay enlace
+});

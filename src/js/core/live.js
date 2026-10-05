@@ -1,5 +1,5 @@
 // Pulso en vivo — parte pura (sin DOM): convierte un evento en texto y calcula pausas. Probable con `npm test`.
-import { escapeHTML } from './dom.js';
+import { escapeHTML, toUsername } from './dom.js';
 import { etiquetaJuego } from './rules.js';
 
 /**
@@ -7,18 +7,23 @@ import { etiquetaJuego } from './rules.js';
  *  - 'reto_aceptado': «quien» aceptó el reto de «rival».
  *  - 'radar_on': «quien» activó el radar.
  * Devuelve { icon, tone, html } (html ya escapado) o null si el evento no es válido.
+ * `{ perfil }` (opcional): URL base de la página de perfil (p. ej. '/phoenixevolution/perfil/'); si se pasa, cada nombre es un enlace a `?u=<usuario>`.
+ *   El @usuario sale de `ev.quienUser` / `ev.rivalUser` si el evento lo trae (actividad real) y, si no, del propio nombre (demo).
  */
-export function formatEvento(ev) {
+export function formatEvento(ev, { perfil = '' } = {}) {
   const q = String(ev?.quien ?? '').trim().slice(0, 30);
   if (!q) return null;
-  const n = (s) => `<b>${escapeHTML(s)}</b>`;
+  const n = (s, usuario) => {
+    const u = toUsername(usuario || s);
+    return perfil && u ? `<b><a href="${escapeHTML(perfil)}?u=${escapeHTML(u)}" class="live-nom">${escapeHTML(s)}</a></b>` : `<b>${escapeHTML(s)}</b>`;
+  };
   if (ev.tipo === 'reto_aceptado') {
     const r = String(ev.rival ?? '').trim().slice(0, 30);
     if (!r) return null;
     const extra = [ev.formato, etiquetaJuego(ev)].filter(Boolean).map((x) => escapeHTML(String(x).slice(0, 48))).join(' · ');
-    return { icon: 'fa-bolt', tone: 'ok', html: `${n(q)} aceptó el reto de ${n(r)}${extra ? ` <span class="live-dim">· ${extra}</span>` : ''}` };
+    return { icon: 'fa-bolt', tone: 'ok', html: `${n(q, ev.quienUser)} aceptó el reto de ${n(r, ev.rivalUser)}${extra ? ` <span class="live-dim">· ${extra}</span>` : ''}` };
   }
-  if (ev.tipo === 'radar_on') return { icon: 'fa-tower-broadcast', tone: 'cyan', html: `${n(q)} activó el radar` };
+  if (ev.tipo === 'radar_on') return { icon: 'fa-tower-broadcast', tone: 'cyan', html: `${n(q, ev.quienUser)} activó el radar` };
   return null;
 }
 
