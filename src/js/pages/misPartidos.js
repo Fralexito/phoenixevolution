@@ -11,6 +11,9 @@ import { EDICIONES } from '../../data/ligaResultados.js';
 import * as act from '../features/duelos/actions.js';
 import { openInviteModal } from '../features/duelos/invite.js';
 import { crearPanelMarcadores } from '../features/resultados/panel.js';
+import { resultadoDe } from '../features/resultados/api.js';
+import { datosTarjeta } from '../core/tarjetaResultado.js';
+import { compartirTarjeta } from '../features/resultados/tarjeta.js';
 import { crearPanelValoraciones } from '../features/valoraciones/panel.js';
 
 const $ = (id) => document.getElementById(id);
@@ -52,7 +55,7 @@ function renderAll() {
   const mine = id ? visibleRetos().filter((r) => isMine(r, id)) : [];
   const agendados = ordenarAgendados(mine); const hist = id ? ordenarPartidosJugados(data.historial) : [];
   $('lista-agendados').innerHTML = !id ? vacio('Inicia sesión para ver tus partidos.') : agendados.length ? agendados.map((r) => card(r, id)).join('') : vacio('No tienes partidos agendados.');
-  $('lista-historial').innerHTML = !id ? '' : hist.length ? hist.map((r) => cardHistorial(r, id)).join('') : vacio('Aún no has terminado ningún partido.');
+  $('lista-historial').innerHTML = !id ? '' : hist.length ? hist.map((r) => cardHistorial(r, id, { tarjeta: true })).join('') : vacio('Aún no has terminado ningún partido.');
   $('cnt-agendados').textContent = agendados.length ? `(${agendados.length})` : '';
   $('cnt-historial').textContent = hist.length ? `(${hist.length})` : '';
   renderRivales(id);
@@ -77,6 +80,21 @@ function onCardClick(e) {
   })[b.dataset.act]?.();
 }
 $('lista-agendados').addEventListener('click', onCardClick);
+// Tarjeta de resultado: solo con marcador CONFIRMADO por ambos líderes (la BD es quien lo dice).
+let generando = false;
+$('lista-historial').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-act="tarjeta"]'); if (!b || generando) return;
+  const r = data.historial.find((x) => x.id === Number(b.dataset.id)); if (!r) return;
+  generando = true; b.disabled = true;
+  try {
+    const res = await resultadoDe(r.id);
+    if (!res || res.estado !== 'CONFIRMADO') { await compartirTarjeta(null); return; }
+    const nombres = (eq) => { const ps = partsOf(r.id).filter((p) => p.equipo === eq).map((p) => nm(p.usuario_id)); const lider = eq === 'A' ? r.retador_id : r.rival_id; return ps.length ? ps : [lider ? nm(lider) : '—']; };
+    const fecha = r.cerrado_at ? new Date(r.cerrado_at).toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+    await compartirTarjeta(datosTarjeta({ bandoA: nombres('A'), bandoB: nombres('B'), golesA: res.goles_a, golesB: res.goles_b, miLado: res.lado, plataforma: r.plataforma, formato: `${r.tam_a} vs ${r.tam_b}`, fecha }));
+  } catch (err) { console.error('[mis-partidos] tarjeta:', err); compartirTarjeta(null); }
+  finally { generando = false; b.disabled = false; }
+});
 $('lista-agendados').addEventListener('submit', (e) => {
   const f = e.target.closest('[data-form="link"]'); if (!f) return;
   e.preventDefault(); const fd = new FormData(f);

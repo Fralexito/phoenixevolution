@@ -136,12 +136,13 @@ export function card(r, id) {
 }
 
 /** Fila compacta del historial: quién jugó contra quién, formato, plataforma y cuándo terminó. */
-export function cardHistorial(r, id) {
+export function cardHistorial(r, id, { tarjeta = false } = {}) {
   const lado = (eq) => { const ps = partsOf(r.id).filter((p) => p.equipo === eq); const lider = eq === 'A' ? r.retador_id : r.rival_id; const nombres = ps.length ? ps.map((p) => nm(p.usuario_id)) : [lider ? nm(lider) : '—']; return escapeHTML(nombres.join(' + ')); };
   const cuando = r.cerrado_at ? fmt(r.cerrado_at) : r.fecha_programada ? fmt(r.fecha_programada) : '';
+  const btnTarjeta = tarjeta ? `<button type="button" data-act="tarjeta" data-id="${Number(r.id)}" class="btn btn-ghost !min-h-8 !px-3 !text-[11px] mt-2"><i class="fa-solid fa-share-nodes"></i> Tarjeta de resultado</button>` : '';
   return `<article class="rounded-xl px-4 py-3 bg-galaxy-panel border border-galaxy-border/80">
     <div class="flex flex-wrap items-center gap-1.5 mb-1.5">${badge('Finalizado', NEUTRAL)}${badge(escapeHTML(r.plataforma))}${badge(`${r.tam_a} vs ${r.tam_b}`, 'text-amber-300 border-amber-400/40 bg-amber-400/10')}</div>
     <p class="font-display font-bold text-white uppercase leading-tight text-sm">${lado('A')} <span class="text-galaxy-400 mx-1">vs</span> ${lado('B')}</p>
-    ${cuando ? `<p class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-calendar-check mr-1"></i>${escapeHTML(cuando)}</p>` : ''}
+    ${cuando ? `<p class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-calendar-check mr-1"></i>${escapeHTML(cuando)}</p>` : ''}${btnTarjeta}
   </article>`;
 }
