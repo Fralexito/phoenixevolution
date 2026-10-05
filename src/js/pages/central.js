@@ -64,6 +64,7 @@ function renderDemo() {
     </tr>`).join('') : '<tr><td colspan="4" class="py-4 text-center text-gray-500 text-xs">Aún no hay partidos jugados.</td></tr>';
   const slot = (p) => `<div class="text-center"><div class="w-8 h-8 rounded-full ${p.cls} border border-white mx-auto text-xs font-bold flex items-center justify-center">${p.pos}</div><span class="text-[11px] font-bold text-white uppercase tracking-wider block mt-1">${p.nombre}</span></div>`;
   const [dc, ei, mco, ed, mcd] = DEMO_XI;
+  if (!$('xi-container')) return;   // el XI está oculto por ahora
   $('xi-container').innerHTML = `
     <div class="flex justify-center relative z-10 pt-2">${slot(dc)}</div>
     <div class="flex justify-between px-6 relative z-10 my-auto">${slot(ei)}${slot(mco)}${slot(ed)}</div>
@@ -127,7 +128,7 @@ $('seg-partidos').addEventListener('click', (e) => {
   pestana = b.dataset.v; $('seg-partidos').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); pintarPartidos();
 });
 // ---- XI plegado en celular, abierto en PC ----
-$('xi-det').open = window.matchMedia('(min-width: 1024px)').matches;
+if ($('xi-det')) $('xi-det').open = window.matchMedia('(min-width: 1024px)').matches;
 
 // ---- Pulso de la comunidad: cuatro conteos reales (head:true no descarga filas, solo el número). Si uno falla se queda en «—». ----
 async function contar(consulta, id) {
