@@ -16,6 +16,7 @@ import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MA
 import * as api from '../features/muro/api.js';
 import { logrosDe } from '../features/logros/api.js';
 import { nivelDe } from '../core/logros.js';
+import { estadisticasDe } from '../features/resultados/api.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
 import * as amigosApi from '../features/amigos/api.js';
 import { relacion, accionesSociales } from '../core/red.js';
@@ -140,6 +141,14 @@ function cabecera(p) {
 }
 
 const opcionesSel = (lista, actual) => lista.map(([v, t]) => `<option value="${v}" ${v === actual ? 'selected' : ''}>${t}</option>`).join('');
+function franjaEstadisticas() {
+  const e = S.stats; if (!e || !e.jugados) return '';
+  const caja = (n, t, c = 'text-white') => `<div class="text-center min-w-[3.2rem]"><b class="block font-display text-lg ${c}">${n}</b><span class="text-[10px] uppercase tracking-wider text-gray-500">${t}</span></div>`;
+  return `<section class="glass-panel rounded-2xl px-3 py-2.5 flex items-center gap-3 flex-wrap" aria-label="Estadísticas de duelos">
+    <span class="text-[10px] font-display font-bold uppercase tracking-widest text-gray-400"><i class="fa-solid fa-chart-simple text-galaxy-400"></i> Duelos</span>
+    ${caja(e.jugados, 'Jugados')}${caja(e.victorias, 'Ganados', 'text-ok')}${caja(e.empates, 'Empates')}${caja(e.derrotas, 'Perdidos', 'text-bad')}${caja(`${e.gf}-${e.gc}`, 'Goles')}${e.efectividad != null ? caja(`${e.efectividad}%`, 'Efectividad', 'text-galaxy-400') : ''}
+    <span class="w-full text-[10px] text-gray-500">Solo cuentan marcadores confirmados por los dos líderes.</span></section>`;
+}
 function franjaLogros(p) {
   const l = S.logros; if (!l?.visible || !l.logros.length) return '';
   const max = 8, ver = l.logros.slice(0, max);
@@ -288,7 +297,7 @@ function seccionClips(p) {
 function pintar() {
   const p = S.p;
   const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${franjaLogros(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
+  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${franjaEstadisticas()}${franjaLogros(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
     <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
@@ -306,6 +315,7 @@ async function cargar() {
     const m = p.puede_ver_muro ? await api.cargarMuro(p.id) : { visible: false, items: [], hay_mas: false };
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
     await marcadoresMuro();
+    S.stats = await estadisticasDe(p.id);             // nunca lanza
     S.logros = await logrosDe(p.id);                 // nunca lanza: sin logros el perfil se ve igual
     S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;
     await cargarExtras(p); await marcadoresMuro();     // clips ya cargados: marcadores de todo lo visible

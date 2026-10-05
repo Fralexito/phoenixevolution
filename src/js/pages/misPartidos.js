@@ -10,8 +10,10 @@ import { coincide, campana, contraRivales } from '../core/perfil.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import * as act from '../features/duelos/actions.js';
 import { openInviteModal } from '../features/duelos/invite.js';
+import { crearPanelMarcadores } from '../features/resultados/panel.js';
 
 const $ = (id) => document.getElementById(id);
+const marcadores = crearPanelMarcadores($('bloque-marcadores'), { yo: me, reto: (id) => data.historial.find((r) => r.id === id) ?? data.retos.find((r) => r.id === id), nombre: nm });
 const vacio = (t) => `<div class="text-center py-6 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
 
 /** Mi campaña en la edición en curso de Galaxy (por nombre visible); null si no aparezco. */
@@ -55,7 +57,7 @@ function renderAll() {
 }
 
 async function fetchAll() {
-  try { await Promise.all([loadPerfiles(), loadRetos()]); renderAll(); }
+  try { await Promise.all([loadPerfiles(), loadRetos()]); renderAll(); marcadores.cargar(); }
   catch (e) { console.error('[mis-partidos] carga:', e); $('lista-agendados').innerHTML = '<div class="text-center py-6 text-bad text-xs">No se pudieron cargar tus partidos. Recarga la página.</div>'; }
 }
 act.setRefresh(fetchAll);
