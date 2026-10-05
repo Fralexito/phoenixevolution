@@ -12,6 +12,8 @@ import { reproductorYT } from '../features/muro/render.js';
 import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
+import { observarPresence, stopPresence, onPresence, ESTADOS } from '../features/presence.js';
+import { href } from '../core/config.js';
 
 const feedEl = document.getElementById('com-feed'); const filtroEl = document.getElementById('com-filtro'); const vistasEl = document.getElementById('com-vistas');
 const q = new URLSearchParams(location.search);
@@ -73,3 +75,23 @@ feedEl.addEventListener('click', (e) => {
 });
 pintarVistas(); pintarFiltro(); cargar();
 onSession(async ({ session }) => { const id = session?.user?.id ?? null; if (id !== S.yo) { S.yo = id; if (vistaInfo(S.vista).requiereSesion) { cargar(); return; } if (S.items.length) { if (id) await cargarEstado('publicacion', S.items.map((x) => x.id)); pintar(); } } });   // al conocer la sesión se pintan los botones de reportar
+
+// «En el radar ahora»: solo con sesión (mirar no te hace aparecer). Presence es cosmético: nunca decide permisos.
+let radarOn = false, ultimos = [];
+function pintarRadar(jugadores) {
+  const sec = document.getElementById('com-radar'); if (!sec) return;
+  const otros = jugadores.filter((p) => p.id !== S.yo);
+  sec.hidden = !radarOn;
+  document.getElementById('com-radar-n').textContent = otros.length ? `(${otros.length})` : '';
+  document.getElementById('com-radar-lista').innerHTML = otros.length
+    ? otros.map((p) => `<span class="inline-flex items-center gap-2 pl-3 pr-1 py-1 rounded-full bg-galaxy-900 border border-galaxy-border text-xs text-white"><span class="w-2 h-2 rounded-full ${ESTADOS[p.estado].dot}"></span><b class="font-display uppercase">${escapeHTML(p.name)}</b><span class="text-gray-400">${ESTADOS[p.estado].label}</span>
+        <a href="${href(`duelos/?retar=${encodeURIComponent(p.id)}`)}" class="ml-1 px-3 min-h-9 inline-flex items-center rounded-full bg-galaxy-600 text-[11px] font-bold uppercase">Retar</a></span>`).join('')
+    : '<span class="text-xs text-gray-500">Nadie en el radar por ahora. Actívalo en Duelos para aparecer.</span>';
+}
+onPresence((j) => { ultimos = j; pintarRadar(ultimos); });
+onSession(({ session }) => {
+  const quiere = !!session;
+  if (quiere && !radarOn) { radarOn = true; try { observarPresence(); } catch (e) { console.warn('[comunidad] radar:', e); } }
+  else if (!quiere && radarOn) { radarOn = false; stopPresence(); }
+  pintarRadar(ultimos);
+});

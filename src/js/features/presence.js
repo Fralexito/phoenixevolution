@@ -6,7 +6,7 @@ import { supabase } from '../core/supabase.js';
 export const ESTADOS = {
   libre: { label: 'Libre', dot: 'bg-emerald-400' },
   esperando: { label: 'Esperando rival', dot: 'bg-amber-400' },
-  ocupado: { label: 'Ocupado', dot: 'bg-red-500' },
+  ocupado: { label: 'En partida', dot: 'bg-red-500' },
 };
 
 const players = new Map();      // uid → { id, name, estado }
@@ -38,6 +38,14 @@ export function startPresence(user) {
     if (status === 'SUBSCRIBED') track();
     else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.error('[presence] canal:', status);
   });
+}
+
+/** Solo MIRAR el radar (sin aparecer en él): para mostrar «quién está en línea» fuera de Duelos. Si ya hay canal, no hace nada. */
+export function observarPresence() {
+  if (channel) return;
+  channel = supabase.channel('radar-duelos');
+  channel.on('presence', { event: 'sync' }, rebuild);
+  channel.subscribe((status) => { if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.error('[presence] observador:', status); });
 }
 
 export function stopPresence() {
