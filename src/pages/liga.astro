@@ -61,7 +61,7 @@ const datos = LIGAS.map((l) => ({
             {(l.sede || l.organizador) && (
               <ul class="flex flex-wrap justify-center sm:justify-start gap-2" aria-label="Sede y organizador">
                 {l.sede && <li><span class="pc-chip"><i class="fa-solid fa-location-dot"></i>Sede: {l.sede}</span></li>}
-                {l.organizador && <li><a class="pc-chip hover:border-galaxy-400" data-org-jugador={l.organizador} href={`${base}database/`} title={`Ver la carta de ${l.organizador}`}><i class="fa-solid fa-user-tie"></i>Organizador: {l.organizador} <i class="fa-solid fa-arrow-up-right-from-square text-[.6rem] opacity-70"></i></a></li>}
+                {l.organizador && <li><a class="liga-org" data-org-jugador={l.organizador} href={`${base}database/`} title={`Ver la carta de ${l.organizador}`}><span class="liga-org-ico"><i class="fa-solid fa-user-tie"></i></span><span class="leading-tight"><span class="block text-[10px] tracking-[.25em] uppercase text-gray-400">Organizador</span><span class="block font-display font-extrabold text-lg text-white uppercase tracking-wider">{l.organizador}</span></span><i class="fa-solid fa-chevron-right text-galaxy-400 text-xs ml-1"></i></a></li>}
               </ul>
             )}
             {ult && (
