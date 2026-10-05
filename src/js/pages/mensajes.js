@@ -1,5 +1,6 @@
 // Página /mensajes/: lista de chats, sala con mensajes en vivo, nuevo chat (directo o grupo), gestión de grupo, silenciar, reportar.
 // Esquema: pages → features/chat/api (RPC + RLS) → core/chat (lógica pura). La privacidad la decide el servidor; aquí solo se muestran sus errores.
+import { abrirReportar } from '../features/moderacion/acciones.js';
 import { onSession } from '../core/session.js';
 import { toast } from '../core/toast.js';
 import { escapeHTML, safeImg } from '../core/dom.js';
@@ -207,7 +208,7 @@ $('txt-msg').addEventListener('input', (e) => { e.target.style.height = 'auto'; 
 $('mensajes').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-borrar]'); const r = e.target.closest('[data-reportar]');
   if (b && confirm('¿Borrar este mensaje para todos?')) { await ejecutar(() => api.borrar(Number(b.dataset.borrar)), { recargar: false }); await refrescarSala(); }
-  if (r) { const motivo = prompt('¿Por qué reportas este mensaje? (mín. 3 letras)'); if (motivo) await ejecutar(async () => { await api.reportar(Number(r.dataset.reportar), motivo); toast('Reporte enviado a los administradores.', 'ok'); }, { recargar: false }); }
+  if (r) abrirReportar({ tipo: 'mensaje', objetivo: r.dataset.reportar, titulo: 'Mensaje en el chat' });
 });
 $('info-panel').addEventListener('click', async (e) => {
   const c = convAbierta(); if (!c) return;

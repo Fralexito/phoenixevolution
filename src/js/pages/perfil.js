@@ -1,6 +1,6 @@
 // Página /perfil/?u=<usuario>: perfil público + MURO de un jugador (sin ?u= abre el tuyo).
 // Esquema: pages (este archivo, pinta y reparte eventos) → features/muro/api (RPC, migración 021) → core/muro (lógica pura) + data/muroEstilo.
-import { onSession, isAdmin, refreshProfile } from '../core/session.js';
+import { onSession, isAdmin, refreshProfile, can } from '../core/session.js';
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { avatarPickerHTML, bindAvatarPicker, resolveAvatar } from '../features/avatarPicker.js';
@@ -20,6 +20,7 @@ import { abrirHistorias, abrirClips } from '../features/muro/visor.js';
 import { abrirNuevaHistoria, abrirDestacadas } from '../features/muro/historiasUI.js';
 import { prepararVideo } from '../features/muro/media.js';
 import { compartir } from '../features/muro/compartir.js';
+import { abrirReportar, abrirOcultar, abrirSancionar } from '../features/moderacion/acciones.js';
 import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/videoSubida.js';
 
 const root = document.getElementById('muro-root');
@@ -56,6 +57,8 @@ function avatarConAnillo(p, acento) {
 }
 
 /* ---------- Relación social con ESTA persona (amigos, solicitudes, seguir) ---------- */
+/** Rol de otra cuenta (la lectura de perfiles es pública). Solo informa en el modal: el rango que cuenta lo decide la BD. */
+async function rolDe(id) { try { const { data } = await supabase.from('perfiles').select('rol').eq('id', id).maybeSingle(); return data?.rol ?? 'jugador'; } catch { return 'jugador'; } }
 const BTN_SOC = 'btn btn-ghost !min-h-9 !px-3 !text-[11px]';
 const yoId = () => S.sesion?.user?.id ?? null;
 const relacionCon = (p) => (S.red ? relacion(S.red, p.id, yoId()) : null);
@@ -63,6 +66,8 @@ function botonSocial(act, icono, texto, extra = '', etiqueta = '') {
   return `<button type="button" data-act="${act}" ${etiqueta ? `aria-label="${etiqueta}" title="${etiqueta}"` : ''} class="${BTN_SOC} ${extra}"><i class="fa-solid ${icono}"></i>${texto ? `<span>${texto}</span>` : ''}</button>`;
 }
 /** Botones de amistad/mensaje según MI relación con la persona (lógica en core/red.accionesSociales). Sin la red cargada: Mensaje + Agregar, como antes. */
+/** Reportar esta cuenta (cualquiera con sesión) y, si el rol lo permite, sancionarla (la BD exige además rango mayor). */
+const botonesModeracion = (p) => `<button type="button" data-act="reportar" data-tipo="usuario" data-id="${escapeHTML(p.id)}" data-titulo="${escapeHTML(p.nombre_display || p.username)}" class="${BTN_SOC}" aria-label="Reportar cuenta" title="Reportar cuenta"><i class="fa-regular fa-flag"></i></button>${can('sancionar') ? `<button type="button" data-act="mod-sancionar" class="${BTN_SOC} !text-amber-300 !border-amber-400/50" title="Sancionar (moderación)"><i class="fa-solid fa-gavel"></i><span>Sancionar</span></button>` : ''}`;
 function botonesSociales(p) {
   const msg = `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="${BTN_SOC} !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>`;
   if (!S.red) return msg + botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo');
@@ -109,7 +114,7 @@ function cabecera(p) {
     ? `${botonesCartaReto(p)}<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
        <button type="button" data-act="panel" data-panel="host" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-server"></i><span>Hosting</span></button>
        <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
-    : (S.sesion ? `${botonesCartaReto(p)}${botonesSociales(p)}`
+    : (S.sesion ? `${botonesCartaReto(p)}${botonesSociales(p)}${botonesModeracion(p)}`
       : `${botonesCartaReto(p)}<span class="text-[11px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Inicia sesión (botón «Entrar», arriba) para escribirle, agregarlo o retarlo.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
     <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
@@ -184,13 +189,15 @@ function seccionRespuestas(it, p) {
   const lista = S.resp.get(it.id);
   const filas = lista === undefined ? '<p class="text-[11px] text-gray-500 py-2">Cargando respuestas…</p>'
     : lista.map((r) => `<div class="flex gap-2 py-1.5"><span class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span>
-        <div class="min-w-0 flex-1 rounded-xl bg-white/[0.03] px-2.5 py-1.5"><p class="text-[11px]"><a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(r.username)}" class="font-display font-bold text-white hover:text-galaxy-400">${escapeHTML(r.nombre_display)}</a> <span class="text-gray-500">· ${tiempoRelativo(r.created_at)}</span>${r.puedo_borrar ? ` <button type="button" data-act="borrar-resp" data-id="${r.id}" data-pub="${it.id}" title="Borrar respuesta" class="text-gray-500 hover:text-bad ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>` : ''}</p>
+        <div class="min-w-0 flex-1 rounded-xl bg-white/[0.03] px-2.5 py-1.5"><p class="text-[11px]"><a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(r.username)}" class="font-display font-bold text-white hover:text-galaxy-400">${escapeHTML(r.nombre_display)}</a> <span class="text-gray-500">· ${tiempoRelativo(r.created_at)}</span>${S.sesion && r.autor_id !== yoId() ? ` <button type="button" data-act="reportar" data-tipo="respuesta" data-id="${r.id}" title="Reportar respuesta" aria-label="Reportar respuesta" class="text-gray-500 hover:text-amber-300 ml-1"><i class="fa-regular fa-flag text-[10px]"></i></button>${can('resolverReportes') ? ` <button type="button" data-act="mod-ocultar" data-tipo="respuesta" data-id="${r.id}" data-pub="${it.id}" title="Ocultar (moderación)" aria-label="Ocultar respuesta (moderación)" class="text-gray-500 hover:text-orange-300 ml-1"><i class="fa-solid fa-eye-slash text-[10px]"></i></button>` : ''}` : ''}${r.puedo_borrar ? ` <button type="button" data-act="borrar-resp" data-id="${r.id}" data-pub="${it.id}" title="Borrar respuesta" class="text-gray-500 hover:text-bad ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>` : ''}</p>
           <p class="text-xs text-gray-200 leading-snug">${textoAHTML(r.texto)}</p></div></div>`).join('');
   const form = p.puede_responder
     ? `<div class="flex gap-2 mt-1"><input data-resp-input="${it.id}" maxlength="${RESP_MAX + 100}" placeholder="Escribe una respuesta…" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"><button type="button" data-act="enviar-resp" data-id="${it.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane"></i></button></div>`
     : `<p class="text-[11px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
+/** Reportar (cualquiera con sesión, salvo en lo propio) y ocultar (solo moderación). La base de datos vuelve a comprobar rol y rango. */
+const moderarBtns = (tipo, id, { pub = '', propio = !!S.p?.soy_yo } = {}) => (!S.sesion || propio ? '' : `<button type="button" data-act="reportar" data-tipo="${tipo}" data-id="${id}" title="Reportar" aria-label="Reportar" class="w-8 h-8 rounded-lg text-gray-400 hover:text-amber-300 shrink-0"><i class="fa-regular fa-flag"></i></button>${can('resolverReportes') ? `<button type="button" data-act="mod-ocultar" data-tipo="${tipo}" data-id="${id}" ${pub ? `data-pub="${pub}"` : ''} title="Ocultar (moderación)" aria-label="Ocultar (moderación)" class="w-8 h-8 rounded-lg text-gray-400 hover:text-orange-300 shrink-0"><i class="fa-solid fa-eye-slash"></i></button>` : ''}`);
 const compartirBtn = (tipo, id) => `<button type="button" data-act="compartir" data-tipo="${tipo}" data-id="${id}" aria-label="Compartir" title="Compartir" class="w-8 h-8 rounded-lg text-gray-400 hover:text-galaxy-400 shrink-0"><i class="fa-solid fa-share-nodes"></i></button>`;
 function tarjeta(it, p) {
   const mia = p.soy_yo; const puedeBorrar = mia || isAdmin();
@@ -207,7 +214,7 @@ function tarjeta(it, p) {
     <header class="flex items-center gap-2.5 mb-2">
       <span class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(p.avatar_url, p.nombre_display, 36)}</span>
       <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${escapeHTML(p.nombre_display)}</p>
-        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${compartirBtn('p', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
+        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${compartirBtn('p', it.id)}${moderarBtns('publicacion', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
 }
 function feed(p) {
   if (!S.visible) return candadoMuro(p);
@@ -398,6 +405,8 @@ function verHistorias(lista, titulo, { vigentes: sonVigentes = false } = {}) {
     inicio: sonVigentes ? indiceInicial(lista, S.vistas) : 0,
     onVistas: (ids) => { if (!sonVigentes) return; guardarVistas(ids); const av = document.querySelector('[data-act=ver-historias][aria-label^="Ver historias"]'); if (av) av.style.boxShadow = '0 0 0 3px #6b7280'; },
     onBorrar: duenyo ? async (id) => { try { await api.borrarHistoria(id); } catch (e) { toast(msgErr(e), 'error'); return false; } await recargarExtras(); return true; } : undefined,
+    onReportar: S.sesion && !duenyo ? (h) => abrirReportar({ tipo: 'historia', objetivo: h.id, titulo: `Historia de ${p.nombre_display || p.username}` }) : undefined,
+    onModerar: S.sesion && !duenyo && can('resolverReportes') ? (h) => abrirOcultar({ tipo: 'historia', id: h.id, titulo: `Historia de ${p.nombre_display || p.username}`, onListo: recargarExtras }) : undefined,
   });
 }
 
@@ -436,7 +445,9 @@ const ACCIONES = {
   },
   'ver-clip': (el) => abrirClips({ clips: clipsVisibles(), inicio: Number(el.dataset.i) || 0,
     onCompartir: (c) => compartir({ url: urlCompartir({ base: siteHome(), usuario: S.p.username, tipo: 'c', id: c.id }), titulo: `${S.p.nombre_display} · clip`, texto: c.titulo }),
-    onBorrar: S.p.soy_yo || isAdmin() ? async (id) => { try { await api.borrarClip(id); } catch (e) { toast(msgErr(e), 'error'); return false; } S.clips = S.clips.filter((c) => Number(c.id) !== id); pintar(); return true; } : undefined }),
+    onBorrar: S.p.soy_yo || isAdmin() ? async (id) => { try { await api.borrarClip(id); } catch (e) { toast(msgErr(e), 'error'); return false; } S.clips = S.clips.filter((c) => Number(c.id) !== id); pintar(); return true; } : undefined,
+    onReportar: S.sesion && !S.p.soy_yo ? (c) => abrirReportar({ tipo: 'clip', objetivo: c.id, titulo: c.titulo || 'Clip' }) : undefined,
+    onModerar: S.sesion && !S.p.soy_yo && can('resolverReportes') ? (c) => abrirOcultar({ tipo: 'clip', id: c.id, titulo: c.titulo || 'Clip', onListo: async () => { S.clips = S.clips.filter((x) => Number(x.id) !== Number(c.id)); pintar(); } }) : undefined }),
   'mas-clips': async (el) => {
     el.disabled = true;
     try { const m = await api.clipsDe(S.p.id, S.clips[S.clips.length - 1]?.id); S.clips = [...S.clips, ...(m.items ?? [])]; S.hayMasClips = !!m.hay_mas; pintar(); }
@@ -547,6 +558,19 @@ const ACCIONES = {
     S.resp.set(id, await api.respuestasDe(id).catch(() => S.resp.get(id) ?? []));
     S.items = S.items.map((x) => (x.id === id ? { ...x, respuestas: (S.resp.get(id) ?? []).length } : x)); pintarFeed();
   },
+  reportar: (el) => {
+    if (!S.sesion) { toast('Inicia sesión para reportar.', 'info'); return; }
+    abrirReportar({ tipo: el.dataset.tipo, objetivo: el.dataset.id, titulo: el.dataset.titulo || '' });
+  },
+  'mod-ocultar': (el) => {
+    const tipo = el.dataset.tipo; const id = Number(el.dataset.id); const pub = Number(el.dataset.pub);
+    abrirOcultar({ tipo, id, titulo: `${{ publicacion: 'Publicación', respuesta: 'Respuesta', clip: 'Clip', historia: 'Historia' }[tipo] ?? 'Contenido'} de ${S.p.nombre_display || S.p.username}`, onListo: async () => {
+      if (tipo === 'respuesta' && pub) { S.resp.set(pub, await api.respuestasDe(pub).catch(() => [])); S.items = S.items.map((x) => (x.id === pub ? { ...x, respuestas: (S.resp.get(pub) ?? []).length } : x)); pintarFeed(); }
+      else if (tipo === 'publicacion') await refrescarMuro();
+      else await recargarExtras();
+    } });
+  },
+  'mod-sancionar': async () => { abrirSancionar({ usuario: { id: S.p.id, nombre: S.p.nombre_display || S.p.username, rol: await rolDe(S.p.id) } }); },
   'borrar-resp': async (el) => {
     if (!window.confirm('¿Borrar esta respuesta?')) return;
     const id = Number(el.dataset.pub);

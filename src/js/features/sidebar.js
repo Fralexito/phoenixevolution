@@ -27,8 +27,8 @@ export function initSidebar() {
   const account = document.getElementById('sidebar-account');
   onSession(({ session }) => {
     if (account) account.hidden = !session;
-    // Enlaces solo para el staff (p. ej. Auditoría): visibles únicamente con el permiso. La página y la BD vuelven a comprobarlo.
-    menu.querySelectorAll('[data-solo-staff]').forEach((el) => { el.hidden = !can('verAuditoria'); });
+    // Enlaces solo para el staff (p. ej. Auditoría, Moderación): cada uno declara su permiso en data-solo-staff. La página y la BD vuelven a comprobarlo.
+    menu.querySelectorAll('[data-solo-staff]').forEach((el) => { el.hidden = !can(el.dataset.soloStaff || 'verAuditoria'); });
   });
   menu.addEventListener('click', (e) => {
     const act = e.target.closest('[data-action]')?.dataset.action;

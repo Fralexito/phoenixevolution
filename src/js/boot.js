@@ -8,6 +8,7 @@ import { initLiveDock } from './features/liveDock.js';
 import { initWelcome } from './features/welcome.js';
 import { initAjustes } from './features/ajustes.js';
 import { initAvatarFallback } from './core/avatar.js';
+import { initAvisoSancion } from './features/moderacion/aviso.js';
 
 initAjustes();
 initSidebar();
@@ -17,4 +18,5 @@ initAvatarFallback();
 initWelcome();
 initLiveFeed();
 initLiveDock();
+initAvisoSancion();
 initSession().catch((e) => console.error('[boot] sesión:', e));

@@ -18,7 +18,6 @@ export const enviar = (conv, texto) => rpc('enviar_mensaje', { p_conv: conv, p_t
 export const borrar = (id) => rpc('borrar_mensaje', { p_id: id });
 export const marcarLeido = (conv) => rpc('marcar_leido', { p_conv: conv });
 export const silenciar = (conv, si) => rpc('silenciar_conversacion', { p_conv: conv, p_silenciar: si });
-export const reportar = (id, motivo) => rpc('reportar_mensaje', { p_mensaje: id, p_motivo: motivo });
 
 /** Últimos 60 mensajes de una conversación (la RLS ya limita a miembros). */
 export async function cargarMensajes(conv) {

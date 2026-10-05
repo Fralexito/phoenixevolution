@@ -39,7 +39,7 @@ const ytEmbed = (id) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1
  * @param {(ids:number[])=>void} [o.onVistas]  se llama con los ids vistos al cerrar
  * @param {(id:number)=>Promise<boolean>} [o.onBorrar]  si existe, muestra el basurero (solo el dueño); true = borrada
  */
-export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio = 0, onVistas, onBorrar }) {
+export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio = 0, onVistas, onBorrar, onReportar, onModerar }) {
   if (!historias?.length) return;
   let lista = [...historias]; let i = Math.min(Math.max(0, inicio), lista.length - 1);
   let pausa = false; let transcurrido = 0; let ultimo = 0; let raf = 0; let dur = HISTORIA_MS; const vistas = new Set();
@@ -51,6 +51,8 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
           <span class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-white/40 shrink-0">${avatar}</span>
           <div class="min-w-0 flex-1 leading-tight"><p class="text-white text-sm font-display font-bold truncate">${escapeHTML(nombre)}${titulo ? ` <span class="text-galaxy-400">· ${escapeHTML(titulo)}</span>` : ''}</p><p class="text-[11px] text-gray-300" data-meta></p></div>
           ${onBorrar ? '<button type="button" data-borrar aria-label="Borrar esta historia" class="w-9 h-9 rounded-full text-white/80 hover:text-bad"><i class="fa-solid fa-trash"></i></button>' : ''}
+          ${onReportar ? '<button type="button" data-reportar aria-label="Reportar esta historia" title="Reportar" class="w-9 h-9 rounded-full text-white/80 hover:text-amber-300"><i class="fa-regular fa-flag"></i></button>' : ''}
+          ${onModerar ? '<button type="button" data-moderar aria-label="Ocultar esta historia (moderación)" title="Ocultar (moderación)" class="w-9 h-9 rounded-full text-white/80 hover:text-orange-300"><i class="fa-solid fa-eye-slash"></i></button>' : ''}
           <button type="button" data-cerrar aria-label="Cerrar historias" class="w-9 h-9 rounded-full text-white hover:bg-white/10"><i class="fa-solid fa-xmark text-lg"></i></button></div></div>
       <div class="flex-1 relative min-h-0" data-escena></div>
       <button type="button" data-ant aria-label="Historia anterior" class="absolute left-0 top-16 bottom-0 w-1/3 z-[5]"></button>
@@ -118,13 +120,16 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
     if (!lista.length) { cerrar(); return; }
     i = Math.min(i, lista.length - 1); mostrar();
   });
+  // Reportar / ocultar: se cierra el visor y se abre la ventana (así no se superponen).
+  el.querySelector('[data-reportar]')?.addEventListener('click', () => { const h = lista[i]; cerrar(); if (h) onReportar(h); });
+  el.querySelector('[data-moderar]')?.addEventListener('click', () => { const h = lista[i]; cerrar(); if (h) onModerar(h); });
   el.addEventListener('visor-cierra', () => { cancelAnimationFrame(raf); document.removeEventListener('keydown', teclas); try { onVistas?.([...vistas]); } catch (e) { console.error('[visor] onVistas:', e); } });
   mostrar(); raf = requestAnimationFrame(tick);
 }
 
 /* ================= CLIPS (reels) ================= */
 /** @param {{clips:Array, inicio?:number, onBorrar?:(id:number)=>Promise<boolean>}} o  clips = infoClip(...) */
-export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir }) {
+export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReportar, onModerar }) {
   if (!clips?.length) return;
   let lista = [...clips]; let activo = -1;
   const { el, cerrar } = crearOverlay('Clips', `
@@ -142,6 +147,8 @@ export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir }) {
       <div class="absolute right-3 bottom-20 z-10 flex flex-col gap-2">
         <a href="${escapeHTML(c.url)}" target="_blank" rel="noopener noreferrer nofollow" aria-label="Abrir en ${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? 'su página')}" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
         ${onCompartir ? `<button type="button" data-compartir="${c.id}" aria-label="Compartir" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+        ${onReportar ? `<button type="button" data-reportar="${c.id}" aria-label="Reportar clip" title="Reportar" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-amber-300"><i class="fa-regular fa-flag"></i></button>` : ''}
+        ${onModerar ? `<button type="button" data-moderar="${c.id}" aria-label="Ocultar clip (moderación)" title="Ocultar (moderación)" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-orange-300"><i class="fa-solid fa-eye-slash"></i></button>` : ''}
         ${onBorrar ? `<button type="button" data-borrar="${c.id}" aria-label="Borrar clip" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-bad"><i class="fa-solid fa-trash"></i></button>` : ''}</div></section>`;
   }
   function pintar() { pista.innerHTML = lista.map(slide).join(''); activo = -1; }
@@ -173,6 +180,8 @@ export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir }) {
   el.addEventListener('click', async (e) => {
     const sh = e.target.closest('[data-compartir]');
     if (sh) { const c = lista.find((x) => x.id === Number(sh.dataset.compartir)); if (c) onCompartir?.(c); return; }
+    const rp = e.target.closest('[data-reportar]'); const md = e.target.closest('[data-moderar]');
+    if (rp || md) { const c = lista.find((x) => x.id === Number((rp ?? md).dataset[rp ? 'reportar' : 'moderar'])); cerrar(); if (c) (rp ? onReportar : onModerar)(c); return; }
     const b = e.target.closest('[data-borrar]');
     if (!b) { if (e.target === el) cerrar(); return; }
     if (!window.confirm('¿Borrar este clip?')) return;

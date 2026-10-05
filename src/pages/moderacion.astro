@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Moderación" active="moderacion">
+  <div class="max-w-4xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Solo staff</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-shield-halved text-galaxy-400 mr-2"></i>Moderación</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Reportes de la comunidad: revisa, oculta, sanciona o descarta. Cada acción queda en la Auditoría.</p>
+    </header>
+
+    <div id="mod-sinsesion" hidden class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm">Inicia sesión para continuar.</div>
+    <div id="mod-denegado" hidden class="glass-panel rounded-2xl p-8 text-center text-sm space-y-1">
+      <p class="text-white font-display font-bold uppercase tracking-wider"><i class="fa-solid fa-lock text-galaxy-400 mr-2"></i>Esta página es solo para el staff</p>
+      <p class="text-gray-400 text-xs">Tu cuenta no tiene permiso para ver los reportes.</p>
+    </div>
+
+    <div id="mod-app" hidden class="space-y-4">
+      <div id="mod-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 flex flex-wrap items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation"></i><span id="mod-error-txt" class="flex-1 min-w-0"></span>
+        <button type="button" id="mod-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Reintentar</button>
+      </div>
+      <p id="mod-solo-lectura" hidden class="rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-2.5 text-xs text-sky-200"><i class="fa-solid fa-eye mr-1.5"></i>Tu rol puede <b>ver</b> los reportes pero no actuar sobre ellos. Si algo es urgente, avisa a un moderador.</p>
+
+      <div id="mod-tabs" class="flex flex-wrap gap-1.5" role="group" aria-label="Estado de los reportes"></div>
+      <section id="mod-lista" class="space-y-3" aria-live="polite"></section>
+      <div class="text-center"><button type="button" id="mod-mas" hidden class="btn btn-ghost">Cargar más</button></div>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/moderacion.js';
+</script>
