@@ -2,6 +2,9 @@
 import { supabase } from '../core/supabase.js';
 import { escapeHTML } from '../core/dom.js';
 import { playerCardHTML } from '../features/playerCard.js';
+import { crearReplica } from '../features/replicaCarta.js';
+import { esIlegible } from '../core/replica.js';
+import { leerAjustes, hayMovimientoReducido } from '../features/ajustes.js';
 import { DEMO_XI } from '../../data/demo.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
@@ -89,15 +92,31 @@ async function renderFeatured() {
 renderDemo();
 renderFeatured();
 // Podio: el pase del mouse agranda por CSS; en celular (sin mouse) el toque agranda/encoge la carta. Un solo jugador agrandado a la vez.
+// En celular las tres cartas miden ≈ 105 px y el CSS oculta sus estadísticas (< 135 px): ahí el toque abre la RÉPLICA completa (features/replicaCarta.js),
+// con el ancho de una carta «normal», igual que en «Jugadores». Si las cartas son anchas (PC), se conserva el zoom por CSS de siempre.
 const podio = $('featured-players-container');
+const AURA = { 1: '#ffc828', 2: '#00e5ff', 3: '#ff3dc8' };           // mismos colores que --glow de cada puesto en components.css
+const esMovil = () => window.matchMedia('(max-width: 639px)').matches;
+const quitarMarcas = () => podio.querySelectorAll('.podio-up, .podio-origen').forEach((x) => { x.classList.remove('podio-up', 'podio-origen'); x.setAttribute('aria-pressed', 'false'); });
+const replicaPodio = crearReplica({ esMovil, sinMovimiento: hayMovimientoReducido, inclinacion: () => leerAjustes().cartasInclinacion, alClicCapa: cerrarPodio });
+function cerrarPodio() { replicaPodio.cerrar(); quitarMarcas(); }
 function alternarPodio(slot) {
+  const carta = slot.querySelector('article');
+  if (carta && esIlegible(slot.getBoundingClientRect().width)) {
+    const abrir = !slot.classList.contains('podio-origen');
+    cerrarPodio();
+    if (abrir && replicaPodio.abrir(carta, { aura: AURA[slot.dataset.puesto] ?? '#00e5ff' })) { slot.classList.add('podio-origen'); slot.setAttribute('aria-pressed', 'true'); }
+    return;
+  }
   const abrir = !slot.classList.contains('podio-up');
-  podio.querySelectorAll('.podio-slot').forEach((x) => { x.classList.remove('podio-up'); x.setAttribute('aria-pressed', 'false'); });
+  cerrarPodio();
   if (abrir) { slot.classList.add('podio-up'); slot.setAttribute('aria-pressed', 'true'); }
 }
 podio.addEventListener('click', (e) => { const s = e.target.closest('.podio-slot'); if (s) alternarPodio(s); });
 podio.addEventListener('keydown', (e) => { const s = e.target.closest('.podio-slot'); if (s && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); alternarPodio(s); } });
-document.addEventListener('click', (e) => { if (!e.target.closest('#featured-players-container')) podio.querySelectorAll('.podio-up').forEach((x) => { x.classList.remove('podio-up'); x.setAttribute('aria-pressed', 'false'); }); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarPodio(); });
+document.addEventListener('click', (e) => { if (!e.target.closest('#featured-players-container, .pcw-replica')) cerrarPodio(); });
+window.addEventListener('resize', () => replicaPodio.reposicionar());
 $('btn-hero-register')?.addEventListener('click', () => openAuthModal('register'));
 // Si ya hay sesión, el botón de "Crear Cuenta" sobra.
 onSession(({ session }) => { const b = $('btn-hero-register'); if (b) b.hidden = !!session; });

@@ -214,6 +214,8 @@
 .podio-slot[data-puesto='1'] .podio-in { --s: 1.04; --y: -.5rem; }
 .podio-in > article > div[class*='h-[2px]'] { background: linear-gradient(90deg, transparent, rgb(var(--glow)), transparent); }
 /* Zoom al pasar el mouse / tocar, escalonado por puesto (1.º el mayor). */
+/* Celular: mientras la réplica completa está abierta, la carta del podio queda atenuada en su sitio (como en «Jugadores»). */
+.podio-slot.podio-origen { opacity: .32; filter: saturate(.5); transition: opacity .6s ease, filter .6s ease; }
 .podio-slot:hover, .podio-slot:focus-visible, .podio-slot.podio-up { z-index: 20; }
 .podio-slot[data-puesto='1']:hover .podio-in, .podio-slot[data-puesto='1']:focus-visible .podio-in, .podio-slot[data-puesto='1'].podio-up .podio-in { --s: var(--z1); }
 .podio-slot[data-puesto='2']:hover .podio-in, .podio-slot[data-puesto='2']:focus-visible .podio-in, .podio-slot[data-puesto='2'].podio-up .podio-in { --s: var(--z2); }
