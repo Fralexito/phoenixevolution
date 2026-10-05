@@ -14,6 +14,8 @@ import { avatarHTML } from '../core/avatar.js';
 import { analizarVideo, segmentoParaGuardar, urlCompartir, destinoDeHash, etiquetaOpcionReto, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
 import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES, PALETA_EMOJIS, SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
+import { logrosDe } from '../features/logros/api.js';
+import { nivelDe } from '../core/logros.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
 import * as amigosApi from '../features/amigos/api.js';
 import { relacion, accionesSociales } from '../core/red.js';
@@ -138,6 +140,15 @@ function cabecera(p) {
 }
 
 const opcionesSel = (lista, actual) => lista.map(([v, t]) => `<option value="${v}" ${v === actual ? 'selected' : ''}>${t}</option>`).join('');
+function franjaLogros(p) {
+  const l = S.logros; if (!l?.visible || !l.logros.length) return '';
+  const max = 8, ver = l.logros.slice(0, max);
+  return `<section class="glass-panel rounded-2xl px-3 py-2.5 flex items-center gap-2 flex-wrap" aria-label="Logros">
+    <span class="text-[10px] font-display font-bold uppercase tracking-widest text-gray-400 mr-1"><i class="fa-solid fa-medal text-galaxy-400"></i> Logros ${l.obtenidos}</span>
+    ${ver.map((x) => `<span title="${escapeHTML(x.nombre + ' — ' + x.descripcion)}" class="w-8 h-8 rounded-lg border flex items-center justify-center ${nivelDe(x.nivel).clase}"><i class="fa-solid ${x.icono} text-sm" aria-hidden="true"></i><span class="sr-only">${escapeHTML(x.nombre)}</span></span>`).join('')}
+    ${l.obtenidos > max ? `<span class="text-[11px] text-gray-500">+${l.obtenidos - max}</span>` : ''}
+    ${p.soy_yo ? `<a href="${escapeHTML(href('logros/'))}" class="ml-auto text-[11px] text-galaxy-400 hover:text-white font-bold">Ver todos</a>` : ''}</section>`;
+}
 function panelEstilo(p) {
   const { banner, acento, lema, foto } = estiloDe(p);
   return `<section id="panel-estilo" hidden class="glass-panel rounded-2xl p-4 space-y-3">
@@ -277,7 +288,7 @@ function seccionClips(p) {
 function pintar() {
   const p = S.p;
   const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
+  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${franjaLogros(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
     <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
@@ -295,6 +306,7 @@ async function cargar() {
     const m = p.puede_ver_muro ? await api.cargarMuro(p.id) : { visible: false, items: [], hay_mas: false };
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
     await marcadoresMuro();
+    S.logros = await logrosDe(p.id);                 // nunca lanza: sin logros el perfil se ve igual
     S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;
     await cargarExtras(p); await marcadoresMuro();     // clips ya cargados: marcadores de todo lo visible
     document.title = `${p.nombre_display} · Muro`;

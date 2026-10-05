@@ -7,10 +7,11 @@ export const CATEGORIAS_AVISO = Object.freeze([
   { id: 'social',    titulo: 'Amigos y seguidores',    icono: 'fa-user-group', texto: 'Solicitudes de amistad, amistades aceptadas y nuevos seguidores.' },
   { id: 'muro',      titulo: 'Respuestas en tu muro',  icono: 'fa-comment',    texto: 'Cuando alguien responde a una de tus publicaciones.' },
   { id: 'menciones', titulo: 'Menciones',              icono: 'fa-at',         texto: 'Cuando alguien escribe tu @usuario en una publicación o respuesta.' },
+  { id: 'logros',    titulo: 'Logros',                 icono: 'fa-medal',      texto: 'Cuando desbloqueas una insignia nueva.' },
 ]);
 export const NOTA_SISTEMA = 'Los avisos del equipo de moderación (por ejemplo, una sanción) siempre te llegan: no se pueden apagar.';
 
-/** Respuesta de `mis_preferencias_notif` (o null) → { duelos, social, muro, menciones } con true/false. Todo lo desconocido cuenta como ACTIVADO. */
+/** Respuesta de `mis_preferencias_notif` (o null) → { duelos, social, muro, menciones, logros } con true/false. Todo lo desconocido cuenta como ACTIVADO. */
 export const normalizarPreferencias = (obj) => Object.fromEntries(CATEGORIAS_AVISO.map((c) => [c.id, obj?.[c.id] !== false]));
 
 export const esCategoriaAviso = (id) => CATEGORIAS_AVISO.some((c) => c.id === id);

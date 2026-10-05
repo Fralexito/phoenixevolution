@@ -15,9 +15,9 @@ const ICON = {
   PARTIDO_CONFIRMADO: 'fa-circle-check', PARTIDO_CANCELADO: 'fa-circle-xmark', RETO_EXPIRADO: 'fa-hourglass-end',
   INVITACION_RETO: 'fa-user-plus', UNION_RETO: 'fa-users', SALIO_RETO: 'fa-user-minus',
   AMISTAD_SOLICITUD: 'fa-user-plus', AMISTAD_ACEPTADA: 'fa-user-group', SEGUIDOR_NUEVO: 'fa-heart',
-  ESPECTADOR_SOLICITUD: 'fa-eye', ESPECTADOR_APROBADO: 'fa-eye', MURO_RESPUESTA: 'fa-comment', MENCION: 'fa-at',
+  ESPECTADOR_SOLICITUD: 'fa-eye', ESPECTADOR_APROBADO: 'fa-eye', MURO_RESPUESTA: 'fa-comment', MENCION: 'fa-at', LOGRO: 'fa-medal',
 };
-const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/', ESPECTADOR_SOLICITUD: 'en-vivo/', ESPECTADOR_APROBADO: 'en-vivo/', MURO_RESPUESTA: 'perfil/' };   // el resto de avisos son de retos → Duelos
+const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/', ESPECTADOR_SOLICITUD: 'en-vivo/', ESPECTADOR_APROBADO: 'en-vivo/', MURO_RESPUESTA: 'perfil/', LOGRO: 'logros/' };   // el resto de avisos son de retos → Duelos
 const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const LIMIT = 30;
 

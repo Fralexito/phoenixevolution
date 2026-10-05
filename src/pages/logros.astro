@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Logros" active="logros">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Mi cuenta</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-medal text-galaxy-400 mr-2"></i>Logros</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Insignias que ganas jugando y participando. Se otorgan solas y se muestran en tu perfil. Los duelos cuentan cuando se finalizan.</p>
+      <p id="lg-resumen" class="text-xs text-galaxy-400 font-bold mt-2"></p>
+    </header>
+    <div id="lg-sinsesion" hidden class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm">Inicia sesión para ver tus logros.</div>
+    <div id="lg-app" hidden class="space-y-3">
+      <div id="lg-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 flex flex-wrap items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation"></i><span id="lg-error-txt" class="flex-1 min-w-0"></span>
+        <button type="button" id="lg-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Reintentar</button>
+      </div>
+      <div id="lg-lista" class="space-y-5" aria-live="polite"></div>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/logros.js';
+</script>
