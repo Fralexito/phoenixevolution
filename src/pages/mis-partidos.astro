@@ -13,6 +13,12 @@ const base = import.meta.env.BASE_URL;
       <a href={`${base}duelos/`} class="btn btn-primary !min-h-10"><i class="fa-solid fa-satellite-dish"></i> Lanzar un reto</a>
     </header>
 
+    <section id="bloque-valoraciones" hidden class="space-y-2" aria-labelledby="h-valoraciones">
+      <h2 id="h-valoraciones" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-star text-galaxy-400 mr-2"></i>Valora a tus rivales</h2>
+      <p class="text-[11px] text-gray-400">Tu valoración es ciega: solo cuenta cuando tu rival también valora, o pasados 3 días. Nadie ve tus estrellas sueltas, solo el resumen en el perfil.</p>
+      <div data-lista class="grid md:grid-cols-2 gap-2"></div>
+    </section>
+
     <section id="bloque-marcadores" hidden class="space-y-2" aria-labelledby="h-marcadores">
       <h2 id="h-marcadores" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-clipboard-check text-galaxy-400 mr-2"></i>Marcadores por confirmar</h2>
       <p class="text-[11px] text-gray-400">Un resultado cuenta en tus estadísticas y logros solo cuando los dos líderes están de acuerdo.</p>

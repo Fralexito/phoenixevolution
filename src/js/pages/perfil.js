@@ -28,6 +28,8 @@ import { abrirNuevaHistoria, abrirDestacadas } from '../features/muro/historiasU
 import { prepararVideo } from '../features/muro/media.js';
 import { compartir } from '../features/muro/compartir.js';
 import { clanDeUsuario } from '../features/clanes/api.js';
+import { reputacionDe } from '../features/valoraciones/api.js';
+import { textoSello } from '../core/reputacion.js';
 import { abrirReportar, abrirOcultar, abrirSancionar } from '../features/moderacion/acciones.js';
 import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/videoSubida.js';
 
@@ -133,7 +135,7 @@ function cabecera(p) {
         ${avatarConAnillo(p, acento)}
         <div class="min-w-0 flex-1 pt-10 sm:pt-12">
           <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl truncate">${escapeHTML(p.nombre_display || 'Jugador')}</h1>
-          <p class="text-xs text-gray-400">@${escapeHTML(p.username)} <a id="pf-clan" hidden class="ml-1 font-display font-extrabold text-galaxy-400 hover:underline" title="Clan"></a></p></div>
+          <p class="text-xs text-gray-400">@${escapeHTML(p.username)} <a id="pf-clan" hidden class="ml-1 font-display font-extrabold text-galaxy-400 hover:underline" title="Clan"></a> <span id="pf-rep" hidden class="ml-1 text-[10px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5"></span></p></div>
         <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:pt-12">${acciones}<button type="button" data-act="compartir" data-tipo="" aria-label="Compartir perfil" title="Compartir perfil" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-share-nodes"></i></button></div>
       </div>
       ${lema ? `<p class="mt-3 text-sm italic" style="color:${acento}">«${escapeHTML(lema)}»</p>` : ''}
@@ -326,6 +328,7 @@ async function cargar() {
     document.title = `${p.nombre_display} · Muro`;
     pintar(); irADestino();
     clanDeUsuario(p.id).then((c) => { const a = document.getElementById('pf-clan'); if (c && a && S.p?.id === p.id) { a.textContent = `[${c.etiqueta}]`; a.title = `Clan ${c.nombre}`; a.href = href('clanes/'); a.hidden = false; } });   // adorno: nunca bloquea el perfil
+    reputacionDe(p.id).then((r) => { const e = document.getElementById('pf-rep'); if (r && e && S.p?.id === p.id) { e.className = `ml-1 text-[10px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${r.clase}`; e.innerHTML = `<i class="fa-solid ${r.icono}"></i> ${textoSello(r).replace(/[<>&]/g, '')}`; e.title = r.valoraciones ? `${r.valoraciones} valoraciones de rivales` : 'Aún sin valoraciones suficientes'; e.hidden = false; } });
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
 }
 /** Mi red (amigos, solicitudes, seguidos). Si falla, devuelve null: el perfil sigue funcionando con los botones básicos. */
