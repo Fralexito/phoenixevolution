@@ -50,6 +50,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
         <div class="flex-1 min-w-0 space-y-3">
           <div><label class="label" for="f-nombre">Nombre</label><input id="f-nombre" class="field" maxlength="40" value="${escapeHTML(p.nombre)}"></div>
           <div><label class="label" for="f-apodo">Apodo <span class="text-gray-500 normal-case">(opcional)</span></label><input id="f-apodo" class="field" maxlength="24" placeholder="Ej: El Cometa" value="${escapeHTML(p.apodo)}"></div>
+          <div><label class="label" for="f-cuenta">Cuenta vinculada <span class="text-gray-500 normal-case">(@usuario, opcional)</span></label><input id="f-cuenta" class="field" maxlength="21" autocomplete="off" placeholder="Ej: fralex · activa el «Muro» en su ficha"></div>
           <div><label class="label" for="f-club">Club</label><input id="f-club" class="field uppercase" maxlength="60" value="${escapeHTML(p.club ?? 'Agente Libre')}"></div>
         </div>
         <div class="flex flex-col items-center gap-1.5 shrink-0">
@@ -222,6 +223,9 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     } catch (ex) { console.error('[ficha] reencuadrar:', ex); err.textContent = 'No se pudo cargar la foto para reencuadrarla. Sube una de nuevo.'; }
   });
 
+  // Si la ficha ya está vinculada, mostrar el @usuario actual (mejor esfuerzo: si falla, el campo queda vacío y se puede volver a escribir).
+  if (player?.perfil_id) supabase.from('perfiles').select('username').eq('id', player.perfil_id).maybeSingle().then((r) => { if (r.data?.username) $('#f-cuenta').value = r.data.username; });
+
   /* ---- Guardar ---- */
   $('#pf').addEventListener('submit', async (ev) => {
     ev.preventDefault(); err.textContent = '';
@@ -230,7 +234,18 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
     if (!nombre) { err.textContent = 'Escribe el nombre.'; return; }
     const alt = leerMedida($('#f-altura').value, ALTURA);
     if (alt.error) { err.textContent = `La altura debe estar entre ${ALTURA.min} y ${ALTURA.max} cm (o déjala vacía).`; return; }
+    // Cuenta vinculada: el @usuario se traduce al id de su perfil (vacío = sin vínculo). Si no existe, no se guarda nada.
+    const cuenta = $('#f-cuenta').value.trim().replace(/^@/, '').toLowerCase();
+    let perfilId = null;
+    if (cuenta) {
+      if (!/^[a-z0-9_]{1,20}$/.test(cuenta)) { err.textContent = 'El @usuario solo puede llevar letras, números y _.'; return; }
+      const r = await supabase.from('perfiles').select('id').eq('username', cuenta).maybeSingle();
+      if (r.error) { console.error('[ficha] buscar cuenta:', r.error.message); err.textContent = 'No pude comprobar esa cuenta. Intenta de nuevo.'; return; }
+      if (!r.data) { err.textContent = `No existe ninguna cuenta con el @${cuenta}.`; return; }
+      perfilId = r.data.id;
+    }
     const row = {
+      perfil_id: perfilId,
       altura_cm: alt.valor, pie: pieValido($('#f-pie [aria-pressed=true]')?.dataset.pie),
       nombre, apodo: $('#f-apodo').value.trim().replace(/[<>]/g, '').slice(0, 24) || null, club: ($('#f-club').value.trim().replace(/[<>]/g, '') || 'Agente Libre').toUpperCase(),
       posicion: $('#f-pos [aria-pressed=true]')?.dataset.pos ?? 'DC', quote: $('#f-quote').value.trim(), descripcion: $('#f-desc').value.trim().replace(/[<>]/g, '') || null,

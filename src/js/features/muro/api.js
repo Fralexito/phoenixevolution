@@ -12,7 +12,8 @@ async function rpc(nombre, args = {}) {
 export const perfilPublico = (username) => rpc('perfil_publico', { p_usuario: username });
 export const cargarMuro = (id, antes = null, limite = 20) => rpc('muro_de', { p_usuario: id, p_antes: antes, p_limite: limite });
 // Solo se envían p_imagen / p_video si existen (así sigue funcionando con la firma anterior de la función).
-export const publicar = (texto, imagen = null, video = null) => rpc('muro_publicar', { p_texto: texto, ...(imagen ? { p_imagen: imagen } : {}), ...(video ? { p_video: video } : {}) });
+export const publicar = (texto, imagen = null, video = null, reto = null) => rpc('muro_publicar', { p_texto: texto, ...(imagen ? { p_imagen: imagen } : {}), ...(video ? { p_video: video } : {}), ...(reto ? { p_reto: reto } : {}) });
+export const misPartidos = () => rpc('muro_mis_partidos');   // mis duelos que puedo adjuntar (aceptados o finalizados)
 export const editar = (id, texto) => rpc('muro_editar', { p_id: id, p_texto: texto });
 /** Borra la publicación; si tenía foto y era mía, el servidor devuelve su URL y aquí limpio el archivo del Storage. */
 export async function borrar(id) { const url = await rpc('muro_borrar', { p_id: id }); if (typeof url === 'string' && url) await quitarImagen(url); }

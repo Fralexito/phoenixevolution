@@ -6,9 +6,10 @@ import { escapeHTML, safeUrl, safeImg } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { avatarHTML } from '../core/avatar.js';
 import { sanitizarExtras, resumenExtra } from '../core/hostExtras.js';
-import { analizarVideo, PROVEEDOR_ETIQUETA, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
+import { analizarVideo, etiquetaOpcionReto, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
 import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
+import { contenidoHTML, reproductorYT } from '../features/muro/render.js';
 import { solicitar } from '../features/amigos/api.js';
 
 const root = document.getElementById('muro-root');
@@ -81,9 +82,11 @@ const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
   <textarea id="mu-texto" rows="3" maxlength="${MURO_MAX + 200}" placeholder="¿Qué quieres contar? Un resultado, una búsqueda de rivales, un enlace de tu clip…" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
   <div id="mu-prev" hidden class="relative inline-block"><img id="mu-prev-img" alt="Vista previa de tu foto" class="max-h-40 rounded-lg border border-galaxy-border"><button type="button" data-act="quitar-foto" aria-label="Quitar foto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
   <input id="mu-video" hidden maxlength="300" placeholder="Pega un enlace de YouTube, TikTok, Kick o Twitch" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
+  <select id="mu-reto" hidden aria-label="Duelo a adjuntar" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"></select>
   <input type="file" id="mu-file" accept="image/jpeg,image/png,image/webp" hidden>
   <div class="flex items-center gap-2"><button type="button" data-act="elegir-foto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span>Foto</span></button>
     <button type="button" data-act="alternar-video" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-circle-play"></i><span>Video</span></button>
+    <button type="button" data-act="alternar-reto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-gamepad"></i><span>Duelo</span></button>
     <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar</span></button></div></section>`;
 
 /** Reacciones: con permiso, los 5 botones (el tuyo resaltado, con su conteo); sin permiso, solo los conteos. Más el botón de respuestas. */
@@ -106,21 +109,6 @@ function seccionRespuestas(it, p) {
     : `<p class="text-[11px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
-/** Foto y/o video de una publicación. YouTube: miniatura que carga el reproductor al tocarla (no se carga nada de YouTube hasta que quieras). Resto: tarjeta con enlace. */
-function medios(it) {
-  const img = safeImg(it.imagen_url) ? `<a href="${escapeHTML(safeImg(it.imagen_url))}" target="_blank" rel="noopener noreferrer" class="block mt-2"><img src="${escapeHTML(safeImg(it.imagen_url))}" alt="Foto de la publicación" loading="lazy" referrerpolicy="no-referrer" class="rounded-xl w-full max-h-[28rem] object-cover border border-galaxy-border"></a>` : '';
-  const v = it.video_url ? analizarVideo(it.video_url) : null;
-  let vid = '';
-  if (v?.ok && v.proveedor === 'youtube') {
-    vid = `<button type="button" data-act="video-yt" data-yt="${escapeHTML(v.id)}" aria-label="Reproducir video de YouTube" class="relative block w-full mt-2 rounded-xl overflow-hidden border border-galaxy-border aspect-video bg-black group">
-      <img src="https://i.ytimg.com/vi/${escapeHTML(v.id)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-80 group-hover:opacity-100">
-      <span class="absolute inset-0 flex items-center justify-center"><i class="fa-solid fa-circle-play text-5xl text-white drop-shadow"></i></span></button>`;
-  } else if (v?.ok) {
-    const ico = { tiktok: 'fa-brands fa-tiktok', twitch: 'fa-brands fa-twitch', kick: 'fa-solid fa-play' }[v.proveedor];
-    vid = `<a href="${escapeHTML(v.url)}" target="_blank" rel="noopener noreferrer nofollow" class="mt-2 flex items-center gap-3 rounded-xl border border-galaxy-border bg-black/30 px-3 py-3 hover:border-galaxy-400"><i class="${ico} text-xl text-galaxy-400"></i><span class="text-sm text-white">Ver en ${PROVEEDOR_ETIQUETA[v.proveedor]}</span><i class="fa-solid fa-arrow-up-right-from-square ml-auto text-xs text-gray-500"></i></a>`;
-  }
-  return img + vid;
-}
 function tarjeta(it, p) {
   const mia = p.soy_yo; const puedeBorrar = mia || isAdmin();
   const menu = (mia || puedeBorrar) ? `<div class="flex gap-1 shrink-0">
@@ -130,7 +118,7 @@ function tarjeta(it, p) {
   const cuerpo = S.editando === it.id
     ? `<textarea id="mu-edit" rows="3" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${escapeHTML(it.texto)}</textarea>
        <div class="flex gap-2 mt-2"><button type="button" data-act="guardar-edicion" data-id="${it.id}" class="btn btn-primary !min-h-8 !text-xs">Guardar</button><button type="button" data-act="cancelar-edicion" class="btn btn-ghost !min-h-8 !text-xs">Cancelar</button></div>`
-    : `${it.texto ? `<p class="text-sm text-gray-100 leading-relaxed">${textoAHTML(it.texto)}</p>` : ''}${medios(it)}`;
+    : contenidoHTML(it);
   const pie = `<footer class="mt-3 pt-2 border-t border-galaxy-border/60">${barraReacciones(it, p)}${S.abiertas.has(it.id) ? seccionRespuestas(it, p) : ''}</footer>`;
   return `<article class="glass-panel rounded-2xl p-3 sm:p-4 ${it.fijada ? 'border border-galaxy-400/40' : ''}">
     <header class="flex items-center gap-2.5 mb-2">
@@ -189,24 +177,36 @@ const ACCIONES = {
   'elegir-foto': () => document.getElementById('mu-file').click(),
   'alternar-video': () => { const i = document.getElementById('mu-video'); i.hidden = !i.hidden; if (!i.hidden) i.focus(); else i.value = ''; },
   'quitar-foto': () => limpiarFoto(),
-  'video-yt': (el) => { const id = /^[A-Za-z0-9_-]{11}$/.test(el.dataset.yt) ? el.dataset.yt : ''; if (!id) return; el.outerHTML = `<div class="mt-2 rounded-xl overflow-hidden border border-galaxy-border aspect-video"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video de YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="w-full h-full"></iframe></div>`; },
+  'alternar-reto': async () => {
+    const sel = document.getElementById('mu-reto'); sel.hidden = !sel.hidden;
+    if (sel.hidden) { sel.value = ''; return; }
+    if (S.misRetos === undefined) {   // se cargan una sola vez, la primera que abres el selector
+      sel.innerHTML = '<option value="">Cargando tus duelos…</option>';
+      S.misRetos = (await seguro(() => api.misPartidos())) ?? [];
+    }
+    sel.innerHTML = S.misRetos.length
+      ? `<option value="">— Elige el duelo a adjuntar —</option>${S.misRetos.map((r) => `<option value="${Number(r.id)}">${escapeHTML(etiquetaOpcionReto(r))}</option>`).join('')}`
+      : '<option value="">Aún no tienes duelos aceptados o finalizados para adjuntar.</option>';
+  },
+  'video-yt': (el) => reproductorYT(el),
   'subir-banner': () => document.getElementById('est-file').click(),
   'quitar-banner': () => { fijarBannerFoto(''); },
   publicar: async () => {
     const crudo = document.getElementById('mu-texto').value; const file = document.getElementById('mu-file').files?.[0] ?? null;
     const vTxt = document.getElementById('mu-video').value.trim(); const vid = vTxt ? analizarVideo(vTxt) : null;
     if (vid && !vid.ok) { toast(vid.error, 'error'); return; }
-    const hayMedios = !!file || !!vid;
-    const v = crudo.trim() ? validarTexto(crudo) : { ok: hayMedios, texto: '', error: 'Escribe algo, sube una foto o pega un enlace de video.' };
+    const reto = Number(document.getElementById('mu-reto').value) || null;
+    const hayMedios = !!file || !!vid || !!reto;
+    const v = crudo.trim() ? validarTexto(crudo) : { ok: hayMedios, texto: '', error: 'Escribe algo, sube una foto, pega un enlace de video o adjunta un duelo.' };
     if (!v.ok) { toast(v.error, 'error'); return; }
     const btn = document.querySelector('[data-act=publicar]'); btn.disabled = true;
     let urlFoto = null;
     try {
       if (file) urlFoto = await api.subirImagen(file, S.p.id);
-      await api.publicar(v.texto, urlFoto, vid?.url ?? null);
+      await api.publicar(v.texto, urlFoto, vid?.url ?? null, reto);
       toast('Publicado.', 'ok');
       document.getElementById('mu-texto').value = ''; document.getElementById('mu-cuenta').textContent = `0 / ${MURO_MAX}`; limpiarFoto();
-      const iv = document.getElementById('mu-video'); iv.value = ''; iv.hidden = true;
+      const iv = document.getElementById('mu-video'); iv.value = ''; iv.hidden = true; const sr = document.getElementById('mu-reto'); sr.value = ''; sr.hidden = true;
       await refrescarMuro();
     } catch (e) {
       toast(msgErr(e), 'error');

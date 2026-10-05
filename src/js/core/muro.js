@@ -96,3 +96,22 @@ export function analizarVideo(texto) {
 export const rutaImagen = (uid, ts = Date.now(), azar = Math.random().toString(36).slice(2, 8)) => `${uid}/${ts}-${String(azar).replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'x'}.jpg`;
 /** URL pública del bucket «muro» → ruta del archivo (para borrarlo del Storage). '' si no es de ese bucket. */
 export const rutaDeUrl = (url) => /\/storage\/v1\/object\/public\/muro\/([^?#]+)/.exec(String(url ?? ''))?.[1] ?? '';
+
+/** Duelo adjunto (tarjeta que arma el SERVIDOR) → datos listos para pintar. null si no es válido. Nunca lanza. */
+const ETIQUETA_ESTADO = { ACEPTADO: 'Agendado', EN_JUEGO: 'En juego', FINALIZADO: 'Finalizado' };
+export function resumenReto(r) {
+  if (!r || !Number.isFinite(Number(r.id))) return null;
+  const persona = (x) => (x ? { nombre: String(x.nombre ?? 'Jugador').slice(0, 40), username: /^[a-z0-9_]{1,20}$/.test(String(x.username ?? '')) ? x.username : '' } : null);
+  const a = Math.max(1, Math.trunc(Number(r.tam_a) || 1)); const b = Math.max(1, Math.trunc(Number(r.tam_b) || 1));
+  return {
+    id: Number(r.id), estado: String(r.estado ?? ''), etiquetaEstado: ETIQUETA_ESTADO[r.estado] ?? 'Duelo', formato: `${a} vs ${b}`,
+    plataforma: String(r.plataforma ?? '').slice(0, 30), fecha: r.fecha ?? null, retador: persona(r.retador), rival: persona(r.rival),
+  };
+}
+/** Texto de una opción del selector «Adjuntar duelo»: «Fralex vs Jack · 1 vs 1 · Finalizado · 3 oct». */
+export function etiquetaOpcionReto(r) {
+  const x = resumenReto(r); if (!x) return '';
+  const f = x.fecha ? new Date(x.fecha) : null;
+  const fecha = f && !Number.isNaN(f.getTime()) ? f.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }) : '';
+  return [`${x.retador?.nombre ?? 'Jugador'} vs ${x.rival?.nombre ?? 'por definir'}`, x.formato, x.etiquetaEstado, fecha].filter(Boolean).join(' · ');
+}

@@ -916,3 +916,14 @@ test('historial en vivo: búsqueda avanzada, filtros y enlaces a perfil', async 
   assert.equal(/<a /.test(formatEvento(H[0]).html), false);
   assert.equal(/<a /.test(formatEvento({ tipo: 'radar_on', quien: '!!!' }, { perfil: '/p/' }).html), false);   // sin @usuario válido no hay enlace
 });
+
+test('muro fase 4: tarjeta de duelo adjunto', async () => {
+  const { resumenReto, etiquetaOpcionReto } = await import('../src/js/core/muro.js');
+  assert.equal(resumenReto(null), null); assert.equal(resumenReto({ id: 'x' }), null);
+  const r = resumenReto({ id: 5, estado: 'FINALIZADO', plataforma: 'Parsec', tam_a: 2, tam_b: 2, fecha: '2026-10-03T20:00:00Z', retador: { nombre: 'Fralex', username: 'fralex' }, rival: { nombre: 'Jugador' } });
+  assert.deepEqual([r.id, r.formato, r.etiquetaEstado, r.retador.username, r.rival.username], [5, '2 vs 2', 'Finalizado', 'fralex', '']);   // rival oculto por bloqueo: sin @usuario
+  assert.equal(resumenReto({ id: 1, estado: 'ACEPTADO', tam_a: 0, tam_b: 'x' }).formato, '1 vs 1');                                        // valores raros → seguros
+  assert.equal(resumenReto({ id: 1, retador: { nombre: 'A', username: '<b>x' } }).retador.username, '');                                   // @usuario inválido no genera enlace
+  assert.match(etiquetaOpcionReto({ id: 5, estado: 'EN_JUEGO', tam_a: 1, tam_b: 1, retador: { nombre: 'Fralex' }, rival: { nombre: 'Jack' }, fecha: '2026-10-03T20:00:00Z' }), /^Fralex vs Jack · 1 vs 1 · En juego/);
+  assert.equal(etiquetaOpcionReto(null), '');
+});

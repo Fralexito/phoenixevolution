@@ -17,6 +17,9 @@ import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from '../features/playerCard.js';
 import { puntosAcumulados, rendimiento } from '../core/perfil.js';
 import { posInfo } from '../../data/posiciones.js';
+import { cargarMuro } from '../features/muro/api.js';
+import { muroCompactoHTML, reproductorYT } from '../features/muro/render.js';
+import { href } from '../core/config.js';
 
 const $ = (id) => document.getElementById(id);
 const COLOR = { G: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40', E: 'bg-amber-500/20 text-amber-300 border-amber-400/40', P: 'bg-rose-500/20 text-rose-300 border-rose-400/40' };
@@ -114,17 +117,29 @@ function tabLiga(p) {
     <h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2">Puntos acumulados por fecha</h3>${curvaSVG(pts)}`;
 }
 const EJES_ED = (id) => EDICIONES[id] ?? [];
-const TABS = [['calor', 'fa-fire', 'Mapa de calor', tabCalor], ['estilo', 'fa-chart-pie', 'Estilo de juego', tabEstilo], ['liga', 'fa-chart-line', 'Rendimiento', tabLiga]];
+/** Pestaña «Muro»: solo si la ficha está vinculada a una cuenta (perfil_id). Carga aparte (red) y se pinta en el contenedor. */
+function tabMuro(p) { return `<div id="jug-muro" data-perfil="${escapeHTML(p.perfil_id)}"><p class="text-sm text-gray-400">Cargando el muro…</p></div>`; }
+async function cargarMuroTab(p) {
+  const cont = $('jug-muro'); if (!cont) return;
+  try {
+    const [m, u] = await Promise.all([cargarMuro(p.perfil_id, null, 5), supabase.from('perfiles').select('username').eq('id', p.perfil_id).maybeSingle()]);
+    const urlMuro = u.data?.username ? `${href('perfil/')}?u=${encodeURIComponent(u.data.username)}` : '';
+    cont.innerHTML = m.visible ? muroCompactoHTML(m.items ?? [], { urlMuro, nombre: p.apodo || p.nombre }) : '<p class="text-sm text-gray-400"><i class="fa-solid fa-lock mr-1"></i>Este jugador comparte su muro solo con sus amigos.</p>';
+  } catch (e) { console.error('[perfil] muro:', e); cont.innerHTML = '<p class="text-sm text-bad">No se pudo cargar el muro. Intenta de nuevo en un momento.</p>'; }
+}
+const TABS_BASE = [['calor', 'fa-fire', 'Mapa de calor', tabCalor], ['estilo', 'fa-chart-pie', 'Estilo de juego', tabEstilo], ['liga', 'fa-chart-line', 'Rendimiento', tabLiga]];
+const tabsDe = (p) => (p.perfil_id ? [...TABS_BASE, ['muro', 'fa-newspaper', 'Muro', tabMuro]] : TABS_BASE);
 function montarAnalisis(p) {
   const btn = $('perfil-analisis-btn'); const panel = $('perfil-analisis'); if (!btn || !panel) return;
   const pintar = (id) => {
-    const t = TABS.find((x) => x[0] === id) ?? TABS[0];
+    const TABS = tabsDe(p); const t = TABS.find((x) => x[0] === id) ?? TABS[0];
     panel.innerHTML = `<div class="flex flex-wrap gap-2 mb-4" role="tablist">${TABS.map(([i, ic, n]) => `<button type="button" role="tab" data-tab="${i}" aria-pressed="${i === t[0]}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${n}</button>`).join('')}</div><div>${t[3](p)}</div>`;
+    if (t[0] === 'muro') cargarMuroTab(p);
   };
-  panel.addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) pintar(b.dataset.tab); });
+  panel.addEventListener('click', (e) => { const yt = e.target.closest('[data-act=video-yt]'); if (yt) { reproductorYT(yt); return; } const b = e.target.closest('[data-tab]'); if (b) pintar(b.dataset.tab); });
   btn.addEventListener('click', () => {
     const abrir = panel.hidden; panel.hidden = !abrir; btn.setAttribute('aria-expanded', String(abrir));
-    btn.querySelector('span').textContent = abrir ? 'Ocultar análisis de juego' : 'Ver análisis de juego';
+    btn.querySelector('span').textContent = abrir ? 'Ocultar análisis de juego' : (p.perfil_id ? 'Ver análisis y muro' : 'Ver análisis de juego');
     if (abrir && !panel.innerHTML.trim()) pintar('calor');
   });
 }
@@ -170,7 +185,7 @@ function render(p, filasHistorial = []) {
           <li class="px-3.5 py-2 rounded-xl border border-emerald-400/50 bg-emerald-500/10 text-emerald-100 font-display font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-star text-emerald-300"></i>Media ${escapeHTML(p.ovr ?? '--')}</li>
         </ul>
         ${p.descripcion ? `<p class="text-gray-300 text-sm mt-3 leading-relaxed max-w-prose">${escapeHTML(p.descripcion)}</p>` : ''}</header>
-      <div><button type="button" id="perfil-analisis-btn" aria-expanded="false" aria-controls="perfil-analisis" class="btn btn-primary"><i class="fa-solid fa-chart-pie"></i> <span>Ver análisis de juego</span></button>
+      <div><button type="button" id="perfil-analisis-btn" aria-expanded="false" aria-controls="perfil-analisis" class="btn btn-primary"><i class="fa-solid fa-chart-pie"></i> <span>${p.perfil_id ? 'Ver análisis y muro' : 'Ver análisis de juego'}</span></button>
         <button type="button" id="perfil-editar" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-pen"></i> Editar ficha</button>
         <button type="button" id="perfil-editar-bio" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-book-open"></i> Editar biografía</button>
         <button type="button" id="perfil-editar-hist" hidden class="btn btn-ghost ml-2"><i class="fa-solid fa-trophy"></i> Editar historial</button></div>
