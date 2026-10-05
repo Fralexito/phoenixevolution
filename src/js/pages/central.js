@@ -8,6 +8,8 @@ import { esIlegible } from '../core/replica.js';
 import { leerAjustes, hayMovimientoReducido } from '../features/ajustes.js';
 import { DEMO_XI } from '../../data/demo.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
+import { FX } from '../../data/experimento.js';
+import { LIGAS } from '../../data/ligas.js';
 import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
 import { calcularTabla } from '../core/tabla.js';
 import { openAuthModal } from '../features/auth.js';
@@ -66,7 +68,8 @@ function pintarPartidos() {
     if (!f) { $('matches-container').innerHTML = '<div class="text-center text-gray-500 text-sm py-6 glass-panel rounded-xl">No hay fechas para mostrar.</div>'; return; }
     const e = estadisticasFecha(f);
     const stats = e.jugados ? `<div class="flex flex-wrap gap-2">${chipStat(ico.goles, `${e.goles} goles`)}${chipStat(ico.prom, `${e.promedio} por partido`)}${chipStat(ico.emp, `${e.empates} empate${e.empates === 1 ? '' : 's'}`)}${e.goleada ? chipStat(ico.gol, `Mayor goleada: ${escapeHTML(e.goleada.l)} ${e.goleada.gl}-${e.goleada.gv} ${escapeHTML(e.goleada.v)}`) : ''}<span class="pc-chip"><i class="fa-solid fa-house"></i>${e.local} local · ${e.visita} visita</span></div>` : `<p class="text-xs text-gray-500">Esta fecha todavía no se juega (${e.total} partidos programados).</p>`;
-    $('matches-container').innerHTML = `<div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${f.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${stats}${f.partidos.map(filaPartido).join('')}`;
+    const boton = FX.compartir ? `<button type="button" data-compartir-fecha class="btn btn-ghost !px-3 !py-1.5 text-xs"><i class="fa-solid fa-share-nodes"></i> Compartir fecha</button>` : '';
+    $('matches-container').innerHTML = `<div class="flex items-center justify-between gap-2"><div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${f.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${boton}</div>${stats}${f.partidos.map(filaPartido).join('')}`;
     return;
   }
   const grupos = pestana === 'proximos' ? (jornadas.proximos ? [jornadas.proximos] : []) : jornadas.resultados;
@@ -240,6 +243,14 @@ onSession(({ session }) => { const b = $('btn-hero-register'); if (b) b.hidden =
 $('seg-partidos').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-v]'); if (!b || b.dataset.v === pestana) return;
   pestana = b.dataset.v; $('seg-partidos').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); refrescar();
+});
+$('matches-container').addEventListener('click', async (e) => {   // «Compartir fecha» → tarjeta-imagen (carga el dibujo solo cuando se pide)
+  if (!e.target.closest('[data-compartir-fecha]')) return;
+  try {
+    const [{ datosFecha }, { abrirTarjeta }] = await Promise.all([import('../core/compartir.js'), import('../features/compartir.js')]);
+    const liga = LIGAS.find((l) => l.id === 'galaxy');
+    abrirTarjeta(datosFecha({ liga: liga ? liga.titulo.join(' ') : 'Galaxy League', edicion: edicion?.nombre ?? '', fecha: fechaObj(fechaSel), clubes: edicion?.clubes ?? {} }), 'galaxy');
+  } catch (err) { console.error('[central] compartir:', err); toast('No se pudo preparar la tarjeta.', 'error'); }
 });
 function refrescar() { pintarPartidos(); pintarDestacado(); pintarPosiciones(); }
 $('fecha-nav').addEventListener('click', (e) => {

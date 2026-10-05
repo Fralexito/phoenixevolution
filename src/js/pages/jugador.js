@@ -5,6 +5,7 @@ import { escudoHTML } from '../core/escudos.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { LIGAS } from '../../data/ligas.js';
 import { SISTEMAS_LIGA } from '../../data/temporada.js';
+import { FX } from '../../data/experimento.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
 import { forma } from '../core/ligaStats.js';
@@ -65,7 +66,8 @@ function seccionEdicion(liga, ed, nombre) {
         <div class="min-w-0"><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">${escapeHTML(liga.titulo.join(' '))}</span>
           <h2 class="font-display font-bold text-xl text-white uppercase leading-tight">${escapeHTML(ed.nombre)}</h2>
           ${c.club ? `<p class="text-sm text-gray-300 uppercase">${escapeHTML(c.club)}</p>` : ''}</div></div>
-      ${ult.length ? `<div class="text-right"><span class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Racha reciente</span><div class="flex gap-1 justify-end">${ult.map(chip).join('')}</div></div>` : ''}
+      <div class="text-right">${ult.length ? `<span class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Racha reciente</span><div class="flex gap-1 justify-end">${ult.map(chip).join('')}</div>` : ''}
+        ${FX.compartir && f ? `<button type="button" data-compartir-camp="${escapeHTML(`${liga.id}|${ed.id}`)}" class="btn btn-ghost !px-3 !py-1.5 text-xs mt-2"><i class="fa-solid fa-share-nodes"></i> Compartir mi campaña</button>` : ''}</div>
     </div>
     ${f ? `<div class="rounded-xl border border-galaxy-400/30 bg-black/30 p-4 flex flex-wrap items-center gap-x-6 gap-y-3">
         <div><span class="text-[10px] uppercase tracking-widest text-gray-400">Posición</span><div class="font-display font-extrabold text-4xl text-white leading-none">${c.puesto}º <span class="text-sm font-normal text-gray-400">de ${c.total}</span></div></div>
@@ -82,6 +84,15 @@ function seccionEdicion(liga, ed, nombre) {
     ${rivales.length ? `<div>${tit('fa-people-arrows', 'Contra cada rival')}<div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-2">${rivales.map((r) => { const t = r.g + r.e + r.p; return `<div class="rounded-xl border border-galaxy-border/50 bg-black/25 p-3"><div class="flex items-center justify-between gap-2 text-sm">${rival(ed, r.rival)}<b class="text-white tabular-nums shrink-0">${r.gf}:${r.gc}</b></div><div class="flex h-1.5 rounded-full overflow-hidden bg-black/40 mt-2"><span class="bg-emerald-400" style="width:${pct(r.g, t)}%"></span><span class="bg-amber-400" style="width:${pct(r.e, t)}%"></span><span class="bg-rose-400" style="width:${pct(r.p, t)}%"></span></div><div class="text-[10px] text-gray-400 mt-1">${r.g}G · ${r.e}E · ${r.p}P</div></div>`; }).join('')}</div></div>` : ''}
   </section>`;
 }
+
+document.addEventListener('click', async (e) => {   // «Compartir mi campaña» → tarjeta-imagen
+  const b = e.target.closest('[data-compartir-camp]'); if (!b || !actual) return;
+  const [lid, eid] = b.dataset.compartirCamp.split('|'); const liga = LIGAS.find((l) => l.id === lid); const ed = (EDICIONES[lid] ?? []).find((x) => x.id === eid); if (!liga || !ed) return;
+  try {
+    const nombre = nombreEnEdicion(actual, ed); const [{ datosJugador }, { abrirTarjeta }] = await Promise.all([import('../core/compartir.js'), import('../features/compartir.js')]);
+    abrirTarjeta(datosJugador({ liga: liga.titulo.join(' '), edicion: ed.nombre, nombre: actual.apodo || actual.nombre, campana: campana(ed, nombre), forma: forma(ed.fechas, nombre, 5) }), lid === 'sudario' ? 'sudario' : 'galaxy');
+  } catch (err) { console.error('[perfil] compartir:', err); }
+});
 
 function datosPerfil(p) {
   const redes = limpiarRedes(p.redes); const logros = partirLogros(p.logros);

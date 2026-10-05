@@ -1188,3 +1188,14 @@ test('central: rachas y novedades', async () => {
   assert.deepEqual(r2.derrotas, [{ nombre: 'X', n: 2 }]); assert.deepEqual(r2.invicto.map((x) => x.nombre), ['W', 'Y', 'Z']);
   assert.equal(c.resultadosNuevos(9, 7), 2); assert.equal(c.resultadosNuevos(7, 7), null); assert.equal(c.resultadosNuevos(7, undefined), null);
 });
+
+test('compartir: datos de las tarjetas', async () => {
+  const c = await import('../src/js/core/compartir.js');
+  const f = { n: 4, partidos: [{ l: 'Beto', v: 'Fralex', gl: 5, gv: 1 }, { l: 'Hugo', v: 'Jack', gl: null, gv: null }] };
+  const d = c.datosFecha({ liga: 'Galaxy League', edicion: '1° Edición', fecha: f, clubes: { Beto: 'Liverpool' } });
+  assert.equal(d.titulo, 'FECHA 4'); assert.equal(d.filas.length, 2); assert.equal(d.filas[0].jugado, true); assert.equal(d.filas[1].jugado, false);
+  assert.match(d.pie, /6 goles en 1 partido$/); assert.match(d.texto, /Beto 5-1 Fralex/); assert.ok(d.filas[0].cl && !d.filas[0].cv);
+  const j = c.datosJugador({ liga: 'Sudario', edicion: '1° Edición', nombre: 'Un nombre larguísimo de jugador', campana: { puesto: 2, total: 12, club: 'Chelsea', fila: { pts: 9, g: 3, e: 0, p: 1, gf: 8, gc: 3, dg: 5 } }, forma: ['G', 'G', 'P', 'G', 'G', 'G'] });
+  assert.equal(j.forma.length, 5); assert.ok(j.titulo.length <= 14); assert.equal(c.datosJugador({ nombre: 'x', campana: { fila: null } }), null);
+  assert.equal(c.nombreArchivo('Galaxy League · FECHA 4'), 'galaxy-league-fecha-4.png');
+});

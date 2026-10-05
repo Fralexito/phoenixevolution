@@ -3,5 +3,6 @@
 //   reveal       → los bloques aparecen con un deslizamiento suave al hacer scroll
 //   esqueletos   → siluetas que brillan mientras cargan los datos (en vez de «Cargando…»)
 //   rachas       → panel «En racha» en Central
+//   compartir    → botón «Compartir» (tarjeta-imagen de la fecha en Central y de la campaña en el perfil)
 //   visita       → aviso «novedades desde tu última visita» en Central
-export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true };
+export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true };
