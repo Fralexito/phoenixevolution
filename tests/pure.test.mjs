@@ -1153,3 +1153,22 @@ test('zonasLiga: ascenso, descenso y copa propios de una liga', async () => {
   assert.deepEqual(z.get('a'), ['copa','sube']); assert.deepEqual(z.get('c'), ['copa']); assert.deepEqual(z.get('d'), []); assert.deepEqual(z.get('h'), ['baja']);
   assert.deepEqual(zonasLiga(['a','b','c'], { suben: 5, bajan: 5 }).get('b'), []);
 });
+
+test('central: tabla por fecha, movimientos y destacado', async () => {
+  const c = await import('../src/js/core/central.js'); const { calcularTabla } = await import('../src/js/core/tabla.js');
+  const fechas = [
+    { n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }, { l: 'C', v: 'D', gl: 2, gv: 2 }] },
+    { n: 2, partidos: [{ l: 'B', v: 'C', gl: 3, gv: 0 }, { l: 'D', v: 'A', gl: 0, gv: 4 }] },
+    { n: 3, partidos: [{ l: 'A', v: 'C', gl: null, gv: null }, { l: 'B', v: 'D', gl: null, gv: null }] },
+  ];
+  assert.deepEqual(c.tablaTrasFecha(fechas, 1, calcularTabla).map((f) => f.nombre), ['A', 'C', 'D', 'B']);
+  assert.equal(c.tablaTrasFecha(fechas, 3, calcularTabla, ['Z']).at(-1).nombre, 'Z');
+  const mv = c.movimientosTabla(fechas, 2, calcularTabla);
+  assert.equal(mv.get('B').antes, 4); assert.equal(mv.get('B').puesto, 2); assert.equal(mv.get('B').delta, 2);
+  assert.equal(c.movimientosTabla(fechas, 1, calcularTabla).get('A').antes, null);
+  const e = c.estadisticasFecha(fechas[1]); assert.equal(e.goles, 7); assert.equal(e.goleada.gl + e.goleada.gv, 4); assert.equal(e.empates, 0);
+  assert.equal(c.destacadoAutomatico(fechas[1], []).l, 'D');                       // 4 goles > 3 goles
+  assert.equal(c.destacadoAutomatico(fechas[2], c.tablaTrasFecha(fechas, 2, calcularTabla)).l, 'A');   // pendiente: los mejor ubicados
+  assert.equal(c.destacadoFinal(fechas[1], [], { local: 'b', visitante: 'c', nota: 'x' }).manual, true);
+  assert.equal(c.destacadoFinal(fechas[1], [], { local: 'Z', visitante: 'Y' }).manual, false);   // cruce inexistente → automático
+});

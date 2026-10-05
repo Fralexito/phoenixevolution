@@ -77,3 +77,63 @@ export function recorteTabla(tabla, nombres, n = 5) {
 
 /** Cifra intermedia de una cuenta animada (0 → destino) con suavizado; `p` va de 0 a 1. */
 export const pasoCuenta = (destino, p) => Math.round(Math.max(0, Number(destino) || 0) * (1 - (1 - Math.min(1, Math.max(0, p))) ** 3));
+
+// ───────── Historial por fecha (pestaña «Por fecha» de Central) ─────────
+const esJugado = (m) => Number.isInteger(m?.gl) && Number.isInteger(m?.gv);
+
+/**
+ * Tabla ordenada tal como quedó DESPUÉS de la fecha `n` (solo cuentan partidos con marcador de las fechas ≤ n).
+ * `calcular` es calcularTabla (se inyecta para que este módulo siga siendo puro). `jugadores` añade a quien aún no jugó, con ceros.
+ */
+export function tablaTrasFecha(fechas, n, calcular, jugadores = []) {
+  const partidos = (Array.isArray(fechas) ? fechas : []).filter((f) => f.n <= n).flatMap((f) => f.partidos ?? []);
+  const t = calcular(partidos).tabla; const hay = new Set(t.map((f) => f.nombre));
+  const faltan = [...new Set(jugadores)].filter((x) => !hay.has(x)).sort((a, b) => a.localeCompare(b, 'es'));
+  return [...t, ...faltan.map((nombre) => ({ nombre, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }))];
+}
+
+/**
+ * Cómo se movió cada jugador en la fecha `n`: puesto tras la fecha, puesto antes (null si no había tabla previa) y `delta` (+ = subió).
+ * @returns {Map<string,{puesto:number, antes:number|null, delta:number}>}
+ */
+export function movimientosTabla(fechas, n, calcular, jugadores = []) {
+  const ahora = tablaTrasFecha(fechas, n, calcular, jugadores);
+  const hayPrevia = (fechas ?? []).some((f) => f.n < n && f.partidos?.some(esJugado));
+  const antes = hayPrevia ? new Map(tablaTrasFecha(fechas, n - 1, calcular, jugadores).map((f, i) => [f.nombre, i + 1])) : new Map();
+  return new Map(ahora.map((f, i) => { const a = antes.get(f.nombre) ?? null; return [f.nombre, { puesto: i + 1, antes: a, delta: a === null ? 0 : a - (i + 1) }]; }));
+}
+
+/** Datos sueltos de una fecha: goles, promedio, empates, mayor goleada y victorias de local/visita. */
+export function estadisticasFecha(fecha) {
+  const js = (fecha?.partidos ?? []).filter(esJugado);
+  const goles = js.reduce((a, m) => a + m.gl + m.gv, 0);
+  const goleada = js.reduce((mejor, m) => (!mejor || Math.abs(m.gl - m.gv) > Math.abs(mejor.gl - mejor.gv) ? m : mejor), null);
+  return {
+    jugados: js.length, total: (fecha?.partidos ?? []).length, goles, promedio: js.length ? Math.round((goles / js.length) * 10) / 10 : null,
+    empates: js.filter((m) => m.gl === m.gv).length, local: js.filter((m) => m.gl > m.gv).length, visita: js.filter((m) => m.gv > m.gl).length,
+    goleada: goleada && goleada.gl !== goleada.gv ? goleada : null,
+  };
+}
+
+/**
+ * Partido destacado AUTOMÁTICO de una fecha. Si ya se jugó: el de más goles (a igualdad, el de mejor ubicados en la tabla previa).
+ * Si no: el que enfrenta a los mejor ubicados. `tablaPrevia` = tabla antes de esa fecha.
+ */
+export function destacadoAutomatico(fecha, tablaPrevia) {
+  const ps = fecha?.partidos ?? []; if (!ps.length) return null;
+  const pos = new Map((tablaPrevia ?? []).map((t, i) => [t.nombre, i + 1]));
+  const peso = (m) => (pos.get(m.l) ?? 99) + (pos.get(m.v) ?? 99);
+  const jugados = ps.filter(esJugado);
+  if (jugados.length) return jugados.reduce((b, m) => { const g = m.gl + m.gv; const gb = b ? b.gl + b.gv : -1; return !b || g > gb || (g === gb && peso(m) < peso(b)) ? m : b; }, null);
+  return partidoDestacado(ps, tablaPrevia);
+}
+
+/** Aplica la elección manual (fila de la tabla partido_destacado: {local, visitante, nota}) si ese cruce existe en la fecha; si no, usa el automático. */
+export function destacadoFinal(fecha, tablaPrevia, manual) {
+  const auto = destacadoAutomatico(fecha, tablaPrevia);
+  if (manual) {
+    const m = (fecha?.partidos ?? []).find((x) => norm(x.l) === norm(manual.local) && norm(x.v) === norm(manual.visitante));
+    if (m) return { partido: m, manual: true, nota: manual.nota ?? '' };
+  }
+  return auto ? { partido: auto, manual: false, nota: '' } : null;
+}
