@@ -52,10 +52,11 @@ function pintarNavFecha() {
   const nav = $('fecha-nav'); nav.hidden = pestana !== 'porfecha'; if (nav.hidden) return;
   if (!fechas.length) { nav.innerHTML = '<p class="text-xs text-gray-500">Aún no hay fechas cargadas.</p>'; return; }
   const idx = fechas.findIndex((f) => f.n === fechaSel);
-  nav.innerHTML = `<div class="flex items-center gap-2"><button type="button" class="forma-flecha !w-8 !h-8" data-fnav="-1" aria-label="Fecha anterior" ${idx <= 0 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>
-    <div class="flex-1 flex gap-1.5 overflow-x-auto py-1" role="group" aria-label="Elegir fecha">${fechas.map((f) => { const ok = f.partidos?.some(jug); return `<button type="button" data-fecha="${f.n}" aria-pressed="${f.n === fechaSel}" class="shrink-0 min-w-[2.6rem] px-2.5 py-1.5 rounded-lg border text-xs font-display font-bold ${f.n === fechaSel ? 'bg-galaxy-600/40 border-galaxy-400 text-white' : ok ? 'border-galaxy-border text-gray-200 hover:border-galaxy-400' : 'border-dashed border-galaxy-border/60 text-gray-500'}">F${f.n}</button>`; }).join('')}</div>
-    <button type="button" class="forma-flecha !w-8 !h-8" data-fnav="1" aria-label="Fecha siguiente" ${idx >= fechas.length - 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button></div>`;
-  nav.querySelector(`[data-fecha="${fechaSel}"]`)?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  const f = fechas[idx]; const ok = f?.partidos?.some(jug);
+  nav.innerHTML = `<div class="liga-sel !flex items-center justify-between w-full" role="group" aria-label="Elegir fecha">
+    <button type="button" class="forma-flecha !w-8 !h-8 shrink-0" data-fnav="-1" aria-label="Fecha anterior" ${idx <= 0 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>
+    <span class="flex-1 text-center leading-tight" aria-live="polite"><span class="block font-display font-bold text-sm text-white uppercase tracking-widest">Fecha ${f?.n ?? '—'}</span><span class="block text-[10px] ${ok ? 'text-emerald-400' : 'text-gray-500'} uppercase tracking-wider">${ok ? 'jugada' : 'por jugar'} · ${idx + 1} de ${fechas.length}</span></span>
+    <button type="button" class="forma-flecha !w-8 !h-8 shrink-0" data-fnav="1" aria-label="Fecha siguiente" ${idx >= fechas.length - 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button></div>`;
 }
 
 function pintarPartidos() {

@@ -63,14 +63,13 @@ const base = import.meta.env.BASE_URL;
       <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
         <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
           <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
+          <div id="fecha-nav" hidden class="order-3 sm:order-none w-full sm:w-auto sm:flex-1 sm:max-w-[19rem] sm:mx-auto min-w-0"></div>
           <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
             <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
             <button type="button" data-v="resultados" aria-pressed="false">Resultados</button>
             <button type="button" data-v="porfecha" aria-pressed="false">Por fecha</button>
           </div>
         </div>
-
-        <div id="fecha-nav" hidden class="glass-panel rounded-xl p-2"></div>
 
         <!-- Partido destacado: lo pinta js/pages/central.js con el próximo cruce entre los mejor ubicados de la tabla real. -->
         <article id="destacado" class="glass-panel rounded-xl overflow-hidden relative min-h-[9rem]" aria-live="polite">
