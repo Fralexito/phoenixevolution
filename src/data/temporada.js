@@ -32,6 +32,7 @@ export const SISTEMAS_LIGA = {
       { nivel: 1, nombre: 'División Sudario', corto: 'Div. 1', icono: 'fa-star' },
       { nivel: 2, nombre: 'División de Ascenso Sudario', corto: 'Div. 2', icono: 'fa-seedling' },
     ],
-    suben: 2, bajan: 2, copa: 4,
+    // suben: 0 → de momento no hay zona de ascenso (la División 2 de Sudario aún no existe); el descenso y la copa sí funcionan.
+    suben: 0, bajan: 2, copa: 4,
   },
 };
