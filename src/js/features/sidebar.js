@@ -1,5 +1,5 @@
 // Menú lateral: abrir/cerrar, Escape, clic en el fondo, foco accesible (inert) y grupo «Mi cuenta» según la sesión.
-import { onSession } from '../core/session.js';
+import { onSession, can } from '../core/session.js';
 import { openProfileModal } from './profile.js';
 import { logout } from './auth.js';
 
@@ -25,7 +25,11 @@ export function initSidebar() {
     openBtn.focus();
   };
   const account = document.getElementById('sidebar-account');
-  onSession(({ session }) => { if (account) account.hidden = !session; });
+  onSession(({ session }) => {
+    if (account) account.hidden = !session;
+    // Enlaces solo para el staff (p. ej. Auditoría): visibles únicamente con el permiso. La página y la BD vuelven a comprobarlo.
+    menu.querySelectorAll('[data-solo-staff]').forEach((el) => { el.hidden = !can('verAuditoria'); });
+  });
   menu.addEventListener('click', (e) => {
     const act = e.target.closest('[data-action]')?.dataset.action;
     const link = e.target.closest('a[href]');

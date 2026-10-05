@@ -6,7 +6,7 @@ import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
 import { forma } from '../core/ligaStats.js';
-import { onSession, isAdmin } from '../core/session.js';
+import { onSession, can } from '../core/session.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { abrirEditorPerfil } from '../features/perfilEditor.js';
 import { abrirEditorHistorial } from '../features/historialEditor.js';
@@ -198,9 +198,9 @@ function render(p, filasHistorial = []) {
 }
 function mostrarEditar() {
   const b = $('perfil-editar'); if (!b) return;
-  b.hidden = !isAdmin(); b.onclick = () => openPlayerForm(actual, init);
-  const hist = $('perfil-editar-hist'); if (hist) { hist.hidden = !isAdmin(); hist.onclick = () => abrirEditorHistorial(actual, historial, init); }
-  const bio = $('perfil-editar-bio'); if (bio) { bio.hidden = !isAdmin(); bio.onclick = () => abrirEditorPerfil(actual, init); }
+  b.hidden = !can('editarLiga'); b.onclick = () => openPlayerForm(actual, init);
+  const hist = $('perfil-editar-hist'); if (hist) { hist.hidden = !can('editarLiga'); hist.onclick = () => abrirEditorHistorial(actual, historial, init, { puedeBorrar: can('borrarLiga') }); }
+  const bio = $('perfil-editar-bio'); if (bio) { bio.hidden = !can('editarLiga'); bio.onclick = () => abrirEditorPerfil(actual, init); }
 }
 
 async function init() {

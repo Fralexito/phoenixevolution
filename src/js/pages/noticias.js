@@ -6,9 +6,9 @@ import { escapeHTML, safeImg } from '../core/dom.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { supabase } from '../core/supabase.js';
 import { toast } from '../core/toast.js';
-import { onSession, isAdmin } from '../core/session.js';
+import { onSession, can } from '../core/session.js';
 import { normalizar, ordenar, elegirDestacada, ligasPresentes, filtrar, fechaRelativa } from '../core/noticias.js';
-import { abrirEditor, borrarNoticia } from '../features/noticiasAdmin.js';
+import { abrirEditor, borrarNoticia, ocultarNoticia } from '../features/noticiasAdmin.js';
 
 const $ = (id) => document.getElementById(id);
 const state = { lista: [], cat: 'TODOS', liga: 'TODAS', term: '' };
@@ -76,7 +76,7 @@ const setUrl = (slug) => { try { history.replaceState(null, '', url(slug)); } ca
 
 function read(slug) {
   const n = state.lista.find((x) => x.slug === slug); if (!n) return;
-  const admin = isAdmin() && n.editable;
+  const puedeEditar = can('editarLiga') && n.editable; const puedeBorrar = can('borrarLiga') && n.editable;   // el moderador edita y oculta; borrar es solo del admin
   const wrap = openModal(`<div class="p-6 md:p-8">
     <div class="flex justify-between items-start mb-4 border-b border-galaxy-border pb-3">
       <div><span class="px-2 py-0.5 rounded bg-galaxy-600 text-white font-bold text-[10px] uppercase tracking-wider inline-block">${escapeHTML(n.tag || n.categoria)}</span>
@@ -89,7 +89,7 @@ function read(slug) {
     <div class="mt-6 pt-4 border-t border-galaxy-border/50 flex flex-wrap gap-2 justify-between">
       <div class="flex gap-2">
         <button type="button" data-copiar class="btn btn-ghost"><i class="fa-solid fa-link"></i> Copiar enlace</button>
-        ${admin ? `<button type="button" data-editar class="btn btn-ghost"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" data-borrar class="btn btn-ghost !text-rose-400">Eliminar</button>` : ''}
+        ${puedeEditar ? `<button type="button" data-editar class="btn btn-ghost"><i class="fa-solid fa-pen"></i> Editar</button>` : ''}${puedeEditar && n.publicada ? `<button type="button" data-ocultar class="btn btn-ghost"><i class="fa-solid fa-eye-slash"></i> Ocultar</button>` : ''}${puedeBorrar ? `<button type="button" data-borrar class="btn btn-ghost !text-rose-400">Eliminar</button>` : ''}
       </div>
       <button type="button" data-close class="btn btn-primary">Cerrar comunicado</button>
     </div>
@@ -100,6 +100,7 @@ function read(slug) {
     catch (e) { console.warn('[noticias] copiar:', e); toast('No se pudo copiar; copia la dirección del navegador.', 'warn'); }
   });
   wrap.querySelector('[data-editar]')?.addEventListener('click', () => { closeModal('news-modal'); abrirEditor({ noticia: n, slugsUsados: state.lista.map((x) => x.slug), onGuardada: cargar }); });
+  wrap.querySelector('[data-ocultar]')?.addEventListener('click', async () => { if (await ocultarNoticia(n)) { closeModal('news-modal'); cargar(); } });
   const del = wrap.querySelector('[data-borrar]');
   del?.addEventListener('click', async () => {
     if (del.dataset.seguro !== '1') { del.dataset.seguro = '1'; del.textContent = '¿Seguro? Pulsa de nuevo'; return; }
@@ -130,4 +131,4 @@ $('news-ligas').addEventListener('click', pulsar($('news-ligas'), 'data-liga', '
 $('news-root').addEventListener('click', (e) => { const b = e.target.closest('[data-slug]'); if (b) read(b.dataset.slug); });
 $('news-nueva').addEventListener('click', () => abrirEditor({ slugsUsados: state.lista.map((x) => x.slug), onGuardada: cargar }));
 // Los admins ven el botón «Nueva noticia» y los borradores (la BD solo se los entrega a ellos).
-onSession(() => { $('news-nueva').hidden = !isAdmin(); cargar().then(() => { const s = new URLSearchParams(location.search).get('n'); if (s && !document.getElementById('news-modal')) read(s); }); });
+onSession(() => { $('news-nueva').hidden = !can('editarLiga'); cargar().then(() => { const s = new URLSearchParams(location.search).get('n'); if (s && !document.getElementById('news-modal')) read(s); }); });

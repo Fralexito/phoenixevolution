@@ -2,7 +2,7 @@
 import { supabase } from '../core/supabase.js';
 import { toUsername } from '../core/dom.js';
 
-const RESERVADOS = ['admin', 'administrador', 'moderador', 'soporte', 'staff', 'comisario', 'oficial', 'phoenix', 'phoenixevolution', 'galaxyleague', 'sistema', 'root']; // [BD] igual que perfiles_username_reservado
+const RESERVADOS = ['admin', 'administrador', 'moderador', 'ayudante', 'arbitro', 'auditoria', 'soporte', 'staff', 'comisario', 'oficial', 'phoenix', 'phoenixevolution', 'galaxyleague', 'sistema', 'root']; // [BD] igual que perfiles_username_reservado
 export const MIN_HANDLE = 3;
 
 /** Estados: 'corto' | 'reservado' | 'libre' | 'ocupado' | 'error'. exceptId = tu propio perfil (tu @ actual cuenta como libre). */

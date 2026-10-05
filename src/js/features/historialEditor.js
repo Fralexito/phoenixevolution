@@ -1,14 +1,15 @@
-// Editor del historial de participación (solo admin; la BD lo refuerza con RLS). Lista las filas del jugador y permite añadir, editar y borrar.
+// Editor del historial de participación (admin y moderador; la BD lo refuerza con RLS). Lista las filas del jugador y permite añadir y editar; borrar solo si `puedeBorrar` (admin).
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
+import { borrarFilas } from './escritura.js';
 import { ordenarHistorial, periodoCorto, validarParticipacion } from '../core/historial.js';
 
 const ID = 'historial-editor';
 const TITULOS = ['Campeón', 'Subcampeón', 'Tercer lugar'];
 
-export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
+export function abrirEditorHistorial(jugador, filas, onChange = () => {}, { puedeBorrar = false } = {}) {
   let lista = ordenarHistorial(filas); let editando = null;   // editando = fila en edición, o null para una nueva
   const m = openModal(`<div class="p-5 sm:p-6 space-y-4">
     <div class="flex justify-between items-start border-b border-galaxy-border pb-3">
@@ -38,7 +39,7 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
   const pintarLista = () => {
     $('#he-lista').innerHTML = lista.length ? lista.map((f) => `<li class="flex items-center gap-3 rounded-lg border border-galaxy-border/40 bg-black/25 px-3 py-2 text-sm" data-id="${escapeHTML(f.id)}">
       <span class="flex-1 min-w-0 truncate text-gray-100"><b class="text-white">${escapeHTML(f.liga)}</b> · ${escapeHTML(f.edicion)}${f.titulo ? ` · <span class="text-amber-300">${escapeHTML(f.titulo)}</span>` : ''}${f.periodo ? ` <span class="text-gray-500">(${escapeHTML(periodoCorto(f.periodo))})</span>` : ''}</span>
-      <button type="button" data-editar class="adv-chip !min-h-8">Editar</button><button type="button" data-borrar class="adv-chip !min-h-8 !text-rose-300">Borrar</button></li>`).join('')
+      <button type="button" data-editar class="adv-chip !min-h-8">Editar</button>${puedeBorrar ? '<button type="button" data-borrar class="adv-chip !min-h-8 !text-rose-300">Borrar</button>' : ''}</li>`).join('')
       : '<li class="text-sm text-gray-500">Aún no hay participaciones registradas.</li>';
   };
   const llenar = (f) => {
@@ -58,8 +59,8 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}) {
     if (e.target.closest('[data-editar]')) { editando = f; llenar(f); $('#he-form').scrollIntoView({ block: 'nearest' }); return; }
     const del = e.target.closest('[data-borrar]'); if (!del) return;
     if (del.dataset.seguro !== '1') { del.dataset.seguro = '1'; del.textContent = '¿Seguro?'; return; }
-    const { error } = await supabase.from('participaciones').delete().eq('id', f.id);
-    if (error) { console.error('[historial] borrar:', error); toast('No se pudo borrar.', 'error'); return; }
+    try { await borrarFilas(supabase, 'participaciones', { id: f.id }); }
+    catch (error) { console.error('[historial] borrar:', error); toast(/permiso/.test(error.message) ? error.message : 'No se pudo borrar.', 'error'); return; }
     toast('Participación eliminada.', 'ok'); if (editando?.id === f.id) { editando = null; llenar(null); } await recargar();
   });
   $('#he-form').addEventListener('submit', async (e) => {

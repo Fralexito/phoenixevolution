@@ -2,7 +2,8 @@
 // Cada cambio en un control vuelve a calcular TODO desde cero (sin estado oculto): es más simple de razonar y no puede quedar a medias.
 import { zonasDivision, resolverAscensos, clasificadosCopa, construirCopa, normalizarConfig, validarResultadoCopa, resultadosDesdeFilas } from '../core/temporada.js';
 import { supabase } from '../core/supabase.js';
-import { onSession, isAdmin } from '../core/session.js';
+import { onSession, can } from '../core/session.js';
+import { borrarFilas } from '../features/escritura.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { toast } from '../core/toast.js';
 import { escapeHTML } from '../core/dom.js';
@@ -59,7 +60,7 @@ function iniciar() {
     const cols = k.rondas.map((r, ri) => `<div class="space-y-3"><h3 class="font-display font-bold text-xs text-galaxy-400 uppercase tracking-[.2em]">${escapeHTML(r.nombre)}</h3>
       ${r.partidos.map((p) => { const gan = p.ganador?.nombre; const marc = Number.isInteger(p.ga) && Number.isInteger(p.gb) ? `${p.ga} : ${p.gb}${Number.isInteger(p.pa) ? ` <span class="text-[10px] text-gray-400">(${p.pa}-${p.pb} pen.)</span>` : ''}` : 'vs';
         const ph = ri === 0 ? 'Por definir' : 'Ganador por definir';
-        const editar = isAdmin() && p.a && p.b && !p.libre ? `<button type="button" data-cruce="${p.id}" class="adv-chip col-span-full !min-h-7"><i class="fa-solid fa-pen mr-1"></i>Resultado</button>` : '';
+        const editar = can('editarLiga') && p.a && p.b && !p.libre ? `<button type="button" data-cruce="${p.id}" class="adv-chip col-span-full !min-h-7"><i class="fa-solid fa-pen mr-1"></i>Resultado</button>` : '';
         return `<div class="tmp-cruce ${p.libre ? 'tmp-libre' : ''}"><div class="tmp-lado ${gan && gan === p.a?.nombre ? 'tmp-gana' : ''}">${equipo(p.a, ph)}</div><div class="tmp-marc font-display font-extrabold tabular-nums">${p.libre ? '<span class="text-[10px] text-gray-400 uppercase">pasa libre</span>' : marc}</div><div class="tmp-lado ${gan && gan === p.b?.nombre ? 'tmp-gana' : ''}">${equipo(p.b, ph)}</div>${editar}</div>`; }).join('')}</div>`).join('');
     const camp = k.campeon ? `<p class="text-sm text-gray-200"><i class="fa-solid fa-crown text-gold-400 mr-1.5"></i>Campeón: <b class="text-white">${escapeHTML(k.campeon.nombre)}</b></p>` : '';
     return `<div class="grid gap-6 ${k.rondas.length > 2 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} sm:grid-cols-1">${cols}</div>${camp}`;
@@ -99,7 +100,7 @@ function iniciar() {
         <span class="font-display font-bold text-white">${escapeHTML(p.b.nombre)}</span><input id="cr-gb" inputmode="numeric" maxlength="2" class="field text-center" value="${v(p.gb)}" aria-label="Goles de ${escapeHTML(p.b.nombre)}"></div>
       <details ${Number.isInteger(p.pa) ? 'open' : ''}><summary class="text-xs text-gray-400 cursor-pointer">Penales (solo si empataron)</summary><div class="grid grid-cols-2 gap-3 pt-2"><input id="cr-pa" inputmode="numeric" maxlength="2" class="field text-center" placeholder="${escapeHTML(p.a.nombre)}" value="${v(p.pa)}"><input id="cr-pb" inputmode="numeric" maxlength="2" class="field text-center" placeholder="${escapeHTML(p.b.nombre)}" value="${v(p.pb)}"></div></details>
       <ul id="cr-err" class="text-xs text-rose-400 space-y-0.5" role="alert"></ul>
-      <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="button" id="cr-borrar" class="btn btn-ghost text-bad">Borrar resultado</button><button type="submit" id="cr-guardar" class="btn btn-primary">Guardar</button></div></form>`, { id: ID_MODAL });
+      <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button>${can('borrarLiga') ? '<button type="button" id="cr-borrar" class="btn btn-ghost text-bad">Borrar resultado</button>' : ''}<button type="submit" id="cr-guardar" class="btn btn-primary">Guardar</button></div></form>`, { id: ID_MODAL });
     const q = (x) => m.querySelector(x);
     q('#cr-form').addEventListener('submit', async (e) => {
       e.preventDefault(); const val = validarResultadoCopa({ ga: q('#cr-ga').value, gb: q('#cr-gb').value, pa: q('#cr-pa').value, pb: q('#cr-pb').value });
@@ -110,10 +111,10 @@ function iniciar() {
         const r = {}; for (const k of ['ga', 'gb', 'pa', 'pb']) if (val.fila[k] !== null) r[k] = val.fila[k];
         if (Object.keys(r).length) resultados[id] = r; else delete resultados[id];
         toast('Resultado guardado.', 'ok'); closeModal(ID_MODAL); pintar();
-      } catch (err) { console.error('[temporada] guardar resultado:', err); q('#cr-err').innerHTML = `<li>${escapeHTML(/row-level security|policy/i.test(err.message) ? 'No tienes permiso (solo administradores).' : (err.message || 'No se pudo guardar.'))}</li>`; } finally { btn.disabled = false; }
+      } catch (err) { console.error('[temporada] guardar resultado:', err); q('#cr-err').innerHTML = `<li>${escapeHTML(/row-level security|policy/i.test(err.message) ? 'No tienes permiso para guardar resultados.' : (err.message || 'No se pudo guardar.'))}</li>`; } finally { btn.disabled = false; }
     });
-    q('#cr-borrar').addEventListener('click', async () => {
-      try { const { error } = await supabase.from('copa_resultados').delete().eq('temporada', datos.temporada).eq('cruce', id); if (error) throw error; delete resultados[id]; toast('Resultado borrado.', 'ok'); closeModal(ID_MODAL); pintar(); }
+    q('#cr-borrar')?.addEventListener('click', async () => {
+      try { await borrarFilas(supabase, 'copa_resultados', { temporada: datos.temporada, cruce: id }, 'cruce'); delete resultados[id]; toast('Resultado borrado.', 'ok'); closeModal(ID_MODAL); pintar(); }
       catch (err) { console.error('[temporada] borrar resultado:', err); q('#cr-err').innerHTML = `<li>${escapeHTML(err.message || 'No se pudo borrar.')}</li>`; }
     });
   };

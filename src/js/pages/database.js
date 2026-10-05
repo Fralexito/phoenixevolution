@@ -1,6 +1,7 @@
 // Base de Datos Global: lista, filtro por club, búsqueda; admin puede añadir/editar/borrar.
 import { supabase } from '../core/supabase.js';
-import { onSession, isAdmin } from '../core/session.js';
+import { onSession, can } from '../core/session.js';
+import { borrarFilas } from '../features/escritura.js';
 import { escapeHTML } from '../core/dom.js';
 import { posInfo } from '../../data/posiciones.js';
 import { href } from '../core/config.js';
@@ -46,7 +47,7 @@ function tirasHist(p) {
   return `<ul class="hist-tiras" aria-label="Participaciones que coinciden">${hits.slice(0, 3).map(una).join('')}${hits.length > 3 ? `<li class="hist-mas">+${hits.length - 3} más</li>` : ''}</ul>`;
 }
 function tarjeta(p, i, extra = '') {
-  const admin = isAdmin(); const niv = divPorId.get(p.id); const dv = SISTEMA.divisiones.find((d) => d.nivel === niv);
+  const admin = can('editarLiga'); const puedeBorrar = can('borrarLiga'); const niv = divPorId.get(p.id); const dv = SISTEMA.divisiones.find((d) => d.nivel === niv);
   const insignia = dv ? `<span class="div-badge div-${niv} ${admin ? 'div-admin' : ''}" title="${escapeHTML(dv.nombre)}"><b>L${niv}</b><span>${escapeHTML(dv.nombre)}</span></span>` : '';
   return `<div data-pcw="${escapeHTML(p.id)}" style="--aura:${posInfo(p.posicion).color}" class="pcw relative group/card ${sel.includes(p.id) ? 'cmp-sel' : ''}">${playerCardHTML(p, i)}${insignia}${tirasHist(p)}${extra}
         <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="cmp-btn"><i class="fa-solid fa-scale-balanced"></i></button>
@@ -54,7 +55,7 @@ function tarjeta(p, i, extra = '') {
         <button type="button" data-menu="${escapeHTML(p.id)}" aria-label="Opciones de la ficha" aria-haspopup="true" class="card-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
         <div class="card-menu" data-menu-for="${escapeHTML(p.id)}" hidden>
           <button type="button" data-edit="${escapeHTML(p.id)}"><i class="fa-solid fa-pen mr-2"></i>Editar</button>
-          <button type="button" data-del="${escapeHTML(p.id)}" class="text-bad"><i class="fa-solid fa-trash mr-2"></i>Borrar</button>
+          ${puedeBorrar ? `<button type="button" data-del="${escapeHTML(p.id)}" class="text-bad"><i class="fa-solid fa-trash mr-2"></i>Borrar</button>` : ''}
         </div>` : ''}</div>`;
 }
 
@@ -243,12 +244,12 @@ $('players-container').addEventListener('click', async (e) => {
   if (del) {
     const p = all.find((x) => x.id === del);
     if (!p || !confirm(`¿Borrar la ficha de ${p.nombre}? No se puede deshacer.`)) return;
-    const { error } = await supabase.from('jugadores').delete().eq('id', del);
-    if (error) { console.error('[database] borrar:', error); toast('No se pudo borrar.', 'error'); return; }
+    try { await borrarFilas(supabase, 'jugadores', { id: del }); }
+    catch (error) { console.error('[database] borrar:', error); toast(/permiso/.test(error.message) ? error.message : 'No se pudo borrar.', 'error'); return; }
     toast('Ficha borrada.', 'ok'); load();
   }
 });
 
-// El botón "Añadir" y los controles de edición solo existen para admin.
-onSession(() => { $('btn-add-player').hidden = !isAdmin(); if (all.length) paint(); });
+// El botón "Añadir" y los controles de edición existen para admin y moderador (borrar: solo admin).
+onSession(() => { $('btn-add-player').hidden = !can('editarLiga'); if (all.length) paint(); });
 load();

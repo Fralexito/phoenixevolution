@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Auditoría" active="auditoria">
+  <div class="max-w-5xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Solo staff</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-clipboard-list text-galaxy-400 mr-2"></i>Auditoría</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Quién hizo qué, cuándo y con qué cambios. Un registro que nadie puede alterar.</p>
+    </header>
+
+    <div id="aud-sinsesion" hidden class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm">Inicia sesión para continuar.</div>
+    <div id="aud-denegado" hidden class="glass-panel rounded-2xl p-8 text-center text-sm space-y-1">
+      <p class="text-white font-display font-bold uppercase tracking-wider"><i class="fa-solid fa-lock text-galaxy-400 mr-2"></i>Esta página es solo para el staff</p>
+      <p class="text-gray-400 text-xs">Tu cuenta no tiene permiso para ver la auditoría.</p>
+    </div>
+
+    <div id="aud-app" hidden class="space-y-4">
+      <div id="aud-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 flex flex-wrap items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation"></i><span id="aud-error-txt" class="flex-1 min-w-0"></span>
+        <button type="button" id="aud-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Reintentar</button>
+      </div>
+
+      <details class="glass-panel rounded-2xl px-4 py-3">
+        <summary class="cursor-pointer font-display font-bold text-white uppercase tracking-wider text-sm select-none"><i class="fa-solid fa-circle-question text-galaxy-400 mr-2"></i>¿Cómo leer este registro?</summary>
+        <div id="aud-ayuda" class="mt-3"></div>
+      </details>
+
+      <section id="aud-resumen" class="space-y-2.5" aria-live="polite"></section>
+
+      <section class="space-y-3">
+        <h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-timeline text-galaxy-400 mr-2"></i>Línea de tiempo</h2>
+        <div id="aud-filtros" class="space-y-2.5"></div>
+        <div id="aud-linea" class="space-y-4" aria-live="polite"></div>
+        <div class="text-center"><button type="button" id="aud-mas" hidden class="btn btn-ghost">Cargar más</button></div>
+      </section>
+
+      <section id="aud-equipo-caja" hidden class="space-y-2.5">
+        <h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-users-gear text-galaxy-400 mr-2"></i>Equipo y roles</h2>
+        <p class="text-xs text-gray-400">Solo un administrador puede dar o quitar roles. Cada cambio pide un motivo y queda en la línea de tiempo.</p>
+        <div id="aud-equipo" class="space-y-2.5"></div>
+      </section>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/auditoria.js';
+</script>

@@ -2,6 +2,7 @@
 // Guarda sesión + perfil (tabla `perfiles`) y avisa a quien se suscriba.
 import { supabase } from './supabase.js';
 import { providerAvatar } from './avatar.js';
+import { normalizarRol, puede, esStaff } from './roles.js';
 
 const state = { session: null, profile: null, ready: false };
 const listeners = new Set();
@@ -51,7 +52,12 @@ export function initSession() {
 }
 
 export const getState = () => ({ ...state });
-export const isAdmin = () => state.profile?.rol === 'admin';
+/** Rol de la cuenta conectada (siempre válido; sin sesión = «jugador»). Solo sirve para MOSTRAR u ocultar botones: la base de datos es la que decide. */
+export const rolActual = () => normalizarRol(state.profile?.rol);
+export const isAdmin = () => rolActual() === 'admin';
+/** ¿Puede esta cuenta hacer X? Ver PERMISOS en core/roles.js (editarLiga, borrarLiga, verAuditoria…). */
+export const can = (permiso) => puede(rolActual(), permiso);
+export const isStaff = () => esStaff(rolActual());
 
 /** Suscribe un listener; se ejecuta ya mismo si el estado está listo. Devuelve función para desuscribir. */
 export function onSession(fn) {

@@ -1,5 +1,6 @@
 // Pinta la zona de usuario de la cabecera según la sesión (único lugar que lo hace).
-import { onSession } from '../core/session.js';
+import { onSession, can } from '../core/session.js';
+import { ROL_INFO, normalizarRol, esStaff } from '../core/roles.js';
 import { escapeHTML } from '../core/dom.js';
 import { avatarHTML } from '../core/avatar.js';
 import { href } from '../core/config.js';
@@ -23,7 +24,7 @@ function pintarPendientes({ mensajes, solicitudes }) {
 
 /** Atajos de «Mi cuenta» para móvil (en PC ya están en la barra lateral): cuadrícula 2x2 pequeña y discreta dentro del menú de la foto. */
 const ATAJOS_MOVIL = ACCOUNT_NAV.filter((n) => n.path && !n.abajo)
-  .map((n) => `<a href="${escapeHTML(href(n.path))}" class="flex items-center gap-2 px-3 py-2 text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-solid ${n.icon} w-4 text-center text-gray-500"></i><span class="truncate">${escapeHTML(n.label)}</span></a>`).join('');
+  .map((n) => `<a href="${escapeHTML(href(n.path))}" ${n.staff ? 'data-solo-staff hidden' : ''} class="flex items-center gap-2 px-3 py-2 text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-solid ${n.icon} w-4 text-center text-gray-500"></i><span class="truncate">${escapeHTML(n.label)}</span></a>`).join('');
 
 function render({ session, profile }) {
   const box = document.getElementById('nav-auth');
@@ -49,7 +50,7 @@ function render({ session, profile }) {
           <span class="hidden md:block font-display font-bold text-sm text-white max-w-28 truncate">${escapeHTML(name)}</span>
         </button>
         <div id="user-menu" hidden class="absolute right-0 mt-3 w-60 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden font-display text-sm uppercase tracking-wider">
-          <div class="px-4 py-3 border-b border-galaxy-border/70"><p class="text-white font-bold truncate">${escapeHTML(name)}</p>${profile?.username ? `<p class="text-[11px] text-gray-400 normal-case tracking-normal truncate">@${escapeHTML(profile.username)}</p>` : ''}</div>
+          <div class="px-4 py-3 border-b border-galaxy-border/70"><p class="text-white font-bold truncate">${escapeHTML(name)}</p>${profile?.username ? `<p class="text-[11px] text-gray-400 normal-case tracking-normal truncate">@${escapeHTML(profile.username)}</p>` : ''}${esStaff(profile?.rol) ? `<p class="mt-1 text-[10px] text-galaxy-400 normal-case tracking-normal"><i class="fa-solid ${ROL_INFO[normalizarRol(profile.rol)].icono} mr-1"></i>${escapeHTML(ROL_INFO[normalizarRol(profile.rol)].etiqueta)}</p>` : ''}</div>
           <div id="menu-pendientes" hidden class="border-b border-galaxy-border/70 py-1"></div>
           <div class="lg:hidden grid grid-cols-2 border-b border-galaxy-border/70 py-1 normal-case tracking-normal">${ATAJOS_MOVIL}</div>
           <div class="py-1">
@@ -61,6 +62,7 @@ function render({ session, profile }) {
       </div>`;
     stopNotif = initNotifications(session.user.id);
     stopPend = iniciarPendientes(pintarPendientes);
+    document.querySelectorAll('#user-menu [data-solo-staff]').forEach((el) => { el.hidden = !can('verAuditoria'); });
   }
 }
 

@@ -1,9 +1,10 @@
-// Editor de noticias (solo admin; la base de datos lo refuerza con RLS) + aviso a Discord.
+// Editor de noticias (administradores y moderadores; borrar solo el admin. La base de datos lo refuerza con RLS) + aviso a Discord.
 // Flujo: abrirEditor() → validar() → (subir portada) → insert/update → (avisar a Discord) → onGuardada().
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML, safeImg } from '../core/dom.js';
 import { toast } from '../core/toast.js';
+import { borrarFilas } from './escritura.js';
 import { getState } from '../core/session.js';
 import { redimensionarJpeg } from '../core/image.js';
 import { CATEGORIAS, slugify, slugUnico, validar } from '../core/noticias.js';
@@ -33,9 +34,18 @@ export async function avisarDiscord(slug) {
 }
 
 export async function borrarNoticia(n) {
-  const { error } = await supabase.from('noticias').delete().eq('id', n.id);
-  if (error) { console.error('[noticias] borrar:', error); toast('No se pudo eliminar la noticia.', 'error'); return false; }
-  toast('Noticia eliminada.', 'ok'); return true;
+  try { await borrarFilas(supabase, 'noticias', { id: n.id }); toast('Noticia eliminada.', 'ok'); return true; }
+  catch (e) { console.error('[noticias] borrar:', e); toast(/permiso/.test(e.message) ? e.message : 'No se pudo eliminar la noticia.', 'error'); return false; }
+}
+
+/** «Ocultar» = pasarla a borrador (deja de verse en la web pero NO se pierde). Es lo que puede hacer un moderador; queda en la auditoría como «ocultó». */
+export async function ocultarNoticia(n) {
+  try {
+    const { data, error } = await supabase.from('noticias').update({ publicada: false }).eq('id', n.id).select('id');
+    if (error) throw error;
+    if (!data?.length) throw new Error('Sin permiso o la noticia ya no existe.');
+    toast('Noticia oculta: pasó a borrador y ya no se ve en la web.', 'ok'); return true;
+  } catch (e) { console.error('[noticias] ocultar:', e); toast('No se pudo ocultar la noticia.', 'error'); return false; }
 }
 
 /** @param {{noticia?: object|null, slugsUsados?: string[], onGuardada?: Function}} o  noticia = null para crear una nueva. */
