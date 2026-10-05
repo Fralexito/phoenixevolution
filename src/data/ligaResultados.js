@@ -95,4 +95,19 @@ export const EDICIONES = {
       clubes: CLUBES, fechas: FECHAS,
     },
   ],
+  // LIGA SUDARIO (SP Football Life): 12 jugadores, una sola ronda (11 fechas). Aún no hay fechas confirmadas: solo se listan los participantes.
+  // Cuando haya calendario, agrega las fechas en `fechas` (mismo formato que galaxy; gl/gv en null = sin jugar; h = hora opcional).
+  sudario: [
+    {
+      id: 'edicion-1', nombre: '1° Edición', torneo: '1° Edición', temporada: '2026', estado: 'en_curso', fase: '1ª Fase',
+      formato: 'Todos contra todos, solo una ronda', participantes: 12,
+      aviso: 'El calendario de fechas se publicará cuando esté confirmado.',
+      jugadores: ['Benyamin', 'Brochas', 'Jordan', 'Mauri', 'José Reyes', 'Julio Cesar', 'Beto', 'Joao', 'Morgado', 'Spidercat', 'Sudario17', 'Victor'],
+      clubes: {
+        Benyamin: 'Bayern Múnich', Brochas: 'Manchester United', Jordan: 'Inter', Mauri: 'FC Barcelona', 'José Reyes': 'Chelsea', 'Julio Cesar': 'Atlético de Madrid',
+        Beto: 'Arsenal', Joao: 'Manchester City', Morgado: 'Real Madrid', Spidercat: 'PSG', Sudario17: 'AC Milan', Victor: 'Liverpool',
+      },
+      fechas: [],
+    },
+  ],
 };

@@ -12,7 +12,7 @@ export function coincide(jugador, nombreLiga) {
 
 /** Nombre con el que el jugador aparece en la edición (o null si no participa). */
 export function nombreEnEdicion(jugador, edicion) {
-  const nombres = new Set((edicion?.fechas ?? []).flatMap((f) => f.partidos.flatMap((m) => [m.l, m.v])));
+  const nombres = new Set([...(edicion?.jugadores ?? []), ...(edicion?.fechas ?? []).flatMap((f) => f.partidos.flatMap((m) => [m.l, m.v]))]);   // `jugadores` = inscritos aunque aún no haya fechas
   return [...nombres].find((n) => coincide(jugador, n)) ?? null;
 }
 

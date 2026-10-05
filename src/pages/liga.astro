@@ -16,13 +16,19 @@ const PUESTO = ['text-gold-400', 'text-gray-200', 'text-bronze-400'];
 
 const divisionDe = (ligaId) => SISTEMA.divisiones.find((d) => d.ligaId === ligaId) ?? null;
 const ESTADO_FECHA = { jugada: 'jugada', en_juego: 'en juego', pendiente: 'por jugar' };
+// Tabla con TODOS los participantes: quien aún no juega aparece con ceros (útil al empezar una liga).
+const tablaCompleta = (e) => {
+  const t = calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla; const hay = new Set(t.map((f) => f.nombre));
+  const faltan = [...new Set([...(e.jugadores ?? []), ...e.fechas.flatMap((f) => f.partidos.flatMap((m) => [m.l, m.v]))])].filter((n) => !hay.has(n)).sort((a, b) => a.localeCompare(b, 'es'));
+  return [...t, ...faltan.map((nombre) => ({ nombre, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }))];
+};
 const datos = LIGAS.map((l) => ({
   liga: l,
   ediciones: (EDICIONES[l.id] ?? []).map((e) => ({
-    ...e, tabla: calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla, actual: fechaActual(e.fechas),
-    formas: Object.fromEntries(calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla.map((f) => [f.nombre, historial(e.fechas, f.nombre)])),
+    ...e, tabla: tablaCompleta(e), actual: fechaActual(e.fechas),
+    formas: Object.fromEntries(tablaCompleta(e).map((f) => [f.nombre, historial(e.fechas, f.nombre)])),
     total: totalFechas(e), jugadas: e.fechas.filter((f) => estadoFecha(f) === 'jugada').length,
-    zonas: e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla.map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
+    zonas: e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(tablaCompleta(e).map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
     fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
   })).reverse(),   // la más reciente primero
 }));
@@ -55,7 +61,7 @@ const datos = LIGAS.map((l) => ({
               <ul class="flex flex-wrap justify-center sm:justify-start gap-2" aria-label="Estado de la edición">
                 <li class="hidden sm:block"><span class="pc-chip"><i class="fa-solid fa-calendar-day"></i>{ult.nombre}</span></li>
                 {fa && <li><span class="pc-chip"><i class="fa-solid fa-futbol"></i>Fecha {fa.n} {ESTADO_FECHA[fa.estado]}</span></li>}
-                {ult.tabla[0] && <li><span class="pc-chip"><i class="fa-solid fa-crown"></i>Líder: {ult.tabla[0].nombre} · {ult.tabla[0].pts} pts</span></li>}
+                {ult.tabla[0]?.pj > 0 && <li><span class="pc-chip"><i class="fa-solid fa-crown"></i>Líder: {ult.tabla[0].nombre} · {ult.tabla[0].pts} pts</span></li>}
                 <li class="hidden sm:block"><span class="pc-chip"><i class="fa-solid fa-users"></i>{ult.participantes} jugadores</span></li>
               </ul>
             )}
@@ -97,7 +103,7 @@ const datos = LIGAS.map((l) => ({
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
-                      <tr data-jug={f.nombre} style={`--i:${i}`} class:list={['liga-fila', i === 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
+                      <tr data-jug={f.nombre} style={`--i:${i}`} class:list={['liga-fila', i === 0 && f.pj > 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
                         <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
                         <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
@@ -126,6 +132,16 @@ const datos = LIGAS.map((l) => ({
             </section>
 
             <!-- RESULTADOS por fecha -->
+            {e.fechas.length === 0 ? (
+              <section class="space-y-3 lg:sticky lg:top-20" aria-label="Resultados por fecha">
+                <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
+                <div class="glass-panel rounded-2xl p-6 text-center space-y-2">
+                  <i class="fa-solid fa-calendar-days text-galaxy-400 text-2xl"></i>
+                  <p class="text-sm text-gray-200 font-display font-bold uppercase tracking-wider">Fechas por confirmar</p>
+                  <p class="text-xs text-gray-400">{e.aviso ?? 'Aún no hay calendario publicado.'}</p>
+                </div>
+              </section>
+            ) : (
             <section class="space-y-3 lg:sticky lg:top-20" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
               <div class="flex items-end justify-between gap-3">
                 <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
@@ -145,7 +161,7 @@ const datos = LIGAS.map((l) => ({
                     {f.partidos.map((m) => (
                       <li data-m-l={m.l} data-m-v={m.v} class="liga-partido rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                         <span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.l]}</span>}</span>
-                        {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-xs text-gray-500 font-display uppercase">vs</span>}
+                        {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-center font-display uppercase leading-tight"><span class="block text-xs text-gray-500">vs</span>{m.h && <span class="block text-[10px] text-galaxy-400 normal-case tracking-wide">{m.h}</span>}</span>}
                         <span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.v]}</span>}</span>
                       </li>
                     ))}
@@ -155,6 +171,7 @@ const datos = LIGAS.map((l) => ({
               ))}
               {e.aviso && <p class="text-xs text-amber-300/80">{e.aviso}</p>}
             </section>
+            )}
             </div>
           </div>
         ))}
