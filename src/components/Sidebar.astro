@@ -1,8 +1,9 @@
 ---
 import SocialIcon from './SocialIcon.astro';
-import { NAV, NAV_EXTRA, ACCOUNT_NAV, SOCIALS } from '../data/site.js';
+import { SECCIONES, seccionDe, rutaDeSeccion, ACCOUNT_NAV, SOCIALS } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
+const actual = seccionDe(active);
 ---
 <div id="sidebar-overlay" hidden class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[400]"></div>
 <aside id="sidebar-menu" aria-label="Red de enlaces" inert
@@ -19,17 +20,24 @@ const { active } = Astro.props;
     <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil es el menú completo. -->
     <div class="flex flex-col gap-1.5 lg:hidden">
     <div class="px-3 pt-1 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Explorar</div>
-    {NAV.map((n) => (
-      <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined}
-        class={`flex items-center gap-4 p-3 rounded-lg transition-all relative overflow-hidden ${active === n.id
-          ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30'
-          : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
-        {active === n.id && <span class="absolute left-0 top-0 bottom-0 w-1 bg-galaxy-400"></span>}
-        <i class={`fa-solid ${n.icon} w-5 text-center ${active === n.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i> {n.label}
+    {SECCIONES.map((x) => x.items.length === 0 ? (
+      <a href={`${base}${rutaDeSeccion(x)}`} aria-current={actual?.id === x.id ? 'page' : undefined}
+        class={`flex items-center gap-4 p-3 rounded-lg transition-all ${actual?.id === x.id ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
+        <i class={`fa-solid ${x.icon} w-5 text-center ${actual?.id === x.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i> {x.label}
       </a>
-    ))}
-    {NAV_EXTRA.map((n) => (
-      <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class={`flex items-center gap-4 p-3 rounded-lg transition-all ${active === n.id ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5 border border-dashed border-galaxy-border/70'}`}><i class={`fa-solid ${n.icon} w-5 text-center text-galaxy-400`}></i> {n.label}</a>
+    ) : (
+      <details class="grupo-movil" open={actual?.id === x.id}>
+        <summary class={`flex items-center gap-4 p-3 rounded-lg cursor-pointer list-none ${actual?.id === x.id ? 'text-galaxy-400 bg-galaxy-400/10 border border-galaxy-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
+          <i class={`fa-solid ${x.icon} w-5 text-center ${actual?.id === x.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i><span class="flex-1">{x.label}</span><i class="fa-solid fa-chevron-down text-[.65rem] opacity-60 grupo-flecha"></i>
+        </summary>
+        <div class="ml-4 pl-3 border-l border-galaxy-border/70 flex flex-col gap-0.5 py-1">
+          {x.items.map((i) => (
+            <a href={`${base}${i.path}`} aria-current={active === i.id ? 'page' : undefined} class={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm normal-case tracking-normal ${active === i.id ? 'text-galaxy-400 bg-galaxy-400/10' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+              <i class={`fa-solid ${i.icon} w-4 text-center text-xs ${active === i.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i>{i.label}
+            </a>
+          ))}
+        </div>
+      </details>
     ))}
     </div>
     <!-- «Mi cuenta» solo en PC: en móvil vive en el menú de la foto de perfil (navbar.js). -->

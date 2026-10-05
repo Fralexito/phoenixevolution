@@ -1077,3 +1077,13 @@ test('inicio: saludo, pasos con progreso regalado y anillo', () => {
   assert.equal(porcentajePasos(null), 0);
   assert.deepEqual(arcoAnillo(100, 10).falta, 0); assert.equal(arcoAnillo(0, 10).falta, arcoAnillo(0, 10).total); assert.ok(arcoAnillo(50, 10).falta < arcoAnillo(0, 10).total);
 });
+
+import { SECCIONES as SECS, seccionDe, rutaDeSeccion } from '../src/data/site.js';
+test('navegación: secciones, pertenencia y rutas', () => {
+  assert.equal(SECS.length, 5);
+  assert.equal(seccionDe('central').id, 'inicio'); assert.equal(seccionDe('tienda').id, 'tienda'); assert.equal(seccionDe('noticias').id, 'comunidad');
+  assert.equal(seccionDe('palmares').id, 'liga'); assert.equal(seccionDe('envivo').id, 'jugar'); assert.equal(seccionDe('ajustes'), null); assert.equal(seccionDe(''), null);
+  assert.equal(rutaDeSeccion(SECS[0]), ''); assert.equal(rutaDeSeccion(seccionDe('liga')), 'liga/'); assert.equal(rutaDeSeccion(seccionDe('tienda')), 'tienda/');
+  const ids = SECS.flatMap((x) => x.items.map((i) => i.id)); assert.equal(new Set(ids).size, ids.length, 'ids repetidos');
+  const paths = SECS.flatMap((x) => x.items.map((i) => i.path)); assert.equal(new Set(paths).size, paths.length, 'rutas repetidas');
+});
