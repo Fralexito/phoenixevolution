@@ -15,6 +15,7 @@ export const NAV_EXTRA = [
   { id: 'eventos', label: 'Eventos', path: 'eventos/', icon: 'fa-calendar-day' },
   { id: 'clanes', label: 'Clanes', path: 'clanes/', icon: 'fa-shield-halved' },
   { id: 'ranking', label: 'Ranking', path: 'ranking/', icon: 'fa-ranking-star' },
+  { id: 'tienda', label: 'Tienda', path: 'tienda/', icon: 'fa-store' },
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
 ];
 
@@ -33,6 +34,7 @@ export const ACCOUNT_NAV = [
   { id: 'eventos',  label: 'Eventos',      path: 'eventos/',       icon: 'fa-calendar-day' },
   { id: 'clanes',   label: 'Clanes',       path: 'clanes/',        icon: 'fa-shield-halved' },
   { id: 'ranking',  label: 'Ranking',      path: 'ranking/',       icon: 'fa-ranking-star' },
+  { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store' },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria' },
