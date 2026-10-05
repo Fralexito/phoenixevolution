@@ -79,7 +79,7 @@ function pintar() {
 }
 
 async function recargar() {
-  try { S.red = await api.cargarRed(); pintar(); }
+  try { S.red = await api.cargarRed(); pintar(); window.dispatchEvent(new CustomEvent('pendientes:refresh')); }
   catch (e) { toast(e.message, 'error', { key: 'red-carga' }); }
 }
 

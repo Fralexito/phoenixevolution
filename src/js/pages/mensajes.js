@@ -95,6 +95,7 @@ async function refrescarLista() {
   try { S.convs = await api.listarConversaciones(); } catch (e) { toast(e.message, 'error', { key: 'chat-lista' }); }
   if (S.abierta && !convAbierta()) { S.abierta = null; $('sala').hidden = true; $('sala-vacia').hidden = false; }
   pintarLista();
+  window.dispatchEvent(new CustomEvent('pendientes:refresh'));
 }
 
 async function refrescarSala() {

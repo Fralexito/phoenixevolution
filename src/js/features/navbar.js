@@ -6,8 +6,19 @@ import { href } from '../core/config.js';
 import { openAuthModal, logout } from './auth.js';
 import { openProfileModal } from './profile.js';
 import { initNotifications } from './notifications.js';
+import { iniciarPendientes } from './pendientes.js';
 
 let stopNotif = null;
+let stopPend = null;
+
+/** Filas «pendientes» del menú: solo aparecen si hay algo que atender; el punto rojo del avatar avisa sin abrir el menú. */
+function pintarPendientes({ mensajes, solicitudes }) {
+  const caja = document.getElementById('menu-pendientes'); const punto = document.getElementById('avatar-dot');
+  if (!caja || !punto) return;
+  const fila = (ruta, icono, texto, n) => `<a href="${escapeHTML(href(ruta))}" class="flex items-center gap-2 px-4 py-2.5 text-gray-200 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid ${icono} w-4 text-center text-galaxy-400"></i><span class="flex-1 truncate">${texto}</span><b class="min-w-5 h-5 px-1 rounded-full bg-bad text-white text-[10px] leading-5 text-center">${n > 9 ? '9+' : n}</b></a>`;
+  caja.innerHTML = (mensajes ? fila('mensajes/', 'fa-comments', 'Sin leer', mensajes) : '') + (solicitudes ? fila('amigos/', 'fa-user-plus', 'Solicitudes', solicitudes) : '');
+  caja.hidden = !(mensajes || solicitudes); punto.hidden = !(mensajes || solicitudes);
+}
 
 function render({ session, profile }) {
   const box = document.getElementById('nav-auth');
@@ -15,6 +26,7 @@ function render({ session, profile }) {
   // CSS (components.css) usa esto: en PC el botón de 3 rayas solo existe con sesión.
   document.documentElement.dataset.sesion = session ? 'si' : 'no';
   stopNotif?.(); stopNotif = null;
+  stopPend?.(); stopPend = null;
 
   if (!session) {
     box.innerHTML = `
@@ -28,20 +40,21 @@ function render({ session, profile }) {
         <div id="dropdown-notif" hidden class="fixed left-2 right-2 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-80 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden"></div></div>
       <div class="relative">
         <button type="button" data-act="menu" aria-haspopup="true" class="flex items-center gap-2">
-          <span class="w-9 h-9 rounded-full overflow-hidden border border-galaxy-400/50 bg-galaxy-card flex items-center justify-center">${avatarHTML(profile?.avatar_url, profile?.nombre_display || session.user.email, 36)}</span>
+          <span class="relative w-9 h-9 rounded-full border border-galaxy-400/50 bg-galaxy-card flex items-center justify-center"><i id="avatar-dot" hidden class="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-bad border-2 border-galaxy-panel z-10"></i><span class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">${avatarHTML(profile?.avatar_url, profile?.nombre_display || session.user.email, 36)}</span></span>
           <span class="hidden md:block font-display font-bold text-sm text-white max-w-28 truncate">${escapeHTML(name)}</span>
         </button>
-        <div id="user-menu" hidden class="absolute right-0 mt-3 w-52 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] py-1 font-display text-sm uppercase tracking-wider">
-          <a href="${escapeHTML(href('mis-partidos/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gamepad mr-2"></i>Mis partidos</a>
-          <a href="${escapeHTML(href('en-vivo/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-tower-broadcast mr-2"></i>Salas en vivo</a>
-          <a href="${escapeHTML(href('mensajes/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-comments mr-2"></i>Mensajes</a>
-          <a href="${escapeHTML(href('amigos/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-user-group mr-2"></i>Amigos</a>
-          <button type="button" data-act="profile" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-user mr-2"></i>Mi perfil</button>
-          <a href="${escapeHTML(href('ajustes/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gear mr-2"></i>Configuración</a>
-          <button type="button" data-act="logout" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-bad"><i class="fa-solid fa-right-from-bracket mr-2"></i>Salir</button>
+        <div id="user-menu" hidden class="absolute right-0 mt-3 w-60 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden font-display text-sm uppercase tracking-wider">
+          <div class="px-4 py-3 border-b border-galaxy-border/70"><p class="text-white font-bold truncate">${escapeHTML(name)}</p>${profile?.username ? `<p class="text-[11px] text-gray-400 normal-case tracking-normal truncate">@${escapeHTML(profile.username)}</p>` : ''}</div>
+          <div id="menu-pendientes" hidden class="border-b border-galaxy-border/70 py-1"></div>
+          <div class="py-1">
+            <button type="button" data-act="profile" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400 uppercase tracking-wider"><i class="fa-solid fa-user mr-2"></i>Mi perfil</button>
+            <a href="${escapeHTML(href('ajustes/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gear mr-2"></i>Configuración</a>
+            <button type="button" data-act="logout" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-bad uppercase tracking-wider"><i class="fa-solid fa-right-from-bracket mr-2"></i>Salir</button>
+          </div>
         </div>
       </div>`;
     stopNotif = initNotifications(session.user.id);
+    stopPend = iniciarPendientes(pintarPendientes);
   }
 }
 
