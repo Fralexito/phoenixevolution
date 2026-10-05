@@ -1096,3 +1096,12 @@ test('historial: todos los partidos jugados de un jugador, de antiguo a reciente
   assert.deepEqual(historial(f, 'A').map((h) => [h.r, h.n, h.rival, h.gf, h.gc, h.local]), [['G', 1, 'B', 2, 1, true], ['E', 2, 'B', 3, 3, false]]);
   assert.equal(historial(f, 'B')[0].r, 'P'); assert.deepEqual(historial(f, 'Z'), []); assert.deepEqual(historial(null, 'A'), []);
 });
+
+import { totalFechas } from '../src/js/core/ligaStats.js';
+test('totalFechas: se deduce del formato', () => {
+  const fs = (n) => Array.from({ length: n }, (_, i) => ({ n: i + 1, partidos: [] }));
+  assert.equal(totalFechas({ participantes: 12, formato: 'Todos contra todos, a ida y vuelta', fechas: fs(8) }), 22);
+  assert.equal(totalFechas({ participantes: 12, formato: 'Todos contra todos', fechas: fs(3) }), 11);
+  assert.equal(totalFechas({ participantes: 5, formato: 'Todos contra todos', fechas: fs(1) }), 5);
+  assert.equal(totalFechas({ participantes: 8, formato: 'Eliminatoria', fechas: fs(3) }), 3); assert.equal(totalFechas(null), 0);
+});

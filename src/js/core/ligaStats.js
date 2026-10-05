@@ -57,3 +57,11 @@ export function historial(fechas, nombre) {
   }
   return h;
 }
+
+/** Total de fechas de una edición: se lee del formato («todos contra todos», «a ida y vuelta»). Si el formato no lo permite deducir, devuelve las fechas cargadas. */
+export function totalFechas(ed) {
+  const n = Number(ed?.participantes), cargadas = (ed?.fechas ?? []).length;
+  if (!Number.isInteger(n) || n < 2 || !/todos contra todos/i.test(String(ed?.formato ?? ''))) return cargadas;
+  const rondas = n % 2 === 0 ? n - 1 : n;
+  return Math.max(cargadas, /ida y vuelta/i.test(ed.formato) ? rondas * 2 : rondas);
+}

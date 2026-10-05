@@ -7,7 +7,7 @@ import { EDICIONES } from '../data/ligaResultados.js';
 import { calcularTabla } from '../js/core/tabla.js';
 import { SISTEMA } from '../data/temporada.js';
 import { zonasDivision } from '../js/core/temporada.js';
-import { estadoFecha, fechaActual, historial, resumenFecha } from '../js/core/ligaStats.js';
+import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas } from '../js/core/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 // Clases completas (Tailwind solo detecta nombres escritos enteros).
 const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black', P: 'bg-rose-500/90 text-white' };
@@ -21,6 +21,7 @@ const datos = LIGAS.map((l) => ({
   ediciones: (EDICIONES[l.id] ?? []).map((e) => ({
     ...e, tabla: calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla, actual: fechaActual(e.fechas),
     formas: Object.fromEntries(calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla.map((f) => [f.nombre, historial(e.fechas, f.nombre)])),
+    total: totalFechas(e), jugadas: e.fechas.filter((f) => estadoFecha(f) === 'jugada').length,
     zonas: e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla.map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
     fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
   })).reverse(),   // la más reciente primero
@@ -31,7 +32,7 @@ const datos = LIGAS.map((l) => ({
   {LIGAS.length > 1 && (
     <nav class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-5 flex items-center gap-3 flex-wrap" aria-label="Cambiar de liga">
       <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Liga</span>
-      <div class="seg" role="group" aria-label="Liga">{LIGAS.map((l, i) => <button type="button" data-liga-btn={l.id} aria-pressed={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono} mr-1.5`}></i>{l.titulo.join(' ')}</button>)}</div>
+      <div class="liga-sel" role="group" aria-label="Liga"><span class="liga-thumb" aria-hidden="true"></span>{LIGAS.map((l, i) => <button type="button" data-liga-btn={l.id} aria-pressed={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono} mr-1.5`}></i>{l.titulo.join(' ')}</button>)}</div>
     </nav>
   )}
 
@@ -90,18 +91,18 @@ const datos = LIGAS.map((l) => ({
               <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3">
                 <table class="liga-tabla w-full">
                   <thead><tr>
-                    <th class="text-left w-6">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
+                    <th class="text-left w-8">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
                     <th class="hidden sm:table-cell">G</th><th class="hidden sm:table-cell">E</th><th class="hidden sm:table-cell">P</th>
-                    <th class="hidden 2xl:table-cell">GF</th><th class="hidden 2xl:table-cell">GC</th><th>DIF</th><th>Últimos</th>
+                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th>Últimos</th>
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
-                      <tr class:list={[i === 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
+                      <tr data-jug={f.nombre} style={`--i:${i}`} class:list={['liga-fila', i === 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
                         <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
-                        <td class="text-left whitespace-nowrap"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="hidden md:inline text-[10px] text-gray-500 uppercase ml-1.5">{e.clubes[f.nombre]}</span>}</td>
-                        <td class="font-display font-extrabold text-white">{f.pts}</td><td>{f.pj}</td>
+                        <td class="text-left"><span class="font-display font-bold text-white tracking-wide">{f.nombre}</span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
+                        <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
-                        <td class="hidden 2xl:table-cell">{f.gf}</td><td class="hidden 2xl:table-cell">{f.gc}</td>
+                        <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
                         <td class:list={[f.dg > 0 ? 'text-emerald-400' : f.dg < 0 ? 'text-rose-400' : 'text-gray-400']}>{f.dg > 0 ? `+${f.dg}` : f.dg}</td>
                         <td>
                           {e.formas[f.nombre].length === 0 ? <span class="text-gray-600">—</span> : (
@@ -111,6 +112,7 @@ const datos = LIGAS.map((l) => ({
                                 {e.formas[f.nombre].map((h) => <span class:list={['liga-forma', CHIP[h.r]]} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
                               </div>
                               <button type="button" class="forma-flecha" data-forma-paso="1" aria-label={`Partidos más recientes de ${f.nombre}`}><i class="fa-solid fa-chevron-right"></i></button>
+                              <span class="forma-cont" data-forma-cont data-total={e.formas[f.nombre].length} title="Partidos que se ven, sobre el total jugado">{Math.min(5, e.formas[f.nombre].length)}/{e.formas[f.nombre].length}</span>
                             </div>
                           )}
                         </td>
@@ -120,16 +122,20 @@ const datos = LIGAS.map((l) => ({
                 </table>
               </div>
               {e.zonas && <p class="text-xs text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1"><span><span class="tmp-dot tmp-copa"></span>Zona de copa</span><span><span class="tmp-dot tmp-baja"></span>Zona de descenso</span><a href={`${base}temporada/`} class="text-galaxy-400 underline">Sistema de divisiones <span class="liga-sello liga-sello-prox !text-[.6rem] !py-0">Beta</span></a></p>}
-              <p class="text-xs text-gray-500 leading-relaxed">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · Últimos: usa las flechas, la rueda o arrastra con el ratón para ver partidos anteriores (pasa el cursor sobre cada cuadro para ver el marcador).</p>
+              <p class="text-xs text-gray-500 leading-relaxed">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · Últimos: flechas, rueda o arrastre para ver partidos anteriores. Toca un jugador para resaltar sus partidos en Resultados.</p>
             </section>
 
             <!-- RESULTADOS por fecha -->
             <section class="space-y-3 lg:sticky lg:top-20" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
-              <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
+              <div class="flex items-end justify-between gap-3">
+                <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
+                <span class="text-[11px] font-display font-bold tracking-wider uppercase text-gray-400"><b class="text-galaxy-400">{e.jugadas}</b> de {e.total} fechas</span>
+              </div>
+              <div class="liga-prog" role="progressbar" aria-label="Fechas jugadas" aria-valuemin="0" aria-valuemax={e.total} aria-valuenow={e.jugadas}><span style={`width:${e.total ? Math.round((e.jugadas / e.total) * 100) : 0}%`}></span></div>
               <div class="flex items-stretch gap-2" aria-label="Elegir fecha">
                 <button type="button" data-fecha-paso="-1" aria-label="Fecha anterior" class="adv-chip !min-h-10 !px-4"><i class="fa-solid fa-chevron-left"></i></button>
                 <select data-fecha-select aria-label="Fecha" class="field flex-1 !min-h-10 text-center font-display font-bold uppercase tracking-wider">
-                  {e.fechas.map((f) => <option value={f.n} selected={f.n === e.actual}>Fecha {f.n}{f.estado === 'jugada' ? '' : f.estado === 'en_juego' ? ' · en juego' : ' · pendiente'}</option>)}
+                  {e.fechas.map((f) => <option value={f.n} selected={f.n === e.actual}>Fecha {f.n} de {e.total}{f.estado === 'jugada' ? '' : f.estado === 'en_juego' ? ' · en juego' : ' · pendiente'}</option>)}
                 </select>
                 <button type="button" data-fecha-paso="1" aria-label="Fecha siguiente" class="adv-chip !min-h-10 !px-4"><i class="fa-solid fa-chevron-right"></i></button>
               </div>
@@ -137,7 +143,7 @@ const datos = LIGAS.map((l) => ({
                 <div data-fecha-panel={f.n} hidden={f.n !== e.actual} class="space-y-3">
                   <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                     {f.partidos.map((m) => (
-                      <li class="rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                      <li data-m-l={m.l} data-m-v={m.v} class="liga-partido rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                         <span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.l]}</span>}</span>
                         {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-xs text-gray-500 font-display uppercase">vs</span>}
                         <span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.v]}</span>}</span>
