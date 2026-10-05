@@ -1,0 +1,52 @@
+name: Respaldo semanal de la base de datos
+# Supabase gratuito NO hace copias de seguridad. Este flujo vuelca la base (esquema y datos de `public` y `auth`) cada domingo, la CIFRA con tu contraseña
+# y la guarda como «artefacto» privado de GitHub durante 90 días (las 12 últimas semanas ≈ 3 meses de historia).
+# · El repositorio es PÚBLICO: por eso el archivo sale CIFRADO (AES-256). Sin la contraseña no sirve de nada; no la pierdas.
+# · Necesita DOS secretos (Settings → Secrets and variables → Actions): SUPABASE_DB_URL y BACKUP_PASSPHRASE. Guía completa en RESPALDOS.md.
+# · GitHub solo ejecuta los flujos programados desde `main`. Para probarlo antes: pestaña Actions → «Respaldo semanal…» → Run workflow.
+on:
+  schedule:
+    - cron: '23 8 * * 0'      # domingo 08:23 UTC (03:23 Lima)
+  workflow_dispatch:
+permissions: {}
+jobs:
+  respaldo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Comprobar secretos
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLAVE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DB_URL" ] || [ -z "$CLAVE" ]; then echo "::error::Faltan los secretos SUPABASE_DB_URL y/o BACKUP_PASSPHRASE (ver RESPALDOS.md)."; exit 1; fi
+          if [ "${#CLAVE}" -lt 12 ]; then echo "::error::BACKUP_PASSPHRASE es demasiado corta (mínimo 12 caracteres)."; exit 1; fi
+      - name: Instalar cliente de PostgreSQL 17 (igual que tu base)
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+      - name: Volcar y cifrar
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLAVE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          fecha=$(date -u +%Y-%m-%d)
+          /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --no-owner --no-privileges --schema=public --schema=auth --format=custom --compress=9 --file=respaldo.dump
+          test -s respaldo.dump
+          /usr/lib/postgresql/17/bin/pg_restore --list respaldo.dump > /dev/null
+          printf '%s' "$CLAVE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "respaldo-$fecha.dump.gpg" respaldo.dump
+          rm -f respaldo.dump
+          ls -l respaldo-*.gpg
+          echo "FECHA=$fecha" >> "$GITHUB_ENV"
+      - name: Guardar el archivo cifrado
+        uses: actions/upload-artifact@v4
+        with:
+          name: respaldo-${{ env.FECHA }}
+          path: respaldo-*.dump.gpg
+          retention-days: 90
+          if-no-files-found: error
