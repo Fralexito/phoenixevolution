@@ -27,5 +27,26 @@ export const LIGAS = [
       { label: "Ver liga", href: "liga/" },
     ],
   },
+  {
+    // LIGA NUEVA (borrador): cuando tenga nombre y datos reales, edita este bloque. No aparece en Central (enCentral: false) hasta que la actives.
+    // Para volver SOLO a la Galaxy League: en la página Liga pulsa «Galaxy League» (o borra este bloque).
+    id: 'nueva',
+    estado: 'proxima',
+    enCentral: false,
+    titulo: ['NUEVA', 'LIGA'],
+    juego: 'Por definir',
+    icono: 'fa-star',
+    imagen: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1400&auto=format&fit=crop',
+    copafacil: '',
+    descripcion: 'La próxima competición de Phoenix Evolution Series. Los datos se publicarán aquí cuando estén definidos.',
+    datos: [
+      { k: 'Participantes', icono: 'fa-users', v: '' },
+      { k: 'Formato', icono: 'fa-diagram-project', v: '' },
+      { k: 'Inscripción', icono: 'fa-pen-to-square', v: '' },
+      { k: 'Calendario', icono: 'fa-calendar-days', v: '' },
+      { k: 'Reglamento', icono: 'fa-scale-balanced', v: '' },
+    ],
+    acciones: [],
+  },
 ];
 export const ETIQUETA_ESTADO = { activa: 'Competición activa', proxima: 'Próximamente' };

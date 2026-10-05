@@ -1089,3 +1089,10 @@ test('buscador: encuentra por nombre, por sinónimo y por varias palabras', () =
   assert.ok(buscarPaginas('a', ix, 3).length <= 3);
   assert.ok(ix.some((p) => p.id === 'moderacion' && p.staff));
 });
+
+import { historial } from '../src/js/core/ligaStats.js';
+test('historial: todos los partidos jugados de un jugador, de antiguo a reciente', () => {
+  const f = [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 2, gv: 1 }, { l: 'C', v: 'D', gl: 0, gv: 0 }] }, { n: 2, partidos: [{ l: 'B', v: 'A', gl: 3, gv: 3 }] }, { n: 3, partidos: [{ l: 'A', v: 'C', gl: null, gv: null }] }];
+  assert.deepEqual(historial(f, 'A').map((h) => [h.r, h.n, h.rival, h.gf, h.gc, h.local]), [['G', 1, 'B', 2, 1, true], ['E', 2, 'B', 3, 3, false]]);
+  assert.equal(historial(f, 'B')[0].r, 'P'); assert.deepEqual(historial(f, 'Z'), []); assert.deepEqual(historial(null, 'A'), []);
+});

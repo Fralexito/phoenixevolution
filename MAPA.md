@@ -337,7 +337,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - **ronda 142** — Navegación devuelta al menú anterior (cabecera + hamburguesa, sin las 5 secciones ni SubNav); se conserva la lupa/buscador global (ahora indexa NAV, NAV_EXTRA y Mi cuenta). Para reponer las 5 secciones: commit 394f2f9.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 142)
+- **ronda 143** — Liga: (1) selector de liga arriba (Galaxy League | Nueva liga; una a la vez, el enlace `#liga-…` recuerda; para volver basta pulsar Galaxy League) — la «Nueva liga» es un borrador en `data/ligas.js` (`enCentral:false`, no sale en Central); (2) tabla más compacta (filas bajas, club en la misma línea, GF/GC solo en pantallas muy anchas); (3) columna «Últimos» navegable: flechas, rueda o arrastre del ratón recorren todos los partidos anteriores (`historial()` en `core/ligaStats.js`, con test), tooltip con fecha/marcador/rival. Retroceso: revertir este commit.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 143)
 - **Reglas fijas:** trabajar solo en `borrador`; pasar a `main` solo cuando el usuario diga «Súbelo/Publícalo». Cada cambio: bullet «ronda N» en este archivo (siguiente = **121**), commit con los dos trailers (`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` y `Claude-Session: ...`) y push a `borrador`. Supabase `fiibiyijojkxqlsrhcil`: no usar `apply_migration` ni DDL grande por `execute_sql` (se cancelan); entregar el `.sql` con SendUserFile para que el usuario lo pegue en el SQL Editor, y verificar después con consultas de solo lectura. Idioma: español.
 - **Modo ligero (pedido del usuario el 05/10):** cambios pequeños = cambio + test pertinente + commit, sin Playwright ni capturas salvo que el cambio sea grande o el usuario lo pida; respuestas cortas (qué cambió y qué hacer); no listar carpetas grandes; no repetir el resumen de pasos.
 - **Estado de la BD:** migraciones 001–042 aplicadas y verificadas (039 disputas, 040 encuestas, 041 feed, 042 eventos con el trabajo `recordar-eventos`). No hay migraciones pendientes.

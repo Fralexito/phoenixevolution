@@ -543,3 +543,16 @@ a.slide-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgb(0 
 .bg-fila { display: flex; align-items: center; gap: .75rem; padding: .55rem .65rem; border-radius: .8rem; border: 1px solid transparent; } .bg-fila b { font: 700 .95rem var(--font-display); letter-spacing: .03em; }
 .bg-fila:hover, .bg-fila[data-sel] { background: rgb(0 229 255 / .09); border-color: rgb(0 229 255 / .35); }
 @media (prefers-reduced-motion: reduce) { .lanza, .lanza-ico { transition: none; } .lanza-bad { animation: none; } }
+
+/* ---- Liga: tabla compacta, racha navegable y selector de liga ---- */
+.liga-tabla th { padding: .25rem .35rem; font-size: .6rem; }
+.liga-tabla td { padding: .28rem .35rem; font-size: .8rem; line-height: 1.15; }
+@media (min-width: 1024px) { .liga-tabla td { padding-top: .24rem; padding-bottom: .24rem; } }
+.forma { display: inline-flex; align-items: center; gap: .15rem; }
+.forma-strip { display: flex; gap: 3px; width: calc(5 * 1.15rem + 4 * 3px); overflow-x: hidden; cursor: grab; scroll-snap-type: x proximity; user-select: none; outline: none; }
+.forma-strip:active { cursor: grabbing; } .forma-strip:focus-visible { box-shadow: 0 0 0 2px var(--color-galaxy-400); border-radius: .3rem; }
+.forma-strip .liga-forma { flex: 0 0 auto; scroll-snap-align: end; transition: transform .15s; } .forma-strip .liga-forma:hover { transform: translateY(-2px) scale(1.12); }
+.forma-flecha { width: 1rem; height: 1.15rem; display: grid; place-items: center; font-size: .55rem; color: var(--color-galaxy-400); border-radius: .25rem; transition: background .15s, color .15s, opacity .15s; }
+.forma-flecha:hover:not([disabled]) { background: rgb(0 229 255 / .15); color: #fff; } .forma-flecha[disabled] { opacity: .2; cursor: default; }
+.forma-sin-mas .forma-flecha { visibility: hidden; }
+.liga-multi [data-liga-sec]:not(.liga-activa) { display: none; }

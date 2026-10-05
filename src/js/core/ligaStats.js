@@ -46,3 +46,14 @@ export function ranking(tabla, campo, asc = false) {
   return [...(tabla ?? [])].map((f) => ({ nombre: f.nombre, valor: f[campo] }))
     .sort((a, b) => (asc ? a.valor - b.valor : b.valor - a.valor) || a.nombre.localeCompare(b.nombre, 'es'));
 }
+
+/** Todos los partidos jugados de un jugador, de más antiguo a más reciente: { r: 'G'|'E'|'P', n: fecha, rival, gf, gc, local }. Sirve para «recorrer» la racha hacia atrás. */
+export function historial(fechas, nombre) {
+  const h = [];
+  for (const f of fechas ?? []) for (const m of f.partidos ?? []) {
+    if (!jugado(m) || (m.l !== nombre && m.v !== nombre)) continue;
+    const local = m.l === nombre, gf = local ? m.gl : m.gv, gc = local ? m.gv : m.gl;
+    h.push({ r: gf > gc ? 'G' : gf < gc ? 'P' : 'E', n: f.n, rival: local ? m.v : m.l, gf, gc, local });
+  }
+  return h;
+}

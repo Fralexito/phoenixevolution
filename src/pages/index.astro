@@ -39,11 +39,11 @@ const base = import.meta.env.BASE_URL;
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full space-y-8 sm:space-y-10">
 
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
-    {LIGAS.length > 1 && (
+    {LIGAS.filter((l) => l.enCentral !== false).length > 1 && (
       <section aria-label="Competiciones" class="space-y-3">
         <h2 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Competiciones</h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {LIGAS.map((l) => (
+          {LIGAS.filter((l) => l.enCentral !== false).map((l) => (
             <a href={`${base}liga/#liga-${l.id}`} class="liga-card group min-h-[170px] block">
               <div class="absolute inset-0 bg-gradient-to-r from-black via-galaxy-900/80 to-transparent z-10"></div>
               <img src={l.imagen} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
