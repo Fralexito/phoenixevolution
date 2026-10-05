@@ -33,6 +33,7 @@ function render({ session, profile }) {
         </button>
         <div id="user-menu" hidden class="absolute right-0 mt-3 w-52 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] py-1 font-display text-sm uppercase tracking-wider">
           <a href="${escapeHTML(href('mis-partidos/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gamepad mr-2"></i>Mis partidos</a>
+          <a href="${escapeHTML(href('amigos/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-user-group mr-2"></i>Amigos</a>
           <button type="button" data-act="profile" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-user mr-2"></i>Mi perfil</button>
           <a href="${escapeHTML(href('ajustes/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gear mr-2"></i>Configuración</a>
           <button type="button" data-act="logout" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-bad"><i class="fa-solid fa-right-from-bracket mr-2"></i>Salir</button>

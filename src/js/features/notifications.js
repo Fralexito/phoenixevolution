@@ -13,7 +13,9 @@ const ICON = {
   SALA_LISTA: 'fa-door-open', CONFIRMAR_PARTIDO: 'fa-clock', AVISO_FINAL: 'fa-triangle-exclamation',
   PARTIDO_CONFIRMADO: 'fa-circle-check', PARTIDO_CANCELADO: 'fa-circle-xmark', RETO_EXPIRADO: 'fa-hourglass-end',
   INVITACION_RETO: 'fa-user-plus', UNION_RETO: 'fa-users', SALIO_RETO: 'fa-user-minus',
+  AMISTAD_SOLICITUD: 'fa-user-plus', AMISTAD_ACEPTADA: 'fa-user-group', SEGUIDOR_NUEVO: 'fa-heart',
 };
+const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/' };   // el resto de avisos son de retos → Duelos
 const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const LIMIT = 30;
 
@@ -35,7 +37,7 @@ export function initNotifications(userId) {
         ${u ? '<button type="button" data-n="all" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase">Marcar leídas</button>' : ''}
       </div>
       <div class="max-h-[60vh] overflow-y-auto">${items.length ? items.map((n) => `
-        <a href="${escapeHTML(href('duelos/'))}" data-n="${n.id}" class="notif-item ${n.leida ? '' : 'is-new'}">
+        <a href="${escapeHTML(href(DESTINO[n.tipo] ?? 'duelos/'))}" data-n="${n.id}" class="notif-item ${n.leida ? '' : 'is-new'}">
           <i class="fa-solid ${ICON[n.tipo] ?? 'fa-bell'} text-galaxy-400 mt-0.5 w-4 text-center"></i>
           <span class="min-w-0 flex-1"><b class="block text-white text-xs font-display uppercase tracking-wide">${escapeHTML(n.titulo)}</b>
             <span class="block text-xs text-gray-300">${escapeHTML(n.mensaje)}</span>

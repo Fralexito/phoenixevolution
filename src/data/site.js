@@ -17,6 +17,7 @@ export const NAV_EXTRA = [{ id: 'organizadores', label: 'Quiénes somos', path: 
 export const ACCOUNT_NAV = [
   { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user' },
   { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad' },
+  { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group' },
   // `abajo: true` = va en el bloque inferior del menú, pegado al fondo del panel.
   { id: 'ajustes',  label: 'Configuración', path: 'ajustes/',            icon: 'fa-gear',  abajo: true },
   { id: 'salir',    label: 'Salir',        action: 'logout',               icon: 'fa-right-from-bracket', abajo: true },

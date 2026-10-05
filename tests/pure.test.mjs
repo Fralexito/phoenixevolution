@@ -709,3 +709,26 @@ test('rivalesDeDuelos: cuenta partidos terminados contra cada rival (1v1 y equip
   assert.equal(r[0].ultimo, '2026-03-01T00:00:00Z');
   assert.deepEqual(rivalesDeDuelos([], () => [], 'yo'), []);
 });
+
+import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_DEFECTO } from '../src/js/core/red.js';
+test('red: normalizarRed completa datos faltantes y descarta valores inválidos', () => {
+  assert.deepEqual(normalizarRed(null).amigos, []);
+  assert.deepEqual(normalizarRed(undefined).privacidad, PRIVACIDAD_DEFECTO);
+  const r = normalizarRed({ amigos: ['a', 3, null, 'b'], privacidad: { quien_escribe: 'hackeado', ver_amigos: 'todos', mostrar_conexion: false } });
+  assert.deepEqual(r.amigos, ['a', 'b']);
+  assert.equal(r.privacidad.quien_escribe, 'amigos');   // valor inválido → defecto
+  assert.equal(r.privacidad.ver_amigos, 'todos'); assert.equal(r.privacidad.mostrar_conexion, false);
+});
+test('red: relacion prioriza yo > bloqueado > amigos > enviada > recibida', () => {
+  const red = normalizarRed({ amigos: ['a'], enviadas: ['b'], recibidas: ['c'], bloqueados: ['d', 'a'] });
+  assert.equal(relacion(red, 'u1', 'u1'), 'yo'); assert.equal(relacion(red, 'a', 'u1'), 'bloqueado');
+  assert.equal(relacion(red, 'b', 'u1'), 'enviada'); assert.equal(relacion(red, 'c', 'u1'), 'recibida'); assert.equal(relacion(red, 'z', 'u1'), 'ninguna');
+  assert.equal(relacion(normalizarRed({ amigos: ['q'] }), 'q', 'u1'), 'amigos');
+});
+test('red: buscarPerfiles ignora tildes, excluye a yo y bloqueados, y exige 2 letras', () => {
+  const ps = [{ id: '1', nombre_display: 'Titán' }, { id: '2', nombre_display: 'Matías', username: 'titanio' }, { id: '3', nombre_display: 'Neo' }, { id: 'yo', nombre_display: 'Tito' }];
+  const red = normalizarRed({ bloqueados: ['3'] });
+  assert.deepEqual(buscarPerfiles(ps, 'tit', red, 'yo').map((p) => p.id), ['1', '2']);   // empieza-con primero; «Tito» (yo) fuera
+  assert.deepEqual(buscarPerfiles(ps, 't', red, 'yo'), []); assert.deepEqual(buscarPerfiles(ps, 'neo', red, 'yo'), []);
+});
+test('red: contadores', () => { assert.deepEqual(contadores(normalizarRed({ amigos: ['a'], recibidas: ['b', 'c'] })), { amigos: 1, solicitudes: 2, seguidores: 0, siguiendo: 0, bloqueados: 0 }); });
