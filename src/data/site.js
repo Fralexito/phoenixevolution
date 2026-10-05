@@ -12,6 +12,7 @@ export const NAV = [
 // Enlaces secundarios (no saturan la cabecera de PC): aparecen en el menú de celular y en el pie de página.
 export const NAV_EXTRA = [
   { id: 'comunidad', label: 'Comunidad', path: 'comunidad/', icon: 'fa-people-group' },
+  { id: 'eventos', label: 'Eventos', path: 'eventos/', icon: 'fa-calendar-day' },
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
 ];
 

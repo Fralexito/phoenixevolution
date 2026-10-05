@@ -34,6 +34,7 @@ export const PERMISOS = Object.freeze({
   verReportes:          ['ayudante', 'moderador', 'admin'],
   resolverReportes:     ['moderador', 'admin'],
   arbitrar:             ['arbitro', 'admin'],     // resolver disputas del Tribunal
+  gestionarEventos:     ['moderador', 'admin'],   // crear, editar y cancelar eventos de la comunidad (migración 042)
 });
 
 export const puede = (rol, permiso) => (PERMISOS[permiso] ?? []).includes(normalizarRol(rol));

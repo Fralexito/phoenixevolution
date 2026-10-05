@@ -42,9 +42,9 @@ test('menciones: nada del usuario se convierte en HTML (XSS)', async () => {
 
 test('avisos: categorías y normalización (lo desconocido cuenta como activado)', async () => {
   const { CATEGORIAS_AVISO, normalizarPreferencias, esCategoriaAviso } = await import('../src/js/core/avisos.js');
-  assert.deepEqual(CATEGORIAS_AVISO.map((c) => c.id), ['duelos', 'social', 'muro', 'menciones', 'logros']);
-  assert.deepEqual(normalizarPreferencias(null), { duelos: true, social: true, muro: true, menciones: true, logros: true });
-  assert.deepEqual(normalizarPreferencias({ muro: false, basura: false, social: 'no' }), { duelos: true, social: true, muro: false, menciones: true, logros: true });
+  assert.deepEqual(CATEGORIAS_AVISO.map((c) => c.id), ['duelos', 'social', 'muro', 'menciones', 'logros', 'eventos']);
+  assert.deepEqual(normalizarPreferencias(null), { duelos: true, social: true, muro: true, menciones: true, logros: true, eventos: true });
+  assert.deepEqual(normalizarPreferencias({ muro: false, basura: false, social: 'no' }), { duelos: true, social: true, muro: false, menciones: true, logros: true, eventos: true });
   assert.equal(esCategoriaAviso('menciones'), true);
   assert.equal(esCategoriaAviso('moderacion'), false);                                      // el sistema no se puede apagar
   assert.equal(esCategoriaAviso('sistema'), false);
