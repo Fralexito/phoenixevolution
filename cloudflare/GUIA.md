@@ -26,7 +26,7 @@ Navegador ──(4) publica el enlace (URL)──▶ Supabase (RPC muro_publicar
 |---|---|
 | `SUPABASE_URL` | `https://fiibiyijojkxqlsrhcil.supabase.co` |
 | `SUPABASE_KEY` | `sb_publishable_siVYbqB8ehtJAkk_tjy2OQ_CuXWX24u` (clave pública, la misma de la web) |
-| `PUBLIC_BASE` | la dirección del paso 4 (DATO 1), sin «/» al final |
+| `PUBLIC_BASE` | la dirección del paso 4 (DATO 1), sin «/» al final: `https://pub-4b6fbf5944a44d8391ccadff7dc09968.r2.dev` |
 | `ALLOWED_ORIGINS` | `https://fralexito.github.io` |
 | `MAX_MB` | `10` |
 | `MAX_VIDEOS` | `3` |
