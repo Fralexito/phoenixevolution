@@ -9,7 +9,7 @@ export const LIGAS = [
     id: 'galaxy',
     estado: 'activa',
     titulo: ['GALAXY', 'LEAGUE'],
-    juego: 'Pro Evolution Soccer (Conmebol Patch)',
+    juego: 'Pro Evolution Soccer (Conmegol Patch)',
     icono: 'fa-crown',
     imagen: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=1400&auto=format&fit=crop',
     copafacil: 'https://copafacil.com/-2vbqe',

@@ -349,11 +349,13 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - **ronda 148** — Noticias: CATÁLOGO DE PLANTILLAS. 22 tarjetas + 4 destacadas + 6 diseños de lector (`core/noticiasPlantillas.js` catálogo y motor, `features/noticias/tarjetas.js` dibujo, `features/noticias/catalogo.js` galería con vista previa, CSS `.nt-*`/`.nl-*`). Cada noticia guarda `plantilla` + `estilo` (acento, forma, brillo, animación, letra, lectura) — migración 052 YA aplicada en la base. Modo «auto»: elige y rota diseños para que no se repitan (no repite plantilla en 3 seguidas ni mismo color+forma en dos). Admin: botón «Catálogo de diseños» en Noticias, «Rediseñar» en el lector y «Elegir diseño» en el editor; «Sorprenderme» genera un estilo al azar. Para sumar una plantilla: entrada en TARJETAS + dibujo en tarjetas.js (el test avisa si falta). Si una imagen falla se muestra degradado.
 
-- **ronda 149** — Texto de juego en Liga: Galaxy League = «Pro Evolution Soccer (Conmebol Patch)»; Liga Sudario = «SP Football Life 26» (`juego` en `data/ligas.js`).
+- **ronda 149** — Texto de juego en Liga: Galaxy League = «Pro Evolution Soccer (Conmegol Patch)»; Liga Sudario = «SP Football Life 26» (`juego` en `data/ligas.js`).
 
 - **ronda 150** — Jugadores: con una carta ampliada, un clic sobre ella abre la biografía del jugador (`jugador/?id=`); clic en el fondo, Esc o clic en otra carta siguen cerrándola. Opción `alClicCarta` en `features/replicaCarta.js` (solo Jugadores la usa; el podio de Central no cambia).
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 150)
+- **ronda 151** — Texto del parche corregido: se llama «Conmegol» (no «Conmebol»). No volver a «corregirlo».
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 151)
 - **Reglas fijas:** trabajar solo en `borrador`; pasar a `main` solo cuando el usuario diga «Súbelo/Publícalo». Cada cambio: bullet «ronda N» en este archivo (siguiente = **121**), commit con los dos trailers (`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` y `Claude-Session: ...`) y push a `borrador`. Supabase `fiibiyijojkxqlsrhcil`: no usar `apply_migration` ni DDL grande por `execute_sql` (se cancelan); entregar el `.sql` con SendUserFile para que el usuario lo pegue en el SQL Editor, y verificar después con consultas de solo lectura. Idioma: español.
 - **Modo ligero (pedido del usuario el 05/10):** cambios pequeños = cambio + test pertinente + commit, sin Playwright ni capturas salvo que el cambio sea grande o el usuario lo pida; respuestas cortas (qué cambió y qué hacer); no listar carpetas grandes; no repetir el resumen de pasos.
 - **Estado de la BD:** migraciones 001–042 aplicadas y verificadas (039 disputas, 040 encuestas, 041 feed, 042 eventos con el trabajo `recordar-eventos`). No hay migraciones pendientes.
