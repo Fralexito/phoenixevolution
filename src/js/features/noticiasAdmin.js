@@ -10,6 +10,9 @@ import { redimensionarJpeg } from '../core/image.js';
 import { CATEGORIAS, slugify, slugUnico, validar } from '../core/noticias.js';
 import { generarCronica } from '../core/cronica.js';
 import { resumenFecha } from '../core/ligaStats.js';
+import { abrirCatalogo } from './noticias/catalogo.js';
+import { plantillaDe } from '../core/noticiasPlantillas.js';
+import { fechaRelativa } from '../core/noticias.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 
@@ -31,6 +34,16 @@ export async function avisarDiscord(slug) {
     const msg = String(e?.context?.status === 503 || /webhook/i.test(e?.message ?? '') ? 'Falta configurar el webhook de Discord en Supabase (secreto DISCORD_WEBHOOK_URL).' : 'No se pudo avisar a Discord. La noticia sí quedó publicada.');
     toast(msg, 'warn', { ms: 8000 }); return false;
   }
+}
+
+/** Guarda el diseño (plantilla + estilo) de una noticia. Devuelve true/false; nunca lanza. */
+export async function guardarDiseno(n, plantilla, estilo) {
+  try {
+    const { data, error } = await supabase.from('noticias').update({ plantilla, estilo }).eq('id', n.id).select('id');
+    if (error) throw error;
+    if (!data?.length) throw new Error('Sin permiso o la noticia ya no existe.');
+    toast('Diseño aplicado.', 'ok'); return true;
+  } catch (e) { console.error('[noticias] diseño:', e); toast('No se pudo guardar el diseño.', 'error'); return false; }
 }
 
 export async function borrarNoticia(n) {
@@ -79,6 +92,10 @@ export function abrirEditor({ noticia = null, slugsUsados = [], onGuardada = () 
         <div class="flex-1 min-w-0 space-y-1.5"><input id="ne-img" class="field" placeholder="Enlace https:// de la imagen" value="${escapeHTML(n.imagen)}"><label class="btn btn-ghost !w-full cursor-pointer"><i class="fa-solid fa-upload"></i> Subir una imagen<input id="ne-file" type="file" accept="image/*" hidden></label></div>
       </div>
     </div>
+    <div class="flex flex-wrap items-center gap-2 rounded-xl border border-galaxy-border/60 bg-black/25 p-3">
+      <span class="label !mb-0"><i class="fa-solid fa-palette text-galaxy-400 mr-1"></i>Diseño</span><span id="ne-diseno-txt" class="text-xs text-gray-300"></span>
+      <button type="button" id="ne-diseno" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] ml-auto">Elegir diseño</button>
+    </div>
     <div class="grid sm:grid-cols-3 gap-2 text-sm text-gray-200">
       <label class="flex items-center gap-2"><input id="ne-dest" type="checkbox" ${n.destacada ? 'checked' : ''}> Destacada</label>
       <label class="flex items-center gap-2"><input id="ne-pub" type="checkbox" ${n.publicada ? 'checked' : ''}> Publicada</label>
@@ -89,6 +106,14 @@ export function abrirEditor({ noticia = null, slugsUsados = [], onGuardada = () 
     <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="submit" id="ne-guardar" class="btn btn-primary">${editando ? 'Guardar cambios' : 'Guardar noticia'}</button></div>
   </form>`, { id: ID, persistent: true, wide: true });
   const $ = (id) => wrap.querySelector(`#${id}`);
+  // --- Diseño: plantilla + estilo (se guardan con la noticia) ---
+  let diseno = { plantilla: n.plantilla ?? 'auto', estilo: n.estilo ?? {} };
+  const pintarDiseno = () => { $('ne-diseno-txt').textContent = diseno.plantilla === 'auto' ? 'Automático (el sitio lo rota)' : (plantillaDe(diseno.plantilla)?.nombre ?? diseno.plantilla); };
+  pintarDiseno();
+  $('ne-diseno').addEventListener('click', () => {
+    const vista = { ...n, slug: 'vista', id: 'vista', titulo: $('ne-titulo').value.trim() || 'Título de la noticia', resumen: $('ne-resumen').value.trim() || 'Resumen de la noticia.', cuerpo: $('ne-cuerpo').value.trim().split(/\n\s*\n/).filter(Boolean), categoria: $('ne-cat').value, tag: $('ne-tag').value.trim(), imagen: $('ne-img').value.trim(), liga: $('ne-liga').value, publicadaEn: new Date().toISOString() };
+    abrirCatalogo({ noticias: [vista], noticiaId: 'vista', inicial: diseno, boton: 'Usar este diseño', ctx: { cuando: (x) => fechaRelativa(x.publicadaEn), ligaNombre: (id) => ligaDe(id)?.titulo.join(' ') ?? id, borrador: () => '' }, onAplicar: ({ plantilla, estilo }) => { diseno = { plantilla, estilo }; pintarDiseno(); } });
+  });
 
   // --- Crónica automática: depende de la liga elegida (usa su edición más reciente) ---
   const pintarFechas = () => {
@@ -135,7 +160,7 @@ export function abrirEditor({ noticia = null, slugsUsados = [], onGuardada = () 
         imagen = supabase.storage.from('noticias').getPublicUrl(path).data.publicUrl;
       }
       const publicada = $('ne-pub').checked;
-      const fila = { slug, titulo: b.titulo, resumen: b.resumen, cuerpo: b.cuerpo, categoria: b.categoria, tag: b.tag, imagen, liga: b.liga, destacada: $('ne-dest').checked, publicada };
+      const fila = { slug, titulo: b.titulo, resumen: b.resumen, cuerpo: b.cuerpo, categoria: b.categoria, tag: b.tag, imagen, liga: b.liga, destacada: $('ne-dest').checked, publicada, plantilla: diseno.plantilla, estilo: diseno.estilo };
       if (!editando) fila.autor_id = getState().session?.user?.id ?? null;
       if (editando && !n.publicada && publicada) fila.publicada_en = new Date().toISOString();   // un borrador cuenta como «nuevo» el día que se publica
       const q = editando ? supabase.from('noticias').update(fila).eq('id', n.id) : supabase.from('noticias').insert(fila);

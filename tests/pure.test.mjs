@@ -1115,3 +1115,34 @@ test('escudos: reconoce el club escrito de varias formas y nunca rompe', () => {
   assert.equal(escudoDe('Agente Libre'), null); assert.equal(escudoDe(null), null);
   assert.match(escudoHTML('Agente Libre'), /fa-shield-halved/); assert.match(escudoHTML('Arsenal'), /<img /);
 });
+
+import { TARJETAS, LECTURAS, NORMALES, HEROES, asignarDiseno, limpiarEstilo, estiloAleatorio, esPlantilla, OPCIONES } from '../src/js/core/noticiasPlantillas.js';
+import { tarjetaHTML, lecturaHTML, PLANTILLAS_DIBUJADAS, LECTURAS_DIBUJADAS } from '../src/js/features/noticias/tarjetas.js';
+test('noticias: cada plantilla del catálogo tiene dibujo, y cada lector también', () => {
+  for (const t of TARJETAS) assert.ok(PLANTILLAS_DIBUJADAS.includes(t.id), `falta dibujo de ${t.id}`);
+  for (const l of LECTURAS) assert.ok(LECTURAS_DIBUJADAS.includes(l.id), `falta lector ${l.id}`);
+  assert.equal(new Set(TARJETAS.map((t) => t.id)).size, TARJETAS.length); assert.ok(NORMALES.length >= 20 && HEROES.length >= 3);
+});
+test('noticias: dibujar escapa el texto, funciona sin imagen y trae el enlace', () => {
+  const n = { slug: 'x-1', titulo: '<img src=x onerror=1>', resumen: '"><script>alert(1)</script>', cuerpo: ['<b>a</b>'], categoria: 'OFICIAL', tag: '', imagen: 'javascript:alert(1)', liga: 'galaxy', publicadaEn: '2026-10-04T10:00:00Z', publicada: true };
+  const ctx = { cuando: () => 'Hoy', ligaNombre: (i) => i, borrador: () => '' };
+  const e = { acento: 'rojo', forma: 'corte', brillo: 'neon', anim: 'zoom', fuente: 'serif', lectura: 'revista' };
+  for (const t of TARJETAS) { const h = tarjetaHTML(n, t.id, e, ctx); assert.ok(h.includes('data-slug="x-1"'), t.id); assert.ok(!/<script|<img src=x|javascript:/i.test(h), `XSS en ${t.id}`); }
+  for (const l of LECTURAS) { const h = lecturaHTML(n, { ...e, lectura: l.id }, ctx, ''); assert.ok(!/<script|<img src=x|javascript:|<b>a/i.test(h), `XSS en lector ${l.id}`); }
+  assert.ok(tarjetaHTML(n, 'no-existe', e, ctx).includes('nt-clasica'));
+});
+test('noticias: el modo automático es estable y no repite diseño seguido', () => {
+  const lista = Array.from({ length: 24 }, (_, i) => ({ slug: `noticia-${i}`, categoria: ['OFICIAL', 'JORNADA', 'TRIBUNAL'][i % 3], imagen: i % 4 ? 'https://x/y.jpg' : '' }));
+  const a = asignarDiseno(lista, { heroIdx: 0 }), b = asignarDiseno(lista, { heroIdx: 0 });
+  assert.deepEqual(a, b); assert.ok(HEROES.some((h) => h.id === a[0].plantilla));
+  for (let i = 2; i < a.length; i++) { assert.notEqual(a[i].plantilla, a[i - 1].plantilla); assert.notEqual(a[i].plantilla, a[i - 2].plantilla); }
+  assert.ok(new Set(a.map((x) => x.plantilla)).size >= 8, 'poca variedad');
+  for (let i = 1; i < a.length; i++) assert.ok(!(a[i].estilo.acento === a[i - 1].estilo.acento && a[i].estilo.forma === a[i - 1].estilo.forma));
+  const fijo = asignarDiseno([{ slug: 'f', categoria: 'OFICIAL', plantilla: 'cita', estilo: { acento: 'oro', basura: 1 } }])[0]; assert.equal(fijo.plantilla, 'cita'); assert.equal(fijo.estilo.acento, 'oro');
+});
+test('noticias: el estilo se limpia y el aleatorio es válido y estable', () => {
+  assert.deepEqual(limpiarEstilo({ acento: 'rojo', forma: 'xx', hack: 1 }), { acento: 'rojo' }); assert.deepEqual(limpiarEstilo(null), {}); assert.deepEqual(limpiarEstilo([1]), {});
+  const s = estiloAleatorio(7, 'TRIBUNAL'); assert.deepEqual(s, estiloAleatorio(7, 'TRIBUNAL'));
+  for (const k of Object.keys(OPCIONES)) assert.ok(OPCIONES[k].includes(s[k]), k);
+  assert.ok(esPlantilla('auto') && esPlantilla('neon') && !esPlantilla('nada'));
+});

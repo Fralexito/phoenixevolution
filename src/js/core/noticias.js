@@ -1,4 +1,5 @@
 // Lógica pura de Noticias (sin DOM ni red → probable con `npm test`).
+import { esPlantilla, limpiarEstilo } from './noticiasPlantillas.js';
 // Forma en pantalla de una noticia: { id, slug, titulo, resumen, cuerpo: string[], categoria, tag, imagen, liga, destacada, publicada, publicadaEn (ISO), editable }.
 
 export const CATEGORIAS = ['OFICIAL', 'JORNADA', 'TRIBUNAL'];
@@ -32,7 +33,7 @@ export function fechaRelativa(iso, ahora = new Date()) {
 export function normalizar(f) {
   return {
     id: f.id, slug: f.slug, titulo: f.titulo, resumen: f.resumen, cuerpo: partirCuerpo(f.cuerpo), categoria: f.categoria, tag: f.tag ?? '',
-    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, discordEn: f.discord_en ?? f.discordEn ?? null,
+    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, fecha: f.fecha ?? '', plantilla: esPlantilla(f.plantilla) ? f.plantilla : 'auto', estilo: limpiarEstilo(f.estilo), discordEn: f.discord_en ?? f.discordEn ?? null,
   };
 }
 /** Valida un borrador del editor con los mismos límites que la base. Devuelve { ok, errores: string[] }. */
@@ -43,6 +44,7 @@ export function validar(b) {
   if (!CATEGORIAS.includes(b.categoria)) e.push('Categoría no válida.');
   if (b.imagen && !/^https:\/\//i.test(String(b.imagen).trim())) e.push('La imagen debe ser un enlace https://.');
   if (!/^[a-z0-9-]{1,40}$/.test(String(b.liga ?? ''))) e.push('Liga no válida.');
+  if (b.plantilla !== undefined && !esPlantilla(b.plantilla)) e.push('Diseño no válido.');
   return { ok: e.length === 0, errores: e };
 }
 /** Más recientes primero. No modifica la lista original. */
