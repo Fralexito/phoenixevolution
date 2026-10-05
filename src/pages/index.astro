@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { FX } from '../data/experimento.js';
 import { DEMO_CLIPS } from '../data/demo.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 const base = import.meta.env.BASE_URL;
@@ -59,6 +60,7 @@ const base = import.meta.env.BASE_URL;
     )}
 
     <!-- 3. CENTRAL DE PARTIDOS (con el partido destacado dentro) + clasificación y XI al costado -->
+    {FX.visita && <div id="novedad" hidden class="novedad" role="status"></div>}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
       <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
         <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
@@ -92,6 +94,10 @@ const base = import.meta.env.BASE_URL;
             </table>
           </div>
         </section>
+        {FX.rachas && <section id="rachas" hidden class="glass-panel rounded-xl overflow-hidden">
+          <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center"><h3 class="font-display font-bold text-lg uppercase tracking-wider text-white">En racha</h3><i class="fa-solid fa-fire-flame-curved text-amber-400"></i></div>
+          <div id="rachas-lista" class="px-4 py-2 text-sm"></div>
+        </section>}
       </aside>
     </div>
 

@@ -1172,3 +1172,19 @@ test('central: tabla por fecha, movimientos y destacado', async () => {
   assert.equal(c.destacadoFinal(fechas[1], [], { local: 'b', visitante: 'c', nota: 'x' }).manual, true);
   assert.equal(c.destacadoFinal(fechas[1], [], { local: 'Z', visitante: 'Y' }).manual, false);   // cruce inexistente → automático
 });
+
+test('central: rachas y novedades', async () => {
+  const c = await import('../src/js/core/central.js');
+  const fechas = [
+    { n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }, { l: 'C', v: 'D', gl: 0, gv: 0 }] },
+    { n: 2, partidos: [{ l: 'A', v: 'C', gl: 2, gv: 1 }, { l: 'B', v: 'D', gl: 0, gv: 3 }] },
+    { n: 3, partidos: [{ l: 'A', v: 'D', gl: 1, gv: 0 }, { l: 'B', v: 'C', gl: null, gv: null }] },
+  ];
+  const r = c.rachas(fechas, ['A', 'B', 'C', 'D']);
+  assert.deepEqual(r.victorias, [{ nombre: 'A', n: 3 }]);
+  assert.deepEqual(r.invicto, []);                                   // D: E,G,P → no
+  assert.deepEqual(r.derrotas, [{ nombre: 'B', n: 2 }]);            // B perdió sus dos partidos
+  const r2 = c.rachas([{ n: 1, partidos: [{ l: 'X', v: 'Y', gl: 0, gv: 1 }, { l: 'Z', v: 'W', gl: 1, gv: 1 }] }, { n: 2, partidos: [{ l: 'X', v: 'W', gl: 0, gv: 2 }, { l: 'Z', v: 'Y', gl: 2, gv: 2 }] }], ['X', 'Y', 'Z', 'W']);
+  assert.deepEqual(r2.derrotas, [{ nombre: 'X', n: 2 }]); assert.deepEqual(r2.invicto.map((x) => x.nombre), ['W', 'Y', 'Z']);
+  assert.equal(c.resultadosNuevos(9, 7), 2); assert.equal(c.resultadosNuevos(7, 7), null); assert.equal(c.resultadosNuevos(7, undefined), null);
+});

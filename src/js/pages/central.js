@@ -15,7 +15,7 @@ import { onSession, can } from '../core/session.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { toast } from '../core/toast.js';
 import { borrarFilas } from '../features/escritura.js';
-import { cifra, ordenPodio, jornadasCentral, visualClub, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/central.js';
+import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/central.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -94,7 +94,10 @@ function pintarPosiciones() {
 function pintarDestacado() {
   const box = $('destacado'); const n = nFechaDestacado(); const f = n == null ? null : fechaObj(n);
   const previa = f ? tablaTrasFecha(fechas, n - 1, calcularTabla, jugadoresEd) : [];
-  const d = f ? destacadoFinal(f, previa, manuales.get(n)) : null;
+  let d = f ? destacadoFinal(f, previa, manuales.get(n)) : null;
+  if (pestana === 'proximos' && d && !d.manual && jug(d.partido)) {   // en «Próximos» el automático debe ser un partido POR JUGAR si queda alguno en esa fecha
+    const pend = f.partidos.filter((x) => !jug(x)); if (pend.length) d = destacadoFinal({ ...f, partidos: pend }, previa, null);
+  }
   const puedeEditar = can('editarLiga') && !!f;
   const editar = puedeEditar ? `<button type="button" data-edit-destacado class="absolute top-2 left-2 z-20 px-2.5 py-1 rounded-lg border border-galaxy-400/40 bg-black/50 text-[10px] font-display font-bold uppercase tracking-wider text-galaxy-400 hover:text-white hover:border-galaxy-400"><i class="fa-solid fa-pen mr-1"></i>Editar</button>` : '';
   if (!d) { box.innerHTML = `${editar}<div class="p-6 text-center text-gray-500 text-xs">Aún no hay un partido destacado.</div>`; return; }
@@ -182,7 +185,26 @@ async function renderFeatured() {
   }
 }
 
+// ---- «En racha» + «novedades desde tu última visita» (interruptores FX.rachas / FX.visita en data/experimento.js; si el bloque no está, no se hace nada) ----
+function pintarRachas() {
+  const box = $('rachas'); if (!box || !fechas.length) return;
+  const r = rachas(fechas, [...new Set([...jugadoresEd, ...tabla.map((t) => t.nombre)])]);
+  const fila = (x, tono, icono, txt) => `<div class="racha-fila"><span class="racha-n ${tono}">${x.n}</span><span class="shrink-0 grid place-items-center w-6">${escudoHTML(clubDe(x.nombre), 20)}</span><span class="min-w-0 flex-1"><span class="block truncate text-white font-semibold">${escapeHTML(x.nombre)}</span><span class="block text-[10px] text-gray-500 uppercase tracking-wider"><i class="fa-solid ${icono} mr-1"></i>${txt}</span></span></div>`;
+  const filas = [...r.victorias.slice(0, 3).map((x) => fila(x, 'text-emerald-400', 'fa-trophy', 'victorias seguidas')), ...r.invicto.slice(0, 2).map((x) => fila(x, 'text-galaxy-400', 'fa-shield', 'sin perder')), ...r.derrotas.slice(0, 2).map((x) => fila(x, 'text-rose-400', 'fa-arrow-trend-down', 'derrotas seguidas'))];
+  if (!filas.length) return;
+  $('rachas-lista').innerHTML = filas.join(''); box.hidden = false;
+}
+function avisoVisita() {
+  const box = $('novedad'); if (!box || !edicion) return;
+  const KEY = `pes-visita-${edicion.id}`; const ahora = fechas.flatMap((f) => f.partidos ?? []).filter(jug).length;
+  try {
+    const antes = Number(localStorage.getItem(KEY)); const nuevos = resultadosNuevos(ahora, localStorage.getItem(KEY) === null ? undefined : antes);
+    if (nuevos) { box.innerHTML = `<i class="fa-solid fa-bell text-galaxy-400"></i><span><b class="text-white">${nuevos} resultado${nuevos === 1 ? '' : 's'} nuevo${nuevos === 1 ? '' : 's'}</b> desde tu última visita. Mira la pestaña <b class="text-white">Por fecha</b> para ver cómo se movió la tabla.</span>`; box.hidden = false; }
+    localStorage.setItem(KEY, String(ahora));
+  } catch { /* sin almacenamiento: simplemente no hay aviso */ }
+}
 renderDemo();
+pintarRachas(); avisoVisita();
 renderFeatured();
 // Podio: el pase del mouse agranda por CSS; en celular (sin mouse) el toque agranda/encoge la carta. Un solo jugador agrandado a la vez.
 // En celular las tres cartas miden ≈ 105 px y el CSS oculta sus estadísticas (< 135 px): ahí el toque abre la RÉPLICA completa (features/replicaCarta.js),

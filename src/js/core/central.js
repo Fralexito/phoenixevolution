@@ -137,3 +137,30 @@ export function destacadoFinal(fecha, tablaPrevia, manual) {
   }
   return auto ? { partido: auto, manual: false, nota: '' } : null;
 }
+
+/**
+ * Rachas actuales. Para cada jugador mira sus partidos jugados (de más reciente a más antiguo) y cuenta cuántos seguidos lleva
+ * ganando (`victorias`), sin perder (`invicto`) o perdiendo (`derrotas`). Solo devuelve rachas de al menos `min` partidos, de mayor a menor.
+ * @param {{n:number,partidos:object[]}[]} fechas  @param {string[]} nombres
+ */
+export function rachas(fechas, nombres, min = 2) {
+  const res = { victorias: [], invicto: [], derrotas: [] };
+  for (const nombre of nombres ?? []) {
+    const rs = [];
+    for (const f of fechas ?? []) for (const m of f.partidos ?? []) {
+      if (!esJugado(m) || (m.l !== nombre && m.v !== nombre)) continue;
+      const a = m.l === nombre ? m.gl : m.gv; const b = m.l === nombre ? m.gv : m.gl; rs.push(a > b ? 'G' : a < b ? 'P' : 'E');
+    }
+    rs.reverse();
+    const cuenta = (ok) => { let k = 0; for (const r of rs) { if (!ok(r)) break; k += 1; } return k; };
+    const g = cuenta((r) => r === 'G'), i = cuenta((r) => r !== 'P'), d = cuenta((r) => r === 'P');
+    if (g >= min) res.victorias.push({ nombre, n: g });
+    if (i >= min && i > g) res.invicto.push({ nombre, n: i });   // si ya cuenta como racha de victorias, no se repite aquí
+    if (d >= min) res.derrotas.push({ nombre, n: d });
+  }
+  for (const k of Object.keys(res)) res[k].sort((x, y) => y.n - x.n || x.nombre.localeCompare(y.nombre, 'es'));
+  return res;
+}
+
+/** Cuántos resultados nuevos hay desde la última visita (null si es la primera visita o no hay dato guardado). */
+export const resultadosNuevos = (jugadosAhora, jugadosAntes) => (Number.isInteger(jugadosAntes) && jugadosAhora > jugadosAntes ? jugadosAhora - jugadosAntes : null);

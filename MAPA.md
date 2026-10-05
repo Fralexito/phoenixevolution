@@ -375,6 +375,7 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
   1) *Escudos locales*: `ESCUDOS_LOCALES` en `core/escudos.js` (false = internet, true = `/public/escudos/`) + flujo `.github/workflows/escudos.yml` que los descarga SOLO en `borrador` y lo activa. Para volver atrás: ponerlo en false.
   2) *Transiciones entre páginas* (CSS `@view-transition`), *aparición al hacer scroll* (`features/reveal.js`) y *esqueletos de carga* (`.esqueleto`): interruptores `transiciones`, `reveal`, `esqueletos`.
   3) *Rachas* y *novedades desde tu última visita* en Central: interruptores `rachas`, `visita`.
+  (Rachas y novedades ya hechos: `rachas()` y `resultadosNuevos()` en `core/central.js`, con test. En «Próximos» el destacado automático ahora es un partido por jugar.)
   NO hecho aún: imágenes de portada (Unsplash) propias; cabecera común en todas las secciones.
 
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 167)
