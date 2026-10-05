@@ -813,3 +813,24 @@ test('historial en vivo: solo el día actual; al cambiar de día lo anterior des
   assert.equal(diaClave(new Date(2026, 9, 5, 12).getTime()).length, 10);   // formato AAAA-MM-DD
   assert.deepEqual(podarHistorialHoy('basura', lunes), []);
 });
+
+test('muro: validar texto, enlaces seguros, tiempo relativo y estilo', async () => {
+  const { validarTexto, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } = await import('../src/js/core/muro.js');
+  assert.equal(validarTexto('   ').ok, false);
+  assert.equal(validarTexto('x'.repeat(1001)).ok, false);
+  assert.deepEqual(validarTexto('  hola\r\n\r\n\r\n\r\nmundo '), { ok: true, texto: 'hola\n\nmundo', error: '' });
+  assert.equal(textoAHTML('<img src=x onerror=a()>'), '&lt;img src=x onerror=a()&gt;');                       // nada de HTML del usuario
+  assert.match(textoAHTML('mira https://youtu.be/abc?x=1&y=2.'), /<a href="https:\/\/youtu\.be\/abc\?x=1&amp;y=2" [^>]*>https:\/\/youtu\.be\/abc\?x=1&amp;y=2<\/a>\.$/);
+  assert.equal(textoAHTML('javascript:alert(1)'), 'javascript:alert(1)');                                      // sin enlace
+  assert.equal(textoAHTML('a\nb'), 'a<br>b');
+  const now = 1_000_000_000_000;
+  assert.equal(tiempoRelativo(now - 10_000, now), 'ahora');
+  assert.equal(tiempoRelativo(now - 5 * 60_000, now), 'hace 5 min');
+  assert.equal(tiempoRelativo(now - 3 * 3_600_000, now), 'hace 3 h');
+  assert.equal(tiempoRelativo(now - 30 * 3_600_000, now), 'ayer');
+  assert.equal(tiempoRelativo('basura', now), '');
+  assert.equal(estiloDe({ muro_banner: 'preset:inexistente', muro_acento: 'rojo' }).banner.id, 'nebulosa');
+  assert.equal(estiloDe({ muro_banner: 'preset:fuego', muro_acento: '#ff0000', muro_lema: '<b>GG</b>' }).lema, 'bGG/b');
+  assert.deepEqual(estiloParaGuardar({ bannerId: 'x', acento: 'y', lema: ' hola ' }), { p_banner: null, p_acento: null, p_lema: 'hola' });
+  assert.equal(usuarioDeURL('?u=Fra<lex>_9'), 'fralex_9');
+});

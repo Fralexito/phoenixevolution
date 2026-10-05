@@ -1,0 +1,54 @@
+// Lógica PURA del muro de jugadores (sin DOM ni red → se prueba en tests/pure.test.mjs).
+import { escapeHTML, safeUrl } from './dom.js';
+import { BANNERS, BANNER_DEFECTO, ACENTOS, ACENTO_DEFECTO, MURO_MAX, LEMA_MAX } from '../../data/muroEstilo.js';
+
+/** Valida el texto de una publicación. → { ok, texto, error }. La BD vuelve a validar: esto solo da el aviso rápido. */
+export function validarTexto(t) {
+  const texto = String(t ?? '').replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  if (!texto) return { ok: false, texto, error: 'Escribe algo para publicar.' };
+  if (texto.length > MURO_MAX) return { ok: false, texto, error: `Máximo ${MURO_MAX} caracteres (llevas ${texto.length}).` };
+  return { ok: true, texto, error: '' };
+}
+
+/** Texto del usuario → HTML seguro: se escapa TODO primero; después los https:// pasan a enlaces y los saltos de línea a <br>. */
+export function textoAHTML(t) {
+  return escapeHTML(t).replace(/https:\/\/[^\s<]+/gi, (u) => {
+    const limpio = u.replace(/(&quot;|&#39;|[.,;:!?)\]])+$/g, '');   // la puntuación final no es parte del enlace
+    const resto = u.slice(limpio.length);
+    const url = safeUrl(limpio.replace(/&amp;/g, '&'));
+    return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer nofollow" class="text-galaxy-400 underline break-all">${limpio}</a>${resto}` : u;
+  }).replace(/\n/g, '<br>');
+}
+
+/** «hace 5 min», «hace 3 h», «ayer», o la fecha. `now` inyectable para probar. */
+export function tiempoRelativo(ts, now = Date.now()) {
+  const t = new Date(ts).getTime(); if (!Number.isFinite(t)) return '';
+  const s = Math.max(0, Math.round((now - t) / 1000));
+  if (s < 45) return 'ahora';
+  if (s < 3600) return `hace ${Math.max(1, Math.round(s / 60))} min`;
+  if (s < 86400) return `hace ${Math.round(s / 3600)} h`;
+  if (s < 172800) return 'ayer';
+  if (s < 7 * 86400) return `hace ${Math.round(s / 86400)} días`;
+  return new Date(t).toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: now - t > 300 * 86400000 ? 'numeric' : undefined });
+}
+
+/** Estilo guardado (puede venir vacío o con basura) → valores seguros para pintar. */
+export function estiloDe(p) {
+  const id = /^preset:([a-z0-9-]{1,30})$/.exec(String(p?.muro_banner ?? ''))?.[1];
+  const banner = BANNERS.find((b) => b.id === id) ?? BANNERS.find((b) => b.id === BANNER_DEFECTO);
+  const acento = /^#[0-9a-fA-F]{6}$/.test(String(p?.muro_acento ?? '')) ? p.muro_acento : ACENTO_DEFECTO;
+  const lema = String(p?.muro_lema ?? '').replace(/[<>]/g, '').trim().slice(0, LEMA_MAX);
+  return { banner, acento, lema };
+}
+
+/** Valores del editor → argumentos de la RPC `muro_guardar_estilo`. */
+export function estiloParaGuardar({ bannerId, acento, lema }) {
+  return {
+    p_banner: BANNERS.some((b) => b.id === bannerId) ? `preset:${bannerId}` : null,
+    p_acento: ACENTOS.includes(acento) ? acento : null,
+    p_lema: String(lema ?? '').replace(/[<>]/g, '').trim().slice(0, LEMA_MAX),
+  };
+}
+
+/** `?u=fralex` → 'fralex' (solo a-z, 0-9 y _; como exige la BD). Vacío si no hay. */
+export const usuarioDeURL = (search) => String(new URLSearchParams(search).get('u') ?? '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);

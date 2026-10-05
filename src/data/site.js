@@ -16,6 +16,7 @@ export const NAV_EXTRA = [{ id: 'organizadores', label: 'Quiénes somos', path: 
 // Para añadir una sección futura, agrega UNA línea aquí (con `path` para una página o `action` para algo del sistema).
 export const ACCOUNT_NAV = [
   { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user' },
+  { id: 'muro',     label: 'Mi muro',      path: 'perfil/',        icon: 'fa-newspaper' },
   { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad' },
   { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast' },
   { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments' },
