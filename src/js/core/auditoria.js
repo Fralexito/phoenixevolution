@@ -27,6 +27,8 @@ export const TABLAS = Object.freeze({
   participaciones:     { objeto: 'una participación del historial', seccion: 'Historial', icono: 'fa-clock-rotate-left' },
   transferencias:      { objeto: 'una transferencia',           seccion: 'Mercado',       icono: 'fa-arrow-right-arrow-left' },
   contratos_plantilla: { objeto: 'un contrato de plantilla',    seccion: 'Plantillas',    icono: 'fa-file-signature' },
+  clanes:              { objeto: 'el clan',                  seccion: 'Clanes',       icono: 'fa-shield-halved' },
+  clan_miembros:       { objeto: 'un miembro de clan',        seccion: 'Clanes',       icono: 'fa-shield-halved' },
   eventos:             { objeto: 'el evento',                 seccion: 'Eventos',      icono: 'fa-calendar-day' },
   noticias:            { objeto: 'la noticia',                  seccion: 'Noticias',      icono: 'fa-newspaper' },
   ligas:               { objeto: 'la liga',                     seccion: 'Ligas',         icono: 'fa-flag' },
