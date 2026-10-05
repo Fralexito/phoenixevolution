@@ -13,7 +13,8 @@ import { analizarVideo, segmentoParaGuardar, urlCompartir, destinoDeHash, etique
 import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES, PALETA_EMOJIS, SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
-import { solicitar } from '../features/amigos/api.js';
+import * as amigosApi from '../features/amigos/api.js';
+import { relacion, accionesSociales } from '../core/red.js';
 import { normalizarHistorias, validarClip, infoClip, hayNuevas, marcarVistas, indiceInicial, CLIP_TITULO_MAX } from '../core/historias.js';
 import { abrirHistorias, abrirClips } from '../features/muro/visor.js';
 import { abrirNuevaHistoria, abrirDestacadas } from '../features/muro/historiasUI.js';
@@ -23,7 +24,7 @@ import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/videoSubida.js';
 
 const root = document.getElementById('muro-root');
 const S = { host: null, sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map(),
-  hist: null, paleta: null, juego: '', juegos: [], clipJuegos: [], vfile: null, cfile: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
+  red: null, hist: null, paleta: null, juego: '', juegos: [], clipJuegos: [], vfile: null, cfile: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
 
 /* «Ya vista» de las historias: solo en este navegador. */
 const KEY_VISTAS = 'pes-historias-vistas';
@@ -54,6 +55,44 @@ function avatarConAnillo(p, acento) {
   return envolver(`<button type="button" data-act="ver-historias" aria-label="Ver historias de ${escapeHTML(p.nombre_display)}" class="${base} cursor-pointer" style="box-shadow:0 0 0 3px ${nuevo ? acento : '#6b7280'}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</button>`);
 }
 
+/* ---------- Relación social con ESTA persona (amigos, solicitudes, seguir) ---------- */
+const BTN_SOC = 'btn btn-ghost !min-h-9 !px-3 !text-[11px]';
+const yoId = () => S.sesion?.user?.id ?? null;
+const relacionCon = (p) => (S.red ? relacion(S.red, p.id, yoId()) : null);
+function botonSocial(act, icono, texto, extra = '', etiqueta = '') {
+  return `<button type="button" data-act="${act}" ${etiqueta ? `aria-label="${etiqueta}" title="${etiqueta}"` : ''} class="${BTN_SOC} ${extra}"><i class="fa-solid ${icono}"></i>${texto ? `<span>${texto}</span>` : ''}</button>`;
+}
+/** Botones de amistad/mensaje según MI relación con la persona (lógica en core/red.accionesSociales). Sin la red cargada: Mensaje + Agregar, como antes. */
+function botonesSociales(p) {
+  const msg = `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="${BTN_SOC} !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>`;
+  if (!S.red) return msg + botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo');
+  const rel = relacionCon(p); const sigo = S.red.siguiendo.includes(p.id);
+  const MAPA = {
+    mensaje: msg,
+    solicitar: botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo', '!text-galaxy-400 !border-galaxy-400/50'),
+    cancelar: botonSocial('cancelar-solicitud', 'fa-clock', 'Solicitud enviada · cancelar'),
+    aceptar: botonSocial('aceptar-amistad', 'fa-check', 'Aceptar solicitud', '!text-ok !border-ok/50'),
+    rechazar: botonSocial('rechazar-amistad', 'fa-xmark', 'Rechazar'),
+    amigos: '<span class="inline-flex items-center gap-1.5 text-[11px] text-ok border border-ok/40 rounded-lg px-2.5 min-h-9"><i class="fa-solid fa-user-check"></i>Amigos</span>',
+    seguir: botonSocial('seguir', 'fa-heart', 'Seguir'), dejar: botonSocial('dejar-seguir', 'fa-check', 'Siguiendo'),
+    bloquear: botonSocial('bloquear', 'fa-ban', '', '!text-bad !border-bad/50', 'Bloquear a esta persona'),
+    desbloquear: botonSocial('desbloquear', 'fa-lock-open', 'Desbloquear'),
+  };
+  return accionesSociales(rel, sigo).map((k) => MAPA[k] ?? '').join('');
+}
+/** Tarjeta de «muro privado»: explica por qué no se ve y ofrece el siguiente paso según la relación (antes solo mostraba un candado). */
+function candadoMuro(p) {
+  const rel = relacionCon(p);
+  const paso = !S.sesion ? 'Inicia sesión y envíale una solicitud de amistad para poder ver su muro.'
+    : rel === 'enviada' ? 'Tu solicitud de amistad está pendiente: cuando la acepte podrás ver su muro.'
+    : rel === 'recibida' ? 'Esta persona te envió una solicitud: acéptala para ver su muro.'
+    : rel === 'ninguna' || rel === null ? 'Envíale una solicitud de amistad; cuando la acepte podrás ver su muro.' : '';
+  const boton = !S.sesion ? '' : rel === 'recibida' ? botonSocial('aceptar-amistad', 'fa-check', 'Aceptar solicitud', '!text-ok !border-ok/50')
+    : (rel === 'ninguna' || rel === null) ? botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo', '!text-galaxy-400 !border-galaxy-400/50') : '';
+  return `<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm space-y-3"><i class="fa-solid fa-lock text-2xl text-gray-500 block"></i>
+    <p>Este jugador comparte su muro solo con sus amigos.</p><p class="text-xs text-gray-500">${paso}</p>${boton ? `<div class="flex justify-center">${boton}</div>` : ''}</div>`;
+}
+
 function cabecera(p) {
   const { banner, acento, lema, foto } = estiloDe(p);
   const fondo = safeImg(foto) ? `url(&quot;${escapeHTML(safeImg(foto))}&quot;) center/cover no-repeat` : banner.css;
@@ -70,9 +109,8 @@ function cabecera(p) {
     ? `${botonesCartaReto(p)}<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
        <button type="button" data-act="panel" data-panel="host" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-server"></i><span>Hosting</span></button>
        <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
-    : (S.sesion ? `${botonesCartaReto(p)}<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>
-       <button type="button" data-act="amistad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-user-plus"></i><span>Agregar</span></button>`
-      : `${botonesCartaReto(p)}<span class="text-[11px] text-gray-500">Inicia sesión para escribirle o retarlo.</span>`);
+    : (S.sesion ? `${botonesCartaReto(p)}${botonesSociales(p)}`
+      : `${botonesCartaReto(p)}<span class="text-[11px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Inicia sesión (botón «Entrar», arriba) para escribirle, agregarlo o retarlo.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
     <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
       ${p.soy_yo ? `<input type="file" id="bn-file" accept="image/jpeg,image/png,image/webp" hidden><button type="button" data-act="cambiar-banner" aria-label="Cambiar banner" title="Cambiar banner" class="absolute top-2 right-2 z-10 h-9 px-3 rounded-full bg-black/60 hover:bg-black/80 text-white text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-camera"></i><span class="max-sm:hidden">Cambiar banner</span></button>` : ''}</div>
@@ -172,7 +210,7 @@ function tarjeta(it, p) {
         <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${compartirBtn('p', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
 }
 function feed(p) {
-  if (!S.visible) return `<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm"><i class="fa-solid fa-lock text-2xl text-gray-500 mb-2 block"></i>Este jugador comparte su muro solo con sus amigos.</div>`;
+  if (!S.visible) return candadoMuro(p);
   if (!S.items.length) return `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${p.soy_yo ? 'Tu muro está vacío. ¡Publica lo primero!' : 'Aún no ha publicado nada.'}</div>`;
   return S.items.map((it) => tarjeta(it, p)).join('') + (S.hayMas ? `<button type="button" data-act="mas" class="btn btn-ghost w-full !text-xs">Cargar más</button>` : '');
 }
@@ -215,7 +253,7 @@ function seccionClips(p) {
       <p id="cl-vinfo" class="text-[11px] text-gray-400" ${S.cfile ? '' : 'hidden'}>${S.cfile ? `<i class="fa-solid fa-film mr-1"></i>${escapeHTML(S.cfile.file.name)} <button type="button" data-act="quitar-video-clip" class="text-gray-500 hover:text-bad ml-1" aria-label="Quitar video"><i class="fa-solid fa-xmark"></i></button>` : ''}</p>
       <div class="flex gap-2"><input id="cl-titulo" maxlength="${CLIP_TITULO_MAX + 10}" placeholder="Título (opcional)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">${selectSegmento('cl-juego')}
         <button type="button" data-act="publicar-clip" aria-label="Añadir clip" class="btn btn-primary !min-h-9 !text-xs shrink-0"><i class="fa-solid fa-plus"></i><span class="max-sm:hidden">Añadir</span></button></div></section>` : '';
-  if (!S.visible) return `${form}<div class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm"><i class="fa-solid fa-lock text-2xl text-gray-500 mb-2 block"></i>Este jugador comparte su contenido solo con sus amigos.</div>`;
+  if (!S.visible) return `${form}${candadoMuro(p)}`;
   const miniatura = (c) => c.ytId ? `<img src="https://i.ytimg.com/vi/${escapeHTML(c.ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100">`
     : c.propio ? `<video src="${escapeHTML(c.url)}#t=0.1" preload="metadata" muted playsinline class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-80"></video>` : '<div class="absolute inset-0 bg-gradient-to-br from-galaxy-600/50 to-black"></div>';
   const grilla = ccc.length ? `<div class="grid grid-cols-3 gap-1.5 sm:gap-2">${ccc.map((c, i) => `<button type="button" data-act="ver-clip" data-i="${i}" aria-label="Ver clip: ${escapeHTML(c.titulo || 'Clip')}" class="relative aspect-[9/16] rounded-lg overflow-hidden border border-galaxy-border bg-galaxy-900 group text-left">
@@ -246,10 +284,15 @@ async function cargar() {
     S.p = p; S.items = []; S.editando = null; S.abiertas.clear(); S.resp.clear();
     const m = p.puede_ver_muro ? await api.cargarMuro(p.id) : { visible: false, items: [], hay_mas: false };
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
+    S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;
     await cargarExtras(p);
     document.title = `${p.nombre_display} · Muro`;
     pintar(); irADestino();
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
+}
+/** Mi red (amigos, solicitudes, seguidos). Si falla, devuelve null: el perfil sigue funcionando con los botones básicos. */
+async function cargarRedSegura() {
+  try { return await amigosApi.cargarRed(); } catch (e) { console.warn('[perfil] red no disponible:', e?.message); return null; }
 }
 /** Historias y clips: si fallan (p. ej. la migración 025 aún no se ejecutó) NO rompen el perfil: simplemente no se muestran. */
 async function cargarExtras(p) {
@@ -359,6 +402,16 @@ function verHistorias(lista, titulo, { vigentes: sonVigentes = false } = {}) {
 }
 
 /* ---------- Eventos ---------- */
+/** Ejecuta un cambio de amistad/seguimiento, refresca MI red y repinta. Con `recargarTodo` se vuelve a pedir el perfil (p. ej. al ser amigos el muro puede abrirse). */
+async function cambioSocial(fn, ok, { recargarTodo = false } = {}) {
+  if (S.ocupadoSocial) return; S.ocupadoSocial = true;
+  try {
+    const r = await seguro(fn, ok); if (r === undefined) return;   // seguro() devuelve undefined solo si hubo error (ya avisado)
+    window.dispatchEvent(new CustomEvent('pendientes:refresh'));   // actualiza los números del menú del avatar
+    if (recargarTodo) await cargar(); else { S.red = await cargarRedSegura(); pintar(); }
+  } finally { S.ocupadoSocial = false; }
+}
+
 const ACCIONES = {
   panel: (el) => abrirPanel(el.dataset.panel),
   'panel-historia': () => abrirNuevaHistoria({ uid: S.p.id, onListo: recargarExtras }),
@@ -389,7 +442,15 @@ const ACCIONES = {
     try { const m = await api.clipsDe(S.p.id, S.clips[S.clips.length - 1]?.id); S.clips = [...S.clips, ...(m.items ?? [])]; S.hayMasClips = !!m.hay_mas; pintar(); }
     catch (e) { toast(msgErr(e), 'error'); el.disabled = false; }
   },
-  amistad: () => seguro(() => solicitar(S.p.id), 'Solicitud enviada.'),
+  amistad: () => ACCIONES.solicitar(),   // nombre anterior del botón
+  solicitar: () => cambioSocial(() => amigosApi.solicitar(S.p.id), 'Solicitud enviada.', { recargarTodo: true }),
+  'cancelar-solicitud': () => cambioSocial(() => amigosApi.cancelarSolicitud(S.p.id), 'Solicitud cancelada.'),
+  'aceptar-amistad': () => cambioSocial(() => amigosApi.responder(S.p.id, true), '¡Ahora son amigos!', { recargarTodo: true }),   // puede abrir su muro: se recarga todo
+  'rechazar-amistad': () => cambioSocial(() => amigosApi.responder(S.p.id, false), 'Solicitud rechazada.'),
+  seguir: () => cambioSocial(() => amigosApi.seguir(S.p.id), 'Ahora lo sigues.', { recargarTodo: true }),   // seguir puede ampliar lo que ves (p. ej. chat de «amigos y seguidores»)
+  'dejar-seguir': () => cambioSocial(() => amigosApi.dejarDeSeguir(S.p.id), 'Dejaste de seguirlo.'),
+  bloquear: () => { if (confirm(`¿Bloquear a ${S.p.nombre_display}? No podrán verse ni escribirse. Podrás desbloquearlo en Amigos → Bloqueados.`)) return cambioSocial(() => amigosApi.bloquear(S.p.id), 'Persona bloqueada.', { recargarTodo: true }); },
+  desbloquear: () => cambioSocial(() => amigosApi.desbloquear(S.p.id), 'Desbloqueada.', { recargarTodo: true }),
   'elegir-foto': () => document.getElementById('mu-file').click(),
   'filtro-juego': async (el) => {
     S.juego = el.dataset.j || ''; pintarFiltro();

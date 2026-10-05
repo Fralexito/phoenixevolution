@@ -1037,3 +1037,19 @@ test('segmentos por juego y enlaces para compartir', () => {
   assert.equal(urlCompartir({ base: '/b/', usuario: 'jack', tipo: 'c', id: -3 }), '/b/perfil/?u=jack');
   assert.deepEqual(destinoDeHash('#p-12'), { tipo: 'p', id: 12 }); assert.equal(destinoDeHash('#x-1'), null); assert.equal(destinoDeHash('#p-12abc'), null); assert.equal(destinoDeHash(''), null);
 });
+
+import { accionesSociales, etiquetaRelacion, enlacePerfil, esRechazoChat } from '../src/js/core/red.js';
+test('red social: acciones del perfil según la relación', () => {
+  assert.deepEqual(accionesSociales('yo'), []);
+  assert.deepEqual(accionesSociales('bloqueado'), ['desbloquear']);
+  assert.deepEqual(accionesSociales('ninguna'), ['mensaje', 'solicitar', 'seguir', 'bloquear']);
+  assert.deepEqual(accionesSociales('enviada', true), ['mensaje', 'cancelar', 'dejar', 'bloquear']);
+  assert.deepEqual(accionesSociales('recibida'), ['mensaje', 'aceptar', 'rechazar', 'seguir', 'bloquear']);
+  assert.deepEqual(accionesSociales('amigos'), ['mensaje', 'amigos', 'seguir', 'bloquear']);
+  assert.deepEqual(accionesSociales('rara'), ['mensaje', 'solicitar', 'seguir', 'bloquear']);   // relación desconocida → la más segura: poder pedir amistad
+});
+test('red social: etiquetas, enlaces y rechazo de chat', () => {
+  assert.equal(etiquetaRelacion('ninguna'), 'No es tu amigo'); assert.equal(etiquetaRelacion('x'), '');
+  assert.equal(enlacePerfil('/pes/', 'hugo'), '/pes/perfil/?u=hugo'); assert.equal(enlacePerfil('/pes/', 'a b&c'), '/pes/perfil/?u=a%20b%26c'); assert.equal(enlacePerfil('/pes/', ''), '');
+  assert.equal(esRechazoChat('No puedes enviarle mensajes a esta persona.'), true); assert.equal(esRechazoChat('Error de red'), false); assert.equal(esRechazoChat(null), false);
+});

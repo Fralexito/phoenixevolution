@@ -49,3 +49,17 @@ export function buscarPerfiles(perfiles, texto, red, yo, limite = 20) {
 
 /** Contadores para las pestañas. */
 export const contadores = (red) => ({ amigos: red.amigos.length, solicitudes: red.recibidas.length, seguidores: red.seguidores.length, siguiendo: red.siguiendo.length, bloqueados: red.bloqueados.length });
+
+/** Qué botones sociales muestra el perfil de OTRA persona, en orden de pantalla. `rel` viene de `relacion()`. Pura y probada. */
+export function accionesSociales(rel, sigo = false) {
+  if (rel === 'yo') return [];
+  if (rel === 'bloqueado') return ['desbloquear'];
+  const amistad = { amigos: ['amigos'], enviada: ['cancelar'], recibida: ['aceptar', 'rechazar'], ninguna: ['solicitar'] }[rel] ?? ['solicitar'];
+  return ['mensaje', ...amistad, sigo ? 'dejar' : 'seguir', 'bloquear'];
+}
+/** Etiqueta corta de la relación (para insignias en listas de búsqueda). */
+export const etiquetaRelacion = (rel) => ({ amigos: 'Amigo', enviada: 'Solicitud enviada', recibida: 'Te envió solicitud', ninguna: 'No es tu amigo', bloqueado: 'Bloqueado' }[rel] ?? '');
+/** Enlace al perfil/muro de alguien. `base` termina en «/» (p. ej. href('')). '' si no hay usuario. */
+export const enlacePerfil = (base, username) => (username ? `${base}perfil/?u=${encodeURIComponent(username)}` : '');
+/** ¿El servidor rechazó el chat por privacidad o bloqueo? (el texto lo fija la función abrir_directo/enviar_mensaje de la BD). */
+export const esRechazoChat = (msg) => /no puedes (enviarle|escribir)/i.test(String(msg ?? ''));

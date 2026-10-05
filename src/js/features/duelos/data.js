@@ -5,7 +5,7 @@ import { isStale } from '../../core/schedule.js';
 
 export const data = {
   retos: [],                 // retos visibles para mí (RLS decide cuáles)
-  perfiles: new Map(),       // id → { id, nombre_display, club_favorito, puede_hostear }
+  perfiles: new Map(),       // id → { id, username, avatar_url, nombre_display, club_favorito, puede_hostear }
   conexion: new Map(),       // reto_id → { link, detalle } (solo si soy participante confirmado)
   parts: new Map(),          // reto_id → filas de reto_participantes (sin las que salieron)
   online: new Set(),         // ids presentes en el radar
@@ -24,7 +24,7 @@ export const isActive = (r) => ['BUSCANDO', 'ACEPTADO', 'EN_JUEGO'].includes(r.e
 const RETO_COLS = 'id, retador_id, rival_id, destinatario_id, host_id, directo_publico, requiere_host, plataforma, estado, modalidad, fecha_programada, created_at, confirmo_retador_at, confirmo_rival_at, tam_a, tam_b, acuerdo_retador_at, acuerdo_rival_at';
 
 export async function loadPerfiles() {
-  const { data: rows, error } = await supabase.from('perfiles').select('id, nombre_display, club_favorito, puede_hostear').limit(500);
+  const { data: rows, error } = await supabase.from('perfiles').select('id, username, avatar_url, nombre_display, club_favorito, puede_hostear').limit(500)   // username y avatar_url son columnas públicas (grant); sin ellas Amigos/Mensajes no podían enlazar al perfil ni mostrar fotos;
   if (error) { console.error('[duelos] perfiles:', error.message); return; }
   data.perfiles = new Map((rows ?? []).map((p) => [p.id, p]));
 }
