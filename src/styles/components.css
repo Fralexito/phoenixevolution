@@ -683,3 +683,9 @@ html[data-tema='sudario'] h1 .bg-clip-text { background-image: linear-gradient(9
 .liga-org-ico { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 999px; background: var(--color-galaxy-400); color: #03010f; font-size: 1rem; }
 html[data-tema='sudario'] .liga-org { border-color: rgb(245 197 66 / .6); background: linear-gradient(135deg, rgb(29 78 216 / .45), rgb(0 0 0 / .45)); box-shadow: 0 0 18px rgb(245 197 66 / .25); }
 html[data-tema='sudario'] .liga-org:hover { box-shadow: 0 0 28px rgb(245 197 66 / .5); }
+/* Selector de liga hecho con enlaces (páginas de divisiones): misma piel que .liga-sel, sin piedra deslizante. */
+.liga-sel-enlaces a { display: inline-flex; align-items: center; padding: .4rem 1rem; border-radius: 999px; font: 700 .72rem var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; border: 1px solid transparent; transition: color .25s, background .25s; }
+.liga-sel-enlaces a:hover { color: #fff; }
+.liga-sel-enlaces a[aria-current='page'] { color: #fff; background: linear-gradient(135deg, rgb(128 0 255 / .55), rgb(0 229 255 / .22)); border-color: rgb(0 229 255 / .45); box-shadow: 0 0 18px rgb(128 0 255 / .35); }
+.liga-sel-enlaces a[aria-current='page'] i { color: var(--color-galaxy-400); }
+html[data-tema='sudario'] .liga-sel-enlaces a[aria-current='page'] { background: linear-gradient(135deg, rgb(29 78 216 / .6), rgb(245 197 66 / .28)); border-color: rgb(245 197 66 / .6); box-shadow: 0 0 18px rgb(29 78 216 / .45); }
