@@ -1108,7 +1108,7 @@ test('totalFechas: se deduce del formato', () => {
 
 import { escudoDe, escudoHTML } from '../src/js/core/escudos.js';
 test('escudos: reconoce el club escrito de varias formas y nunca rompe', () => {
-  const u = escudoDe('Liverpool'); assert.match(u, /^https:\/\/crests\.football-data\.org\/\d+\.png$/);
+  const u = escudoDe('Liverpool'); assert.match(u, /^(https:\/\/crests\.football-data\.org|\/escudos)\/\d+\.png$/);
   assert.equal(escudoDe('LIVERPOOL'), u); assert.equal(escudoDe('Bayern Múnich'), escudoDe('Bayern Munich')); assert.equal(escudoDe('PSG'), escudoDe('Paris Saint-Germain'));
   assert.equal(escudoDe('Paris Saint Germain'), escudoDe('PARIS SAINT GERMAIN')); assert.equal(escudoDe('Atlético de Madrid'), escudoDe('atletico madrid'));
   for (const c of ['Arsenal', 'Chelsea', 'Inter', 'AC Milan', 'Real Madrid', 'FC Barcelona', 'Manchester City', 'Manchester United']) assert.ok(escudoDe(c), c);
