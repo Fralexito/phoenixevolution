@@ -2,11 +2,11 @@
 // Esquema: pages (este archivo, pinta y reparte eventos) → features/muro/api (RPC, migración 021) → core/muro (lógica pura) + data/muroEstilo.
 import { onSession, isAdmin } from '../core/session.js';
 import { toast } from '../core/toast.js';
-import { escapeHTML, safeUrl } from '../core/dom.js';
+import { escapeHTML, safeUrl, safeImg } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { avatarHTML } from '../core/avatar.js';
 import { sanitizarExtras, resumenExtra } from '../core/hostExtras.js';
-import { validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
+import { analizarVideo, PROVEEDOR_ETIQUETA, validarTexto, validarRespuesta, resumenReacciones, aplicarReaccion, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } from '../core/muro.js';
 import { BANNERS, ACENTOS, MURO_MAX, LEMA_MAX, MURO_VER, MURO_RESPONDER, RESP_MAX, REACCIONES } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { solicitar } from '../features/amigos/api.js';
@@ -21,7 +21,8 @@ async function seguro(fn, ok) {
 
 /* ---------- Pintado ---------- */
 function cabecera(p) {
-  const { banner, acento, lema } = estiloDe(p);
+  const { banner, acento, lema, foto } = estiloDe(p);
+  const fondo = safeImg(foto) ? `url(&quot;${escapeHTML(safeImg(foto))}&quot;) center/cover no-repeat` : banner.css;
   const extras = sanitizarExtras(p.host_extras).map(resumenExtra);
   const chips = [
     p.club_favorito && ['fa-shield-halved', p.club_favorito], p.posicion_preferida && ['fa-location-crosshairs', p.posicion_preferida],
@@ -37,7 +38,7 @@ function cabecera(p) {
        <button type="button" data-act="amistad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-user-plus"></i><span>Agregar</span></button>`
       : `<span class="text-[11px] text-gray-500">Inicia sesión para escribirle.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
-    <div class="h-36 sm:h-52 relative" style="background:${banner.css}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div></div>
+    <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div></div>
     <div class="px-4 sm:px-6 pb-5 -mt-10 sm:-mt-12 relative">
       <div class="flex flex-wrap items-end gap-3 sm:gap-4">
         <span class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border-4 border-galaxy-panel shrink-0" style="box-shadow:0 0 0 2px ${acento}">${avatarHTML(p.avatar_url, p.nombre_display, 96)}</span>
@@ -55,13 +56,17 @@ function cabecera(p) {
 
 const opcionesSel = (lista, actual) => lista.map(([v, t]) => `<option value="${v}" ${v === actual ? 'selected' : ''}>${t}</option>`).join('');
 function panelEstilo(p) {
-  const { banner, acento, lema } = estiloDe(p);
+  const { banner, acento, lema, foto } = estiloDe(p);
   return `<section id="panel-estilo" hidden class="glass-panel rounded-2xl p-4 space-y-3">
     <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-palette text-galaxy-400 mr-2"></i>Estilo de tu perfil</h2>
-    <div><p class="text-[11px] text-gray-400 mb-1.5">Banner</p><div class="grid grid-cols-4 gap-2" id="est-banners">${BANNERS.map((b) => `<button type="button" data-banner="${b.id}" aria-pressed="${b.id === banner.id}" title="${b.label}" class="h-12 rounded-lg border-2 border-transparent aria-pressed:border-white text-[10px] font-bold text-white/90 flex items-end justify-center pb-0.5" style="background:${b.css}">${b.label}</button>`).join('')}</div></div>
+    <div><p class="text-[11px] text-gray-400 mb-1.5">Banner</p><div class="grid grid-cols-4 gap-2" id="est-banners" data-foto="${escapeHTML(foto)}">${BANNERS.map((b) => `<button type="button" data-banner="${b.id}" aria-pressed="${!foto && b.id === banner.id}" title="${b.label}" class="h-12 rounded-lg border-2 border-transparent aria-pressed:border-white text-[10px] font-bold text-white/90 flex items-end justify-center pb-0.5" style="background:${b.css}">${b.label}</button>`).join('')}</div>
+      <div class="mt-2 flex flex-wrap items-center gap-2"><input type="file" id="est-file" accept="image/jpeg,image/png,image/webp" hidden>
+        <button type="button" data-act="subir-banner" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-image"></i><span>Subir mi foto de banner</span></button>
+        <button type="button" data-act="quitar-banner" id="est-quitar" ${foto ? '' : 'hidden'} class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-xmark"></i><span>Quitar foto</span></button>
+        <span id="est-foto-estado" class="text-[11px] text-gray-500">${foto ? 'Usando tu foto de banner.' : 'JPG, PNG o WebP; se reduce sola a 1600 px.'}</span></div></div>
     <div><p class="text-[11px] text-gray-400 mb-1.5">Color de acento</p><div class="flex flex-wrap gap-2" id="est-acentos">${ACENTOS.map((c) => `<button type="button" data-acento="${c}" aria-pressed="${c.toLowerCase() === acento.toLowerCase()}" aria-label="Color ${c}" class="w-8 h-8 rounded-full border-2 border-transparent aria-pressed:border-white" style="background:${c}"></button>`).join('')}</div></div>
     <label class="block"><span class="text-[11px] text-gray-400">Tu lema (máx. ${LEMA_MAX})</span><input id="est-lema" maxlength="${LEMA_MAX}" value="${escapeHTML(lema)}" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white" placeholder="Ej.: Juego limpio, remontada segura"></label>
-    <p class="text-[11px] text-gray-500">Tu bio y tu club se editan en «Mi perfil». Las fotos de banner llegan en la fase 3.</p>
+    <p class="text-[11px] text-gray-500">Tu bio y tu club se editan en «Mi perfil».</p>
     <div class="flex gap-2"><button type="button" data-act="guardar-estilo" class="btn btn-primary !min-h-9 !text-xs">Guardar estilo</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div></section>`;
 }
 function panelPrivacidad(p) {
@@ -74,7 +79,12 @@ function panelPrivacidad(p) {
 }
 const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
   <textarea id="mu-texto" rows="3" maxlength="${MURO_MAX + 200}" placeholder="¿Qué quieres contar? Un resultado, una búsqueda de rivales, un enlace de tu clip…" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
-  <div class="flex items-center justify-between gap-2"><span id="mu-cuenta" class="text-[11px] text-gray-500">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar</span></button></div></section>`;
+  <div id="mu-prev" hidden class="relative inline-block"><img id="mu-prev-img" alt="Vista previa de tu foto" class="max-h-40 rounded-lg border border-galaxy-border"><button type="button" data-act="quitar-foto" aria-label="Quitar foto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
+  <input id="mu-video" hidden maxlength="300" placeholder="Pega un enlace de YouTube, TikTok, Kick o Twitch" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
+  <input type="file" id="mu-file" accept="image/jpeg,image/png,image/webp" hidden>
+  <div class="flex items-center gap-2"><button type="button" data-act="elegir-foto" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-image"></i><span>Foto</span></button>
+    <button type="button" data-act="alternar-video" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-circle-play"></i><span>Video</span></button>
+    <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar</span></button></div></section>`;
 
 /** Reacciones: con permiso, los 5 botones (el tuyo resaltado, con su conteo); sin permiso, solo los conteos. Más el botón de respuestas. */
 function barraReacciones(it, p) {
@@ -96,6 +106,21 @@ function seccionRespuestas(it, p) {
     : `<p class="text-[11px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
+/** Foto y/o video de una publicación. YouTube: miniatura que carga el reproductor al tocarla (no se carga nada de YouTube hasta que quieras). Resto: tarjeta con enlace. */
+function medios(it) {
+  const img = safeImg(it.imagen_url) ? `<a href="${escapeHTML(safeImg(it.imagen_url))}" target="_blank" rel="noopener noreferrer" class="block mt-2"><img src="${escapeHTML(safeImg(it.imagen_url))}" alt="Foto de la publicación" loading="lazy" referrerpolicy="no-referrer" class="rounded-xl w-full max-h-[28rem] object-cover border border-galaxy-border"></a>` : '';
+  const v = it.video_url ? analizarVideo(it.video_url) : null;
+  let vid = '';
+  if (v?.ok && v.proveedor === 'youtube') {
+    vid = `<button type="button" data-act="video-yt" data-yt="${escapeHTML(v.id)}" aria-label="Reproducir video de YouTube" class="relative block w-full mt-2 rounded-xl overflow-hidden border border-galaxy-border aspect-video bg-black group">
+      <img src="https://i.ytimg.com/vi/${escapeHTML(v.id)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-80 group-hover:opacity-100">
+      <span class="absolute inset-0 flex items-center justify-center"><i class="fa-solid fa-circle-play text-5xl text-white drop-shadow"></i></span></button>`;
+  } else if (v?.ok) {
+    const ico = { tiktok: 'fa-brands fa-tiktok', twitch: 'fa-brands fa-twitch', kick: 'fa-solid fa-play' }[v.proveedor];
+    vid = `<a href="${escapeHTML(v.url)}" target="_blank" rel="noopener noreferrer nofollow" class="mt-2 flex items-center gap-3 rounded-xl border border-galaxy-border bg-black/30 px-3 py-3 hover:border-galaxy-400"><i class="${ico} text-xl text-galaxy-400"></i><span class="text-sm text-white">Ver en ${PROVEEDOR_ETIQUETA[v.proveedor]}</span><i class="fa-solid fa-arrow-up-right-from-square ml-auto text-xs text-gray-500"></i></a>`;
+  }
+  return img + vid;
+}
 function tarjeta(it, p) {
   const mia = p.soy_yo; const puedeBorrar = mia || isAdmin();
   const menu = (mia || puedeBorrar) ? `<div class="flex gap-1 shrink-0">
@@ -105,7 +130,7 @@ function tarjeta(it, p) {
   const cuerpo = S.editando === it.id
     ? `<textarea id="mu-edit" rows="3" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${escapeHTML(it.texto)}</textarea>
        <div class="flex gap-2 mt-2"><button type="button" data-act="guardar-edicion" data-id="${it.id}" class="btn btn-primary !min-h-8 !text-xs">Guardar</button><button type="button" data-act="cancelar-edicion" class="btn btn-ghost !min-h-8 !text-xs">Cancelar</button></div>`
-    : `<p class="text-sm text-gray-100 leading-relaxed">${textoAHTML(it.texto)}</p>`;
+    : `${it.texto ? `<p class="text-sm text-gray-100 leading-relaxed">${textoAHTML(it.texto)}</p>` : ''}${medios(it)}`;
   const pie = `<footer class="mt-3 pt-2 border-t border-galaxy-border/60">${barraReacciones(it, p)}${S.abiertas.has(it.id) ? seccionRespuestas(it, p) : ''}</footer>`;
   return `<article class="glass-panel rounded-2xl p-3 sm:p-4 ${it.fijada ? 'border border-galaxy-400/40' : ''}">
     <header class="flex items-center gap-2.5 mb-2">
@@ -141,21 +166,60 @@ async function cargar() {
 }
 async function refrescarMuro() { const m = await api.cargarMuro(S.p.id); S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.visible = m.visible; pintarFeed(); }
 
+/* ---------- Ayudantes de fotos ---------- */
+function limpiarFoto() {
+  const f = document.getElementById('mu-file'); if (f) f.value = '';
+  const img = document.getElementById('mu-prev-img'); if (img?.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  const box = document.getElementById('mu-prev'); if (box) box.hidden = true;
+}
+/** Marca (o quita) la foto de banner pendiente del editor de estilo: se apagan los presets y se actualiza el texto de estado. */
+function fijarBannerFoto(url) {
+  const cont = document.getElementById('est-banners'); cont.dataset.foto = url;
+  cont.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+  if (!url) cont.querySelector('button')?.setAttribute('aria-pressed', 'true');   // sin foto vuelve a quedar un preset marcado (el primero)
+  document.getElementById('est-quitar').hidden = !url;
+  document.getElementById('est-foto-estado').textContent = url ? 'Foto lista: pulsa «Guardar estilo».' : 'JPG, PNG o WebP; se reduce sola a 1600 px.';
+}
+
 /* ---------- Eventos ---------- */
 const ACCIONES = {
   panel: (el) => { ['estilo', 'privacidad'].forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = n !== el.dataset.panel ? true : !x.hidden; }); },
   'cerrar-panel': () => { document.getElementById('panel-estilo').hidden = true; document.getElementById('panel-privacidad').hidden = true; },
   amistad: () => seguro(() => solicitar(S.p.id), 'Solicitud enviada.'),
+  'elegir-foto': () => document.getElementById('mu-file').click(),
+  'alternar-video': () => { const i = document.getElementById('mu-video'); i.hidden = !i.hidden; if (!i.hidden) i.focus(); else i.value = ''; },
+  'quitar-foto': () => limpiarFoto(),
+  'video-yt': (el) => { const id = /^[A-Za-z0-9_-]{11}$/.test(el.dataset.yt) ? el.dataset.yt : ''; if (!id) return; el.outerHTML = `<div class="mt-2 rounded-xl overflow-hidden border border-galaxy-border aspect-video"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video de YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" class="w-full h-full"></iframe></div>`; },
+  'subir-banner': () => document.getElementById('est-file').click(),
+  'quitar-banner': () => { fijarBannerFoto(''); },
   publicar: async () => {
-    const v = validarTexto(document.getElementById('mu-texto').value);
+    const crudo = document.getElementById('mu-texto').value; const file = document.getElementById('mu-file').files?.[0] ?? null;
+    const vTxt = document.getElementById('mu-video').value.trim(); const vid = vTxt ? analizarVideo(vTxt) : null;
+    if (vid && !vid.ok) { toast(vid.error, 'error'); return; }
+    const hayMedios = !!file || !!vid;
+    const v = crudo.trim() ? validarTexto(crudo) : { ok: hayMedios, texto: '', error: 'Escribe algo, sube una foto o pega un enlace de video.' };
     if (!v.ok) { toast(v.error, 'error'); return; }
-    if (await seguro(() => api.publicar(v.texto), 'Publicado.') !== undefined) { document.getElementById('mu-texto').value = ''; document.getElementById('mu-cuenta').textContent = `0 / ${MURO_MAX}`; await refrescarMuro(); }
+    const btn = document.querySelector('[data-act=publicar]'); btn.disabled = true;
+    let urlFoto = null;
+    try {
+      if (file) urlFoto = await api.subirImagen(file, S.p.id);
+      await api.publicar(v.texto, urlFoto, vid?.url ?? null);
+      toast('Publicado.', 'ok');
+      document.getElementById('mu-texto').value = ''; document.getElementById('mu-cuenta').textContent = `0 / ${MURO_MAX}`; limpiarFoto();
+      const iv = document.getElementById('mu-video'); iv.value = ''; iv.hidden = true;
+      await refrescarMuro();
+    } catch (e) {
+      toast(msgErr(e), 'error');
+      if (urlFoto) api.quitarImagen(urlFoto);   // la publicación falló: no dejar la foto huérfana en el Storage
+    } finally { btn.disabled = false; }
   },
   fijar: async (el) => { const id = Number(el.dataset.id); const it = S.items.find((x) => x.id === id); if (await seguro(() => api.fijar(id, !it?.fijada)) !== undefined) await refrescarMuro(); },
   editar: (el) => { S.editando = Number(el.dataset.id); pintarFeed(); },
   'cancelar-edicion': () => { S.editando = null; pintarFeed(); },
   'guardar-edicion': async (el) => {
-    const v = validarTexto(document.getElementById('mu-edit').value); if (!v.ok) { toast(v.error, 'error'); return; }
+    const it = S.items.find((x) => x.id === Number(el.dataset.id)); const crudo = document.getElementById('mu-edit').value;
+    const v = crudo.trim() ? validarTexto(crudo) : { ok: !!(it?.imagen_url || it?.video_url), texto: '', error: 'El texto no puede quedar vacío si no hay foto ni video.' };
+    if (!v.ok) { toast(v.error, 'error'); return; }
     if (await seguro(() => api.editar(Number(el.dataset.id), v.texto), 'Cambios guardados.') !== undefined) { S.editando = null; await refrescarMuro(); }
   },
   borrar: async (el) => { if (!window.confirm('¿Borrar esta publicación? No se puede deshacer.')) return; if (await seguro(() => api.borrar(Number(el.dataset.id)), 'Publicación borrada.') !== undefined) await refrescarMuro(); },
@@ -191,7 +255,10 @@ const ACCIONES = {
   },
   'guardar-estilo': async () => {
     const b = document.querySelector('#est-banners [aria-pressed="true"]')?.dataset.banner; const a = document.querySelector('#est-acentos [aria-pressed="true"]')?.dataset.acento;
-    if (await seguro(() => api.guardarEstilo(estiloParaGuardar({ bannerId: b, acento: a, lema: document.getElementById('est-lema').value })), 'Estilo guardado.') !== undefined) await cargar();
+    const foto = document.getElementById('est-banners').dataset.foto || '';
+    if (await seguro(() => api.guardarEstilo(estiloParaGuardar({ bannerId: b, foto, acento: a, lema: document.getElementById('est-lema').value })), 'Estilo guardado.') === undefined) return;
+    const anterior = estiloDe(S.p).foto; if (anterior && anterior !== foto) api.quitarImagen(anterior);   // el banner viejo ya no se usa: limpiar el archivo
+    await cargar();
   },
   'guardar-priv': async () => {
     if (await seguro(() => api.guardarPrivacidadMuro(document.getElementById('pr-ver').value, document.getElementById('pr-resp').value), 'Privacidad guardada.') !== undefined) await cargar();
@@ -199,9 +266,32 @@ const ACCIONES = {
 };
 root.addEventListener('click', (e) => {
   const sw = e.target.closest('[data-banner],[data-acento]');
-  if (sw) { const grupo = sw.parentElement; grupo.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === sw))); return; }
+  if (sw) {
+    const grupo = sw.parentElement; grupo.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === sw)));
+    if (sw.dataset.banner && grupo.id === 'est-banners') { grupo.dataset.foto = ''; document.getElementById('est-quitar').hidden = true; document.getElementById('est-foto-estado').textContent = 'JPG, PNG o WebP; se reduce sola a 1600 px.'; }   // elegir un preset descarta la foto
+    return;
+  }
   const el = e.target.closest('[data-act]'); if (!el) return;
   try { const r = ACCIONES[el.dataset.act]?.(el); if (r?.catch) r.catch((err) => console.error('[perfil] acción:', err)); } catch (err) { console.error('[perfil] acción:', err); toast('No se pudo completar la acción.', 'error'); }
+});
+root.addEventListener('change', async (e) => {
+  const t = e.target;
+  if (t.id === 'mu-file') {   // foto del compositor: solo vista previa; se sube al pulsar «Publicar»
+    const f = t.files?.[0]; if (!f) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); t.value = ''; return; }
+    const img = document.getElementById('mu-prev-img'); if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+    img.src = URL.createObjectURL(f); document.getElementById('mu-prev').hidden = false;
+  } else if (t.id === 'est-file') {   // foto de banner: se sube ya (para poder previsualizar) y se guarda con «Guardar estilo»
+    const f = t.files?.[0]; t.value = ''; if (!f) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { toast('Usa una foto JPG, PNG o WebP.', 'error'); return; }
+    const estado = document.getElementById('est-foto-estado'); estado.textContent = 'Subiendo…';
+    try {
+      const pendiente = document.getElementById('est-banners').dataset.foto; const guardada = estiloDe(S.p).foto;
+      const url = await api.subirImagen(f, S.p.id, 1600);
+      if (pendiente && pendiente !== guardada) api.quitarImagen(pendiente);   // reemplazó una foto que ni se llegó a guardar
+      fijarBannerFoto(url);
+    } catch (err) { toast(msgErr(err), 'error'); estado.textContent = 'No se pudo subir.'; }
+  }
 });
 root.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('[data-resp-input]')) { e.preventDefault(); e.target.nextElementSibling?.click(); } });
 root.addEventListener('input', (e) => { if (e.target.id === 'mu-texto') { const n = e.target.value.trim().length; const c = document.getElementById('mu-cuenta'); c.textContent = `${n} / ${MURO_MAX}`; c.classList.toggle('text-bad', n > MURO_MAX); } });

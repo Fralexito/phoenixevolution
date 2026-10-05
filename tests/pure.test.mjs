@@ -851,3 +851,24 @@ test('muro fase 2: respuestas, resumen y reacción local', async () => {
   assert.deepEqual([c.reacciones, c.mia], [{}, null]);
   assert.deepEqual(it, { id: 1, reacciones: { fuego: 1 }, mia: null });   // no muta
 });
+
+test('muro fase 3: enlaces de video, rutas de imagen y banner con foto', async () => {
+  const { analizarVideo, rutaImagen, rutaDeUrl, estiloDe, estiloParaGuardar } = await import('../src/js/core/muro.js');
+  assert.deepEqual([analizarVideo('https://www.youtube.com/watch?v=dQw4w9WgXcQ').proveedor, analizarVideo('https://www.youtube.com/watch?v=dQw4w9WgXcQ').id], ['youtube', 'dQw4w9WgXcQ']);
+  assert.equal(analizarVideo('https://youtu.be/dQw4w9WgXcQ?t=5').id, 'dQw4w9WgXcQ');
+  assert.equal(analizarVideo('https://www.youtube.com/shorts/dQw4w9WgXcQ').ok, true);
+  assert.equal(analizarVideo('https://www.tiktok.com/@user/video/123').proveedor, 'tiktok');
+  assert.equal(analizarVideo('https://kick.com/fralex').proveedor, 'kick');
+  assert.equal(analizarVideo('https://clips.twitch.tv/AbcDef').proveedor, 'twitch');
+  assert.equal(analizarVideo('http://youtu.be/dQw4w9WgXcQ').ok, false);                 // solo https
+  assert.equal(analizarVideo('https://evil.com/?u=https://youtu.be/dQw4w9WgXcQ').ok, false);
+  assert.equal(analizarVideo('https://youtu.be/dQw4w9WgXcQ"><script>').ok, false);       // sin comillas ni etiquetas
+  assert.equal(analizarVideo('').error, '');
+  assert.equal(rutaImagen('u-1', 123, 'ab!cd'), 'u-1/123-abcd.jpg');
+  assert.equal(rutaDeUrl('https://x.supabase.co/storage/v1/object/public/muro/u-1/123-abcd.jpg'), 'u-1/123-abcd.jpg');
+  assert.equal(rutaDeUrl('https://otro.com/foto.jpg'), '');
+  assert.equal(estiloDe({ muro_banner: 'https://x.supabase.co/storage/v1/object/public/muro/u/1.jpg' }).foto.startsWith('https://'), true);
+  assert.equal(estiloDe({ muro_banner: 'preset:oro' }).foto, '');
+  assert.equal(estiloParaGuardar({ bannerId: 'oro', foto: 'https://x/y.jpg', acento: '#00e5ff', lema: '' }).p_banner, 'https://x/y.jpg');   // la foto manda sobre el preset
+  assert.equal(estiloParaGuardar({ bannerId: 'oro', foto: '', acento: '#00e5ff', lema: '' }).p_banner, 'preset:oro');
+});

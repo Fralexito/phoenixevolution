@@ -38,13 +38,14 @@ export function estiloDe(p) {
   const banner = BANNERS.find((b) => b.id === id) ?? BANNERS.find((b) => b.id === BANNER_DEFECTO);
   const acento = /^#[0-9a-fA-F]{6}$/.test(String(p?.muro_acento ?? '')) ? p.muro_acento : ACENTO_DEFECTO;
   const lema = String(p?.muro_lema ?? '').replace(/[<>]/g, '').trim().slice(0, LEMA_MAX);
-  return { banner, acento, lema };
+  const foto = /^https:\/\//i.test(String(p?.muro_banner ?? '')) ? String(p.muro_banner) : '';   // banner subido por la persona (bucket «muro»)
+  return { banner, acento, lema, foto };
 }
 
 /** Valores del editor → argumentos de la RPC `muro_guardar_estilo`. */
-export function estiloParaGuardar({ bannerId, acento, lema }) {
+export function estiloParaGuardar({ bannerId, foto, acento, lema }) {
   return {
-    p_banner: BANNERS.some((b) => b.id === bannerId) ? `preset:${bannerId}` : null,
+    p_banner: /^https:\/\//i.test(String(foto ?? '')) ? String(foto) : (BANNERS.some((b) => b.id === bannerId) ? `preset:${bannerId}` : null),   // la foto, si hay, manda sobre el preset
     p_acento: ACENTOS.includes(acento) ? acento : null,
     p_lema: String(lema ?? '').replace(/[<>]/g, '').trim().slice(0, LEMA_MAX),
   };
@@ -74,3 +75,24 @@ export function aplicarReaccion(item, final) {
   for (const k of Object.keys(reacciones)) if (!reacciones[k]) delete reacciones[k];
   return { ...item, reacciones, mia: final ?? null };
 }
+
+/** Enlace de video → { ok, proveedor, id, url, error }. Mismos proveedores que la BD (private.video_valido): YouTube, TikTok, Kick y Twitch (solo https). `id` solo en YouTube. */
+const PROVEEDORES = [
+  ['youtube', /^https:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:[^#\s]*&)?v=|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i],
+  ['tiktok', /^https:\/\/(?:www\.|m\.|vm\.)?tiktok\.com\/\S+/i],
+  ['kick', /^https:\/\/(?:www\.)?kick\.com\/\S+/i],
+  ['twitch', /^https:\/\/(?:www\.|clips\.)?twitch\.tv\/\S+/i],
+];
+export const PROVEEDOR_ETIQUETA = { youtube: 'YouTube', tiktok: 'TikTok', kick: 'Kick', twitch: 'Twitch' };
+export function analizarVideo(texto) {
+  const url = String(texto ?? '').trim();
+  if (!url) return { ok: false, proveedor: '', id: '', url: '', error: '' };
+  if (url.length > 300 || /[<>"'\s]/.test(url)) return { ok: false, proveedor: '', id: '', url, error: 'El enlace no es válido.' };
+  for (const [proveedor, re] of PROVEEDORES) { const m = re.exec(url); if (m) return { ok: true, proveedor, id: m[1] ?? '', url, error: '' }; }
+  return { ok: false, proveedor: '', id: '', url, error: 'Solo se aceptan enlaces https de YouTube, TikTok, Kick o Twitch.' };
+}
+
+/** Ruta del archivo dentro del bucket «muro»: `<uid>/<marca de tiempo>-<aleatorio>.jpg` (la BD exige que empiece por tu uid). */
+export const rutaImagen = (uid, ts = Date.now(), azar = Math.random().toString(36).slice(2, 8)) => `${uid}/${ts}-${String(azar).replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'x'}.jpg`;
+/** URL pública del bucket «muro» → ruta del archivo (para borrarlo del Storage). '' si no es de ese bucket. */
+export const rutaDeUrl = (url) => /\/storage\/v1\/object\/public\/muro\/([^?#]+)/.exec(String(url ?? ''))?.[1] ?? '';
