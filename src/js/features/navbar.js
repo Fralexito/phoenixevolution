@@ -7,6 +7,7 @@ import { openAuthModal, logout } from './auth.js';
 import { openProfileModal } from './profile.js';
 import { initNotifications } from './notifications.js';
 import { iniciarPendientes } from './pendientes.js';
+import { ACCOUNT_NAV } from '../../data/site.js';
 
 let stopNotif = null;
 let stopPend = null;
@@ -19,6 +20,10 @@ function pintarPendientes({ mensajes, solicitudes }) {
   caja.innerHTML = (mensajes ? fila('mensajes/', 'fa-comments', 'Sin leer', mensajes) : '') + (solicitudes ? fila('amigos/', 'fa-user-plus', 'Solicitudes', solicitudes) : '');
   caja.hidden = !(mensajes || solicitudes); punto.hidden = !(mensajes || solicitudes);
 }
+
+/** Atajos de «Mi cuenta» para móvil (en PC ya están en la barra lateral): cuadrícula 2x2 pequeña y discreta dentro del menú de la foto. */
+const ATAJOS_MOVIL = ACCOUNT_NAV.filter((n) => n.path && !n.abajo)
+  .map((n) => `<a href="${escapeHTML(href(n.path))}" class="flex items-center gap-2 px-3 py-2 text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-solid ${n.icon} w-4 text-center text-gray-500"></i><span class="truncate">${escapeHTML(n.label)}</span></a>`).join('');
 
 function render({ session, profile }) {
   const box = document.getElementById('nav-auth');
@@ -46,6 +51,7 @@ function render({ session, profile }) {
         <div id="user-menu" hidden class="absolute right-0 mt-3 w-60 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden font-display text-sm uppercase tracking-wider">
           <div class="px-4 py-3 border-b border-galaxy-border/70"><p class="text-white font-bold truncate">${escapeHTML(name)}</p>${profile?.username ? `<p class="text-[11px] text-gray-400 normal-case tracking-normal truncate">@${escapeHTML(profile.username)}</p>` : ''}</div>
           <div id="menu-pendientes" hidden class="border-b border-galaxy-border/70 py-1"></div>
+          <div class="lg:hidden grid grid-cols-2 border-b border-galaxy-border/70 py-1 normal-case tracking-normal">${ATAJOS_MOVIL}</div>
           <div class="py-1">
             <button type="button" data-act="profile" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400 uppercase tracking-wider"><i class="fa-solid fa-user mr-2"></i>Mi perfil</button>
             <a href="${escapeHTML(href('ajustes/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gear mr-2"></i>Configuración</a>
