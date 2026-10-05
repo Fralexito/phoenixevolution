@@ -58,14 +58,10 @@ const datos = LIGAS.map((l) => ({
             </div>
             <h1 class="text-5xl sm:text-7xl md:text-8xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">{l.titulo[0]} <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">{l.titulo[1]}</span></h1>
             <p class="text-sm sm:text-2xl font-display font-light tracking-[0.25em] sm:tracking-[0.3em] text-gray-300 uppercase">{l.juego}</p>
-            {(l.sede || l.organizador) && (
-              <ul class="flex flex-wrap justify-center sm:justify-start gap-2" aria-label="Sede y organizador">
-                {l.sede && <li><span class="pc-chip"><i class="fa-solid fa-location-dot"></i>Sede: {l.sede}</span></li>}
-                {l.organizador && <li><a class="liga-org" data-org-jugador={l.organizador} href={`${base}database/`} title={`Ver la carta de ${l.organizador}`}><span class="liga-org-ico"><i class="fa-solid fa-user-tie"></i></span><span class="leading-tight"><span class="block text-[10px] tracking-[.25em] uppercase text-gray-400">Organizador</span><span class="block font-display font-extrabold text-lg text-white uppercase tracking-wider">{l.organizador}</span></span><i class="fa-solid fa-chevron-right text-galaxy-400 text-xs ml-1"></i></a></li>}
-              </ul>
-            )}
             {ult && (
-              <ul class="flex flex-wrap justify-center sm:justify-start gap-2" aria-label="Estado de la edición">
+              <ul class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5" aria-label="Datos de la liga">
+                {l.organizador && <li><a class="liga-org" data-org-jugador={l.organizador} href={`${base}database/`} title={`Ver la carta de ${l.organizador}`}><span class="liga-org-ico"><i class="fa-solid fa-user-tie"></i></span><span class="leading-tight"><span class="block text-[10px] tracking-[.25em] uppercase text-gray-400">Organizador</span><span class="block font-display font-extrabold text-base text-white uppercase tracking-wider">{l.organizador}</span></span><i class="fa-solid fa-chevron-right text-galaxy-400 text-xs ml-1"></i></a></li>}
+                {l.sede && <li><span class="pc-chip"><i class="fa-solid fa-location-dot"></i>Sede: {l.sede}</span></li>}
                 <li class="hidden sm:block"><span class="pc-chip"><i class="fa-solid fa-calendar-day"></i>{ult.nombre}</span></li>
                 {fa && <li><span class="pc-chip"><i class="fa-solid fa-futbol"></i>Fecha {fa.n} {ESTADO_FECHA[fa.estado]}</span></li>}
                 {ult.tabla[0]?.pj > 0 && <li><span class="pc-chip"><i class="fa-solid fa-crown"></i>Líder: {ult.tabla[0].nombre} · {ult.tabla[0].pts} pts</span></li>}

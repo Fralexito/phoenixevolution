@@ -366,8 +366,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **ronda 159** — Sudario: se quita la zona de ascenso (`suben: 0` en `SISTEMAS_LIGA`; Div. 2 aún no existe) y la leyenda enlaza a la nueva página `/sudario-divisiones/` (estática, tema azul/dorado: escalera de divisiones, tabla con zonas copa/descenso). Incompleta a propósito.
 - **ronda 160** — Liga: el organizador pasa de chip pequeño a insignia grande `.liga-org` (ícono, etiqueta, nombre grande, brillo al pasar el cursor; dorada en Sudario).
 - **ronda 161** — Páginas de divisiones (`/temporada/` Galaxy y `/sudario-divisiones/`): selector «Ligas activas» (componente `SelectorDivisiones.astro`) para saltar de una a otra.
+- **ronda 162** — Liga: organizador, sede, edición y jugadores van en UNA sola fila alineada al centro (antes eran dos filas desparejas); insignia del organizador un poco más compacta.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 161)
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 162)
 - **Reglas fijas:** trabajar solo en `borrador`; pasar a `main` solo cuando el usuario diga «Súbelo/Publícalo». Cada cambio: bullet «ronda N» en este archivo (siguiente = **121**), commit con los dos trailers (`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` y `Claude-Session: ...`) y push a `borrador`. Supabase `fiibiyijojkxqlsrhcil`: no usar `apply_migration` ni DDL grande por `execute_sql` (se cancelan); entregar el `.sql` con SendUserFile para que el usuario lo pegue en el SQL Editor, y verificar después con consultas de solo lectura. Idioma: español.
 - **Modo ligero (pedido del usuario el 05/10):** cambios pequeños = cambio + test pertinente + commit, sin Playwright ni capturas salvo que el cambio sea grande o el usuario lo pida; respuestas cortas (qué cambió y qué hacer); no listar carpetas grandes; no repetir el resumen de pasos.
 - **Estado de la BD:** migraciones 001–042 aplicadas y verificadas (039 disputas, 040 encuestas, 041 feed, 042 eventos con el trabajo `recordar-eventos`). No hay migraciones pendientes.
