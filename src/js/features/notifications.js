@@ -14,8 +14,9 @@ const ICON = {
   PARTIDO_CONFIRMADO: 'fa-circle-check', PARTIDO_CANCELADO: 'fa-circle-xmark', RETO_EXPIRADO: 'fa-hourglass-end',
   INVITACION_RETO: 'fa-user-plus', UNION_RETO: 'fa-users', SALIO_RETO: 'fa-user-minus',
   AMISTAD_SOLICITUD: 'fa-user-plus', AMISTAD_ACEPTADA: 'fa-user-group', SEGUIDOR_NUEVO: 'fa-heart',
+  ESPECTADOR_SOLICITUD: 'fa-eye', ESPECTADOR_APROBADO: 'fa-eye',
 };
-const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/' };   // el resto de avisos son de retos → Duelos
+const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/', ESPECTADOR_SOLICITUD: 'en-vivo/', ESPECTADOR_APROBADO: 'en-vivo/' };   // el resto de avisos son de retos → Duelos
 const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const LIMIT = 30;
 

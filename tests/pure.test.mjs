@@ -759,3 +759,24 @@ test('chat: etiquetaDia y hoyClave', () => {
   assert.equal(etiquetaDia('2026-10-04', '2026-10-04'), 'Hoy'); assert.equal(etiquetaDia('2026-10-03', '2026-10-04'), 'Ayer');
   assert.match(etiquetaDia('2026-09-20', '2026-10-04'), /20/); assert.equal(hoyClave('America/Lima', new Date('2026-10-05T03:00:00Z')), '2026-10-04');
 });
+
+import { MODOS, modoValido, clampMax, normalizarPartidos, normalizarSalas, accionPara } from '../src/js/core/espectadores.js';
+test('espectadores: modos válidos y límites de cupos', () => {
+  assert.deepEqual(MODOS.map((m) => m.id), ['APAGADO', 'APROBACION', 'AMIGOS', 'CUALQUIERA']);
+  assert.equal(modoValido('HACK'), 'APAGADO'); assert.equal(modoValido('AMIGOS'), 'AMIGOS');
+  assert.equal(clampMax(0), 1); assert.equal(clampMax(99), 20); assert.equal(clampMax('x'), 4); assert.equal(clampMax(7.4), 7);
+});
+test('espectadores: normalizar partidos y salas descarta basura', () => {
+  const p = normalizarPartidos([null, { id: 'x' }, { id: 5, modo: 'AMIGOS', max: 3, aprobados: '2', mi_estado: 'APROBADO', jugadores: ['a', 3] }]);
+  assert.equal(p.length, 1); assert.deepEqual([p[0].modo, p[0].max, p[0].aprobados, p[0].mi_estado, p[0].jugadores], ['AMIGOS', 3, 2, 'APROBADO', ['a']]);
+  assert.deepEqual(normalizarPartidos(undefined), []);
+  const s = normalizarSalas([{ id: 1, modo: 'APROBACION', espectadores: [{ usuario_id: 'a', estado: 'PENDIENTE' }, { usuario_id: 'b', estado: 'APROBADO' }, { estado: 'APROBADO' }] }]);
+  assert.deepEqual([s[0].pendientes, s[0].aprobados], [['a'], ['b']]);
+});
+test('espectadores: accionPara decide el botón', () => {
+  const base = { modo: 'APROBACION', max: 2, aprobados: 0, mi_estado: null, motivo: '' };
+  assert.equal(accionPara({ ...base, mi_estado: 'APROBADO' }).tipo, 'ver'); assert.equal(accionPara({ ...base, mi_estado: 'PENDIENTE' }).tipo, 'pendiente');
+  assert.equal(accionPara({ ...base, motivo: 'Inicia sesión para pedir entrar.' }).tipo, 'no'); assert.equal(accionPara({ ...base, aprobados: 2 }).tipo, 'lleno');
+  assert.equal(accionPara(base).tipo, 'pedir'); assert.equal(accionPara({ ...base, modo: 'CUALQUIERA' }).tipo, 'entrar');
+  assert.equal(accionPara({ ...base, modo: 'AMIGOS' }).activo, true);
+});

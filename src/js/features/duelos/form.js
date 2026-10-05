@@ -8,6 +8,8 @@ import { MAX_PLAYERS } from '../../core/rules.js';
 import { setTeamSize, maxFor } from '../../core/teams.js';
 import { data, me, myProfile, nm } from './data.js';
 import { needLogin, guard, friendly, refresh, invitar } from './actions.js';
+import { MODOS, modoDe } from '../../core/espectadores.js';
+import * as espectadores from '../espectadores/api.js';
 
 const $ = (id) => document.getElementById(id);
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -15,7 +17,8 @@ const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'nu
 const pressed = (btns, pred) => btns.forEach((b) => b.setAttribute('aria-pressed', String(pred(b))));
 const all = (sel) => [...document.querySelectorAll(sel)];
 
-export const ui = { destino: 'abierto', vis: 'privado', host: 'yo', preset: 'ya', mode: 'rapido', dayOffset: 0, slot: null, rival: null, a: 1, b: 1, amigos: new Set() };
+
+export const ui = { espectadores: 'APAGADO', destino: 'abierto', vis: 'privado', host: 'yo', preset: 'ya', mode: 'rapido', dayOffset: 0, slot: null, rival: null, a: 1, b: 1, amigos: new Set() };
 
 /* ---------- Cuándo ---------- */
 function chosenWhen() {
@@ -111,6 +114,10 @@ export function initForm() {
   $('presets').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) { ui.preset = b.dataset.p; refreshForm(); } });
 
   const size = (side, d) => { const t = setTeamSize(ui, side, ui[side] + d); ui.a = t.a; ui.b = t.b; refreshForm(); };
+  // Espectadores: modo elegido al crear el reto (se puede cambiar después en «Salas en vivo»).
+  $('select-espectadores').innerHTML = MODOS.map((m) => `<option value="${m.id}">${m.etiqueta}</option>`).join('');
+  $('select-espectadores').addEventListener('change', (e) => { ui.espectadores = e.target.value; $('hint-espectadores').textContent = modoDe(ui.espectadores).ayuda; });
+  $('hint-espectadores').textContent = modoDe(ui.espectadores).ayuda;
   $('tam-reset').addEventListener('click', () => { ui.a = 1; ui.b = 1; refreshForm(); });
   $('tam-personal').addEventListener('click', () => { if (ui.a === ui.b || ui.a + ui.b < 2) { ui.a = 1; ui.b = 2; } refreshForm(); $('tam-b-mas').focus({ preventScroll: true }); });
   $('tam-a-menos').addEventListener('click', () => size('a', -1)); $('tam-a-mas').addEventListener('click', () => size('a', 1));
@@ -169,6 +176,10 @@ export async function submitReto(ev) {
     createdId = created.id;
   });
   if (!ok) return;
+  if (ui.espectadores !== 'APAGADO') {   // el reto ya existe: si esto falla solo se avisa (se puede ajustar en «Salas en vivo»)
+    try { await espectadores.configurar(createdId, ui.espectadores, 4); }
+    catch (e) { console.error('[duelos] espectadores:', e.message); toast('El reto se emitió, pero no se pudo abrir a espectadores. Ajústalo en «Salas en vivo».', 'error', { key: 'esp-cfg' }); }
+  }
   let fallidas = 0;
   for (const uid of ui.amigos) { if (!(await invitar(createdId, uid, 'A'))) fallidas += 1; }   // si alguna falla, el reto ya existe: se avisa sin deshacerlo
   ui.amigos.clear();

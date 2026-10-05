@@ -116,6 +116,12 @@ import Layout from '../layouts/Layout.astro';
             <p id="hint-host" class="col-span-2 text-[11px] text-gray-400 leading-snug empty:hidden -mt-0.5"></p>
           </div>
 
+          <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
+            <label class="label !mb-0" for="select-espectadores"><i class="fa-solid fa-eye text-galaxy-400 mr-1"></i>Espectadores</label>
+            <select id="select-espectadores" class="field !py-1.5" aria-describedby="hint-espectadores"></select>
+            <p id="hint-espectadores" class="col-span-2 text-[11px] text-gray-400 leading-snug -mt-0.5"></p>
+          </div>
+
           <div>
             <span class="label">¿Cuándo?</span>
             <div id="presets" class="grid grid-cols-5 gap-1.5" role="group" aria-label="Cuándo jugar">

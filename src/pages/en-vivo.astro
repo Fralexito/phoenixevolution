@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL;
+---
+<Layout title="Salas en vivo" active="envivo">
+  <div class="max-w-6xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+      <div class="min-w-0">
+        <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad</span>
+        <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-tower-broadcast text-galaxy-400 mr-2"></i>Salas en vivo</h1>
+        <p class="text-gray-300 text-xs mt-0.5 max-w-2xl">Partidos que sus jugadores abrieron para que otros puedan mirar. Entras al mismo Parsec o Smash Soda solo como espectador.</p>
+      </div>
+      <a href={`${base}duelos/`} class="btn btn-primary !min-h-10"><i class="fa-solid fa-satellite-dish"></i> Lanzar un reto</a>
+    </header>
+
+    <section id="bloque-mis" hidden class="space-y-3" aria-labelledby="h-mis-salas">
+      <h2 id="h-mis-salas" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-sliders text-galaxy-400 mr-2"></i>Mis partidos · espectadores <b id="cnt-mis-salas" class="text-galaxy-400"></b></h2>
+      <div id="lista-mis-salas" class="grid md:grid-cols-2 gap-3"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="h-en-vivo">
+      <h2 id="h-en-vivo" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-eye text-galaxy-400 mr-2"></i>Para mirar <b id="cnt-en-vivo" class="text-galaxy-400"></b></h2>
+      <div id="lista-en-vivo" class="grid md:grid-cols-2 gap-3"><div class="col-span-full text-center py-8 text-gray-400 text-xs">Cargando…</div></div>
+    </section>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/enVivo.js';
+</script>
