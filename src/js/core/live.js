@@ -51,3 +51,18 @@ export function podarHistorial(hist, now = Date.now(), { maxMs = HIST_MAX_MS, ma
     .sort((a, b) => b.ts - a.ts)
     .slice(0, maxN);
 }
+
+/** Clave de día «AAAA-MM-DD» en la zona indicada (o la local del dispositivo). Sirve para saber «¿es de hoy?» sin depender de horas sueltas. */
+export function diaClave(ts, timeZone) {
+  const d = new Date(ts); if (Number.isNaN(d.getTime())) return '';
+  try { return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', ...(timeZone ? { timeZone } : {}) }).format(d); }
+  catch { return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }   // zona desconocida: día local
+}
+/** Historial SOLO DEL DÍA de `now`: cuando cambia el día, lo anterior desaparece solo. Válidos, más nuevo primero, con tope. No muta. */
+export function podarHistorialHoy(hist, now = Date.now(), { timeZone, maxN = HIST_MAX_N } = {}) {
+  const hoy = diaClave(now, timeZone);
+  return (Array.isArray(hist) ? hist : [])
+    .filter((e) => e && Number.isFinite(e.ts) && e.ts <= now + 60_000 && diaClave(e.ts, timeZone) === hoy && formatEvento(e))
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, maxN);
+}

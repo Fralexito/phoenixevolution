@@ -799,3 +799,17 @@ test('etiquetaJuego: FIFA / EA FC / eFootball con mod entre paréntesis', async 
   assert.equal(etiquetaJuego({ juego: 'EA FC', version: '27' }), 'EA FC 27');
   assert.equal(etiquetaJuego({ juego: 'eFootball', version: '2027', parche: 'Option File' }), 'eFootball 2027 (Option File)');
 });
+
+test('historial en vivo: solo el día actual; al cambiar de día lo anterior desaparece', async () => {
+  const { podarHistorialHoy, diaClave } = await import('../src/js/core/live.js');
+  const ev = (ts, quien) => ({ tipo: 'radar_on', quien, ts });
+  const lunes = new Date(2026, 9, 5, 10, 0, 0).getTime();       // lunes 5 oct 2026, 10:00 local
+  const tarde = new Date(2026, 9, 5, 23, 59, 0).getTime();
+  const martes = new Date(2026, 9, 6, 0, 1, 0).getTime();
+  const h = [ev(lunes, 'A'), ev(tarde, 'B')];
+  assert.deepEqual(podarHistorialHoy(h, tarde).map((e) => e.quien), ['B', 'A']);   // mismo día: se ven ambos, el más nuevo primero
+  assert.deepEqual(podarHistorialHoy(h, martes), []);                                // pasó la medianoche: se vacía
+  assert.deepEqual(podarHistorialHoy([...h, ev(martes, 'C')], martes).map((e) => e.quien), ['C']);
+  assert.equal(diaClave(new Date(2026, 9, 5, 12).getTime()).length, 10);   // formato AAAA-MM-DD
+  assert.deepEqual(podarHistorialHoy('basura', lunes), []);
+});

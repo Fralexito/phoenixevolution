@@ -26,10 +26,11 @@ export const SECCIONES = [
     { clave: 'tickerVel', tipo: 'opciones', etiqueta: 'Velocidad de la barra', ayuda: 'Qué tan rápido pasan las noticias.', defecto: 'normal', opciones: [{ valor: 'lenta', etiqueta: 'Lenta' }, { valor: 'normal', etiqueta: 'Normal' }, { valor: 'rapida', etiqueta: 'Rápida' }] },
   ] },
   { id: 'privacidad', vista: true, titulo: 'Privacidad', icono: 'fa-user-shield', texto: 'Qué recuerda este navegador. Nada de esto sale de tu equipo.', ajustes: [
-    { clave: 'vivoHistorial', tipo: 'switch', etiqueta: 'Guardar el historial de «En vivo»', ayuda: 'Las últimas 2 horas, para verlas al cambiar de página.', defecto: true },
+    { clave: 'vivoHistorial', tipo: 'switch', etiqueta: 'Guardar el historial de «En vivo»', ayuda: 'Solo el del día de hoy; se vacía solo al cambiar de día. Se abre en otra pestaña con el botón «Historial».', defecto: true },
     { clave: 'recordarZoom', tipo: 'switch', etiqueta: 'Recordar el zoom de Jugadores', ayuda: 'El tamaño de las cartas que elegiste.', defecto: true },
   ], acciones: [
-    { id: 'borrar-historial-vivo', etiqueta: 'Borrar historial de «En vivo»', icono: 'fa-eraser' },
+    { id: 'borrar-historial-vivo', etiqueta: 'Borrar historial de hoy de «En vivo»', icono: 'fa-eraser' },
+    { id: 'restablecer-vivo-pos', etiqueta: 'Devolver «En vivo» a su sitio', icono: 'fa-arrows-up-down-left-right' },
     { id: 'borrar-zoom', etiqueta: 'Olvidar el zoom guardado', icono: 'fa-magnifying-glass-minus' },
   ] },
   { id: 'cuenta', titulo: 'Cuenta', icono: 'fa-user', texto: 'Tu perfil y tu sesión.', ajustes: [], cuenta: true },

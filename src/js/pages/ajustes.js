@@ -34,6 +34,7 @@ const descargar = (nombre, texto) => {
 };
 const ACCIONES = {
   'borrar-historial-vivo': () => { quitar('pes-live-hist'); toast('Historial de «En vivo» borrado.', 'info'); },
+  'restablecer-vivo-pos': () => { quitar('pes-live-dock'); toast('El botón «En vivo» volverá a su sitio al recargar la página.', 'info'); },
   'borrar-zoom': () => { quitar('pes-zoom-pc'); quitar('pes-zoom-movil'); toast('Zoom olvidado: volverá al tamaño predeterminado.', 'info'); },
   exportar: () => { descargar('ajustes-phoenix.json', exportarAjustes(leerAjustes())); avisar('Archivo descargado.'); },
   importar: () => document.getElementById('aj-archivo')?.click(),
