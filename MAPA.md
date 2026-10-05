@@ -258,3 +258,4 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **Ronda 71** — Duelos/Tamaño: se quitó el botón 1v1 (es el valor por defecto; volver a tocar un formato lo regresa a 1v1). Fila: 2v2 · 3v3 · 4v4 · «Personalizar» (sutil, borde punteado) y los contadores Mi equipo/Rival quedan siempre visibles.
 - **Ronda 72** — Duelos: se quitó el enlace «Mis partidos» del encabezado del radar (queda como antes: título + Actualizar). Mis partidos se abre desde el menú de cuenta.
 - **Ronda 73** — Duelos/Tamaño: enlace «volver a 1v1» (solo aparece si el tamaño no es 1v1) para regresar al valor por defecto sin usar las flechas.
+- **Ronda 74** — Duelos/Tamaño: «Restablecer a 1 vs 1» pasa a ser un botón de ancho completo con icono y borde cian (aparece solo si el tamaño no es 1v1).
