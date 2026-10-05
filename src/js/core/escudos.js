@@ -6,7 +6,7 @@ import { norm } from './search.js';
 const REMOTO = 'https://crests.football-data.org/';
 // MODO LOCAL: cuando el flujo «Descargar escudos» (.github/workflows/escudos.yml) baja los PNG a /public/escudos/ y comprueba que están todos, pone esto en true.
 // Para VOLVER a pedirlos a internet (reversible): ponlo en false.
-export const ESCUDOS_LOCALES = false;
+export const ESCUDOS_LOCALES = true;
 const BASE_URL = ESCUDOS_LOCALES ? `${import.meta.env?.BASE_URL ?? '/'}escudos/` : REMOTO;
 /** Identificadores de los escudos conocidos (los usa el flujo que los descarga). */
 const ID = {
