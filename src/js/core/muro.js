@@ -10,14 +10,20 @@ export function validarTexto(t) {
   return { ok: true, texto, error: '' };
 }
 
-/** Texto del usuario → HTML seguro: se escapa TODO primero; después los https:// pasan a enlaces y los saltos de línea a <br>. */
-export function textoAHTML(t) {
-  return escapeHTML(t).replace(/https:\/\/[^\s<]+/gi, (u) => {
-    const limpio = u.replace(/(&quot;|&#39;|[.,;:!?)\]])+$/g, '');   // la puntuación final no es parte del enlace
-    const resto = u.slice(limpio.length);
-    const url = safeUrl(limpio.replace(/&amp;/g, '&'));
-    return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer nofollow" class="text-galaxy-400 underline break-all">${limpio}</a>${resto}` : u;
-  }).replace(/\n/g, '<br>');
+/** Texto del usuario → HTML seguro: se escapa TODO primero; después los https:// pasan a enlaces, las @menciones a enlaces al perfil y los saltos de línea a <br>.
+ *  Una sola pasada: un «@» dentro de una URL (youtube.com/@canal) es parte de la URL, no una mención; «correo@sitio.com» tampoco (la mención no puede ir pegada a una letra).
+ *  `urlPerfil` se inyecta para que este módulo siga siendo puro (sin config.js); por defecto sirve para cualquier página de primer nivel (../perfil/). */
+const urlPerfilPorDefecto = (u) => `../perfil/?u=${encodeURIComponent(u)}`;
+function enlaceURL(u) {
+  const limpio = u.replace(/(&quot;|&#39;|[.,;:!?)\]])+$/g, '');   // la puntuación final no es parte del enlace
+  const resto = u.slice(limpio.length);
+  const url = safeUrl(limpio.replace(/&amp;/g, '&'));
+  return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer nofollow" class="text-galaxy-400 underline break-all">${limpio}</a>${resto}` : u;
+}
+export function textoAHTML(t, { urlPerfil = urlPerfilPorDefecto } = {}) {
+  return escapeHTML(t).replace(/(https:\/\/[^\s<]+)|(^|[^A-Za-z0-9_@])@([A-Za-z0-9_]{1,20})/gi, (m, url, pre, usuario) =>
+    url ? enlaceURL(url) : `${pre}<a href="${escapeHTML(urlPerfil(usuario))}" class="text-galaxy-400 font-bold hover:underline">@${usuario}</a>`,
+  ).replace(/\n/g, '<br>');
 }
 
 /** «hace 5 min», «hace 3 h», «ayer», o la fecha. `now` inyectable para probar. */

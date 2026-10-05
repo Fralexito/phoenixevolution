@@ -1,4 +1,4 @@
-// Página /amigos/: pestañas (Amigos · Solicitudes · Buscar · Seguidores · Siguiendo · Bloqueados · Privacidad).
+// Página /amigos/: pestañas (Amigos · Solicitudes · Buscar · Seguidores · Siguiendo · Bloqueados · Privacidad · Avisos).
 // Esquema: pages → features/amigos/api (RPC) → core/red (lógica pura).
 import { onSession } from '../core/session.js';
 import { toast } from '../core/toast.js';
@@ -8,14 +8,16 @@ import { me, data, loadPerfiles } from '../features/duelos/data.js';
 import { supabase } from '../core/supabase.js';
 import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_OPCIONES } from '../core/red.js';
 import * as api from '../features/amigos/api.js';
+import * as avisosApi from '../features/avisos/api.js';
+import { CATEGORIAS_AVISO, NOTA_SISTEMA, normalizarPreferencias } from '../core/avisos.js';
 
 const $ = (id) => document.getElementById(id);
-const S = { red: normalizarRed(null), tab: 'amigos', texto: '', ocupado: false };
+const S = { red: normalizarRed(null), tab: 'amigos', texto: '', ocupado: false, avisos: normalizarPreferencias(null), avisosError: '' };
 const perfil = (id) => data.perfiles.get(id) ?? { id, nombre_display: 'Jugador' };
 
 const TABS = [
   ['amigos', 'Amigos', 'fa-user-group'], ['solicitudes', 'Solicitudes', 'fa-inbox'], ['buscar', 'Buscar', 'fa-magnifying-glass'],
-  ['seguidores', 'Seguidores', 'fa-heart'], ['siguiendo', 'Siguiendo', 'fa-eye'], ['bloqueados', 'Bloqueados', 'fa-ban'], ['privacidad', 'Privacidad', 'fa-shield-halved'],
+  ['seguidores', 'Seguidores', 'fa-heart'], ['siguiendo', 'Siguiendo', 'fa-eye'], ['bloqueados', 'Bloqueados', 'fa-ban'], ['privacidad', 'Privacidad', 'fa-shield-halved'], ['avisos', 'Avisos', 'fa-bell'],
 ];
 const vacio = (t) => `<div class="text-center py-8 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
 
@@ -64,6 +66,12 @@ const VISTAS = {
     + `<label class="flex items-center justify-between gap-3 rounded-xl bg-galaxy-panel border border-galaxy-border/80 p-3 cursor-pointer"><span class="text-sm text-white"><i class="fa-solid fa-circle text-ok text-[8px] mr-1.5"></i>Mostrar que estoy conectado
       <span class="block text-[11px] text-gray-400">Si lo apagas, no apareces «en línea» para tus amigos.</span></span>
       <input type="checkbox" data-priv="mostrar_conexion" ${S.red.privacidad.mostrar_conexion ? 'checked' : ''} class="w-5 h-5 accent-[#8000ff]"></label>`,
+  avisos: () => (S.avisosError ? `<div class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-xs text-rose-200"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>${escapeHTML(S.avisosError)}</div>` : '')
+    + '<p class="text-xs text-gray-400">Elige qué avisos quieres recibir en la campana. Lo que apagues no se guarda: no podrás verlo después.</p>'
+    + CATEGORIAS_AVISO.map((c) => `<label class="flex items-center justify-between gap-3 rounded-xl bg-galaxy-panel border border-galaxy-border/80 p-3 cursor-pointer"><span class="text-sm text-white min-w-0"><i class="fa-solid ${c.icono} text-galaxy-400 w-5 text-center mr-1"></i>${escapeHTML(c.titulo)}
+        <span class="block text-[11px] text-gray-400 mt-0.5">${escapeHTML(c.texto)}</span></span>
+        <input type="checkbox" data-aviso="${c.id}" ${S.avisos[c.id] ? 'checked' : ''} class="w-5 h-5 accent-[#8000ff] shrink-0"></label>`).join('')
+    + `<p class="text-[11px] text-gray-500 pt-1"><i class="fa-solid fa-lock mr-1"></i>${escapeHTML(NOTA_SISTEMA)}</p>`,
 };
 
 function resultadosBusqueda() {
@@ -103,7 +111,14 @@ async function ejecutar(fn) {
 $('tabs-red').addEventListener('click', (e) => { const t = e.target.closest('[data-tab]')?.dataset.tab; if (t) { S.tab = t; pintar(); } });
 $('panel-red').addEventListener('click', (e) => { const b = e.target.closest('[data-act]'); const f = b && ACCIONES[b.dataset.act]; if (f) ejecutar(() => f(b.dataset.id)); });
 $('panel-red').addEventListener('input', (e) => { if (e.target.id === 'q-red') { S.texto = e.target.value; $('res-red').innerHTML = resultadosBusqueda(); } });
-$('panel-red').addEventListener('change', (e) => {
+$('panel-red').addEventListener('change', async (e) => {
+  const cat = e.target.dataset.aviso;
+  if (cat) {                                           // Avisos: se guarda al instante; si falla, el interruptor vuelve a como estaba
+    const activa = e.target.checked; S.avisos[cat] = activa;
+    try { await avisosApi.guardarPreferencia(cat, activa); toast(activa ? 'Recibirás estos avisos.' : 'Ya no recibirás estos avisos.', 'ok', { key: 'avisos' }); }
+    catch (err) { S.avisos[cat] = !activa; e.target.checked = !activa; toast(err.message, 'error'); }
+    return;
+  }
   const k = e.target.dataset.priv; if (!k) return;
   const nuevo = { ...S.red.privacidad, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value };
   ejecutar(async () => { await api.guardarPrivacidad(nuevo); toast('Privacidad guardada.', 'ok', { key: 'priv' }); });
@@ -113,6 +128,8 @@ onSession(async ({ session }) => {
   $('amigos-vacio').hidden = !!session; $('amigos-app').hidden = !session;
   if (!session) return;
   await loadPerfiles(); await recargar();
+  try { S.avisos = await avisosApi.cargarPreferencias(); S.avisosError = ''; } catch (err) { S.avisosError = err.message; }   // si falla, el resto de la página sigue funcionando
+  if (S.tab === 'avisos') pintar();
 });
 let t; const soon = () => { clearTimeout(t); t = setTimeout(recargar, 300); };
 supabase.channel('amistades').on('postgres_changes', { event: '*', schema: 'public', table: 'amistades' }, soon).subscribe();

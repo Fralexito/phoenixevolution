@@ -4,6 +4,7 @@ import { supabase } from '../core/supabase.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast, beep } from '../core/toast.js';
 import { href } from '../core/config.js';
+import { enlaceAvisoSeguro } from '../core/avisos.js';
 import { regionAhora } from './ajustes.js';
 import { isRadarOn } from './radar.js';
 import { showHolo } from './holo.js';
@@ -14,7 +15,7 @@ const ICON = {
   PARTIDO_CONFIRMADO: 'fa-circle-check', PARTIDO_CANCELADO: 'fa-circle-xmark', RETO_EXPIRADO: 'fa-hourglass-end',
   INVITACION_RETO: 'fa-user-plus', UNION_RETO: 'fa-users', SALIO_RETO: 'fa-user-minus',
   AMISTAD_SOLICITUD: 'fa-user-plus', AMISTAD_ACEPTADA: 'fa-user-group', SEGUIDOR_NUEVO: 'fa-heart',
-  ESPECTADOR_SOLICITUD: 'fa-eye', ESPECTADOR_APROBADO: 'fa-eye', MURO_RESPUESTA: 'fa-comment',
+  ESPECTADOR_SOLICITUD: 'fa-eye', ESPECTADOR_APROBADO: 'fa-eye', MURO_RESPUESTA: 'fa-comment', MENCION: 'fa-at',
 };
 const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/', ESPECTADOR_SOLICITUD: 'en-vivo/', ESPECTADOR_APROBADO: 'en-vivo/', MURO_RESPUESTA: 'perfil/' };   // el resto de avisos son de retos → Duelos
 const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
@@ -38,7 +39,7 @@ export function initNotifications(userId) {
         ${u ? '<button type="button" data-n="all" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase">Marcar leídas</button>' : ''}
       </div>
       <div class="max-h-[60vh] overflow-y-auto">${items.length ? items.map((n) => `
-        <a href="${escapeHTML(href(DESTINO[n.tipo] ?? 'duelos/'))}" data-n="${n.id}" class="notif-item ${n.leida ? '' : 'is-new'}">
+        <a href="${escapeHTML(href(enlaceAvisoSeguro(n.enlace) ?? DESTINO[n.tipo] ?? 'duelos/'))}" data-n="${n.id}" class="notif-item ${n.leida ? '' : 'is-new'}">
           <i class="fa-solid ${ICON[n.tipo] ?? 'fa-bell'} text-galaxy-400 mt-0.5 w-4 text-center"></i>
           <span class="min-w-0 flex-1"><b class="block text-white text-xs font-display uppercase tracking-wide">${escapeHTML(n.titulo)}</b>
             <span class="block text-xs text-gray-300">${escapeHTML(n.mensaje)}</span>
@@ -46,9 +47,12 @@ export function initNotifications(userId) {
         </a>`).join('') : '<div class="px-4 py-8 text-xs text-gray-500 text-center">Sin novedades por ahora.</div>'}</div>`;
   };
 
+  // `enlace` existe desde la migración 033. Si aún no está aplicada, se reintenta sin esa columna: la campana nunca debe quedarse muda por eso.
+  const COLS = 'id, tipo, titulo, mensaje, reto_id, fecha_ref, leida, created_at';
+  const pedir = (cols) => supabase.from('notificaciones').select(cols).eq('usuario_id', userId).order('created_at', { ascending: false }).limit(LIMIT);
   async function load() {
-    const { data, error } = await supabase.from('notificaciones').select('id, tipo, titulo, mensaje, reto_id, fecha_ref, leida, created_at')
-      .eq('usuario_id', userId).order('created_at', { ascending: false }).limit(LIMIT);
+    let { data, error } = await pedir(`${COLS}, enlace`);
+    if (error) { console.warn('[notif] carga con «enlace» falló; reintento sin esa columna:', error.message); ({ data, error } = await pedir(COLS)); }
     if (error) { console.error('[notif] carga:', error.message); return; }
     items = data ?? []; paint();
   }
