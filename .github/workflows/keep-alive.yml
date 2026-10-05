@@ -1,0 +1,29 @@
+name: Mantener Supabase despierto
+# El plan gratuito de Supabase PAUSA el proyecto tras 7 días sin actividad en la base de datos.
+# Este flujo hace una consulta mínima cada 3 días (margen de más del doble) para que nunca llegue a pausarse.
+# · La URL y la clave son la «publishable key», que YA es pública por diseño (viaja en el JS de la web); por eso no hacen falta secretos.
+# · La consulta es `perfil_publico('__ping__')`: lee la base, no devuelve datos (null) y no escribe nada.
+# · IMPORTANTE: GitHub solo ejecuta los flujos programados (cron) desde la rama por defecto (`main`). En `borrador` no corre solo.
+on:
+  schedule:
+    - cron: '17 9 */3 * *'   # 09:17 UTC (04:17 Lima), cada 3 días
+  workflow_dispatch:          # botón «Run workflow» para probarlo a mano
+permissions: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: https://fiibiyijojkxqlsrhcil.supabase.co
+      SUPABASE_KEY: sb_publishable_siVYbqB8ehtJAkk_tjy2OQ_CuXWX24u
+    steps:
+      - name: Consulta mínima a la base de datos
+        run: |
+          set -euo pipefail
+          # --fail: cualquier 4xx/5xx hace fallar el flujo (GitHub te avisa por correo). --retry: reintenta 3 veces ante fallos pasajeros.
+          code=$(curl --silent --show-error --fail --retry 3 --retry-delay 10 --max-time 30 \
+            --output /tmp/ping.json --write-out '%{http_code}' \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/perfil_publico" \
+            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" \
+            -d '{"p_usuario":"__ping__"}')
+          echo "Supabase respondió HTTP $code · cuerpo: $(cat /tmp/ping.json)"
