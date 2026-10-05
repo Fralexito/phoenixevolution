@@ -48,7 +48,7 @@ export function openProfileModal() {
           ${cd.blocked ? '' : prof.perfil_completo ? `<p class="text-[11px] text-gray-500">Ojo: después de cambiarlo, no podrás volver a hacerlo hasta pasados ${USERNAME_COOLDOWN_DAYS} días.</p>` : ''}
         </div>
         <div><label class="label" for="p-pais">País</label><select id="p-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>
-        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}"></div>
+        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}"><p class="text-[11px] text-gray-500 mt-1">Por privacidad, si eres menor de 18 años no guardamos ni mostramos tu país ni tu club.</p></div>
       </div>
 
       <div data-pane="social" hidden class="space-y-4">
