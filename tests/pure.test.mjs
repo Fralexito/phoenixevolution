@@ -1146,3 +1146,10 @@ test('noticias: el estilo se limpia y el aleatorio es válido y estable', () => 
   for (const k of Object.keys(OPCIONES)) assert.ok(OPCIONES[k].includes(s[k]), k);
   assert.ok(esPlantilla('auto') && esPlantilla('neon') && !esPlantilla('nada'));
 });
+
+test('zonasLiga: ascenso, descenso y copa propios de una liga', async () => {
+  const { zonasLiga } = await import('../src/js/core/temporada.js');
+  const z = zonasLiga(['a','b','c','d','e','f','g','h'], { suben: 2, bajan: 2, copa: 3 });
+  assert.deepEqual(z.get('a'), ['copa','sube']); assert.deepEqual(z.get('c'), ['copa']); assert.deepEqual(z.get('d'), []); assert.deepEqual(z.get('h'), ['baja']);
+  assert.deepEqual(zonasLiga(['a','b','c'], { suben: 5, bajan: 5 }).get('b'), []);
+});

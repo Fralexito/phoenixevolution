@@ -4,6 +4,7 @@ import { escapeHTML } from '../core/dom.js';
 import { escudoHTML } from '../core/escudos.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { LIGAS } from '../../data/ligas.js';
+import { SISTEMAS_LIGA } from '../../data/temporada.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
 import { forma } from '../core/ligaStats.js';
@@ -29,24 +30,56 @@ const aviso = (t, sub = '') => caja(`<div class="text-center py-16"><p class="te
 const kpi = (v, l) => `<div class="rounded-xl border border-galaxy-border/60 bg-black/25 px-3 py-3 text-center"><div class="font-display font-bold text-2xl text-white">${escapeHTML(v)}</div><div class="text-[10px] uppercase tracking-widest text-gray-400 mt-0.5">${escapeHTML(l)}</div></div>`;
 const chip = (r) => `<span class="inline-grid place-items-center w-6 h-6 rounded border text-[10px] font-bold ${COLOR[r]}">${r}</span>`;
 
+const tit = (ic, t, extra = '') => `<h3 class="flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-gray-200 mb-3"><i class="fa-solid ${ic} text-galaxy-400"></i>${t}${extra}</h3>`;
+const TONO = { G: 'text-emerald-300', E: 'text-amber-300', P: 'text-rose-300' };
+const BORDE = { G: 'border-l-emerald-400', E: 'border-l-amber-400', P: 'border-l-rose-400' };
+const TXT_RES = { G: 'Victoria', E: 'Empate', P: 'Derrota' };
+const pct = (n, t) => (t > 0 ? Math.round((n / t) * 100) : 0);
+const kpiV = (ic, v, l, tono) => `<div class="rounded-xl border border-galaxy-border/60 bg-gradient-to-b from-white/[.06] to-black/30 px-3 py-3 text-center"><i class="fa-solid ${ic} ${tono} text-sm"></i><div class="font-display font-bold text-2xl text-white leading-tight mt-1">${escapeHTML(v)}</div><div class="text-[10px] uppercase tracking-widest text-gray-400 mt-0.5">${escapeHTML(l)}</div></div>`;
+const rival = (ed, n) => `<span class="inline-flex items-center gap-2 min-w-0">${escudoHTML(ed.clubes?.[n], 22)}<span class="min-w-0"><span class="block truncate text-gray-100 font-semibold leading-tight">${escapeHTML(n)}</span>${ed.clubes?.[n] ? `<span class="block truncate text-[10px] uppercase text-gray-500 leading-tight">${escapeHTML(ed.clubes[n])}</span>` : ''}</span></span>`;
+function zonaBadge(liga, puesto, total) {
+  const z = SISTEMAS_LIGA[liga.id]; if (!z || !puesto || !total) return '';
+  const k = Math.min(z.suben, Math.floor(total / 2)); const b = Math.min(z.bajan, Math.floor(total / 2));
+  if (puesto <= k) return '<span class="px-2.5 py-1 rounded-full border border-emerald-400/50 bg-emerald-500/15 text-emerald-200 text-[11px] font-bold uppercase"><i class="fa-solid fa-arrow-up mr-1"></i>Zona de ascenso</span>';
+  if (b && puesto > total - b) return '<span class="px-2.5 py-1 rounded-full border border-rose-400/50 bg-rose-500/15 text-rose-200 text-[11px] font-bold uppercase"><i class="fa-solid fa-arrow-down mr-1"></i>Zona de descenso</span>';
+  return '<span class="px-2.5 py-1 rounded-full border border-galaxy-border/60 bg-black/30 text-gray-300 text-[11px] font-bold uppercase"><i class="fa-solid fa-minus mr-1"></i>Zona media</span>';
+}
+
 function seccionEdicion(liga, ed, nombre) {
   const c = campana(ed, nombre); if (!c) return '';
   const f = c.fila; const rivales = contraRivales(c.jugados);
   const ult = forma(ed.fechas, nombre, 5);
-  return `<section class="rounded-2xl border border-galaxy-border/60 bg-black/20 p-5 space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <div><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">${escapeHTML(liga.titulo.join(' '))}</span>
-        <h2 class="font-display font-bold text-xl text-white uppercase">${escapeHTML(ed.nombre)}${c.club ? ` <span class="text-sm text-gray-400 uppercase font-normal">· ${escudoHTML(c.club, 16)} ${escapeHTML(c.club)}</span>` : ''}</h2></div>
-      <div class="flex gap-1">${ult.map(chip).join('')}</div>
+  const avance = c.total ? pct(c.jugados.length, c.jugados.length + c.proximos.length) : 0;
+  const barra = f ? `<div><div class="flex h-3 rounded-full overflow-hidden bg-black/40 border border-galaxy-border/40" role="img" aria-label="${f.g} ganados, ${f.e} empatados, ${f.p} perdidos"><span class="bg-emerald-400" style="width:${pct(f.g, f.pj)}%"></span><span class="bg-amber-400" style="width:${pct(f.e, f.pj)}%"></span><span class="bg-rose-400" style="width:${pct(f.p, f.pj)}%"></span></div>
+      <div class="flex justify-between text-[11px] mt-1.5"><span class="text-emerald-300">${f.g} ganados</span><span class="text-amber-300">${f.e} empates</span><span class="text-rose-300">${f.p} perdidos</span></div></div>` : '';
+  const goles = f && (f.gf + f.gc) > 0 ? `<div><div class="flex h-3 rounded-full overflow-hidden bg-black/40 border border-galaxy-border/40"><span class="bg-galaxy-400" style="width:${pct(f.gf, f.gf + f.gc)}%"></span><span class="bg-fuchsia-500/80" style="width:${pct(f.gc, f.gf + f.gc)}%"></span></div>
+      <div class="flex justify-between text-[11px] mt-1.5"><span class="text-galaxy-400">${f.gf} a favor</span><span class="text-fuchsia-300">${f.gc} en contra</span></div></div>` : '';
+  const fila = (p) => `<li class="flex items-center gap-3 text-sm rounded-xl bg-black/25 border border-galaxy-border/40 border-l-4 ${BORDE[p.res]} px-3 py-2">
+      <span class="w-12 shrink-0 text-center"><span class="block text-[9px] uppercase text-gray-500 leading-none">Fecha</span><b class="font-display text-white">${p.n}</b></span>
+      <span class="flex-1 min-w-0">${rival(ed, p.rival)}</span>
+      <span class="shrink-0 text-right"><b class="block text-white tabular-nums text-base leading-tight">${p.gf} : ${p.gc}</b><span class="block text-[10px] uppercase ${TONO[p.res]} font-bold leading-tight">${TXT_RES[p.res]} · ${p.local ? 'local' : 'visita'}</span></span></li>`;
+  return `<section class="rounded-2xl border border-galaxy-border/60 bg-gradient-to-br from-galaxy-600/10 via-black/20 to-black/30 p-5 space-y-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="shrink-0 grid place-items-center w-14 h-14 rounded-2xl border border-galaxy-400/40 bg-black/40 shadow-[0_0_18px_rgba(0,229,255,.2)]">${escudoHTML(c.club, 40)}</span>
+        <div class="min-w-0"><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">${escapeHTML(liga.titulo.join(' '))}</span>
+          <h2 class="font-display font-bold text-xl text-white uppercase leading-tight">${escapeHTML(ed.nombre)}</h2>
+          ${c.club ? `<p class="text-sm text-gray-300 uppercase">${escapeHTML(c.club)}</p>` : ''}</div></div>
+      ${ult.length ? `<div class="text-right"><span class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Racha reciente</span><div class="flex gap-1 justify-end">${ult.map(chip).join('')}</div></div>` : ''}
     </div>
-    ${f ? `<div class="grid grid-cols-3 sm:grid-cols-6 gap-2">${kpi(`${c.puesto}º`, `de ${c.total}`)}${kpi(f.pts, 'Puntos')}${kpi(f.pj, 'Jugados')}${kpi(`${f.g}-${f.e}-${f.p}`, 'G-E-P')}${kpi(`${f.gf}:${f.gc}`, 'Goles')}${kpi(f.dg > 0 ? `+${f.dg}` : f.dg, 'Dif.')}</div>` : '<p class="text-sm text-gray-400">Aún no tiene partidos jugados en esta edición.</p>'}
-    <div class="grid md:grid-cols-2 gap-4">
-      <div><h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2">Resultados</h3>
-        ${c.jugados.length ? `<ul class="space-y-1.5">${[...c.jugados].reverse().map((p) => `<li class="flex items-center gap-3 text-sm rounded-lg bg-black/25 border border-galaxy-border/40 px-3 py-2">${chip(p.res)}<span class="text-gray-400 text-xs w-14 shrink-0">Fecha ${p.n}</span><span class="flex-1 min-w-0 truncate text-gray-100">${p.local ? 'vs' : '@'} ${escapeHTML(p.rival)}</span><b class="text-white tabular-nums">${p.gf} : ${p.gc}</b></li>`).join('')}</ul>` : '<p class="text-sm text-gray-500">Sin resultados todavía.</p>'}</div>
-      <div><h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2">Próximos partidos</h3>
-        ${c.proximos.length ? `<ul class="space-y-1.5">${c.proximos.slice(0, 5).map((p) => `<li class="flex items-center gap-3 text-sm rounded-lg bg-black/25 border border-galaxy-border/40 px-3 py-2"><span class="text-gray-400 text-xs w-14 shrink-0">Fecha ${p.n}</span><span class="flex-1 min-w-0 truncate text-gray-100">${p.local ? 'vs' : '@'} ${escapeHTML(p.rival)}</span><span class="text-[10px] uppercase text-amber-300">Pendiente</span></li>`).join('')}</ul>` : '<p class="text-sm text-gray-500">No quedan partidos pendientes.</p>'}</div>
+    ${f ? `<div class="rounded-xl border border-galaxy-400/30 bg-black/30 p-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div><span class="text-[10px] uppercase tracking-widest text-gray-400">Posición</span><div class="font-display font-extrabold text-4xl text-white leading-none">${c.puesto}º <span class="text-sm font-normal text-gray-400">de ${c.total}</span></div></div>
+        <div class="flex-1 min-w-[180px]"><div class="flex justify-between text-[11px] text-gray-400 mb-1"><span>Avance de la edición</span><span>${c.jugados.length} de ${c.jugados.length + c.proximos.length} partidos</span></div><div class="h-2 rounded-full bg-black/50 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-galaxy-600 to-galaxy-400" style="width:${avance}%"></div></div></div>
+        ${zonaBadge(liga, c.puesto, c.total)}</div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${kpiV('fa-bolt', f.pts, 'Puntos', 'text-amber-300')}${kpiV('fa-futbol', f.pj, 'Jugados', 'text-galaxy-400')}${kpiV('fa-bullseye', f.gf, 'Goles a favor', 'text-emerald-300')}${kpiV('fa-scale-balanced', f.dg > 0 ? `+${f.dg}` : f.dg, 'Diferencia', f.dg < 0 ? 'text-rose-300' : 'text-emerald-300')}</div>
+      <div class="grid sm:grid-cols-2 gap-4">${barra}${goles}</div>` : '<p class="text-sm text-gray-400">Aún no tiene partidos jugados en esta edición.</p>'}
+    <div class="grid md:grid-cols-2 gap-5">
+      <div>${tit('fa-clock-rotate-left', 'Resultados', ' <span class="text-gray-500 normal-case font-normal tracking-normal">· del más reciente</span>')}
+        ${c.jugados.length ? `<ul class="space-y-2">${[...c.jugados].reverse().map(fila).join('')}</ul>` : '<p class="text-sm text-gray-500">Sin resultados todavía.</p>'}</div>
+      <div>${tit('fa-calendar-days', 'Próximos partidos')}
+        ${c.proximos.length ? `<ul class="space-y-2">${c.proximos.slice(0, 5).map((p) => `<li class="flex items-center gap-3 text-sm rounded-xl bg-black/25 border border-dashed border-amber-400/30 px-3 py-2"><span class="w-12 shrink-0 text-center"><span class="block text-[9px] uppercase text-gray-500 leading-none">Fecha</span><b class="font-display text-white">${p.n}</b></span><span class="flex-1 min-w-0">${rival(ed, p.rival)}</span><span class="shrink-0 text-[10px] uppercase text-amber-300 font-bold">${p.local ? 'Local' : 'Visita'}</span></li>`).join('')}</ul>` : '<p class="text-sm text-gray-500">No quedan partidos pendientes o el calendario aún no está confirmado.</p>'}</div>
     </div>
-    ${rivales.length ? `<div><h3 class="text-xs font-display font-bold uppercase tracking-widest text-gray-300 mb-2">Contra cada rival</h3><div class="flex flex-wrap gap-2">${rivales.map((r) => `<span class="text-xs rounded-lg border border-galaxy-border/50 bg-black/25 px-3 py-1.5 text-gray-200"><b class="text-white">${escapeHTML(r.rival)}</b> · ${r.g}G ${r.e}E ${r.p}P · ${r.gf}:${r.gc}</span>`).join('')}</div></div>` : ''}
+    ${rivales.length ? `<div>${tit('fa-people-arrows', 'Contra cada rival')}<div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-2">${rivales.map((r) => { const t = r.g + r.e + r.p; return `<div class="rounded-xl border border-galaxy-border/50 bg-black/25 p-3"><div class="flex items-center justify-between gap-2 text-sm">${rival(ed, r.rival)}<b class="text-white tabular-nums shrink-0">${r.gf}:${r.gc}</b></div><div class="flex h-1.5 rounded-full overflow-hidden bg-black/40 mt-2"><span class="bg-emerald-400" style="width:${pct(r.g, t)}%"></span><span class="bg-amber-400" style="width:${pct(r.e, t)}%"></span><span class="bg-rose-400" style="width:${pct(r.p, t)}%"></span></div><div class="text-[10px] text-gray-400 mt-1">${r.g}G · ${r.e}E · ${r.p}P</div></div>`; }).join('')}</div></div>` : ''}
   </section>`;
 }
 

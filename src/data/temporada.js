@@ -23,3 +23,15 @@ export const DEMO_SEGUNDA = [
   { nombre: 'Aspirante 4', pts: 14, pj: 9, dg: 1 }, { nombre: 'Aspirante 5', pts: 11, pj: 9, dg: -3 }, { nombre: 'Aspirante 6', pts: 8, pj: 9, dg: -7 },
   { nombre: 'Aspirante 7', pts: 5, pj: 9, dg: -9 }, { nombre: 'Aspirante 8', pts: 3, pj: 9, dg: -10 },
 ];
+
+// SISTEMA PROPIO de las ligas independientes (no se mezcla con Galaxy/Segunda). Cada una tiene sus zonas y su propia escalera de divisiones.
+export const SISTEMAS_LIGA = {
+  sudario: {
+    nombre: 'Sistema de Divisiones · Sudario',
+    divisiones: [
+      { nivel: 1, nombre: 'División Sudario', corto: 'Div. 1', icono: 'fa-star' },
+      { nivel: 2, nombre: 'División de Ascenso Sudario', corto: 'Div. 2', icono: 'fa-seedling' },
+    ],
+    suben: 2, bajan: 2, copa: 4,
+  },
+};

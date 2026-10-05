@@ -25,6 +25,22 @@ export function zonasDivision(nombres, nivel, cfg = {}) {
 }
 
 /**
+ * Zonas de una liga INDEPENDIENTE (p. ej. Sudario): sube/baja/copa se calculan solo con su propia tabla, sin mezclarse con otra liga.
+ * @param {string[]} nombres tabla ordenada de 1.º a último
+ * @param {{suben?:number, bajan?:number, copa?:number}} cfg
+ */
+export function zonasLiga(nombres, cfg = {}) {
+  const n = nombres.length; const z = new Map(nombres.map((x) => [x, []]));
+  const k = Math.min(natural(cfg.suben, 8), Math.floor(n / 2)); const b = Math.min(natural(cfg.bajan, 8), Math.floor(n / 2)); const c = Math.min(natural(cfg.copa, 16), n);
+  nombres.forEach((nombre, i) => {
+    if (i < c) z.get(nombre).push('copa');
+    if (i < k) z.get(nombre).push('sube');
+    if (b > 0 && i >= n - b) z.get(nombre).push('baja');
+  });
+  return z;
+}
+
+/**
  * Ascensos y descensos al cerrar la temporada. Suben y bajan SIEMPRE el mismo número, para que cada división conserve su tamaño.
  * @returns {{k:number, suben:string[], bajan:string[], div1:string[], div2:string[], avisos:string[]}}
  */

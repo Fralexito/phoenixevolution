@@ -358,8 +358,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - **ronda 152** — Galaxy League fecha 9: Axel 0–3 Arens (el usuario pidió «victoria de Arens 3-0 sobre Arens»; el único rival de Arens en la fecha 9 es Axel, así que se cargó contra Axel).
 
 - **ronda 153** — Quiénes somos: roles Fralex = CEO, Jack = Presidente, Hugo = Vicepresidente (se quitó «Fundador»), con descripciones más profesionales (`data/organizadores.js`).
+- **ronda 154** — Liga Sudario: zonas de ascenso/descenso/copa y sistema de divisiones PROPIO (`SISTEMAS_LIGA` en `data/temporada.js`, `zonasLiga` en `core/temporada.js`; no se mezcla con Galaxy). Perfil de jugador: sección de campaña rediseñada (escudos del club y de cada rival, barra de avance, G-E-P y goles en barras, tarjetas por rival, insignia de zona).
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 153)
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 154)
 - **Reglas fijas:** trabajar solo en `borrador`; pasar a `main` solo cuando el usuario diga «Súbelo/Publícalo». Cada cambio: bullet «ronda N» en este archivo (siguiente = **121**), commit con los dos trailers (`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` y `Claude-Session: ...`) y push a `borrador`. Supabase `fiibiyijojkxqlsrhcil`: no usar `apply_migration` ni DDL grande por `execute_sql` (se cancelan); entregar el `.sql` con SendUserFile para que el usuario lo pegue en el SQL Editor, y verificar después con consultas de solo lectura. Idioma: español.
 - **Modo ligero (pedido del usuario el 05/10):** cambios pequeños = cambio + test pertinente + commit, sin Playwright ni capturas salvo que el cambio sea grande o el usuario lo pida; respuestas cortas (qué cambió y qué hacer); no listar carpetas grandes; no repetir el resumen de pasos.
 - **Estado de la BD:** migraciones 001–042 aplicadas y verificadas (039 disputas, 040 encuestas, 041 feed, 042 eventos con el trabajo `recordar-eventos`). No hay migraciones pendientes.
