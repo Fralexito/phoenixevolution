@@ -1,8 +1,7 @@
 ---
-import { SECCIONES, seccionDe, rutaDeSeccion } from '../data/site.js';
+import { NAV } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
-const actual = seccionDe(active);
 ---
 <nav class="glass-panel pointer-events-auto relative z-20 border-b border-galaxy-border/80 shadow-[0_6px_24px_rgba(128,0,255,0.14)]">
   <div class="w-full pl-6 pr-4 md:pl-12 md:pr-8 flex items-center justify-between h-16 relative">
@@ -18,20 +17,8 @@ const actual = seccionDe(active);
     </a>
 
     <div class="hidden lg:flex items-center gap-1 font-display text-[0.95rem] xl:text-[1.05rem] ml-auto">
-      {SECCIONES.map((x) => (
-        <div class="nav-grupo">
-          <a href={`${base}${rutaDeSeccion(x)}`} class="nav-link" aria-current={actual?.id === x.id ? 'page' : undefined} aria-haspopup={x.items.length ? 'true' : undefined}>{x.label}{x.items.length > 0 && <i class="fa-solid fa-chevron-down text-[.55rem] ml-1.5 opacity-60"></i>}</a>
-          {x.items.length > 0 && (
-            <div class="nav-menu" role="menu">
-              {x.items.map((i) => (
-                <a href={`${base}${i.path}`} role="menuitem" class="nav-item" aria-current={active === i.id ? 'page' : undefined}>
-                  <span class="nav-item-ico"><i class={`fa-solid ${i.icon}`}></i></span>
-                  <span class="min-w-0"><b>{i.label}</b><small>{i.info}</small></span>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+      {NAV.map((n) => (
+        <a href={`${base}${n.path}`} class="nav-link" aria-current={active === n.id ? 'page' : undefined}>{n.label}</a>
       ))}
     </div>
 

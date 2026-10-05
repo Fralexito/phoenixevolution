@@ -1,11 +1,11 @@
 // Buscador global — parte PURA: índice de páginas y puntuación (sin DOM → probable). La ventana vive en features/buscadorGlobal.js.
-import { SECCIONES, ACCOUNT_NAV } from '../../data/site.js';
+import { NAV, NAV_EXTRA, ACCOUNT_NAV } from '../../data/site.js';
 
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
 // Palabras que la gente usaría para pedir cada página aunque no se llame así.
 const SINONIMOS = {
-  duelos: 'jugar partida reto rival matchmaking host parsec', partidos: 'resultados historial valorar', envivo: 'streaming transmitir directo kick',
+  central: 'inicio portada principal home', duelos: 'jugar partida reto rival matchmaking host parsec', partidos: 'resultados historial valorar', envivo: 'streaming transmitir directo kick',
   eventos: 'torneo quedada calendario', liga: 'tabla posiciones clasificacion calendario fixture', palmares: 'campeones titulos historia',
   mercado: 'fichajes transferencias traspasos', database: 'jugadores fichas cartas comparar stats', comunidad: 'muro social radar',
   noticias: 'novedades prensa articulos', clanes: 'equipo grupo tag', ranking: 'mejores top temporada retos semanales', amigos: 'solicitudes seguir bloquear',
@@ -14,15 +14,14 @@ const SINONIMOS = {
   moderacion: 'reportes sanciones staff', auditoria: 'registro cambios staff',
 };
 
-/** Todas las páginas buscables: de las secciones, de «Mi cuenta» (solo enlaces) y la portada. */
+/** Todas las páginas buscables: las del menú, las secundarias y las de «Mi cuenta» (solo enlaces). Sin repetir. */
 export function indicePaginas() {
-  const l = [{ id: 'central', label: 'Inicio', path: '', icon: 'fa-house', info: 'La portada', seccion: 'Inicio' }];
-  for (const s of SECCIONES) {
-    if (s.id === 'tienda') l.push({ id: 'tienda', label: 'Tienda', path: s.path, icon: s.icon, info: 'Cosméticos que se compran con tokens', seccion: 'Tienda' });
-    for (const i of s.items) l.push({ ...i, seccion: s.label });
-  }
-  for (const a of ACCOUNT_NAV) if (a.path) l.push({ id: a.id, label: a.label, path: a.path, icon: a.icon, info: a.staff ? 'Solo para el equipo' : 'Tu cuenta', seccion: 'Mi cuenta', staff: a.staff });
-  return l.map((p) => ({ ...p, _t: norm(`${p.label} ${p.info ?? ''} ${p.seccion} ${SINONIMOS[p.id] ?? ''}`), _l: norm(p.label) }));
+  const vistos = new Set(), l = [];
+  const meter = (p, seccion, info) => { if (!p.path && p.id !== 'central') return; if (vistos.has(p.id)) return; vistos.add(p.id); l.push({ id: p.id, label: p.label, path: p.path, icon: p.icon, staff: p.staff, seccion, info: p.staff ? 'Solo para el equipo' : info }); };
+  for (const p of NAV) meter(p, 'Menú', 'Página principal');
+  for (const p of NAV_EXTRA) meter(p, 'Más', 'Sección de la comunidad');
+  for (const p of ACCOUNT_NAV) meter(p, 'Mi cuenta', 'Tu cuenta');
+  return l.map((p) => ({ ...p, _t: norm(`${p.label} ${p.info ?? ''} ${SINONIMOS[p.id] ?? ''}`), _l: norm(p.label) }));
 }
 
 /** Páginas que coinciden con `q`, mejores primero. Consulta vacía → []. Cada palabra de la consulta debe aparecer (en cualquier orden). */
