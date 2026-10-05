@@ -1,7 +1,8 @@
 // Pinta la zona de usuario de la cabecera según la sesión (único lugar que lo hace).
-import { onSession, can } from '../core/session.js';
+import { onSession, can, tieneRolStaff, staffVisible_, setStaffVisible } from '../core/session.js';
 import { ROL_INFO, normalizarRol, esStaff } from '../core/roles.js';
 import { escapeHTML } from '../core/dom.js';
+import { toast } from '../core/toast.js';
 import { avatarHTML } from '../core/avatar.js';
 import { href } from '../core/config.js';
 import { openAuthModal, logout } from './auth.js';
@@ -56,6 +57,7 @@ function render({ session, profile }) {
           <div class="py-1">
             <button type="button" data-act="profile" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400 uppercase tracking-wider"><i class="fa-solid fa-user mr-2"></i>Mi perfil</button>
             <a href="${escapeHTML(href('ajustes/'))}" class="block px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid fa-gear mr-2"></i>Configuración</a>
+            ${tieneRolStaff() ? `<button type="button" data-act="staff-ui" role="switch" aria-checked="${staffVisible_()}" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-galaxy-400 uppercase tracking-wider"><i class="fa-solid ${staffVisible_() ? 'fa-eye' : 'fa-eye-slash'} mr-2"></i>Opciones de staff: <b class="${staffVisible_() ? 'text-ok' : 'text-gray-500'}">${staffVisible_() ? 'visibles' : 'ocultas'}</b></button>` : ''}
             <button type="button" data-act="logout" class="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-white/5 hover:text-bad uppercase tracking-wider"><i class="fa-solid fa-right-from-bracket mr-2"></i>Salir</button>
           </div>
         </div>
@@ -77,6 +79,7 @@ export function initNavbar() {
     else if (act === 'menu') menu.hidden = !menu.hidden;
     else if (act === 'profile') { menu.hidden = true; openProfileModal(); }
     else if (act === 'logout') { menu.hidden = true; logout(); }
+    else if (act === 'staff-ui') { setStaffVisible(!staffVisible_()); toast(staffVisible_() ? 'Opciones de staff visibles.' : 'Opciones de staff ocultas: ves la web como un jugador.', 'info'); }
   });
   document.addEventListener('click', (e) => {
     if (!e.target.closest('#nav-auth')) document.getElementById('user-menu')?.setAttribute('hidden', '');

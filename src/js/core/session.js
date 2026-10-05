@@ -3,10 +3,13 @@
 import { supabase } from './supabase.js';
 import { providerAvatar } from './avatar.js';
 import { normalizarRol, puede, esStaff } from './roles.js';
+import { leerStaffVisible, guardarStaffVisible } from './staffUi.js';
 
 const state = { session: null, profile: null, ready: false };
 const listeners = new Set();
 let started = null;
+const almacen = () => { try { return window.localStorage; } catch { return null; } };
+let staffVisible = leerStaffVisible(almacen());
 
 const emit = () => listeners.forEach((fn) => { try { fn({ ...state }); } catch (e) { console.error('[session] listener:', e); } });
 
@@ -53,7 +56,14 @@ export function initSession() {
 
 export const getState = () => ({ ...state });
 /** Rol de la cuenta conectada (siempre válido; sin sesión = «jugador»). Solo sirve para MOSTRAR u ocultar botones: la base de datos es la que decide. */
-export const rolActual = () => normalizarRol(state.profile?.rol);
+export const rolReal = () => normalizarRol(state.profile?.rol);
+/** ¿La cuenta es de staff de verdad (aunque tenga las opciones ocultas)? Sirve para ofrecer el interruptor. */
+export const tieneRolStaff = () => esStaff(rolReal());
+export const staffVisible_ = () => staffVisible;
+/** Muestra u oculta TODAS las opciones de staff en este navegador (menús, botones, páginas). Avisa a quien escuche la sesión para que se repinte. */
+export function setStaffVisible(v) { staffVisible = !!v; const s = almacen(); if (s) guardarStaffVisible(s, staffVisible); emit(); }
+/** Rol que se usa para MOSTRAR cosas: con las opciones de staff ocultas, se comporta como «jugador». */
+export const rolActual = () => (staffVisible ? rolReal() : 'jugador');
 export const isAdmin = () => rolActual() === 'admin';
 /** ¿Puede esta cuenta hacer X? Ver PERMISOS en core/roles.js (editarLiga, borrarLiga, verAuditoria…). */
 export const can = (permiso) => puede(rolActual(), permiso);
