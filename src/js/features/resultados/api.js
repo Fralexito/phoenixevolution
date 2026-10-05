@@ -21,3 +21,5 @@ export async function estadisticasDe(usuarioId) {
   try { const { data, error } = await supabase.rpc('estadisticas_de', { p_usuario: usuarioId }); if (error) { console.warn('[resultados] estadisticas_de:', error.message); return null; } return normalizarEstadisticas(data); }
   catch (e) { console.warn('[resultados] estadisticas_de:', e); return null; }
 }
+/** Cola de marcadores en disputa (solo staff; la BD vuelve a comprobar el rol). Lanza Error legible. */
+export const disputados = async () => { const d = await rpc('resultados_disputados'); return Array.isArray(d) ? d : []; };

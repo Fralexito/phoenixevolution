@@ -22,6 +22,11 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <p id="mod-solo-lectura" hidden class="rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-2.5 text-xs text-sky-200"><i class="fa-solid fa-eye mr-1.5"></i>Tu rol puede <b>ver</b> los reportes pero no actuar sobre ellos. Si algo es urgente, avisa a un moderador.</p>
 
+      <section id="mod-marcadores" hidden class="space-y-2" aria-labelledby="h-mod-marc">
+        <h2 id="h-mod-marc" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-scale-balanced text-galaxy-400 mr-2"></i>Marcadores en disputa <b data-cuenta class="text-galaxy-400"></b></h2>
+        <div data-lista class="grid md:grid-cols-2 gap-2"></div>
+      </section>
+
       <div id="mod-tabs" class="flex flex-wrap gap-1.5" role="group" aria-label="Estado de los reportes"></div>
       <section id="mod-lista" class="space-y-3" aria-live="polite"></section>
       <div class="text-center"><button type="button" id="mod-mas" hidden class="btn btn-ghost">Cargar más</button></div>

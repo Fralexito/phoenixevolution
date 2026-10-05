@@ -8,6 +8,7 @@ import * as api from '../features/moderacion/api.js';
 import { listaReportesHTML, historialHTML } from '../features/moderacion/vista.js';
 import { abrirOcultar, abrirSancionar, abrirNota } from '../features/moderacion/acciones.js';
 import { tipoInfo, NOTA_SANCION_MAX } from '../core/moderacion.js';
+import { crearColaMarcadores } from '../features/resultados/staffPanel.js';
 
 const $ = (id) => document.getElementById(id);
 const PAGINA = 30;
@@ -93,5 +94,5 @@ onSession(({ session }) => {
   $('mod-denegado').hidden = !session || permitido;
   $('mod-app').hidden = !permitido;
   $('mod-solo-lectura').hidden = !permitido || can('resolverReportes');
-  if (permitido && !S.iniciado) { S.iniciado = true; pintarTabs(); conectar(); recargar(); }
+  if (permitido && !S.iniciado) { S.iniciado = true; pintarTabs(); conectar(); recargar(); crearColaMarcadores($('mod-marcadores'), { puedeResolver: can('resolverReportes') }).cargar(); }
 });
