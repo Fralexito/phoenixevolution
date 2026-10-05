@@ -31,6 +31,12 @@ export const TABLAS = Object.freeze({
   ligas:               { objeto: 'la liga',                     seccion: 'Ligas',         icono: 'fa-flag' },
   temporadas:          { objeto: 'la temporada',                seccion: 'Temporadas',    icono: 'fa-calendar' },
   perfiles:            { objeto: 'la cuenta de',                seccion: 'Cuentas y roles', icono: 'fa-id-card' },
+  sanciones:           { objeto: 'la cuenta de',                seccion: 'Sanciones',     icono: 'fa-ban' },
+  reportes:            { objeto: 'el reporte',                  seccion: 'Reportes',      icono: 'fa-flag' },
+  muro_publicaciones:  { objeto: 'una publicación del muro',    seccion: 'Muro · publicaciones',          icono: 'fa-comments' },
+  muro_respuestas:     { objeto: 'una respuesta del muro',      seccion: 'Muro · respuestas',          icono: 'fa-comments' },
+  muro_clips:          { objeto: 'un clip',                     seccion: 'Muro · clips',          icono: 'fa-film' },
+  muro_historias:      { objeto: 'una historia',                seccion: 'Muro · historias',          icono: 'fa-circle-play' },
 });
 
 /** Opciones del filtro «sección» (sin repetidos, con la tabla real que se envía a la BD). */
@@ -46,6 +52,7 @@ const NOMBRE_CAMPO = Object.freeze({
   goles_local: 'Goles del local', goles_visita: 'Goles de la visita', estado: 'Estado', modalidad: 'Modalidad', fecha_programada: 'Fecha programada', jornada: 'Jornada',
   ga: 'Goles A', gb: 'Goles B', pa: 'Penales A', pb: 'Penales B', cruce: 'Cruce', temporada: 'Temporada', activa: 'Activa', siglas: 'Siglas', logo_url: 'Escudo',
   monto_operacion: 'Monto', tipo_evento: 'Tipo', minuto: 'Minuto', puesto: 'Puesto', premios: 'Premios', torneo: 'Torneo', edicion: 'Edición', rol: 'Rol', rol_plantilla: 'Rol en la plantilla',
+  oculto: 'Oculto', tipo: 'Tipo de sanción', hasta: 'Hasta', reportes_cerrados: 'Reportes cerrados',
 });
 
 const capitalizar = (s) => { const t = String(s).replace(/_/g, ' ').trim(); return t.charAt(0).toUpperCase() + t.slice(1); };

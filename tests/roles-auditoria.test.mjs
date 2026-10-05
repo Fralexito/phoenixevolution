@@ -220,3 +220,15 @@ test('vista: equipo y roles — no se puede cambiar el rol propio y el modal exi
   assert.match(modal, /value="moderador" class="mt-1 accent-cyan-400" checked/);
   assert.match(rolBadge('comisario'), /Árbitro/);
 });
+
+test('moderación: sanciones, reportes y muro tienen frase y sección propia (y el filtro no pierde tablas)', () => {
+  for (const t of ['sanciones', 'reportes', 'muro_publicaciones', 'muro_respuestas', 'muro_clips', 'muro_historias']) assert.ok(TABLAS[t], `falta ${t}`);
+  const etiquetas = FILTRO_SECCIONES.map((s) => s.etiqueta);
+  for (const t of ['muro_publicaciones', 'muro_respuestas', 'muro_clips', 'muro_historias']) {
+    assert.equal(etiquetas.filter((e) => e === TABLAS[t].seccion).length, 1, `etiqueta repetida para ${t}`);
+  }
+  const e = describirEntrada(normalizarEntrada({ id: 1, momento: '2026-10-05T10:00:00Z', actor_rol: 'moderador', actor_nombre: 'Mod', accion: 'sancion', tabla: 'sanciones', titulo: 'Jugador Uno',
+    cambios: { tipo: [null, 'suspension'] }, motivo: 'spam reiterado' }));
+  assert.match(frase(e), /sancionó a/);
+  assert.match(frase(e), /Jugador Uno/);
+});
