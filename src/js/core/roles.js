@@ -34,6 +34,7 @@ export const PERMISOS = Object.freeze({
   verReportes:          ['ayudante', 'moderador', 'admin'],
   resolverReportes:     ['moderador', 'admin'],
   arbitrar:             ['arbitro', 'admin'],     // resolver disputas del Tribunal
+  moderarValoraciones:  ['moderador', 'admin'],   // ver y anular valoraciones post-partido (migración 044)
   gestionarClanes:      ['moderador', 'admin'],   // ocultar clanes y sacar gente de un clan (migración 043)
   gestionarEventos:     ['moderador', 'admin'],   // crear, editar y cancelar eventos de la comunidad (migración 042)
 });

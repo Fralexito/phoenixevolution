@@ -30,6 +30,7 @@ import { compartir } from '../features/muro/compartir.js';
 import { clanDeUsuario } from '../features/clanes/api.js';
 import { reputacionDe } from '../features/valoraciones/api.js';
 import { textoSello } from '../core/reputacion.js';
+import { abrirValoracionesStaff } from '../features/valoraciones/staff.js';
 import { abrirReportar, abrirOcultar, abrirSancionar } from '../features/moderacion/acciones.js';
 import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/videoSubida.js';
 
@@ -78,7 +79,7 @@ function botonSocial(act, icono, texto, extra = '', etiqueta = '') {
 }
 /** Botones de amistad/mensaje según MI relación con la persona (lógica en core/red.accionesSociales). Sin la red cargada: Mensaje + Agregar, como antes. */
 /** Reportar esta cuenta (cualquiera con sesión) y, si el rol lo permite, sancionarla (la BD exige además rango mayor). */
-const botonesModeracion = (p) => `<button type="button" data-act="reportar" data-tipo="usuario" data-id="${escapeHTML(p.id)}" data-titulo="${escapeHTML(p.nombre_display || p.username)}" class="${BTN_SOC}" aria-label="Reportar cuenta" title="Reportar cuenta"><i class="fa-regular fa-flag"></i></button>${can('sancionar') ? `<button type="button" data-act="mod-sancionar" class="${BTN_SOC} !text-amber-300 !border-amber-400/50" title="Sancionar (moderación)"><i class="fa-solid fa-gavel"></i><span>Sancionar</span></button>` : ''}`;
+const botonesModeracion = (p) => `<button type="button" data-act="reportar" data-tipo="usuario" data-id="${escapeHTML(p.id)}" data-titulo="${escapeHTML(p.nombre_display || p.username)}" class="${BTN_SOC}" aria-label="Reportar cuenta" title="Reportar cuenta"><i class="fa-regular fa-flag"></i></button>${can('sancionar') ? `<button type="button" data-act="mod-sancionar" class="${BTN_SOC} !text-amber-300 !border-amber-400/50" title="Sancionar (moderación)"><i class="fa-solid fa-gavel"></i><span>Sancionar</span></button>` : ''}${can('moderarValoraciones') ? `<button type="button" data-act="mod-valoraciones" class="${BTN_SOC} !text-amber-300 !border-amber-400/50" title="Valoraciones recibidas (moderación)"><i class="fa-solid fa-star"></i><span>Valoraciones</span></button>` : ''}`;
 function botonesSociales(p) {
   const msg = `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="${BTN_SOC} !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>`;
   if (!S.red) return msg + botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo');
@@ -608,6 +609,7 @@ const ACCIONES = {
       else await recargarExtras();
     } });
   },
+  'mod-valoraciones': () => abrirValoracionesStaff({ usuario: { id: S.p.id, nombre: S.p.nombre_display || S.p.username } }),
   'mod-sancionar': async () => { abrirSancionar({ usuario: { id: S.p.id, nombre: S.p.nombre_display || S.p.username, rol: await rolDe(S.p.id) } }); },
   'borrar-resp': async (el) => {
     if (!window.confirm('¿Borrar esta respuesta?')) return;

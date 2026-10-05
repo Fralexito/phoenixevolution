@@ -18,3 +18,6 @@ export async function reputacionDe(id) {
   try { const { data, error } = await supabase.rpc('reputacion_de', { p_usuario: id }); if (error) { console.warn('[valoraciones] reputacion_de:', error.message); return null; } return normalizarReputacion(data); }
   catch (e) { console.warn('[valoraciones] reputacion_de:', e); return null; }
 }
+/** Solo moderación (la BD vuelve a comprobar el rol). Lanzan Error legible. */
+export const recibidasStaff = async (usuario) => { const d = await rpc('valoraciones_recibidas_staff', { p_usuario: usuario }); return Array.isArray(d) ? d : []; };
+export const anular = (id, motivo) => rpc('anular_valoracion', { p_id: Number(id), p_motivo: motivo });
