@@ -3,6 +3,7 @@
 import { onSession } from '../core/session.js';
 import { toast } from '../core/toast.js';
 import { escapeHTML, safeImg } from '../core/dom.js';
+import { href } from '../core/config.js';
 import { me, data, loadPerfiles } from '../features/duelos/data.js';
 import { supabase } from '../core/supabase.js';
 import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_OPCIONES } from '../core/red.js';
@@ -26,6 +27,7 @@ function avatar(p) {
   return src ? `<img src="${escapeHTML(src)}" alt="" class="w-10 h-10 rounded-full object-cover border border-galaxy-border" loading="lazy">`
     : `<span class="w-10 h-10 rounded-full bg-galaxy-900 border border-galaxy-border flex items-center justify-center font-display font-bold text-galaxy-400">${escapeHTML((p.nombre_display || '?').trim().charAt(0).toUpperCase())}</span>`;
 }
+const msg = (id) => `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>`;
 const fila = (id, acciones, extra = '') => { const p = perfil(id);
   return `<div class="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-galaxy-panel border border-galaxy-border/80">${avatar(p)}
     <div class="min-w-0 flex-1"><p class="font-display font-bold text-white uppercase text-sm truncate">${escapeHTML(p.nombre_display || 'Jugador')}</p>${extra ? `<p class="text-[11px] text-gray-400 truncate">${extra}</p>` : ''}</div>
@@ -42,7 +44,7 @@ function accionesPara(id) {
 }
 
 const VISTAS = {
-  amigos: () => S.red.amigos.length ? S.red.amigos.map((id) => fila(id, btn('quitar', id, 'Quitar', 'fa-user-minus') + btn('bloquear', id, '', 'fa-ban', MAL))).join('')
+  amigos: () => S.red.amigos.length ? S.red.amigos.map((id) => fila(id, msg(id) + btn('quitar', id, 'Quitar', 'fa-user-minus') + btn('bloquear', id, '', 'fa-ban', MAL))).join('')
     : vacio('Aún no tienes amigos. Usa «Buscar» para encontrar jugadores.'),
   solicitudes: () => `<h3 class="text-[11px] text-gray-400 tracking-[0.2em] uppercase">Recibidas <b class="text-galaxy-400">${S.red.recibidas.length || ''}</b></h3>`
     + (S.red.recibidas.length ? S.red.recibidas.map((id) => fila(id, btn('aceptar', id, 'Aceptar', 'fa-check', '!text-ok !border-ok/50') + btn('rechazar', id, 'Rechazar', 'fa-xmark') + btn('bloquear', id, '', 'fa-ban', MAL))).join('') : vacio('No tienes solicitudes pendientes.'))

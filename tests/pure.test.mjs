@@ -732,3 +732,30 @@ test('red: buscarPerfiles ignora tildes, excluye a yo y bloqueados, y exige 2 le
   assert.deepEqual(buscarPerfiles(ps, 't', red, 'yo'), []); assert.deepEqual(buscarPerfiles(ps, 'neo', red, 'yo'), []);
 });
 test('red: contadores', () => { assert.deepEqual(contadores(normalizarRed({ amigos: ['a'], recibidas: ['b', 'c'] })), { amigos: 1, solicitudes: 2, seguidores: 0, siguiendo: 0, bloqueados: 0 }); });
+
+import { validarTexto, normalizarConversaciones, totalNoLeidos, vistaPrevia, agruparMensajes, etiquetaDia, hoyClave } from '../src/js/core/chat.js';
+test('chat: validarTexto recorta, rechaza vacío y > 1000', () => {
+  assert.equal(validarTexto('  hola \r\n  ').texto, 'hola'); assert.equal(validarTexto('   ').ok, false); assert.equal(validarTexto(null).ok, false);
+  assert.equal(validarTexto('x'.repeat(1000)).ok, true); assert.equal(validarTexto('x'.repeat(1001)).ok, false);
+});
+test('chat: normalizarConversaciones descarta basura, ordena y cuenta no leídos (sin silenciadas)', () => {
+  const l = normalizarConversaciones([null, { id: 'a', tipo: 'DIRECTO', ultimo_at: '2026-01-01T00:00:00Z', no_leidos: 2 }, { id: 'b', tipo: 'GRUPO', nombre: 'G', ultimo_at: '2026-02-01T00:00:00Z', no_leidos: 3, silenciado: true }, { id: 'x', tipo: 'OTRO' }, { tipo: 'GRUPO' }]);
+  assert.deepEqual(l.map((c) => c.id), ['b', 'a']); assert.equal(totalNoLeidos(l), 2); assert.deepEqual(normalizarConversaciones(undefined), []);
+});
+test('chat: vistaPrevia', () => {
+  const n = (id) => ({ u1: 'Yo', u2: 'Axel' }[id]);
+  assert.equal(vistaPrevia({ tipo: 'DIRECTO', ultimo: null }, 'u1', n), 'Sin mensajes todavía');
+  assert.equal(vistaPrevia({ tipo: 'GRUPO', ultimo: { autor: 'u2', texto: 'hola' } }, 'u1', n), 'Axel: hola');
+  assert.equal(vistaPrevia({ tipo: 'DIRECTO', ultimo: { autor: 'u1', texto: 'hey' } }, 'u1', n), 'Tú: hey');
+  assert.equal(vistaPrevia({ tipo: 'DIRECTO', ultimo: { autor: 'u2', texto: null } }, 'u1', n), 'Mensaje eliminado');
+});
+test('chat: agruparMensajes junta por autor (<5 min) y separa por día (zona Lima)', () => {
+  const m = [{ id: 3, autor_id: 'b', created_at: '2026-10-04T15:10:00Z' }, { id: 1, autor_id: 'a', created_at: '2026-10-04T15:00:00Z' }, { id: 2, autor_id: 'a', created_at: '2026-10-04T15:02:00Z' }, { id: 4, autor_id: 'a', created_at: '2026-10-05T12:00:00Z' }];
+  const g = agruparMensajes(m, 'a');
+  assert.equal(g.length, 2); assert.deepEqual(g[0].items.map((i) => [i.autor, i.mensajes.length, i.mios]), [['a', 2, true], ['b', 1, false]]);
+  assert.equal(agruparMensajes([{ id: 1, autor_id: 'a', created_at: '2026-10-05T03:00:00Z' }], 'a')[0].dia, '2026-10-04');   // 03:00 UTC = 22:00 del día anterior en Lima
+});
+test('chat: etiquetaDia y hoyClave', () => {
+  assert.equal(etiquetaDia('2026-10-04', '2026-10-04'), 'Hoy'); assert.equal(etiquetaDia('2026-10-03', '2026-10-04'), 'Ayer');
+  assert.match(etiquetaDia('2026-09-20', '2026-10-04'), /20/); assert.equal(hoyClave('America/Lima', new Date('2026-10-05T03:00:00Z')), '2026-10-04');
+});
