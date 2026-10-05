@@ -38,6 +38,42 @@ const base = import.meta.env.BASE_URL;
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full space-y-8 sm:space-y-10">
 
+    <!-- 1a. EXPLORA LA GALAXY: una puerta por sección, todas del MISMO tamaño y peso (modelo de portales de las webs gaming). Mismo estilo que las tarjetas de liga. -->
+    <section aria-label="Explora la Galaxy" class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Explora la Galaxy</h2>
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {[
+          { h: 'duelos/', i: 'fa-gamepad', k: 'Jugar', t: 'Duelos', d: 'Busca rival y entra a una sala remota' },
+          { h: 'en-vivo/', i: 'fa-tower-broadcast', k: 'Jugar', t: 'En vivo', d: 'Mira las partidas que se juegan ahora' },
+          { h: 'eventos/', i: 'fa-calendar-day', k: 'Jugar', t: 'Eventos', d: 'Torneos y quedadas de la comunidad' },
+          { h: 'liga/', i: 'fa-crown', k: 'Liga', t: 'La liga', d: 'Tabla, calendario y resultados' },
+          { h: 'mercado/', i: 'fa-handshake', k: 'Liga', t: 'Mercado', d: 'Fichajes y transferencias' },
+          { h: 'database/', i: 'fa-id-card', k: 'Liga', t: 'Jugadores', d: 'Fichas, cartas y comparador' },
+          { h: 'clanes/', i: 'fa-shield-halved', k: 'Comunidad', t: 'Clanes', d: 'Arma tu equipo y compite en grupo' },
+          { h: 'ranking/', i: 'fa-ranking-star', k: 'Comunidad', t: 'Ranking', d: 'Los mejores del mes y los retos' },
+          { h: 'noticias/', i: 'fa-newspaper', k: 'Comunidad', t: 'Noticias', d: 'Lo último que pasa en la liga' },
+        ].map((x) => (
+          <a href={`${base}${x.h}`} class:list={["liga-card group block min-h-[130px] sm:min-h-[150px]", x.h === "noticias/" ? "col-span-2 lg:col-span-1" : ""]}>
+            <div class="absolute inset-0 bg-gradient-to-br from-galaxy-900 via-black/70 to-galaxy-600/30 z-10"></div>
+            <i class={`fa-solid ${x.i} absolute -right-2 -bottom-4 text-[6.5rem] text-galaxy-400/10 group-hover:text-galaxy-400/25 group-hover:scale-110 transition-all duration-500 z-10`}></i>
+            <div class="relative z-20 p-4 sm:p-5 flex flex-col justify-end h-full min-h-[130px] sm:min-h-[150px]">
+              <span class="liga-sello self-start mb-2">{x.k}</span>
+              <h3 class="text-xl sm:text-2xl font-display font-bold text-white uppercase leading-none flex items-center gap-2">{x.t} <i class="fa-solid fa-arrow-right text-xs text-galaxy-400 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"></i></h3>
+              <p class="text-[11px] sm:text-xs text-gray-300 mt-1 leading-snug">{x.d}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+      <a href={`${base}tienda/`} class="liga-card group block min-h-[84px]">
+        <div class="absolute inset-0 bg-gradient-to-r from-galaxy-600/40 via-galaxy-900/80 to-black z-10"></div>
+        <div class="relative z-20 p-4 sm:p-5 flex items-center gap-4">
+          <span class="w-12 h-12 rounded-xl bg-galaxy-600/40 border border-galaxy-400/40 flex items-center justify-center text-galaxy-400 text-xl shrink-0"><i class="fa-solid fa-store"></i></span>
+          <div class="min-w-0 flex-1"><h3 class="text-xl font-display font-bold text-white uppercase leading-none">Tienda</h3><p class="text-xs text-gray-300 mt-1">Marcos, títulos y colores para presumir tu estilo con tus tokens.</p></div>
+          <i class="fa-solid fa-arrow-right text-galaxy-400 group-hover:translate-x-1 transition-transform"></i>
+        </div>
+      </a>
+    </section>
+
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
     {LIGAS.length > 1 && (
       <section aria-label="Competiciones" class="space-y-3">
