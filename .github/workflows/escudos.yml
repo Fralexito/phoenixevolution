@@ -1,0 +1,44 @@
+name: Descargar escudos
+# Baja los escudos de los clubes a public/escudos/ (para que la web no dependa de otra página) y activa el modo local.
+# Se ejecuta SOLO: (a) a mano desde la pestaña Actions, o (b) al subir un cambio a ESTE archivo en la rama `borrador`.
+# Escribe únicamente en `borrador` (nunca en `main`). Para deshacerlo: ESCUDOS_LOCALES = false en src/js/core/escudos.js.
+on:
+  workflow_dispatch:
+  push:
+    branches: [borrador]
+    paths: ['.github/workflows/escudos.yml']
+permissions:
+  contents: write
+  actions: write
+jobs:
+  descargar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: borrador
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Bajar escudos
+        run: |
+          mkdir -p public/escudos
+          ids=$(node --input-type=module -e "import { IDS_ESCUDOS } from './src/js/core/escudos.js'; console.log(IDS_ESCUDOS.join(' '))")
+          echo "Escudos: $ids"
+          for id in $ids; do
+            curl -fsSL --retry 3 -o "public/escudos/$id.png" "https://crests.football-data.org/$id.png"
+            test -s "public/escudos/$id.png"
+          done
+          ls -la public/escudos
+      - name: Activar modo local y subir a borrador
+        run: |
+          sed -i 's/export const ESCUDOS_LOCALES = false;/export const ESCUDOS_LOCALES = true;/' src/js/core/escudos.js
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add public/escudos src/js/core/escudos.js
+          git diff --cached --quiet && { echo "Nada que cambiar"; exit 0; }
+          git commit -m "Escudos: alojados en la propia web (modo local)"
+          git push origin borrador
+          gh workflow run deploy.yml --ref borrador
+        env:
+          GH_TOKEN: ${{ github.token }}

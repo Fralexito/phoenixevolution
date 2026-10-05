@@ -3,7 +3,12 @@
 // escudito genérico de siempre: nunca queda un hueco roto. Para alojarlos en la propia web, copia los PNG a /public/escudos/ y cambia BASE_URL.
 import { norm } from './search.js';
 
-const BASE_URL = 'https://crests.football-data.org/';
+const REMOTO = 'https://crests.football-data.org/';
+// MODO LOCAL: cuando el flujo «Descargar escudos» (.github/workflows/escudos.yml) baja los PNG a /public/escudos/ y comprueba que están todos, pone esto en true.
+// Para VOLVER a pedirlos a internet (reversible): ponlo en false.
+export const ESCUDOS_LOCALES = false;
+const BASE_URL = ESCUDOS_LOCALES ? `${import.meta.env?.BASE_URL ?? '/'}escudos/` : REMOTO;
+/** Identificadores de los escudos conocidos (los usa el flujo que los descarga). */
 const ID = {
   arsenal: 57, chelsea: 61, liverpool: 64, 'manchester city': 65, 'manchester united': 66, 'bayern munich': 5, 'fc barcelona': 81, 'real madrid': 86,
   'atletico de madrid': 78, inter: 108, 'ac milan': 98, 'paris saint germain': 524,
@@ -28,3 +33,6 @@ export function escudoHTML(club, px = 18) {
   if (!u) return '<i class="fa-solid fa-shield-halved text-galaxy-400"></i>';
   return `<img src="${u}" alt="" width="${px}" height="${px}" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="escudo inline-block object-contain align-middle" style="width:${px}px;height:${px}px" onerror="${FALLBACK}">`;
 }
+
+/** Identificadores de los escudos conocidos (los usa el flujo que los descarga). */
+export const IDS_ESCUDOS = [...new Set(Object.values(ID))];
