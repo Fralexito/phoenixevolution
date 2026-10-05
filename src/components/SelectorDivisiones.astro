@@ -2,14 +2,16 @@
 // Selector de liga para las páginas de «Sistema de divisiones». Son enlaces (cada liga tiene su propia página), con el mismo aspecto que el selector de /liga/.
 const { activa } = Astro.props;   // 'galaxy' | 'sudario'
 const base = import.meta.env.BASE_URL;
+const inicio = `${base}liga/#liga-${activa}`;   // «inicio» de la liga activa
 const items = [
   { id: 'galaxy', icono: 'fa-crown', texto: 'Galaxy League', href: `${base}temporada/` },
   { id: 'sudario', icono: 'fa-star', texto: 'Liga Sudario', href: `${base}sudario-divisiones/` },
 ];
 ---
 <div class="flex flex-wrap items-center gap-3">
+  <a href={inicio} class="liga-volver" aria-label="Volver al inicio de la liga" title="Volver al inicio de la liga"><i class="fa-solid fa-arrow-left"></i></a>
   <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Ligas activas</span>
   <nav class="liga-sel liga-sel-enlaces" aria-label="Cambiar de liga">
-    {items.map((i) => <a href={i.href} aria-current={i.id === activa ? 'page' : undefined}><i class={`fa-solid ${i.icono} mr-1.5`}></i>{i.texto}</a>)}
+    {items.map((i) => <a href={i.id === activa ? inicio : i.href} title={i.id === activa ? 'Volver al inicio de esta liga' : `Ver el sistema de divisiones de ${i.texto}`} aria-current={i.id === activa ? 'page' : undefined}><i class={`fa-solid ${i.icono} mr-1.5`}></i>{i.texto}</a>)}
   </nav>
 </div>

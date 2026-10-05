@@ -689,3 +689,6 @@ html[data-tema='sudario'] .liga-org:hover { box-shadow: 0 0 28px rgb(245 197 66 
 .liga-sel-enlaces a[aria-current='page'] { color: #fff; background: linear-gradient(135deg, rgb(128 0 255 / .55), rgb(0 229 255 / .22)); border-color: rgb(0 229 255 / .45); box-shadow: 0 0 18px rgb(128 0 255 / .35); }
 .liga-sel-enlaces a[aria-current='page'] i { color: var(--color-galaxy-400); }
 html[data-tema='sudario'] .liga-sel-enlaces a[aria-current='page'] { background: linear-gradient(135deg, rgb(29 78 216 / .6), rgb(245 197 66 / .28)); border-color: rgb(245 197 66 / .6); box-shadow: 0 0 18px rgb(29 78 216 / .45); }
+.liga-volver { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 999px; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .35); color: var(--color-galaxy-400); transition: transform .25s ease, box-shadow .25s ease; }
+.liga-volver:hover { transform: translateX(-3px); box-shadow: 0 0 14px rgb(0 229 255 / .4); }
+html[data-tema='sudario'] .liga-volver:hover { box-shadow: 0 0 14px rgb(245 197 66 / .45); }
