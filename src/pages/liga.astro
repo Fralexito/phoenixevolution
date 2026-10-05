@@ -38,8 +38,8 @@ const datos = LIGAS.map((l) => ({
   <!-- Selector de liga: muestra una sola liga a la vez. Pulsar la otra vuelve al instante; el enlace (#liga-…) recuerda cuál. -->
   {LIGAS.length > 1 && (
     <nav class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-5 flex items-center gap-3 flex-wrap" aria-label="Cambiar de liga">
-      <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Liga</span>
-      <div class="liga-sel" role="group" aria-label="Liga"><span class="liga-thumb" aria-hidden="true"></span>{LIGAS.map((l, i) => <button type="button" data-liga-btn={l.id} aria-pressed={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono} mr-1.5`}></i>{l.titulo.join(' ')}</button>)}</div>
+      <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Ligas activas</span>
+      <div class="liga-sel" role="group" aria-label="Ligas activas"><span class="liga-thumb" aria-hidden="true"></span>{LIGAS.map((l, i) => <button type="button" data-liga-btn={l.id} aria-pressed={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono} mr-1.5`}></i>{l.titulo.join(' ')}</button>)}</div>
     </nav>
   )}
 
