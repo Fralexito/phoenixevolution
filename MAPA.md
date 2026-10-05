@@ -321,7 +321,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - **ronda 133** · Fin de los cuadros del navegador: `core/dialogo.js` (`confirmar`, `pedirTexto`, con el diseño del sitio, z-index 2000) reemplaza los 21 `confirm/prompt` de historias, visor, compartir, mensajes, amigos, perfil, base de datos, en vivo, ajustes, clanes y tienda. Regla: **nunca** usar `window.confirm/prompt/alert`.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 133)
+- **ronda 134** · Rediseño de Central (reversible: etiqueta `pre-rediseno-central`, o `git revert` del commit): barra única con la fecha, «Tu próximo partido» (si hay sesión y juegas), destacado con escudos flotantes y botón, tarjetas de partido con escudo y estado, Posiciones top 5 + tu fila con barras (sin scroll interno), XI bajo los partidos, entradas animadas (`features/reveal.js`, respeta «reducir movimiento»), cifras del pulso que cuentan. Lógica pura probada: `partidoDe`, `recorteTabla`, `pasoCuenta`.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 134)
 - **Reglas fijas:** trabajar solo en `borrador`; pasar a `main` solo cuando el usuario diga «Súbelo/Publícalo». Cada cambio: bullet «ronda N» en este archivo (siguiente = **121**), commit con los dos trailers (`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` y `Claude-Session: ...`) y push a `borrador`. Supabase `fiibiyijojkxqlsrhcil`: no usar `apply_migration` ni DDL grande por `execute_sql` (se cancelan); entregar el `.sql` con SendUserFile para que el usuario lo pegue en el SQL Editor, y verificar después con consultas de solo lectura. Idioma: español.
 - **Modo ligero (pedido del usuario el 05/10):** cambios pequeños = cambio + test pertinente + commit, sin Playwright ni capturas salvo que el cambio sea grande o el usuario lo pida; respuestas cortas (qué cambió y qué hacer); no listar carpetas grandes; no repetir el resumen de pasos.
 - **Estado de la BD:** migraciones 001–042 aplicadas y verificadas (039 disputas, 040 encuestas, 041 feed, 042 eventos con el trabajo `recordar-eventos`). No hay migraciones pendientes.

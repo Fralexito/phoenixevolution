@@ -1053,3 +1053,15 @@ test('red social: etiquetas, enlaces y rechazo de chat', () => {
   assert.equal(enlacePerfil('/pes/', 'hugo'), '/pes/perfil/?u=hugo'); assert.equal(enlacePerfil('/pes/', 'a b&c'), '/pes/perfil/?u=a%20b%26c'); assert.equal(enlacePerfil('/pes/', ''), '');
   assert.equal(esRechazoChat('No puedes enviarle mensajes a esta persona.'), true); assert.equal(esRechazoChat('Error de red'), false); assert.equal(esRechazoChat(null), false);
 });
+
+import { partidoDe, recorteTabla, pasoCuenta } from '../src/js/core/central.js';
+test('central: partidoDe, recorteTabla y pasoCuenta', () => {
+  const ps = [{ l: 'Beto', v: 'Morgado' }, { l: 'Degox', v: 'Jeremi' }];
+  assert.deepEqual(partidoDe(ps, ['degox']), ps[1]); assert.deepEqual(partidoDe(ps, ['  MÓRGADO ']), ps[0]);
+  assert.equal(partidoDe(ps, ['Nadie']), null); assert.equal(partidoDe(ps, []), null); assert.equal(partidoDe(null, ['x']), null);
+  const t = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((nombre) => ({ nombre }));
+  assert.equal(recorteTabla(t, ['b']).length, 5); assert.equal(recorteTabla(t, ['b'])[1].mio, true);
+  const r = recorteTabla(t, ['g']); assert.equal(r.length, 6); assert.deepEqual([r[5].puesto, r[5].mio], [7, true]);
+  assert.equal(recorteTabla([], ['x']).length, 0);
+  assert.equal(pasoCuenta(100, 0), 0); assert.equal(pasoCuenta(100, 1), 100); assert.ok(pasoCuenta(100, 0.5) > 50); assert.equal(pasoCuenta(-5, 1), 0);
+});

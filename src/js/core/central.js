@@ -52,3 +52,28 @@ export function visualClub(club, mapa = {}) {
   const v = mapa[club]; if (v) return v;
   return { sigla: String(club ?? '?').replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 3).toUpperCase() || '?', a: '#6b7280', b: '#1f2937' };
 }
+
+const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+
+/** Primer partido de la lista donde juega alguien con alguno de estos nombres (sin importar mayúsculas ni tildes). null si no hay. */
+export function partidoDe(partidos, nombres) {
+  const ns = new Set((Array.isArray(nombres) ? nombres : []).map(norm).filter(Boolean));
+  if (!ns.size) return null;
+  return (Array.isArray(partidos) ? partidos : []).find((m) => ns.has(norm(m.l)) || ns.has(norm(m.v))) ?? null;
+}
+
+/**
+ * Recorte de la tabla para la portada: los `n` primeros y, si la persona está más abajo, su fila al final (marcada).
+ * @returns {{fila:object, puesto:number, mio:boolean}[]}
+ */
+export function recorteTabla(tabla, nombres, n = 5) {
+  const t = Array.isArray(tabla) ? tabla : [], ns = new Set((Array.isArray(nombres) ? nombres : []).map(norm).filter(Boolean));
+  const mio = (f) => ns.has(norm(f.nombre));
+  const out = t.slice(0, n).map((fila, i) => ({ fila, puesto: i + 1, mio: mio(fila) }));
+  const i = t.findIndex(mio);
+  if (i >= n) out.push({ fila: t[i], puesto: i + 1, mio: true });
+  return out;
+}
+
+/** Cifra intermedia de una cuenta animada (0 → destino) con suavizado; `p` va de 0 a 1. */
+export const pasoCuenta = (destino, p) => Math.round(Math.max(0, Number(destino) || 0) * (1 - (1 - Math.min(1, Math.max(0, p))) ** 3));

@@ -7,7 +7,7 @@ const base = import.meta.env.BASE_URL;
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
   <header class="relative flex flex-col overflow-hidden pt-4 pb-6 sm:pt-6 sm:pb-14 px-4 sm:px-6 lg:px-8 min-h-[calc(100svh-6.1rem)] sm:min-h-[calc(100svh-7rem)] border-b border-galaxy-border/40">
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
+    <div class="hero-glow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="flex-1 flex items-center justify-center w-full"><div class="max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-6">
       <span class="inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
       <h1 class="text-[1.85rem] leading-[1.15] sm:text-6xl md:text-7xl font-display font-extrabold text-white uppercase tracking-wider sm:leading-tight">
@@ -26,8 +26,8 @@ const base = import.meta.env.BASE_URL;
       { id: 'comunidad', icon: 'fa-users', label: 'Jugadores registrados', href: 'duelos/' },
       { id: 'hosts', icon: 'fa-tower-broadcast', label: 'Hosts disponibles', href: 'duelos/' },
       { id: 'retos', icon: 'fa-bolt', label: 'Retos abiertos', href: 'duelos/' },
-    ].map((t) => (
-      <a href={`${base}${t.href}`} class="pulse-tile group">
+    ].map((t, i) => (
+      <a href={`${base}${t.href}`} class="pulse-tile group" data-reveal style={`--i:${i}`}>
         <i class={`fa-solid ${t.icon} pulse-ico`}></i>
         <span class="pulse-num" id={`pulso-${t.id}`}>—</span>
         <span class="pulse-lbl">{t.label}</span>
@@ -40,7 +40,7 @@ const base = import.meta.env.BASE_URL;
 
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
     {LIGAS.length > 1 && (
-      <section aria-label="Competiciones" class="space-y-3">
+      <section aria-label="Competiciones" class="space-y-3" data-reveal>
         <h2 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Competiciones</h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {LIGAS.map((l) => (
@@ -58,40 +58,30 @@ const base = import.meta.env.BASE_URL;
       </section>
     )}
 
-    <!-- 3. CENTRAL DE PARTIDOS (con el partido destacado dentro) + clasificación y XI al costado -->
+    <!-- 3. CENTRAL DE PARTIDOS: barra única → «tu partido» (si lo tienes) → destacado → resto de la fecha; a un lado, tabla corta y XI. Lo pinta js/pages/central.js. -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
-      <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
-        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
-          <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
+      <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32" data-reveal>
+        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
+            <p id="fecha-etiqueta" class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-[0.18em] mt-0.5" aria-live="polite"></p>
+          </div>
           <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
             <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
             <button type="button" data-v="resultados" aria-pressed="false">Resultados</button>
           </div>
         </div>
 
-        <!-- Partido destacado: lo pinta js/pages/central.js con el próximo cruce entre los mejor ubicados de la tabla real. -->
-        <article id="destacado" class="glass-panel rounded-xl overflow-hidden relative min-h-[9rem]" aria-live="polite">
+        <div id="tu-partido" hidden aria-live="polite"></div>
+
+        <article id="destacado" class="glass-panel rounded-2xl overflow-hidden relative min-h-[9rem]" aria-live="polite">
           <div class="p-6 text-center text-gray-500 text-xs">Cargando el partido destacado…</div>
         </article>
 
-        <div class="grid gap-3" id="matches-container" aria-live="polite"></div>
+        <div class="grid gap-3 sm:grid-cols-2" id="matches-container" aria-live="polite"></div>
         <a href={`${base}duelos/`} class="flex items-center justify-center gap-2 text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase tracking-wider border border-dashed border-galaxy-400/30 rounded-xl py-3 hover:border-galaxy-400 transition-colors"><i class="fa-solid fa-gamepad"></i> Ver retos abiertos en la Sala de Duelos <i class="fa-solid fa-arrow-right"></i></a>
-      </section>
-
-      <aside class="space-y-5">
-        <section class="glass-panel rounded-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
-            <h3 class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><i class="fa-solid fa-trophy text-galaxy-400"></i>
-          </div>
-          <div class="p-4 overflow-auto max-h-[260px]">
-            <table class="w-full text-left text-sm">
-              <thead><tr class="text-gray-500 border-b border-galaxy-border/50"><th class="pb-2 font-semibold">Pos</th><th class="pb-2 font-semibold">DT / Club</th><th class="pb-2 text-center font-semibold">PJ</th><th class="pb-2 text-center font-semibold text-galaxy-400">PTS</th></tr></thead>
-              <tbody id="mini-table-container"></tbody>
-            </table>
-          </div>
-        </section>
         <!-- En celular el XI viene plegado para no alargar la página (central.js lo abre en PC). -->
-        <details id="xi-det" open class="glass-panel rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(128,0,255,0.2)]">
+        <details id="xi-det" open class="glass-panel mt-1 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(128,0,255,0.2)]" data-reveal>
           <summary class="bg-galaxy-dark/80 px-4 py-3 border-b border-galaxy-border/60 cursor-pointer flex items-center justify-between list-none">
             <h3 class="font-display font-bold text-sm uppercase tracking-widest text-galaxy-400 text-shadow-glow">XI IDEAL DE LA FECHA</h3><i class="fa-solid fa-chevron-down text-galaxy-400 text-xs xi-chev"></i>
           </summary>
@@ -103,11 +93,24 @@ const base = import.meta.env.BASE_URL;
             <div id="xi-container" class="contents"></div>
           </div>
         </details>
+      </section>
+
+      <aside class="space-y-5">
+        <section class="glass-panel rounded-2xl overflow-hidden" data-reveal style="--i:1">
+          <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
+            <h3 class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><i class="fa-solid fa-trophy text-galaxy-400"></i>
+          </div>
+          <div class="p-3">
+            <div class="grid grid-cols-[1.6rem_minmax(0,1fr)_auto_2.2rem] gap-2 px-2 pb-1 text-[10px] font-display font-bold uppercase tracking-widest text-gray-500"><span>#</span><span>DT / Club</span><span>PJ</span><span class="text-right text-galaxy-400">PTS</span></div>
+            <div id="mini-table-container" class="space-y-0.5"></div>
+            <a href={`${base}liga/`} class="mt-2 flex items-center justify-center gap-2 text-[11px] font-display font-bold text-galaxy-400 hover:text-white uppercase tracking-wider py-2 rounded-lg hover:bg-white/5 transition-colors">Ver tabla completa <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </section>
       </aside>
     </div>
 
     <!-- 4. JUGADORES DESTACADOS: en celular, carrusel que se desliza de lado -->
-    <section class="space-y-4">
+    <section class="space-y-4" data-reveal>
       <div class="flex items-center justify-between">
         <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
         <a href={`${base}database/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1.5 border border-galaxy-400/30 bg-galaxy-400/10 px-3 py-1.5 rounded hover:bg-galaxy-400/20 transition-colors">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
@@ -116,7 +119,7 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <!-- 5. HIGHLIGHTS: video principal grande + lista de clips al costado (en celular, debajo) -->
-    <section class="space-y-4">
+    <section class="space-y-4" data-reveal>
       <div class="flex items-center justify-between">
         <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow flex items-center gap-2"><i class="fa-solid fa-video text-galaxy-400 text-lg"></i> Highlights<span class="hidden sm:inline"> de la jornada</span></h2>
         <a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase flex items-center gap-1.5 whitespace-nowrap"><i class="fa-brands fa-youtube text-red-500 text-sm"></i> Ver canal</a>
@@ -146,7 +149,7 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <!-- 6. INVITACIÓN FINAL -->
-    <section class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+    <section class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left" data-reveal>
       <div>
         <h2 class="font-display font-bold text-lg sm:text-xl text-white uppercase tracking-wider">¿Listo para entrar a la Galaxy?</h2>
         <p class="text-sm text-gray-400 mt-0.5">La comunidad vive en Discord: ahí se pactan partidas, se arman torneos y se avisa cada novedad.</p>

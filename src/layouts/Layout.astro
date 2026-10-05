@@ -25,6 +25,7 @@ const base = import.meta.env.BASE_URL;
     <meta name="theme-color" content="#03010f" />
     {import.meta.env.PUBLIC_PREVIEW && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href={`${base}favicon.png`} />
+      <script is:inline>document.documentElement.classList.add('js');</script>
   </head>
   <body class="flex flex-col min-h-screen">
     <div class="sticky top-0 z-50 flex flex-col pointer-events-none">

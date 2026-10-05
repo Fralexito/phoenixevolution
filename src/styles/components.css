@@ -429,3 +429,35 @@ body:has(#players-container) { overflow-x: clip; }
 button.rx:hover { border-color: var(--acento, var(--color-galaxy-400)); }
 .rx[aria-pressed='true'] { border-color: var(--acento, var(--color-galaxy-400)); background: color-mix(in srgb, var(--acento, var(--color-galaxy-400)) 18%, transparent); color: #fff; }
 #dialogo-modal { z-index: 2000; }
+
+/* ---- Rediseño de Central: entrada animada, tarjetas de partido, «tu partido», tabla compacta ---- */
+@keyframes revela-a-tiempo { to { opacity: 1; transform: none; } }
+.js [data-reveal] { animation: revela-a-tiempo 0s 4s forwards; transition: opacity .55s ease, transform .55s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i, 0) * 60ms); }
+.js [data-reveal]:not(.is-in) { opacity: 0; transform: translate3d(0, 14px, 0); }
+[data-reveal].is-in { opacity: 1; transform: none; animation: none; }
+@keyframes flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes latido { 0%, 100% { opacity: .75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes brilla { 0%, 100% { box-shadow: 0 0 0 0 rgb(0 229 255 / .0), 0 0 22px rgb(128 0 255 / .35); } 50% { box-shadow: 0 0 0 3px rgb(0 229 255 / .18), 0 0 34px rgb(0 229 255 / .45); } }
+@keyframes respira { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(1); } 50% { opacity: .9; transform: translate(-50%, -50%) scale(1.08); } }
+.hero-glow { animation: respira 7s ease-in-out infinite; }
+.escudo { animation: flota 5s ease-in-out infinite; } .escudo.der { animation-delay: -2.5s; }
+.vs-latido { animation: latido 2.4s ease-in-out infinite; }
+.tu-partido { border: 1px solid rgb(0 229 255 / .55); background: linear-gradient(120deg, rgb(128 0 255 / .22), rgb(0 229 255 / .08)); animation: brilla 3.2s ease-in-out infinite; }
+.cta-pulso { position: relative; } .cta-pulso::after { content: ''; position: absolute; inset: -3px; border-radius: inherit; border: 1px solid rgb(0 229 255 / .6); animation: latido 2s ease-in-out infinite; pointer-events: none; }
+.match-card { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .6rem; padding: .8rem .9rem; border-radius: .9rem; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.match-card:hover { transform: translateY(-3px); border-color: var(--color-galaxy-400); box-shadow: 0 8px 26px rgb(0 0 0 / .4), 0 0 18px rgb(0 229 255 / .2); }
+.match-card.mio { border-color: rgb(0 229 255 / .7); box-shadow: 0 0 18px rgb(0 229 255 / .25); }
+.mini-escudo { width: 2rem; height: 2rem; border-radius: 9999px; display: grid; place-items: center; font: 800 .62rem var(--font-display); border: 1px solid rgb(255 255 255 / .25); flex-shrink: 0; transition: transform .25s ease; }
+.match-card:hover .mini-escudo { transform: scale(1.12) rotate(-6deg); }
+.estado-chip { font: 700 .6rem var(--font-display); letter-spacing: .12em; text-transform: uppercase; padding: .15rem .5rem; border-radius: 9999px; border: 1px solid; }
+.estado-chip.pend { color: #00e5ff; border-color: rgb(0 229 255 / .4); background: rgb(0 229 255 / .08); } .estado-chip.fin { color: #9ca3af; border-color: rgb(156 163 175 / .35); }
+.fila-tabla { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto 2.2rem; align-items: center; gap: .5rem; padding: .55rem .6rem; border-radius: .6rem; transition: background .2s ease, transform .2s ease; }
+.fila-tabla:hover { background: rgb(255 255 255 / .05); transform: translateX(3px); }
+.fila-tabla.mio { background: linear-gradient(90deg, rgb(0 229 255 / .16), transparent); outline: 1px solid rgb(0 229 255 / .45); }
+.barra-pts { height: 3px; border-radius: 9999px; background: rgb(255 255 255 / .08); overflow: hidden; } .barra-pts > i { display: block; height: 100%; width: var(--w, 0%); background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-400)); transform-origin: left; transform: scaleX(0); transition: transform .9s cubic-bezier(.2, .8, .2, 1) .2s; } .is-in .barra-pts > i, .is-in.barra-pts > i { transform: scaleX(1); }
+.pulse-tile { transition: transform .2s ease, border-color .2s, box-shadow .2s; } .pulse-tile:hover { transform: translateY(-3px); }
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal], .js [data-reveal]:not(.is-in) { opacity: 1; transform: none; transition: none; animation: none; }
+  .hero-glow, .escudo, .vs-latido, .tu-partido, .cta-pulso::after { animation: none; }
+  .match-card, .fila-tabla, .pulse-tile, .mini-escudo { transition: none; } .barra-pts > i { transform: none; transition: none; }
+}
