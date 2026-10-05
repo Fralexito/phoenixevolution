@@ -185,7 +185,7 @@ const datos = LIGAS.map((l) => ({
 </Layout>
 <script is:inline>
   // Antes de pintar: muestra solo la liga elegida en el enlace (#liga-…) o la primera. Si esto fallara, se ven todas.
-  (function () { try { var s = [].slice.call(document.querySelectorAll('[data-liga-sec]')); if (s.length < 2) return; var h = (location.hash || '').replace('#liga-', ''); var a = s.filter(function (x) { return x.dataset.ligaSec === h })[0] || s[0]; s.forEach(function (x) { x.classList.toggle('liga-activa', x === a); }); document.documentElement.classList.add('liga-multi'); } catch (e) { console.warn('[liga] selector:', e); } })();
+  (function () { try { var s = [].slice.call(document.querySelectorAll('[data-liga-sec]')); if (s.length < 2) return; var h = (location.hash || '').replace('#liga-', ''); var a = s.filter(function (x) { return x.dataset.ligaSec === h })[0] || s[0]; s.forEach(function (x) { x.classList.toggle('liga-activa', x === a); }); document.documentElement.dataset.tema = a.dataset.ligaSec; document.documentElement.classList.add('liga-multi'); } catch (e) { console.warn('[liga] selector:', e); } })();
 </script>
 <script>
   import '../js/pages/liga.js';

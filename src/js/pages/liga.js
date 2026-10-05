@@ -34,7 +34,7 @@ document.addEventListener('click', (e) => {
 // ---- Selector de liga (reversible: pulsar la otra liga vuelve al instante) ----
 function mostrarLiga(id) {
   const secs = $$('[data-liga-sec]'); if (!secs.some((x) => x.dataset.ligaSec === id)) { console.warn('[liga] liga desconocida:', id); return; }
-  document.documentElement.classList.add('liga-multi');
+  document.documentElement.classList.add('liga-multi'); document.documentElement.dataset.tema = id;   // CSS cambia la paleta según la liga
   secs.forEach((x) => x.classList.toggle('liga-activa', x.dataset.ligaSec === id));
   $$('[data-liga-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ligaBtn === id)));
   try { history.replaceState(null, '', `#liga-${id}`); } catch { /* sin historial: no pasa nada */ }

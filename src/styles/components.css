@@ -661,3 +661,18 @@ a.slide-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgb(0 
 .cat-item .cat-vista { pointer-events: none; } .cat-item .cat-vista .nt { pointer-events: none; }
 
 .liga-sel:not(.lista) button[aria-pressed='true'] { background: rgb(0 229 255 / .18); }
+
+/* TEMA POR LIGA: al elegir Sudario, la paleta se remapea a azules y dorados (los utilitarios usan estas variables, así que todo cambia solo). */
+html { transition: background-color .5s ease; }
+html[data-tema='sudario'] {
+  --color-galaxy-50: #fff7d6; --color-galaxy-100: #e6ecf8;
+  --color-galaxy-400: #f5c542; --color-galaxy-500: #e0a82e;
+  --color-galaxy-600: #1d4ed8; --color-galaxy-700: #1e40af;
+  --color-galaxy-900: #081c4a; --color-galaxy-dark: #020a1f; --color-galaxy-deep: #030d26;
+  --color-galaxy-card: #071634; --color-galaxy-panel: #061230;
+  --color-galaxy-border: #1e3a8a; --color-galaxy-line: #0e2257;
+}
+html[data-tema='sudario'] .liga-thumb { background: linear-gradient(135deg, rgb(29 78 216 / .6), rgb(245 197 66 / .28)); border-color: rgb(245 197 66 / .6); box-shadow: 0 0 18px rgb(29 78 216 / .45); }
+html[data-tema='sudario'] .liga-sello { background: rgb(245 197 66 / .12); border-color: rgb(245 197 66 / .4); }
+html[data-tema='sudario'] .liga-tabla tbody tr.liga-sel-fila { background: rgb(245 197 66 / .1); }
+html[data-tema='sudario'] h1 .bg-clip-text { background-image: linear-gradient(90deg, #fde68a, #f5c542 55%, #60a5fa); }
