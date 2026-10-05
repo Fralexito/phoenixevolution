@@ -5,6 +5,7 @@ import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { avatarHTML } from '../core/avatar.js';
 import { toast } from '../core/toast.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/clanes/api.js';
 import { LIMITES, ROLES, validarClan, puede, restante, textoMotivo } from '../core/clan.js';
@@ -102,23 +103,23 @@ async function hacer(fn, ok) {
   catch (e) { console.error('[clanes] acción:', e); toast(e?.message || 'No se pudo completar la acción.', 'error'); }
   finally { S.busy = false; }
 }
-const pedirMotivo = (t) => { const m = window.prompt(t); return m && m.trim() ? m.trim().slice(0, LIMITES.motivoMax) : null; };
+const pedirMotivo = async (t) => { const m = await pedirTexto(t, { titulo: 'Motivo', maximo: LIMITES.motivoMax }); return m ? m.slice(0, LIMITES.motivoMax) : null; };
 
 // ── Eventos (delegación) ─────────────────────────────────────────────────────────────────────────────────────
-$('cl-contenido').addEventListener('click', (ev) => {
+$('cl-contenido').addEventListener('click', async (ev) => {
   const t = ev.target.closest('[data-resp],[data-invitar],[data-salir],[data-expulsar],[data-sub],[data-ceder],[data-votar],[data-destituir],[data-solicitar],[data-mod],[data-mod-expulsar]'); if (!t) return;
   const d = t.dataset;
   if (d.resp) hacer(() => api.responder(Number(d.resp), d.ok === '1'), d.ok === '1' ? 'Listo.' : 'Respondido.');
   else if (d.invitar) hacer(() => api.invitar(d.invitar), 'Invitación enviada.').then(() => { S.encontrados = S.encontrados.filter((u) => u.id !== d.invitar); pintar(); });
-  else if (t.hasAttribute('data-salir')) { if (window.confirm('¿Seguro que quieres salir del clan?')) hacer(() => api.salir(), 'Saliste del clan.'); }
-  else if (d.expulsar) { if (window.confirm('¿Expulsar a esta persona del clan?')) hacer(() => api.expulsar(d.expulsar), 'Miembro expulsado.'); }
+  else if (t.hasAttribute('data-salir')) { if (await confirmar('¿Seguro que quieres salir del clan?', { titulo: 'Salir del clan', aceptar: 'Salir', peligro: true })) hacer(() => api.salir(), 'Saliste del clan.'); }
+  else if (d.expulsar) { if (await confirmar('¿Expulsar a esta persona del clan?', { titulo: 'Expulsar', aceptar: 'Expulsar', peligro: true })) hacer(() => api.expulsar(d.expulsar), 'Miembro expulsado.'); }
   else if (d.sub) hacer(() => api.nombrarSubcapitan(d.sub), 'Subcapitán nombrado.');
-  else if (d.ceder) { if (window.confirm('¿Ceder la capitanía? Pasarás a ser un miembro más.')) hacer(() => api.cederCapitania(d.ceder), 'Capitanía cedida.'); }
+  else if (d.ceder) { if (await confirmar('¿Ceder la capitanía? Pasarás a ser un miembro más.', { titulo: 'Ceder capitanía', aceptar: 'Ceder', peligro: true })) hacer(() => api.cederCapitania(d.ceder), 'Capitanía cedida.'); }
   else if (d.votar) hacer(() => api.votar(d.votar), 'Voto registrado.');
   else if (d.destituir) hacer(() => api.pedirDestitucion(d.destituir === 'si'), d.destituir === 'si' ? 'Pedido registrado.' : 'Pedido retirado.');
   else if (d.solicitar) hacer(() => api.solicitarIngreso(Number(d.solicitar)), 'Solicitud enviada al clan.');
-  else if (d.mod) { const c = S.lista.find((x) => x.id === Number(d.mod)); const m = pedirMotivo(c?.oculto ? 'Motivo para volver a mostrarlo:' : 'Motivo para ocultar este clan:'); if (m && c) hacer(() => api.moderarClan(c.id, !c.oculto, m), 'Hecho (queda en la auditoría).'); }
-  else if (d.modExpulsar) { const m = pedirMotivo('Motivo para sacar a esta persona del clan:'); if (m) hacer(() => api.moderarExpulsar(d.modExpulsar, m), 'Persona sacada del clan (queda en la auditoría).'); }
+  else if (d.mod) { const c = S.lista.find((x) => x.id === Number(d.mod)); const m = await pedirMotivo(c?.oculto ? 'Motivo para volver a mostrarlo:' : 'Motivo para ocultar este clan:'); if (m && c) hacer(() => api.moderarClan(c.id, !c.oculto, m), 'Hecho (queda en la auditoría).'); }
+  else if (d.modExpulsar) { const m = await pedirMotivo('Motivo para sacar a esta persona del clan:'); if (m) hacer(() => api.moderarExpulsar(d.modExpulsar, m), 'Persona sacada del clan (queda en la auditoría).'); }
 });
 $('cl-contenido').addEventListener('submit', async (ev) => {
   ev.preventDefault(); const f = ev.target;

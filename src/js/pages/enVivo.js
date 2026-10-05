@@ -2,6 +2,7 @@
 // Esquema: pages → features/espectadores/api (RPC) → core/espectadores (lógica pura).
 import { onSession, getState } from '../core/session.js';
 import { toast } from '../core/toast.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML, safeUrl } from '../core/dom.js';
 import { supabase } from '../core/supabase.js';
 import { data, loadPerfiles } from '../features/duelos/data.js';
@@ -101,7 +102,7 @@ $('lista-mis-salas').addEventListener('click', (e) => {
     guardar: () => { const c = b.closest('[data-sala]'); const modo = c.querySelector('[data-campo="modo"]').value; const max = clampMax(c.querySelector('[data-campo="max"]').value);
       ejecutar(async () => { await api.configurar(id, modo, max); toast('Guardado.', 'ok', { key: 'cfg' }); }); },
     aceptar: () => ejecutar(() => api.responder(id, uid, true)), rechazar: () => ejecutar(() => api.responder(id, uid, false)),
-    quitar: () => confirm('¿Quitar a este espectador?') && ejecutar(() => api.quitar(id, uid)),
+    quitar: async () => { if (await confirmar('¿Quitar a este espectador?', { titulo: 'Quitar espectador', aceptar: 'Quitar', peligro: true })) ejecutar(() => api.quitar(id, uid)); },
   })[b.dataset.act]?.();
 });
 

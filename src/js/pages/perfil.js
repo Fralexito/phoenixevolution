@@ -28,6 +28,7 @@ import { abrirNuevaHistoria, abrirDestacadas } from '../features/muro/historiasU
 import { prepararVideo } from '../features/muro/media.js';
 import { compartir } from '../features/muro/compartir.js';
 import { clanDeUsuario } from '../features/clanes/api.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { xpDe, equipamientoDe } from '../features/economia/api.js';
 import { estiloColor, estiloMarco } from '../core/economia.js';
 import { reputacionDe } from '../features/valoraciones/api.js';
@@ -507,7 +508,7 @@ const ACCIONES = {
   'rechazar-amistad': () => cambioSocial(() => amigosApi.responder(S.p.id, false), 'Solicitud rechazada.'),
   seguir: () => cambioSocial(() => amigosApi.seguir(S.p.id), 'Ahora lo sigues.', { recargarTodo: true }),   // seguir puede ampliar lo que ves (p. ej. chat de «amigos y seguidores»)
   'dejar-seguir': () => cambioSocial(() => amigosApi.dejarDeSeguir(S.p.id), 'Dejaste de seguirlo.'),
-  bloquear: () => { if (confirm(`¿Bloquear a ${S.p.nombre_display}? No podrán verse ni escribirse. Podrás desbloquearlo en Amigos → Bloqueados.`)) return cambioSocial(() => amigosApi.bloquear(S.p.id), 'Persona bloqueada.', { recargarTodo: true }); },
+  bloquear: async () => { if (await confirmar(`¿Bloquear a ${S.p.nombre_display}? No podrán verse ni escribirse. Podrás desbloquearlo en Amigos → Bloqueados.`, { titulo: 'Bloquear', aceptar: 'Bloquear', peligro: true })) return cambioSocial(() => amigosApi.bloquear(S.p.id), 'Persona bloqueada.', { recargarTodo: true }); },
   desbloquear: () => cambioSocial(() => amigosApi.desbloquear(S.p.id), 'Desbloqueada.', { recargarTodo: true }),
   'elegir-foto': () => document.getElementById('mu-file').click(),
   'filtro-juego': async (el) => {
@@ -570,7 +571,7 @@ const ACCIONES = {
     if (!v.ok) { toast(v.error, 'error'); return; }
     if (await seguro(() => api.editar(Number(el.dataset.id), v.texto), 'Cambios guardados.') !== undefined) { S.editando = null; await refrescarMuro(); }
   },
-  borrar: async (el) => { if (!window.confirm('¿Borrar esta publicación? No se puede deshacer.')) return; if (await seguro(() => api.borrar(Number(el.dataset.id)), 'Publicación borrada.') !== undefined) await refrescarMuro(); },
+  borrar: async (el) => { if (!(await confirmar('¿Borrar esta publicación? No se puede deshacer.', { titulo: 'Borrar publicación', aceptar: 'Borrar', peligro: true }))) return; if (await seguro(() => api.borrar(Number(el.dataset.id)), 'Publicación borrada.') !== undefined) await refrescarMuro(); },
   'cambiar-foto': () => abrirFoto(),
   'cambiar-banner': () => document.getElementById('bn-file').click(),
   'host-juego': (el) => { S.host.cat = alternarJuego(S.host.cat, el.dataset.juego); pintarPanelHost(); },
@@ -621,7 +622,7 @@ const ACCIONES = {
   'mod-valoraciones': () => abrirValoracionesStaff({ usuario: { id: S.p.id, nombre: S.p.nombre_display || S.p.username } }),
   'mod-sancionar': async () => { abrirSancionar({ usuario: { id: S.p.id, nombre: S.p.nombre_display || S.p.username, rol: await rolDe(S.p.id) } }); },
   'borrar-resp': async (el) => {
-    if (!window.confirm('¿Borrar esta respuesta?')) return;
+    if (!(await confirmar('¿Borrar esta respuesta?', { titulo: 'Borrar respuesta', aceptar: 'Borrar', peligro: true }))) return;
     const id = Number(el.dataset.pub);
     if (await seguro(() => api.borrarRespuesta(Number(el.dataset.id)), 'Respuesta borrada.') === undefined) return;
     S.resp.set(id, await api.respuestasDe(id).catch(() => []));

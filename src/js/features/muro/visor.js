@@ -1,6 +1,7 @@
 // Visores a pantalla completa del muro: HISTORIAS (barras de progreso, toque izq./der., mantener = pausa) y CLIPS (estilo reels: desliza arriba/abajo).
 // Solo DOM: recibe datos ya normalizados (core/historias.js). Todo texto pasa por escapeHTML; los enlaces ya fueron validados por analizarVideo.
 // Privacidad: nada de YouTube se carga hasta que la historia/clip activo lo necesita (y con el dominio «nocookie»).
+import { confirmar, pedirTexto } from '../../core/dialogo.js';
 import { escapeHTML, safeImg } from '../../core/dom.js';
 import { HISTORIA_MS, caducaEn } from '../../core/historias.js';
 import { tiempoRelativo, textoAHTML, PROVEEDOR_ETIQUETA } from '../../core/muro.js';
@@ -112,7 +113,7 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
   };
   document.addEventListener('keydown', teclas);
   el.querySelector('[data-borrar]')?.addEventListener('click', async () => {
-    if (!window.confirm('¿Borrar esta historia?')) return;
+    if (!(await confirmar('¿Borrar esta historia?', { titulo: 'Borrar historia', aceptar: 'Borrar', peligro: true }))) return;
     pausa = true;
     let ok = false; try { ok = await onBorrar(lista[i].id); } catch (e) { console.error('[visor] borrar historia:', e); }
     pausa = false; if (!ok) return;
@@ -186,7 +187,7 @@ export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReporta
     if (rp || md) { const c = lista.find((x) => x.id === Number((rp ?? md).dataset[rp ? 'reportar' : 'moderar'])); cerrar(); if (c) (rp ? onReportar : onModerar)(c); return; }
     const b = e.target.closest('[data-borrar]');
     if (!b) { if (e.target === el) cerrar(); return; }
-    if (!window.confirm('¿Borrar este clip?')) return;
+    if (!(await confirmar('¿Borrar este clip?', { titulo: 'Borrar clip', aceptar: 'Borrar', peligro: true }))) return;
     let ok = false; try { ok = await onBorrar(Number(b.dataset.borrar)); } catch (err) { console.error('[visor] borrar clip:', err); }
     if (!ok) return;
     const k = Math.max(0, activo); lista = lista.filter((c) => c.id !== Number(b.dataset.borrar));

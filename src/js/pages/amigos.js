@@ -2,6 +2,7 @@
 // Esquema: pages → features/amigos/api (RPC) → core/red (lógica pura).
 import { onSession } from '../core/session.js';
 import { toast } from '../core/toast.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML, safeImg } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { me, data, loadPerfiles } from '../features/duelos/data.js';
@@ -95,10 +96,10 @@ async function recargar() {
 
 const ACCIONES = {
   solicitar: (id) => api.solicitar(id).then((r) => toast(r === 'ACEPTADA' ? '¡Ya son amigos!' : 'Solicitud enviada.', 'ok')),
-  cancelar: (id) => api.cancelarSolicitud(id), quitar: (id) => confirm('¿Quitar a este amigo?') && api.eliminarAmigo(id),
+  cancelar: (id) => api.cancelarSolicitud(id), quitar: async (id) => (await confirmar('¿Quitar a este amigo?', { titulo: 'Quitar amigo', aceptar: 'Quitar', peligro: true })) && api.eliminarAmigo(id),
   aceptar: (id) => api.responder(id, true).then(() => toast('Solicitud aceptada.', 'ok')), rechazar: (id) => api.responder(id, false),
   seguir: (id) => api.seguir(id), dejar: (id) => api.dejarDeSeguir(id),
-  bloquear: (id) => confirm('¿Bloquear a esta persona? Se cortará la amistad y los seguimientos.') && api.bloquear(id).then(() => toast('Persona bloqueada.', 'info')),
+  bloquear: async (id) => (await confirmar('¿Bloquear a esta persona? Se cortará la amistad y los seguimientos.', { titulo: 'Bloquear', aceptar: 'Bloquear', peligro: true })) && api.bloquear(id).then(() => toast('Persona bloqueada.', 'info')),
   desbloquear: (id) => api.desbloquear(id),
 };
 

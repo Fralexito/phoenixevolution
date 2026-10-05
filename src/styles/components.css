@@ -428,3 +428,4 @@ body:has(#players-container) { overflow-x: clip; }
 .rx b { font: 700 .68rem/1 var(--font-display); }
 button.rx:hover { border-color: var(--acento, var(--color-galaxy-400)); }
 .rx[aria-pressed='true'] { border-color: var(--acento, var(--color-galaxy-400)); background: color-mix(in srgb, var(--acento, var(--color-galaxy-400)) 18%, transparent); color: #fff; }
+#dialogo-modal { z-index: 2000; }

@@ -3,6 +3,7 @@
 import { abrirReportar } from '../features/moderacion/acciones.js';
 import { onSession } from '../core/session.js';
 import { toast } from '../core/toast.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML, safeImg } from '../core/dom.js';
 import { supabase } from '../core/supabase.js';
 import { me, data, loadPerfiles } from '../features/duelos/data.js';
@@ -207,16 +208,16 @@ $('txt-msg').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.sh
 $('txt-msg').addEventListener('input', (e) => { e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`; if (e.target.value.length > MAX_TEXTO - 50) e.target.title = `${e.target.value.length}/${MAX_TEXTO}`; });
 $('mensajes').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-borrar]'); const r = e.target.closest('[data-reportar]');
-  if (b && confirm('¿Borrar este mensaje para todos?')) { await ejecutar(() => api.borrar(Number(b.dataset.borrar)), { recargar: false }); await refrescarSala(); }
+  if (b && await confirmar('¿Borrar este mensaje para todos?', { titulo: 'Borrar mensaje', aceptar: 'Borrar', peligro: true })) { await ejecutar(() => api.borrar(Number(b.dataset.borrar)), { recargar: false }); await refrescarSala(); }
   if (r) abrirReportar({ tipo: 'mensaje', objetivo: r.dataset.reportar, titulo: 'Mensaje en el chat' });
 });
 $('info-panel').addEventListener('click', async (e) => {
   const c = convAbierta(); if (!c) return;
   const q = e.target.closest('[data-quitar]')?.dataset.quitar;
-  if (q && confirm(`¿Quitar a ${nombre(q)} del grupo?`)) { await ejecutar(() => api.expulsarDeGrupo(c.id, q), { recargar: false }); await refrescarSala(); await refrescarLista(); return; }
+  if (q && await confirmar(`¿Quitar a ${nombre(q)} del grupo?`, { titulo: 'Quitar del grupo', aceptar: 'Quitar', peligro: true })) { await ejecutar(() => api.expulsarDeGrupo(c.id, q), { recargar: false }); await refrescarSala(); await refrescarLista(); return; }
   const a = e.target.closest('[data-info]')?.dataset.info;
   if (a === 'silenciar') { await ejecutar(() => api.silenciar(c.id, !c.silenciado)); pintarInfo(); }
-  if (a === 'salir' && confirm(c.tipo === 'GRUPO' ? '¿Salir de este grupo?' : '¿Quitar este chat de tu lista? Volverá a aparecer si te escriben.')) {
+  if (a === 'salir' && await confirmar(c.tipo === 'GRUPO' ? '¿Salir de este grupo?' : '¿Quitar este chat de tu lista? Volverá a aparecer si te escriben.', { titulo: c.tipo === 'GRUPO' ? 'Salir del grupo' : 'Quitar chat', aceptar: 'Sí', peligro: true })) {
     await ejecutar(() => api.salir(c.id)); S.abierta = null; $('sala').hidden = true; $('sala-vacia').hidden = false; pintarLista();
   }
   if (a === 'agregar') { const v = $('sel-agregar')?.value; if (v) { await ejecutar(() => api.agregarAGrupo(c.id, v), { recargar: false }); await refrescarSala(); await refrescarLista(); } }

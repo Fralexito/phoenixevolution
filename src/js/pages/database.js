@@ -7,6 +7,7 @@ import { posInfo } from '../../data/posiciones.js';
 import { href } from '../core/config.js';
 import { leerAjustes, hayMovimientoReducido } from '../features/ajustes.js';
 import { toast } from '../core/toast.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
@@ -203,7 +204,7 @@ $('players-container').addEventListener('click', async (e) => {
   if (edit) openPlayerForm(all.find((p) => p.id === edit), load);
   if (del) {
     const p = all.find((x) => x.id === del);
-    if (!p || !confirm(`¿Borrar la ficha de ${p.nombre}? No se puede deshacer.`)) return;
+    if (!p || !(await confirmar(`¿Borrar la ficha de ${p.nombre}? No se puede deshacer.`, { titulo: 'Borrar ficha', aceptar: 'Borrar', peligro: true }))) return;
     try { await borrarFilas(supabase, 'jugadores', { id: del }); }
     catch (error) { console.error('[database] borrar:', error); toast(/permiso/.test(error.message) ? error.message : 'No se pudo borrar.', 'error'); return; }
     toast('Ficha borrada.', 'ok'); load();

@@ -7,6 +7,7 @@ import { logout } from '../features/auth.js';
 import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { toast } from '../core/toast.js';
+import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { iniciarVistas } from '../features/ajustesVista.js';
 
 const estado = document.getElementById('aj-estado');
@@ -39,8 +40,8 @@ const ACCIONES = {
   exportar: () => { descargar('ajustes-phoenix.json', exportarAjustes(leerAjustes())); avisar('Archivo descargado.'); },
   importar: () => document.getElementById('aj-archivo')?.click(),
   restablecer: () => { reemplazarAjustes(AJUSTES_DEFECTO); pintar(); avisar('Ajustes restablecidos.'); },
-  'borrar-local': () => {
-    if (!window.confirm('Se borrarán tus ajustes, el historial de «En vivo» y el zoom guardado de ESTE navegador. Tu cuenta no se toca. ¿Continuar?')) return;
+  'borrar-local': async () => {
+    if (!(await confirmar('Se borrarán tus ajustes, el historial de «En vivo» y el zoom guardado de ESTE navegador. Tu cuenta no se toca. ¿Continuar?', { titulo: 'Borrar datos de este navegador', aceptar: 'Borrar', peligro: true }))) return;
     const n = borrarDatosLocales(); reemplazarAjustes(AJUSTES_DEFECTO); pintar(); avisar(`Listo: ${n} dato(s) local(es) borrados.`);
   },
 };

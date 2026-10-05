@@ -2,6 +2,7 @@
 // Capa DOM: valida con core/historias.js y core/videoSubida.js, sube archivos y llama a api.js. Cada ventana avisa con `onListo()` al terminar para que el perfil se recargue.
 import { openModal, closeModal } from '../../core/modal.js';
 import { toast } from '../../core/toast.js';
+import { confirmar, pedirTexto } from '../../core/dialogo.js';
 import { escapeHTML, safeImg } from '../../core/dom.js';
 import { validarHistoria, validarTituloDestacada, normalizarHistorias, HISTORIA_MAX, DESTACADA_TITULO_MAX, MAX_DESTACADAS } from '../../core/historias.js';
 import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../../core/videoSubida.js';
@@ -84,12 +85,12 @@ export function abrirDestacadas({ hist, onListo }) {
     const ids = [...m.querySelectorAll('[data-sel]:checked')].map((x) => Number(x.value)); if (!ids.length) { err.textContent = 'Elige al menos una historia.'; return; }
     hacer(() => api.crearDestacada(t.titulo, ids), 'Destacada creada.');
   });
-  m.addEventListener('click', (e) => {
+  m.addEventListener('click', async (e) => {
     const ren = e.target.closest('[data-ren]'); const del = e.target.closest('[data-del]');
     if (ren) {
-      const d = hist.destacadas.find((x) => x.id === Number(ren.dataset.ren)); const nuevo = window.prompt('Nuevo título de la destacada:', d?.titulo ?? ''); if (nuevo === null) return;
+      const d = hist.destacadas.find((x) => x.id === Number(ren.dataset.ren)); const nuevo = await pedirTexto('Nuevo título de la destacada:', { titulo: 'Renombrar destacada', valor: d?.titulo ?? '', maximo: 40 }); if (nuevo === null) return;
       const t = validarTituloDestacada(nuevo); if (!t.ok) { err.textContent = t.error; return; }
       hacer(() => api.renombrarDestacada(Number(ren.dataset.ren), t.titulo), 'Título cambiado.');
-    } else if (del && window.confirm('¿Borrar esta destacada? Sus historias no se pierden: vuelven a tu archivo.')) hacer(() => api.borrarDestacada(Number(del.dataset.del)), 'Destacada borrada.');
+    } else if (del && await confirmar('¿Borrar esta destacada? Sus historias no se pierden: vuelven a tu archivo.', { titulo: 'Borrar destacada', aceptar: 'Borrar', peligro: true })) hacer(() => api.borrarDestacada(Number(del.dataset.del)), 'Destacada borrada.');
   });
 }
