@@ -129,7 +129,7 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
 
 /* ================= CLIPS (reels) ================= */
 /** @param {{clips:Array, inicio?:number, onBorrar?:(id:number)=>Promise<boolean>}} o  clips = infoClip(...) */
-export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReportar, onModerar }) {
+export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReportar, onModerar, guardarHTML = null, onGuardar = null }) {
   if (!clips?.length) return;
   let lista = [...clips]; let activo = -1;
   const { el, cerrar } = crearOverlay('Clips', `
@@ -147,6 +147,7 @@ export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReporta
       <div class="absolute right-3 bottom-20 z-10 flex flex-col gap-2">
         <a href="${escapeHTML(c.url)}" target="_blank" rel="noopener noreferrer nofollow" aria-label="Abrir en ${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? 'su página')}" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
         ${onCompartir ? `<button type="button" data-compartir="${c.id}" aria-label="Compartir" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+        ${guardarHTML ? guardarHTML(c) : ''}
         ${onReportar ? `<button type="button" data-reportar="${c.id}" aria-label="Reportar clip" title="Reportar" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-amber-300"><i class="fa-regular fa-flag"></i></button>` : ''}
         ${onModerar ? `<button type="button" data-moderar="${c.id}" aria-label="Ocultar clip (moderación)" title="Ocultar (moderación)" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-orange-300"><i class="fa-solid fa-eye-slash"></i></button>` : ''}
         ${onBorrar ? `<button type="button" data-borrar="${c.id}" aria-label="Borrar clip" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:text-bad"><i class="fa-solid fa-trash"></i></button>` : ''}</div></section>`;
@@ -180,6 +181,7 @@ export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReporta
   el.addEventListener('click', async (e) => {
     const sh = e.target.closest('[data-compartir]');
     if (sh) { const c = lista.find((x) => x.id === Number(sh.dataset.compartir)); if (c) onCompartir?.(c); return; }
+    const gu = e.target.closest('[data-guardar]'); if (gu) { onGuardar?.(gu); return; }
     const rp = e.target.closest('[data-reportar]'); const md = e.target.closest('[data-moderar]');
     if (rp || md) { const c = lista.find((x) => x.id === Number((rp ?? md).dataset[rp ? 'reportar' : 'moderar'])); cerrar(); if (c) (rp ? onReportar : onModerar)(c); return; }
     const b = e.target.closest('[data-borrar]');

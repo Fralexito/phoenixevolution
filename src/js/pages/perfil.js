@@ -1,6 +1,8 @@
 // Página /perfil/?u=<usuario>: perfil público + MURO de un jugador (sin ?u= abre el tuyo).
 // Esquema: pages (este archivo, pinta y reparte eventos) → features/muro/api (RPC, migración 021) → core/muro (lógica pura) + data/muroEstilo.
 import { onSession, isAdmin, refreshProfile, can } from '../core/session.js';
+import { botonGuardarHTML, alternar as alternarGuardado, cargarEstado as cargarGuardados } from '../features/social/guardados.js';
+import { initMencionAuto } from '../features/social/mencionAuto.js';
 import { supabase } from '../core/supabase.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { avatarPickerHTML, bindAvatarPicker, resolveAvatar } from '../features/avatarPicker.js';
@@ -23,6 +25,7 @@ import { compartir } from '../features/muro/compartir.js';
 import { abrirReportar, abrirOcultar, abrirSancionar } from '../features/moderacion/acciones.js';
 import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/videoSubida.js';
 
+initMencionAuto();
 const root = document.getElementById('muro-root');
 const S = { host: null, sesion: null, usuario: '', p: null, items: [], hayMas: false, visible: true, cargando: false, editando: null, abiertas: new Set(), resp: new Map(),
   red: null, hist: null, paleta: null, juego: '', juegos: [], clipJuegos: [], vfile: null, cfile: null, clips: [], hayMasClips: false, tab: 'pub', vistas: {} };   // hist = null → la migración 025 aún no está aplicada: la web oculta historias y clips en vez de romperse
@@ -159,7 +162,7 @@ function panelPrivacidad(p) {
 }
 const selectSegmento = (id) => `<select id="${id}" aria-label="Juego de la publicación (opcional)" class="rounded-lg bg-black/30 border border-galaxy-border px-2 py-1.5 text-[11px] text-gray-300 max-w-[9.5rem]"><option value="">General (sin juego)</option>${SEGMENTOS.map(([id, n]) => `<option value="${id}">${n}</option>`).join('')}</select>`;
 const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
-  <textarea id="mu-texto" rows="3" maxlength="${MURO_MAX + 200}" placeholder="¿Qué quieres contar? Un resultado, una búsqueda de rivales, un enlace de tu clip…" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
+  <textarea id="mu-texto" data-menciones rows="3" maxlength="${MURO_MAX + 200}" placeholder="¿Qué quieres contar? Un resultado, una búsqueda de rivales, un enlace de tu clip…" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
   <div id="mu-prev" hidden class="relative inline-block"><img id="mu-prev-img" alt="Vista previa de tu foto" class="max-h-40 rounded-lg border border-galaxy-border" hidden><video id="mu-prev-vid" muted playsinline controls class="max-h-48 rounded-lg border border-galaxy-border" hidden></video><button type="button" data-act="quitar-foto" aria-label="Quitar adjunto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
   <input id="mu-video" hidden maxlength="300" placeholder="Pega un enlace de YouTube, TikTok, Kick o Twitch" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
   <select id="mu-reto" hidden aria-label="Duelo a adjuntar" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"></select>
@@ -192,7 +195,7 @@ function seccionRespuestas(it, p) {
         <div class="min-w-0 flex-1 rounded-xl bg-white/[0.03] px-2.5 py-1.5"><p class="text-[11px]"><a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(r.username)}" class="font-display font-bold text-white hover:text-galaxy-400">${escapeHTML(r.nombre_display)}</a> <span class="text-gray-500">· ${tiempoRelativo(r.created_at)}</span>${S.sesion && r.autor_id !== yoId() ? ` <button type="button" data-act="reportar" data-tipo="respuesta" data-id="${r.id}" title="Reportar respuesta" aria-label="Reportar respuesta" class="text-gray-500 hover:text-amber-300 ml-1"><i class="fa-regular fa-flag text-[10px]"></i></button>${can('resolverReportes') ? ` <button type="button" data-act="mod-ocultar" data-tipo="respuesta" data-id="${r.id}" data-pub="${it.id}" title="Ocultar (moderación)" aria-label="Ocultar respuesta (moderación)" class="text-gray-500 hover:text-orange-300 ml-1"><i class="fa-solid fa-eye-slash text-[10px]"></i></button>` : ''}` : ''}${r.puedo_borrar ? ` <button type="button" data-act="borrar-resp" data-id="${r.id}" data-pub="${it.id}" title="Borrar respuesta" class="text-gray-500 hover:text-bad ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>` : ''}</p>
           <p class="text-xs text-gray-200 leading-snug">${textoAHTML(r.texto)}</p></div></div>`).join('');
   const form = p.puede_responder
-    ? `<div class="flex gap-2 mt-1"><input data-resp-input="${it.id}" maxlength="${RESP_MAX + 100}" placeholder="Escribe una respuesta…" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"><button type="button" data-act="enviar-resp" data-id="${it.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane"></i></button></div>`
+    ? `<div class="flex gap-2 mt-1"><input data-resp-input="${it.id}" data-menciones maxlength="${RESP_MAX + 100}" placeholder="Escribe una respuesta…" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"><button type="button" data-act="enviar-resp" data-id="${it.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane"></i></button></div>`
     : `<p class="text-[11px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
@@ -214,7 +217,7 @@ function tarjeta(it, p) {
     <header class="flex items-center gap-2.5 mb-2">
       <span class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(p.avatar_url, p.nombre_display, 36)}</span>
       <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${escapeHTML(p.nombre_display)}</p>
-        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${compartirBtn('p', it.id)}${moderarBtns('publicacion', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
+        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${S.sesion ? botonGuardarHTML('publicacion', it.id) : ''}${compartirBtn('p', it.id)}${moderarBtns('publicacion', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
 }
 function feed(p) {
   if (!S.visible) return candadoMuro(p);
@@ -291,8 +294,9 @@ async function cargar() {
     S.p = p; S.items = []; S.editando = null; S.abiertas.clear(); S.resp.clear();
     const m = p.puede_ver_muro ? await api.cargarMuro(p.id) : { visible: false, items: [], hay_mas: false };
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
+    await marcadoresMuro();
     S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;
-    await cargarExtras(p);
+    await cargarExtras(p); await marcadoresMuro();     // clips ya cargados: marcadores de todo lo visible
     document.title = `${p.nombre_display} · Muro`;
     pintar(); irADestino();
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
@@ -312,6 +316,8 @@ async function cargarExtras(p) {
   else if (c.status === 'rejected') console.warn('[perfil] clips no disponibles:', c.reason?.message);
   if (!S.hist && c.status === 'fulfilled') S.hist = { historias: [], destacadas: [], archivo: [] };
 }
+/** Marcadores (guardados) de lo que se ve ahora: publicaciones del muro y clips. Si falla, no se muestran marcados y todo sigue funcionando. */
+async function marcadoresMuro() { if (!S.sesion) return; await Promise.all([cargarGuardados('publicacion', S.items.map((x) => x.id)), cargarGuardados('clip', (S.clips ?? []).map((c) => c.id))]); }
 /** Enlace compartido (#p-<id> publicación, #c-<id> clip): al abrir el perfil se lleva a ese contenido. Solo una vez por visita. */
 let destinoUsado = false;
 function irADestino() {
@@ -325,8 +331,8 @@ function irADestino() {
     ACCIONES.tab({ dataset: { tab: 'clips' } }); ACCIONES['ver-clip']({ dataset: { i: String(i) } });
   }
 }
-async function recargarExtras() { await cargarExtras(S.p); pintar(); }
-async function refrescarMuro() { const m = await api.cargarMuro(S.p.id, null, 20, S.juego); S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.visible = m.visible; if (!S.juego) S.juegos = m.juegos ?? S.juegos; pintarFeed(); pintarFiltro(); }
+async function recargarExtras() { await cargarExtras(S.p); await marcadoresMuro(); pintar(); }
+async function refrescarMuro() { const m = await api.cargarMuro(S.p.id, null, 20, S.juego); S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.visible = m.visible; await marcadoresMuro(); if (!S.juego) S.juegos = m.juegos ?? S.juegos; pintarFeed(); pintarFiltro(); }
 
 /* ---------- Ayudantes de fotos ---------- */
 function limpiarFoto() {
@@ -447,10 +453,11 @@ const ACCIONES = {
     onCompartir: (c) => compartir({ url: urlCompartir({ base: siteHome(), usuario: S.p.username, tipo: 'c', id: c.id }), titulo: `${S.p.nombre_display} · clip`, texto: c.titulo }),
     onBorrar: S.p.soy_yo || isAdmin() ? async (id) => { try { await api.borrarClip(id); } catch (e) { toast(msgErr(e), 'error'); return false; } S.clips = S.clips.filter((c) => Number(c.id) !== id); pintar(); return true; } : undefined,
     onReportar: S.sesion && !S.p.soy_yo ? (c) => abrirReportar({ tipo: 'clip', objetivo: c.id, titulo: c.titulo || 'Clip' }) : undefined,
-    onModerar: S.sesion && !S.p.soy_yo && can('resolverReportes') ? (c) => abrirOcultar({ tipo: 'clip', id: c.id, titulo: c.titulo || 'Clip', onListo: async () => { S.clips = S.clips.filter((x) => Number(x.id) !== Number(c.id)); pintar(); } }) : undefined }),
+    onModerar: S.sesion && !S.p.soy_yo && can('resolverReportes') ? (c) => abrirOcultar({ tipo: 'clip', id: c.id, titulo: c.titulo || 'Clip', onListo: async () => { S.clips = S.clips.filter((x) => Number(x.id) !== Number(c.id)); pintar(); } }) : undefined,
+    guardarHTML: S.sesion ? (c) => botonGuardarHTML('clip', c.id, { clase: 'w-10 h-10 rounded-full bg-black/60 grid place-items-center' }) : null, onGuardar: S.sesion ? (b) => alternarGuardado(b) : null }),
   'mas-clips': async (el) => {
     el.disabled = true;
-    try { const m = await api.clipsDe(S.p.id, S.clips[S.clips.length - 1]?.id); S.clips = [...S.clips, ...(m.items ?? [])]; S.hayMasClips = !!m.hay_mas; pintar(); }
+    try { const m = await api.clipsDe(S.p.id, S.clips[S.clips.length - 1]?.id); S.clips = [...S.clips, ...(m.items ?? [])]; S.hayMasClips = !!m.hay_mas; await marcadoresMuro(); pintar(); }
     catch (e) { toast(msgErr(e), 'error'); el.disabled = false; }
   },
   amistad: () => ACCIONES.solicitar(),   // nombre anterior del botón
@@ -580,7 +587,7 @@ const ACCIONES = {
   },
   mas: async (el) => {
     el.disabled = true;
-    try { const m = await api.cargarMuro(S.p.id, S.items[S.items.length - 1]?.id, 20, S.juego); S.items = [...S.items, ...(m.items ?? [])]; S.hayMas = !!m.hay_mas; pintarFeed(); }
+    try { const m = await api.cargarMuro(S.p.id, S.items[S.items.length - 1]?.id, 20, S.juego); S.items = [...S.items, ...(m.items ?? [])]; S.hayMas = !!m.hay_mas; await marcadoresMuro(); pintarFeed(); }
     catch (e) { toast(msgErr(e), 'error'); el.disabled = false; }
   },
   'guardar-estilo': async () => {
@@ -595,6 +602,7 @@ const ACCIONES = {
   },
 };
 root.addEventListener('click', (e) => {
+  const gu = e.target.closest('[data-guardar]'); if (gu) { alternarGuardado(gu); return; }
   const sw = e.target.closest('[data-banner],[data-acento]');
   if (sw) {
     const grupo = sw.parentElement; grupo.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === sw)));
