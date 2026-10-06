@@ -405,4 +405,17 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Aplazado por el usuario: webhook y bot de Discord, pasarela de pago, pruebas de clanes/etiqueta.
 - Antiguo backlog (ver rondas anteriores): B5 Clanes, Ola C, copias de seguridad/alertas (fase 5), tareas del panel de Supabase.
 
+**Decisiones y por qué (para no repetir discusiones):**
+- *Sudario separada de Galaxy:* el usuario pidió que «no se mezclen». Por eso tiene su propia edición, su propio sistema (`SISTEMAS_LIGA`) y su propia página de divisiones; Galaxy sigue con `SISTEMA` (Primera/Segunda).
+- *Ascenso de Sudario en 0:* el usuario pidió quitar «Zona de ascenso» porque la Div. 2 de Sudario no existe aún; la página de divisiones es «incompleta a propósito». Se reactiva cambiando `suben` en `data/temporada.js`.
+- *Tema azul/dorado solo en Sudario:* el usuario quiso que al cambiar de liga cambie la estética, sin perder la identidad cian/púrpura de Galaxy. Se hace con `html[data-tema]` y variables CSS (reversible).
+- *Navegación original (hamburguesa) y portada original:* el usuario rechazó rediseños que «perdían la identidad». Regla: mejorar sin cambiar la identidad base.
+- *Minisecciones plegables:* el usuario quiere evitar el scroll excesivo; lo secundario va detrás de un clic.
+- *Experimento reversible:* todo lo «dinámico» tiene interruptores en `data/experimento.js` y cada pieza es un commit propio, porque el usuario pidió poder deshacerlo.
+- *Escudos propios:* las imágenes externas pueden fallar; se alojan en `/public/escudos/` (descarga automática por GitHub Actions solo en `borrador`).
+- *«Conmegol»:* es el nombre real del parche; nunca «corregirlo».
+- *PWA por etapas:* manifest primero; service worker/offline después, para que nadie vea versiones viejas mientras se itera.
+
+**Visión del usuario (en sus palabras):** _pendiente de dictar; completar cuando la dé._
+
 **Mapa rápido de archivos:** `src/data/` (ligas, ligaResultados, temporada, experimento, organizadores) · `src/js/core/` (lógica pura con test: tabla, ligaStats, central, compartir, escudos, temporada) · `src/js/features/` · `src/js/pages/` · `src/pages/*.astro` · `src/styles/components.css` · `supabase/migrations/` · `.github/workflows/` (deploy, escudos, respaldo, keep-alive).
