@@ -101,7 +101,7 @@ function initRadar() {
       ? players.map((p) => `<span class="inline-flex items-center gap-2 pl-3 pr-1 py-1 rounded-full bg-galaxy-900 border border-galaxy-border text-xs text-white">
           <span class="w-2 h-2 rounded-full ${ESTADOS[p.estado].dot}"></span><b class="font-display uppercase">${escapeHTML(p.name)}</b>
           <span class="text-gray-400">${ESTADOS[p.estado].label}</span>
-          ${p.id !== me() ? `<button type="button" data-retar="${escapeHTML(p.id)}" class="ml-1 px-3 min-h-9 rounded-full bg-galaxy-600 text-[11px] font-bold uppercase">Retar</button>` : '<span class="px-2 text-galaxy-400 text-[10px]">(tú)</span>'}</span>`).join('')
+          ${p.id !== me() ? `<button type="button" data-retar="${escapeHTML(p.id)}" class="ml-1 px-3 min-h-9 rounded-full bg-galaxy-600 text-[12px] font-bold uppercase">Retar</button>` : '<span class="px-2 text-galaxy-400 text-[12px]">(tú)</span>'}</span>`).join('')
       : '<span class="text-xs text-gray-500">Nadie en el radar todavía.</span>';
     paintRivales();
   });

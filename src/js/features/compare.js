@@ -35,7 +35,7 @@ function radarSVG(a, b, rows) {
     return `<circle class="cmp-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${gana ? 3.6 : 2.2}" fill="${c}" stroke="#05020f" stroke-width="1" style="animation-delay:${0.5 + i * 0.03}s"><title>${k.toUpperCase()}: ${escapeHTML(p.nombre)} ${Number(p[k]) || '—'} · ${escapeHTML(otro.nombre)} ${Number(otro[k]) || '—'}</title></circle>`;
   }).join('');
   return `<svg viewBox="0 0 300 300" role="img" aria-label="Radar comparativo de las 14 estadísticas" class="cmp-radar w-full max-w-[17.5rem] sm:max-w-[19rem] mx-auto">${rings}${spokes}${poly(a, CA, 'cmp-poly-a')}${poly(b, CB, 'cmp-poly-b')}${dots(a, CA, b, 'a')}${dots(b, CB, a, 'b')}</svg>
-    <div class="flex justify-center gap-4 text-[11px] font-display font-bold uppercase tracking-wider -mt-1"><span style="color:${CA}">● ${escapeHTML(a.nombre)}</span><span style="color:${CB}">● ${escapeHTML(b.nombre)}</span><span class="text-gray-500 normal-case tracking-normal font-sans font-normal text-[10px] self-center">escala 40–99</span></div>`;
+    <div class="flex justify-center gap-4 text-[12px] font-display font-bold uppercase tracking-wider -mt-1"><span style="color:${CA}">● ${escapeHTML(a.nombre)}</span><span style="color:${CB}">● ${escapeHTML(b.nombre)}</span><span class="text-gray-500 normal-case tracking-normal font-sans font-normal text-[12px] self-center">escala 40–99</span></div>`;
 }
 
 /** Tarjeta de «luchador»: foto con aura, media general grande, club/posición y su mejor estadística. `lider` la resalta con corona. */
@@ -60,7 +60,7 @@ function marcadorHTML(c, a, b, lider) {
   return `<div class="cmp-score">
     <div class="flex items-end justify-between gap-2">
       <span class="cmp-big" style="color:${CA}" data-count="${c.wins.a}">${c.wins.a}</span>
-      <span class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-display pb-0.5 text-center">${total} estadísticas${c.wins.tie ? ` · ${c.wins.tie} empate${c.wins.tie === 1 ? '' : 's'}` : ''}</span>
+      <span class="text-[12px] text-gray-400 uppercase tracking-[0.2em] font-display pb-0.5 text-center">${total} estadísticas${c.wins.tie ? ` · ${c.wins.tie} empate${c.wins.tie === 1 ? '' : 's'}` : ''}</span>
       <span class="cmp-big" style="color:${CB}" data-count="${c.wins.b}">${c.wins.b}</span>
     </div>
     <div class="cmp-meter" role="img" aria-label="${c.wins.a} estadísticas a favor de ${escapeHTML(a.nombre)} y ${c.wins.b} a favor de ${escapeHTML(b.nombre)}"><i class="cmp-m-a" style="--w:${pc(c.wins.a)};--c:${CA}"></i><i class="cmp-m-t" style="--w:${pc(c.wins.tie)}"></i><i class="cmp-m-b" style="--w:${pc(c.wins.b)};--c:${CB}"></i><span class="cmp-m-spark"></span></div>
@@ -75,7 +75,7 @@ function rowHTML(r, i = 0) {
   const cls = (me) => (r.win === me ? 'font-extrabold' : 'opacity-70');
   const barra = (v, c, gana, der) => `<div class="cmp-bar ${der ? '' : 'justify-end'}"><div class="cmp-fill ${gana ? 'cmp-gana' : ''}" style="--w:${w(v)};--c:${c};animation-delay:${i * 40}ms;opacity:${r.win && !gana ? .45 : 1}"></div></div>`;
   return `<div class="py-1">
-    <div class="text-center text-[10px] text-gray-500 uppercase tracking-wider font-display" title="${escapeHTML(info.texto)}"><b class="text-gray-300">${r.k.toUpperCase()}</b> · ${escapeHTML(info.nombre)}${r.diff ? ` <span class="cmp-chip" style="color:${r.diff > 0 ? CA : CB};border-color:${r.diff > 0 ? CA : CB}66">${r.diff > 0 ? '◀' : ''} +${Math.abs(r.diff)} ${r.diff < 0 ? '▶' : ''}</span>` : ''}</div>
+    <div class="text-center text-[12px] text-gray-500 uppercase tracking-wider font-display" title="${escapeHTML(info.texto)}"><b class="text-gray-300">${r.k.toUpperCase()}</b> · ${escapeHTML(info.nombre)}${r.diff ? ` <span class="cmp-chip" style="color:${r.diff > 0 ? CA : CB};border-color:${r.diff > 0 ? CA : CB}66">${r.diff > 0 ? '◀' : ''} +${Math.abs(r.diff)} ${r.diff < 0 ? '▶' : ''}</span>` : ''}</div>
     <div class="flex items-center gap-2 mt-0.5">
       <span class="w-7 text-right font-display text-sm ${cls('a')}" style="color:${statColor(r.a)}">${r.a}</span>
       ${barra(r.a, CA, r.win === 'a', false)}${barra(r.b, CB, r.win === 'b', true)}
@@ -114,7 +114,7 @@ export function openCompare(players, idA = null, idB = null, masivoIds = null) {
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-scale-balanced text-galaxy-400 mr-2"></i>Comparar</h2>
         <div class="flex items-center gap-3">
-          <button type="button" id="cmp-ir-masivo" class="text-[11px] text-gray-400 hover:text-white font-display font-bold uppercase tracking-wider" title="Comparar hasta 8 jugadores en dos equipos"><i class="fa-solid fa-people-group mr-1"></i>Masiva</button>
+          <button type="button" id="cmp-ir-masivo" class="text-[12px] text-gray-400 hover:text-white font-display font-bold uppercase tracking-wider" title="Comparar hasta 8 jugadores en dos equipos"><i class="fa-solid fa-people-group mr-1"></i>Masiva</button>
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
       </div>

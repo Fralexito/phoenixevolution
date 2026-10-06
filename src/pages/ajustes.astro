@@ -24,7 +24,7 @@ const base = import.meta.env.BASE_URL;
           <div class="divide-y divide-galaxy-border/60 min-w-0">
             {s.ajustes.map((a) => (
               <div class="px-4 py-3 flex items-center justify-between gap-3">
-                <div class="min-w-0"><label class="text-white text-sm font-semibold" for={`aj-${a.clave}`}>{a.etiqueta}</label><div class="text-[11px] text-gray-400 leading-snug">{a.ayuda}</div></div>
+                <div class="min-w-0"><label class="text-white text-sm font-semibold" for={`aj-${a.clave}`}>{a.etiqueta}</label><div class="text-[12px] text-gray-400 leading-snug">{a.ayuda}</div></div>
                 {a.tipo === 'switch'
                   ? <input id={`aj-${a.clave}`} data-clave={a.clave} data-tipo="switch" type="checkbox" class="w-5 h-5 shrink-0 accent-cyan-400" />
                   : <select id={`aj-${a.clave}`} data-clave={a.clave} data-tipo="opciones" class="field !w-auto !min-h-9 !py-1 max-w-[52%]">{a.opciones.map((o) => <option value={String(o.valor)}>{o.etiqueta}</option>)}</select>}
@@ -40,7 +40,7 @@ const base = import.meta.env.BASE_URL;
           </div>
           {s.vista && (
             <aside aria-label="Vista previa" class="p-4 border-t lg:border-t-0 lg:border-l border-galaxy-border/70 bg-black/20 space-y-2">
-              <div class="text-[10px] text-gray-500 tracking-[0.25em] uppercase"><i class="fa-regular fa-eye mr-1"></i>Vista previa en vivo</div>
+              <div class="text-[12px] text-gray-500 tracking-[0.25em] uppercase"><i class="fa-regular fa-eye mr-1"></i>Vista previa en vivo</div>
               <div id={`vp-${s.id}`} class="aj-vp"></div>
             </aside>
           )}

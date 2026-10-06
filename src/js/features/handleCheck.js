@@ -32,7 +32,7 @@ const MSG = {
  */
 export function bindHandle(input, statusEl, { exceptId = null } = {}) {
   let estado = 'vacio'; let n = 0; let t;
-  const pintar = (s) => { estado = s; const [html, cls] = MSG[s]; statusEl.className = `text-[11px] mt-1 min-h-4 ${cls}`; statusEl.innerHTML = html; };
+  const pintar = (s) => { estado = s; const [html, cls] = MSG[s]; statusEl.className = `text-[12px] mt-1 min-h-4 ${cls}`; statusEl.innerHTML = html; };
   const comprobar = async () => {
     const mi = ++n; const s = await checkHandle(input.value, exceptId);
     if (mi === n) pintar(s);

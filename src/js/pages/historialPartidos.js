@@ -13,9 +13,9 @@ const todos = aplanarPartidos(LIGAS, EDICIONES);
 const porClave = new Map(todos.map((m) => [m.clave, m]));
 let f = leerFiltros(location.search, LIGAS.map((l) => l.id));
 
-const lado = (n, club, der) => `<span class="min-w-0 flex items-center gap-2 ${der ? 'flex-row-reverse text-right' : ''}"><span class="shrink-0 grid place-items-center w-9 h-9 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(club, 26)}</span><span class="min-w-0"><b class="block font-display text-white truncate">${escapeHTML(n)}</b><small class="block text-[10px] uppercase text-gray-400 truncate">${escapeHTML(club)}</small></span></span>`;
+const lado = (n, club, der) => `<span class="min-w-0 flex items-center gap-2 ${der ? 'flex-row-reverse text-right' : ''}"><span class="shrink-0 grid place-items-center w-9 h-9 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(club, 26)}</span><span class="min-w-0"><b class="block font-display text-white truncate">${escapeHTML(n)}</b><small class="block text-[12px] uppercase text-gray-400 truncate">${escapeHTML(club)}</small></span></span>`;
 const tarjeta = (m) => `<div data-clave="${escapeHTML(m.clave)}" role="button" tabindex="0" aria-label="Ver detalle: ${escapeHTML(m.l)} contra ${escapeHTML(m.v)}" class="glass-panel rounded-xl p-3 cursor-pointer hover:border-galaxy-400/60 transition-colors">
-  <div class="flex items-center justify-between gap-2 text-[10px] font-display font-bold uppercase tracking-[0.15em] text-galaxy-400 mb-2"><span class="truncate">${escapeHTML(m.ligaTitulo)} · Fecha ${m.fecha}</span><span class="sello-partido ${m.sello}">${NOMBRE[m.sello]}</span></div>
+  <div class="flex items-center justify-between gap-2 text-[12px] font-display font-bold uppercase tracking-[0.15em] text-galaxy-400 mb-2"><span class="truncate">${escapeHTML(m.ligaTitulo)} · Fecha ${m.fecha}</span><span class="sello-partido ${m.sello}">${NOMBRE[m.sello]}</span></div>
   <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center text-white">${lado(m.l, m.clubL)}<span class="text-center font-display font-bold text-lg bg-black/50 py-1 px-3 rounded border border-galaxy-border whitespace-nowrap">${m.jugado ? `${m.gl} - ${m.gv}` : 'VS'}</span>${lado(m.v, m.clubV, true)}</div></div>`;
 
 function guardarUrl() {

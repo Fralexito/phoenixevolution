@@ -18,14 +18,14 @@ let stopPend = null;
 function pintarPendientes({ mensajes, solicitudes }) {
   const caja = document.getElementById('menu-pendientes'); const punto = document.getElementById('avatar-dot');
   if (!caja || !punto) return;
-  const fila = (ruta, icono, texto, n) => `<a href="${escapeHTML(href(ruta))}" class="flex items-center gap-2 px-4 py-2.5 text-gray-200 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid ${icono} w-4 text-center text-galaxy-400"></i><span class="flex-1 truncate">${texto}</span><b class="min-w-5 h-5 px-1 rounded-full bg-bad text-white text-[10px] leading-5 text-center">${n > 9 ? '9+' : n}</b></a>`;
+  const fila = (ruta, icono, texto, n) => `<a href="${escapeHTML(href(ruta))}" class="flex items-center gap-2 px-4 py-2.5 text-gray-200 hover:bg-white/5 hover:text-galaxy-400"><i class="fa-solid ${icono} w-4 text-center text-galaxy-400"></i><span class="flex-1 truncate">${texto}</span><b class="min-w-5 h-5 px-1 rounded-full bg-bad text-white text-[12px] leading-5 text-center">${n > 9 ? '9+' : n}</b></a>`;
   caja.innerHTML = (mensajes ? fila('mensajes/', 'fa-comments', 'Sin leer', mensajes) : '') + (solicitudes ? fila('amigos/', 'fa-user-plus', 'Solicitudes', solicitudes) : '');
   caja.hidden = !(mensajes || solicitudes); punto.hidden = !(mensajes || solicitudes);
 }
 
 /** Atajos de «Mi cuenta» para móvil (en PC ya están en la barra lateral): cuadrícula 2x2 pequeña y discreta dentro del menú de la foto. */
 const ATAJOS_MOVIL = ACCOUNT_NAV.filter((n) => n.path && !n.abajo)
-  .map((n) => `<a href="${escapeHTML(href(n.path))}" ${n.staff ? `data-solo-staff="${escapeHTML(n.staff)}" hidden` : ''} class="flex items-center gap-2 px-3 py-2 text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-solid ${n.icon} w-4 text-center text-gray-500"></i><span class="truncate">${escapeHTML(n.label)}</span></a>`).join('');
+  .map((n) => `<a href="${escapeHTML(href(n.path))}" ${n.staff ? `data-solo-staff="${escapeHTML(n.staff)}" hidden` : ''} class="flex items-center gap-2 px-3 py-2 text-[12px] text-gray-400 hover:text-galaxy-400"><i class="fa-solid ${n.icon} w-4 text-center text-gray-500"></i><span class="truncate">${escapeHTML(n.label)}</span></a>`).join('');
 
 function render({ session, profile }) {
   const box = document.getElementById('nav-auth');
@@ -43,7 +43,7 @@ function render({ session, profile }) {
     const name = profile?.nombre_display || 'Jugador';
     box.innerHTML = `
       <div class="relative mr-2 sm:mr-3"><button type="button" id="btn-notif" aria-label="Notificaciones" class="relative text-gray-400 hover:text-galaxy-400">
-        <i class="fa-solid fa-bell text-lg"></i><span id="notif-dot" hidden class="absolute -top-2 -right-2 min-w-4 h-4 px-1 rounded-full bg-bad text-white text-[9px] font-bold leading-4 text-center"></span></button>
+        <i class="fa-solid fa-bell text-lg"></i><span id="notif-dot" hidden class="absolute -top-2 -right-2 min-w-4 h-4 px-1 rounded-full bg-bad text-white text-[12px] font-bold leading-4 text-center"></span></button>
         <div id="dropdown-notif" hidden class="fixed left-2 right-2 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-80 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden"></div></div>
       <div class="relative">
         <button type="button" data-act="menu" aria-haspopup="true" class="flex items-center gap-2">
@@ -51,7 +51,7 @@ function render({ session, profile }) {
           <span class="hidden md:block font-display font-bold text-sm text-white max-w-28 truncate">${escapeHTML(name)}</span>
         </button>
         <div id="user-menu" hidden class="absolute right-0 mt-3 w-60 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden font-display text-sm uppercase tracking-wider">
-          <div class="px-4 py-3 border-b border-galaxy-border/70"><p class="text-white font-bold truncate">${escapeHTML(name)}</p>${profile?.username ? `<p class="text-[11px] text-gray-400 normal-case tracking-normal truncate">@${escapeHTML(profile.username)}</p>` : ''}${esStaff(profile?.rol) ? `<p class="mt-1 text-[10px] text-galaxy-400 normal-case tracking-normal"><i class="fa-solid ${ROL_INFO[normalizarRol(profile.rol)].icono} mr-1"></i>${escapeHTML(ROL_INFO[normalizarRol(profile.rol)].etiqueta)}</p>` : ''}</div>
+          <div class="px-4 py-3 border-b border-galaxy-border/70"><p class="text-white font-bold truncate">${escapeHTML(name)}</p>${profile?.username ? `<p class="text-[12px] text-gray-400 normal-case tracking-normal truncate">@${escapeHTML(profile.username)}</p>` : ''}${esStaff(profile?.rol) ? `<p class="mt-1 text-[12px] text-galaxy-400 normal-case tracking-normal"><i class="fa-solid ${ROL_INFO[normalizarRol(profile.rol)].icono} mr-1"></i>${escapeHTML(ROL_INFO[normalizarRol(profile.rol)].etiqueta)}</p>` : ''}</div>
           <div id="menu-pendientes" hidden class="border-b border-galaxy-border/70 py-1"></div>
           <div class="lg:hidden grid grid-cols-2 border-b border-galaxy-border/70 py-1 normal-case tracking-normal">${ATAJOS_MOVIL}</div>
           <div class="py-1">

@@ -10,7 +10,7 @@ const items = [
 ---
 <div class="flex flex-wrap items-center gap-3">
   <a href={inicio} class="liga-volver" aria-label="Volver al inicio de la liga" title="Volver al inicio de la liga"><i class="fa-solid fa-arrow-left"></i></a>
-  <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Ligas activas</span>
+  <span class="text-[12px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Ligas activas</span>
   <nav class="liga-sel liga-sel-enlaces" aria-label="Cambiar de liga">
     {items.map((i) => <a href={i.id === activa ? inicio : i.href} title={i.id === activa ? 'Volver al inicio de esta liga' : `Ver el sistema de divisiones de ${i.texto}`} aria-current={i.id === activa ? 'page' : undefined}><i class={`fa-solid ${i.icono} mr-1.5`}></i>{i.texto}</a>)}
   </nav>

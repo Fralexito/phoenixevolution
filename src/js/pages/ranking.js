@@ -18,8 +18,8 @@ function fila(r, extra) {
   const yo = r.id === S.yo;
   return `<a href="${href(`perfil/?u=${encodeURIComponent(r.username)}`)}" class="glass-panel rounded-xl px-3 py-2 flex items-center gap-3 ${yo ? 'ring-1 ring-galaxy-400' : ''} hover:bg-white/5">
     <span class="w-7 text-center font-display font-extrabold text-sm ${r.pos <= 3 ? 'text-amber-300' : 'text-gray-400'}">${medalla(r.pos)}</span><span class="shrink-0">${avatarHTML(r.avatar, r.nombre, 32)}</span>
-    <span class="flex-1 min-w-0"><b class="font-display uppercase text-white text-sm truncate block">${escapeHTML(r.nombre)}${yo ? ' <span class="text-galaxy-400 text-[10px]">(tú)</span>' : ''}</b><span class="text-[11px] text-gray-400">${extra}</span></span>
-    ${r.elo !== undefined ? `<span class="flex flex-col items-end gap-0.5">${rangoChip(r.rango)}<b class="font-display text-galaxy-400 text-lg leading-none">${r.elo}<span class="text-[10px] text-gray-400 ml-0.5">ELO</span></b></span>` : `<b class="font-display text-galaxy-400 text-lg">${r.puntos}<span class="text-[10px] text-gray-400 ml-0.5">pts</span></b>`}</a>`;
+    <span class="flex-1 min-w-0"><b class="font-display uppercase text-white text-sm truncate block">${escapeHTML(r.nombre)}${yo ? ' <span class="text-galaxy-400 text-[12px]">(tú)</span>' : ''}</b><span class="text-[12px] text-gray-400">${extra}</span></span>
+    ${r.elo !== undefined ? `<span class="flex flex-col items-end gap-0.5">${rangoChip(r.rango)}<b class="font-display text-galaxy-400 text-lg leading-none">${r.elo}<span class="text-[12px] text-gray-400 ml-0.5">ELO</span></b></span>` : `<b class="font-display text-galaxy-400 text-lg">${r.puntos}<span class="text-[12px] text-gray-400 ml-0.5">pts</span></b>`}</a>`;
 }
 function pintarLista() {
   const l = S.filas;
@@ -35,11 +35,11 @@ function pintarRetos() {
   if (sec.hidden) return;
   $('rk-retos-fin').textContent = textoFinSemana(S.retos.semanaFin); $('rk-retos-pts').textContent = `${S.retos.puntosTemporada} pts este mes`;
   $('rk-retos-lista').innerHTML = S.retos.retos.map((r) => `<article class="rounded-xl border border-galaxy-border bg-galaxy-900/60 p-3 ${r.cobrado ? 'opacity-70' : ''}">
-      <div class="flex items-center gap-2"><b class="font-display uppercase text-white text-xs flex-1 min-w-0 truncate">${escapeHTML(r.titulo)}</b><span class="text-[11px] text-amber-300">+${r.puntos}</span></div>
-      <p class="text-[11px] text-gray-400 mt-0.5">${escapeHTML(r.descripcion)}</p>
+      <div class="flex items-center gap-2"><b class="font-display uppercase text-white text-xs flex-1 min-w-0 truncate">${escapeHTML(r.titulo)}</b><span class="text-[12px] text-amber-300">+${r.puntos}</span></div>
+      <p class="text-[12px] text-gray-400 mt-0.5">${escapeHTML(r.descripcion)}</p>
       <div class="h-1.5 rounded bg-black/40 mt-2 overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="${r.meta}" aria-valuenow="${r.progreso}"><div class="h-full bg-galaxy-400" style="width:${r.pct}%"></div></div>
-      <div class="flex items-center gap-2 mt-2"><span class="text-[11px] text-gray-300">${r.progreso}/${r.meta}</span>
-        ${r.cobrado ? '<span class="ml-auto text-[11px] text-emerald-300"><i class="fa-solid fa-check"></i> Cobrado</span>' : `<button type="button" data-cobrar="${escapeHTML(r.clave)}" ${r.cobrable && !S.busy ? '' : 'disabled'} class="btn btn-primary !min-h-8 !px-3 !text-[11px] ml-auto">Cobrar</button>`}</div></article>`).join('');
+      <div class="flex items-center gap-2 mt-2"><span class="text-[12px] text-gray-300">${r.progreso}/${r.meta}</span>
+        ${r.cobrado ? '<span class="ml-auto text-[12px] text-emerald-300"><i class="fa-solid fa-check"></i> Cobrado</span>' : `<button type="button" data-cobrar="${escapeHTML(r.clave)}" ${r.cobrable && !S.busy ? '' : 'disabled'} class="btn btn-primary !min-h-8 !px-3 !text-[12px] ml-auto">Cobrar</button>`}</div></article>`).join('');
 }
 async function cargar() {
   const mia = ++S.req;

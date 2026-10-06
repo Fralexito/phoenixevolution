@@ -27,7 +27,7 @@ export function encuestaHTML(postId) {
   }).join('');
   const aviso = e.cerrada ? 'Encuesta cerrada' : (!hayVoto ? 'Inicia sesión para votar' : e.miVoto != null ? 'Puedes cambiar tu voto' : e.soyAutor ? 'Los demás verán los resultados al votar' : 'Vota para ver los resultados');
   return `<div class="mt-2 space-y-1.5" data-encuesta="${Number(postId)}" role="group" aria-label="Encuesta">${filas}
-    <p class="text-[11px] text-gray-500"><i class="fa-solid fa-chart-simple mr-1"></i>${e.total} voto${e.total === 1 ? '' : 's'}${e.visibles || e.cerrada ? '' : ' (ocultos hasta que votes)'} · ${escapeHTML(textoCierre(e.cierra_at))} · ${escapeHTML(aviso)}</p></div>`;
+    <p class="text-[12px] text-gray-500"><i class="fa-solid fa-chart-simple mr-1"></i>${e.total} voto${e.total === 1 ? '' : 's'}${e.visibles || e.cerrada ? '' : ' (ocultos hasta que votes)'} · ${escapeHTML(textoCierre(e.cierra_at))} · ${escapeHTML(aviso)}</p></div>`;
 }
 
 /** Repinta solo el bloque de esa encuesta (en todas las copias que haya en la página). */

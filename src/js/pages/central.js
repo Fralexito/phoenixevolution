@@ -39,7 +39,7 @@ let fechaSel = ultimaJugada;                                   // fecha elegida 
 const manuales = new Map();                                    // fecha → elección manual del partido destacado (tabla partido_destacado)
 const nFechaDestacado = () => (pestana === 'porfecha' ? fechaSel : pestana === 'resultados' ? (jornadas.resultados[0]?.n ?? ultimaJugada) : (jornadas.proximos?.n ?? ultimaJugada));
 
-const ladoFila = (n, gana, der) => `<span class="min-w-0 flex items-center gap-2.5 ${der ? 'flex-row-reverse text-right' : ''}"><span class="shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(clubDe(n), 26)}</span><span class="min-w-0"><span class="block truncate text-sm sm:text-base ${gana ? 'font-bold text-white' : 'font-semibold text-gray-300'}">${escapeHTML(n)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(n)}</span></span></span>`;
+const ladoFila = (n, gana, der) => `<span class="min-w-0 flex items-center gap-2.5 ${der ? 'flex-row-reverse text-right' : ''}"><span class="shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(clubDe(n), 26)}</span><span class="min-w-0"><span class="block truncate text-sm sm:text-base ${gana ? 'font-bold text-white' : 'font-semibold text-gray-300'}">${escapeHTML(n)}</span><span class="block truncate text-[12px] text-gray-500 tracking-wider">${club(n)}</span></span></span>`;
 const SELLO = {
   oficial: ['fa-circle-check', 'Oficial', 'Resultado cargado desde CopaFácil por el staff'], pendiente: ['fa-clock', 'Pendiente', 'Aún no se juega'],
   aplazado: ['fa-calendar-xmark', 'Aplazado', 'Se jugará en otra fecha'], wo: ['fa-flag', 'WO', 'Walkover: el rival no se presentó (el marcador es el de la regla)'],
@@ -64,7 +64,7 @@ function pintarNavFecha() {
   const f = fechas[idx]; const ok = f?.partidos?.some(jug);
   nav.innerHTML = `<div class="liga-sel !flex items-center justify-between w-full" role="group" aria-label="Elegir fecha">
     <button type="button" class="forma-flecha !w-8 !h-8 shrink-0" data-fnav="-1" aria-label="Fecha anterior" ${idx <= 0 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>
-    <span class="flex-1 text-center leading-tight" aria-live="polite"><span class="block font-display font-bold text-sm text-white uppercase tracking-widest">Fecha ${f?.n ?? '—'}</span><span class="block text-[10px] ${ok ? 'text-emerald-400' : 'text-gray-500'} uppercase tracking-wider">${ok ? 'jugada' : 'por jugar'} · ${idx + 1} de ${fechas.length}</span></span>
+    <span class="flex-1 text-center leading-tight" aria-live="polite"><span class="block font-display font-bold text-sm text-white uppercase tracking-widest">Fecha ${f?.n ?? '—'}</span><span class="block text-[12px] ${ok ? 'text-emerald-400' : 'text-gray-500'} uppercase tracking-wider">${ok ? 'jugada' : 'por jugar'} · ${idx + 1} de ${fechas.length}</span></span>
     <button type="button" class="forma-flecha !w-8 !h-8 shrink-0" data-fnav="1" aria-label="Fecha siguiente" ${idx >= fechas.length - 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button></div>`;
 }
 
@@ -76,21 +76,21 @@ function pintarPartidos() {
     const e = estadisticasFecha(f);
     const stats = e.jugados ? `<div class="flex flex-wrap gap-2">${chipStat(ico.goles, `${e.goles} goles`)}${chipStat(ico.prom, `${e.promedio} por partido`)}${chipStat(ico.emp, `${e.empates} empate${e.empates === 1 ? '' : 's'}`)}${e.goleada ? chipStat(ico.gol, `Mayor goleada: ${escapeHTML(e.goleada.l)} ${e.goleada.gl}-${e.goleada.gv} ${escapeHTML(e.goleada.v)}`) : ''}<span class="pc-chip"><i class="fa-solid fa-house"></i>${e.local} local · ${e.visita} visita</span></div>` : `<p class="text-xs text-gray-500">Esta fecha todavía no se juega (${e.total} partidos programados).</p>`;
     const boton = FX.compartir ? `<button type="button" data-compartir-fecha class="btn btn-ghost !px-3 !py-1.5 text-xs"><i class="fa-solid fa-share-nodes"></i> Compartir fecha</button>` : '';
-    $('matches-container').innerHTML = `<div class="flex items-center justify-between gap-2"><div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${f.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${boton}</div>${stats}${f.partidos.map((m) => filaPartido(m, true, f.n)).join('')}`;
+    $('matches-container').innerHTML = `<div class="flex items-center justify-between gap-2"><div class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${f.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${boton}</div>${stats}${f.partidos.map((m) => filaPartido(m, true, f.n)).join('')}`;
     return;
   }
   const grupos = pestana === 'proximos' ? (jornadas.proximos ? [jornadas.proximos] : []) : jornadas.resultados;
   if (!grupos.length) { $('matches-container').innerHTML = `<div class="text-center text-gray-500 text-sm py-6 glass-panel rounded-xl">${pestana === 'proximos' ? 'No hay partidos por jugar por ahora.' : 'Aún no hay resultados.'}</div>`; return; }
-  $('matches-container').innerHTML = grupos.map((j) => `<div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${j.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${j.partidos.map((m) => filaPartido(m, pestana === 'resultados', j.n)).join('')}`).join('');
+  $('matches-container').innerHTML = grupos.map((j) => `<div class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${j.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${j.partidos.map((m) => filaPartido(m, pestana === 'resultados', j.n)).join('')}`).join('');
 }
 
 /** Tabla de posiciones (derecha). Con `mov` (modo «Por fecha») muestra cómo se movió cada jugador en esa fecha. */
 function pintarTabla(t, mov = null) {
   $('mini-table-container').innerHTML = t.length ? t.map((x, i) => {
     const m = mov?.get(x.nombre); const d = m?.delta ?? 0;
-    const flecha = !mov ? '' : m?.antes === null || m === undefined ? '' : d > 0 ? `<span class="block text-[10px] font-bold text-emerald-400">▲${d}</span>` : d < 0 ? `<span class="block text-[10px] font-bold text-rose-400">▼${-d}</span>` : '<span class="block text-[10px] text-gray-600">＝</span>';
+    const flecha = !mov ? '' : m?.antes === null || m === undefined ? '' : d > 0 ? `<span class="block text-[12px] font-bold text-emerald-400">▲${d}</span>` : d < 0 ? `<span class="block text-[12px] font-bold text-rose-400">▼${-d}</span>` : '<span class="block text-[12px] text-gray-600">＝</span>';
     return `<tr class="border-b border-galaxy-border/30 text-gray-300 text-sm">
-      <td class="py-2 pl-1 leading-tight">${i + 1}${flecha}</td><td class="pr-2 max-w-[10rem]"><span class="flex items-center gap-2"><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(clubDe(x.nombre), 22)}</span><span class="min-w-0"><span class="block truncate">${escapeHTML(x.nombre)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(x.nombre)}</span></span></span></td><td class="text-center text-gray-400">${x.pj}</td><td class="text-center font-bold text-white">${x.pts}</td>
+      <td class="py-2 pl-1 leading-tight">${i + 1}${flecha}</td><td class="pr-2 max-w-[10rem]"><span class="flex items-center gap-2"><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(clubDe(x.nombre), 22)}</span><span class="min-w-0"><span class="block truncate">${escapeHTML(x.nombre)}</span><span class="block truncate text-[12px] text-gray-500 tracking-wider">${club(x.nombre)}</span></span></span></td><td class="text-center text-gray-400">${x.pj}</td><td class="text-center font-bold text-white">${x.pts}</td>
     </tr>`; }).join('') : '<tr><td colspan="4" class="py-4 text-center text-gray-500 text-xs">Aún no hay partidos jugados.</td></tr>';
 }
 function pintarPosiciones() {
@@ -109,22 +109,22 @@ function pintarDestacado() {
     const pend = f.partidos.filter((x) => !jug(x)); if (pend.length) d = destacadoFinal({ ...f, partidos: pend }, previa, null);
   }
   const puedeEditar = can('editarLiga') && !!f;
-  const editar = puedeEditar ? `<button type="button" data-edit-destacado class="absolute top-2 left-2 z-20 px-2.5 py-1 rounded-lg border border-galaxy-400/40 bg-black/50 text-[10px] font-display font-bold uppercase tracking-wider text-galaxy-400 hover:text-white hover:border-galaxy-400"><i class="fa-solid fa-pen mr-1"></i>Editar</button>` : '';
+  const editar = puedeEditar ? `<button type="button" data-edit-destacado class="absolute top-2 left-2 z-20 px-2.5 py-1 rounded-lg border border-galaxy-400/40 bg-black/50 text-[12px] font-display font-bold uppercase tracking-wider text-galaxy-400 hover:text-white hover:border-galaxy-400"><i class="fa-solid fa-pen mr-1"></i>Editar</button>` : '';
   if (!d) { box.innerHTML = `${editar}<div class="p-6 text-center text-gray-500 text-xs">Aún no hay un partido destacado.</div>`; return; }
   const m = d.partido; const jugado = jug(m); const hayPrevia = previa.some((t) => t.pj > 0);
   const pos = (x) => (hayPrevia ? previa.findIndex((t) => t.nombre === x) + 1 : 0);
   const lado = (x, der) => {
     const v = visualClub(clubDe(x), CLUBES_VISUAL); const real = escudoDe(clubDe(x));
     const escudo = real ? `<div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 grid place-items-center bg-black/40" style="border-color:${v.a};box-shadow:0 0 20px ${v.a}66">${escudoHTML(clubDe(x), 44)}</div>` : `<div class="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-full border-2 flex items-center justify-center font-display font-bold text-lg sm:text-2xl ${v.oscuro ? 'text-black' : 'text-white'}" style="border-color:${v.a};background:linear-gradient(135deg,${v.a},${v.b});box-shadow:0 0 20px ${v.a}66">${escapeHTML(v.sigla)}</div>`;
-    const txt = `<div class="min-w-0">${pos(x) ? `<div class="inline-flex items-center gap-1.5 px-2 py-0.5 whitespace-nowrap rounded bg-galaxy-600/25 border border-galaxy-400/30 text-[10px] text-galaxy-400 font-bold mb-1">${pos(x)}.º en la tabla</div>` : ''}
-      <h3 class="font-display font-bold text-xl sm:text-3xl text-white text-shadow-glow truncate uppercase">${escapeHTML(x)}</h3><p class="text-[11px] sm:text-sm text-galaxy-400 uppercase tracking-widest font-bold truncate">${club(x)}</p></div>`;
+    const txt = `<div class="min-w-0">${pos(x) ? `<div class="inline-flex items-center gap-1.5 px-2 py-0.5 whitespace-nowrap rounded bg-galaxy-600/25 border border-galaxy-400/30 text-[12px] text-galaxy-400 font-bold mb-1">${pos(x)}.º en la tabla</div>` : ''}
+      <h3 class="font-display font-bold text-xl sm:text-3xl text-white text-shadow-glow truncate uppercase">${escapeHTML(x)}</h3><p class="text-[12px] sm:text-sm text-galaxy-400 uppercase tracking-widest font-bold truncate">${club(x)}</p></div>`;
     return `<div class="flex flex-col-reverse ${der ? 'sm:flex-row-reverse sm:justify-end text-center sm:text-left' : 'sm:flex-row sm:justify-end text-center sm:text-right'} items-center gap-2 sm:gap-4 min-w-0">${txt}${escudo}</div>`;
   };
   const centro = jugado ? `<span class="font-display font-extrabold text-3xl sm:text-5xl text-white drop-shadow-[0_0_10px_rgba(0,229,255,0.8)] tabular-nums">${m.gl}<span class="text-galaxy-400 mx-1">-</span>${m.gv}</span>` : '<span class="font-display font-bold text-2xl sm:text-4xl text-galaxy-400 italic drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]">VS</span>';
-  box.innerHTML = `${editar}<div class="absolute top-0 right-0 bg-galaxy-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-widest z-10"><i class="fa-solid fa-fire mr-1"></i> Partido Destacado${d.manual ? ' · elegido' : ''}</div>
+  box.innerHTML = `${editar}<div class="absolute top-0 right-0 bg-galaxy-600 text-white text-[12px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-widest z-10"><i class="fa-solid fa-fire mr-1"></i> Partido Destacado${d.manual ? ' · elegido' : ''}</div>
     <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-white/10"></div>
     <div class="relative z-10 p-4 sm:p-6 pt-9 sm:pt-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">${lado(m.l, false)}
-      <div class="flex flex-col items-center">${centro}<span class="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-widest mt-1 text-center">Fecha ${n} · ${jugado ? 'Final' : 'Parsec'}</span></div>${lado(m.v, true)}</div>
+      <div class="flex flex-col items-center">${centro}<span class="text-[12px] sm:text-[12px] text-gray-500 uppercase tracking-widest mt-1 text-center">Fecha ${n} · ${jugado ? 'Final' : 'Parsec'}</span></div>${lado(m.v, true)}</div>
     ${d.nota ? `<p class="relative z-10 px-4 sm:px-6 pb-4 -mt-1 text-center text-xs sm:text-sm text-gray-300 italic">“${escapeHTML(d.nota)}”</p>` : ''}`;
 }
 
@@ -167,7 +167,7 @@ async function cargarManuales() {
 function renderDemo() {
   pintarPartidos(); pintarDestacado();
   pintarPosiciones();
-  const slot = (p) => `<div class="text-center"><div class="w-8 h-8 rounded-full ${p.cls} border border-white mx-auto text-xs font-bold flex items-center justify-center">${p.pos}</div><span class="text-[11px] font-bold text-white uppercase tracking-wider block mt-1">${p.nombre}</span></div>`;
+  const slot = (p) => `<div class="text-center"><div class="w-8 h-8 rounded-full ${p.cls} border border-white mx-auto text-xs font-bold flex items-center justify-center">${p.pos}</div><span class="text-[12px] font-bold text-white uppercase tracking-wider block mt-1">${p.nombre}</span></div>`;
   const [dc, ei, mco, ed, mcd] = DEMO_XI;
   if (!$('xi-container')) return;   // el XI está oculto por ahora
   $('xi-container').innerHTML = `
@@ -199,7 +199,7 @@ async function renderFeatured() {
 function pintarRachas() {
   const box = $('rachas'); if (!box || !fechas.length) return;
   const r = rachas(fechas, [...new Set([...jugadoresEd, ...tabla.map((t) => t.nombre)])]);
-  const fila = (x, tono, icono, txt) => `<div class="racha-fila"><span class="racha-n ${tono}">${x.n}</span><span class="shrink-0 grid place-items-center w-6">${escudoHTML(clubDe(x.nombre), 20)}</span><span class="min-w-0 flex-1"><span class="block truncate text-white font-semibold">${escapeHTML(x.nombre)}</span><span class="block text-[10px] text-gray-500 uppercase tracking-wider"><i class="fa-solid ${icono} mr-1"></i>${txt}</span></span></div>`;
+  const fila = (x, tono, icono, txt) => `<div class="racha-fila"><span class="racha-n ${tono}">${x.n}</span><span class="shrink-0 grid place-items-center w-6">${escudoHTML(clubDe(x.nombre), 20)}</span><span class="min-w-0 flex-1"><span class="block truncate text-white font-semibold">${escapeHTML(x.nombre)}</span><span class="block text-[12px] text-gray-500 uppercase tracking-wider"><i class="fa-solid ${icono} mr-1"></i>${txt}</span></span></div>`;
   const filas = [...r.victorias.slice(0, 3).map((x) => fila(x, 'text-emerald-400', 'fa-trophy', 'victorias seguidas')), ...r.invicto.slice(0, 2).map((x) => fila(x, 'text-galaxy-400', 'fa-shield', 'sin perder')), ...r.derrotas.slice(0, 2).map((x) => fila(x, 'text-rose-400', 'fa-arrow-trend-down', 'derrotas seguidas'))];
   if (!filas.length) return;
   $('rachas-lista').innerHTML = filas.join(''); box.hidden = false;
@@ -245,7 +245,7 @@ window.addEventListener('goles-cambiaron', pintarGoleadores);
 function pintarRankings() {
   const cl = $('clubes-lista'); if (!cl || !edicion) return;
   try {
-    const filaClub = (x, i) => `<div class="rank-fila break-inside-avoid"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(x.club, 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.club)}<small class="block text-[10px] text-gray-500 truncate">${escapeHTML(x.dts.join(', '))}</small></span><span class="rank-val">${x.pj} <small class="text-[10px] text-gray-500 font-normal">PJ</small></span></div>`;
+    const filaClub = (x, i) => `<div class="rank-fila break-inside-avoid"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(x.club, 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.club)}<small class="block text-[12px] text-gray-500 truncate">${escapeHTML(x.dts.join(', '))}</small></span><span class="rank-val">${x.pj} <small class="text-[12px] text-gray-500 font-normal">PJ</small></span></div>`;
     cl.innerHTML = clubesMasUsados(fechas, edicion.clubes ?? {}).map(filaClub).join('') || '<p class="text-xs text-gray-500">Aún no hay partidos jugados.</p>';
   } catch (err) { console.error('[central] rankings:', err); }
 }

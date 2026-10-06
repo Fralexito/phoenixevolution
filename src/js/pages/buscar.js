@@ -27,11 +27,11 @@ function filaPersona(p, { sugerencia = false } = {}) {
   return `<article class="glass-panel rounded-2xl p-3 flex items-center gap-3" data-persona="${escapeHTML(p.id)}">
     <a href="${escapeHTML(perfilURL(p.username))}" class="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(p.avatar, p.nombre, 44)}</a>
     <div class="min-w-0 flex-1"><a href="${escapeHTML(perfilURL(p.username))}" class="font-display font-bold text-white text-sm truncate block hover:text-galaxy-400">${escapeHTML(p.nombre)}</a>
-      <p class="text-[11px] text-gray-400 truncate">@${escapeHTML(p.username)}${p.club ? ` · ${escapeHTML(p.club)}` : ''}</p>
-      ${sugerencia && p.motivo ? `<p class="text-[11px] text-galaxy-400 truncate"><i class="fa-solid fa-lightbulb mr-1"></i>${escapeHTML(p.motivo)}</p>` : ''}</div>
-    ${sugerencia ? `<button type="button" data-act="seguir" data-id="${escapeHTML(p.id)}" class="btn btn-primary !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-heart"></i><span>Seguir</span></button>
+      <p class="text-[12px] text-gray-400 truncate">@${escapeHTML(p.username)}${p.club ? ` · ${escapeHTML(p.club)}` : ''}</p>
+      ${sugerencia && p.motivo ? `<p class="text-[12px] text-galaxy-400 truncate"><i class="fa-solid fa-lightbulb mr-1"></i>${escapeHTML(p.motivo)}</p>` : ''}</div>
+    ${sugerencia ? `<button type="button" data-act="seguir" data-id="${escapeHTML(p.id)}" class="btn btn-primary !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-heart"></i><span>Seguir</span></button>
       <button type="button" data-act="descartar" data-id="${escapeHTML(p.id)}" title="No me interesa" aria-label="No me interesa" class="w-8 h-8 rounded-lg text-gray-500 hover:text-bad shrink-0"><i class="fa-solid fa-xmark"></i></button>`
-      : `<a href="${escapeHTML(perfilURL(p.username))}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-user"></i><span>Ver perfil</span></a>`}</article>`;
+      : `<a href="${escapeHTML(perfilURL(p.username))}" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-user"></i><span>Ver perfil</span></a>`}</article>`;
 }
 const vacio = (t) => `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${t}</div>`;
 const tarjeta = (it) => tarjetaComunidadHTML(it, { yo: S.yo, puedeOcultar: can('resolverReportes') });
@@ -45,14 +45,14 @@ function pintar(estado = 'resultados') {
   if (estado === 'inicio') {
     el.innerHTML = `<h2 class="font-display font-bold text-white text-xs uppercase tracking-widest"><i class="fa-solid fa-lightbulb text-galaxy-400 mr-1.5"></i>A quién seguir</h2>`
       + (S.sugs.length ? S.sugs.map((p) => filaPersona(p, { sugerencia: true })).join('') : vacio('Por ahora no tenemos sugerencias. Escribe un nombre arriba para buscar jugadores.'))
-      + '<p class="text-[11px] text-gray-500">Sugerimos según amigos en común, a quién siguen tus seguidos, tu club favorito, tu país y la actividad reciente. «✕» oculta una sugerencia.</p>';
+      + '<p class="text-[12px] text-gray-500">Sugerimos según amigos en común, a quién siguen tus seguidos, tu club favorito, tu país y la actividad reciente. «✕» oculta una sugerencia.</p>';
     return;
   }
   if (S.tipo === 'personas') { el.innerHTML = S.personas.length ? S.personas.map((p) => filaPersona(p)).join('') : vacio('No encontramos a nadie con ese nombre.'); return; }
   el.innerHTML = S.pubs.length ? S.pubs.map(tarjeta).join('') : vacio('No encontramos publicaciones con esas palabras.');
   const mas = S.hayMas && S.desp + PAGINA <= DESPL_MAX;
   $('bu-mas').hidden = !mas;
-  if (S.hayMas && !mas) el.insertAdjacentHTML('beforeend', '<p class="text-[11px] text-gray-500 text-center">Hay más coincidencias: afina las palabras para verlas.</p>');
+  if (S.hayMas && !mas) el.insertAdjacentHTML('beforeend', '<p class="text-[12px] text-gray-500 text-center">Hay más coincidencias: afina las palabras para verlas.</p>');
 }
 
 function sincronizarURL() {

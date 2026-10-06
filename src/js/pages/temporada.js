@@ -31,7 +31,7 @@ function iniciar() {
         <div class="flex items-stretch gap-2"><button type="button" data-paso="${c.k}:-1" class="adv-chip !min-h-10 !px-4" aria-label="Menos ${escapeHTML(c.t)}"><i class="fa-solid fa-minus"></i></button>
           <output id="c-${c.k}" class="flex-1 grid place-items-center rounded-lg border border-galaxy-border bg-black/30 font-display font-extrabold text-xl text-white tabular-nums">${estado[c.k]}</output>
           <button type="button" data-paso="${c.k}:1" class="adv-chip !min-h-10 !px-4" aria-label="Más ${escapeHTML(c.t)}"><i class="fa-solid fa-plus"></i></button></div>
-        <p class="text-[11px] text-gray-500 leading-snug">${c.ayuda}</p></div>`).join('');
+        <p class="text-[12px] text-gray-500 leading-snug">${c.ayuda}</p></div>`).join('');
   };
 
   const ETIQ = { copa: ['Copa', 'tmp-copa', 'fa-trophy'], sube: ['Ascenso', 'tmp-sube', 'fa-arrow-up'], baja: ['Descenso', 'tmp-baja', 'fa-arrow-down'] };
@@ -40,7 +40,7 @@ function iniciar() {
     const cuerpo = filas.length ? filas.map((f, i) => {
       const z = zonas.get(f.nombre) ?? []; const clase = z.includes('baja') ? 'tmp-baja' : z.includes('sube') ? 'tmp-sube' : z.includes('copa') ? 'tmp-copa' : '';
       const marcas = z.map((x) => `<span class="tmp-tag ${ETIQ[x][1]}" title="${ETIQ[x][0]}"><i class="fa-solid ${ETIQ[x][2]}"></i></span>`).join('');
-      return `<tr class="tmp-fila ${clase}"><td class="text-left font-display font-bold text-gray-300">${i + 1}</td><td class="text-left"><span class="font-display font-bold text-white">${escapeHTML(f.nombre)}</span>${f.club ? `<span class="block text-[11px] text-gray-400 leading-tight uppercase">${escapeHTML(f.club)}</span>` : ''}</td><td class="text-left">${marcas}</td><td class="font-display font-extrabold text-white">${f.pts}</td><td>${f.pj}</td><td>${f.dg > 0 ? `+${f.dg}` : f.dg}</td></tr>`;
+      return `<tr class="tmp-fila ${clase}"><td class="text-left font-display font-bold text-gray-300">${i + 1}</td><td class="text-left"><span class="font-display font-bold text-white">${escapeHTML(f.nombre)}</span>${f.club ? `<span class="block text-[12px] text-gray-400 leading-tight uppercase">${escapeHTML(f.club)}</span>` : ''}</td><td class="text-left">${marcas}</td><td class="font-display font-extrabold text-white">${f.pts}</td><td>${f.pj}</td><td>${f.dg > 0 ? `+${f.dg}` : f.dg}</td></tr>`;
     }).join('') : `<tr><td colspan="6" class="text-sm text-gray-400 py-4 text-center">Aún no hay jugadores en esta división.</td></tr>`;
     return `<h2 class="font-display font-bold text-base text-white uppercase tracking-widest">${escapeHTML(titulo)}${nota ? ` <span class="liga-sello liga-sello-prox ml-2 align-middle">${nota}</span>` : ''}</h2>
       <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto" role="region" tabindex="0" aria-label="Tabla de posiciones, desplazable"><table class="liga-tabla w-full"><thead><tr><th class="text-left w-8">#</th><th class="text-left">Jugador</th><th class="text-left"></th><th>PTS</th><th>PJ</th><th>DIF</th></tr></thead><tbody>${cuerpo}</tbody></table></div>`;
@@ -54,14 +54,14 @@ function iniciar() {
       <div class="glass-panel rounded-xl p-4 text-sm text-gray-300 space-y-1"><p><b class="text-galaxy-400 font-display uppercase text-xs tracking-wider">Próxima ${escapeHTML(datos.nombres.d1)}</b><br>${lista(r.div1)}</p><p><b class="text-galaxy-400 font-display uppercase text-xs tracking-wider">Próxima ${escapeHTML(datos.nombres.d2)}</b><br>${lista(r.div2)}</p></div>
     </div>`;
 
-  const equipo = (t, ph) => (t ? `<span class="min-w-0"><span class="block font-display font-bold text-white truncate">${escapeHTML(t.nombre)}</span><span class="block text-[10px] text-gray-400 uppercase tracking-wider">${t.nivel === 1 ? 'Liga 1' : 'Liga 2'} · ${t.pos}.º</span></span>` : `<span class="text-xs text-gray-500 italic">${ph}</span>`);
+  const equipo = (t, ph) => (t ? `<span class="min-w-0"><span class="block font-display font-bold text-white truncate">${escapeHTML(t.nombre)}</span><span class="block text-[12px] text-gray-400 uppercase tracking-wider">${t.nivel === 1 ? 'Liga 1' : 'Liga 2'} · ${t.pos}.º</span></span>` : `<span class="text-xs text-gray-500 italic">${ph}</span>`);
   const cuadro = (k) => {
     if (!k.rondas.length) return `<p class="text-sm text-gray-400">${escapeHTML(k.avisos[0] ?? 'Sin cuadro todavía.')}</p>`;
     const cols = k.rondas.map((r, ri) => `<div class="space-y-3"><h3 class="font-display font-bold text-xs text-galaxy-400 uppercase tracking-[.2em]">${escapeHTML(r.nombre)}</h3>
-      ${r.partidos.map((p) => { const gan = p.ganador?.nombre; const marc = Number.isInteger(p.ga) && Number.isInteger(p.gb) ? `${p.ga} : ${p.gb}${Number.isInteger(p.pa) ? ` <span class="text-[10px] text-gray-400">(${p.pa}-${p.pb} pen.)</span>` : ''}` : 'vs';
+      ${r.partidos.map((p) => { const gan = p.ganador?.nombre; const marc = Number.isInteger(p.ga) && Number.isInteger(p.gb) ? `${p.ga} : ${p.gb}${Number.isInteger(p.pa) ? ` <span class="text-[12px] text-gray-400">(${p.pa}-${p.pb} pen.)</span>` : ''}` : 'vs';
         const ph = ri === 0 ? 'Por definir' : 'Ganador por definir';
         const editar = can('editarLiga') && p.a && p.b && !p.libre ? `<button type="button" data-cruce="${p.id}" class="adv-chip col-span-full !min-h-7"><i class="fa-solid fa-pen mr-1"></i>Resultado</button>` : '';
-        return `<div class="tmp-cruce ${p.libre ? 'tmp-libre' : ''}"><div class="tmp-lado ${gan && gan === p.a?.nombre ? 'tmp-gana' : ''}">${equipo(p.a, ph)}</div><div class="tmp-marc font-display font-extrabold tabular-nums">${p.libre ? '<span class="text-[10px] text-gray-400 uppercase">pasa libre</span>' : marc}</div><div class="tmp-lado ${gan && gan === p.b?.nombre ? 'tmp-gana' : ''}">${equipo(p.b, ph)}</div>${editar}</div>`; }).join('')}</div>`).join('');
+        return `<div class="tmp-cruce ${p.libre ? 'tmp-libre' : ''}"><div class="tmp-lado ${gan && gan === p.a?.nombre ? 'tmp-gana' : ''}">${equipo(p.a, ph)}</div><div class="tmp-marc font-display font-extrabold tabular-nums">${p.libre ? '<span class="text-[12px] text-gray-400 uppercase">pasa libre</span>' : marc}</div><div class="tmp-lado ${gan && gan === p.b?.nombre ? 'tmp-gana' : ''}">${equipo(p.b, ph)}</div>${editar}</div>`; }).join('')}</div>`).join('');
     const camp = k.campeon ? `<p class="text-sm text-gray-200"><i class="fa-solid fa-crown text-gold-400 mr-1.5"></i>Campeón: <b class="text-white">${escapeHTML(k.campeon.nombre)}</b></p>` : '';
     return `<div class="grid gap-6 ${k.rondas.length > 2 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} sm:grid-cols-1">${cols}</div>${camp}`;
   };

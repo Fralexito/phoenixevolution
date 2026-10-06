@@ -30,7 +30,7 @@ function show(n) {
   el.innerHTML = `
     <div class="holo-card">
       <div class="holo-scan" aria-hidden="true"></div>
-      <div class="text-[10px] font-display font-bold uppercase tracking-[0.3em] text-galaxy-400 mb-1">${invite ? 'Invitación a un equipo' : direct ? 'Desafío directo' : 'Se busca host'}</div>
+      <div class="text-[12px] font-display font-bold uppercase tracking-[0.3em] text-galaxy-400 mb-1">${invite ? 'Invitación a un equipo' : direct ? 'Desafío directo' : 'Se busca host'}</div>
       <h3 class="font-display font-extrabold text-xl text-white uppercase text-shadow-glow">${escapeHTML(n.titulo)}</h3>
       <p class="text-sm text-gray-300 mt-2">${escapeHTML(n.mensaje)}</p>
       <div class="flex gap-2 mt-5">

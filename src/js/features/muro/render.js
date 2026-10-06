@@ -5,7 +5,7 @@ import { href } from '../../core/config.js';
 import { analizarVideo, PROVEEDOR_ETIQUETA, resumenReto, tiempoRelativo, textoAHTML, etiquetaSegmento } from '../../core/muro.js';
 
 /** Etiqueta pequeña del segmento (juego) de una publicación o clip; '' si es general. */
-export const segmentoChipHTML = (id) => (etiquetaSegmento(id) ? `<span class="inline-block text-[10px] leading-none rounded-full border border-galaxy-border/80 text-gray-400 px-2 py-1">${escapeHTML(etiquetaSegmento(id))}</span>` : '');
+export const segmentoChipHTML = (id) => (etiquetaSegmento(id) ? `<span class="inline-block text-[12px] leading-none rounded-full border border-galaxy-border/80 text-gray-400 px-2 py-1">${escapeHTML(etiquetaSegmento(id))}</span>` : '');
 
 const nombreLink = (p) => (p?.username ? `<a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(p.username)}" class="font-bold text-white hover:text-galaxy-400">${escapeHTML(p.nombre)}</a>` : `<b class="text-white">${escapeHTML(p?.nombre ?? 'Por definir')}</b>`);
 
@@ -16,9 +16,9 @@ export function retoHTML(reto) {
   const cuando = f && !Number.isNaN(f.getTime()) ? f.toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const tono = r.estado === 'FINALIZADO' ? 'text-gray-300 border-galaxy-border' : 'text-ok border-ok/40 bg-ok/10';
   return `<div class="mt-2 rounded-xl border border-galaxy-400/30 bg-galaxy-600/10 p-3">
-    <p class="text-[10px] uppercase tracking-widest text-galaxy-400 font-display font-bold mb-1.5"><i class="fa-solid fa-circle-check mr-1"></i>Duelo verificado</p>
+    <p class="text-[12px] uppercase tracking-widest text-galaxy-400 font-display font-bold mb-1.5"><i class="fa-solid fa-circle-check mr-1"></i>Duelo verificado</p>
     <p class="text-sm flex flex-wrap items-center gap-x-2"><i class="fa-solid fa-gamepad text-galaxy-400"></i>${nombreLink(r.retador)}<span class="text-gray-500 text-xs">vs</span>${nombreLink(r.rival)}</p>
-    <div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+    <div class="mt-2 flex flex-wrap gap-1.5 text-[12px]">
       <span class="rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 px-2 py-0.5">${escapeHTML(r.formato)}</span>
       ${r.plataforma ? `<span class="rounded-full border border-galaxy-border text-gray-300 px-2 py-0.5">${escapeHTML(r.plataforma)}</span>` : ''}
       <span class="rounded-full border px-2 py-0.5 ${tono}">${escapeHTML(r.etiquetaEstado)}</span>
@@ -55,7 +55,7 @@ export function reproductorYT(el) {
 /** Versión compacta para la ficha del jugador: últimas publicaciones, solo lectura (reacciones/respuestas están en el muro completo). */
 export function muroCompactoHTML(items, { urlMuro = '', nombre = 'este jugador' } = {}) {
   const lista = items.length
-    ? items.map((it) => `<article class="rounded-xl border border-galaxy-border/60 bg-black/25 p-3"><p class="text-[11px] text-gray-500 mb-1">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>' : ''}${tiempoRelativo(it.created_at)}</p>${contenidoHTML(it)}</article>`).join('')
+    ? items.map((it) => `<article class="rounded-xl border border-galaxy-border/60 bg-black/25 p-3"><p class="text-[12px] text-gray-500 mb-1">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>' : ''}${tiempoRelativo(it.created_at)}</p>${contenidoHTML(it)}</article>`).join('')
     : `<p class="text-sm text-gray-500">${escapeHTML(nombre)} todavía no ha publicado nada.</p>`;
   return `<div class="space-y-3">${lista}${urlMuro ? `<a href="${escapeHTML(urlMuro)}" class="btn btn-ghost w-full !text-xs"><i class="fa-solid fa-newspaper"></i><span>Ver el muro completo</span></a>` : ''}</div>`;
 }

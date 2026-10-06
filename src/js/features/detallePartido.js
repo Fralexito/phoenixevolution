@@ -24,13 +24,13 @@ async function leerGoles(c) {
 }
 
 const icono = (g) => g.tipo === 'penal' ? '<i class="fa-solid fa-bullseye text-amber-300" title="Penal"></i>' : g.tipo === 'en_contra' ? '<i class="fa-solid fa-rotate-left text-rose-400" title="Autogol"></i>' : '<i class="fa-solid fa-futbol text-galaxy-400" title="Gol"></i>';
-const textoGol = (g) => `<b class="text-white">${escapeHTML(g.goleador)}</b>${g.tipo === 'en_contra' ? ' <span class="text-[10px] uppercase text-rose-300">(en contra)</span>' : ''}${g.asistente ? `<small class="block text-[11px] text-gray-400"><i class="fa-solid fa-shoe-prints mr-1"></i>${escapeHTML(g.asistente)}</small>` : ''}`;
+const textoGol = (g) => `<b class="text-white">${escapeHTML(g.goleador)}</b>${g.tipo === 'en_contra' ? ' <span class="text-[12px] uppercase text-rose-300">(en contra)</span>' : ''}${g.asistente ? `<small class="block text-[12px] text-gray-400"><i class="fa-solid fa-shoe-prints mr-1"></i>${escapeHTML(g.asistente)}</small>` : ''}`;
 
 function cabecera(c) {
   const p = c.partido; const k = selloPartido(p); const club = (n) => c.clubes?.[n] ?? '';
-  const lado = (n, der) => `<div class="min-w-0 flex flex-col items-center gap-1 text-center"><span class="grid place-items-center w-14 h-14 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(club(n), 40)}</span><b class="font-display text-white uppercase truncate max-w-full">${escapeHTML(n)}</b><small class="text-[10px] text-gray-400 uppercase truncate max-w-full">${escapeHTML(club(n))}</small></div>`;
+  const lado = (n, der) => `<div class="min-w-0 flex flex-col items-center gap-1 text-center"><span class="grid place-items-center w-14 h-14 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(club(n), 40)}</span><b class="font-display text-white uppercase truncate max-w-full">${escapeHTML(n)}</b><small class="text-[12px] text-gray-400 uppercase truncate max-w-full">${escapeHTML(club(n))}</small></div>`;
   return `<div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">${lado(p.l)}<div class="text-center"><span class="block font-display font-extrabold text-4xl text-white tabular-nums">${jugado(p) ? `${p.gl} - ${p.gv}` : 'VS'}</span><span class="sello-partido ${k} mt-1">${NOMBRE_SELLO[k]}</span></div>${lado(p.v)}</div>
-    <p class="text-center text-[11px] font-display font-bold uppercase tracking-[0.2em] text-galaxy-400 mt-3">${escapeHTML(c.ligaTitulo)} · ${escapeHTML(c.edicionNombre)} · Fecha ${c.fecha}</p>`;
+    <p class="text-center text-[12px] font-display font-bold uppercase tracking-[0.2em] text-galaxy-400 mt-3">${escapeHTML(c.ligaTitulo)} · ${escapeHTML(c.edicionNombre)} · Fecha ${c.fecha}</p>`;
 }
 
 function lineaTiempo(goles) {
@@ -82,7 +82,7 @@ export async function abrirDetalle(c) {
         <input id="dp-asi" class="field col-span-2" maxlength="60" placeholder="Asistencia (opcional)" autocomplete="off" aria-label="Asistente">
         <ul id="dp-err" class="col-span-2 text-xs text-rose-400" role="alert"></ul>
         <div class="col-span-2 flex flex-wrap gap-2 justify-between"><button type="button" id="dp-listo" class="btn btn-ghost">Listo</button><button type="submit" id="dp-add" class="btn btn-primary">Agregar gol</button></div>
-        <p class="col-span-2 text-[11px] text-gray-500">En un autogol, el goleador es del equipo rival pero el gol suma al equipo elegido arriba.</p>
+        <p class="col-span-2 text-[12px] text-gray-500">En un autogol, el goleador es del equipo rival pero el gol suma al equipo elegido arriba.</p>
       </form>`;
     const q = (x) => cuerpo.querySelector(x); const err = (l) => { q('#dp-err').innerHTML = l.map((t) => `<li>${escapeHTML(t)}</li>`).join(''); };
     q('#dp-listo').addEventListener('click', () => { editando = false; pintarVista(); });

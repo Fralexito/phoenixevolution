@@ -4,36 +4,36 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="Eventos" active="eventos">
   <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
     <header class="glass-panel px-4 py-3 rounded-2xl">
-      <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad</span>
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad</span>
       <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-calendar-day text-galaxy-400 mr-2"></i>Eventos</h1>
       <p class="text-gray-300 text-xs mt-0.5">Torneos, noches de duelos y transmisiones. Marca «Me interesa» y, si quieres, te avisamos 1 hora antes en la campana. Todas las horas son de Lima.</p>
     </header>
 
     <div id="ev-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 flex flex-wrap items-center gap-3">
       <i class="fa-solid fa-triangle-exclamation"></i><span id="ev-error-txt" class="flex-1 min-w-0"></span>
-      <button type="button" id="ev-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Reintentar</button>
+      <button type="button" id="ev-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Reintentar</button>
     </div>
 
     <!-- Solo staff con permiso (moderador/admin) y con las opciones de staff visibles -->
     <section id="ev-gestion" hidden class="glass-panel rounded-2xl p-4 space-y-3">
       <div class="flex items-center justify-between gap-2">
         <h2 id="ev-form-titulo" class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-plus text-galaxy-400 mr-1"></i>Nuevo evento</h2>
-        <button type="button" id="ev-form-cancelar" hidden class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Cancelar edición</button>
+        <button type="button" id="ev-form-cancelar" hidden class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Cancelar edición</button>
       </div>
       <form id="ev-form" class="grid sm:grid-cols-2 gap-3" novalidate>
-        <label class="sm:col-span-2 text-[11px] text-gray-400">Título (3–80)
+        <label class="sm:col-span-2 text-[12px] text-gray-400">Título (3–80)
           <input id="ev-titulo" type="text" maxlength="80" class="field mt-1 w-full" autocomplete="off" required>
         </label>
-        <label class="text-[11px] text-gray-400">Fecha (Lima)
+        <label class="text-[12px] text-gray-400">Fecha (Lima)
           <input id="ev-fecha" type="date" class="field mt-1 w-full" required>
         </label>
-        <label class="text-[11px] text-gray-400">Hora (Lima)
+        <label class="text-[12px] text-gray-400">Hora (Lima)
           <input id="ev-hora" type="time" class="field mt-1 w-full" required>
         </label>
-        <label class="text-[11px] text-gray-400">Juego (opcional)
+        <label class="text-[12px] text-gray-400">Juego (opcional)
           <select id="ev-juego" class="field mt-1 w-full"><option value="">Cualquiera / general</option></select>
         </label>
-        <label class="sm:col-span-2 text-[11px] text-gray-400">Descripción (opcional, máx. 500)
+        <label class="sm:col-span-2 text-[12px] text-gray-400">Descripción (opcional, máx. 500)
           <textarea id="ev-descripcion" maxlength="500" rows="3" class="field mt-1 w-full"></textarea>
         </label>
         <p id="ev-form-error" hidden role="alert" class="sm:col-span-2 text-xs text-rose-300"></p>

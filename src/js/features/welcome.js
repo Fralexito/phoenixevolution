@@ -28,12 +28,12 @@ function show(session, prof) {
         <p class="text-sm text-gray-400 mt-1">Arma tu perfil en 30 segundos. Podrás cambiar casi todo después en «Mi perfil».</p>
       </div>
       ${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user, ns: 'w' })}
-      <div><label class="label" for="w-name">Apodo (nombre visible)</label><input id="w-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[11px] text-gray-500 mt-1">Es como te ven en tus partidos.</p></div>
+      <div><label class="label" for="w-name">Apodo (nombre visible)</label><input id="w-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[12px] text-gray-500 mt-1">Es como te ven en tus partidos.</p></div>
       <div>
         <label class="label" for="w-user">Usuario único</label>
         <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-display font-bold">@</span><input id="w-user" class="field !pl-7" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" value="${escapeHTML(prof.username)}"></div>
-        <p id="w-user-st" class="text-[11px] mt-1 min-h-4"></p>
-        <p class="text-[11px] text-gray-500">Elígelo bien: después de guardar solo podrás cambiarlo cada 14 días.</p>
+        <p id="w-user-st" class="text-[12px] mt-1 min-h-4"></p>
+        <p class="text-[12px] text-gray-500">Elígelo bien: después de guardar solo podrás cambiarlo cada 14 días.</p>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="label" for="w-pais">País</label><select id="w-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>

@@ -7,7 +7,7 @@ import Layout from '../layouts/Layout.astro';
     <!-- 1. Cabecera + estado unificado (Inactivo · Activo · Radar) -->
     <section class="glass-panel px-4 py-3 rounded-2xl shadow-[0_0_24px_rgba(128,0,255,0.18)] flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4">
       <div class="min-w-0">
-        <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Centro de Emparejamiento</span>
+        <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Centro de Emparejamiento</span>
         <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1">SALA DE DUELOS &amp; HOSTING</h1>
         <p class="text-gray-300 text-xs mt-0.5 max-w-3xl">Rétalos directo, abre un reto a toda la red o pacta una hora. Sin host, se lo pedimos a quienes sí tienen.</p>
       </div>
@@ -18,7 +18,7 @@ import Layout from '../layouts/Layout.astro';
           <button type="button" data-v="on" aria-pressed="false"><i class="fa-solid fa-bolt mr-1"></i>Activo</button>
           <button type="button" data-v="radar" aria-pressed="false"><i class="fa-solid fa-tower-broadcast mr-1"></i>Radar</button>
         </div>
-        <p id="estado-hint" class="text-[11px] text-gray-400 mt-1 min-h-4 md:min-h-8">Inicia sesión para elegir tu estado.</p>
+        <p id="estado-hint" class="text-[12px] text-gray-400 mt-1 min-h-4 md:min-h-8">Inicia sesión para elegir tu estado.</p>
       </div>
     </section>
 
@@ -60,7 +60,7 @@ import Layout from '../layouts/Layout.astro';
                 <button type="button" data-v="privado" aria-pressed="true"><i class="fa-solid fa-lock mr-1"></i>Solo el retado</button>
                 <button type="button" data-v="publico" aria-pressed="false"><i class="fa-solid fa-eye mr-1"></i>Público</button>
               </div>
-              <p id="hint-vis" class="text-[11px] text-gray-400 mt-1.5">Solo tu rival verá que lo retaste.</p>
+              <p id="hint-vis" class="text-[12px] text-gray-400 mt-1.5">Solo tu rival verá que lo retaste.</p>
             </div>
           </div>
 
@@ -70,11 +70,11 @@ import Layout from '../layouts/Layout.astro';
               <button type="button" class="chip" data-t="2-2" aria-pressed="false">2v2</button>
               <button type="button" class="chip" data-t="3-3" aria-pressed="false">3v3</button>
               <button type="button" class="chip" data-t="4-4" aria-pressed="false">4v4</button>
-              <button type="button" id="tam-personal" class="chip !px-3 !text-[11px] !font-medium !normal-case !tracking-normal !text-gray-400 !border-dashed" aria-pressed="false" title="Elige cuántos jugadores por equipo">Personalizar</button>
+              <button type="button" id="tam-personal" class="chip !px-3 !text-[12px] !font-medium !normal-case !tracking-normal !text-gray-400 !border-dashed" aria-pressed="false" title="Elige cuántos jugadores por equipo">Personalizar</button>
             </div>
             <div id="tam-custom" class="grid grid-cols-2 gap-2">
               <div class="bg-black/40 border border-galaxy-border rounded-lg px-2 py-1">
-                <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Mi equipo (A)</div>
+                <div class="text-[12px] font-display font-bold uppercase tracking-wider text-gray-400">Mi equipo (A)</div>
                 <div class="flex items-center justify-between gap-1">
                   <button type="button" id="tam-a-menos" aria-label="Quitar un jugador de mi equipo" class="chip !px-0 w-8 !min-h-8">−</button>
                   <span id="tam-a" class="font-display font-extrabold text-xl text-white">1</span>
@@ -82,7 +82,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
               </div>
               <div class="bg-black/40 border border-galaxy-border rounded-lg px-2 py-1">
-                <div class="text-[10px] font-display font-bold uppercase tracking-wider text-gray-400">Rival (B)</div>
+                <div class="text-[12px] font-display font-bold uppercase tracking-wider text-gray-400">Rival (B)</div>
                 <div class="flex items-center justify-between gap-1">
                   <button type="button" id="tam-b-menos" aria-label="Quitar un jugador del rival" class="chip !px-0 w-8 !min-h-8">−</button>
                   <span id="tam-b" class="font-display font-extrabold text-xl text-white">1</span>
@@ -90,7 +90,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
               </div>
             </div>
-            <p class="text-[11px] text-gray-400 mt-1 leading-snug">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span></p>
+            <p class="text-[12px] text-gray-400 mt-1 leading-snug">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span></p>
             <button type="button" id="tam-reset" hidden class="mt-1.5 w-full min-h-9 rounded-lg border border-galaxy-400/60 bg-galaxy-400/10 text-galaxy-400 hover:bg-galaxy-400/20 hover:text-white transition-colors text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-rotate-left"></i> Restablecer a 1 vs 1</button>
           </div>
 
@@ -98,7 +98,7 @@ import Layout from '../layouts/Layout.astro';
             <span class="label">Invita a tu equipo (opcional)</span>
             <input id="buscar-amigo" class="field" type="search" placeholder="Buscar jugador…" autocomplete="off" maxlength="40">
             <ul id="lista-amigos" class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto"></ul>
-            <p id="hint-amigos" class="text-[11px] text-gray-400"></p>
+            <p id="hint-amigos" class="text-[12px] text-gray-400"></p>
           </div>
 
           <div class="grid grid-cols-[minmax(0,1fr)_8.6rem] gap-2 items-start">
@@ -113,13 +113,13 @@ import Layout from '../layouts/Layout.astro';
               <label class="label" for="select-plataforma">Plataforma</label>
               <select id="select-plataforma" class="field !px-2"><option value="Parsec">Parsec</option><option value="Smash Soda">Smash Soda</option><option value="Steam Remote Play">Steam Remote Play</option></select>
             </div>
-            <p id="hint-host" class="col-span-2 text-[11px] text-gray-400 leading-snug empty:hidden -mt-0.5"></p>
+            <p id="hint-host" class="col-span-2 text-[12px] text-gray-400 leading-snug empty:hidden -mt-0.5"></p>
           </div>
 
           <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2">
             <label class="label !mb-0" for="select-espectadores"><i class="fa-solid fa-eye text-galaxy-400 mr-1"></i>Espectadores</label>
             <select id="select-espectadores" class="field !py-1.5" aria-describedby="hint-espectadores"></select>
-            <p id="hint-espectadores" class="col-span-2 text-[11px] text-gray-400 leading-snug -mt-0.5"></p>
+            <p id="hint-espectadores" class="col-span-2 text-[12px] text-gray-400 leading-snug -mt-0.5"></p>
           </div>
 
           <div>
@@ -131,7 +131,7 @@ import Layout from '../layouts/Layout.astro';
               <button type="button" class="chip !px-1" data-p="60" aria-pressed="false">1 hora</button>
               <button type="button" class="chip !px-1" data-p="manual" aria-pressed="false" aria-label="Elegir hora"><i class="fa-regular fa-calendar"></i></button>
             </div>
-            <p id="hint-when" class="text-[11px] text-gray-400 mt-1 leading-snug"></p>
+            <p id="hint-when" class="text-[12px] text-gray-400 mt-1 leading-snug"></p>
           </div>
 
           <div id="campo-fecha" hidden class="bg-[#0c051a] p-3 rounded-xl border border-galaxy-600/40 space-y-3">
@@ -144,7 +144,7 @@ import Layout from '../layouts/Layout.astro';
                 <button type="button" id="btn-dia-hoy" aria-pressed="true">Hoy</button>
                 <button type="button" id="btn-dia-manana" aria-pressed="false">Mañana</button>
               </div>
-              <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold block">Hora (00:00 y 01:00 son de madrugada). Mínimo 30 min de antelación.</span>
+              <span class="text-[12px] text-gray-400 uppercase tracking-wider font-semibold block">Hora (00:00 y 01:00 son de madrugada). Mínimo 30 min de antelación.</span>
               <div id="grid-horas" class="grid grid-cols-4 gap-1.5"></div>
             </div>
             <div id="panel-horario-manual" hidden class="grid grid-cols-3 gap-2">

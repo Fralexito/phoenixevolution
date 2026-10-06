@@ -26,7 +26,7 @@ export function avatarMini(nombre, url, px = 'w-9 h-9') {
 
 export function rolBadge(rol) {
   const info = ROL_INFO[normalizarRol(rol)];
-  return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider align-middle ${tono(info.tono).chip}"><i class="fa-solid ${info.icono}"></i>${e(info.etiqueta)}</span>`;
+  return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[12px] font-bold uppercase tracking-wider align-middle ${tono(info.tono).chip}"><i class="fa-solid ${info.icono}"></i>${e(info.etiqueta)}</span>`;
 }
 
 const horaLima = (ms) => new Date(ms).toLocaleTimeString('es-PE', { timeZone: 'America/Lima', hour: '2-digit', minute: '2-digit' });
@@ -59,20 +59,20 @@ export function resumenHTML(r, { dias = 7, esAdmin = false } = {}) {
     const etiqueta = i % cadaN === 0 || i === r.serie.length - 1 ? String(Number(s.clave.slice(8))) : '';
     return `<div class="flex-1 min-w-0 flex flex-col items-center gap-1" title="${e(s.clave)} · ${s.total} acción${s.total === 1 ? '' : 'es'}">
       <div class="w-full h-16 flex items-end"><div class="w-full rounded-t ${s.total ? 'bg-galaxy-400/80' : 'bg-white/10'}" style="height:${h}%"></div></div>
-      <span class="text-[9px] text-gray-500 h-3">${etiqueta}</span></div>`;
+      <span class="text-[12px] text-gray-500 h-3">${etiqueta}</span></div>`;
   }).join('');
   const SEG = [['creadas', 'ok', 'Creó'], ['editadas', 'warn', 'Editó'], ['ocultadas', 'oculto', 'Ocultó'], ['borradas', 'bad', 'Borró'], ['roles', 'rol', 'Roles']];
   const personas = r.personas.length ? r.personas.map((p) => `<article class="rounded-xl border border-galaxy-border/80 bg-galaxy-panel p-3 space-y-2">
       <div class="flex items-center gap-2.5">${avatarMini(p.nombre, p.avatar)}
-        <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${e(p.nombre)}</p><p class="text-[11px] text-gray-400">${p.rol ? rolBadge(p.rol) : '<span class="text-gray-500">Sistema</span>'}</p></div>
-        <div class="text-right"><p class="font-display font-extrabold text-xl text-galaxy-400 leading-none">${p.total}</p><p class="text-[10px] text-gray-500">acciones</p></div></div>
+        <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${e(p.nombre)}</p><p class="text-[12px] text-gray-400">${p.rol ? rolBadge(p.rol) : '<span class="text-gray-500">Sistema</span>'}</p></div>
+        <div class="text-right"><p class="font-display font-extrabold text-xl text-galaxy-400 leading-none">${p.total}</p><p class="text-[12px] text-gray-500">acciones</p></div></div>
       <div class="flex h-2 rounded-full overflow-hidden bg-white/10" role="img" aria-label="${e(SEG.filter(([k]) => p[k]).map(([k, , n]) => `${n} ${p[k]}`).join(', '))}">${SEG.filter(([k]) => p[k]).map(([k, t]) => `<span class="${tono(t).barra}" style="width:${(p[k] / Math.max(1, p.total)) * 100}%"></span>`).join('')}</div>
-      <p class="text-[11px] text-gray-400 flex flex-wrap gap-x-3 gap-y-0.5">${SEG.filter(([k]) => p[k]).map(([k, t, n]) => `<span><i class="inline-block w-2 h-2 rounded-full ${tono(t).barra} mr-1"></i>${n} ${p[k]}</span>`).join('')}</p>
-      <div class="flex items-center justify-between gap-2"><span class="text-[11px] text-gray-500">${p.ultima ? `Última acción: ${e(tiempoRelativo(p.ultima))}` : ''}</span>
-        ${esAdmin && p.actorId ? `<button type="button" data-actor="${e(p.actorId)}" class="adv-chip !min-h-7 !text-[11px]">Ver sus acciones</button>` : ''}</div></article>`).join('')
+      <p class="text-[12px] text-gray-400 flex flex-wrap gap-x-3 gap-y-0.5">${SEG.filter(([k]) => p[k]).map(([k, t, n]) => `<span><i class="inline-block w-2 h-2 rounded-full ${tono(t).barra} mr-1"></i>${n} ${p[k]}</span>`).join('')}</p>
+      <div class="flex items-center justify-between gap-2"><span class="text-[12px] text-gray-500">${p.ultima ? `Última acción: ${e(tiempoRelativo(p.ultima))}` : ''}</span>
+        ${esAdmin && p.actorId ? `<button type="button" data-actor="${e(p.actorId)}" class="adv-chip !min-h-7 !text-[12px]">Ver sus acciones</button>` : ''}</div></article>`).join('')
     : vacio('Aún no hay actividad del staff en este periodo. Cuando un moderador o administrador cree, edite u oculte algo, aparecerá aquí.');
   return `<div class="flex flex-wrap items-center justify-between gap-2"><h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-chart-column text-galaxy-400 mr-2"></i>Actividad del staff</h2><div class="flex gap-1.5" role="group" aria-label="Periodo">${chips}</div></div>
-    <div class="rounded-xl border border-galaxy-border/80 bg-galaxy-panel p-3"><p class="text-[11px] text-gray-400 mb-2">Acciones por día · <b class="text-white">${r.total}</b> en los últimos ${r.dias} días</p><div class="flex gap-1">${barras}</div></div>
+    <div class="rounded-xl border border-galaxy-border/80 bg-galaxy-panel p-3"><p class="text-[12px] text-gray-400 mb-2">Acciones por día · <b class="text-white">${r.total}</b> en los últimos ${r.dias} días</p><div class="flex gap-1">${barras}</div></div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">${personas}</div>`;
 }
 
@@ -94,8 +94,8 @@ function detalleCambios(d) {
   const filas = d.cambios.map((c) => `<tr class="border-t border-galaxy-border/40"><th scope="row" class="py-1.5 pr-3 text-left font-semibold text-gray-300 align-top">${e(c.etiqueta)}</th>
     ${soloDespues ? '' : `<td class="py-1.5 pr-3 align-top ${c.tipo === 'nuevo' ? 'text-gray-500' : 'text-rose-300 line-through decoration-rose-400/40'} break-words">${e(c.antes)}</td>`}
     ${soloAntes ? '' : `<td class="py-1.5 align-top ${c.tipo === 'quitado' ? 'text-gray-500' : 'text-emerald-300'} break-words">${e(c.despues)}</td>`}</tr>`).join('');
-  const cab = `<tr><th class="text-left text-[10px] uppercase tracking-wider text-gray-500 pb-1">Dato</th>${soloDespues ? '' : `<th class="text-left text-[10px] uppercase tracking-wider text-gray-500 pb-1">${soloAntes ? 'Valor que tenía' : 'Antes'}</th>`}${soloAntes ? '' : `<th class="text-left text-[10px] uppercase tracking-wider text-gray-500 pb-1">${soloDespues ? 'Valor guardado' : 'Después'}</th>`}</tr>`;
-  return `<details class="mt-2 group"><summary class="cursor-pointer text-[11px] text-galaxy-400 hover:underline select-none">Ver detalle (${d.cambios.length})</summary>
+  const cab = `<tr><th class="text-left text-[12px] uppercase tracking-wider text-gray-500 pb-1">Dato</th>${soloDespues ? '' : `<th class="text-left text-[12px] uppercase tracking-wider text-gray-500 pb-1">${soloAntes ? 'Valor que tenía' : 'Antes'}</th>`}${soloAntes ? '' : `<th class="text-left text-[12px] uppercase tracking-wider text-gray-500 pb-1">${soloDespues ? 'Valor guardado' : 'Después'}</th>`}</tr>`;
+  return `<details class="mt-2 group"><summary class="cursor-pointer text-[12px] text-galaxy-400 hover:underline select-none">Ver detalle (${d.cambios.length})</summary>
     <div class="mt-1.5 overflow-x-auto"><table class="w-full text-xs"><thead>${cab}</thead><tbody>${filas}</tbody></table></div></details>`;
 }
 
@@ -105,7 +105,7 @@ export function entradaHTML(d, ahora = Date.now()) {
     <span class="w-9 h-9 rounded-full border grid place-items-center text-sm shrink-0 ${t.icono}" aria-hidden="true"><i class="fa-solid ${d.icono}"></i></span>
     <div class="min-w-0 flex-1">
       <p class="text-sm text-gray-200 leading-snug"><b class="text-white">${e(d.actor)}</b> ${d.actorRol ? rolBadge(d.actorRol) : ''} ${e(d.verbo)} ${e(d.objeto)}${d.titulo ? ` <b class="text-white">«${e(d.titulo)}»</b>` : ''}</p>
-      <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid ${e(d.iconoTabla)} mr-1"></i>${e(d.seccion)} · ${e(horaLima(d.momento))} · ${e(tiempoRelativo(d.momento, ahora))}</p>
+      <p class="text-[12px] text-gray-500 mt-0.5"><i class="fa-solid ${e(d.iconoTabla)} mr-1"></i>${e(d.seccion)} · ${e(horaLima(d.momento))} · ${e(tiempoRelativo(d.momento, ahora))}</p>
       ${d.corto ? `<p class="mt-1 text-xs text-gray-300 break-words">${e(d.corto)}</p>` : ''}
       ${d.motivo ? `<p class="mt-1 text-xs text-violet-300 break-words"><i class="fa-solid fa-comment-dots mr-1"></i>Motivo: ${e(d.motivo)}</p>` : ''}
       ${detalleCambios(d)}</div></article>`;
@@ -115,15 +115,15 @@ export function entradaHTML(d, ahora = Date.now()) {
 export function lineaHTML(entradas, ahora = Date.now()) {
   if (!entradas.length) return vacio('No hay acciones con estos filtros.');
   return agruparPorDia(entradas, ahora).map((g) => `<section aria-label="${e(g.etiqueta)}" class="space-y-2">
-    <h3 class="sticky top-14 z-10 -mx-1 px-1 py-1 bg-galaxy-deep/90 backdrop-blur text-[11px] uppercase tracking-[.2em] text-gray-400 capitalize">${e(g.etiqueta)} <span class="text-gray-600">· ${g.entradas.length}</span></h3>
+    <h3 class="sticky top-14 z-10 -mx-1 px-1 py-1 bg-galaxy-deep/90 backdrop-blur text-[12px] uppercase tracking-[.2em] text-gray-400 capitalize">${e(g.etiqueta)} <span class="text-gray-600">· ${g.entradas.length}</span></h3>
     ${g.entradas.map((d) => entradaHTML(d, ahora)).join('')}</section>`).join('');
 }
 
 const filaCuenta = (c, yo, extra = '') => `<li class="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-galaxy-panel border border-galaxy-border/80">${avatarMini(c.nombre, c.avatar)}
-    <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${e(c.nombre)}${c.id === yo ? ' <span class="text-[10px] text-gray-500 normal-case">(tú)</span>' : ''}</p><p class="text-[11px] text-gray-400 truncate">${c.username ? `@${e(c.username)}` : ''}</p></div>
+    <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${e(c.nombre)}${c.id === yo ? ' <span class="text-[12px] text-gray-500 normal-case">(tú)</span>' : ''}</p><p class="text-[12px] text-gray-400 truncate">${c.username ? `@${e(c.username)}` : ''}</p></div>
     ${rolBadge(c.rol)}${extra}</li>`;
-const botonCambiar = (c, yo) => (c.id === yo ? '<span class="text-[10px] text-gray-500 max-w-24 leading-tight" title="Para no quedarte sin acceso, tu propio rol lo cambia otra cuenta admin.">No puedes cambiar tu propio rol</span>'
-  : `<button type="button" data-rol-cuenta="${e(c.id)}" class="adv-chip !min-h-8 !text-[11px]">Cambiar rol</button>`);
+const botonCambiar = (c, yo) => (c.id === yo ? '<span class="text-[12px] text-gray-500 max-w-24 leading-tight" title="Para no quedarte sin acceso, tu propio rol lo cambia otra cuenta admin.">No puedes cambiar tu propio rol</span>'
+  : `<button type="button" data-rol-cuenta="${e(c.id)}" class="adv-chip !min-h-8 !text-[12px]">Cambiar rol</button>`);
 
 /** Resultados del buscador de cuentas: `null` = aún no se buscó nada. */
 export function resultadosHTML(resultados, yo = null) {
@@ -144,7 +144,7 @@ export function equipoHTML(equipo, yo = null, resultados = null) {
 /** Contenido del modal «Cambiar rol»: una opción por rol con su explicación y un motivo obligatorio. */
 export function modalRolHTML(cuenta) {
   return `<form id="rol-form" class="p-5 sm:p-6 space-y-4" novalidate>
-    <div class="flex items-start justify-between border-b border-galaxy-border pb-3"><div><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Roles</span>
+    <div class="flex items-start justify-between border-b border-galaxy-border pb-3"><div><span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Roles</span>
       <h3 class="font-display font-bold text-xl text-white uppercase">Rol de ${e(cuenta.nombre)}</h3><p class="text-xs text-gray-400 mt-0.5">Ahora es ${rolBadge(cuenta.rol)}</p></div>
       <button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button></div>
     <fieldset class="space-y-1.5"><legend class="label">Nuevo rol</legend>

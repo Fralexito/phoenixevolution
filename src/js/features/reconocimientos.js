@@ -13,11 +13,11 @@ const TARJETAS = [
   { k: 'revelacion', titulo: 'Revelación', icono: 'fa-seedling', color: '#34d399' },
 ];
 const avatar = (p) => (safeImg(p.foto_url) ? `<img src="${escapeHTML(safeImg(p.foto_url))}" alt="" loading="lazy" class="w-12 h-12 rounded-full object-cover object-top border border-galaxy-400/50 shrink-0">` : '<span class="w-12 h-12 rounded-full bg-galaxy-600/30 border border-galaxy-400/40 grid place-items-center text-galaxy-400/70 shrink-0"><i class="fa-solid fa-user-astronaut"></i></span>');
-const nombreHTML = (p) => `<a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" class="font-display font-bold text-white uppercase tracking-wide hover:text-galaxy-400 truncate">${escapeHTML(p.nombre)}</a>${p.apodo ? `<span class="block text-[11px] text-galaxy-400 font-bold truncate">«${escapeHTML(p.apodo)}»</span>` : ''}`;
+const nombreHTML = (p) => `<a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" class="font-display font-bold text-white uppercase tracking-wide hover:text-galaxy-400 truncate">${escapeHTML(p.nombre)}</a>${p.apodo ? `<span class="block text-[12px] text-galaxy-400 font-bold truncate">«${escapeHTML(p.apodo)}»</span>` : ''}`;
 
 function tarjeta(t, r) {
   return `<article class="rounded-xl border bg-black/25 p-4 flex flex-col gap-3" style="border-color:${t.color}55">
-    <div class="flex items-center gap-2 text-[11px] font-display font-bold uppercase tracking-widest" style="color:${t.color}"><i class="fa-solid ${t.icono}"></i>${t.titulo}</div>
+    <div class="flex items-center gap-2 text-[12px] font-display font-bold uppercase tracking-widest" style="color:${t.color}"><i class="fa-solid ${t.icono}"></i>${t.titulo}</div>
     ${r ? `<div class="flex items-center gap-3 min-w-0">${avatar(r.p)}<div class="min-w-0">${nombreHTML(r.p)}</div></div><p class="text-xs text-gray-300 leading-relaxed">${escapeHTML(r.detalle)}</p>`
       : '<p class="text-xs text-gray-500">Aparecerá cuando haya resultados suficientes en la liga.</p>'}
   </article>`;
@@ -40,7 +40,7 @@ function panelVoto(jugadores, v, sesion) {
   const top = v.conteo.filter((x) => por.has(x.jugador_id)).slice(0, 3);
   const miVoto = v.mio ? por.get(v.mio.jugador_id) : null;
   return `<article class="rounded-xl border border-galaxy-400/50 bg-galaxy-600/10 p-4 flex flex-col gap-3 sm:col-span-2 xl:col-span-1" style="box-shadow:0 0 22px rgba(128,0,255,.18)">
-    <div class="flex items-center gap-2 text-[11px] font-display font-bold uppercase tracking-widest text-galaxy-400"><i class="fa-solid fa-ranking-star"></i>Jugador de la semana · voto de la comunidad</div>
+    <div class="flex items-center gap-2 text-[12px] font-display font-bold uppercase tracking-widest text-galaxy-400"><i class="fa-solid fa-ranking-star"></i>Jugador de la semana · voto de la comunidad</div>
     ${v.error ? '<p class="text-xs text-gray-500">No se pudieron cargar los votos. Intenta más tarde.</p>'
       : top.length ? `<ol class="space-y-1.5">${top.map((x, i) => `<li class="flex items-center gap-2 text-sm"><b class="w-5 text-galaxy-400">${i + 1}</b><span class="flex-1 min-w-0 truncate text-gray-100">${escapeHTML(por.get(x.jugador_id).nombre)}</span><b class="text-white tabular-nums">${x.votos}</b></li>`).join('')}</ol>`
         : '<p class="text-xs text-gray-400">Aún nadie ha votado esta semana. ¡Sé el primero!</p>'}
@@ -57,13 +57,13 @@ export function montarReconocimientos(el, jugadores, edicion) {
   const r = reconocimientos(jugadores, edicion); const semana = semanaActual();
   let sesion = false; let votos = { conteo: [], mio: null };
   let abierto = false;                     // plegado por defecto: una franja sutil; el botón la expande
-  const pastilla = (t, rec) => `<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] leading-none whitespace-nowrap" style="border-color:${t.color}55;color:${t.color}"><i class="fa-solid ${t.icono}"></i><span class="text-gray-100 max-w-[7rem] truncate">${rec ? escapeHTML(rec.p.nombre) : '—'}</span></span>`;
+  const pastilla = (t, rec) => `<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] leading-none whitespace-nowrap" style="border-color:${t.color}55;color:${t.color}"><i class="fa-solid ${t.icono}"></i><span class="text-gray-100 max-w-[7rem] truncate">${rec ? escapeHTML(rec.p.nombre) : '—'}</span></span>`;
   const pintar = () => {
     const por = new Map(jugadores.map((p) => [p.id, p])); const lider = votos.conteo.find((x) => por.has(x.jugador_id));
-    const pVoto = `<span class="inline-flex items-center gap-1.5 rounded-full border border-galaxy-400/50 px-2.5 py-1 text-[11px] leading-none whitespace-nowrap text-galaxy-400"><i class="fa-solid fa-ranking-star"></i><span class="text-gray-100 max-w-[7rem] truncate">${lider ? escapeHTML(por.get(lider.jugador_id).nombre) : 'Vota'}</span></span>`;
+    const pVoto = `<span class="inline-flex items-center gap-1.5 rounded-full border border-galaxy-400/50 px-2.5 py-1 text-[12px] leading-none whitespace-nowrap text-galaxy-400"><i class="fa-solid fa-ranking-star"></i><span class="text-gray-100 max-w-[7rem] truncate">${lider ? escapeHTML(por.get(lider.jugador_id).nombre) : 'Vota'}</span></span>`;
     el.innerHTML = `<div class="rounded-xl border border-galaxy-border/60 bg-black/20">
       <button type="button" data-recon-toggle aria-expanded="${abierto}" class="w-full flex items-center gap-3 px-3 py-2 text-left">
-        <span class="text-[11px] font-display font-bold uppercase tracking-widest text-gray-300 shrink-0"><i class="fa-solid fa-award text-galaxy-400 mr-1.5"></i>Reconocimientos</span>
+        <span class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-300 shrink-0"><i class="fa-solid fa-award text-galaxy-400 mr-1.5"></i>Reconocimientos</span>
         <span class="flex-1 min-w-0 flex flex-wrap gap-1.5 ${abierto ? 'invisible' : ''}">${TARJETAS.map((t) => pastilla(t, r[t.k])).join('')}${pVoto}</span>
         <i class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300 ${abierto ? 'rotate-180' : ''}"></i>
       </button>

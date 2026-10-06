@@ -38,10 +38,10 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
       <button type="button" id="cp-elegir" class="sx-chip"><i class="fa-solid fa-photo-film text-galaxy-400" aria-hidden="true"></i>Foto o video</button>
       <button type="button" id="cp-enlace" class="sx-chip" aria-expanded="false"><i class="fa-solid fa-link text-galaxy-400" aria-hidden="true"></i>Enlace</button>
       <select id="cp-juego" aria-label="Juego de la publicación" class="field !min-h-9 !py-1 !text-xs !w-auto"><option value="">Todos los juegos</option>${SEGMENTOS.map(([id, n]) => `<option value="${id}">${escapeHTML(n)}</option>`).join('')}</select>
-      <span id="cp-cuenta" class="ml-auto text-[11px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span>
+      <span id="cp-cuenta" class="ml-auto text-[12px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span>
       <button type="button" id="cp-ok" class="btn btn-primary !min-h-9 !text-xs"><i class="fa-solid fa-paper-plane"></i><span>Publicar</span></button>
     </div>
-    <p id="cp-ayuda" hidden class="text-[10px] text-gray-500">Foto JPG/PNG/WebP · Video MP4/WebM/MOV de hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB.</p>
+    <p id="cp-ayuda" hidden class="text-[12px] text-gray-500">Foto JPG/PNG/WebP · Video MP4/WebM/MOV de hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB.</p>
   </div>`;
   const $ = (s) => host.querySelector(s); const texto = $('#cp-texto');
   let elegido = null;   // { tipo: 'foto' | 'video', file, ext?, mime? }

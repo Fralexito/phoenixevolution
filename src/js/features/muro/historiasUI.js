@@ -16,12 +16,12 @@ const cabecera = (titulo, icono) => `<div class="flex justify-between items-cent
 /** Ventana «Nueva historia»: foto o video (archivo), enlace de video y/o texto. Dura 24 horas. */
 export function abrirNuevaHistoria({ uid, onListo }) {
   const m = openModal(`<div class="p-5 sm:p-6 space-y-3">${cabecera('Nueva historia', 'fa-circle-plus')}
-    <p class="text-[11px] text-gray-400">Se ve durante 24 horas. Después queda en tu archivo para que la guardes como destacada.</p>
+    <p class="text-[12px] text-gray-400">Se ve durante 24 horas. Después queda en tu archivo para que la guardes como destacada.</p>
     <div id="nh-prev" hidden class="relative inline-block"><img id="nh-img" alt="Vista previa" class="max-h-56 rounded-lg border border-galaxy-border" hidden><video id="nh-vid" muted playsinline controls class="max-h-56 rounded-lg border border-galaxy-border" hidden></video>
       <button type="button" id="nh-quitar" aria-label="Quitar" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
     <input type="file" id="nh-file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
     <button type="button" id="nh-elegir" class="btn btn-ghost !min-h-10 w-full"><i class="fa-solid fa-photo-film"></i><span>Elegir foto o video</span></button>
-    <p class="text-[10px] text-gray-500 -mt-1">Foto JPG/PNG/WebP · Video MP4/WebM/MOV de hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB.</p>
+    <p class="text-[12px] text-gray-500 -mt-1">Foto JPG/PNG/WebP · Video MP4/WebM/MOV de hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB.</p>
     <textarea id="nh-texto" rows="2" maxlength="${HISTORIA_MAX + 40}" placeholder="Texto (opcional si subes foto o video)" class="field w-full resize-y"></textarea>
     <input id="nh-link" maxlength="300" placeholder="…o un enlace de video (YouTube, TikTok, Kick o Twitch)" class="field w-full !text-xs">
     <p id="nh-err" class="text-xs text-bad min-h-4" role="alert"></p>
@@ -66,17 +66,17 @@ export function abrirNuevaHistoria({ uid, onListo }) {
 export function abrirDestacadas({ hist, onListo }) {
   const cand = [...normalizarHistorias(hist.historias).filter((h) => !h.destacada), ...normalizarHistorias(hist.archivo)];
   const celda = (h) => `<label class="relative block w-20 h-28 rounded-lg overflow-hidden border border-galaxy-border cursor-pointer bg-black/40"><input type="checkbox" data-sel value="${h.id}" class="absolute top-1 left-1 z-10 w-4 h-4 accent-amber-400">
-    ${safeImg(h.imagen) ? `<img src="${escapeHTML(safeImg(h.imagen))}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="absolute inset-0 grid place-items-center p-1 text-[10px] text-gray-300 text-center bg-galaxy-900">${h.video ? '<i class="fa-solid fa-circle-play text-lg"></i>' : escapeHTML(h.texto.slice(0, 40))}</span>`}</label>`;
+    ${safeImg(h.imagen) ? `<img src="${escapeHTML(safeImg(h.imagen))}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover">` : `<span class="absolute inset-0 grid place-items-center p-1 text-[12px] text-gray-300 text-center bg-galaxy-900">${h.video ? '<i class="fa-solid fa-circle-play text-lg"></i>' : escapeHTML(h.texto.slice(0, 40))}</span>`}</label>`;
   const existentes = hist.destacadas.map((d) => `<li class="flex items-center gap-2 text-xs text-gray-200 rounded-lg bg-black/25 px-2.5 py-2"><i class="fa-solid fa-star text-amber-300"></i><span class="flex-1 truncate">${escapeHTML(d.titulo)} <span class="text-gray-500">· ${(d.historias ?? []).length}</span></span>
     <button type="button" data-ren="${Number(d.id)}" title="Cambiar título" class="text-gray-400 hover:text-galaxy-400 w-8 h-8"><i class="fa-solid fa-pen"></i></button>
     <button type="button" data-del="${Number(d.id)}" title="Borrar destacada (sus historias vuelven al archivo)" class="text-gray-400 hover:text-bad w-8 h-8"><i class="fa-solid fa-trash"></i></button></li>`).join('');
   const m = openModal(`<div class="p-5 sm:p-6 space-y-3">${cabecera('Destacadas', 'fa-star')}
     ${existentes ? `<ul class="space-y-1.5">${existentes}</ul>` : ''}
-    ${hist.destacadas.length >= MAX_DESTACADAS ? `<p class="text-[11px] text-gray-500">Llegaste al máximo de ${MAX_DESTACADAS} destacadas: borra alguna para crear otra.</p>`
-      : cand.length ? `<p class="text-[11px] text-gray-400">Elige las historias (activas o de tu archivo) que quieres guardar para siempre:</p><div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">${cand.map(celda).join('')}</div>
-        <label class="block"><span class="text-[11px] text-gray-400">Título (máx. ${DESTACADA_TITULO_MAX})</span><input id="de-titulo" maxlength="${DESTACADA_TITULO_MAX + 10}" class="field w-full mt-1" placeholder="Ej.: Mejores goles"></label>
+    ${hist.destacadas.length >= MAX_DESTACADAS ? `<p class="text-[12px] text-gray-500">Llegaste al máximo de ${MAX_DESTACADAS} destacadas: borra alguna para crear otra.</p>`
+      : cand.length ? `<p class="text-[12px] text-gray-400">Elige las historias (activas o de tu archivo) que quieres guardar para siempre:</p><div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">${cand.map(celda).join('')}</div>
+        <label class="block"><span class="text-[12px] text-gray-400">Título (máx. ${DESTACADA_TITULO_MAX})</span><input id="de-titulo" maxlength="${DESTACADA_TITULO_MAX + 10}" class="field w-full mt-1" placeholder="Ej.: Mejores goles"></label>
         <button type="button" id="de-ok" class="btn btn-primary w-full"><i class="fa-solid fa-star"></i><span>Crear destacada</span></button>`
-      : '<p class="text-[11px] text-gray-500">Aún no tienes historias para destacar. Publica una y vuelve aquí.</p>'}
+      : '<p class="text-[12px] text-gray-500">Aún no tienes historias para destacar. Publica una y vuelve aquí.</p>'}
     <p id="de-err" class="text-xs text-bad min-h-4" role="alert"></p></div>`, { id: 'destacadas-modal' });
   const err = m.querySelector('#de-err');
   const hacer = async (fn, ok) => { try { await fn(); toast(ok, 'ok'); closeModal('destacadas-modal'); onListo?.(); } catch (e) { console.error('[destacadas]', e); err.textContent = msgErr(e); } };

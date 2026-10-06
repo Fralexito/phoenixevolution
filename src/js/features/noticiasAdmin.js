@@ -68,14 +68,14 @@ export function abrirEditor({ noticia = null, slugsUsados = [], onGuardada = () 
   const opt = (v, t, sel) => `<option value="${escapeHTML(v)}"${sel ? ' selected' : ''}>${escapeHTML(t)}</option>`;
   const wrap = openModal(`<form id="ne-form" class="p-5 sm:p-6 space-y-4" novalidate>
     <div class="flex justify-between items-start border-b border-galaxy-border pb-3">
-      <div><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">${editando ? 'Editar' : 'Nueva'} noticia</span>
+      <div><span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest">${editando ? 'Editar' : 'Nueva'} noticia</span>
         <h3 class="font-display font-bold text-xl text-white uppercase">${editando ? 'Editar comunicado' : 'Publicar comunicado'}</h3></div>
       <button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div id="ne-cronica" class="rounded-xl border border-galaxy-border/60 bg-black/25 p-3 space-y-2" hidden>
       <span class="label !mb-0"><i class="fa-solid fa-wand-magic-sparkles text-galaxy-400 mr-1"></i>Crónica automática de una fecha</span>
       <div class="flex gap-2"><select id="ne-fecha" class="field" aria-label="Fecha"></select><button type="button" id="ne-generar" class="btn btn-ghost shrink-0">Generar borrador</button></div>
-      <p class="text-[11px] text-gray-500">Rellena los campos con los resultados de esa fecha. Revísalo y edítalo antes de publicar.</p>
+      <p class="text-[12px] text-gray-500">Rellena los campos con los resultados de esa fecha. Revísalo y edítalo antes de publicar.</p>
     </div>
     <div><label class="label" for="ne-titulo">Título</label><input id="ne-titulo" class="field" maxlength="140" value="${escapeHTML(n.titulo)}"></div>
     <div><label class="label" for="ne-resumen">Resumen <span class="text-gray-500 normal-case">(se ve en la tarjeta)</span></label><textarea id="ne-resumen" class="field" rows="2" maxlength="400">${escapeHTML(n.resumen)}</textarea></div>
@@ -94,14 +94,14 @@ export function abrirEditor({ noticia = null, slugsUsados = [], onGuardada = () 
     </div>
     <div class="flex flex-wrap items-center gap-2 rounded-xl border border-galaxy-border/60 bg-black/25 p-3">
       <span class="label !mb-0"><i class="fa-solid fa-palette text-galaxy-400 mr-1"></i>Diseño</span><span id="ne-diseno-txt" class="text-xs text-gray-300"></span>
-      <button type="button" id="ne-diseno" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] ml-auto">Elegir diseño</button>
+      <button type="button" id="ne-diseno" class="btn btn-ghost !min-h-9 !px-3 !text-[12px] ml-auto">Elegir diseño</button>
     </div>
     <div class="grid sm:grid-cols-3 gap-2 text-sm text-gray-200">
       <label class="flex items-center gap-2"><input id="ne-dest" type="checkbox" ${n.destacada ? 'checked' : ''}> Destacada</label>
       <label class="flex items-center gap-2"><input id="ne-pub" type="checkbox" ${n.publicada ? 'checked' : ''}> Publicada</label>
       <label class="flex items-center gap-2" id="ne-disc-wrap"><input id="ne-disc" type="checkbox"> Avisar a Discord</label>
     </div>
-    <p class="text-[11px] text-gray-500 -mt-2">Sin «Publicada» queda como borrador (solo los admins la ven). Solo puede haber una destacada por liga.</p>
+    <p class="text-[12px] text-gray-500 -mt-2">Sin «Publicada» queda como borrador (solo los admins la ven). Solo puede haber una destacada por liga.</p>
     <ul id="ne-errores" class="text-xs text-rose-400 space-y-0.5" role="alert"></ul>
     <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="submit" id="ne-guardar" class="btn btn-primary">${editando ? 'Guardar cambios' : 'Guardar noticia'}</button></div>
   </form>`, { id: ID, persistent: true, wide: true });

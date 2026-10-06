@@ -26,7 +26,7 @@ function radarSVG(pa, pb) {
   }).join('');
   const poly = (p, c) => `<polygon points="${radarPoints(p, STAT_KEYS, RADAR)}" fill="${c}" fill-opacity=".18" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`;
   return `<svg viewBox="0 0 300 300" role="img" aria-label="Radar comparativo de los promedios de cada equipo" class="w-full max-w-[22rem] mx-auto">${rings}${spokes}${poly(pa, COL.a)}${poly(pb, COL.b)}</svg>
-    <p class="text-[10px] text-gray-500 text-center -mt-1">Escala del radar: 40 a 99</p>`;
+    <p class="text-[12px] text-gray-500 text-center -mt-1">Escala del radar: 40 a 99</p>`;
 }
 
 const mini = (p, c) => {
@@ -37,8 +37,8 @@ const mini = (p, c) => {
 function teamHead(side, players, prof) {
   const c = COL[side];
   return `<div class="flex-1 min-w-0 rounded-xl border p-3" style="border-color:${c}66;background:${c}0d">
-    <div class="flex items-baseline justify-between gap-2"><b class="font-display uppercase tracking-wider text-sm" style="color:${c}">Equipo ${side.toUpperCase()}</b><span class="text-[11px] text-gray-400">${players.length} jugador${players.length === 1 ? '' : 'es'}</span></div>
-    <div class="font-display font-extrabold text-3xl leading-none mt-1" style="color:${c}">${prof.ovr ?? '--'}<span class="text-[10px] text-gray-500 font-bold tracking-wider ml-1">MEDIA</span></div>
+    <div class="flex items-baseline justify-between gap-2"><b class="font-display uppercase tracking-wider text-sm" style="color:${c}">Equipo ${side.toUpperCase()}</b><span class="text-[12px] text-gray-400">${players.length} jugador${players.length === 1 ? '' : 'es'}</span></div>
+    <div class="font-display font-extrabold text-3xl leading-none mt-1" style="color:${c}">${prof.ovr ?? '--'}<span class="text-[12px] text-gray-500 font-bold tracking-wider ml-1">MEDIA</span></div>
     <div class="flex flex-wrap gap-1 mt-2">${players.map((p) => mini(p, c)).join('')}</div>
   </div>`;
 }
@@ -47,7 +47,7 @@ function rowHTML(r) {
   const info = STAT_INFO[r.k]; const w = (v) => `${Math.round((v / 99) * 100)}%`;
   const cls = (me) => (r.win === me ? 'font-extrabold' : 'opacity-70');
   return `<div class="py-1.5">
-    <div class="text-center text-[10px] text-gray-500 uppercase tracking-wider font-display" title="${escapeHTML(info.texto)}"><b class="text-gray-300">${r.k.toUpperCase()}</b> · ${escapeHTML(info.nombre)}${r.diff ? ` <span style="color:${r.diff > 0 ? COL.a : COL.b}">(${r.diff > 0 ? '+' : ''}${r.diff})</span>` : ''}</div>
+    <div class="text-center text-[12px] text-gray-500 uppercase tracking-wider font-display" title="${escapeHTML(info.texto)}"><b class="text-gray-300">${r.k.toUpperCase()}</b> · ${escapeHTML(info.nombre)}${r.diff ? ` <span style="color:${r.diff > 0 ? COL.a : COL.b}">(${r.diff > 0 ? '+' : ''}${r.diff})</span>` : ''}</div>
     <div class="flex items-center gap-2 mt-0.5">
       <span class="w-9 text-right font-display text-sm ${cls('a')}" style="color:${statColor(r.a)}">${r.a}</span>
       <div class="flex-1 h-2 rounded-full bg-[#1a1033] overflow-hidden flex justify-end"><div style="width:${w(r.a)};background:${COL.a};opacity:${r.win === 'b' ? .45 : 1}" class="h-full rounded-full"></div></div>
@@ -60,13 +60,13 @@ function rowHTML(r) {
 function matrixHTML(cols) {
   const rows = [{ k: 'ovr', nombre: 'Media' }, ...STAT_KEYS.map((k) => ({ k, nombre: STAT_INFO[k].nombre }))];
   const val = (p, k) => Number(p[k]) || 0;
-  const head = cols.map(({ p, side }) => { const i = posInfo(p.posicion); return `<th class="px-1.5 pb-1.5 font-normal align-bottom" style="min-width:4.2rem"><div class="border-b-2 pb-1" style="border-color:${COL[side]}"><div class="font-display font-bold uppercase text-[11px] text-white truncate max-w-[4.6rem]" title="${escapeHTML(p.nombre)}">${escapeHTML(p.nombre)}</div><div class="text-[10px]" style="color:${i.color}">${escapeHTML(p.posicion)}</div></div></th>`; }).join('');
+  const head = cols.map(({ p, side }) => { const i = posInfo(p.posicion); return `<th class="px-1.5 pb-1.5 font-normal align-bottom" style="min-width:4.2rem"><div class="border-b-2 pb-1" style="border-color:${COL[side]}"><div class="font-display font-bold uppercase text-[12px] text-white truncate max-w-[4.6rem]" title="${escapeHTML(p.nombre)}">${escapeHTML(p.nombre)}</div><div class="text-[12px]" style="color:${i.color}">${escapeHTML(p.posicion)}</div></div></th>`; }).join('');
   const body = rows.map(({ k, nombre }) => {
     const best = Math.max(...cols.map(({ p }) => val(p, k)));
-    return `<tr class="border-t border-galaxy-border/40"><th class="sticky left-0 bg-galaxy-panel text-left pr-2 py-1 font-display text-[10px] uppercase tracking-wider text-gray-400 whitespace-nowrap z-[1]"><b class="text-gray-200">${k === 'ovr' ? 'OVR' : k}</b> <span class="hidden sm:inline">${escapeHTML(nombre)}</span></th>${cols.map(({ p }) => { const v = val(p, k); return `<td class="text-center font-display text-sm py-1 ${v === best ? 'font-extrabold underline decoration-2 underline-offset-2' : ''}" style="color:${statColor(v)}">${v || '–'}</td>`; }).join('')}</tr>`;
+    return `<tr class="border-t border-galaxy-border/40"><th class="sticky left-0 bg-galaxy-panel text-left pr-2 py-1 font-display text-[12px] uppercase tracking-wider text-gray-400 whitespace-nowrap z-[1]"><b class="text-gray-200">${k === 'ovr' ? 'OVR' : k}</b> <span class="hidden sm:inline">${escapeHTML(nombre)}</span></th>${cols.map(({ p }) => { const v = val(p, k); return `<td class="text-center font-display text-sm py-1 ${v === best ? 'font-extrabold underline decoration-2 underline-offset-2' : ''}" style="color:${statColor(v)}">${v || '–'}</td>`; }).join('')}</tr>`;
   }).join('');
   return `<div class="overflow-x-auto -mx-1 px-1"><table class="w-full border-collapse"><thead><tr><th class="sticky left-0 bg-galaxy-panel z-[1]"></th>${head}</tr></thead><tbody>${body}</tbody></table></div>
-    <p class="text-[10px] text-gray-500 mt-1">Subrayado = mejor valor de la fila entre todos los jugadores. Desliza para ver más columnas.</p>`;
+    <p class="text-[12px] text-gray-500 mt-1">Subrayado = mejor valor de la fila entre todos los jugadores. Desliza para ver más columnas.</p>`;
 }
 
 /** Abre el comparador con los ids preseleccionados (reparte A/B alternando). `players` = lista completa. */
@@ -81,14 +81,14 @@ export function openCompareMasivo(players, ids = []) {
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-xl sm:text-2xl text-white uppercase tracking-wider"><i class="fa-solid fa-people-group text-galaxy-400 mr-2"></i>Comparación masiva</h2>
         <div class="flex items-center gap-3">
-          <button type="button" id="cmp-ir-unico" class="text-[11px] text-gray-400 hover:text-white font-display font-bold uppercase tracking-wider" title="Volver a comparar solo dos jugadores"><i class="fa-solid fa-scale-balanced mr-1"></i>1 vs 1</button>
+          <button type="button" id="cmp-ir-unico" class="text-[12px] text-gray-400 hover:text-white font-display font-bold uppercase tracking-wider" title="Volver a comparar solo dos jugadores"><i class="fa-solid fa-scale-balanced mr-1"></i>1 vs 1</button>
           <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
       </div>
       <div id="cmp-teams" class="grid grid-cols-2 gap-2"></div>
       <div class="flex items-center gap-2">
         <div id="cmp-add" class="flex-1"></div>
-        <span id="cmp-count" class="text-[11px] text-gray-400 font-display uppercase tracking-wider shrink-0"></span>
+        <span id="cmp-count" class="text-[12px] text-gray-400 font-display uppercase tracking-wider shrink-0"></span>
       </div>
       <div id="cmp-body" aria-live="polite"></div>
     </div>`, { id: 'compare-modal', wide: true });
@@ -103,7 +103,7 @@ export function openCompareMasivo(players, ids = []) {
       <button type="button" data-mover="${escapeHTML(id)}" data-a="${otro}" ${lleno ? 'disabled' : ''} class="cmp-mini" aria-label="Pasar ${escapeHTML(p.nombre)} al equipo ${otro.toUpperCase()}" title="${lleno ? 'El otro equipo está lleno' : `Pasar al equipo ${otro.toUpperCase()}`}"><i class="fa-solid fa-right-left"></i></button>
       <button type="button" data-quitar="${escapeHTML(id)}" class="cmp-mini" aria-label="Quitar a ${escapeHTML(p.nombre)}"><i class="fa-solid fa-xmark"></i></button></li>`; };
   const col = (side) => `<div><div class="label !mb-1" style="color:${COL[side]}">Equipo ${side.toUpperCase()} <span class="text-gray-500">(${teams[side].length}/${MAX_TEAM})</span></div>
-    <ul class="space-y-1 min-h-[2rem]">${teams[side].map((id) => chip(id, side)).join('') || '<li class="text-[11px] text-gray-500 py-1">Vacío</li>'}</ul></div>`;
+    <ul class="space-y-1 min-h-[2rem]">${teams[side].map((id) => chip(id, side)).join('') || '<li class="text-[12px] text-gray-500 py-1">Vacío</li>'}</ul></div>`;
 
   function paint() {
     $('#cmp-teams').innerHTML = col('a') + col('b');
@@ -123,8 +123,8 @@ export function openCompareMasivo(players, ids = []) {
       resumen = `<div class="flex items-stretch gap-2">${teamHead('a', A, pa)}<span class="font-display text-gray-500 self-center">VS</span>${teamHead('b', B, pb)}</div>
         <div class="mt-3 text-center text-[12px] text-gray-300 rounded-lg bg-black/30 border border-galaxy-border py-2 px-2">
           <b style="color:${COL.a}">${c.wins.a}</b> a favor de A · <b style="color:${COL.b}">${c.wins.b}</b> a favor de B · ${c.wins.tie} empates — <b class="text-white">${lider}</b>
-          ${c.ovr.diff ? `<span class="block text-[11px] text-gray-400">Media general: Equipo ${c.ovr.diff > 0 ? 'A' : 'B'} por ${Math.abs(c.ovr.diff)}</span>` : ''}
-          ${A.length !== B.length ? `<span class="block text-[11px] text-gray-500">${A.length} vs ${B.length}: se comparan promedios por jugador, así es justo aunque no sean los mismos.</span>` : ''}
+          ${c.ovr.diff ? `<span class="block text-[12px] text-gray-400">Media general: Equipo ${c.ovr.diff > 0 ? 'A' : 'B'} por ${Math.abs(c.ovr.diff)}</span>` : ''}
+          ${A.length !== B.length ? `<span class="block text-[12px] text-gray-500">${A.length} vs ${B.length}: se comparan promedios por jugador, así es justo aunque no sean los mismos.</span>` : ''}
         </div>`;
       radar = radarSVG(pa, pb);
       barras = `<div class="divide-y divide-galaxy-border/40">${c.rows.map(rowHTML).join('')}</div>`;

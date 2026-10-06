@@ -15,7 +15,7 @@ const S = { partidos: [], salas: [], enlaces: new Map(), ocupado: false };
 const nm = (id) => (id ? data.perfiles.get(id)?.nombre_display || 'Jugador' : null);
 const yo = () => getState().session?.user.id ?? null;
 const fecha = (iso) => new Date(iso).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
-const badge = (t, c = '') => `<span class="px-2 py-0.5 rounded border text-[10px] font-display font-bold uppercase tracking-wide ${c || 'text-gray-300 border-galaxy-border'}">${t}</span>`;
+const badge = (t, c = '') => `<span class="px-2 py-0.5 rounded border text-[12px] font-display font-bold uppercase tracking-wide ${c || 'text-gray-300 border-galaxy-border'}">${t}</span>`;
 const vacio = (t) => `<div class="col-span-full text-center py-8 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
 
 const titulo = (p) => `${escapeHTML(nm(p.retador_id) ?? '—')} <span class="text-galaxy-400 mx-1">vs</span> ${escapeHTML(nm(p.rival_id) ?? 'por definir')}`;
@@ -23,20 +23,20 @@ const titulo = (p) => `${escapeHTML(nm(p.retador_id) ?? '—')} <span class="tex
 /* ---------- Para mirar ---------- */
 function tarjetaPartido(p) {
   const a = accionPara(p); const m = modoDe(p.modo); const enlace = S.enlaces.get(p.id);
-  const boton = a.tipo === 'ver' ? `<button type="button" data-act="enlace" data-id="${p.id}" class="btn btn-primary !min-h-9 !px-4 !text-[11px]"><i class="fa-solid fa-link"></i> ${a.texto}</button>
-      <button type="button" data-act="salir" data-id="${p.id}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]">Dejar de ver</button>`
-    : a.activo ? `<button type="button" data-act="pedir" data-id="${p.id}" class="btn btn-primary !min-h-9 !px-4 !text-[11px]"><i class="fa-solid ${p.modo === 'APROBACION' ? 'fa-hand' : 'fa-door-open'}"></i> ${a.texto}</button>`
-    : `<span class="text-[11px] text-gray-400 flex items-center gap-1.5"><i class="fa-solid ${a.tipo === 'pendiente' ? 'fa-hourglass-half' : 'fa-lock'}"></i>${escapeHTML(a.texto)}</span>`;
+  const boton = a.tipo === 'ver' ? `<button type="button" data-act="enlace" data-id="${p.id}" class="btn btn-primary !min-h-9 !px-4 !text-[12px]"><i class="fa-solid fa-link"></i> ${a.texto}</button>
+      <button type="button" data-act="salir" data-id="${p.id}" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]">Dejar de ver</button>`
+    : a.activo ? `<button type="button" data-act="pedir" data-id="${p.id}" class="btn btn-primary !min-h-9 !px-4 !text-[12px]"><i class="fa-solid ${p.modo === 'APROBACION' ? 'fa-hand' : 'fa-door-open'}"></i> ${a.texto}</button>`
+    : `<span class="text-[12px] text-gray-400 flex items-center gap-1.5"><i class="fa-solid ${a.tipo === 'pendiente' ? 'fa-hourglass-half' : 'fa-lock'}"></i>${escapeHTML(a.texto)}</span>`;
   const revelado = enlace ? `<div class="rounded-lg border border-galaxy-400/40 bg-galaxy-400/5 p-2.5 text-xs space-y-1">
       ${safeUrl(enlace.link, { allowParsec: true }) ? `<a href="${escapeHTML(safeUrl(enlace.link, { allowParsec: true }))}" target="_blank" rel="noopener noreferrer" class="btn btn-primary !min-h-9 w-full"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir sala</a>`
         : `<p class="text-bad">El enlace del host no es válido. Pídele que lo publique de nuevo.</p>`}
       ${enlace.detalle ? `<p class="text-gray-300">${escapeHTML(enlace.detalle)}</p>` : ''}
-      <p class="text-[11px] text-gray-400">Entras al mismo Parsec/Smash Soda: el host te acepta <b>dentro de la app</b> y debes quedarte como espectador.</p></div>` : '';
+      <p class="text-[12px] text-gray-400">Entras al mismo Parsec/Smash Soda: el host te acepta <b>dentro de la app</b> y debes quedarte como espectador.</p></div>` : '';
   return `<article class="glass-panel rounded-2xl p-3.5 space-y-2">
     <div class="flex flex-wrap items-center gap-1.5">${p.estado === 'EN_JUEGO' ? badge('● En juego', 'text-ok border-ok/50 bg-ok/10') : badge('Agendado', 'text-amber-300 border-amber-400/40 bg-amber-400/10')}
       ${badge(escapeHTML(p.plataforma), 'text-galaxy-400 border-galaxy-400/40')}${badge(`${p.tam_a} vs ${p.tam_b}`)}${badge(`<i class="fa-solid ${m.icono} mr-1"></i>${m.corto}`)}</div>
     <p class="font-display font-bold text-white uppercase text-sm leading-tight">${titulo(p)}</p>
-    <p class="text-[11px] text-gray-400"><i class="fa-solid fa-eye mr-1"></i>${p.aprobados}/${p.max} espectadores${p.host_id ? ` · Host: ${escapeHTML(nm(p.host_id))}` : ''}${p.estado === 'ACEPTADO' && p.fecha ? ` · ${escapeHTML(fecha(p.fecha))}` : ''}</p>
+    <p class="text-[12px] text-gray-400"><i class="fa-solid fa-eye mr-1"></i>${p.aprobados}/${p.max} espectadores${p.host_id ? ` · Host: ${escapeHTML(nm(p.host_id))}` : ''}${p.estado === 'ACEPTADO' && p.fecha ? ` · ${escapeHTML(fecha(p.fecha))}` : ''}</p>
     <div class="flex flex-wrap items-center gap-2">${boton}</div>${revelado}</article>`;
 }
 function pintarPartidos() {
@@ -47,7 +47,7 @@ function pintarPartidos() {
 /* ---------- Mis partidos ---------- */
 function tarjetaSala(s) {
   const fila = (id, botones) => `<div class="flex items-center gap-2"><span class="text-xs text-white flex-1 truncate">${escapeHTML(nm(id))}</span>${botones}</div>`;
-  const b = (act, id, uid, t, c = '') => `<button type="button" data-act="${act}" data-id="${id}" data-uid="${escapeHTML(uid)}" class="btn btn-ghost !min-h-8 !px-2.5 !text-[11px] ${c}">${t}</button>`;
+  const b = (act, id, uid, t, c = '') => `<button type="button" data-act="${act}" data-id="${id}" data-uid="${escapeHTML(uid)}" class="btn btn-ghost !min-h-8 !px-2.5 !text-[12px] ${c}">${t}</button>`;
   return `<article class="glass-panel rounded-2xl p-3.5 space-y-2.5" data-sala="${s.id}">
     <div class="flex flex-wrap items-center gap-1.5">${badge(s.estado === 'BUSCANDO' ? 'Buscando' : s.estado === 'EN_JUEGO' ? 'En juego' : 'Agendado')}${badge(escapeHTML(s.plataforma), 'text-galaxy-400 border-galaxy-400/40')}${badge(`${s.tam_a} vs ${s.tam_b}`)}</div>
     <p class="font-display font-bold text-white uppercase text-sm">${titulo(s)}</p>
@@ -56,11 +56,11 @@ function tarjetaSala(s) {
         <select id="modo-${s.id}" class="field !py-1.5" data-campo="modo">${MODOS.map((m) => `<option value="${m.id}" ${m.id === s.modo ? 'selected' : ''}>${m.etiqueta}</option>`).join('')}</select></div>
       <div><label class="label !mb-1" for="max-${s.id}">Cupos</label><input id="max-${s.id}" type="number" min="1" max="20" value="${s.max}" class="field !py-1.5" data-campo="max"></div>
     </div>
-    <p class="text-[11px] text-gray-400" data-ayuda>${escapeHTML(modoDe(s.modo).ayuda)}</p>
-    <button type="button" data-act="guardar" data-id="${s.id}" class="btn btn-primary !min-h-9 w-full !text-[11px]"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
-    ${s.pendientes.length ? `<div class="space-y-1.5 pt-1 border-t border-galaxy-border/60"><p class="text-[11px] text-gray-400 uppercase tracking-widest">Solicitudes (${s.pendientes.length})</p>
+    <p class="text-[12px] text-gray-400" data-ayuda>${escapeHTML(modoDe(s.modo).ayuda)}</p>
+    <button type="button" data-act="guardar" data-id="${s.id}" class="btn btn-primary !min-h-9 w-full !text-[12px]"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+    ${s.pendientes.length ? `<div class="space-y-1.5 pt-1 border-t border-galaxy-border/60"><p class="text-[12px] text-gray-400 uppercase tracking-widest">Solicitudes (${s.pendientes.length})</p>
       ${s.pendientes.map((u) => fila(u, b('aceptar', s.id, u, 'Aceptar', '!text-ok !border-ok/50') + b('rechazar', s.id, u, 'Rechazar'))).join('')}</div>` : ''}
-    ${s.aprobados.length ? `<div class="space-y-1.5 pt-1 border-t border-galaxy-border/60"><p class="text-[11px] text-gray-400 uppercase tracking-widest">Mirando (${s.aprobados.length}/${s.max})</p>
+    ${s.aprobados.length ? `<div class="space-y-1.5 pt-1 border-t border-galaxy-border/60"><p class="text-[12px] text-gray-400 uppercase tracking-widest">Mirando (${s.aprobados.length}/${s.max})</p>
       ${s.aprobados.map((u) => fila(u, b('quitar', s.id, u, 'Quitar', '!text-bad !border-bad/50'))).join('')}</div>` : ''}
   </article>`;
 }

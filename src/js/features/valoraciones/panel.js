@@ -16,10 +16,10 @@ export function crearPanelValoraciones(el) {
     const estrellas = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-estrella="${n}" data-k="${k}" aria-label="${n} estrella${n === 1 ? '' : 's'}" aria-pressed="${s.estrellas >= n}" class="text-xl leading-none ${s.estrellas >= n ? 'text-amber-300' : 'text-gray-600'} hover:text-amber-200"><i class="fa-solid fa-star"></i></button>`).join('');
     const tags = etiquetasPara(s.estrellas).map(([id, n]) => `<button type="button" data-etiqueta="${id}" data-k="${k}" aria-pressed="${s.etiquetas.has(id)}" class="adv-chip !min-h-8">${escapeHTML(n)}</button>`).join('');
     return `<article class="glass-panel rounded-xl p-3" data-val="${k}"><div class="flex items-center gap-2"><span class="shrink-0">${avatarHTML(p.avatar, p.nombre, 32)}</span>
-      <p class="text-sm text-white font-display font-bold uppercase min-w-0 truncate">${escapeHTML(p.nombre)} <span class="text-[10px] text-gray-500 normal-case">· duelo #${p.reto}</span></p></div>
+      <p class="text-sm text-white font-display font-bold uppercase min-w-0 truncate">${escapeHTML(p.nombre)} <span class="text-[12px] text-gray-500 normal-case">· duelo #${p.reto}</span></p></div>
       <div class="flex gap-1 mt-2" role="group" aria-label="Estrellas">${estrellas}</div>
       ${tags ? `<div class="flex flex-wrap gap-1.5 mt-2">${tags}</div>` : ''}
-      <button type="button" data-enviar="${k}" ${s.estrellas && !ocupado ? '' : 'disabled'} class="btn btn-primary !min-h-8 !px-3 !text-[11px] mt-2">Enviar valoración</button></article>`;
+      <button type="button" data-enviar="${k}" ${s.estrellas && !ocupado ? '' : 'disabled'} class="btn btn-primary !min-h-8 !px-3 !text-[12px] mt-2">Enviar valoración</button></article>`;
   }
   function pintar() {
     el.hidden = !lista.length;

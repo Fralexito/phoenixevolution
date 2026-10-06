@@ -39,7 +39,7 @@ const datos = LIGAS.map((l) => ({
   <!-- Selector de liga: muestra una sola liga a la vez. Pulsar la otra vuelve al instante; el enlace (#liga-…) recuerda cuál. -->
   {LIGAS.length > 1 && (
     <nav class="liga-flota" aria-label="Cambiar de liga">
-      <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-300 drop-shadow-[0_1px_4px_rgba(0,0,0,.9)]">Ligas activas</span>
+      <span class="text-[12px] font-display font-bold tracking-[0.2em] uppercase text-gray-300 drop-shadow-[0_1px_4px_rgba(0,0,0,.9)]">Ligas activas</span>
       <div class="liga-sel" role="group" aria-label="Ligas activas"><span class="liga-thumb" aria-hidden="true"></span>{LIGAS.map((l, i) => <button type="button" data-liga-btn={l.id} aria-pressed={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono} mr-1.5`}></i>{l.titulo.join(' ')}</button>)}</div>
     </nav>
   )}
@@ -61,7 +61,7 @@ const datos = LIGAS.map((l) => ({
             <p class="text-sm sm:text-2xl font-display font-light tracking-[0.25em] sm:tracking-[0.3em] text-gray-300 uppercase">{l.juego}</p>
             {ult && (
               <ul class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5" aria-label="Datos de la liga">
-                {l.organizador && <li><a class="liga-org" data-org-jugador={l.organizador} href={`${base}database/`} title={`Ver la carta de ${l.organizador}`}><span class="liga-org-ico"><i class="fa-solid fa-user-tie"></i></span><span class="leading-tight"><span class="block text-[10px] tracking-[.25em] uppercase text-gray-400">Organizador</span><span class="block font-display font-extrabold text-base text-white uppercase tracking-wider">{l.organizador}</span></span><i class="fa-solid fa-chevron-right text-galaxy-400 text-xs ml-1"></i></a></li>}
+                {l.organizador && <li><a class="liga-org" data-org-jugador={l.organizador} href={`${base}database/`} title={`Ver la carta de ${l.organizador}`}><span class="liga-org-ico"><i class="fa-solid fa-user-tie"></i></span><span class="leading-tight"><span class="block text-[12px] tracking-[.25em] uppercase text-gray-400">Organizador</span><span class="block font-display font-extrabold text-base text-white uppercase tracking-wider">{l.organizador}</span></span><i class="fa-solid fa-chevron-right text-galaxy-400 text-xs ml-1"></i></a></li>}
                 {l.sede && <li><span class="pc-chip"><i class="fa-solid fa-location-dot"></i>Sede: {l.sede}</span></li>}
                 <li class="hidden sm:block"><span class="pc-chip"><i class="fa-solid fa-calendar-day"></i>{ult.nombre}</span></li>
                 {fa && <li><span class="pc-chip"><i class="fa-solid fa-futbol"></i>Fecha {fa.n} {ESTADO_FECHA[fa.estado]}</span></li>}
@@ -109,7 +109,7 @@ const datos = LIGAS.map((l) => ({
                     {e.tabla.map((f, i) => (
                       <tr data-jug={f.nombre} style={`--i:${i}`} class:list={['liga-fila', i === 0 && f.pj > 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
                         <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
-                        <td class="text-left"><span class="inline-flex items-center gap-2">{escudoDe(e.clubes?.[f.nombre]) && <img src={escudoDe(e.clubes[f.nombre])} alt="" width="22" height="22" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:22px;height:22px" onerror="this.style.display='none'" />}<span class="font-display font-bold text-white tracking-wide">{f.nombre}</span></span>{e.clubes?.[f.nombre] && <span class="block text-[11px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
+                        <td class="text-left"><span class="inline-flex items-center gap-2">{escudoDe(e.clubes?.[f.nombre]) && <img src={escudoDe(e.clubes[f.nombre])} alt="" width="22" height="22" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:22px;height:22px" onerror="this.style.display='none'" />}<span class="font-display font-bold text-white tracking-wide">{f.nombre}</span></span>{e.clubes?.[f.nombre] && <span class="block text-[12px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
                         <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
@@ -131,7 +131,7 @@ const datos = LIGAS.map((l) => ({
                   </tbody>
                 </table>
               </div>
-              {e.zonas && <p class="text-xs text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1"><span><span class="tmp-dot tmp-copa"></span>Zona de copa</span><span><span class="tmp-dot tmp-baja"></span>Zona de descenso</span>{SISTEMAS_LIGA[l.id] ? <a href={`${base}sudario-divisiones/`} class="text-galaxy-400 underline"><i class="fa-solid fa-layer-group mr-1"></i>{SISTEMAS_LIGA[l.id].nombre} <span class="liga-sello liga-sello-prox !text-[.6rem] !py-0">Beta</span></a>: <a href={`${base}temporada/`} class="text-galaxy-400 underline">Sistema de divisiones <span class="liga-sello liga-sello-prox !text-[.6rem] !py-0">Beta</span></a>}</p>}
+              {e.zonas && <p class="text-xs text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1"><span><span class="tmp-dot tmp-copa"></span>Zona de copa</span><span><span class="tmp-dot tmp-baja"></span>Zona de descenso</span>{SISTEMAS_LIGA[l.id] ? <a href={`${base}sudario-divisiones/`} class="text-galaxy-400 underline"><i class="fa-solid fa-layer-group mr-1"></i>{SISTEMAS_LIGA[l.id].nombre} <span class="liga-sello liga-sello-prox !text-[12px] !py-0">Beta</span></a>: <a href={`${base}temporada/`} class="text-galaxy-400 underline">Sistema de divisiones <span class="liga-sello liga-sello-prox !text-[12px] !py-0">Beta</span></a>}</p>}
               <p class="text-xs text-gray-500 leading-relaxed">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · Últimos: flechas, rueda o arrastre para ver partidos anteriores. Toca un jugador para resaltar sus partidos en Resultados.</p>
             </section>
 
@@ -149,7 +149,7 @@ const datos = LIGAS.map((l) => ({
             <section class="space-y-3 lg:sticky lg:top-20" aria-label="Resultados por fecha" data-fechas={`${l.id}:${e.id}`}>
               <div class="flex items-end justify-between gap-3">
                 <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Resultados</h2>
-                <span class="text-[11px] font-display font-bold tracking-wider uppercase text-gray-400"><b class="text-galaxy-400">{e.jugadas}</b> de {e.total} fechas</span>
+                <span class="text-[12px] font-display font-bold tracking-wider uppercase text-gray-400"><b class="text-galaxy-400">{e.jugadas}</b> de {e.total} fechas</span>
               </div>
               <div class="liga-prog" role="progressbar" aria-label="Fechas jugadas" aria-valuemin="0" aria-valuemax={e.total} aria-valuenow={e.jugadas}><span style={`width:${e.total ? Math.round((e.jugadas / e.total) * 100) : 0}%`}></span></div>
               <div class="flex items-stretch gap-2" aria-label="Elegir fecha">
@@ -167,9 +167,9 @@ const datos = LIGAS.map((l) => ({
                   <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                     {f.partidos.map((m) => (
                       <li data-m-l={m.l} data-m-v={m.v} class="liga-partido rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                        <span class="flex items-center justify-end gap-2 min-w-0 flex-nowrap"><span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.l]}</span>}</span>{escudoDe(e.clubes?.[m.l]) && <img src={escudoDe(e.clubes[m.l])} alt="" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:28px;height:28px" onerror="this.style.display='none'" />}</span>
-                        {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-center font-display uppercase leading-tight"><span class="block text-xs text-gray-500">vs</span>{m.h && <span class="block text-[10px] text-galaxy-400 normal-case tracking-wide">{m.h}</span>}</span>}
-                        <span class="flex items-center justify-start gap-2 min-w-0 flex-nowrap">{escudoDe(e.clubes?.[m.v]) && <img src={escudoDe(e.clubes[m.v])} alt="" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:28px;height:28px" onerror="this.style.display='none'" />}<span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[11px] text-gray-400 truncate uppercase">{e.clubes[m.v]}</span>}</span></span>
+                        <span class="flex items-center justify-end gap-2 min-w-0 flex-nowrap"><span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[12px] text-gray-400 truncate uppercase">{e.clubes[m.l]}</span>}</span>{escudoDe(e.clubes?.[m.l]) && <img src={escudoDe(e.clubes[m.l])} alt="" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:28px;height:28px" onerror="this.style.display='none'" />}</span>
+                        {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-center font-display uppercase leading-tight"><span class="block text-xs text-gray-500">vs</span>{m.h && <span class="block text-[12px] text-galaxy-400 normal-case tracking-wide">{m.h}</span>}</span>}
+                        <span class="flex items-center justify-start gap-2 min-w-0 flex-nowrap">{escudoDe(e.clubes?.[m.v]) && <img src={escudoDe(e.clubes[m.v])} alt="" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:28px;height:28px" onerror="this.style.display='none'" />}<span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[12px] text-gray-400 truncate uppercase">{e.clubes[m.v]}</span>}</span></span>
                       </li>
                     ))}
                   </ul>

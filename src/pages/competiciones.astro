@@ -41,7 +41,7 @@ const tarjetas = LIGAS.map((l) => {
           <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase leading-none"><i class={`fa-solid ${l.icono} text-galaxy-400 mr-2 text-2xl`}></i>{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span></h2>
           <p class="text-xs font-display tracking-[0.2em] text-gray-300 uppercase">{l.juego}</p>
           {l.descripcion && <p class="text-sm text-gray-300 leading-relaxed">{l.descripcion}</p>}
-          <ul class="flex flex-wrap gap-1.5">{chips.map(([i, t]) => (<li class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-100 rounded-full border border-galaxy-400/30 bg-black/40 px-2.5 py-1"><i class={`fa-solid ${i} text-galaxy-400`}></i>{t}</li>))}</ul>
+          <ul class="flex flex-wrap gap-1.5">{chips.map(([i, t]) => (<li class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-gray-100 rounded-full border border-galaxy-400/30 bg-black/40 px-2.5 py-1"><i class={`fa-solid ${i} text-galaxy-400`}></i>{t}</li>))}</ul>
           <div class="flex flex-wrap gap-2 pt-1">
             <a href={`${base}liga/#liga-${l.id}`} class="btn btn-primary !py-1.5 text-xs"><i class="fa-solid fa-table-list"></i> Tabla y fechas</a>
             <a href={`${base}historial/?liga=${l.id}`} class="btn btn-ghost !py-1.5 text-xs"><i class="fa-solid fa-clock-rotate-left"></i> Historial</a>

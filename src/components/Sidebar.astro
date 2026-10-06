@@ -18,7 +18,7 @@ const { active } = Astro.props;
   <nav class="flex-1 p-4 flex flex-col gap-1.5 font-display text-base uppercase tracking-wider overflow-y-auto">
     <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil es el menú completo. -->
     <div class="flex flex-col gap-1.5 lg:hidden">
-    <div class="px-3 pt-1 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Explorar</div>
+    <div class="px-3 pt-1 pb-1 text-[12px] text-gray-500 tracking-[0.25em]">Explorar</div>
     {NAV.map((n) => (
       <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined}
         class={`flex items-center gap-4 p-3 rounded-lg transition-all relative overflow-hidden ${active === n.id
@@ -34,7 +34,7 @@ const { active } = Astro.props;
     </div>
     <!-- «Mi cuenta» solo en PC: en móvil vive en el menú de la foto de perfil (navbar.js). -->
     <div id="sidebar-account" hidden class="max-lg:!hidden flex flex-col flex-1 gap-1.5 mt-3 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
-      <div class="px-3 pb-1 text-[10px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
+      <div class="px-3 pb-1 text-[12px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
       {ACCOUNT_NAV.filter((n) => !n.abajo).map((n) => (
         n.path
           ? <a href={`${base}${n.path}`} data-solo-staff={n.staff ? n.staff : undefined} hidden={n.staff ? true : undefined} aria-current={active === n.id ? 'page' : undefined} class={`flex items-center gap-4 p-3 rounded-lg hover:text-white hover:bg-white/5 ${active === n.id ? 'text-galaxy-400 bg-galaxy-400/10' : 'text-gray-400'}`}><i class={`fa-solid ${n.icon} w-5 text-center ${active === n.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i> {n.label}</a>
@@ -51,7 +51,7 @@ const { active } = Astro.props;
     </div>
   </nav>
   <div class="p-5 border-t border-galaxy-border bg-black/50 text-center lg:hidden">
-    <div class="text-[9px] text-gray-500 tracking-widest uppercase mb-3">Redes Sociales</div>
+    <div class="text-[12px] text-gray-500 tracking-widest uppercase mb-3">Redes Sociales</div>
     <div class="flex justify-center gap-4">
       {SOCIALS.map((s) => (<a href={s.href} aria-label={s.label} target="_blank" rel="noopener noreferrer" class={`text-gray-400 ${s.hover} text-lg transition-colors`}><SocialIcon s={s} /></a>))}
     </div>

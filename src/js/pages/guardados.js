@@ -23,7 +23,7 @@ function tarjetaClip(c) {
     <header class="flex items-center gap-2.5 mb-2">
       <a href="${escapeHTML(perfil)}" class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(a.avatar_url, a.nombre_display, 36)}</a>
       <div class="min-w-0 flex-1"><a href="${escapeHTML(perfil)}" class="font-display font-bold text-white text-sm truncate block hover:text-galaxy-400">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
-        <p class="text-[11px] text-gray-500">Clip · ${tiempoRelativo(c.created_at)} ${segmentoChipHTML(c.juego)}</p></div>${botonGuardarHTML('clip', c.id)}</header>
+        <p class="text-[12px] text-gray-500">Clip · ${tiempoRelativo(c.created_at)} ${segmentoChipHTML(c.juego)}</p></div>${botonGuardarHTML('clip', c.id)}</header>
     <p class="text-sm text-gray-100"><i class="fa-solid fa-film text-galaxy-400 mr-1.5"></i>${escapeHTML(c.titulo || 'Clip sin título')}</p>
     <a href="${escapeHTML(`${perfil}#c-${Number(c.id)}`)}" class="btn btn-ghost !min-h-8 !text-xs mt-2"><i class="fa-solid fa-play"></i><span>Ver clip</span></a></article>`;
 }

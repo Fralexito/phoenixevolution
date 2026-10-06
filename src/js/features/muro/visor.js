@@ -50,7 +50,7 @@ export function abrirHistorias({ historias, nombre, avatar, titulo = '', inicio 
         <div class="flex gap-1" data-barras></div>
         <div class="mt-2 flex items-center gap-2">
           <span class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-white/40 shrink-0">${avatar}</span>
-          <div class="min-w-0 flex-1 leading-tight"><p class="text-white text-sm font-display font-bold truncate">${escapeHTML(nombre)}${titulo ? ` <span class="text-galaxy-400">· ${escapeHTML(titulo)}</span>` : ''}</p><p class="text-[11px] text-gray-300" data-meta></p></div>
+          <div class="min-w-0 flex-1 leading-tight"><p class="text-white text-sm font-display font-bold truncate">${escapeHTML(nombre)}${titulo ? ` <span class="text-galaxy-400">· ${escapeHTML(titulo)}</span>` : ''}</p><p class="text-[12px] text-gray-300" data-meta></p></div>
           ${onBorrar ? '<button type="button" data-borrar aria-label="Borrar esta historia" class="w-9 h-9 rounded-full text-white/80 hover:text-bad"><i class="fa-solid fa-trash"></i></button>' : ''}
           ${onReportar ? '<button type="button" data-reportar aria-label="Reportar esta historia" title="Reportar" class="w-9 h-9 rounded-full text-white/80 hover:text-amber-300"><i class="fa-regular fa-flag"></i></button>' : ''}
           ${onModerar ? '<button type="button" data-moderar aria-label="Ocultar esta historia (moderación)" title="Ocultar (moderación)" class="w-9 h-9 rounded-full text-white/80 hover:text-orange-300"><i class="fa-solid fa-eye-slash"></i></button>' : ''}
@@ -144,7 +144,7 @@ export function abrirClips({ clips, inicio = 0, onBorrar, onCompartir, onReporta
       <div data-medio class="absolute inset-0">${miniatura}<div class="absolute inset-0 flex items-center justify-center"><i class="${escapeHTML(c.icono)} text-6xl text-white/80"></i></div></div>
       <div class="absolute inset-x-0 bottom-0 z-10 p-4 pt-20 bg-gradient-to-t from-black/90 to-transparent pointer-events-none">
         <p class="text-white font-display font-bold text-base leading-tight">${escapeHTML(c.titulo || 'Clip')}</p>
-        <p class="text-[11px] text-gray-300 mt-1">${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? '')}${c.creado ? ` · ${escapeHTML(tiempoRelativo(c.creado))}` : ''} · ${k + 1} / ${lista.length}</p></div>
+        <p class="text-[12px] text-gray-300 mt-1">${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? '')}${c.creado ? ` · ${escapeHTML(tiempoRelativo(c.creado))}` : ''} · ${k + 1} / ${lista.length}</p></div>
       <div class="absolute right-3 bottom-20 z-10 flex flex-col gap-2">
         <a href="${escapeHTML(c.url)}" target="_blank" rel="noopener noreferrer nofollow" aria-label="Abrir en ${escapeHTML(PROVEEDOR_ETIQUETA[c.proveedor] ?? 'su página')}" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
         ${onCompartir ? `<button type="button" data-compartir="${c.id}" aria-label="Compartir" class="w-10 h-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-galaxy-600"><i class="fa-solid fa-share-nodes"></i></button>` : ''}

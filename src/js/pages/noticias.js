@@ -18,7 +18,7 @@ const state = { lista: [], cat: 'TODOS', liga: 'TODAS', term: '' };
 const nombreLiga = (id) => LIGAS.find((l) => l.id === id)?.titulo.join(' ') ?? id;
 const cuando = (n) => (n.publicadaEn ? fechaRelativa(n.publicadaEn) : (n.fecha ?? ''));
 
-const borrador = (n) => (n.publicada ? '' : '<span class="ml-2 px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[9px] font-bold uppercase tracking-wider">Borrador</span>');
+const borrador = (n) => (n.publicada ? '' : '<span class="ml-2 px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[12px] font-bold uppercase tracking-wider">Borrador</span>');
 const ctx = { cuando, ligaNombre: nombreLiga, borrador };
 const disenos = new Map();   // slug → { plantilla, estilo } tal como se ve ahora (el lector usa el mismo)
 

@@ -34,9 +34,9 @@ export function abrirBuscador() {
   const m = openModal(`<div class="p-4 sm:p-5 space-y-3">
     <div class="flex items-center gap-3 rounded-xl border border-galaxy-400/40 bg-black/40 px-3"><i class="fa-solid fa-magnifying-glass text-galaxy-400"></i>
       <input id="bg-q" type="search" autocomplete="off" maxlength="40" class="flex-1 bg-transparent py-3 text-white outline-none placeholder:text-gray-500" placeholder="¿Qué buscas? Página, función o persona…" aria-label="Buscar en el sitio">
-      <kbd class="hidden sm:inline text-[10px] text-gray-500 border border-galaxy-border rounded px-1.5 py-0.5">Esc</kbd></div>
+      <kbd class="hidden sm:inline text-[12px] text-gray-500 border border-galaxy-border rounded px-1.5 py-0.5">Esc</kbd></div>
     <div id="bg-res" role="listbox" class="max-h-[55vh] overflow-y-auto space-y-0.5" aria-live="polite"></div>
-    <p class="text-[10px] text-gray-600 text-center hidden sm:block">↑ ↓ para moverte · Enter para ir · / o Ctrl+K para abrir en cualquier momento</p></div>`, { id: ID });
+    <p class="text-[12px] text-gray-600 text-center hidden sm:block">↑ ↓ para moverte · Enter para ir · / o Ctrl+K para abrir en cualquier momento</p></div>`, { id: ID });
   const inp = m.querySelector('#bg-q'); inp.focus(); pintar(m, '');
   if (!indiceL) Promise.all([import('../../data/ligas.js'), import('../../data/ligaResultados.js')]).then(([{ LIGAS }, { EDICIONES }]) => { indiceL = indiceLiga(LIGAS, EDICIONES); if (document.getElementById(ID) && inp.value.trim()) pintar(m, inp.value); }).catch((e) => console.warn('[buscador] índice de la liga:', e?.message ?? e));
   inp.addEventListener('input', () => {

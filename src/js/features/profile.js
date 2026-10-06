@@ -40,15 +40,15 @@ export function openProfileModal() {
       </div>
 
       <div data-pane="identidad" class="space-y-4">
-        <div><label class="label" for="p-name">Apodo (nombre visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[11px] text-gray-500 mt-1">Es como te ven en tus partidos. Puedes poner lo que quieras.</p></div>
+        <div><label class="label" for="p-name">Apodo (nombre visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[12px] text-gray-500 mt-1">Es como te ven en tus partidos. Puedes poner lo que quieras.</p></div>
         <div>
           <label class="label" for="p-user">Usuario único</label>
           <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-display font-bold">@</span><input id="p-user" class="field !pl-7" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" value="${escapeHTML(prof.username)}" ${cd.blocked ? 'disabled' : ''}></div>
-          <p id="p-user-st" class="text-[11px] mt-1 min-h-4"></p>
-          ${cd.blocked ? '' : prof.perfil_completo ? `<p class="text-[11px] text-gray-500">Ojo: después de cambiarlo, no podrás volver a hacerlo hasta pasados ${USERNAME_COOLDOWN_DAYS} días.</p>` : ''}
+          <p id="p-user-st" class="text-[12px] mt-1 min-h-4"></p>
+          ${cd.blocked ? '' : prof.perfil_completo ? `<p class="text-[12px] text-gray-500">Ojo: después de cambiarlo, no podrás volver a hacerlo hasta pasados ${USERNAME_COOLDOWN_DAYS} días.</p>` : ''}
         </div>
         <div><label class="label" for="p-pais">País</label><select id="p-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>
-        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}"><p class="text-[11px] text-gray-500 mt-1">Por privacidad, si eres menor de 18 años no guardamos ni mostramos tu país ni tu club.</p></div>
+        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}"><p class="text-[12px] text-gray-500 mt-1">Por privacidad, si eres menor de 18 años no guardamos ni mostramos tu país ni tu club.</p></div>
       </div>
 
       <div data-pane="social" hidden class="space-y-4">
@@ -89,7 +89,7 @@ export function openProfileModal() {
 
   /* ---- @usuario con verificación en vivo ---- */
   let handle = null;
-  if (cd.blocked) { $('#p-user-st').className = 'text-[11px] mt-1 text-warn'; $('#p-user-st').innerHTML = `<i class="fa-solid fa-lock mr-1"></i>Podrás cambiarlo de nuevo el ${escapeHTML(fechaCd)}.`; }
+  if (cd.blocked) { $('#p-user-st').className = 'text-[12px] mt-1 text-warn'; $('#p-user-st').innerHTML = `<i class="fa-solid fa-lock mr-1"></i>Podrás cambiarlo de nuevo el ${escapeHTML(fechaCd)}.`; }
   else handle = bindHandle($('#p-user'), $('#p-user-st'), { exceptId: uid });
 
   /* ---- Host: interruptor + selectores segmentados ---- */

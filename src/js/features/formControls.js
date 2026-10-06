@@ -7,7 +7,7 @@ export function switchHTML({ id, checked = false, title, hint = '' }) {
     <label class="flex items-center justify-between gap-4 cursor-pointer bg-black/40 border border-galaxy-border rounded-xl px-4 py-3 hover:border-galaxy-400/60 transition-colors">
       <span class="min-w-0">
         <span class="block text-sm font-display font-bold text-white uppercase tracking-wide">${escapeHTML(title)}</span>
-        ${hint ? `<span class="block text-[11px] text-gray-400 mt-0.5">${escapeHTML(hint)}</span>` : ''}
+        ${hint ? `<span class="block text-[12px] text-gray-400 mt-0.5">${escapeHTML(hint)}</span>` : ''}
       </span>
       <span class="relative inline-flex shrink-0">
         <input id="${escapeHTML(id)}" type="checkbox" class="peer sr-only" ${checked ? 'checked' : ''}>

@@ -36,9 +36,9 @@ function pintarLista() {
   $('lista-conv').innerHTML = S.convs.length ? S.convs.map((c) => `
     <button type="button" data-conv="${escapeHTML(c.id)}" class="w-full text-left flex items-center gap-2.5 rounded-xl px-2.5 py-2 border ${S.abierta === c.id ? 'bg-galaxy-600/20 border-galaxy-400/50' : 'bg-galaxy-panel border-galaxy-border/70 hover:border-galaxy-400/40'}">
       ${c.tipo === 'GRUPO' ? iconoGrupo() : avatar(c.otro_id)}
-      <span class="min-w-0 flex-1"><b class="block text-white text-xs font-display uppercase truncate">${escapeHTML(tituloConv(c, nombre))}${c.silenciado ? ' <i class="fa-solid fa-bell-slash text-gray-500 text-[10px]"></i>' : ''}</b>
-        <span class="block text-[11px] text-gray-400 truncate">${escapeHTML(vistaPrevia(c, me(), nombre))}</span></span>
-      ${c.no_leidos ? `<b class="min-w-5 h-5 px-1 rounded-full bg-galaxy-400 text-black text-[10px] flex items-center justify-center">${c.no_leidos > 9 ? '9+' : c.no_leidos}</b>` : ''}
+      <span class="min-w-0 flex-1"><b class="block text-white text-xs font-display uppercase truncate">${escapeHTML(tituloConv(c, nombre))}${c.silenciado ? ' <i class="fa-solid fa-bell-slash text-gray-500 text-[12px]"></i>' : ''}</b>
+        <span class="block text-[12px] text-gray-400 truncate">${escapeHTML(vistaPrevia(c, me(), nombre))}</span></span>
+      ${c.no_leidos ? `<b class="min-w-5 h-5 px-1 rounded-full bg-galaxy-400 text-black text-[12px] flex items-center justify-center">${c.no_leidos > 9 ? '9+' : c.no_leidos}</b>` : ''}
     </button>`).join('')
     : `<div class="text-center py-8 text-gray-500 text-xs space-y-1"><p>Aún no tienes chats. Pulsa «Nuevo chat».</p><p>Solo puedes escribir a tus amigos: <a href="${escapeHTML(href('amigos/'))}" class="text-galaxy-400 underline">busca jugadores en Amigos</a>.</p></div>`;
   // Móvil: o la lista o la sala.
@@ -52,13 +52,13 @@ const convAbierta = () => S.convs.find((c) => c.id === S.abierta) ?? null;
 function pintarMensajes() {
   const yo = me(); const hoy = hoyClave(tz()); const esGrupo = convAbierta()?.tipo === 'GRUPO';
   const dias = agruparMensajes(S.mensajes, yo, tz());
-  $('mensajes').innerHTML = dias.length ? dias.map((d) => `<div class="space-y-2"><p class="text-center text-[10px] uppercase tracking-widest text-gray-500">${escapeHTML(etiquetaDia(d.dia, hoy))}</p>
+  $('mensajes').innerHTML = dias.length ? dias.map((d) => `<div class="space-y-2"><p class="text-center text-[12px] uppercase tracking-widest text-gray-500">${escapeHTML(etiquetaDia(d.dia, hoy))}</p>
     ${d.items.map((it) => `<div class="flex ${it.mios ? 'justify-end' : 'justify-start'}"><div class="max-w-[85%] sm:max-w-[70%] space-y-1">
-      ${esGrupo && !it.mios ? `<p class="text-[10px] text-galaxy-400 font-bold uppercase">${linkNombre(it.autor, 'hover:underline')}</p>` : ''}
+      ${esGrupo && !it.mios ? `<p class="text-[12px] text-galaxy-400 font-bold uppercase">${linkNombre(it.autor, 'hover:underline')}</p>` : ''}
       ${it.mensajes.map((m) => m.eliminado ? `<p class="text-xs italic text-gray-500 px-3 py-1.5 rounded-xl border border-galaxy-border/50">Mensaje eliminado</p>`
         : `<div class="group relative px-3 py-1.5 rounded-2xl text-sm ${it.mios ? 'bg-galaxy-600/40 border border-galaxy-400/30 text-white' : 'bg-galaxy-panel border border-galaxy-border text-gray-100'}">
             <p class="whitespace-pre-wrap break-words">${escapeHTML(m.texto)}</p>
-            <p class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-2 justify-end">${escapeHTML(hora(m.created_at))}
+            <p class="text-[12px] text-gray-400 mt-0.5 flex items-center gap-2 justify-end">${escapeHTML(hora(m.created_at))}
               ${it.mios ? `<button type="button" data-borrar="${m.id}" class="hover:text-bad" aria-label="Borrar mensaje"><i class="fa-regular fa-trash-can"></i></button>`
                 : `<button type="button" data-reportar="${m.id}" class="hover:text-bad" aria-label="Reportar mensaje"><i class="fa-regular fa-flag"></i></button>`}</p></div>`).join('')}
     </div></div>`).join('')}</div>`).join('')
@@ -69,16 +69,16 @@ function pintarMensajes() {
 function pintarInfo() {
   const c = convAbierta(); const p = $('info-panel'); $('btn-info').setAttribute('aria-expanded', String(S.info)); p.hidden = !S.info || !c; if (p.hidden) return;
   const base = `<div class="flex flex-wrap gap-1.5">
-    <button type="button" data-info="silenciar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid ${c.silenciado ? 'fa-bell' : 'fa-bell-slash'}"></i> ${c.silenciado ? 'Activar avisos' : 'Silenciar'}</button>
-    <button type="button" data-info="salir" class="btn btn-ghost !min-h-8 !px-3 !text-[11px] !text-bad !border-bad/50"><i class="fa-solid fa-right-from-bracket"></i> ${c.tipo === 'GRUPO' ? 'Salir del grupo' : 'Quitar de mi lista'}</button></div>`;
+    <button type="button" data-info="silenciar" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]"><i class="fa-solid ${c.silenciado ? 'fa-bell' : 'fa-bell-slash'}"></i> ${c.silenciado ? 'Activar avisos' : 'Silenciar'}</button>
+    <button type="button" data-info="salir" class="btn btn-ghost !min-h-8 !px-3 !text-[12px] !text-bad !border-bad/50"><i class="fa-solid fa-right-from-bracket"></i> ${c.tipo === 'GRUPO' ? 'Salir del grupo' : 'Quitar de mi lista'}</button></div>`;
   if (c.tipo !== 'GRUPO') { p.innerHTML = base; return; }
   const ids = new Set(S.miembros.map((m) => m.usuario_id));
   const agregables = S.red.amigos.filter((id) => !ids.has(id));
-  p.innerHTML = base + `<p class="text-[11px] text-gray-400 uppercase tracking-widest pt-1">Miembros (${S.miembros.length}/20)</p>
-    <div class="space-y-1">${S.miembros.map((m) => `<div class="flex items-center gap-2">${avatar(m.usuario_id, 'w-7 h-7')}<span class="text-xs text-white flex-1 truncate">${linkNombre(m.usuario_id)}${m.rol === 'ADMIN' ? ' <i class="fa-solid fa-crown text-amber-300 text-[10px]"></i>' : ''}${m.usuario_id === me() ? ' (tú)' : ''}</span>
-      ${c.es_admin && m.usuario_id !== me() ? `<button type="button" data-quitar="${escapeHTML(m.usuario_id)}" class="text-[11px] text-bad hover:underline">Quitar</button>` : ''}</div>`).join('')}</div>`
+  p.innerHTML = base + `<p class="text-[12px] text-gray-400 uppercase tracking-widest pt-1">Miembros (${S.miembros.length}/20)</p>
+    <div class="space-y-1">${S.miembros.map((m) => `<div class="flex items-center gap-2">${avatar(m.usuario_id, 'w-7 h-7')}<span class="text-xs text-white flex-1 truncate">${linkNombre(m.usuario_id)}${m.rol === 'ADMIN' ? ' <i class="fa-solid fa-crown text-amber-300 text-[12px]"></i>' : ''}${m.usuario_id === me() ? ' (tú)' : ''}</span>
+      ${c.es_admin && m.usuario_id !== me() ? `<button type="button" data-quitar="${escapeHTML(m.usuario_id)}" class="text-[12px] text-bad hover:underline">Quitar</button>` : ''}</div>`).join('')}</div>`
     + (c.es_admin ? `<div class="flex gap-1.5 pt-1"><select id="sel-agregar" class="field !py-1.5 flex-1" aria-label="Agregar amigo"><option value="">Agregar un amigo…</option>${agregables.map((id) => `<option value="${escapeHTML(id)}">${escapeHTML(nombre(id))}</option>`).join('')}</select>
-      <button type="button" data-info="agregar" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]">Agregar</button></div>` : '');
+      <button type="button" data-info="agregar" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]">Agregar</button></div>` : '');
 }
 
 async function abrir(id) {
@@ -143,14 +143,14 @@ function alRechazar(id) {
 function tarjetaRechazo() {
   const id = S.rechazo; if (!id) return '';
   const rel = relacion(S.red, id, me()); const u = data.perfiles.get(id)?.username;
-  const accion = rel === 'ninguna' ? '<button type="button" data-rechazo="solicitar" class="btn btn-primary !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-user-plus"></i> Enviar solicitud de amistad</button>'
-    : rel === 'recibida' ? '<button type="button" data-rechazo="aceptar" class="btn btn-primary !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-check"></i> Aceptar su solicitud</button>'
-    : rel === 'enviada' ? '<span class="text-[11px] text-galaxy-400"><i class="fa-solid fa-clock mr-1"></i>Ya le enviaste una solicitud: espera a que la acepte.</span>' : '';
+  const accion = rel === 'ninguna' ? '<button type="button" data-rechazo="solicitar" class="btn btn-primary !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-user-plus"></i> Enviar solicitud de amistad</button>'
+    : rel === 'recibida' ? '<button type="button" data-rechazo="aceptar" class="btn btn-primary !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-check"></i> Aceptar su solicitud</button>'
+    : rel === 'enviada' ? '<span class="text-[12px] text-galaxy-400"><i class="fa-solid fa-clock mr-1"></i>Ya le enviaste una solicitud: espera a que la acepte.</span>' : '';
   return `<div role="alert" class="rounded-lg border border-bad/40 bg-bad/10 p-2.5 space-y-2">
     <p class="text-xs text-white"><b>${escapeHTML(nombre(id))}</b> no recibe mensajes tuyos todavía.</p>
-    <p class="text-[11px] text-gray-300">Por defecto solo escriben las personas que son amigas. ${rel === 'bloqueado' ? 'Hay un bloqueo entre ustedes.' : 'Cuando acepte tu solicitud podrán escribirse (si decidió no recibir mensajes de nadie, tampoco será posible).'}</p>
-    <div class="flex flex-wrap items-center gap-1.5">${accion}${u ? `<a href="${escapeHTML(enlacePerfil(href(''), u))}" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-newspaper"></i> Ver su perfil</a>` : ''}
-      <button type="button" data-rechazo="cerrar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Cerrar</button></div></div>`;
+    <p class="text-[12px] text-gray-300">Por defecto solo escriben las personas que son amigas. ${rel === 'bloqueado' ? 'Hay un bloqueo entre ustedes.' : 'Cuando acepte tu solicitud podrán escribirse (si decidió no recibir mensajes de nadie, tampoco será posible).'}</p>
+    <div class="flex flex-wrap items-center gap-1.5">${accion}${u ? `<a href="${escapeHTML(enlacePerfil(href(''), u))}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-newspaper"></i> Ver su perfil</a>` : ''}
+      <button type="button" data-rechazo="cerrar" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Cerrar</button></div></div>`;
 }
 
 /* ---------- Nuevo chat ---------- */
@@ -160,15 +160,15 @@ function pintarNuevo() {
   if (S.nuevo === 'directo') {
     const r = S.buscar.trim().length >= 2 ? buscarPerfiles([...data.perfiles.values()], S.buscar, S.red, me(), 8) : S.red.amigos.map((id) => data.perfiles.get(id)).filter(Boolean);
     p.innerHTML = tabs + tarjetaRechazo() + `<input id="q-nuevo" type="search" maxlength="40" autocomplete="off" class="field" placeholder="Buscar jugador (o elige un amigo)" value="${escapeHTML(S.buscar)}">
-      <div class="space-y-1 max-h-48 overflow-y-auto">${r.length ? r.map((x) => `<button type="button" data-directo="${escapeHTML(x.id)}" class="w-full flex items-center gap-2 text-left rounded-lg px-2 py-1.5 hover:bg-white/5">${avatar(x.id, 'w-7 h-7')}<span class="text-xs text-white truncate">${escapeHTML(x.nombre_display || 'Jugador')}</span>${etiquetaRelacion(relacion(S.red, x.id, me())) ? `<span class="ml-auto text-[10px] ${S.red.amigos.includes(x.id) ? 'text-galaxy-400' : 'text-gray-500'} whitespace-nowrap">${S.red.amigos.includes(x.id) ? '<i class="fa-solid fa-user-group mr-1"></i>' : ''}${etiquetaRelacion(relacion(S.red, x.id, me()))}</span>` : ''}</button>`).join('')
-        : `<p class="text-[11px] text-gray-500 py-2">Sin resultados. ${S.buscar.trim().length >= 2 ? 'Prueba con otro nombre o usuario.' : `Aún no tienes amigos: <a href="${escapeHTML(href('amigos/'))}" class="text-galaxy-400 underline">búscalos en Amigos</a>, o escribe un nombre aquí arriba.`}</p>`}</div>
-      <p class="text-[10px] text-gray-500">Solo puedes escribir a quien lo permita (por defecto, sus amigos). Si no se puede, te diremos cómo seguir.</p>`;
+      <div class="space-y-1 max-h-48 overflow-y-auto">${r.length ? r.map((x) => `<button type="button" data-directo="${escapeHTML(x.id)}" class="w-full flex items-center gap-2 text-left rounded-lg px-2 py-1.5 hover:bg-white/5">${avatar(x.id, 'w-7 h-7')}<span class="text-xs text-white truncate">${escapeHTML(x.nombre_display || 'Jugador')}</span>${etiquetaRelacion(relacion(S.red, x.id, me())) ? `<span class="ml-auto text-[12px] ${S.red.amigos.includes(x.id) ? 'text-galaxy-400' : 'text-gray-500'} whitespace-nowrap">${S.red.amigos.includes(x.id) ? '<i class="fa-solid fa-user-group mr-1"></i>' : ''}${etiquetaRelacion(relacion(S.red, x.id, me()))}</span>` : ''}</button>`).join('')
+        : `<p class="text-[12px] text-gray-500 py-2">Sin resultados. ${S.buscar.trim().length >= 2 ? 'Prueba con otro nombre o usuario.' : `Aún no tienes amigos: <a href="${escapeHTML(href('amigos/'))}" class="text-galaxy-400 underline">búscalos en Amigos</a>, o escribe un nombre aquí arriba.`}</p>`}</div>
+      <p class="text-[12px] text-gray-500">Solo puedes escribir a quien lo permita (por defecto, sus amigos). Si no se puede, te diremos cómo seguir.</p>`;
   } else {
     p.innerHTML = tabs + `<input id="nom-grupo" type="text" maxlength="40" class="field" placeholder="Nombre del grupo" value="${escapeHTML(S.nombreGrupo)}">
-      <p class="text-[11px] text-gray-400">Elige a quienes quieres invitar (${S.sel.size}/19):</p>
+      <p class="text-[12px] text-gray-400">Elige a quienes quieres invitar (${S.sel.size}/19):</p>
       <div class="space-y-1 max-h-40 overflow-y-auto">${S.red.amigos.length ? S.red.amigos.map((id) => `<label class="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-white/5 cursor-pointer"><input type="checkbox" data-sel="${escapeHTML(id)}" ${S.sel.has(id) ? 'checked' : ''} class="accent-[#8000ff]">${avatar(id, 'w-6 h-6')}<span class="text-xs text-white truncate">${escapeHTML(nombre(id))}</span></label>`).join('')
-        : '<p class="text-[11px] text-gray-500 py-2">Necesitas tener amigos para crear un grupo.</p>'}</div>
-      <button type="button" data-crear-grupo class="btn btn-primary !min-h-9 w-full !text-[11px]"><i class="fa-solid fa-user-group"></i> Crear grupo</button>`;
+        : '<p class="text-[12px] text-gray-500 py-2">Necesitas tener amigos para crear un grupo.</p>'}</div>
+      <button type="button" data-crear-grupo class="btn btn-primary !min-h-9 w-full !text-[12px]"><i class="fa-solid fa-user-group"></i> Crear grupo</button>`;
   }
 }
 

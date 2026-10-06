@@ -26,7 +26,7 @@ function mostrar(uid) {
       <div><h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest"><i class="fa-solid fa-cake-candles text-galaxy-400 mr-2"></i>Tu fecha de nacimiento</h2>
         <p class="text-sm text-gray-300 mt-1">Necesitamos saber tu edad para cuidar a los más jóvenes de la comunidad. Es un dato privado: <b>nadie lo ve</b>, ni siquiera en tu perfil.</p></div>
       <div><label class="label" for="edad-fecha">Fecha de nacimiento</label><input id="edad-fecha" type="date" class="field" max="${escapeHTML(hoyISO())}" min="1900-01-01" required></div>
-      <ul class="text-[11px] text-gray-400 space-y-1 list-disc pl-4">
+      <ul class="text-[12px] text-gray-400 space-y-1 list-disc pl-4">
         <li>La edad mínima para usar la comunidad es de <b>${EDAD_MINIMA} años</b>.</li>
         <li>Si tienes menos de 18, tu cuenta tendrá protecciones extra (por ejemplo, mensajes y búsquedas más limitados).</li>
         <li><b>Solo se puede escribir una vez</b>: revísala antes de continuar.</li></ul>
@@ -47,7 +47,7 @@ function mostrar(uid) {
       if (data?.bloqueada) {
         $('#edad-form').innerHTML = `<div class="space-y-3 text-center"><i class="fa-solid fa-ban text-3xl text-bad"></i>
           <p class="text-sm text-gray-200">Lo sentimos: para usar la comunidad hay que tener al menos <b>${EDAD_MINIMA} años</b>. Tu cuenta no puede continuar.</p>
-          <p class="text-[11px] text-gray-500">Si escribiste mal tu fecha, contacta al equipo de la liga desde Discord.</p>
+          <p class="text-[12px] text-gray-500">Si escribiste mal tu fecha, contacta al equipo de la liga desde Discord.</p>
           <button type="button" id="edad-ok" class="btn btn-ghost w-full">Entendido</button></div>`;
         $('#edad-ok').addEventListener('click', async () => { await supabase.auth.signOut(); closeModal(ID); });
         return;

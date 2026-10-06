@@ -31,13 +31,13 @@ function miLiga() {
 }
 
 const filaRival = (nombre, sub, derecha) => `<div class="flex items-center justify-between gap-3 rounded-xl px-4 py-2.5 bg-galaxy-panel border border-galaxy-border/80">
-  <div class="min-w-0"><p class="font-display font-bold text-white uppercase text-sm truncate">${escapeHTML(nombre)}</p>${sub ? `<p class="text-[11px] text-gray-400">${sub}</p>` : ''}</div>
+  <div class="min-w-0"><p class="font-display font-bold text-white uppercase text-sm truncate">${escapeHTML(nombre)}</p>${sub ? `<p class="text-[12px] text-gray-400">${sub}</p>` : ''}</div>
   <div class="shrink-0 text-right">${derecha}</div></div>`;
 
 function renderRivales(id) {
   const duelos = id ? rivalesDeDuelos(data.historial, partsOf, id) : [];
   $('lista-rivales-duelos').innerHTML = !id ? vacio('Inicia sesión para ver tus rivales.')
-    : duelos.length ? duelos.map((x) => filaRival(nm(x.id), '', `<b class="font-display text-galaxy-400 text-lg">${x.partidos}</b><span class="text-[10px] text-gray-400 block uppercase">${x.partidos === 1 ? 'partido' : 'partidos'}</span>`)).join('')
+    : duelos.length ? duelos.map((x) => filaRival(nm(x.id), '', `<b class="font-display text-galaxy-400 text-lg">${x.partidos}</b><span class="text-[12px] text-gray-400 block uppercase">${x.partidos === 1 ? 'partido' : 'partidos'}</span>`)).join('')
       : vacio('Aún no has terminado duelos contra nadie.');
   const liga = id ? miLiga() : null;
   $('bloque-liga').hidden = !liga;

@@ -37,14 +37,14 @@ export function initNotifications(userId) {
     panel.innerHTML = `
       <div class="px-4 py-3 border-b border-galaxy-border flex items-center justify-between">
         <span class="font-display font-bold text-xs uppercase tracking-widest text-gray-400">Notificaciones</span>
-        ${u ? '<button type="button" data-n="all" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase">Marcar leídas</button>' : ''}
+        ${u ? '<button type="button" data-n="all" class="text-[12px] text-galaxy-400 hover:text-white font-bold uppercase">Marcar leídas</button>' : ''}
       </div>
       <div class="max-h-[60vh] overflow-y-auto">${items.length ? items.map((n) => `
         <a href="${escapeHTML(href(enlaceAvisoSeguro(n.enlace) ?? DESTINO[n.tipo] ?? 'duelos/'))}" data-n="${n.id}" class="notif-item ${n.leida ? '' : 'is-new'}">
           <i class="fa-solid ${ICON[n.tipo] ?? 'fa-bell'} text-galaxy-400 mt-0.5 w-4 text-center"></i>
           <span class="min-w-0 flex-1"><b class="block text-white text-xs font-display uppercase tracking-wide">${escapeHTML(n.titulo)}</b>
             <span class="block text-xs text-gray-300">${escapeHTML(n.mensaje)}</span>
-            <span class="block text-[10px] text-gray-500 mt-0.5">${escapeHTML(fmt(n.created_at))}${n.fecha_ref ? ` · partido ${escapeHTML(fmt(n.fecha_ref))}` : ''}</span></span>
+            <span class="block text-[12px] text-gray-500 mt-0.5">${escapeHTML(fmt(n.created_at))}${n.fecha_ref ? ` · partido ${escapeHTML(fmt(n.fecha_ref))}` : ''}</span></span>
         </a>`).join('') : '<div class="px-4 py-8 text-xs text-gray-500 text-center">Sin novedades por ahora.</div>'}</div>`;
   };
 

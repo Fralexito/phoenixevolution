@@ -17,8 +17,8 @@ const LEYENDA_VACIA = 'Toca o desliza una estadística y aquí te explicamos qu�
 const tileHTML = (k, v, { grande = false, extra = '' } = {}) => {
   const nom = escapeHTML(STAT_INFO[k].nombre);
   const titulo = grande
-    ? `<div class="min-w-0"><b class="font-display text-xs uppercase tracking-wider text-white">OVR</b><span class="block text-[10px] text-gray-500 leading-tight truncate">${nom}</span></div>`
-    : `<div class="min-w-0 flex items-baseline gap-1.5"><b class="font-display text-xs uppercase tracking-wider text-white">${k}</b><span class="text-[10px] text-gray-500 truncate">${nom}</span></div>`;
+    ? `<div class="min-w-0"><b class="font-display text-xs uppercase tracking-wider text-white">OVR</b><span class="block text-[12px] text-gray-500 leading-tight truncate">${nom}</span></div>`
+    : `<div class="min-w-0 flex items-baseline gap-1.5"><b class="font-display text-xs uppercase tracking-wider text-white">${k}</b><span class="text-[12px] text-gray-500 truncate">${nom}</span></div>`;
   const menos = `<button type="button" class="step" data-d="-1" aria-label="Bajar ${nom}">−</button>`;
   const mas = `<button type="button" class="step" data-d="1" aria-label="Subir ${nom}">+</button>`;
   const num = (cls) => `<input class="stat-val stat-num font-display font-extrabold ${cls} text-center" type="text" inputmode="numeric" maxlength="2" value="${v}" autocomplete="off" aria-label="Valor de ${nom} (1 a 99)">`;
@@ -59,7 +59,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
           <span class="photo-pick-badge"><i class="fa-solid fa-camera"></i></span>
           <input id="f-foto" type="file" accept="image/*" hidden>
         </label>
-        <button type="button" id="f-reenc" ${foto0 ? '' : 'hidden'} class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase"><i class="fa-solid fa-crop-simple mr-1"></i>Reencuadrar</button>
+        <button type="button" id="f-reenc" ${foto0 ? '' : 'hidden'} class="text-[12px] text-galaxy-400 hover:text-white font-bold uppercase"><i class="fa-solid fa-crop-simple mr-1"></i>Reencuadrar</button>
         </div>
       </div>
 
@@ -71,12 +71,12 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
         <p id="pos-cap" class="text-[12px] mt-1.5 min-h-5" aria-live="polite"></p>
       </div>
 
-      ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[11px] font-display font-bold uppercase tracking-wider"></span><div class="flex items-center gap-3"><button type="button" id="ovr-auto" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button><button type="button" id="ovr-azar" class="ovr-azar" title="Genera stats al azar que justifican la media que pusiste"><i class="fa-solid fa-dice"></i> Al azar</button></div></div><p class="text-[11px] text-gray-500 mt-1.5">Escribe la media y las stats se ajustan solas, o usa «Al azar» para repartirlas.</p>` })}
+      ${tileHTML('ovr', vals.ovr, { grande: true, extra: `<div class="flex items-center justify-between mt-2"><span id="ovr-modo" class="text-[12px] font-display font-bold uppercase tracking-wider"></span><div class="flex items-center gap-3"><button type="button" id="ovr-auto" class="text-[12px] text-galaxy-400 hover:text-white font-bold uppercase" hidden>Volver a automático</button><button type="button" id="ovr-azar" class="ovr-azar" title="Genera stats al azar que justifican la media que pusiste"><i class="fa-solid fa-dice"></i> Al azar</button></div></div><p class="text-[12px] text-gray-500 mt-1.5">Escribe la media y las stats se ajustan solas, o usa «Al azar» para repartirlas.</p>` })}
 
       <div class="sticky top-0 z-10 bg-galaxy-panel/95 backdrop-blur pb-1 -mx-1 px-1">
         <div class="flex items-center justify-between mb-1">
           <span class="label !mb-0">Leyenda</span>
-          <button type="button" id="ley-toggle" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase" aria-expanded="false" aria-controls="ley-full"><i class="fa-solid fa-list-ul mr-1"></i><span>Ver completa</span></button>
+          <button type="button" id="ley-toggle" class="text-[12px] text-galaxy-400 hover:text-white font-bold uppercase" aria-expanded="false" aria-controls="ley-full"><i class="fa-solid fa-list-ul mr-1"></i><span>Ver completa</span></button>
         </div>
         <div id="leyenda" class="rounded-lg border border-galaxy-border bg-galaxy-panel px-3 py-2 text-[13px] leading-snug text-gray-300 h-[6rem] sm:h-[4.75rem] overflow-y-auto" aria-live="polite">${LEYENDA_VACIA}</div>
       </div>
@@ -94,13 +94,13 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
           <div><input id="f-altura" class="field" type="text" inputmode="numeric" maxlength="3" placeholder="Altura cm" aria-label="Altura en centímetros" value="${escapeHTML(p.altura_cm)}"></div>
           <div class="seg" id="f-pie" role="group" aria-label="Pie dominante">${PIES.map((x) => `<button type="button" data-pie="${x}" aria-pressed="${p.pie === x}" title="Pie ${x.toLowerCase()}">${x === 'Derecho' ? 'Der.' : 'Izq.'}</button>`).join('')}</div>
         </div>
-        <p class="text-[11px] text-gray-500 mt-1">Altura ${ALTURA.min}–${ALTURA.max} cm · toca el pie otra vez para quitarlo.</p>
+        <p class="text-[12px] text-gray-500 mt-1">Altura ${ALTURA.min}–${ALTURA.max} cm · toca el pie otra vez para quitarlo.</p>
       </div>
       <div><label class="label" for="f-quote">Frase <span class="text-gray-500 normal-case">(opcional)</span></label><input id="f-quote" class="field" maxlength="140" placeholder="Una frase que lo represente" value="${escapeHTML(p.quote)}"></div>
       <div>
         <label class="label" for="f-desc">Descripción del jugador <span class="text-gray-500 normal-case">(opcional)</span></label>
         <textarea id="f-desc" class="field" rows="4" maxlength="600" placeholder="Su táctica, estrategia, estilo de juego, cómo ataca y defiende…">${escapeHTML(p.descripcion)}</textarea>
-        <p class="text-[11px] text-gray-500 mt-1 text-right"><span id="f-desc-n">0</span>/600</p>
+        <p class="text-[12px] text-gray-500 mt-1 text-right"><span id="f-desc-n">0</span>/600</p>
       </div>
       <p id="f-err" class="text-xs text-bad min-h-4" role="alert"></p>
       <button class="btn btn-primary w-full" type="submit">Guardar ficha</button>
@@ -118,7 +118,7 @@ export function openPlayerForm(player = null, onSaved = () => {}) {
   };
   const paintModo = () => {
     const el = $('#ovr-modo'); el.textContent = manual ? 'Manual' : 'Automático · promedio de las 14';
-    el.className = `text-[11px] font-display font-bold uppercase tracking-wider ${manual ? 'text-warn' : 'text-ok'}`;
+    el.className = `text-[12px] font-display font-bold uppercase tracking-wider ${manual ? 'text-warn' : 'text-ok'}`;
     $('#ovr-auto').hidden = !manual;
   };
   // «forma» = reparto de las 14 stats al que se le aplica la media cuando cambias el OVR (así subir y bajar la media no deforma tus stats).

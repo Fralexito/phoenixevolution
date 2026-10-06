@@ -15,27 +15,27 @@ const avisoError = (msg) => { $('ev-error-txt').textContent = msg; $('ev-error')
 function tarjeta(e, ahora) {
   const est = estadoEvento(e, ahora), info = ESTADOS[est], activo = est !== 'pasado' && est !== 'cancelado';
   const pend = S.pend.has(e.id), gestiona = can('gestionarEventos') && activo;
-  const juego = e.juego ? `<span class="text-[10px] uppercase tracking-wider text-gray-300 border border-galaxy-border rounded px-1.5 py-0.5">${escapeHTML(nombreJuego(e.juego))}</span>` : '';
+  const juego = e.juego ? `<span class="text-[12px] uppercase tracking-wider text-gray-300 border border-galaxy-border rounded px-1.5 py-0.5">${escapeHTML(nombreJuego(e.juego))}</span>` : '';
   const accionesUsuario = !activo ? '' : !S.yo
-    ? '<p class="text-[11px] text-gray-500 mt-2">Inicia sesión para marcar «Me interesa».</p>'
+    ? '<p class="text-[12px] text-gray-500 mt-2">Inicia sesión para marcar «Me interesa».</p>'
     : est === 'en_curso' ? ''
     : `<div class="mt-2 flex flex-wrap items-center gap-3">
         <button type="button" data-interes="${e.id}" aria-pressed="${e.mi_interes}" ${pend ? 'disabled' : ''} class="adv-chip !min-h-9"><i class="fa-solid ${e.mi_interes ? 'fa-star' : 'fa-star-half-stroke'}"></i> ${e.mi_interes ? 'Me interesa' : 'Marcar «Me interesa»'}</button>
-        ${e.mi_interes ? `<label class="text-[11px] text-gray-300 inline-flex items-center gap-1.5"><input type="checkbox" data-recordar="${e.id}" ${e.mi_recordar ? 'checked' : ''} ${pend ? 'disabled' : ''}> Avísame 1 hora antes</label>` : ''}
+        ${e.mi_interes ? `<label class="text-[12px] text-gray-300 inline-flex items-center gap-1.5"><input type="checkbox" data-recordar="${e.id}" ${e.mi_recordar ? 'checked' : ''} ${pend ? 'disabled' : ''}> Avísame 1 hora antes</label>` : ''}
       </div>`;
   const acciones = gestiona ? `<div class="mt-2 flex flex-wrap gap-2">
-      <button type="button" data-editar="${e.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-pen"></i> Editar</button>
-      <button type="button" data-cancelar="${e.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[11px] !text-rose-300"><i class="fa-solid fa-ban"></i> Cancelar evento</button></div>
-    ${S.cancelando === e.id ? `<form data-cancelar-form="${e.id}" class="mt-2 flex flex-wrap items-center gap-2"><input name="motivo" class="field flex-1 min-w-[10rem]" maxlength="${LIMITES.motivoMax}" placeholder="Motivo (opcional)" aria-label="Motivo de la cancelación"><button type="submit" class="btn btn-primary !min-h-8 !px-3 !text-[11px]" ${pend ? 'disabled' : ''}>Confirmar cancelación</button><button type="button" data-cancelar-no class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Volver</button></form>` : ''}` : '';
+      <button type="button" data-editar="${e.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-pen"></i> Editar</button>
+      <button type="button" data-cancelar="${e.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px] !text-rose-300"><i class="fa-solid fa-ban"></i> Cancelar evento</button></div>
+    ${S.cancelando === e.id ? `<form data-cancelar-form="${e.id}" class="mt-2 flex flex-wrap items-center gap-2"><input name="motivo" class="field flex-1 min-w-[10rem]" maxlength="${LIMITES.motivoMax}" placeholder="Motivo (opcional)" aria-label="Motivo de la cancelación"><button type="submit" class="btn btn-primary !min-h-8 !px-3 !text-[12px]" ${pend ? 'disabled' : ''}>Confirmar cancelación</button><button type="button" data-cancelar-no class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Volver</button></form>` : ''}` : '';
   return `<article class="glass-panel rounded-2xl p-4 ${est === 'cancelado' ? 'opacity-70' : ''}" data-evento="${e.id}">
     <div class="flex flex-wrap items-center gap-2">
-      <span class="text-[10px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${info.clase}">${escapeHTML(info.etiqueta)}</span>${juego}
-      <span class="text-[11px] text-gray-400 ml-auto"><i class="fa-solid fa-star text-amber-300/80"></i> ${e.interesados} interesado${e.interesados === 1 ? '' : 's'}</span>
+      <span class="text-[12px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${info.clase}">${escapeHTML(info.etiqueta)}</span>${juego}
+      <span class="text-[12px] text-gray-400 ml-auto"><i class="fa-solid fa-star text-amber-300/80"></i> ${e.interesados} interesado${e.interesados === 1 ? '' : 's'}</span>
     </div>
     <h3 class="font-display font-bold text-white text-base mt-1.5 ${est === 'cancelado' ? 'line-through' : ''}">${escapeHTML(e.titulo)}</h3>
     <p class="text-xs text-galaxy-400 font-bold"><i class="fa-regular fa-clock"></i> ${escapeHTML(formatoLima(e.inicia_at))} (Lima)${activo ? ` · <span class="text-gray-300 font-normal">${escapeHTML(cuentaRegresiva(e.inicia_at, ahora))}</span>` : ''}</p>
     ${e.descripcion ? `<p class="text-xs text-gray-300 mt-1.5 whitespace-pre-line">${escapeHTML(e.descripcion)}</p>` : ''}
-    ${est === 'cancelado' && e.motivo ? `<p class="text-[11px] text-rose-300 mt-1.5">Motivo: ${escapeHTML(e.motivo)}</p>` : ''}
+    ${est === 'cancelado' && e.motivo ? `<p class="text-[12px] text-rose-300 mt-1.5">Motivo: ${escapeHTML(e.motivo)}</p>` : ''}
     ${accionesUsuario}${acciones}</article>`;
 }
 function pintar() {

@@ -13,7 +13,7 @@ export function abrirCrearEncuesta({ onListo } = {}) {
     <div class="space-y-2"><span class="label">Opciones (2 a 4)</span>
       ${[1, 2, 3, 4].map((i) => `<input name="op" maxlength="${OPCION_MAX}" class="field" placeholder="Opción ${i}${i > 2 ? ' (opcional)' : ''}" aria-label="Opción ${i}">`).join('')}</div>
     <div><label class="label" for="enc-dias">Dura</label><select id="enc-dias" class="field">${[1, 2, 3, 5, 7].map((d) => `<option value="${d}" ${d === 3 ? 'selected' : ''}>${d} día${d > 1 ? 's' : ''}</option>`).join('')}</select>
-      <p class="text-[11px] text-gray-500 mt-1">Cada persona vota una vez y puede cambiar su voto mientras siga abierta. Los resultados se ven al votar.</p></div>
+      <p class="text-[12px] text-gray-500 mt-1">Cada persona vota una vez y puede cambiar su voto mientras siga abierta. Los resultados se ven al votar.</p></div>
     <p id="enc-err" class="text-xs text-bad min-h-4" role="alert"></p>
     <button type="submit" class="btn btn-primary w-full">Publicar encuesta</button></form>`, { id: ID });
   m.querySelector('#enc-form').addEventListener('submit', async (ev) => {

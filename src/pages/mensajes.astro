@@ -4,14 +4,14 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="Mensajes" active="mensajes">
   <div class="max-w-6xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-3">
     <header class="glass-panel px-4 py-3 rounded-2xl">
-      <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Mi cuenta</span>
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Mi cuenta</span>
       <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-comments text-galaxy-400 mr-2"></i>Mensajes</h1>
     </header>
     <div id="chat-vacio" hidden class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm">Inicia sesión para usar los mensajes privados.</div>
     <div id="chat-app" hidden class="grid lg:grid-cols-[19rem_minmax(0,1fr)] gap-3 items-stretch h-[calc(100svh-22rem)] sm:h-[calc(100svh-17rem)] min-h-[24rem]">
       <aside id="chat-lista" class="glass-panel rounded-2xl p-3 flex flex-col min-h-0 min-w-0">
         <div class="flex gap-1.5 mb-2">
-          <button type="button" id="btn-nuevo" class="btn btn-primary !min-h-9 flex-1 !text-[11px]"><i class="fa-solid fa-pen-to-square"></i> Nuevo chat</button>
+          <button type="button" id="btn-nuevo" class="btn btn-primary !min-h-9 flex-1 !text-[12px]"><i class="fa-solid fa-pen-to-square"></i> Nuevo chat</button>
         </div>
         <div id="nuevo-panel" hidden class="mb-2 space-y-2 rounded-xl border border-galaxy-border bg-black/30 p-2.5"></div>
         <div id="lista-conv" class="flex-1 overflow-y-auto space-y-1.5 min-h-0"></div>
@@ -21,7 +21,7 @@ import Layout from '../layouts/Layout.astro';
         <div id="sala" hidden class="flex flex-col min-h-0 flex-1">
           <div class="flex items-center gap-2 px-3 py-2 border-b border-galaxy-border">
             <button type="button" id="btn-atras" class="lg:!hidden btn btn-ghost !min-h-9 !px-3" aria-label="Volver a mis chats"><i class="fa-solid fa-arrow-left"></i></button>
-            <div class="min-w-0 flex-1"><p id="sala-titulo" class="font-display font-bold text-white uppercase text-sm truncate"></p><p id="sala-sub" class="text-[11px] text-gray-400 truncate"></p></div>
+            <div class="min-w-0 flex-1"><p id="sala-titulo" class="font-display font-bold text-white uppercase text-sm truncate"></p><p id="sala-sub" class="text-[12px] text-gray-400 truncate"></p></div>
             <button type="button" id="btn-info" class="btn btn-ghost !min-h-9 !px-3" aria-label="Opciones del chat" aria-expanded="false"><i class="fa-solid fa-ellipsis-vertical"></i></button>
           </div>
           <div id="info-panel" hidden class="border-b border-galaxy-border bg-black/30 p-3 space-y-2 max-h-[45%] overflow-y-auto"></div>

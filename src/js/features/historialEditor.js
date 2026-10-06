@@ -13,7 +13,7 @@ export function abrirEditorHistorial(jugador, filas, onChange = () => {}, { pued
   let lista = ordenarHistorial(filas); let editando = null;   // editando = fila en edición, o null para una nueva
   const m = openModal(`<div class="p-5 sm:p-6 space-y-4">
     <div class="flex justify-between items-start border-b border-galaxy-border pb-3">
-      <div><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Historial</span>
+      <div><span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Historial</span>
         <h3 class="font-display font-bold text-xl text-white uppercase">Participaciones de ${escapeHTML(jugador.nombre)}</h3></div>
       <button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
     </div>

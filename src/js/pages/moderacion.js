@@ -45,9 +45,9 @@ const reporte = (id) => S.items.find((r) => r.id === Number(id));
 const resumenObjeto = (r) => `${tipoInfo(r.tipo).etiqueta} de ${r.acusado.nombre}`;
 
 async function cargarHistorial(caja, r) {
-  caja.hidden = false; caja.innerHTML = '<p class="text-[11px] text-gray-500 py-1">Cargando historial…</p>';
-  try { caja.innerHTML = `<p class="text-[11px] text-gray-400 mt-1 font-display font-bold uppercase tracking-wider">Historial de sanciones</p>${historialHTML(await api.sancionesDe(r.acusado.id), { ...yo(), rolObjetivo: r.acusado.rol })}`; }
-  catch (err) { caja.innerHTML = `<p class="text-[11px] text-rose-300">${escapeHTML(err.message)}</p>`; }
+  caja.hidden = false; caja.innerHTML = '<p class="text-[12px] text-gray-500 py-1">Cargando historial…</p>';
+  try { caja.innerHTML = `<p class="text-[12px] text-gray-400 mt-1 font-display font-bold uppercase tracking-wider">Historial de sanciones</p>${historialHTML(await api.sancionesDe(r.acusado.id), { ...yo(), rolObjetivo: r.acusado.rol })}`; }
+  catch (err) { caja.innerHTML = `<p class="text-[12px] text-rose-300">${escapeHTML(err.message)}</p>`; }
 }
 
 const ACCIONES = {

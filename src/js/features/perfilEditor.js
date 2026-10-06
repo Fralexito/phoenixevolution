@@ -12,11 +12,11 @@ const limpio = (v, max) => String(v ?? '').trim().replace(/[<>]/g, '').slice(0, 
 export function abrirEditorPerfil(p, onSaved = () => {}) {
   const m = openModal(`<form id="pe-form" class="p-5 sm:p-6 space-y-4" novalidate>
     <div class="flex justify-between items-start border-b border-galaxy-border pb-3">
-      <div><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Perfil público</span>
+      <div><span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Perfil público</span>
         <h3 class="font-display font-bold text-xl text-white uppercase">Biografía de ${escapeHTML(p.nombre)}</h3></div>
       <button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div><label class="label" for="pe-bio">Biografía</label><textarea id="pe-bio" class="field" rows="7" maxlength="2000" placeholder="Su historia en la comunidad, cómo empezó, qué lo define…">${escapeHTML(p.biografia)}</textarea><p class="text-[11px] text-gray-500 mt-1 text-right"><span id="pe-bio-n">0</span>/2000</p></div>
+    <div><label class="label" for="pe-bio">Biografía</label><textarea id="pe-bio" class="field" rows="7" maxlength="2000" placeholder="Su historia en la comunidad, cómo empezó, qué lo define…">${escapeHTML(p.biografia)}</textarea><p class="text-[12px] text-gray-500 mt-1 text-right"><span id="pe-bio-n">0</span>/2000</p></div>
     <div class="grid sm:grid-cols-2 gap-3">
       <div><label class="label" for="pe-ciudad">Ciudad / país</label><input id="pe-ciudad" class="field" maxlength="60" placeholder="Lima, Perú" value="${escapeHTML(p.ciudad)}"></div>
       <div><label class="label" for="pe-desde">Miembro desde</label><input id="pe-desde" type="date" class="field" value="${escapeHTML(p.miembro_desde)}"></div>

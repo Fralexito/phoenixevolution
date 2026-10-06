@@ -15,9 +15,9 @@ export function crearColaMarcadores(el, { puedeResolver }) {
   function tarjeta(x) {
     return `<article class="glass-panel rounded-2xl p-3" data-disputa="${Number(x.reto_id)}">
       <p class="text-sm text-white font-display font-bold uppercase">Duelo #${Number(x.reto_id)} · ${nom(x.retador)} vs ${nom(x.rival)}
-        ${x.agotado ? '<span class="ml-1 text-[10px] text-amber-300 normal-case tracking-normal"><i class="fa-solid fa-gavel"></i> sin más intentos</span>' : ''}</p>
-      <p class="text-[11px] text-gray-400 mt-0.5">Último marcador propuesto: <b class="text-white">${Number(x.goles_a)} - ${Number(x.goles_b)}</b> (retador - rival) · intento ${Number(x.intentos)} de 3</p>
-      ${puedeResolver ? `<button type="button" data-resolver="${Number(x.reto_id)}" class="btn btn-primary !min-h-8 !text-xs mt-2">Decidir marcador</button>` : '<p class="text-[11px] text-gray-500 mt-1">Tu rol puede ver, no decidir.</p>'}</article>`;
+        ${x.agotado ? '<span class="ml-1 text-[12px] text-amber-300 normal-case tracking-normal"><i class="fa-solid fa-gavel"></i> sin más intentos</span>' : ''}</p>
+      <p class="text-[12px] text-gray-400 mt-0.5">Último marcador propuesto: <b class="text-white">${Number(x.goles_a)} - ${Number(x.goles_b)}</b> (retador - rival) · intento ${Number(x.intentos)} de 3</p>
+      ${puedeResolver ? `<button type="button" data-resolver="${Number(x.reto_id)}" class="btn btn-primary !min-h-8 !text-xs mt-2">Decidir marcador</button>` : '<p class="text-[12px] text-gray-500 mt-1">Tu rol puede ver, no decidir.</p>'}</article>`;
   }
   function pintar() {
     el.hidden = !lista.length;
@@ -34,9 +34,9 @@ export function crearColaMarcadores(el, { puedeResolver }) {
       <div class="flex justify-between items-start gap-3"><div><h2 class="font-display font-bold text-xl text-white uppercase tracking-widest">Decidir marcador</h2>
         <p class="text-xs text-gray-400 mt-0.5">Duelo #${Number(x.reto_id)} · ${nom(x.retador)} vs ${nom(x.rival)}</p></div>
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button></div>
-      <div class="flex items-end gap-3"><label class="text-[11px] text-gray-400 flex-1">Goles de ${nom(x.retador)}<input name="a" inputmode="numeric" maxlength="2" value="${Number(x.goles_a)}" class="field !text-center" required></label>
+      <div class="flex items-end gap-3"><label class="text-[12px] text-gray-400 flex-1">Goles de ${nom(x.retador)}<input name="a" inputmode="numeric" maxlength="2" value="${Number(x.goles_a)}" class="field !text-center" required></label>
         <span class="pb-2 text-gray-500">-</span>
-        <label class="text-[11px] text-gray-400 flex-1">Goles de ${nom(x.rival)}<input name="b" inputmode="numeric" maxlength="2" value="${Number(x.goles_b)}" class="field !text-center" required></label></div>
+        <label class="text-[12px] text-gray-400 flex-1">Goles de ${nom(x.rival)}<input name="b" inputmode="numeric" maxlength="2" value="${Number(x.goles_b)}" class="field !text-center" required></label></div>
       <div><label class="label" for="res-motivo">Motivo de tu decisión <span class="text-gray-500 normal-case">(lo verán los jugadores y queda en la Auditoría)</span></label><textarea id="res-motivo" name="motivo" rows="2" maxlength="300" class="field" required></textarea></div>
       <p id="res-err" class="text-xs text-bad min-h-4" role="alert"></p>
       <button type="submit" class="btn btn-primary w-full">Confirmar decisión</button></form>`, { id: ID });

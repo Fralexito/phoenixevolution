@@ -25,19 +25,19 @@ const reloj = () => {
   const a = leerAjustes(); const o = opcionesRegion(a); const ahora = new Date(); const manana = new Date(ahora.getTime() + 86400000 + 3600000);
   const f = (d, x) => escapeHTML(d.toLocaleString('es', x));
   return `<div class="rounded-lg border border-galaxy-border p-3 bg-galaxy-card space-y-1.5">
-    <div class="text-[11px] text-gray-400">Hora en los avisos «En vivo»</div><div class="font-display font-extrabold text-2xl text-white">${f(ahora, { hour: '2-digit', minute: '2-digit', second: '2-digit', ...o })}</div>
-    <div class="text-[11px] text-gray-400 pt-1">Un duelo programado</div><div class="text-sm text-galaxy-400"><i class="fa-regular fa-clock mr-1"></i>${f(manana, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...o })}</div>
+    <div class="text-[12px] text-gray-400">Hora en los avisos «En vivo»</div><div class="font-display font-extrabold text-2xl text-white">${f(ahora, { hour: '2-digit', minute: '2-digit', second: '2-digit', ...o })}</div>
+    <div class="text-[12px] text-gray-400 pt-1">Un duelo programado</div><div class="text-sm text-galaxy-400"><i class="fa-regular fa-clock mr-1"></i>${f(manana, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...o })}</div>
     <div class="aj-nota">Zona: ${escapeHTML(o.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone)}</div></div>`;
 };
 const privacidad = () => {
   const n = (() => { try { return JSON.parse(localStorage.getItem('pes-live-hist') ?? '[]').length; } catch { return 0; } })();
   const z = (() => { try { return ['pes-zoom-pc', 'pes-zoom-movil'].filter((k) => localStorage.getItem(k) !== null).length; } catch { return 0; } })();
   return `<div class="rounded-lg border border-galaxy-border p-3 bg-galaxy-card text-sm space-y-1.5">
-    <div class="text-[11px] text-gray-400">Guardado ahora en este navegador</div>
+    <div class="text-[12px] text-gray-400">Guardado ahora en este navegador</div>
     <div><i class="fa-solid fa-clock-rotate-left text-galaxy-400 w-5"></i>${n} aviso(s) en el historial de «En vivo»</div>
     <div><i class="fa-solid fa-magnifying-glass-plus text-galaxy-400 w-5"></i>${z} zoom(s) de Jugadores recordado(s)</div></div>`;
 };
-const datos = () => `<pre class="text-[10px] leading-snug text-gray-300 rounded-lg border border-galaxy-border p-3 bg-galaxy-card overflow-auto max-h-48">${escapeHTML(exportarAjustes(leerAjustes()))}</pre><p class="aj-nota">Esto es exactamente lo que lleva el archivo exportado.</p>`;
+const datos = () => `<pre class="text-[12px] leading-snug text-gray-300 rounded-lg border border-galaxy-border p-3 bg-galaxy-card overflow-auto max-h-48">${escapeHTML(exportarAjustes(leerAjustes()))}</pre><p class="aj-nota">Esto es exactamente lo que lleva el archivo exportado.</p>`;
 
 let timerAviso = 0;
 function notificaciones() {

@@ -11,7 +11,7 @@
   .ticker-wrap[data-oculto='true'] { transform: none; visibility: visible; pointer-events: none; background-color: transparent; border-color: transparent; backdrop-filter: none; align-items: flex-start; }
   .ticker-wrap[data-oculto='true'] > :first-child { display: none; }
   .ticker-wrap[data-oculto='true'] #ticker-view { flex: 1 1 auto; height: 1.35rem; opacity: .6; background: linear-gradient(to bottom, rgb(3 1 15 / .7), rgb(3 1 15 / .35)); }
-  .ticker-wrap[data-oculto='true'] .ticker-item { font-size: .65rem; }
+  .ticker-wrap[data-oculto='true'] .ticker-item { font-size: .75rem; }
 }
 /* El ticker SIEMPRE avanza (es parte del diseño; antes lo congelábamos con prefers-reduced-motion y se veía quieto).
    Se pausa al pasar el mouse o tocarlo para poder leer (features/ticker.js). */
@@ -20,17 +20,17 @@
 }
 
 /* ---- Pulso en vivo: mensajitos sutiles de actividad (abajo a la izquierda) ---- */
-.live-msg { display: flex; align-items: center; gap: .5rem; max-width: 19rem; padding: .4rem .65rem; border-radius: .6rem; font-size: .74rem; line-height: 1.25; color: #cbd5e1;
+.live-msg { display: flex; align-items: center; gap: .5rem; max-width: 19rem; padding: .4rem .65rem; border-radius: .6rem; font-size: .75rem; line-height: 1.25; color: #cbd5e1;
   background: rgba(8, 3, 22, .78); backdrop-filter: blur(6px); border: 1px solid rgba(167, 139, 250, .22); border-left-width: 3px;
   opacity: 0; transform: translateX(-10px); transition: opacity .4s ease, transform .4s ease; }
 .live-msg.live-in { opacity: .92; transform: none; }
 .live-msg b { color: #fff; font-weight: 700; }
 .live-ok { border-left-color: #00ff88; } .live-ok .live-ico { color: #00ff88; }
 .live-cyan { border-left-color: #00e5ff; } .live-cyan .live-ico { color: #00e5ff; }
-.live-ico { font-size: .72rem; flex: none; }
+.live-ico { font-size: .75rem; flex: none; }
 .live-dim { color: #94a3b8; }
-.live-demo { flex: none; font-style: normal; font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); border-radius: 9999px; padding: 0 .35rem; }
-.live-toggle { display: inline-flex; align-items: center; gap: .4rem; min-height: 28px; padding: 0 .65rem; border-radius: 9999px; font: 700 .65rem/1 var(--font-display); text-transform: uppercase; letter-spacing: .08em;
+.live-demo { flex: none; font-style: normal; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); border-radius: 9999px; padding: 0 .35rem; }
+.live-toggle { display: inline-flex; align-items: center; gap: .4rem; min-height: 28px; padding: 0 .65rem; border-radius: 9999px; font: 700 .75rem/1 var(--font-display); text-transform: uppercase; letter-spacing: .08em;
   color: #cbd5e1; background: rgba(8, 3, 22, .78); border: 1px solid rgba(167, 139, 250, .3); backdrop-filter: blur(6px); }
 .live-toggle:hover { color: #fff; border-color: var(--color-galaxy-400); }
 .live-dot { width: 7px; height: 7px; border-radius: 9999px; background: #00ff88; box-shadow: 0 0 8px #00ff88; animation: live-pulse 1.8s ease-in-out infinite; }
@@ -49,10 +49,10 @@
 /* PC: el pulso vive abajo a la derecha y los mensajes entran desde ese lado. */
 @media (min-width: 768px) { .live-msg:not(.live-in) { transform: translateX(10px); } }
 /* Hora exacta en cada mensaje + historial. */
-.live-time { flex: none; margin-left: auto; padding-left: .5rem; font-variant-numeric: tabular-nums; font-size: .66rem; color: #94a3b8; }
+.live-time { flex: none; margin-left: auto; padding-left: .5rem; font-variant-numeric: tabular-nums; font-size: .75rem; color: #94a3b8; }
 .live-msg { max-width: 100%; }
 .live-msg .live-txt { min-width: 0; }
-.live-row { display: flex; align-items: center; gap: .5rem; padding: .4rem .55rem; font-size: .74rem; line-height: 1.25; color: #cbd5e1; border-left: 3px solid; border-radius: .4rem; background: rgba(255, 255, 255, .03); }
+.live-row { display: flex; align-items: center; gap: .5rem; padding: .4rem .55rem; font-size: .75rem; line-height: 1.25; color: #cbd5e1; border-left: 3px solid; border-radius: .4rem; background: rgba(255, 255, 255, .03); }
 .live-row.live-ok { border-left-color: #00ff88; } .live-row.live-cyan { border-left-color: #00e5ff; }
 .live-row b { color: #fff; }
 .live-empty { padding: 1rem; text-align: center; font-size: .75rem; color: #6b7280; }
@@ -69,7 +69,7 @@
 @media (hover: hover) and (pointer: fine) { #ticker-view { cursor: grab; user-select: none; } #ticker-view.ticker-arrastrando { cursor: grabbing; } }
 .ticker-ctl { position: absolute; right: .4rem; top: 50%; transform: translateY(-50%); z-index: 5; gap: .25rem; opacity: 0; transition: opacity .2s; pointer-events: none; }
 #ticker-view:hover .ticker-ctl, .ticker-ctl:focus-within { opacity: 1; pointer-events: auto; }
-.ticker-ctl button { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; border-radius: .4rem; font-size: .65rem; color: #e5e7eb; background: rgb(3 1 15 / .85); border: 1px solid rgb(0 229 255 / .4); }
+.ticker-ctl button { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; border-radius: .4rem; font-size: .75rem; color: #e5e7eb; background: rgb(3 1 15 / .85); border: 1px solid rgb(0 229 255 / .4); }
 .ticker-ctl button:hover { color: #fff; background: rgb(0 229 255 / .25); }
 
 /* AJUSTES: features/ajustes.js escribe data-aj-* en <html>; aquí SOLO se leen. Catálogo: data/ajustes.js */
@@ -102,17 +102,17 @@ html[data-aj-liga-compacta='si'] .liga-tabla td { padding-top: .3rem; padding-bo
 .aj-tab:hover { color: var(--color-galaxy-400); border-color: color-mix(in srgb, var(--color-galaxy-400) 50%, transparent); }
 .aj-tab[aria-selected='true'] { color: #fff; border-color: var(--color-galaxy-400); background: color-mix(in srgb, var(--color-galaxy-400) 16%, transparent); }
 .aj-vp { display: grid; gap: .6rem; }
-.aj-vp .aj-nota { font-size: .68rem; color: #94a3b8; }
+.aj-vp .aj-nota { font-size: .75rem; color: #94a3b8; }
 @keyframes aj-ticker { from { left: 100%; transform: none; } to { left: 0; transform: translateX(-100%); } }
 .aj-tk { position: relative; overflow: hidden; height: 1.9rem; border: 1px solid var(--color-galaxy-border); border-radius: .5rem; background: rgb(0 0 0 / .35); }
 .aj-tk > span { position: absolute; top: 0; left: 100%; height: 100%; display: flex; align-items: center; white-space: nowrap; font-size: .75rem; color: var(--color-galaxy-50); animation: aj-ticker var(--aj-dur, 12s) linear infinite; }
 html[data-aj-ticker='no'] .aj-tk { opacity: .35; }
-html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .7rem; color: #fff; background: rgb(0 0 0 / .5); }
+html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .75rem; color: #fff; background: rgb(0 0 0 / .5); }
 .aj-vp .live-msg { opacity: .92; transform: none; }
 
 /* HISTORIAL EN VIVO: controles del panel de filtros y nombres clicables */
 .hv-ctl { display: block; width: 100%; margin-top: .2rem; min-height: 2.25rem; padding: 0 .5rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .3); color: #fff; font-size: .78rem; }
 .hv-ctl:focus { outline: none; border-color: var(--color-galaxy-400); }
-#hv-filtros code, .hv-ayuda code { padding: 0 .3rem; border-radius: .3rem; background: rgb(255 255 255 / .08); color: var(--color-galaxy-400); font-size: .7rem; }
+#hv-filtros code, .hv-ayuda code { padding: 0 .3rem; border-radius: .3rem; background: rgb(255 255 255 / .08); color: var(--color-galaxy-400); font-size: .75rem; }
 .live-nom { color: inherit; text-decoration: none; border-bottom: 1px dotted rgb(255 255 255 / .35); }
 .live-nom:hover { color: var(--color-galaxy-400); border-bottom-color: var(--color-galaxy-400); }

@@ -2,15 +2,15 @@
 export const PODIO = [
   { copa: 'Copa Galaxy', dt: 'FRALEX', club: 'FC Barcelona', sigla: 'FCB',
     card: 'border-t border-l border-silver-400/40 p-4 shadow-[0_0_15px_rgba(156,163,175,0.1)]',
-    icon: 'text-3xl text-silver-300 mb-2 drop-shadow-[0_0_10px_rgba(156,163,175,0.5)]', label: 'text-[8px] text-silver-400', rule: 'border-silver-500/30',
+    icon: 'text-3xl text-silver-300 mb-2 drop-shadow-[0_0_10px_rgba(156,163,175,0.5)]', label: 'text-[12px] text-silver-400', rule: 'border-silver-500/30',
     badge: 'from-blue-800 to-red-800 border-silver-300 text-white', clubCls: 'text-silver-300' },
   { copa: 'Campeón de Liga', dt: 'AXEL', club: 'Real Madrid', sigla: 'RMA', gold: true,
     card: 'border border-gold-400 p-5 shadow-[0_0_25px_rgba(245,158,11,0.2)] relative overflow-hidden',
-    icon: 'text-4xl text-gold-400 mb-2 animate-glow', label: 'text-[8px] bg-black/50 border border-gold-500/40 px-2 py-0.5 rounded text-gold-400', rule: 'border-gold-500/40',
+    icon: 'text-4xl text-gold-400 mb-2 animate-glow', label: 'text-[12px] bg-black/50 border border-gold-500/40 px-2 py-0.5 rounded text-gold-400', rule: 'border-gold-500/40',
     badge: 'from-gray-100 to-gray-400 border-gold-400 text-black', clubCls: 'text-gold-300' },
   { copa: 'Supercopa', dt: 'ARENS', club: 'Man. City', sigla: 'MCI',
     card: 'border-t border-r border-bronze-400/40 p-4 shadow-[0_0_15px_rgba(205,127,50,0.1)]',
-    icon: 'text-3xl text-bronze-400 mb-2 drop-shadow-[0_0_10px_rgba(205,127,50,0.5)]', label: 'text-[8px] text-bronze-400', rule: 'border-bronze-500/30',
+    icon: 'text-3xl text-bronze-400 mb-2 drop-shadow-[0_0_10px_rgba(205,127,50,0.5)]', label: 'text-[12px] text-bronze-400', rule: 'border-bronze-500/30',
     badge: 'from-cyan-600 to-blue-900 border-bronze-300 text-white', clubCls: 'text-bronze-300' },
 ];
 

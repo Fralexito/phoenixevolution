@@ -8,7 +8,7 @@ import { data, nm, partsOf, myPart, isLeader, isActive, myProfile } from './data
 
 const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const hm = (ms) => new Date(ms).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', ...regionAhora() });
-const badge = (t, cls = 'text-galaxy-400 border-galaxy-400/30 bg-galaxy-600/20') => `<span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${cls}">${t}</span>`;
+const badge = (t, cls = 'text-galaxy-400 border-galaxy-400/30 bg-galaxy-600/20') => `<span class="px-2 py-0.5 rounded border text-[12px] font-bold uppercase ${cls}">${t}</span>`;
 const NEUTRAL = 'text-gray-300 border-gray-600/50 bg-black/30';
 
 /* ---------- Equipos y cupos ---------- */
@@ -37,8 +37,8 @@ function teamColumn(r, equipo, id) {
   const join = canJoin(r, equipo, id) ? `<button type="button" data-act="join" data-id="${r.id}" data-team="${equipo}" class="btn btn-cyan w-full !min-h-11 mt-2 !text-xs">Unirme al equipo ${equipo}</button>` : '';
   const inv = iLead && isActive(r) && s.free > 0 ? `<button type="button" data-act="invite" data-id="${r.id}" data-team="${equipo}" class="btn btn-ghost w-full !min-h-11 mt-2 !text-xs"><i class="fa-solid fa-user-plus"></i> Invitar</button>` : '';
   return `<div class="rounded-lg bg-black/40 border border-galaxy-border/70 p-2.5">
-    <div class="flex justify-between text-[10px] font-display font-bold uppercase tracking-wider mb-1.5"><span class="text-galaxy-400">Equipo ${equipo}</span><span class="text-gray-400">${s.confirmed}/${tam}</span></div>
-    <ul class="space-y-1 text-[11px]">${rows}${aviso}${libres}</ul>${join}${inv}</div>`;
+    <div class="flex justify-between text-[12px] font-display font-bold uppercase tracking-wider mb-1.5"><span class="text-galaxy-400">Equipo ${equipo}</span><span class="text-gray-400">${s.confirmed}/${tam}</span></div>
+    <ul class="space-y-1 text-[12px]">${rows}${aviso}${libres}</ul>${join}${inv}</div>`;
 }
 
 function inviteBanner(r, id) {
@@ -56,9 +56,9 @@ function agreementBlock(r, id) {
   const missing = seats(r.tam_a, parts, 'A').missing + seats(r.tam_b, parts, 'B').missing;
   if (!missing) return '';
   const mineAt = id === r.retador_id ? r.acuerdo_retador_at : r.acuerdo_rival_at;
-  const chip = (who, at) => `<span class="text-[11px] ${at ? 'text-emerald-400' : 'text-gray-400'}"><i class="fa-solid ${at ? 'fa-circle-check' : 'fa-circle-notch'} mr-1"></i>${escapeHTML(who)}</span>`;
+  const chip = (who, at) => `<span class="text-[12px] ${at ? 'text-emerald-400' : 'text-gray-400'}"><i class="fa-solid ${at ? 'fa-circle-check' : 'fa-circle-notch'} mr-1"></i>${escapeHTML(who)}</span>`;
   return `<div class="mt-3 p-3 rounded-lg bg-black/40 border border-warn/40 space-y-2">
-    <p class="text-[11px] text-warn"><i class="fa-solid fa-users-slash mr-1"></i>Faltan ${missing} jugador${missing > 1 ? 'es' : ''}. Para publicar la sala sin completar los equipos, los dos líderes deben aceptar.</p>
+    <p class="text-[12px] text-warn"><i class="fa-solid fa-users-slash mr-1"></i>Faltan ${missing} jugador${missing > 1 ? 'es' : ''}. Para publicar la sala sin completar los equipos, los dos líderes deben aceptar.</p>
     <div class="flex flex-wrap gap-x-4">${chip(nm(r.retador_id), r.acuerdo_retador_at)}${chip(nm(r.rival_id), r.acuerdo_rival_at)}</div>
     ${mineAt ? '' : `<button type="button" data-act="agree" data-id="${r.id}" class="btn btn-cyan w-full !min-h-11">Jugar con los cupos actuales</button>`}</div>`;
 }
@@ -69,12 +69,12 @@ function confirmBlock(r, id) {
   const phase = confirmPhase(r.fecha_programada);
   const t = new Date(r.fecha_programada).getTime();
   const mineAt = id === r.retador_id ? r.confirmo_retador_at : r.confirmo_rival_at;
-  const chip = (who, at) => `<span class="text-[11px] ${at ? 'text-emerald-400' : 'text-gray-400'}"><i class="fa-solid ${at ? 'fa-circle-check' : 'fa-circle-notch'} mr-1"></i>${escapeHTML(who)}</span>`;
+  const chip = (who, at) => `<span class="text-[12px] ${at ? 'text-emerald-400' : 'text-gray-400'}"><i class="fa-solid ${at ? 'fa-circle-check' : 'fa-circle-notch'} mr-1"></i>${escapeHTML(who)}</span>`;
   let body;
-  if (mineAt) body = '<p class="text-[11px] text-emerald-400">Ya confirmaste. Esperando al otro líder.</p>';
-  else if (phase === 'pronto') body = `<p class="text-[11px] text-gray-300"><i class="fa-regular fa-clock mr-1"></i>Podrás confirmar desde las ${escapeHTML(hm(t - CONFIRM_OPEN_MIN * 60e3))}.</p>`;
-  else if (phase === 'abierta') body = `<button type="button" data-act="confirm" data-id="${r.id}" class="btn btn-primary w-full !min-h-11">Confirmar que sigo en pie</button><p class="text-[10px] text-warn mt-1">Si no confirmas antes de las ${escapeHTML(hm(t - CONFIRM_CLOSE_MIN * 60e3))}, el partido se cancela.</p>`;
-  else body = '<p class="text-[11px] text-bad">Se cerró la confirmación: el sistema cancelará el partido.</p>';
+  if (mineAt) body = '<p class="text-[12px] text-emerald-400">Ya confirmaste. Esperando al otro líder.</p>';
+  else if (phase === 'pronto') body = `<p class="text-[12px] text-gray-300"><i class="fa-regular fa-clock mr-1"></i>Podrás confirmar desde las ${escapeHTML(hm(t - CONFIRM_OPEN_MIN * 60e3))}.</p>`;
+  else if (phase === 'abierta') body = `<button type="button" data-act="confirm" data-id="${r.id}" class="btn btn-primary w-full !min-h-11">Confirmar que sigo en pie</button><p class="text-[12px] text-warn mt-1">Si no confirmas antes de las ${escapeHTML(hm(t - CONFIRM_CLOSE_MIN * 60e3))}, el partido se cancela.</p>`;
+  else body = '<p class="text-[12px] text-bad">Se cerró la confirmación: el sistema cancelará el partido.</p>';
   return `<div class="mt-3 p-3 rounded-lg bg-black/40 border border-galaxy-border/70 space-y-2"><div class="flex flex-wrap gap-x-4 gap-y-1">${chip(nm(r.retador_id), r.confirmo_retador_at)}${chip(nm(r.rival_id), r.confirmo_rival_at)}</div>${body}</div>`;
 }
 
@@ -92,7 +92,7 @@ function linkBlock(r, id) {
   const url = safeUrl(c?.link, { allowParsec: true });
   return c && url
     ? `<div class="mt-3 space-y-2"><a href="${escapeHTML(url)}" target="_blank" rel="noopener" class="btn btn-primary w-full !min-h-11">Conectar a ${escapeHTML(nm(r.host_id))}</a>${c.detalle ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-key mr-1 text-galaxy-400"></i>${escapeHTML(c.detalle)}</p>` : ''}</div>`
-    : `<p class="mt-3 text-[11px] text-gray-400"><i class="fa-solid fa-hourglass-half mr-1"></i>Esperando el enlace del host (${escapeHTML(nm(r.host_id))})…</p>`;
+    : `<p class="mt-3 text-[12px] text-gray-400"><i class="fa-solid fa-hourglass-half mr-1"></i>Esperando el enlace del host (${escapeHTML(nm(r.host_id))})…</p>`;
 }
 
 function mainActions(r, id) {
@@ -126,9 +126,9 @@ export function card(r, id) {
       ${direct ? badge(r.directo_publico ? '<i class="fa-solid fa-eye mr-1"></i>Público' : '<i class="fa-solid fa-lock mr-1"></i>Privado', NEUTRAL) : badge('Abierto', NEUTRAL)}
       ${open ? badge('● Aceptado', 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10') : ''}
     </div>
-    <h3 class="text-lg font-display font-bold text-white uppercase leading-tight">${title}${r.retador_id === id ? ' <span class="text-[10px] text-galaxy-400">(tú)</span>' : ''}</h3>
-    <p class="text-[11px] text-gray-300 mt-1.5"><i class="fa-regular fa-clock mr-1"></i>${escapeHTML(when)} · ${r.modalidad === 'PROGRAMADO' ? 'con confirmación' : 'sin confirmación'}</p>
-    <p class="text-[11px] text-gray-400 mb-3"><i class="fa-solid fa-server mr-1"></i>${hostTxt}</p>
+    <h3 class="text-lg font-display font-bold text-white uppercase leading-tight">${title}${r.retador_id === id ? ' <span class="text-[12px] text-galaxy-400">(tú)</span>' : ''}</h3>
+    <p class="text-[12px] text-gray-300 mt-1.5"><i class="fa-regular fa-clock mr-1"></i>${escapeHTML(when)} · ${r.modalidad === 'PROGRAMADO' ? 'con confirmación' : 'sin confirmación'}</p>
+    <p class="text-[12px] text-gray-400 mb-3"><i class="fa-solid fa-server mr-1"></i>${hostTxt}</p>
     <div class="grid grid-cols-2 gap-2">${teamColumn(r, 'A', id)}${teamColumn(r, 'B', id)}</div>
     ${id ? inviteBanner(r, id) + agreementBlock(r, id) + confirmBlock(r, id) + linkBlock(r, id) : ''}
     ${actions ? `<div class="mt-4 pt-3 border-t border-galaxy-border/60 flex gap-2">${actions}</div>` : ''}
@@ -139,10 +139,10 @@ export function card(r, id) {
 export function cardHistorial(r, id, { tarjeta = false } = {}) {
   const lado = (eq) => { const ps = partsOf(r.id).filter((p) => p.equipo === eq); const lider = eq === 'A' ? r.retador_id : r.rival_id; const nombres = ps.length ? ps.map((p) => nm(p.usuario_id)) : [lider ? nm(lider) : '—']; return escapeHTML(nombres.join(' + ')); };
   const cuando = r.cerrado_at ? fmt(r.cerrado_at) : r.fecha_programada ? fmt(r.fecha_programada) : '';
-  const btnTarjeta = tarjeta ? `<button type="button" data-act="tarjeta" data-id="${Number(r.id)}" class="btn btn-ghost !min-h-8 !px-3 !text-[11px] mt-2"><i class="fa-solid fa-share-nodes"></i> Tarjeta de resultado</button>` : '';
+  const btnTarjeta = tarjeta ? `<button type="button" data-act="tarjeta" data-id="${Number(r.id)}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px] mt-2"><i class="fa-solid fa-share-nodes"></i> Tarjeta de resultado</button>` : '';
   return `<article class="rounded-xl px-4 py-3 bg-galaxy-panel border border-galaxy-border/80">
     <div class="flex flex-wrap items-center gap-1.5 mb-1.5">${badge('Finalizado', NEUTRAL)}${badge(escapeHTML(r.plataforma))}${badge(`${r.tam_a} vs ${r.tam_b}`, 'text-amber-300 border-amber-400/40 bg-amber-400/10')}</div>
     <p class="font-display font-bold text-white uppercase leading-tight text-sm">${lado('A')} <span class="text-galaxy-400 mx-1">vs</span> ${lado('B')}</p>
-    ${cuando ? `<p class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-calendar-check mr-1"></i>${escapeHTML(cuando)}</p>` : ''}${btnTarjeta}
+    ${cuando ? `<p class="text-[12px] text-gray-400 mt-1"><i class="fa-regular fa-calendar-check mr-1"></i>${escapeHTML(cuando)}</p>` : ''}${btnTarjeta}
   </article>`;
 }

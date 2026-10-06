@@ -18,11 +18,11 @@ const esAdmin = () => can('administrarTienda');
 
 function carteraHTML() {
   const e = S.eco; if (!e) return '<p class="text-xs text-gray-400">Inicia sesión para ver tu nivel y tus tokens.</p>';
-  return `<div class="flex flex-wrap items-center gap-4"><div><p class="text-[10px] uppercase tracking-widest text-gray-400 font-display">Nivel</p><p class="font-display font-extrabold text-3xl text-white">${e.nivel}</p></div>
+  return `<div class="flex flex-wrap items-center gap-4"><div><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Nivel</p><p class="font-display font-extrabold text-3xl text-white">${e.nivel}</p></div>
     <div class="flex-1 min-w-[10rem]"><div class="h-2 rounded-full bg-galaxy-800 overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(e.progreso * 100)}" aria-label="Progreso al siguiente nivel"><div class="h-full bg-gradient-to-r from-galaxy-400 to-cyan-300" style="width:${Math.round(e.progreso * 100)}%"></div></div>
-      <p class="text-[11px] text-gray-400 mt-1">${formatoTokens(e.xp)} / ${formatoTokens(e.xpSiguiente)} XP para el nivel ${e.nivel + 1}</p></div>
-    <div class="text-right"><p class="text-[10px] uppercase tracking-widest text-gray-400 font-display">Tokens</p><p class="font-display font-extrabold text-2xl ${e.saldo < 0 ? 'text-rose-300' : 'text-amber-300'}"><i class="fa-solid fa-coins"></i> ${formatoTokens(e.saldo)}</p></div></div>
-    ${e.saldo < 0 ? '<p class="text-[11px] text-rose-300 mt-2">Tu saldo es negativo por un reembolso o disputa. Ganando tokens o comprando un paquete se compensa; mientras tanto no puedes comprar en la tienda.</p>' : ''}`;
+      <p class="text-[12px] text-gray-400 mt-1">${formatoTokens(e.xp)} / ${formatoTokens(e.xpSiguiente)} XP para el nivel ${e.nivel + 1}</p></div>
+    <div class="text-right"><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Tokens</p><p class="font-display font-extrabold text-2xl ${e.saldo < 0 ? 'text-rose-300' : 'text-amber-300'}"><i class="fa-solid fa-coins"></i> ${formatoTokens(e.saldo)}</p></div></div>
+    ${e.saldo < 0 ? '<p class="text-[12px] text-rose-300 mt-2">Tu saldo es negativo por un reembolso o disputa. Ganando tokens o comprando un paquete se compensa; mientras tanto no puedes comprar en la tienda.</p>' : ''}`;
 }
 function filtroHTML() {
   return `<div class="flex flex-wrap gap-2">${['todas', ...ORDEN_CATEGORIAS].map((c) => `<button type="button" data-cat="${c}" aria-pressed="${S.cat === c}" class="adv-chip !min-h-8">${c === 'todas' ? 'Todo' : CATEGORIAS[c].etiqueta}</button>`).join('')}</div>`;
@@ -30,10 +30,10 @@ function filtroHTML() {
 function itemHTML(i) {
   const razon = S.eco ? motivoNoComprable(i, S.eco) : 'Inicia sesión';
   return `<article class="glass-panel rounded-2xl p-3 flex flex-col gap-2"><div class="h-14 flex items-center justify-center">${vistaPrevia(i)}</div>
-    <div class="min-w-0"><h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[11px] text-gray-400 line-clamp-2">${escapeHTML(i.descripcion)}</p>
-    <p class="text-[10px] text-gray-500 mt-1">${CATEGORIAS[i.categoria].etiqueta}${i.nivelMin > 1 ? ` · Nivel ${i.nivelMin}+` : ''}${i.stock !== null ? ` · Quedan ${i.stock}` : ''}</p></div>
+    <div class="min-w-0"><h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[12px] text-gray-400 line-clamp-2">${escapeHTML(i.descripcion)}</p>
+    <p class="text-[12px] text-gray-500 mt-1">${CATEGORIAS[i.categoria].etiqueta}${i.nivelMin > 1 ? ` · Nivel ${i.nivelMin}+` : ''}${i.stock !== null ? ` · Quedan ${i.stock}` : ''}</p></div>
     <div class="mt-auto flex items-center gap-2"><span class="font-display font-extrabold text-amber-300 text-sm"><i class="fa-solid fa-coins"></i> ${formatoTokens(i.precio)}</span>
-    <button type="button" data-comprar="${i.id}" class="btn btn-primary !min-h-8 !px-3 !text-[11px] ml-auto" ${razon ? 'disabled' : ''}>${razon ? escapeHTML(razon) : 'Comprar'}</button></div></article>`;
+    <button type="button" data-comprar="${i.id}" class="btn btn-primary !min-h-8 !px-3 !text-[12px] ml-auto" ${razon ? 'disabled' : ''}>${razon ? escapeHTML(razon) : 'Comprar'}</button></div></article>`;
 }
 const tiendaHTML = () => {
   const l = S.items.filter((i) => S.cat === 'todas' || i.categoria === S.cat);
@@ -43,19 +43,19 @@ function inventarioHTML() {
   if (!S.yo) return vacio('Inicia sesión para ver tu inventario.');
   if (!S.inv?.length) return vacio('Aún no tienes objetos. Visita la tienda.');
   return `<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${S.inv.map((i) => `<article class="glass-panel rounded-2xl p-3 flex flex-col gap-2 ${i.equipado ? 'border border-galaxy-400/60' : ''}"><div class="h-14 flex items-center justify-center">${vistaPrevia(i)}</div>
-    <h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[10px] text-gray-500">${CATEGORIAS[i.categoria].etiqueta}</p>
-    <button type="button" data-equipar="${i.id}" data-valor="${i.equipado ? 'no' : 'si'}" class="btn ${i.equipado ? 'btn-ghost' : 'btn-primary'} !min-h-8 !px-3 !text-[11px] mt-auto">${i.equipado ? 'Quitar' : 'Equipar'}</button></article>`).join('')}</div>`;
+    <h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[12px] text-gray-500">${CATEGORIAS[i.categoria].etiqueta}</p>
+    <button type="button" data-equipar="${i.id}" data-valor="${i.equipado ? 'no' : 'si'}" class="btn ${i.equipado ? 'btn-ghost' : 'btn-primary'} !min-h-8 !px-3 !text-[12px] mt-auto">${i.equipado ? 'Quitar' : 'Equipar'}</button></article>`).join('')}</div>`;
 }
 function ganarHTML() {
   if (!S.reglas.length) return vacio('Aún no hay reglas publicadas.');
   return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Cómo ganar XP y tokens</h3>
     <ul class="divide-y divide-galaxy-border/40 mt-2">${S.reglas.map((r) => `<li class="flex flex-wrap items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 text-white">${escapeHTML(r.descripcion || r.fuente)}</span>
-      <span class="text-xs text-cyan-300">+${r.xp} XP</span><span class="text-xs text-amber-300">+${r.tokens} tokens</span>${r.topeDiario ? `<span class="text-[10px] text-gray-500">máx. ${r.topeDiario}/día</span>` : ''}</li>`).join('')}</ul>
-    <p class="text-[11px] text-gray-400 mt-2">Los partidos solo cuentan cuando el resultado queda confirmado. Los tokens no se pueden transferir ni cambiar por dinero.</p></section>`;
+      <span class="text-xs text-cyan-300">+${r.xp} XP</span><span class="text-xs text-amber-300">+${r.tokens} tokens</span>${r.topeDiario ? `<span class="text-[12px] text-gray-500">máx. ${r.topeDiario}/día</span>` : ''}</li>`).join('')}</ul>
+    <p class="text-[12px] text-gray-400 mt-2">Los partidos solo cuentan cuando el resultado queda confirmado. Los tokens no se pueden transferir ni cambiar por dinero.</p></section>`;
 }
 function tokensHTML() {
   const p = S.pq; if (!p) return vacio('Cargando…');
-  const aviso = '<p class="text-[11px] text-gray-400 mt-2">Los tokens son una moneda virtual del sitio: sirven solo para objetos cosméticos, no se transfieren entre personas ni se cambian por dinero. Compra reservada a mayores de 18 años con fecha de nacimiento declarada.</p>';
+  const aviso = '<p class="text-[12px] text-gray-400 mt-2">Los tokens son una moneda virtual del sitio: sirven solo para objetos cosméticos, no se transfieren entre personas ni se cambian por dinero. Compra reservada a mayores de 18 años con fecha de nacimiento declarada.</p>';
   if (!p.pagosActivos) return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-lock text-gray-400"></i> Compra de tokens</h3><p class="text-sm text-gray-300 mt-1">Todavía no está disponible. Mientras tanto, los tokens se ganan jugando.</p>${aviso}</section>`;
   if (!S.yo) return vacio('Inicia sesión para comprar tokens.');
   if (p.edad !== 'adulto') return `<section class="glass-panel rounded-2xl p-4"><p class="text-sm text-amber-200">La compra con dinero real es solo para mayores de 18 años con fecha de nacimiento declarada en tu perfil.</p></section>`;
@@ -65,7 +65,7 @@ function tokensHTML() {
 }
 function historialHTML() {
   if (!S.yo) return vacio('Inicia sesión para ver tu historial.');
-  const m = S.movs.length ? `<ul class="divide-y divide-galaxy-border/40">${S.movs.map((x) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 text-white">${escapeHTML(textoTipo(x.tipo))} <span class="text-[10px] text-gray-500">${escapeHTML(fecha(x.fecha))}</span></span><span class="font-display font-bold ${x.delta > 0 ? 'text-emerald-300' : 'text-rose-300'}">${x.delta > 0 ? '+' : ''}${x.delta}</span><span class="text-[10px] text-gray-500 w-16 text-right">saldo ${x.saldoDespues}</span></li>`).join('')}</ul>` : '<p class="text-xs text-gray-500">Sin movimientos todavía.</p>';
+  const m = S.movs.length ? `<ul class="divide-y divide-galaxy-border/40">${S.movs.map((x) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 text-white">${escapeHTML(textoTipo(x.tipo))} <span class="text-[12px] text-gray-500">${escapeHTML(fecha(x.fecha))}</span></span><span class="font-display font-bold ${x.delta > 0 ? 'text-emerald-300' : 'text-rose-300'}">${x.delta > 0 ? '+' : ''}${x.delta}</span><span class="text-[12px] text-gray-500 w-16 text-right">saldo ${x.saldoDespues}</span></li>`).join('')}</ul>` : '<p class="text-xs text-gray-500">Sin movimientos todavía.</p>';
   const o = S.ordenes.length ? `<h4 class="font-display font-bold text-white text-xs uppercase tracking-wider mt-4 mb-1">Órdenes de compra</h4><ul class="divide-y divide-galaxy-border/40">${S.ordenes.map((x) => `<li class="flex items-center gap-2 py-2 text-xs text-gray-300"><span class="flex-1">${escapeHTML(x.paquete)} · ${formatoPrecio(x.monto_centimos, x.moneda)}</span><span>${escapeHTML(x.estado)}</span></li>`).join('')}</ul>` : '';
   return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider mb-1">Movimientos de tokens</h3>${m}${o}</section>`;
 }
@@ -76,8 +76,8 @@ function adminHTML() {
   const resumen = `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Resumen</h3>
     <p class="text-xs text-gray-300 mt-1">Tokens en circulación: <b>${formatoTokens(r.tokens_en_circulacion)}</b> · Billeteras negativas: <b>${r.billeteras_negativas}</b> · Ingresos confirmados: <b>${formatoPrecio(r.ingresos_centimos)}</b></p>
     <p class="text-xs text-gray-300 mt-1">Órdenes: ${escapeHTML(JSON.stringify(r.ordenes))}</p>
-    <label class="flex items-center gap-2 text-sm text-white mt-3"><input type="checkbox" id="ti-pagos" ${r.pagos_activos ? 'checked' : ''}> Compras con dinero real activas <span class="text-[10px] text-gray-500">(requiere pasarela conectada)</span></label></section>`;
-  const items = `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Catálogo</h3><ul class="divide-y divide-galaxy-border/40 mt-1">${S.admItems.map((i) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 truncate ${i.activo ? 'text-white' : 'text-gray-500 line-through'}">${escapeHTML(i.nombre)} <span class="text-[10px] text-gray-500">${i.categoria} · ${i.precio}</span></span><button type="button" data-editar-item="${i.id}" class="btn btn-ghost !min-h-7 !px-2 !text-[10px]">Editar</button></li>`).join('')}</ul></section>`;
+    <label class="flex items-center gap-2 text-sm text-white mt-3"><input type="checkbox" id="ti-pagos" ${r.pagos_activos ? 'checked' : ''}> Compras con dinero real activas <span class="text-[12px] text-gray-500">(requiere pasarela conectada)</span></label></section>`;
+  const items = `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Catálogo</h3><ul class="divide-y divide-galaxy-border/40 mt-1">${S.admItems.map((i) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 truncate ${i.activo ? 'text-white' : 'text-gray-500 line-through'}">${escapeHTML(i.nombre)} <span class="text-[12px] text-gray-500">${i.categoria} · ${i.precio}</span></span><button type="button" data-editar-item="${i.id}" class="btn btn-ghost !min-h-7 !px-2 !text-[12px]">Editar</button></li>`).join('')}</ul></section>`;
   const f = `<form id="ti-item" class="glass-panel rounded-2xl p-4 grid grid-cols-2 gap-2"><h3 class="col-span-2 font-display font-bold text-white text-sm uppercase tracking-wider">${e.id ? 'Editar objeto' : 'Nuevo objeto'}</h3>
     <input id="ai-clave" class="field" placeholder="clave_unica" maxlength="40" value="${escapeHTML(e.clave)}" ${e.id ? 'readonly' : ''}><input id="ai-nombre" class="field" placeholder="Nombre" maxlength="40" value="${escapeHTML(e.nombre)}">
     <input id="ai-desc" class="field col-span-2" placeholder="Descripción" maxlength="200" value="${escapeHTML(e.descripcion)}">
@@ -90,11 +90,11 @@ function adminHTML() {
     <div class="col-span-2 flex gap-2"><button class="btn btn-primary !min-h-9 !px-3 !text-xs" type="submit">Guardar</button>${e.id ? '<button type="button" id="ai-nuevo" class="btn btn-ghost !min-h-9 !px-3 !text-xs">Nuevo</button>' : ''}</div></form>`;
   const reglas = `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Reglas de ganancia</h3><ul class="divide-y divide-galaxy-border/40 mt-1">${S.reglas.map((x) => `<li><form data-regla="${escapeHTML(x.fuente)}" class="flex flex-wrap items-center gap-2 py-2 text-xs text-gray-300"><span class="flex-1 min-w-[8rem] text-white">${escapeHTML(x.fuente)}</span>
     XP <input name="xp" type="number" min="0" class="field !w-16 !min-h-8" value="${x.xp}"> Tokens <input name="tokens" type="number" min="0" class="field !w-16 !min-h-8" value="${x.tokens}"> Tope/día <input name="tope" type="number" min="0" class="field !w-16 !min-h-8" value="${x.topeDiario ?? ''}">
-    <label><input name="activa" type="checkbox" ${x.activa ? 'checked' : ''}> activa</label><button class="btn btn-ghost !min-h-8 !px-2 !text-[10px]" type="submit">Guardar</button></form></li>`).join('')}</ul></section>`;
+    <label><input name="activa" type="checkbox" ${x.activa ? 'checked' : ''}> activa</label><button class="btn btn-ghost !min-h-8 !px-2 !text-[12px]" type="submit">Guardar</button></form></li>`).join('')}</ul></section>`;
   const aj = `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Ajustar tokens de una persona</h3>
     <button type="button" data-ajustar="${escapeHTML(S.yo)}" class="btn btn-primary !min-h-9 !px-3 !text-xs mt-2"><i class="fa-solid fa-coins"></i> Ajustarme a mí</button>
     <form id="ti-buscar" class="flex gap-2 mt-2"><input id="ti-buscar-q" class="field flex-1 min-w-0" maxlength="40" placeholder="Buscar persona" aria-label="Buscar persona"><button class="btn btn-ghost !min-h-9 !px-3 !text-xs" type="submit">Buscar</button></form>
-    <ul class="divide-y divide-galaxy-border/40 mt-1">${S.encontrados.map((u) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 truncate text-white">${escapeHTML(u.nombre)} <span class="text-gray-500 text-xs">@${escapeHTML(u.username)}</span></span><button type="button" data-ajustar="${escapeHTML(u.id)}" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Ajustar</button></li>`).join('')}</ul></section>`;
+    <ul class="divide-y divide-galaxy-border/40 mt-1">${S.encontrados.map((u) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 truncate text-white">${escapeHTML(u.nombre)} <span class="text-gray-500 text-xs">@${escapeHTML(u.username)}</span></span><button type="button" data-ajustar="${escapeHTML(u.id)}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Ajustar</button></li>`).join('')}</ul></section>`;
   return resumen + items + f + reglas + aj;
 }
 function pintar() {

@@ -39,9 +39,9 @@ export async function openPhotoCropper(file, { getPlayer = () => ({}), aspecto: 
               <button type="button" id="cr-menos" class="step" aria-label="Alejar">−</button>
               <input id="cr-zoom" type="range" class="stat-range flex-1" min="0" max="100" step="1" value="0" aria-label="Zoom" style="--p:0%;--c:#00e5ff">
               <button type="button" id="cr-mas" class="step" aria-label="Acercar">+</button>
-              <button type="button" id="cr-reset" class="text-[11px] text-galaxy-400 hover:text-white font-bold uppercase px-2 min-h-9">Ajustar</button>
+              <button type="button" id="cr-reset" class="text-[12px] text-galaxy-400 hover:text-white font-bold uppercase px-2 min-h-9">Ajustar</button>
             </div>
-            <p class="text-[11px] text-gray-500">Arrastra la foto para moverla. Tu foto se guarda con el encuadre que ves aquí.</p>
+            <p class="text-[12px] text-gray-500">Arrastra la foto para moverla. Tu foto se guarda con el encuadre que ves aquí.</p>
           </div>
           <div class="sm:w-[15rem] shrink-0 mx-auto sm:mx-0">
             <span class="label">Vista previa de la tarjeta</span>

@@ -16,14 +16,14 @@ export function abrirCatalogo({ noticias = [], noticiaId = null, inicial = {}, c
   const est = { plantilla: plantillaDe(inicial.plantilla) ? inicial.plantilla : 'auto', estilo: limpiarEstilo(inicial.estilo), tab: 'tarjetas', semilla: Date.now() % 100000, id: noticiaId };
   const wrap = openModal(`<div class="p-4 sm:p-6 space-y-4">
     <div class="flex justify-between items-start gap-3 border-b border-galaxy-border pb-3">
-      <div><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Catálogo</span><h3 class="font-display font-bold text-xl text-white uppercase">Diseños de noticias</h3>
+      <div><span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest">Catálogo</span><h3 class="font-display font-bold text-xl text-white uppercase">Diseños de noticias</h3>
         <p class="text-xs text-gray-400 mt-0.5"><b class="text-white">${NORMALES.length}</b> tarjetas · <b class="text-white">${HEROES.length}</b> destacadas · <b class="text-white">${LECTURAS.length}</b> lectores · combínalos con colores, formas y animaciones.</p></div>
       <button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button></div>
     ${noticias.length ? `<div class="flex flex-wrap items-center gap-2"><label for="cat-noticia" class="label !mb-0">Aplicar a</label><select id="cat-noticia" class="field !w-auto max-w-full flex-1 min-w-[12rem]">${noticias.map((n) => `<option value="${esc(n.id)}"${n.id === noticiaId ? ' selected' : ''}>${esc(n.titulo)}</option>`).join('')}</select></div>` : ''}
     <div id="cat-ctrl" class="space-y-2"></div>
     <div class="flex flex-wrap gap-2 items-center"><div class="liga-sel" id="cat-tabs" role="group" aria-label="Vista del catálogo"><button type="button" data-tab="tarjetas" aria-pressed="true">Tarjetas</button><button type="button" data-tab="heroes" aria-pressed="false">Destacadas</button><button type="button" data-tab="lectura" aria-pressed="false">Lectura</button></div>
-      <button type="button" id="cat-azar" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-dice"></i> Sorprenderme</button>
-      <button type="button" id="cat-auto" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-wand-magic-sparkles"></i> Automático</button></div>
+      <button type="button" id="cat-azar" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-dice"></i> Sorprenderme</button>
+      <button type="button" id="cat-auto" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-wand-magic-sparkles"></i> Automático</button></div>
     <div id="cat-galeria" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-h-[52vh] overflow-y-auto pr-1"></div>
     <div class="flex flex-wrap gap-2 justify-between items-center pt-2 border-t border-galaxy-border/50"><p id="cat-info" class="text-xs text-gray-400"></p>
       <div class="flex gap-2"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="button" id="cat-ok" class="btn btn-primary">${esc(boton)}</button></div></div>
@@ -33,11 +33,11 @@ export function abrirCatalogo({ noticias = [], noticiaId = null, inicial = {}, c
   const resolver = (n, plantilla) => asignarDiseno([{ ...n, plantilla, estilo: est.estilo }], { heroIdx: plantillaDe(plantilla)?.tamano === 'hero' ? 0 : -1 })[0];
 
   const controles = () => {
-    $('#cat-ctrl').innerHTML = CONTROLES.map((k) => `<div class="flex flex-wrap items-center gap-1.5"><span class="w-28 shrink-0 text-[10px] font-display font-bold uppercase tracking-widest text-gray-500">${ETIQUETAS_OPCION[k]}</span>
-      <button type="button" data-k="${k}" data-v="" aria-pressed="${est.estilo[k] === undefined}" class="adv-chip !min-h-8 !px-2.5 !text-[11px]">Auto</button>
+    $('#cat-ctrl').innerHTML = CONTROLES.map((k) => `<div class="flex flex-wrap items-center gap-1.5"><span class="w-28 shrink-0 text-[12px] font-display font-bold uppercase tracking-widest text-gray-500">${ETIQUETAS_OPCION[k]}</span>
+      <button type="button" data-k="${k}" data-v="" aria-pressed="${est.estilo[k] === undefined}" class="adv-chip !min-h-8 !px-2.5 !text-[12px]">Auto</button>
       ${OPCIONES[k].map((v) => k === 'acento'
         ? `<button type="button" data-k="${k}" data-v="${v}" aria-pressed="${est.estilo[k] === v}" title="${esc(ACENTOS[v].nombre)}" aria-label="${esc(ACENTOS[v].nombre)}" class="w-7 h-7 rounded-full border-2 ${est.estilo[k] === v ? 'border-white' : 'border-transparent'}" style="background:rgb(${ACENTOS[v].rgb});box-shadow:0 0 10px rgb(${ACENTOS[v].rgb}/.5)"></button>`
-        : `<button type="button" data-k="${k}" data-v="${v}" aria-pressed="${est.estilo[k] === v}" class="adv-chip !min-h-8 !px-2.5 !text-[11px]">${esc(ETIQUETAS_OPCION[v])}</button>`).join('')}</div>`).join('');
+        : `<button type="button" data-k="${k}" data-v="${v}" aria-pressed="${est.estilo[k] === v}" class="adv-chip !min-h-8 !px-2.5 !text-[12px]">${esc(ETIQUETAS_OPCION[v])}</button>`).join('')}</div>`).join('');
   };
   const galeria = () => {
     const n = actual(); const g = $('#cat-galeria');

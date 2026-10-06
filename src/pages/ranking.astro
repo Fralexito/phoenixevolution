@@ -4,18 +4,18 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="Ranking" active="ranking">
   <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
     <header class="glass-panel px-4 py-3 rounded-2xl">
-      <span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad</span>
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad</span>
       <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-ranking-star text-galaxy-400 mr-2"></i>Ranking</h1>
       <p class="text-gray-300 text-xs mt-0.5">Cada mes es una temporada (hora de Lima). El ranking <b>competitivo</b> cuenta solo duelos con marcador confirmado por los dos líderes: victoria 3, empate 1. El ranking de <b>retos</b> suma los puntos de los retos semanales que cobras.</p>
     </header>
 
     <div id="rk-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 flex flex-wrap items-center gap-3">
       <i class="fa-solid fa-triangle-exclamation"></i><span id="rk-error-txt" class="flex-1 min-w-0"></span>
-      <button type="button" id="rk-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]">Reintentar</button>
+      <button type="button" id="rk-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Reintentar</button>
     </div>
 
     <section id="rk-retos" hidden class="glass-panel rounded-2xl p-4" aria-labelledby="rk-retos-t">
-      <div class="flex flex-wrap items-center gap-2"><h2 id="rk-retos-t" class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-bullseye text-galaxy-400 mr-1"></i>Retos de la semana</h2><span id="rk-retos-fin" class="text-[11px] text-gray-400"></span><span id="rk-retos-pts" class="text-[11px] text-amber-300 ml-auto"></span></div>
+      <div class="flex flex-wrap items-center gap-2"><h2 id="rk-retos-t" class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-bullseye text-galaxy-400 mr-1"></i>Retos de la semana</h2><span id="rk-retos-fin" class="text-[12px] text-gray-400"></span><span id="rk-retos-pts" class="text-[12px] text-amber-300 ml-auto"></span></div>
       <div id="rk-retos-lista" class="grid sm:grid-cols-2 gap-2 mt-3"></div>
     </section>
 
@@ -25,9 +25,9 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" role="tab" data-tab="retos" aria-selected="false" class="adv-chip !min-h-9">Retos</button>
         <button type="button" role="tab" data-tab="elo" aria-selected="false" class="adv-chip !min-h-9">ELO</button>
       </div>
-      <label id="rk-mes-wrap" class="ml-auto text-[11px] text-gray-400">Temporada <select id="rk-mes" class="field !py-1 ml-1"></select></label>
+      <label id="rk-mes-wrap" class="ml-auto text-[12px] text-gray-400">Temporada <select id="rk-mes" class="field !py-1 ml-1"></select></label>
     </div>
-    <p id="rk-elo-info" hidden class="glass-panel rounded-xl px-3 py-2 text-[11px] text-gray-300 leading-relaxed"><b class="text-white">ELO de amistosos.</b> Solo cuentan los duelos 1v1 con marcador confirmado por los dos líderes (nunca la liga oficial). Todos parten de 1000; ganarle a alguien con más ELO suma más, y las goleadas pesan más. Los rangos: Bronce, Plata (desde 925), Oro (1025), Platino (1100) y Diamante (1175). No es acumulativo por mes: dura toda la historia.</p>
+    <p id="rk-elo-info" hidden class="glass-panel rounded-xl px-3 py-2 text-[12px] text-gray-300 leading-relaxed"><b class="text-white">ELO de amistosos.</b> Solo cuentan los duelos 1v1 con marcador confirmado por los dos líderes (nunca la liga oficial). Todos parten de 1000; ganarle a alguien con más ELO suma más, y las goleadas pesan más. Los rangos: Bronce, Plata (desde 925), Oro (1025), Platino (1100) y Diamante (1175). No es acumulativo por mes: dura toda la historia.</p>
     <div id="rk-lista" class="space-y-2" aria-live="polite"></div>
   </div>
 </Layout>

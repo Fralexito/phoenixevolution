@@ -58,8 +58,8 @@ async function seguro(fn, ok) {
 const urlCarta = (p) => `${href('jugador/')}?id=${encodeURIComponent(p.ficha_id)}`;
 /** «Ver carta» (si su cuenta está vinculada a una ficha) y «Retar a duelo» (si no soy yo; exige sesión para enviarse). */
 function botonesCartaReto(p, conReto = true) {
-  const carta = p.ficha_id ? `<a href="${escapeHTML(urlCarta(p))}" class="btn btn-ghost !min-h-9 !px-3 !text-[11px] !text-amber-300 !border-amber-400/50"><i class="fa-solid fa-id-card"></i><span>${p.soy_yo ? 'Ver mi carta' : 'Ver su carta'}</span></a>` : '';
-  const reto = conReto && !p.soy_yo ? `<a href="${escapeHTML(href('duelos/'))}?retar=${escapeHTML(p.id)}" class="btn btn-primary !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-gamepad"></i><span>Retar a duelo</span></a>` : '';
+  const carta = p.ficha_id ? `<a href="${escapeHTML(urlCarta(p))}" class="btn btn-ghost !min-h-9 !px-3 !text-[12px] !text-amber-300 !border-amber-400/50"><i class="fa-solid fa-id-card"></i><span>${p.soy_yo ? 'Ver mi carta' : 'Ver su carta'}</span></a>` : '';
+  const reto = conReto && !p.soy_yo ? `<a href="${escapeHTML(href('duelos/'))}?retar=${escapeHTML(p.id)}" class="btn btn-primary !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-gamepad"></i><span>Retar a duelo</span></a>` : '';
   return carta + reto;
 }
 const vigentes = () => S.hist?.historias ?? [];
@@ -76,7 +76,7 @@ function avatarConAnillo(p, acento) {
 /* ---------- Relación social con ESTA persona (amigos, solicitudes, seguir) ---------- */
 /** Rol de otra cuenta (la lectura de perfiles es pública). Solo informa en el modal: el rango que cuenta lo decide la BD. */
 async function rolDe(id) { try { const { data } = await supabase.from('perfiles').select('rol').eq('id', id).maybeSingle(); return data?.rol ?? 'jugador'; } catch { return 'jugador'; } }
-const BTN_SOC = 'btn btn-ghost !min-h-9 !px-3 !text-[11px]';
+const BTN_SOC = 'btn btn-ghost !min-h-9 !px-3 !text-[12px]';
 const yoId = () => S.sesion?.user?.id ?? null;
 const relacionCon = (p) => (S.red ? relacion(S.red, p.id, yoId()) : null);
 function botonSocial(act, icono, texto, extra = '', etiqueta = '') {
@@ -95,7 +95,7 @@ function botonesSociales(p) {
     cancelar: botonSocial('cancelar-solicitud', 'fa-clock', 'Solicitud enviada · cancelar'),
     aceptar: botonSocial('aceptar-amistad', 'fa-check', 'Aceptar solicitud', '!text-ok !border-ok/50'),
     rechazar: botonSocial('rechazar-amistad', 'fa-xmark', 'Rechazar'),
-    amigos: '<span class="inline-flex items-center gap-1.5 text-[11px] text-ok border border-ok/40 rounded-lg px-2.5 min-h-9"><i class="fa-solid fa-user-check"></i>Amigos</span>',
+    amigos: '<span class="inline-flex items-center gap-1.5 text-[12px] text-ok border border-ok/40 rounded-lg px-2.5 min-h-9"><i class="fa-solid fa-user-check"></i>Amigos</span>',
     seguir: botonSocial('seguir', 'fa-heart', 'Seguir'), dejar: botonSocial('dejar-seguir', 'fa-check', 'Siguiendo'),
     bloquear: botonSocial('bloquear', 'fa-ban', '', '!text-bad !border-bad/50', 'Bloquear a esta persona'),
     desbloquear: botonSocial('desbloquear', 'fa-lock-open', 'Desbloquear'),
@@ -122,27 +122,27 @@ function cabecera(p) {
     p.club_favorito && ['fa-shield-halved', p.club_favorito], p.posicion_preferida && ['fa-location-crosshairs', p.posicion_preferida],
     p.pais_codigo && ['fa-flag', p.pais_codigo], `${p.partidos_jugados ?? 0}` !== '' && ['fa-gamepad', `${p.partidos_jugados ?? 0} partidos`],
     p.rango_fairplay && ['fa-handshake', p.rango_fairplay],
-  ].filter(Boolean).map(([i, t]) => `<span class="inline-flex items-center gap-1.5 text-[11px] text-gray-300 bg-black/30 border border-galaxy-border/70 rounded-full px-2.5 py-1"><i class="fa-solid ${i}" style="color:${acento}"></i>${escapeHTML(t)}</span>`).join('');
+  ].filter(Boolean).map(([i, t]) => `<span class="inline-flex items-center gap-1.5 text-[12px] text-gray-300 bg-black/30 border border-galaxy-border/70 rounded-full px-2.5 py-1"><i class="fa-solid ${i}" style="color:${acento}"></i>${escapeHTML(t)}</span>`).join('');
   const lineas = p.puede_hostear ? lineasHost(catalogoDe(p)) : [];
   const detalleHost = lineas.length ? lineas.map((l) => `<b class="text-white">${escapeHTML(l.juego)}</b>${l.detalle ? ` <span class="text-gray-400">(${escapeHTML(l.detalle)})</span>` : ''}`).join(' · ') : '<b class="text-white">PES 2021</b>';
   const host = p.puede_hostear ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-server mr-1.5" style="color:${acento}"></i>Hostea ${detalleHost} · ${escapeHTML(p.software_host || 'Parsec')}${p.soy_yo && p.host_visible === false ? ' <em class="text-amber-300 not-italic">· oculto para los demás</em>' : ''}</p>` : '';
   const stream = safeUrl(p.stream_url) ? `<a href="${escapeHTML(safeUrl(p.stream_url))}" target="_blank" rel="noopener noreferrer" class="text-xs text-galaxy-400 underline"><i class="fa-solid fa-tower-broadcast mr-1"></i>Ver su canal</a>` : '';
   const acciones = p.soy_yo
-    ? `${botonesCartaReto(p)}<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
-       <button type="button" data-act="panel" data-panel="host" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-server"></i><span>Hosting</span></button>
-       <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
+    ? `${botonesCartaReto(p)}<button type="button" data-act="panel" data-panel="estilo" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-palette"></i><span>Estilo</span></button>
+       <button type="button" data-act="panel" data-panel="host" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-server"></i><span>Hosting</span></button>
+       <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
     : (S.sesion ? `${botonesCartaReto(p)}${botonesSociales(p)}${botonesModeracion(p)}`
-      : `${botonesCartaReto(p)}<span class="text-[11px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Inicia sesión (botón «Entrar», arriba) para escribirle, agregarlo o retarlo.</span>`);
+      : `${botonesCartaReto(p)}<span class="text-[12px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Inicia sesión (botón «Entrar», arriba) para escribirle, agregarlo o retarlo.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
     <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
-      ${p.soy_yo ? `<input type="file" id="bn-file" accept="image/jpeg,image/png,image/webp" hidden><button type="button" data-act="cambiar-banner" aria-label="Cambiar banner" title="Cambiar banner" class="absolute top-2 right-2 z-10 h-9 px-3 rounded-full bg-black/60 hover:bg-black/80 text-white text-[11px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-camera"></i><span class="max-sm:hidden">Cambiar banner</span></button>` : ''}</div>
+      ${p.soy_yo ? `<input type="file" id="bn-file" accept="image/jpeg,image/png,image/webp" hidden><button type="button" data-act="cambiar-banner" aria-label="Cambiar banner" title="Cambiar banner" class="absolute top-2 right-2 z-10 h-9 px-3 rounded-full bg-black/60 hover:bg-black/80 text-white text-[12px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-camera"></i><span class="max-sm:hidden">Cambiar banner</span></button>` : ''}</div>
     <div class="px-4 sm:px-6 pb-5 -mt-10 sm:-mt-12 relative">
       <div class="flex flex-wrap items-end gap-3 sm:gap-4">
         ${avatarConAnillo(p, acento)}
         <div class="min-w-0 flex-1 pt-10 sm:pt-12">
           <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl truncate">${escapeHTML(p.nombre_display || 'Jugador')}</h1>
-          <p class="text-xs text-gray-400">@${escapeHTML(p.username)} <a id="pf-clan" hidden class="ml-1 font-display font-extrabold text-galaxy-400 hover:underline" title="Clan"></a> <span id="pf-nivel" hidden class="ml-1 text-[10px] font-display font-bold uppercase tracking-wider border border-amber-400/40 text-amber-300 rounded px-1.5 py-0.5"></span> <span id="pf-titulo" hidden class="ml-1 text-[10px] font-display font-bold uppercase tracking-wider"></span> <span id="pf-rep" hidden class="ml-1 text-[10px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5"></span></p></div>
-        <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:pt-12">${acciones}<button type="button" data-act="compartir" data-tipo="" aria-label="Compartir perfil" title="Compartir perfil" class="btn btn-ghost !min-h-9 !px-3 !text-[11px]"><i class="fa-solid fa-share-nodes"></i></button></div>
+          <p class="text-xs text-gray-400">@${escapeHTML(p.username)} <a id="pf-clan" hidden class="ml-1 font-display font-extrabold text-galaxy-400 hover:underline" title="Clan"></a> <span id="pf-nivel" hidden class="ml-1 text-[12px] font-display font-bold uppercase tracking-wider border border-amber-400/40 text-amber-300 rounded px-1.5 py-0.5"></span> <span id="pf-titulo" hidden class="ml-1 text-[12px] font-display font-bold uppercase tracking-wider"></span> <span id="pf-rep" hidden class="ml-1 text-[12px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5"></span></p></div>
+        <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:pt-12">${acciones}<button type="button" data-act="compartir" data-tipo="" aria-label="Compartir perfil" title="Compartir perfil" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-share-nodes"></i></button></div>
       </div>
       ${lema ? `<p class="mt-3 text-sm italic" style="color:${acento}">«${escapeHTML(lema)}»</p>` : ''}
       ${p.bio ? `<p class="mt-2 text-sm text-gray-300 whitespace-pre-line">${escapeHTML(p.bio)}</p>` : ''}
@@ -154,45 +154,45 @@ function cabecera(p) {
 const opcionesSel = (lista, actual) => lista.map(([v, t]) => `<option value="${v}" ${v === actual ? 'selected' : ''}>${t}</option>`).join('');
 function franjaEstadisticas() {
   const e = S.stats; if (!e || !e.jugados) return '';
-  const caja = (n, t, c = 'text-white') => `<div class="text-center min-w-[3.2rem]"><b class="block font-display text-lg ${c}">${n}</b><span class="text-[10px] uppercase tracking-wider text-gray-500">${t}</span></div>`;
+  const caja = (n, t, c = 'text-white') => `<div class="text-center min-w-[3.2rem]"><b class="block font-display text-lg ${c}">${n}</b><span class="text-[12px] uppercase tracking-wider text-gray-500">${t}</span></div>`;
   return `<section class="glass-panel rounded-2xl px-3 py-2.5 flex items-center gap-3 flex-wrap" aria-label="Estadísticas de duelos">
-    <span class="text-[10px] font-display font-bold uppercase tracking-widest text-gray-400"><i class="fa-solid fa-chart-simple text-galaxy-400"></i> Duelos</span>
+    <span class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-400"><i class="fa-solid fa-chart-simple text-galaxy-400"></i> Duelos</span>
     ${caja(e.jugados, 'Jugados')}${caja(e.victorias, 'Ganados', 'text-ok')}${caja(e.empates, 'Empates')}${caja(e.derrotas, 'Perdidos', 'text-bad')}${caja(`${e.gf}-${e.gc}`, 'Goles')}${e.efectividad != null ? caja(`${e.efectividad}%`, 'Efectividad', 'text-galaxy-400') : ''}
-    ${S.elo ? `<div class="w-full border-t border-galaxy-border/40 pt-1">${rangoBloque(progresoRango(S.elo.elo, S.elo.jugados), S.elo.elo)}<span class="text-[10px] text-gray-500">ELO de amistosos 1v1 (${S.elo.jugados} jugado${S.elo.jugados === 1 ? '' : 's'}).</span></div>` : ''}
-    <span class="w-full text-[10px] text-gray-500">Solo cuentan marcadores confirmados por los dos líderes.</span></section>`;
+    ${S.elo ? `<div class="w-full border-t border-galaxy-border/40 pt-1">${rangoBloque(progresoRango(S.elo.elo, S.elo.jugados), S.elo.elo)}<span class="text-[12px] text-gray-500">ELO de amistosos 1v1 (${S.elo.jugados} jugado${S.elo.jugados === 1 ? '' : 's'}).</span></div>` : ''}
+    <span class="w-full text-[12px] text-gray-500">Solo cuentan marcadores confirmados por los dos líderes.</span></section>`;
 }
 function franjaLogros(p) {
   const l = S.logros; if (!l?.visible || !l.logros.length) return '';
   const max = 8, ver = l.logros.slice(0, max);
   return `<section class="glass-panel rounded-2xl px-3 py-2.5 flex items-center gap-2 flex-wrap" aria-label="Logros">
-    <span class="text-[10px] font-display font-bold uppercase tracking-widest text-gray-400 mr-1"><i class="fa-solid fa-medal text-galaxy-400"></i> Logros ${l.obtenidos}</span>
+    <span class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-400 mr-1"><i class="fa-solid fa-medal text-galaxy-400"></i> Logros ${l.obtenidos}</span>
     ${ver.map((x) => `<span title="${escapeHTML(x.nombre + ' — ' + x.descripcion)}" class="w-8 h-8 rounded-lg border flex items-center justify-center ${nivelDe(x.nivel).clase}"><i class="fa-solid ${x.icono} text-sm" aria-hidden="true"></i><span class="sr-only">${escapeHTML(x.nombre)}</span></span>`).join('')}
-    ${l.obtenidos > max ? `<span class="text-[11px] text-gray-500">+${l.obtenidos - max}</span>` : ''}
-    ${p.soy_yo ? `<a href="${escapeHTML(href('logros/'))}" class="ml-auto text-[11px] text-galaxy-400 hover:text-white font-bold">Ver todos</a>` : ''}</section>`;
+    ${l.obtenidos > max ? `<span class="text-[12px] text-gray-500">+${l.obtenidos - max}</span>` : ''}
+    ${p.soy_yo ? `<a href="${escapeHTML(href('logros/'))}" class="ml-auto text-[12px] text-galaxy-400 hover:text-white font-bold">Ver todos</a>` : ''}</section>`;
 }
 function panelEstilo(p) {
   const { banner, acento, lema, foto } = estiloDe(p);
   return `<section id="panel-estilo" hidden class="glass-panel rounded-2xl p-4 space-y-3">
     <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-palette text-galaxy-400 mr-2"></i>Estilo de tu perfil</h2>
-    <div><p class="text-[11px] text-gray-400 mb-1.5">Banner</p><div class="grid grid-cols-4 gap-2" id="est-banners" data-foto="${escapeHTML(foto)}">${BANNERS.map((b) => `<button type="button" data-banner="${b.id}" aria-pressed="${!foto && b.id === banner.id}" title="${b.label}" class="h-12 rounded-lg border-2 border-transparent aria-pressed:border-white text-[10px] font-bold text-white/90 flex items-end justify-center pb-0.5" style="background:${b.css}">${b.label}</button>`).join('')}</div>
+    <div><p class="text-[12px] text-gray-400 mb-1.5">Banner</p><div class="grid grid-cols-4 gap-2" id="est-banners" data-foto="${escapeHTML(foto)}">${BANNERS.map((b) => `<button type="button" data-banner="${b.id}" aria-pressed="${!foto && b.id === banner.id}" title="${b.label}" class="h-12 rounded-lg border-2 border-transparent aria-pressed:border-white text-[12px] font-bold text-white/90 flex items-end justify-center pb-0.5" style="background:${b.css}">${b.label}</button>`).join('')}</div>
       <div class="mt-2 flex flex-wrap items-center gap-2"><input type="file" id="est-file" accept="image/jpeg,image/png,image/webp" hidden>
-        <button type="button" data-act="subir-banner" class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-image"></i><span>Subir mi foto de banner</span></button>
-        <button type="button" data-act="quitar-banner" id="est-quitar" ${foto ? '' : 'hidden'} class="btn btn-ghost !min-h-8 !px-3 !text-[11px]"><i class="fa-solid fa-xmark"></i><span>Quitar foto</span></button>
-        <span id="est-foto-estado" class="text-[11px] text-gray-500">${foto ? 'Usando tu foto de banner.' : 'JPG, PNG o WebP; se reduce sola a 1600 px.'}</span></div></div>
-    <div><p class="text-[11px] text-gray-400 mb-1.5">Color de acento</p><div class="flex flex-wrap gap-2" id="est-acentos">${ACENTOS.map((c) => `<button type="button" data-acento="${c}" aria-pressed="${c.toLowerCase() === acento.toLowerCase()}" aria-label="Color ${c}" class="w-8 h-8 rounded-full border-2 border-transparent aria-pressed:border-white" style="background:${c}"></button>`).join('')}</div></div>
-    <label class="block"><span class="text-[11px] text-gray-400">Tu lema (máx. ${LEMA_MAX})</span><input id="est-lema" maxlength="${LEMA_MAX}" value="${escapeHTML(lema)}" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white" placeholder="Ej.: Juego limpio, remontada segura"></label>
-    <p class="text-[11px] text-gray-500">Tu bio y tu club se editan en «Mi perfil».</p>
+        <button type="button" data-act="subir-banner" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-image"></i><span>Subir mi foto de banner</span></button>
+        <button type="button" data-act="quitar-banner" id="est-quitar" ${foto ? '' : 'hidden'} class="btn btn-ghost !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-xmark"></i><span>Quitar foto</span></button>
+        <span id="est-foto-estado" class="text-[12px] text-gray-500">${foto ? 'Usando tu foto de banner.' : 'JPG, PNG o WebP; se reduce sola a 1600 px.'}</span></div></div>
+    <div><p class="text-[12px] text-gray-400 mb-1.5">Color de acento</p><div class="flex flex-wrap gap-2" id="est-acentos">${ACENTOS.map((c) => `<button type="button" data-acento="${c}" aria-pressed="${c.toLowerCase() === acento.toLowerCase()}" aria-label="Color ${c}" class="w-8 h-8 rounded-full border-2 border-transparent aria-pressed:border-white" style="background:${c}"></button>`).join('')}</div></div>
+    <label class="block"><span class="text-[12px] text-gray-400">Tu lema (máx. ${LEMA_MAX})</span><input id="est-lema" maxlength="${LEMA_MAX}" value="${escapeHTML(lema)}" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white" placeholder="Ej.: Juego limpio, remontada segura"></label>
+    <p class="text-[12px] text-gray-500">Tu bio y tu club se editan en «Mi perfil».</p>
     <div class="flex gap-2"><button type="button" data-act="guardar-estilo" class="btn btn-primary !min-h-9 !text-xs">Guardar estilo</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div></section>`;
 }
 function panelPrivacidad(p) {
   return `<section id="panel-privacidad" hidden class="glass-panel rounded-2xl p-4 space-y-3">
     <h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-shield-halved text-galaxy-400 mr-2"></i>Privacidad de tu muro</h2>
-    <label class="block"><span class="text-[11px] text-gray-400">¿Quién puede ver mi muro?</span><select id="pr-ver" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${opcionesSel(MURO_VER, p.muro_ver)}</select></label>
-    <label class="block"><span class="text-[11px] text-gray-400">¿Quién podrá responder? <em class="not-italic text-gray-500">(responder y reaccionar)</em></span><select id="pr-resp" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${opcionesSel(MURO_RESPONDER, p.muro_responder)}</select></label>
-    <p class="text-[11px] text-gray-500">Los jugadores que bloqueaste nunca ven tu muro, sea cual sea esta opción.</p>
+    <label class="block"><span class="text-[12px] text-gray-400">¿Quién puede ver mi muro?</span><select id="pr-ver" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${opcionesSel(MURO_VER, p.muro_ver)}</select></label>
+    <label class="block"><span class="text-[12px] text-gray-400">¿Quién podrá responder? <em class="not-italic text-gray-500">(responder y reaccionar)</em></span><select id="pr-resp" class="mt-1 w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white">${opcionesSel(MURO_RESPONDER, p.muro_responder)}</select></label>
+    <p class="text-[12px] text-gray-500">Los jugadores que bloqueaste nunca ven tu muro, sea cual sea esta opción.</p>
     <div class="flex gap-2"><button type="button" data-act="guardar-priv" class="btn btn-primary !min-h-9 !text-xs">Guardar</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div></section>`;
 }
-const selectSegmento = (id) => `<select id="${id}" aria-label="Juego de la publicación (opcional)" class="rounded-lg bg-black/30 border border-galaxy-border px-2 py-1.5 text-[11px] text-gray-300 max-w-[9.5rem]"><option value="">General (sin juego)</option>${SEGMENTOS.map(([id, n]) => `<option value="${id}">${n}</option>`).join('')}</select>`;
+const selectSegmento = (id) => `<select id="${id}" aria-label="Juego de la publicación (opcional)" class="rounded-lg bg-black/30 border border-galaxy-border px-2 py-1.5 text-[12px] text-gray-300 max-w-[9.5rem]"><option value="">General (sin juego)</option>${SEGMENTOS.map(([id, n]) => `<option value="${id}">${n}</option>`).join('')}</select>`;
 const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
   <textarea id="mu-texto" data-menciones rows="3" maxlength="${MURO_MAX + 200}" placeholder="¿Qué quieres contar? Un resultado, una búsqueda de rivales, un enlace de tu clip…" class="w-full rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-sm text-white resize-y"></textarea>
   <div id="mu-prev" hidden class="relative inline-block"><img id="mu-prev-img" alt="Vista previa de tu foto" class="max-h-40 rounded-lg border border-galaxy-border" hidden><video id="mu-prev-vid" muted playsinline controls class="max-h-48 rounded-lg border border-galaxy-border" hidden></video><button type="button" data-act="quitar-foto" aria-label="Quitar adjunto" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/70 text-white text-xs"><i class="fa-solid fa-xmark"></i></button></div>
@@ -205,8 +205,8 @@ const composer = () => `<section class="glass-panel rounded-2xl p-3 space-y-2">
     <button type="button" data-act="alternar-video" aria-label="Enlace de video" title="Enlace de YouTube, TikTok, Kick o Twitch" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-link"></i><span class="max-sm:hidden">Enlace</span></button>
     <button type="button" data-act="crear-encuesta" aria-label="Encuesta" title="Crear una encuesta" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-square-poll-vertical"></i><span class="max-sm:hidden">Encuesta</span></button>
     <button type="button" data-act="alternar-reto" aria-label="Duelo" title="Adjuntar duelo" class="btn btn-ghost !min-h-9 !px-3 !text-xs"><i class="fa-solid fa-gamepad"></i><span class="max-sm:hidden">Duelo</span></button>
-    <span id="mu-cuenta" class="ml-auto text-[11px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" aria-label="Publicar" title="Publicar" class="btn btn-primary !min-h-9 !text-xs shrink-0 max-sm:!px-3"><i class="fa-solid fa-paper-plane"></i><span class="max-sm:hidden">Publicar</span></button></div>
-  <div class="flex items-center gap-2 text-[11px] text-gray-500"><i class="fa-solid fa-tag"></i><span>Juego (opcional):</span>${selectSegmento('mu-juego')}</div></section>`;
+    <span id="mu-cuenta" class="ml-auto text-[12px] text-gray-500 whitespace-nowrap">0 / ${MURO_MAX}</span><button type="button" data-act="publicar" aria-label="Publicar" title="Publicar" class="btn btn-primary !min-h-9 !text-xs shrink-0 max-sm:!px-3"><i class="fa-solid fa-paper-plane"></i><span class="max-sm:hidden">Publicar</span></button></div>
+  <div class="flex items-center gap-2 text-[12px] text-gray-500"><i class="fa-solid fa-tag"></i><span>Juego (opcional):</span>${selectSegmento('mu-juego')}</div></section>`;
 
 /** Reacciones: las que ya tiene la publicación, de MÁS a MENOS votada (la más popular va primero); con permiso son botones (la mía resaltada) y hay un «+» que abre
  *  la paleta de emojis. Sin ninguna reacción todavía, se ofrecen las 5 rápidas para no dejar la fila vacía. */
@@ -216,20 +216,20 @@ function barraReacciones(it, p) {
     ? `<button type="button" data-act="reaccion" data-id="${it.id}" data-tipo="${escapeHTML(tipo)}" aria-pressed="${activo}" class="rx"><span>${escapeHTML(tipo)}</span>${n ? `<b>${n}</b>` : ''}</button>`
     : `<span class="rx"><span>${escapeHTML(tipo)}</span><b>${n}</b></span>`;
   const rapidas = !resumen.length && p.puede_responder ? REACCIONES.map(([t]) => chip(t, 0, false)).join('') : '';
-  const mas = p.puede_responder ? `<button type="button" data-act="paleta" data-id="${it.id}" aria-expanded="${abierta}" aria-label="Más emojis" title="Más emojis" class="rx !px-2"><i class="fa-regular fa-face-smile"></i><i class="fa-solid fa-plus text-[9px]"></i></button>` : '';
+  const mas = p.puede_responder ? `<button type="button" data-act="paleta" data-id="${it.id}" aria-expanded="${abierta}" aria-label="Más emojis" title="Más emojis" class="rx !px-2"><i class="fa-regular fa-face-smile"></i><i class="fa-solid fa-plus text-[12px]"></i></button>` : '';
   const n = Number(it.respuestas) || 0;
   const paleta = abierta ? `<div class="mt-2 p-2 rounded-xl border border-galaxy-border bg-black/40 grid grid-cols-8 gap-1" role="group" aria-label="Elige un emoji">${PALETA_EMOJIS.map((e) => `<button type="button" data-act="reaccion" data-id="${it.id}" data-tipo="${e}" aria-pressed="${it.mia === e}" class="h-9 rounded-lg text-lg hover:bg-white/10 aria-pressed:bg-white/15">${e}</button>`).join('')}</div>` : '';
-  return `<div class="flex flex-wrap items-center gap-1.5">${resumen.map((x) => chip(x.tipo, x.n, it.mia === x.tipo)).join('')}${rapidas}${mas}<button type="button" data-act="respuestas" data-id="${it.id}" aria-expanded="${S.abiertas.has(it.id)}" class="ml-auto text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'}` : (p.puede_responder ? 'Responder' : 'Sin respuestas')}</button></div>${paleta}`;
+  return `<div class="flex flex-wrap items-center gap-1.5">${resumen.map((x) => chip(x.tipo, x.n, it.mia === x.tipo)).join('')}${rapidas}${mas}<button type="button" data-act="respuestas" data-id="${it.id}" aria-expanded="${S.abiertas.has(it.id)}" class="ml-auto text-[12px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'}` : (p.puede_responder ? 'Responder' : 'Sin respuestas')}</button></div>${paleta}`;
 }
 function seccionRespuestas(it, p) {
   const lista = S.resp.get(it.id);
-  const filas = lista === undefined ? '<p class="text-[11px] text-gray-500 py-2">Cargando respuestas…</p>'
+  const filas = lista === undefined ? '<p class="text-[12px] text-gray-500 py-2">Cargando respuestas…</p>'
     : lista.map((r) => `<div class="flex gap-2 py-1.5"><span class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span>
-        <div class="min-w-0 flex-1 rounded-xl bg-white/[0.03] px-2.5 py-1.5"><p class="text-[11px]"><a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(r.username)}" class="font-display font-bold text-white hover:text-galaxy-400">${escapeHTML(r.nombre_display)}</a> <span class="text-gray-500">· ${tiempoRelativo(r.created_at)}</span>${S.sesion && r.autor_id !== yoId() ? ` <button type="button" data-act="reportar" data-tipo="respuesta" data-id="${r.id}" title="Reportar respuesta" aria-label="Reportar respuesta" class="text-gray-500 hover:text-amber-300 ml-1"><i class="fa-regular fa-flag text-[10px]"></i></button>${can('resolverReportes') ? ` <button type="button" data-act="mod-ocultar" data-tipo="respuesta" data-id="${r.id}" data-pub="${it.id}" title="Ocultar (moderación)" aria-label="Ocultar respuesta (moderación)" class="text-gray-500 hover:text-orange-300 ml-1"><i class="fa-solid fa-eye-slash text-[10px]"></i></button>` : ''}` : ''}${r.puedo_borrar ? ` <button type="button" data-act="borrar-resp" data-id="${r.id}" data-pub="${it.id}" title="Borrar respuesta" class="text-gray-500 hover:text-bad ml-1"><i class="fa-solid fa-trash text-[10px]"></i></button>` : ''}</p>
+        <div class="min-w-0 flex-1 rounded-xl bg-white/[0.03] px-2.5 py-1.5"><p class="text-[12px]"><a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(r.username)}" class="font-display font-bold text-white hover:text-galaxy-400">${escapeHTML(r.nombre_display)}</a> <span class="text-gray-500">· ${tiempoRelativo(r.created_at)}</span>${S.sesion && r.autor_id !== yoId() ? ` <button type="button" data-act="reportar" data-tipo="respuesta" data-id="${r.id}" title="Reportar respuesta" aria-label="Reportar respuesta" class="text-gray-500 hover:text-amber-300 ml-1"><i class="fa-regular fa-flag text-[12px]"></i></button>${can('resolverReportes') ? ` <button type="button" data-act="mod-ocultar" data-tipo="respuesta" data-id="${r.id}" data-pub="${it.id}" title="Ocultar (moderación)" aria-label="Ocultar respuesta (moderación)" class="text-gray-500 hover:text-orange-300 ml-1"><i class="fa-solid fa-eye-slash text-[12px]"></i></button>` : ''}` : ''}${r.puedo_borrar ? ` <button type="button" data-act="borrar-resp" data-id="${r.id}" data-pub="${it.id}" title="Borrar respuesta" class="text-gray-500 hover:text-bad ml-1"><i class="fa-solid fa-trash text-[12px]"></i></button>` : ''}</p>
           <p class="text-xs text-gray-200 leading-snug">${textoAHTML(r.texto)}</p></div></div>`).join('');
   const form = p.puede_responder
     ? `<div class="flex gap-2 mt-1"><input data-resp-input="${it.id}" data-menciones maxlength="${RESP_MAX + 100}" placeholder="Escribe una respuesta…" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"><button type="button" data-act="enviar-resp" data-id="${it.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane"></i></button></div>`
-    : `<p class="text-[11px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
+    : `<p class="text-[12px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
 /** Reportar (cualquiera con sesión, salvo en lo propio) y ocultar (solo moderación). La base de datos vuelve a comprobar rol y rango. */
@@ -250,7 +250,7 @@ function tarjeta(it, p) {
     <header class="flex items-center gap-2.5 mb-2">
       <span class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(p.avatar_url, p.nombre_display, 36)}</span>
       <div class="min-w-0 flex-1"><p class="font-display font-bold text-white text-sm truncate">${escapeHTML(p.nombre_display)}</p>
-        <p class="text-[11px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${S.sesion ? botonGuardarHTML('publicacion', it.id) : ''}${compartirBtn('p', it.id)}${moderarBtns('publicacion', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
+        <p class="text-[12px] text-gray-500">${it.fijada ? '<i class="fa-solid fa-thumbtack text-galaxy-400 mr-1"></i>Fijada · ' : ''}${tiempoRelativo(it.created_at)}${it.editada_at ? ' · editada' : ''} ${segmentoChipHTML(it.juego)}</p></div>${S.sesion ? botonGuardarHTML('publicacion', it.id) : ''}${compartirBtn('p', it.id)}${moderarBtns('publicacion', it.id)}${menu}</header>${cuerpo}${S.editando === it.id ? '' : pie}</article>`;
 }
 function feed(p) {
   if (!S.visible) return candadoMuro(p);
@@ -258,7 +258,7 @@ function feed(p) {
   return S.items.map((it) => tarjeta(it, p)).join('') + (S.hayMas ? `<button type="button" data-act="mas" class="btn btn-ghost w-full !text-xs">Cargar más</button>` : '');
 }
 /* ---------- Historias, destacadas y clips ---------- */
-const bolita = (inner, etiqueta, acc, extra = '') => `<button type="button" ${acc} class="flex flex-col items-center gap-1 w-16 shrink-0 group" aria-label="${escapeHTML(etiqueta)}"><span class="w-14 h-14 rounded-full grid place-items-center overflow-hidden bg-galaxy-card ${extra}">${inner}</span><span class="text-[10px] text-gray-300 truncate w-full text-center group-hover:text-white">${escapeHTML(etiqueta)}</span></button>`;
+const bolita = (inner, etiqueta, acc, extra = '') => `<button type="button" ${acc} class="flex flex-col items-center gap-1 w-16 shrink-0 group" aria-label="${escapeHTML(etiqueta)}"><span class="w-14 h-14 rounded-full grid place-items-center overflow-hidden bg-galaxy-card ${extra}">${inner}</span><span class="text-[12px] text-gray-300 truncate w-full text-center group-hover:text-white">${escapeHTML(etiqueta)}</span></button>`;
 function barraHistorias(p) {
   if (!S.hist || (!S.visible && !p.soy_yo)) return '';
   const { historias, destacadas, archivo } = S.hist; const acento = estiloDe(p).acento;
@@ -273,7 +273,7 @@ function barraHistorias(p) {
     return bolita(cuerpo, d.titulo, `data-act="ver-destacada" data-id="${Number(d.id)}"`, 'border-2 border-amber-400/70');
   }).join('');
   if (!mias && !dest) return '';
-  const ayuda = p.soy_yo && !archivo.length && !historias.length && !destacadas.length ? '<p class="text-[11px] text-gray-500 mt-1">Las historias duran 24 h. Luego las encuentras en tu archivo para guardarlas como destacadas.</p>' : '';
+  const ayuda = p.soy_yo && !archivo.length && !historias.length && !destacadas.length ? '<p class="text-[12px] text-gray-500 mt-1">Las historias duran 24 h. Luego las encuentras en tu archivo para guardarlas como destacadas.</p>' : '';
   return `<section class="glass-panel rounded-2xl p-3" aria-label="Historias y destacadas" style="--acento:${acento}"><div class="flex gap-3 overflow-x-auto pb-1">${mias}${dest}</div>${ayuda}</section>`;
 }
 const pestanas = () => `<div class="flex gap-2" role="tablist" aria-label="Secciones del perfil">${[['pub', 'fa-newspaper', 'Publicaciones'], ['clips', 'fa-clapperboard', `Clips${S.clips.length ? ` · ${S.clips.length}${S.hayMasClips ? '+' : ''}` : ''}`]].map(([id, ic, t]) =>
@@ -283,7 +283,7 @@ const juegosUsados = () => SEGMENTOS.filter(([id]) => S.juegos.includes(id) || S
 /** Filtro sutil por juego: solo aparece si el perfil usó al menos un segmento. */
 function filtroHTML() {
   const usados = juegosUsados(); if (!usados.length) return '';
-  return `<div id="filtro-juego" class="flex flex-wrap items-center gap-1.5 text-[11px]" role="group" aria-label="Filtrar por juego"><i class="fa-solid fa-tag text-gray-600"></i>${[['', 'Todo'], ...usados].map(([id, n]) =>
+  return `<div id="filtro-juego" class="flex flex-wrap items-center gap-1.5 text-[12px]" role="group" aria-label="Filtrar por juego"><i class="fa-solid fa-tag text-gray-600"></i>${[['', 'Todo'], ...usados].map(([id, n]) =>
     `<button type="button" data-act="filtro-juego" data-j="${id}" aria-pressed="${S.juego === id}" class="rounded-full border border-galaxy-border/70 px-2.5 py-1 text-gray-400 aria-pressed:text-white aria-pressed:border-galaxy-400 aria-pressed:bg-galaxy-600/20">${escapeHTML(n)}</button>`).join('')}</div>`;
 }
 const pintarFiltro = () => { const f = document.getElementById('filtro-juego'); if (f) f.outerHTML = filtroHTML() || '<span id="filtro-juego" hidden></span>'; };
@@ -293,7 +293,7 @@ function seccionClips(p) {
   const form = p.soy_yo ? `<section class="glass-panel rounded-2xl p-3 space-y-2">
       <div class="flex gap-2"><input id="cl-video" maxlength="300" placeholder="Enlace de tu clip (YouTube, Shorts, TikTok, Kick o Twitch)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">
         <input type="file" id="cl-vfile" accept="video/mp4,video/webm,video/quicktime" hidden><button type="button" data-act="elegir-video-clip" aria-label="Subir video" title="Subir video (hasta ${VIDEO_MAX_SEG} s y ${VIDEO_MAX_MB} MB)" class="btn btn-ghost !min-h-9 !px-3 !text-xs shrink-0"><i class="fa-solid fa-film"></i><span class="max-sm:hidden">Subir</span></button></div>
-      <p id="cl-vinfo" class="text-[11px] text-gray-400" ${S.cfile ? '' : 'hidden'}>${S.cfile ? `<i class="fa-solid fa-film mr-1"></i>${escapeHTML(S.cfile.file.name)} <button type="button" data-act="quitar-video-clip" class="text-gray-500 hover:text-bad ml-1" aria-label="Quitar video"><i class="fa-solid fa-xmark"></i></button>` : ''}</p>
+      <p id="cl-vinfo" class="text-[12px] text-gray-400" ${S.cfile ? '' : 'hidden'}>${S.cfile ? `<i class="fa-solid fa-film mr-1"></i>${escapeHTML(S.cfile.file.name)} <button type="button" data-act="quitar-video-clip" class="text-gray-500 hover:text-bad ml-1" aria-label="Quitar video"><i class="fa-solid fa-xmark"></i></button>` : ''}</p>
       <div class="flex gap-2"><input id="cl-titulo" maxlength="${CLIP_TITULO_MAX + 10}" placeholder="Título (opcional)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white">${selectSegmento('cl-juego')}
         <button type="button" data-act="publicar-clip" aria-label="Añadir clip" class="btn btn-primary !min-h-9 !text-xs shrink-0"><i class="fa-solid fa-plus"></i><span class="max-sm:hidden">Añadir</span></button></div></section>` : '';
   if (!S.visible) return `${form}${candadoMuro(p)}`;
@@ -302,7 +302,7 @@ function seccionClips(p) {
   const grilla = ccc.length ? `<div class="grid grid-cols-3 gap-1.5 sm:gap-2">${ccc.map((c, i) => `<button type="button" data-act="ver-clip" data-i="${i}" aria-label="Ver clip: ${escapeHTML(c.titulo || 'Clip')}" class="relative aspect-[9/16] rounded-lg overflow-hidden border border-galaxy-border bg-galaxy-900 group text-left">
       ${miniatura(c)}
       <i class="${escapeHTML(c.icono)} absolute top-1.5 right-1.5 text-white/90 text-sm drop-shadow"></i><i class="fa-solid fa-play absolute inset-0 m-auto w-fit h-fit text-white/90 text-2xl drop-shadow opacity-80"></i>
-      <span class="absolute inset-x-0 bottom-0 p-1.5 pt-6 bg-gradient-to-t from-black/85 to-transparent text-[10px] text-white leading-tight line-clamp-2">${escapeHTML(c.titulo)}</span></button>`).join('')}</div>${S.hayMasClips ? '<button type="button" data-act="mas-clips" class="btn btn-ghost w-full !text-xs mt-2">Cargar más</button>' : ''}`
+      <span class="absolute inset-x-0 bottom-0 p-1.5 pt-6 bg-gradient-to-t from-black/85 to-transparent text-[12px] text-white leading-tight line-clamp-2">${escapeHTML(c.titulo)}</span></button>`).join('')}</div>${S.hayMasClips ? '<button type="button" data-act="mas-clips" class="btn btn-ghost w-full !text-xs mt-2">Cargar más</button>' : ''}`
     : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${S.juego ? 'No hay clips de ese juego.' : p.soy_yo ? 'Todavía no tienes clips. Sube un video o pega el enlace de tu mejor jugada.' : 'Aún no ha subido clips.'}</div>`;
   return `<div class="space-y-3">${form}${grilla}</div>`;
 }
@@ -343,7 +343,7 @@ async function cargar() {
       const c = document.getElementById('pf-clan'); if (q.color_clan && c) c.style.cssText = estiloColor(q.color_clan.estilo);
       const av = document.querySelector('#pf-clan')?.closest('div')?.parentElement?.querySelector('[data-avatar], img, span.rounded-full'); if (q.marco && av) av.style.cssText += ';' + estiloMarco(q.marco.estilo);
     });
-    reputacionDe(p.id).then((r) => { const e = document.getElementById('pf-rep'); if (r && e && S.p?.id === p.id) { e.className = `ml-1 text-[10px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${r.clase}`; e.innerHTML = `<i class="fa-solid ${r.icono}"></i> ${textoSello(r).replace(/[<>&]/g, '')}`; e.title = r.valoraciones ? `${r.valoraciones} valoraciones de rivales` : 'Aún sin valoraciones suficientes'; e.hidden = false; } });
+    reputacionDe(p.id).then((r) => { const e = document.getElementById('pf-rep'); if (r && e && S.p?.id === p.id) { e.className = `ml-1 text-[12px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${r.clase}`; e.innerHTML = `<i class="fa-solid ${r.icono}"></i> ${textoSello(r).replace(/[<>&]/g, '')}`; e.title = r.valoraciones ? `${r.valoraciones} valoraciones de rivales` : 'Aún sin valoraciones suficientes'; e.hidden = false; } });
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
 }
 /** Mi red (amigos, solicitudes, seguidos). Si falla, devuelve null: el perfil sigue funcionando con los botones básicos. */
@@ -404,17 +404,17 @@ function pintarPanelHost() {
     const opciones = e ? [...new Set([...j.sugeridas, ...e.opciones])] : [];
     return `<div class="rounded-xl border ${e ? 'border-galaxy-400/50 bg-galaxy-600/10' : 'border-galaxy-border/60 bg-black/20'} p-2.5">
       <button type="button" data-act="host-juego" data-juego="${id}" aria-pressed="${!!e}" class="flex items-center gap-2 text-sm text-white font-display font-bold uppercase tracking-wide w-full text-left"><i class="fa-regular ${e ? 'fa-square-check text-galaxy-400' : 'fa-square'}"></i>${id}</button>
-      ${e ? `<p class="text-[11px] text-gray-400 mt-2 mb-1">${escapeHTML(j.opcion)} (puedes elegir varios)</p>
-        <div class="flex flex-wrap gap-1.5">${opciones.map((o) => `<button type="button" data-act="host-opcion" data-juego="${id}" data-o="${escapeHTML(o)}" aria-pressed="${e.opciones.includes(o)}" class="adv-chip !min-h-8 !px-2.5 !text-[11px]">${escapeHTML(o)}</button>`).join('')}</div>
+      ${e ? `<p class="text-[12px] text-gray-400 mt-2 mb-1">${escapeHTML(j.opcion)} (puedes elegir varios)</p>
+        <div class="flex flex-wrap gap-1.5">${opciones.map((o) => `<button type="button" data-act="host-opcion" data-juego="${id}" data-o="${escapeHTML(o)}" aria-pressed="${e.opciones.includes(o)}" class="adv-chip !min-h-8 !px-2.5 !text-[12px]">${escapeHTML(o)}</button>`).join('')}</div>
         <div class="flex gap-1.5 mt-2"><input data-host-otro="${id}" maxlength="${HOST_MAX_TEXTO}" placeholder="Otro (escríbelo)" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-2.5 py-1.5 text-xs text-white">
           <button type="button" data-act="host-agregar" data-juego="${id}" aria-label="Añadir" class="btn btn-ghost !min-h-8 !px-3 !text-xs"><i class="fa-solid fa-plus"></i></button></div>` : ''}</div>`;
   }).join('');
   box.innerHTML = `<h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-server text-galaxy-400 mr-2"></i>Mi hosting</h2>
     <label class="flex items-center gap-2.5 text-sm text-white cursor-pointer"><input type="checkbox" data-act="host-visible" ${h.visible ? 'checked' : ''} class="w-4 h-4 accent-[#8000ff]">Mostrar mi hosting en mi perfil</label>
-    ${S.p.puede_hostear ? '' : '<p class="text-[11px] text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Aún no tienes activado «Puedo ser host» en Mi perfil → Sistema Host: mientras tanto no se mostrará.</p>'}
-    <div><p class="text-[11px] text-gray-400 mb-1.5">Plataforma</p><div class="flex gap-1.5">${['Ambos', 'Smash Soda', 'Parsec'].map((v) => `<button type="button" data-act="host-soft" data-v="${v}" aria-pressed="${h.soft === v}" class="adv-chip !min-h-8 !px-3 !text-[11px]">${v}</button>`).join('')}</div></div>
+    ${S.p.puede_hostear ? '' : '<p class="text-[12px] text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Aún no tienes activado «Puedo ser host» en Mi perfil → Sistema Host: mientras tanto no se mostrará.</p>'}
+    <div><p class="text-[12px] text-gray-400 mb-1.5">Plataforma</p><div class="flex gap-1.5">${['Ambos', 'Smash Soda', 'Parsec'].map((v) => `<button type="button" data-act="host-soft" data-v="${v}" aria-pressed="${h.soft === v}" class="adv-chip !min-h-8 !px-3 !text-[12px]">${v}</button>`).join('')}</div></div>
     <div class="space-y-2">${juegos}</div>
-    <p class="text-[11px] text-gray-500">Marca todos los juegos que hosteas y, en cada uno, todos los parches o versiones que ofreces. La velocidad, las aclaraciones y «Puedo ser host» siguen en Mi perfil.</p>
+    <p class="text-[12px] text-gray-500">Marca todos los juegos que hosteas y, en cada uno, todos los parches o versiones que ofreces. La velocidad, las aclaraciones y «Puedo ser host» siguen en Mi perfil.</p>
     <div class="flex gap-2"><button type="button" data-act="guardar-host" class="btn btn-primary !min-h-9 !text-xs">Guardar hosting</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div>`;
 }
 

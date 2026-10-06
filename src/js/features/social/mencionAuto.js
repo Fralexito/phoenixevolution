@@ -22,7 +22,7 @@ function pintar() {
   if (!E.caja) { E.caja = document.createElement('div'); E.caja.id = 'mencion-lista'; E.caja.setAttribute('role', 'listbox'); E.caja.className = 'rounded-xl border border-galaxy-border bg-galaxy-panel shadow-2xl overflow-hidden'; document.body.appendChild(E.caja); }
   E.caja.innerHTML = E.lista.map((p, i) => `<div role="option" aria-selected="${i === E.sel}" data-i="${i}" class="flex items-center gap-2 px-3 py-2 cursor-pointer ${i === E.sel ? 'bg-galaxy-600/30' : 'hover:bg-white/5'}">
     <span class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(p.avatar, p.nombre, 28)}</span>
-    <span class="min-w-0"><b class="block text-xs text-white truncate">${escapeHTML(p.nombre)}</b><span class="block text-[11px] text-gray-400 truncate">@${escapeHTML(p.username)}</span></span></div>`).join('');
+    <span class="min-w-0"><b class="block text-xs text-white truncate">${escapeHTML(p.nombre)}</b><span class="block text-[12px] text-gray-400 truncate">@${escapeHTML(p.username)}</span></span></div>`).join('');
   posicionar();
 }
 

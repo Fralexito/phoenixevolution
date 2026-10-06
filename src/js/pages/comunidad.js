@@ -85,7 +85,7 @@ function pintarRadar(jugadores) {
   document.getElementById('com-radar-n').textContent = otros.length ? `(${otros.length})` : '';
   document.getElementById('com-radar-lista').innerHTML = otros.length
     ? otros.map((p) => `<span class="inline-flex items-center gap-2 pl-3 pr-1 py-1 rounded-full bg-galaxy-900 border border-galaxy-border text-xs text-white"><span class="w-2 h-2 rounded-full ${ESTADOS[p.estado].dot}"></span><b class="font-display uppercase">${escapeHTML(p.name)}</b><span class="text-gray-400">${ESTADOS[p.estado].label}</span>
-        <a href="${href(`duelos/?retar=${encodeURIComponent(p.id)}`)}" class="ml-1 px-3 min-h-9 inline-flex items-center rounded-full bg-galaxy-600 text-[11px] font-bold uppercase">Retar</a></span>`).join('')
+        <a href="${href(`duelos/?retar=${encodeURIComponent(p.id)}`)}" class="ml-1 px-3 min-h-9 inline-flex items-center rounded-full bg-galaxy-600 text-[12px] font-bold uppercase">Retar</a></span>`).join('')
     : '<span class="text-xs text-gray-500">Nadie en el radar por ahora. Actívalo en Duelos para aparecer.</span>';
 }
 onPresence((j) => { ultimos = j; pintarRadar(ultimos); });
