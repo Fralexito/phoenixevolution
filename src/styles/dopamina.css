@@ -65,3 +65,36 @@ html[data-fx-dopamina] .dp-chispa { position: fixed; left: 0; top: 0; z-index: 9
   html[data-fx-dopamina] :is(.btn, .adv-chip, .chip, .toggle-btn, .seg > button, .sx-btn, .sx-chip, .sx-tab, .liga-sel button, .cat-item, .hero-cta, .lanza, .car-flecha):active:not(:disabled) { transform: none; }
   html[data-fx-dopamina] :is(.item-tienda, [data-pub]):hover { transform: none; }
 }
+
+/* ───────── Ronda 179 · efectos visibles a primera vista ───────── */
+
+/* 8 · Brillo que cruza los botones principales cada pocos segundos (solo transform: acelerado por GPU) */
+@keyframes dp-brillo { 0%, 62% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(130%) skewX(-18deg); } }
+html[data-fx-dopamina] :is(.btn-primary, .hero-cta-p) { position: relative; overflow: hidden; isolation: isolate; }
+html[data-fx-dopamina] :is(.btn-primary, .hero-cta-p):not(:disabled)::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 55%; pointer-events: none; z-index: 1;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / .32), transparent);
+  transform: translateX(-130%) skewX(-18deg); animation: dp-brillo 4.6s var(--ease-out) 1.4s infinite;
+}
+
+/* 9 · Entrada escalonada de las tarjetas cuando su sección aparece (y cuando llegan datos después).
+   OJO: fill-mode «backwards» (no «both»): si se queda «forwards» la animación pisaría el hover/tilt/presión para siempre. */
+@keyframes dp-tarjeta { from { opacity: 0; transform: translateY(20px) scale(.955); } }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org) { animation: dp-tarjeta 460ms var(--ease-out) backwards; }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org):nth-child(2) { animation-delay: 55ms; }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org):nth-child(3) { animation-delay: 110ms; }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org):nth-child(4) { animation-delay: 165ms; }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org):nth-child(5) { animation-delay: 220ms; }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org):nth-child(6) { animation-delay: 275ms; }
+html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org):nth-child(n+7) { animation-delay: 330ms; }
+
+/* 10 · Solo con mouse: inclinación 3D siguiendo el cursor (--rx/--ry los pone features/dopamina.js) */
+@media (hover: hover) and (pointer: fine) {
+  html[data-fx-dopamina] [data-tilt]:hover { transform: perspective(820px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)) translateY(-4px); box-shadow: 0 14px 34px rgb(0 0 0 / .45), 0 0 24px color-mix(in srgb, var(--color-galaxy-400) 20%, transparent); transition-duration: 110ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-fx-dopamina] :is(.btn-primary, .hero-cta-p)::after { animation: none; display: none; }
+  html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org) { animation: none; }
+  html[data-fx-dopamina] [data-tilt]:hover { transform: none; }
+}

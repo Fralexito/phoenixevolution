@@ -11,6 +11,7 @@ const EASE = 'cubic-bezier(.22, 1, .36, 1)';
 const POP = 'cubic-bezier(.34, 1.56, .64, 1)';
 
 /** Tarjetas que reciben la luz que sigue al cursor (solo con mouse). */
+const SELECTOR_TILT = '.match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido';
 const SELECTOR_LUZ = '.match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .cat-item, .liga-partido, [data-pub]';
 
 /** Suelta partículas desde el centro de `origen`. `emojis`: texto o lista; `n`: cuántas (máx. 18). Devuelve la cantidad creada. */
@@ -70,7 +71,8 @@ export function initDopamina() {
       const t = e.target.closest?.(SELECTOR_LUZ); if (!t) return;
       ultimo = { t, x: e.clientX, y: e.clientY };
       if (cuadro) return;
-      cuadro = requestAnimationFrame(() => { cuadro = 0; const { t: el, x, y } = ultimo; const r = el.getBoundingClientRect(); el.dataset.spot = ''; el.style.setProperty('--mx', `${x - r.left}px`); el.style.setProperty('--my', `${y - r.top}px`); });
+      cuadro = requestAnimationFrame(() => { cuadro = 0; const { t: el, x, y } = ultimo; const r = el.getBoundingClientRect(); el.dataset.spot = ''; el.style.setProperty('--mx', `${x - r.left}px`); el.style.setProperty('--my', `${y - r.top}px`);
+        if (el.matches(SELECTOR_TILT) && r.width > 0 && r.height > 0) { el.dataset.tilt = ''; el.style.setProperty('--rx', `${((x - r.left) / r.width - 0.5) * 9}deg`); el.style.setProperty('--ry', `${-((y - r.top) / r.height - 0.5) * 9}deg`); } });
     }, { passive: true });
   }
   // Ondulación al pulsar el botón principal.
