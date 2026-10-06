@@ -33,7 +33,7 @@ function renderAll() {
   const mine = id ? visible.filter((r) => isMine(r, id)) : [];
   const rest = visible.filter((r) => !isMine(r, id));
   const pend = pendientes(mine);
-  const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
+  const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-400 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
   $('lista-pend').innerHTML = !id ? vacio('Inicia sesión para ver los retos que lanzaste.', 'py-10') : pend.length ? pend.map((r) => card(r, id)).join('') : vacio('No tienes retos pendientes. Lanza uno desde el formulario.', 'py-10');
   $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio('No hay retos públicos activos en este momento.', 'py-10');
   $('cnt-pend').textContent = pend.length ? `(${pend.length})` : '';

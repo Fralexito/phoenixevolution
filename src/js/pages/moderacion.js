@@ -24,7 +24,7 @@ function mostrarError(err) {
 const ocultarError = () => { $('mod-error').hidden = true; };
 
 function pintarTabs() {
-  $('mod-tabs').innerHTML = ESTADOS.map(([id, texto, ico]) => `<button type="button" data-estado="${id}" aria-pressed="${id === S.estado}" class="adv-chip !min-h-9 ${id === S.estado ? '!border-galaxy-400 !text-galaxy-400' : ''}"><i class="fa-solid ${ico} mr-1.5"></i>${escapeHTML(texto)}</button>`).join('');
+  $('mod-tabs').innerHTML = ESTADOS.map(([id, texto, ico]) => `<button type="button" data-estado="${id}" aria-pressed="${id === S.estado}" class="adv-chip !min-h-9 ${id === S.estado ? '!border-galaxy-400' : ''}"><i class="fa-solid ${ico} mr-1.5"></i>${escapeHTML(texto)}</button>`).join('');
 }
 function pintarLista() { $('mod-lista').innerHTML = listaReportesHTML(S.items, yo()); $('mod-mas').hidden = !S.hayMas; }
 

@@ -17,12 +17,12 @@ import Layout from '../layouts/Layout.astro';
     <section id="ti-cartera" class="glass-panel rounded-2xl p-4" aria-live="polite"></section>
 
     <div id="ti-tabs" class="flex flex-wrap gap-2" role="tablist" aria-label="Tienda">
-      <button type="button" role="tab" data-tab="tienda" aria-pressed="true" class="adv-chip !min-h-9">Tienda</button>
-      <button type="button" role="tab" data-tab="inventario" aria-pressed="false" class="adv-chip !min-h-9">Mi inventario</button>
-      <button type="button" role="tab" data-tab="ganar" aria-pressed="false" class="adv-chip !min-h-9">Cómo ganar</button>
-      <button type="button" role="tab" data-tab="tokens" aria-pressed="false" class="adv-chip !min-h-9">Comprar tokens</button>
-      <button type="button" role="tab" data-tab="historial" aria-pressed="false" class="adv-chip !min-h-9">Historial</button>
-      <button type="button" role="tab" data-tab="admin" aria-pressed="false" class="adv-chip !min-h-9" hidden id="ti-tab-admin">Administrar</button>
+      <button type="button" role="tab" data-tab="tienda" aria-selected="true" class="adv-chip !min-h-9">Tienda</button>
+      <button type="button" role="tab" data-tab="inventario" aria-selected="false" class="adv-chip !min-h-9">Mi inventario</button>
+      <button type="button" role="tab" data-tab="ganar" aria-selected="false" class="adv-chip !min-h-9">Cómo ganar</button>
+      <button type="button" role="tab" data-tab="tokens" aria-selected="false" class="adv-chip !min-h-9">Comprar tokens</button>
+      <button type="button" role="tab" data-tab="historial" aria-selected="false" class="adv-chip !min-h-9">Historial</button>
+      <button type="button" role="tab" data-tab="admin" aria-selected="false" class="adv-chip !min-h-9" hidden id="ti-tab-admin">Administrar</button>
     </div>
     <div id="ti-contenido" class="space-y-3" aria-live="polite"></div>
   </div>

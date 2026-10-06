@@ -178,7 +178,7 @@ function montarAnalisis(p) {
   const btn = $('perfil-analisis-btn'); const panel = $('perfil-analisis'); if (!btn || !panel) return;
   const pintar = (id) => {
     const TABS = tabsDe(p); const t = TABS.find((x) => x[0] === id) ?? TABS[0];
-    panel.innerHTML = `<div class="flex flex-wrap gap-2 mb-4" role="tablist">${TABS.map(([i, ic, n]) => `<button type="button" role="tab" data-tab="${i}" aria-pressed="${i === t[0]}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${n}</button>`).join('')}</div><div>${t[3](p)}</div>`;
+    panel.innerHTML = `<div class="flex flex-wrap gap-2 mb-4" role="tablist">${TABS.map(([i, ic, n]) => `<button type="button" role="tab" data-tab="${i}" aria-selected="${i === t[0]}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${n}</button>`).join('')}</div><div>${t[3](p)}</div>`;
     if (t[0] === 'muro') cargarMuroTab(p);
   };
   panel.addEventListener('click', (e) => { const yt = e.target.closest('[data-act=video-yt]'); if (yt) { reproductorYT(yt); return; } const b = e.target.closest('[data-tab]'); if (b) pintar(b.dataset.tab); });

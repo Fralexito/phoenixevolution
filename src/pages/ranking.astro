@@ -21,9 +21,9 @@ import Layout from '../layouts/Layout.astro';
 
     <div class="flex flex-wrap items-center gap-2">
       <div id="rk-tabs" class="flex gap-2" role="tablist" aria-label="Tipo de ranking">
-        <button type="button" role="tab" data-tab="competitivo" aria-pressed="true" class="adv-chip !min-h-9">Competitivo</button>
-        <button type="button" role="tab" data-tab="retos" aria-pressed="false" class="adv-chip !min-h-9">Retos</button>
-        <button type="button" role="tab" data-tab="elo" aria-pressed="false" class="adv-chip !min-h-9">ELO</button>
+        <button type="button" role="tab" data-tab="competitivo" aria-selected="true" class="adv-chip !min-h-9">Competitivo</button>
+        <button type="button" role="tab" data-tab="retos" aria-selected="false" class="adv-chip !min-h-9">Retos</button>
+        <button type="button" role="tab" data-tab="elo" aria-selected="false" class="adv-chip !min-h-9">ELO</button>
       </div>
       <label id="rk-mes-wrap" class="ml-auto text-[11px] text-gray-400">Temporada <select id="rk-mes" class="field !py-1 ml-1"></select></label>
     </div>

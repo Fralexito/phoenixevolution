@@ -43,7 +43,7 @@ const jugados = tabla.some((f) => f.pj > 0);
     </section>
     <section class="space-y-3" aria-label="Tabla con zonas">
       <h2 class="font-display font-bold text-base text-white uppercase tracking-widest"><i class="fa-solid fa-flag-checkered text-galaxy-400 mr-2"></i>{jugados ? 'Si la temporada terminara hoy' : 'Tabla (aún sin partidos jugados)'}</h2>
-      <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 overflow-x-auto">
+      <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 overflow-x-auto" role="region" tabindex="0" aria-label="Tabla de la división, desplazable">
         <table class="liga-tabla w-full text-sm"><thead><tr><th class="text-left w-8">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th><th>DIF</th><th class="text-left">Zona</th></tr></thead>
           <tbody>{tabla.map((f, i) => { const z = zonas.get(f.nombre) ?? []; return (
             <tr class:list={['tmp-fila', z.includes('baja') ? 'tmp-baja' : z.includes('copa') ? 'tmp-copa' : '']}>

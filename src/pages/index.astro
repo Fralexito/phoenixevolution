@@ -101,7 +101,7 @@ const base = import.meta.env.BASE_URL;
           <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
             <div><h3 id="pos-titulo" class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><p id="pos-sub" hidden class="text-[10px] text-gray-400"></p></div><i class="fa-solid fa-trophy text-galaxy-400"></i>
           </div>
-          <div class="p-4 overflow-auto max-h-[260px]">
+          <div class="p-4 overflow-auto max-h-[260px]" role="region" tabindex="0" aria-label="Contenido desplazable">
             <table class="w-full text-left text-sm">
               <thead><tr class="text-gray-500 border-b border-galaxy-border/50"><th class="pb-2 font-semibold">Pos</th><th class="pb-2 font-semibold">DT / Club</th><th class="pb-2 text-center font-semibold">PJ</th><th class="pb-2 text-center font-semibold text-galaxy-400">PTS</th></tr></thead>
               <tbody id="mini-table-container"></tbody>

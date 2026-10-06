@@ -277,7 +277,7 @@ function barraHistorias(p) {
   return `<section class="glass-panel rounded-2xl p-3" aria-label="Historias y destacadas" style="--acento:${acento}"><div class="flex gap-3 overflow-x-auto pb-1">${mias}${dest}</div>${ayuda}</section>`;
 }
 const pestanas = () => `<div class="flex gap-2" role="tablist" aria-label="Secciones del perfil">${[['pub', 'fa-newspaper', 'Publicaciones'], ['clips', 'fa-clapperboard', `Clips${S.clips.length ? ` · ${S.clips.length}${S.hayMasClips ? '+' : ''}` : ''}`]].map(([id, ic, t]) =>
-  `<button type="button" role="tab" data-act="tab" data-tab="${id}" aria-pressed="${S.tab === id}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${t}</button>`).join('')}</div>`;
+  `<button type="button" role="tab" data-act="tab" data-tab="${id}" aria-selected="${S.tab === id}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${t}</button>`).join('')}</div>`;
 /** Segmentos (juegos) que este perfil usa en publicaciones o clips. */
 const juegosUsados = () => SEGMENTOS.filter(([id]) => S.juegos.includes(id) || S.clipJuegos.includes(id));
 /** Filtro sutil por juego: solo aparece si el perfil usó al menos un segmento. */
@@ -478,7 +478,7 @@ const ACCIONES = {
   'panel-destacada': () => abrirDestacadas({ hist: S.hist, onListo: recargarExtras }),
   'cerrar-panel': () => PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = true; }),
   tab: (el) => { S.tab = el.dataset.tab === 'clips' ? 'clips' : 'pub'; document.getElementById('tab-pub').hidden = S.tab !== 'pub'; document.getElementById('tab-clips').hidden = S.tab !== 'clips';
-    document.querySelectorAll('[data-act=tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab))); },
+    document.querySelectorAll('[data-act=tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === S.tab))); },
   'ver-historias': () => verHistorias(normalizarHistorias(S.hist?.historias), '', { vigentes: true }),
   'ver-destacada': (el) => { const d = S.hist?.destacadas.find((x) => x.id === Number(el.dataset.id)); if (d) verHistorias(normalizarHistorias(d.historias), d.titulo); },
   'elegir-video-clip': () => document.getElementById('cl-vfile').click(),

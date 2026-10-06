@@ -99,7 +99,7 @@ function adminHTML() {
 }
 function pintar() {
   $('ti-cartera').innerHTML = carteraHTML(); $('ti-tab-admin').hidden = !esAdmin();
-  for (const b of $('ti-tabs').querySelectorAll('[data-tab]')) b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab));
+  for (const b of $('ti-tabs').querySelectorAll('[data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
   const v = { tienda: tiendaHTML, inventario: inventarioHTML, ganar: ganarHTML, tokens: tokensHTML, historial: historialHTML, admin: adminHTML }[S.tab] ?? tiendaHTML;
   $('ti-contenido').innerHTML = v();
 }

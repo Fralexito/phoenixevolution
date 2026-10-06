@@ -28,7 +28,7 @@ function pintarLista() {
       : S.tab === 'elo' ? fila(r, `${r.jugados} amistoso${r.jugados === 1 ? '' : 's'} 1v1${r.delta ? ` · ${r.delta > 0 ? '▲' : '▼'}${Math.abs(r.delta)} en el último` : ''}`)
       : fila(r, `${r.retos} reto${r.retos === 1 ? '' : 's'} cobrado${r.retos === 1 ? '' : 's'}`))).join('')
     : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${S.tab === 'competitivo' ? 'Nadie tiene partidos confirmados en esta temporada todavía.' : S.tab === 'elo' ? 'Aún no hay amistosos 1v1 confirmados para calcular el ELO.' : 'Nadie ha cobrado retos en esta temporada todavía.'}</div>`;
-  for (const b of document.querySelectorAll('#rk-tabs [data-tab]')) b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab));
+  for (const b of document.querySelectorAll('#rk-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
 }
 function pintarRetos() {
   const sec = $('rk-retos'); sec.hidden = !S.yo || !S.retos;

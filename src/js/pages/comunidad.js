@@ -20,7 +20,7 @@ const q = new URLSearchParams(location.search);
 const S = { yo: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0 };
 const urlActual = () => { const p = new URLSearchParams(); if (S.vista !== 'recientes') p.set('v', S.vista); if (S.vista === 'recientes' && S.juego) p.set('j', S.juego); const t = p.toString(); return t ? `?${t}` : location.pathname; };
 function pintarVistas() {
-  vistasEl.innerHTML = VISTAS.map((v) => `<button type="button" data-v="${v.id}" aria-pressed="${S.vista === v.id}" class="adv-chip !min-h-9 ${S.vista === v.id ? '!border-galaxy-400 !text-galaxy-400' : ''}"><i class="fa-solid ${v.icono} mr-1.5"></i>${escapeHTML(v.texto)}</button>`).join('');
+  vistasEl.innerHTML = VISTAS.map((v) => `<button type="button" data-v="${v.id}" aria-pressed="${S.vista === v.id}" class="adv-chip !min-h-9 ${S.vista === v.id ? '!border-galaxy-400' : ''}"><i class="fa-solid ${v.icono} mr-1.5"></i>${escapeHTML(v.texto)}</button>`).join('');
   filtroEl.hidden = !vistaInfo(S.vista).filtraJuego;
 }
 

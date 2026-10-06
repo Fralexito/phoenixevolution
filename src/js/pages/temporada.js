@@ -43,7 +43,7 @@ function iniciar() {
       return `<tr class="tmp-fila ${clase}"><td class="text-left font-display font-bold text-gray-300">${i + 1}</td><td class="text-left"><span class="font-display font-bold text-white">${escapeHTML(f.nombre)}</span>${f.club ? `<span class="block text-[11px] text-gray-400 leading-tight uppercase">${escapeHTML(f.club)}</span>` : ''}</td><td class="text-left">${marcas}</td><td class="font-display font-extrabold text-white">${f.pts}</td><td>${f.pj}</td><td>${f.dg > 0 ? `+${f.dg}` : f.dg}</td></tr>`;
     }).join('') : `<tr><td colspan="6" class="text-sm text-gray-400 py-4 text-center">Aún no hay jugadores en esta división.</td></tr>`;
     return `<h2 class="font-display font-bold text-base text-white uppercase tracking-widest">${escapeHTML(titulo)}${nota ? ` <span class="liga-sello liga-sello-prox ml-2 align-middle">${nota}</span>` : ''}</h2>
-      <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3"><table class="liga-tabla w-full"><thead><tr><th class="text-left w-8">#</th><th class="text-left">Jugador</th><th class="text-left"></th><th>PTS</th><th>PJ</th><th>DIF</th></tr></thead><tbody>${cuerpo}</tbody></table></div>`;
+      <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto" role="region" tabindex="0" aria-label="Tabla de posiciones, desplazable"><table class="liga-tabla w-full"><thead><tr><th class="text-left w-8">#</th><th class="text-left">Jugador</th><th class="text-left"></th><th>PTS</th><th>PJ</th><th>DIF</th></tr></thead><tbody>${cuerpo}</tbody></table></div>`;
   };
 
   const nombres = (l) => l.map((f) => f.nombre);

@@ -98,7 +98,7 @@ const datos = LIGAS.map((l) => ({
             <!-- TABLA -->
             <section class="space-y-3" aria-label="Tabla de posiciones">
               <h2 class="font-display font-bold text-base text-white uppercase tracking-widest">Tabla de posiciones</h2>
-              <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3">
+              <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto" role="region" tabindex="0" aria-label="Tabla de posiciones, desplazable">
                 <table class="liga-tabla w-full">
                   <thead><tr>
                     <th class="text-left w-8">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
@@ -161,7 +161,7 @@ const datos = LIGAS.map((l) => ({
               </div>
               {e.fechas.map((f) => (
                 <div data-fecha-panel={f.n} hidden={f.n !== e.actual} class="space-y-3">
-                  <div class="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto py-1" aria-label="Escudos de la fecha">
+                  <div class="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto py-1" role="region" tabindex="0" aria-label="Escudos de la fecha">
                     {f.partidos.flatMap((m) => [m.l, m.v]).map((n) => escudoDe(e.clubes?.[n]) && <img src={escudoDe(e.clubes[n])} alt={e.clubes[n]} title={`${n} · ${e.clubes[n]}`} width="26" height="26" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0 opacity-90 hover:opacity-100 hover:scale-110 transition-transform" style="width:26px;height:26px" onerror="this.style.display='none'" />)}
                   </div>
                   <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">

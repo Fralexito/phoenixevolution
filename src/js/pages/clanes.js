@@ -82,7 +82,7 @@ function explorarHTML() {
   return `<form id="cl-explorar" class="flex gap-2"><input id="cl-q" class="field flex-1 min-w-0" maxlength="40" value="${escapeHTML(S.busqueda)}" placeholder="Buscar por nombre o etiqueta" aria-label="Buscar clan"><button class="btn btn-ghost !min-h-9 !px-3 !text-xs" type="submit">Buscar</button></form>${filas || vacio('No hay clanes que mostrar.')}`;
 }
 function pintar() {
-  for (const b of document.querySelectorAll('#cl-tabs [data-tab]')) b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab));
+  for (const b of document.querySelectorAll('#cl-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
   const c = $('cl-contenido');
   if (S.tab === 'explorar') { c.innerHTML = explorarHTML(); return; }
   if (!S.yo) { c.innerHTML = vacio('Inicia sesión para ver o crear tu clan.'); return; }

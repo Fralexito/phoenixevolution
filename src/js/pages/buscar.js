@@ -37,7 +37,7 @@ const vacio = (t) => `<div class="glass-panel rounded-2xl p-8 text-center text-g
 const tarjeta = (it) => tarjetaComunidadHTML(it, { yo: S.yo, puedeOcultar: can('resolverReportes') });
 
 function pintarTabs() {
-  $('bu-tabs').innerHTML = TIPOS_BUSQUEDA.map((t) => `<button type="button" data-tipo="${t.id}" aria-pressed="${S.tipo === t.id}" class="adv-chip !min-h-9 ${S.tipo === t.id ? '!border-galaxy-400 !text-galaxy-400' : ''}"><i class="fa-solid ${t.icono} mr-1.5"></i>${t.etiqueta}</button>`).join('');
+  $('bu-tabs').innerHTML = TIPOS_BUSQUEDA.map((t) => `<button type="button" data-tipo="${t.id}" aria-pressed="${S.tipo === t.id}" class="adv-chip !min-h-9 ${S.tipo === t.id ? '!border-galaxy-400' : ''}"><i class="fa-solid ${t.icono} mr-1.5"></i>${t.etiqueta}</button>`).join('');
 }
 function pintar(estado = 'resultados') {
   const el = $('bu-res'); $('bu-mas').hidden = true;

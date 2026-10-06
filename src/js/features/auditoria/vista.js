@@ -52,7 +52,7 @@ export function ayudaHTML() {
 
 /** Barras por día + una tarjeta por persona con su desglose. */
 export function resumenHTML(r, { dias = 7, esAdmin = false } = {}) {
-  const chips = [7, 30].map((d) => `<button type="button" data-dias="${d}" aria-pressed="${d === dias}" class="adv-chip !min-h-8 ${d === dias ? '!border-galaxy-400 !text-galaxy-400' : ''}">${d} días</button>`).join('');
+  const chips = [7, 30].map((d) => `<button type="button" data-dias="${d}" aria-pressed="${d === dias}" class="adv-chip !min-h-8 ${d === dias ? '!border-galaxy-400' : ''}">${d} días</button>`).join('');
   const cadaN = r.serie.length > 14 ? 5 : 1;
   const barras = r.serie.map((s, i) => {
     const h = s.total ? Math.max(10, Math.round((s.total / r.maximo) * 100)) : 3;
@@ -78,7 +78,7 @@ export function resumenHTML(r, { dias = 7, esAdmin = false } = {}) {
 
 /** Chips de acción + selectores de sección, persona y fecha. */
 export function filtrosHTML(f, personas = [], esAdmin = false) {
-  const chip = (valor, texto, icono) => `<button type="button" data-accion="${e(valor)}" aria-pressed="${f.accion === valor}" class="adv-chip !min-h-8 ${f.accion === valor ? '!border-galaxy-400 !text-galaxy-400' : ''}">${icono ? `<i class="fa-solid ${icono} mr-1"></i>` : ''}${e(texto)}</button>`;
+  const chip = (valor, texto, icono) => `<button type="button" data-accion="${e(valor)}" aria-pressed="${f.accion === valor}" class="adv-chip !min-h-8 ${f.accion === valor ? '!border-galaxy-400' : ''}">${icono ? `<i class="fa-solid ${icono} mr-1"></i>` : ''}${e(texto)}</button>`;
   const opt = (v, t, sel) => `<option value="${e(v)}"${sel ? ' selected' : ''}>${e(t)}</option>`;
   const secciones = FILTRO_SECCIONES.filter((s, i, a) => a.findIndex((x) => x.etiqueta === s.etiqueta) === i);
   return `<div class="flex flex-wrap gap-1.5" role="group" aria-label="Tipo de acción">${chip('', 'Todo')}${FILTRO_ACCIONES.map((a) => chip(a.accion, a.etiqueta, a.icono)).join('')}</div>

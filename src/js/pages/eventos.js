@@ -42,7 +42,7 @@ function pintar() {
   const ahora = Date.now();
   $('ev-lista').innerHTML = S.eventos.length ? S.eventos.map((e) => tarjeta(e, ahora)).join('')
     : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${escapeHTML(textoVacio(S.tab === 'pasados'))}</div>`;
-  for (const b of document.querySelectorAll('#ev-tabs [data-tab]')) b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab));
+  for (const b of document.querySelectorAll('#ev-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
   $('ev-gestion').hidden = !can('gestionarEventos');
 }
 async function cargar() {
