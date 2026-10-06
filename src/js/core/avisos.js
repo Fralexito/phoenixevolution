@@ -9,10 +9,11 @@ export const CATEGORIAS_AVISO = Object.freeze([
   { id: 'menciones', titulo: 'Menciones',              icono: 'fa-at',         texto: 'Cuando alguien escribe tu @usuario en una publicación o respuesta.' },
   { id: 'logros',    titulo: 'Logros',                 icono: 'fa-medal',      texto: 'Cuando desbloqueas una insignia nueva.' },
   { id: 'eventos',   titulo: 'Eventos',                icono: 'fa-calendar-day', texto: 'Recordatorios de los eventos que marcaste con «Me interesa» y cambios o cancelaciones.' },
+  { id: 'salas',     titulo: 'Salas abiertas',         icono: 'fa-tower-broadcast', texto: 'Cuando un amigo abre sala de Smash Soda o un amigo tuyo va a jugar en una (lo decide el host al abrir).' },
 ]);
 export const NOTA_SISTEMA = 'Los avisos del equipo de moderación (por ejemplo, una sanción) siempre te llegan: no se pueden apagar.';
 
-/** Respuesta de `mis_preferencias_notif` (o null) → { duelos, social, muro, menciones, logros, eventos } con true/false. Todo lo desconocido cuenta como ACTIVADO. */
+/** Respuesta de `mis_preferencias_notif` (o null) → { duelos, social, muro, menciones, logros, eventos, salas } con true/false. Todo lo desconocido cuenta como ACTIVADO. */
 export const normalizarPreferencias = (obj) => Object.fromEntries(CATEGORIAS_AVISO.map((c) => [c.id, obj?.[c.id] !== false]));
 
 export const esCategoriaAviso = (id) => CATEGORIAS_AVISO.some((c) => c.id === id);
