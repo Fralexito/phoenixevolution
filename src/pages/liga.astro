@@ -4,7 +4,7 @@
 import Layout from '../layouts/Layout.astro';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
-import { calcularTabla } from '../js/core/tabla.js';
+import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
 import { escudoDe } from '../js/core/escudos.js';
 import { SISTEMA, SISTEMAS_LIGA } from '../data/temporada.js';
 import { zonasDivision, zonasLiga } from '../js/core/temporada.js';
@@ -19,7 +19,7 @@ const divisionDe = (ligaId) => SISTEMA.divisiones.find((d) => d.ligaId === ligaI
 const ESTADO_FECHA = { jugada: 'jugada', en_juego: 'en juego', pendiente: 'por jugar' };
 // Tabla con TODOS los participantes: quien aún no juega aparece con ceros (útil al empezar una liga).
 const tablaCompleta = (e) => {
-  const t = calcularTabla(e.fechas.flatMap((f) => f.partidos)).tabla; const hay = new Set(t.map((f) => f.nombre));
+  const t = tablaEdicion(e); const hay = new Set(t.map((f) => f.nombre));
   const faltan = [...new Set([...(e.jugadores ?? []), ...e.fechas.flatMap((f) => f.partidos.flatMap((m) => [m.l, m.v]))])].filter((n) => !hay.has(n)).sort((a, b) => a.localeCompare(b, 'es'));
   return [...t, ...faltan.map((nombre) => ({ nombre, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }))];
 };

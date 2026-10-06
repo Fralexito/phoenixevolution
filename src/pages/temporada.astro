@@ -6,11 +6,11 @@ import Plegable from '../components/Plegable.astro';
 import SelectorDivisiones from '../components/SelectorDivisiones.astro';
 import { SISTEMA, DEMO_SEGUNDA } from '../data/temporada.js';
 import { EDICIONES } from '../data/ligaResultados.js';
-import { calcularTabla } from '../js/core/tabla.js';
+import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
 const base = import.meta.env.BASE_URL;
 const [d1cfg, d2cfg] = SISTEMA.divisiones;
 const ultima = (id) => (EDICIONES[id] ?? []).at(-1) ?? null;
-const filas = (ed) => calcularTabla(ed.fechas.flatMap((f) => f.partidos)).tabla.map((f) => ({ nombre: f.nombre, pts: f.pts, pj: f.pj, dg: f.dg, club: ed.clubes?.[f.nombre] ?? '' }));
+const filas = (ed) => tablaEdicion(ed).map((f) => ({ nombre: f.nombre, pts: f.pts, pj: f.pj, dg: f.dg, club: ed.clubes?.[f.nombre] ?? '' }));
 const ed1 = ultima(d1cfg.ligaId); const ed2 = ultima(d2cfg.ligaId);
 const datos = {
   d1: ed1 ? filas(ed1) : [], d2: ed2 ? filas(ed2) : DEMO_SEGUNDA.map((f) => ({ ...f, club: '' })), demo2: !ed2,

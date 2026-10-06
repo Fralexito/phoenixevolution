@@ -3,14 +3,14 @@
 import Layout from '../layouts/Layout.astro';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
-import { calcularTabla } from '../js/core/tabla.js';
+import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
 import { estadoLiga } from '../js/core/pulso.js';
 const base = import.meta.env.BASE_URL;
 // Dónde está la ficha de divisiones/ascensos de cada liga (cada una tiene su propio sistema).
 const DIVISIONES = { galaxy: 'temporada/', sudario: 'sudario-divisiones/' };
 const tarjetas = LIGAS.map((l) => {
   const ed = (EDICIONES[l.id] ?? []).find((e) => e.estado === 'en_curso') ?? (EDICIONES[l.id] ?? [])[0] ?? null;
-  const tabla = ed ? calcularTabla(ed.fechas.flatMap((f) => f.partidos)).tabla : [];
+  const tabla = ed ? tablaEdicion(ed) : [];
   const est = ed ? estadoLiga(ed.fechas) : null;
   const chips = [
     l.sede && ['fa-location-dot', `Sede: ${l.sede}`], l.organizador && ['fa-user-tie', `Organiza: ${l.organizador}`], ed && ['fa-calendar-day', ed.nombre],

@@ -48,3 +48,18 @@ export function calcularTabla(partidos) {
   const tabla = partir(todas, (f) => f.pts).flatMap(resolver);
   return { tabla, descartados, pendientes };
 }
+
+/**
+ * Tabla de una edición. Si la edición trae `tablaOficial` (tabla publicada por el organizador SIN resultados por fecha),
+ * se usa tal cual en su orden; si no, se calcula desde `fechas`. Filas incompletas o con números no válidos se descartan con aviso.
+ */
+export function tablaEdicion(ed) {
+  const of = ed?.tablaOficial;
+  if (Array.isArray(of) && of.length) {
+    try {
+      return of.filter((f) => f && f.nombre && ['pj', 'g', 'e', 'p', 'gf', 'gc', 'pts'].every((k) => entero(f[k])))
+        .map((f) => ({ nombre: f.nombre, pj: f.pj, g: f.g, e: f.e, p: f.p, gf: f.gf, gc: f.gc, dg: f.gf - f.gc, pts: f.pts }));
+    } catch (err) { console.warn('[tabla] tablaOficial inválida, se calcula desde fechas', err); }
+  }
+  return calcularTabla((ed?.fechas ?? []).flatMap((f) => f.partidos ?? [])).tabla;
+}
