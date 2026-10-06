@@ -1,0 +1,67 @@
+/* CAPA «DOPAMINA» (ronda 178). Se activa con FX.dopamina (data/experimento.js → atributo html[data-fx-dopamina]).
+   Todo está acotado a ese atributo: con la bandera en false este archivo no hace NADA y la web queda como antes.
+   Criterio (Emil Kowalski + Jhey): lo que se toca mucho es corto y firme (100–220 ms, ease-out); lo raro o celebratorio puede ser más juguetón.
+   Solo se animan transform y opacity. Todo respeta prefers-reduced-motion. Los efectos de hover solo existen con mouse (hover: hover). */
+
+:root {
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-pop: cubic-bezier(.34, 1.56, .64, 1);   /* leve rebote: SOLO para celebraciones y reacciones */
+  --dur-press: 140ms;
+}
+
+/* 1 · Los botones se hunden al presionar (feedback inmediato) */
+html[data-fx-dopamina] :is(.btn, .adv-chip, .chip, .toggle-btn, .seg > button, .sx-btn, .sx-chip, .sx-tab, .liga-sel button, .cat-item, .hero-cta, .lanza, .car-flecha) {
+  transition-property: transform, background-color, border-color, color, box-shadow, opacity;
+  transition-duration: var(--dur-press), 160ms, 160ms, 160ms, 200ms, 160ms;
+  transition-timing-function: var(--ease-out);
+}
+html[data-fx-dopamina] :is(.btn, .adv-chip, .chip, .toggle-btn, .seg > button, .sx-btn, .sx-chip, .sx-tab, .liga-sel button, .cat-item, .hero-cta, .lanza, .car-flecha):active:not(:disabled) {
+  transform: scale(.96);
+}
+
+/* 2 · Ondulación al pulsar el botón principal (la crea features/dopamina.js) */
+html[data-fx-dopamina] .btn-primary { position: relative; overflow: hidden; }
+html[data-fx-dopamina] .dp-onda { position: absolute; border-radius: 9999px; pointer-events: none; background: rgb(255 255 255 / .35); transform: scale(0); opacity: .9; }
+
+/* 3 · Solo con mouse: las tarjetas se elevan y una luz sigue el cursor (--mx/--my los pone features/dopamina.js) */
+@media (hover: hover) and (pointer: fine) {
+  html[data-fx-dopamina] :is(.match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .cat-item, .liga-partido, [data-pub]) {
+    transition: transform 200ms var(--ease-out), border-color 200ms, box-shadow 220ms;
+  }
+  html[data-fx-dopamina] :is(.item-tienda, [data-pub]):hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgb(0 0 0 / .4), 0 0 20px color-mix(in srgb, var(--color-galaxy-400) 14%, transparent); }
+  html[data-fx-dopamina] [data-spot] { position: relative; }
+  html[data-fx-dopamina] [data-spot]::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 220ms var(--ease-out);
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--color-galaxy-400) 15%, transparent), transparent 70%);
+  }
+  html[data-fx-dopamina] [data-spot]:hover::after { opacity: 1; }
+}
+
+/* 4 · En pantallas táctiles los hover con movimiento no deben «quedarse pegados» tras un toque */
+@media (hover: none) {
+  html[data-fx-dopamina] :is(.player-card, .match-card, .pulse-tile, a.slide-card, .lanza, .liga-partido, .na-sube, .cat-item, .liga-org, .fila-tabla, .nav-item, .car-flecha, .liga-volver, .item-tienda, [data-pub]):hover { transform: none; }
+}
+
+/* 5 · Social: entrada escalonada del feed (30–60 ms entre tarjetas, máximo 8: lo demás aparece de golpe) */
+@keyframes dp-sube { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+html[data-fx-dopamina] .dp-entra { animation: dp-sube 380ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 45ms); }
+
+/* 6 · Social: el anillo de las historias nuevas gira (conic-gradient detrás del avatar; el avatar no gira) */
+@keyframes dp-gira { to { transform: rotate(360deg); } }
+html[data-fx-dopamina] .sx-anillo.is-nueva { position: relative; background: none; box-shadow: 0 0 16px color-mix(in srgb, var(--color-galaxy-400) 40%, transparent); }
+html[data-fx-dopamina] .sx-anillo.is-nueva::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: 0;
+  background: conic-gradient(from 0deg, var(--color-galaxy-400), var(--color-galaxy-600), var(--color-galaxy-400) 50%, var(--color-galaxy-600), var(--color-galaxy-400));
+  animation: dp-gira 3.4s linear infinite;
+}
+html[data-fx-dopamina] .sx-anillo.is-nueva .sx-anillo-in { position: relative; z-index: 1; }
+
+/* 7 · Reacciones: el emoji «salta» y suelta una ráfaga (WAAPI en features/dopamina.js; aquí solo la partícula) */
+html[data-fx-dopamina] .dp-chispa { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; font-size: 1rem; line-height: 1; will-change: transform, opacity; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-fx-dopamina] .dp-entra { animation: none; }
+  html[data-fx-dopamina] .sx-anillo.is-nueva::before { animation: none; }
+  html[data-fx-dopamina] :is(.btn, .adv-chip, .chip, .toggle-btn, .seg > button, .sx-btn, .sx-chip, .sx-tab, .liga-sel button, .cat-item, .hero-cta, .lanza, .car-flecha):active:not(:disabled) { transform: none; }
+  html[data-fx-dopamina] :is(.item-tienda, [data-pub]):hover { transform: none; }
+}

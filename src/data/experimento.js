@@ -6,5 +6,6 @@
 //   compartir    → botón «Compartir» (tarjeta-imagen de la fecha en Central y de la campaña en el perfil)
 //   visita       → aviso «novedades desde tu última visita» en Central
 //   social       → sección «Social» (portada social: historias, publicar y feed de todos) en el menú principal. Pon false y desaparece del menú (la página sigue existiendo)
+//   dopamina     → capa «dopamínica»: botones que se hunden al presionar, tarjetas que se levantan y brillan con el mouse, ráfaga de emojis al reaccionar/publicar, anillos de historias que giran, entrada escalonada del feed. Pon false y todo vuelve a como estaba (la web se reconstruye)
 //   barraLateral → barra lateral izquierda estilo red social (solo PC ≥ 1280 px): atajos, ligas y amigos. Pon false y desaparece por completo
-export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true };
+export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true, dopamina: true };

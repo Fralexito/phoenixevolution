@@ -17,6 +17,7 @@ import { reproductorYT } from '../features/muro/render.js';
 import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { pieSocialHTML } from '../features/muro/pieSocial.js';
 import { montarCompositor } from '../features/muro/compositor.js';
+import { rafaga, salto, entrada } from '../features/dopamina.js';
 import { abrirNuevaHistoria } from '../features/muro/historiasUI.js';
 import { abrirHistorias } from '../features/muro/visor.js';
 import { compartir } from '../features/muro/compartir.js';
@@ -81,10 +82,14 @@ function pintarFiltro() {
   const r = $('sx-filtro-res'); if (r) r.textContent = S.juego ? (SEGMENTOS.find((s) => s[0] === S.juego)?.[1] ?? '') : 'Todos los juegos';
 }
 const tarjeta = (it) => tarjetaComunidadHTML(it, { yo: S.yo, puedeOcultar: can('resolverReportes'), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id) }) });
+let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
 function pintar() {
   feedEl.innerHTML = S.items.length ? S.items.map(tarjeta).join('')
     : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${escapeHTML(textoVacio(S.vista, { juego: S.juego, conSesion: !!S.yo }))}</div>`;
   finEl.hidden = !S.hayMas;
+  const idPrimero = S.items[0]?.id ?? null; const continuacion = pintados > 0 && idPrimero !== null && idPrimero === primero && S.items.length > pintados;
+  if (S.items.length) entrada(feedEl, continuacion ? pintados : 0);
+  pintados = S.items.length; primero = idPrimero;
 }
 /** Repinta SOLO una tarjeta (reaccionar no debe reiniciar los videos ni mover el scroll de las demás). */
 function repintar(id) {
@@ -123,6 +128,7 @@ async function reaccionar(id, tipo) {
   if (!S.yo) { toast('Inicia sesión para reaccionar.', 'info'); openAuthModal('login'); return; }
   let final; try { final = await api.reaccionar(id, tipo); } catch (e) { toast(String(e?.message ?? 'No se pudo reaccionar.'), 'error'); return; }   // null = quité mi reacción
   S.paleta = null; S.items = S.items.map((x) => (Number(x.id) === Number(id) ? aplicarReaccion(x, final) : x)); repintar(id);
+  if (final) { const b = feedEl.querySelector(`[data-pie="${Number(id)}"] [data-sx="reaccionar"]`); if (b) { salto(b.querySelector('span')); rafaga(b, [final, '✨'], { n: 7 }); } }   // pequeña celebración al reaccionar (no al quitar)
 }
 const baseAbsoluta = () => new URL(href(''), location.href).href;
 feedEl.addEventListener('click', (e) => {
@@ -163,7 +169,7 @@ pintarVistas(); pintarFiltro(); feedEl.innerHTML = cargandoHTML; cargar(); carga
 onSession(({ session, profile }) => {
   const id = session?.user?.id ?? null; const cambio = id !== S.yo; S.yo = id; S.perfil = profile ?? getState().profile ?? null;
   if (cambio || !S.compositor) {   // solo se monta de nuevo si cambió la persona: un refresco de sesión no debe borrar lo que está escribiendo
-    S.compositor?.destruir(); S.compositor = montarCompositor(compEl, { yo: S.yo, perfil: S.perfil, onLogin: () => openAuthModal('login'), onPublicado: () => { if (S.vista !== 'recientes') { S.vista = 'recientes'; pintarVistas(); history.replaceState(null, '', urlActual()); } reiniciarFeed(); } });
+    S.compositor?.destruir(); S.compositor = montarCompositor(compEl, { yo: S.yo, perfil: S.perfil, onLogin: () => openAuthModal('login'), onPublicado: () => { if (S.vista !== 'recientes') { S.vista = 'recientes'; pintarVistas(); history.replaceState(null, '', urlActual()); } reiniciarFeed(); rafaga(compEl, ['🔥', '✨', '⚽', '🏆'], { n: 14 }); } });
   }
   if (!cambio) return;
   cargarHistorias(); if (vistaInfo(S.vista).requiereSesion || S.items.length) reiniciarFeed();

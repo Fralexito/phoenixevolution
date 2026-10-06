@@ -24,5 +24,11 @@ Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Footb
 ## Identidad visual (no negociable)
 Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sudario = azul + dorado (`html[data-tema='sudario']`). Se conservan a propósito el texto con degradado, `glass-panel`, etiquetas en mayúsculas con tracking y los bordes laterales de acento, aunque una guía de diseño genérica los desaconseje.
 
+## Movimiento (estándares)
+- Lo que se toca mucho: corto y firme (100–220 ms, `ease-out` con `cubic-bezier(.22,1,.36,1)`), solo `transform`/`opacity`, nunca `transition: all`.
+- Lo raro o celebratorio (reaccionar, publicar, ganar) puede ser más juguetón (`--ease-pop`, ráfagas). El usuario quiere la web lo más «dopamínica» posible, mientras no pierda la identidad.
+- Los efectos de hover con movimiento solo con mouse (`@media (hover: hover)`); `prefers-reduced-motion` siempre respetado.
+- La capa vive tras la bandera `FX.dopamina` (`styles/dopamina.css`, `js/features/dopamina.js`); si algo no gusta, se apaga ahí.
+
 ## Diferido por el usuario
 Webhook/bot de Discord, pasarela de pago, pruebas de clanes. El cumplimiento legal de monetización y escudos es responsabilidad del usuario.

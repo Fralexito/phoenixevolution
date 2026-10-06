@@ -5,7 +5,7 @@
 .tab-btn[aria-selected='true'] { background: var(--color-galaxy-600); color: #fff; box-shadow: 0 0 10px rgba(128, 0, 255, 0.4); }
 
 /* ---------- Duelos v2 ---------- */
-.chip { min-height: 38px; padding: 0 .8rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: var(--color-galaxy-900); color: #cbd5e1; font-family: var(--font-display); font-weight: 700; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; transition: all .15s; }
+.chip { min-height: 38px; padding: 0 .8rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: var(--color-galaxy-900); color: #cbd5e1; font-family: var(--font-display); font-weight: 700; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; transition: transform .15s, background-color .15s, border-color .15s, color .15s, box-shadow .15s; }
 .chip:hover:not(:disabled) { border-color: var(--color-galaxy-400); color: #fff; }
 .chip:disabled { opacity: .35; cursor: not-allowed; }
 .chip[aria-pressed='true'] { background: var(--color-galaxy-600); border-color: var(--color-galaxy-400); color: #fff; }
