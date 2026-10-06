@@ -3,7 +3,7 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.0.0',
+  version_api: '1.1.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
   intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300 }),
@@ -29,6 +29,10 @@ export const ERRORES = Object.freeze({
   DEMASIADOS_INTENTOS:  { http: 429, reintentable: true,  mensaje: 'Demasiadas peticiones: espera y reintenta.' },
   SALA_NO_ENCONTRADA:   { http: 404, reintentable: false, mensaje: 'La sala no existe o no es de esta PC.' },
   SALA_CERRADA:         { http: 409, reintentable: false, mensaje: 'La sala ya está cerrada: abre una nueva.' },
+  DISPOSITIVO_SUSPENDIDO:{ http: 403, reintentable: false, mensaje: 'El staff suspendió esta PC. Consulta en Discord.' },
+  BUILD_NO_OFICIAL:     { http: 403, reintentable: false, mensaje: 'Este Smash Soda no es un build oficial de Phoenix.' },
+  BUILD_DESACTIVADO:    { http: 403, reintentable: false, mensaje: 'Este build fue desactivado: descarga el oficial más reciente.' },
+  VERSION_DESACTIVADA:  { http: 403, reintentable: false, mensaje: 'Esta versión de Smash Soda fue desactivada: actualiza.' },
   RETO_NO_VALIDO:       { http: 422, reintentable: false, mensaje: 'El reto no existe, no está aceptado o no eres su host.' },
   LOTE_DEMASIADO_GRANDE:{ http: 413, reintentable: false, mensaje: 'Demasiados eventos en un lote.' },
   ERROR_INTERNO:        { http: 500, reintentable: true,  mensaje: 'Error del servidor: reintenta con espera.' },
@@ -87,6 +91,17 @@ export const v = {
     if (x === undefined || x === null) { if (opcional) return null; falla(campo, `${campo} es obligatorio.`); }
     if (!opciones.includes(x)) falla(campo, `${campo} debe ser uno de: ${opciones.join(', ')}.`);
     return x;
+  },
+  booleano(x, campo, porDefecto) {
+    if (x === undefined || x === null) return porDefecto;
+    if (typeof x !== 'boolean') falla(campo, `${campo} debe ser true o false.`);
+    return x;
+  },
+  huella(x) {
+    if (x === undefined || x === null || x === '') return null;
+    const t = typeof x === 'string' ? x.trim().toLowerCase() : '';
+    if (!/^[0-9a-f]{64}$/.test(t)) falla('x-phoenix-build', 'La huella del build son 64 caracteres hexadecimales (SHA-256).');
+    return t;
   },
   enlace(x, campo) {
     const t = v.texto(x, campo, { max: CONFIG.limites.enlace_max });
@@ -163,6 +178,7 @@ export function limpiarEventos(lista, ahora = Date.now()) {
  * Lista de roles de una sala de reto: lado A → mandos 1..n, lado B → siguientes; espectadores sin mando (pad_limit 0).
  * `participantes`: [{ usuario_id, lado: 'A'|'B' }] en orden (retador primero). `parsec`: Map usuario → parsec_id.
  */
+/** @param {{ participantes?: Array<{ usuario_id: string, lado: string }>, espectadores?: string[], staff?: string[], parsec?: Map<string, string>, nombres?: Map<string, string|null> }} p */
 export function construirRoles({ participantes = [], espectadores = [], staff = [], parsec = new Map(), nombres = new Map() }) {
   const jugadores = []; const usados = new Set();
   const ordenados = [...participantes.filter((p) => p.lado === 'A'), ...participantes.filter((p) => p.lado === 'B')];
@@ -173,4 +189,40 @@ export function construirRoles({ participantes = [], espectadores = [], staff = 
   const mirar = (ids, rol) => ids.filter((id) => !usados.has(id) && (usados.add(id), true))
     .map((id) => ({ usuario_id: id, nombre: nombres.get(id) ?? null, parsec_id: parsec.get(id) ?? null, rol, pad_limit: 0 }));
   return { modo: 'reto', jugadores, espectadores: [...mirar(espectadores, 'espectador'), ...mirar(staff, 'staff')] };
+}
+
+/** Mezcla la config fija con las filas de phoenix_config (clave → valor). Valores con tipo incorrecto se ignoran. */
+export function fusionarConfig(base, filas = []) {
+  const out = { version_app_min: base.version_app_min, version_app_recomendada: base.version_app_recomendada, exigir_build: false,
+                intervalos: { ...base.intervalos }, interruptores: { ...base.interruptores } };
+  const VER = /^[0-9]+(\.[0-9]+){1,3}$/;
+  for (const { clave, valor } of filas) {
+    if ((clave === 'version_app_min' || clave === 'version_app_recomendada') && typeof valor === 'string' && VER.test(valor)) out[clave] = valor;
+    else if (clave === 'exigir_build' && typeof valor === 'boolean') out.exigir_build = valor;
+    else if ((clave === 'intervalos' || clave === 'interruptores') && valor && typeof valor === 'object' && !Array.isArray(valor)) {
+      for (const [k, x] of Object.entries(valor)) {
+        if (!(k in base[clave])) continue;                                  // claves desconocidas: fuera
+        if (typeof x === typeof base[clave][k]) out[clave][k] = x;
+      }
+    }
+  }
+  if (out.intervalos.latido_seg < 10) out.intervalos.latido_seg = 10;      // frenos de seguridad: un error de staff no puede saturar el plan FREE
+  if (out.intervalos.latido_min_seg < 5) out.intervalos.latido_min_seg = 5;
+  return out;
+}
+
+/**
+ * ¿Este build puede hablar con /v1? → null (sí) o un código de error.
+ * `builds`: filas { huella_sha256, version, activo } (todas). Orden: build desactivado > versión desactivada > exigencia de build oficial.
+ */
+/** @param {{ huella?: string|null, version?: string|null, builds?: Array<{ huella_sha256: string, version: string, activo: boolean }>, exigir?: boolean }} p */
+export function evaluarBuild({ huella, version, builds = [], exigir = false }) {
+  const propio = huella ? builds.find((b) => b.huella_sha256 === huella) : null;
+  if (propio && !propio.activo) return 'BUILD_DESACTIVADO';
+  if (version) {
+    const deEsa = builds.filter((b) => b.version === version);
+    if (deEsa.length && deEsa.every((b) => !b.activo)) return 'VERSION_DESACTIVADA';
+  }
+  if (exigir && !propio) return 'BUILD_NO_OFICIAL';
+  return null;
 }

@@ -1,7 +1,7 @@
 // Pruebas del núcleo puro de la API /v1 (supabase/functions/phoenix/_lib/nucleo.js). El contrato vive en claude/contrato-v1.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles } from '../supabase/functions/phoenix/_lib/nucleo.js';
+import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild } from '../supabase/functions/phoenix/_lib/nucleo.js';
 
 test('catálogo de errores: todos con http, reintentable y mensaje', () => {
   for (const [k, e] of Object.entries(ERRORES)) {
@@ -71,4 +71,29 @@ test('construirRoles: lado A primero, mandos correlativos, espectadores sin mand
   assert.deepEqual(r.jugadores.map((j) => [j.usuario_id, j.mando]), [['a1', 1], ['a2', 2], ['b1', 3]]);
   assert.equal(r.jugadores[0].parsec_id, '111'); assert.equal(r.jugadores[0].nombre, 'Kaiser');
   assert.deepEqual(r.espectadores.map((e) => [e.usuario_id, e.rol, e.pad_limit]), [['e1', 'espectador', 0], ['s1', 'staff', 0]]);
+});
+
+test('fusionarConfig: aplica valores válidos, ignora basura y respeta frenos', () => {
+  const c = fusionarConfig(CONFIG, [
+    { clave: 'version_app_min', valor: '7.1.0' }, { clave: 'version_app_recomendada', valor: 'malo' },
+    { clave: 'exigir_build', valor: true }, { clave: 'intervalos', valor: { latido_seg: 3, inventado: 9, eventos_lote_max: '50' } },
+    { clave: 'interruptores', valor: { integracion: false } },
+  ]);
+  assert.equal(c.version_app_min, '7.1.0'); assert.equal(c.version_app_recomendada, CONFIG.version_app_recomendada);
+  assert.equal(c.exigir_build, true); assert.equal(c.intervalos.latido_seg, 10); assert.equal(c.intervalos.eventos_lote_max, 50);
+  assert.ok(!('inventado' in c.intervalos)); assert.equal(c.interruptores.integracion, false);
+  assert.equal(CONFIG.interruptores.integracion, true);                        // no muta la base
+});
+
+test('evaluarBuild: desactivado > versión desactivada > exigencia', () => {
+  const h1 = 'a'.repeat(64); const h2 = 'b'.repeat(64);
+  const builds = [{ huella_sha256: h1, version: '7.0.4', activo: false }, { huella_sha256: h2, version: '7.0.5', activo: true }];
+  assert.equal(evaluarBuild({ huella: h1, version: '7.0.4', builds }), 'BUILD_DESACTIVADO');
+  assert.equal(evaluarBuild({ huella: null, version: '7.0.4', builds }), 'VERSION_DESACTIVADA');
+  assert.equal(evaluarBuild({ huella: null, version: '7.0.5', builds }), null);
+  assert.equal(evaluarBuild({ huella: null, version: '7.0.5', builds, exigir: true }), 'BUILD_NO_OFICIAL');
+  assert.equal(evaluarBuild({ huella: h2, version: '7.0.5', builds, exigir: true }), null);
+  assert.equal(evaluarBuild({ huella: 'c'.repeat(64), version: '9.9.9', builds: [], exigir: false }), null);
+  assert.equal(v.huella('A'.repeat(64)), 'a'.repeat(64)); assert.equal(v.huella(undefined), null);
+  assert.throws(() => v.huella('xyz'), (e) => e.campo === 'x-phoenix-build');
 });

@@ -6,7 +6,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   CONFIG, ErrorApi, cuerpoError, compararVersion, v, ESTADOS_LATIDO, VISIBILIDADES_APP,
-  limpiarInvitados, limpiarEventos, construirRoles,
+  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild,
 } from "./_lib/nucleo.js";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
@@ -43,16 +43,42 @@ const db = (error: { message: string } | null, contexto: string) => {
 
 type Dispositivo = { id: string; usuario: string; nombre: string };
 
+/** Config efectiva = fija (nucleo.js) + phoenix_config (la cambia el staff desde la web). Caché 60 s por instancia. */
+let cacheCfg: { t: number; cfg: ReturnType<typeof fusionarConfig>; builds: { huella_sha256: string; version: string; activo: boolean }[] } | null = null;
+async function cfgVigente() {
+  if (cacheCfg && Date.now() - cacheCfg.t < 60_000) return cacheCfg;
+  try {
+    const [{ data: filas, error: e1 }, { data: builds, error: e2 }] = await Promise.all([
+      sb.from("phoenix_config").select("clave, valor"), sb.from("builds_oficiales").select("huella_sha256, version, activo"),
+    ]);
+    if (e1 || e2) throw new Error((e1 ?? e2)!.message);
+    cacheCfg = { t: Date.now(), cfg: fusionarConfig(CONFIG, filas ?? []), builds: builds ?? [] };
+  } catch (err) {
+    log("error", "config_bd", { mensaje: String((err as Error).message) });
+    if (!cacheCfg) cacheCfg = { t: Date.now() - 50_000, cfg: fusionarConfig(CONFIG, []), builds: [] };   // sin BD: config fija, reintenta en 10 s
+  }
+  return cacheCfg;
+}
+
+/** Versión + build de la app (cabeceras o cuerpo). Lanza APP_DESACTUALIZADA / BUILD_* / VERSION_DESACTIVADA. */
+async function controlarApp(version: string | null, huellaCruda: unknown) {
+  const { cfg, builds } = await cfgVigente();
+  if (version && compararVersion(version, cfg.version_app_min) < 0) throw new ErrorApi("APP_DESACTUALIZADA");
+  const fallo = evaluarBuild({ huella: v.huella(huellaCruda), version, builds, exigir: cfg.exigir_build });
+  if (fallo) throw new ErrorApi(fallo);
+}
+
 /** Token → dispositivo válido de un host aprobado, con app al día. */
 async function autenticar(req: Request): Promise<Dispositivo> {
   const m = /^Bearer\s+(phx_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "");
   if (!m) throw new ErrorApi(req.headers.get("authorization") ? "TOKEN_INVALIDO" : "TOKEN_FALTANTE");
   const ver = req.headers.get("x-phoenix-version");
-  if (ver && compararVersion(ver, CONFIG.version_app_min) < 0) throw new ErrorApi("APP_DESACTUALIZADA");
-  const { data, error } = await sb.from("dispositivos_host").select("id, usuario, nombre, revocado").eq("huella_token", await sha256(m[1])).maybeSingle();
+  await controlarApp(ver, req.headers.get("x-phoenix-build"));
+  const { data, error } = await sb.from("dispositivos_host").select("id, usuario, nombre, revocado, suspendido").eq("huella_token", await sha256(m[1])).maybeSingle();
   db(error, "autenticar");
   if (!data) throw new ErrorApi("TOKEN_INVALIDO");
   if (data.revocado) throw new ErrorApi("TOKEN_REVOCADO");
+  if (data.suspendido) throw new ErrorApi("DISPOSITIVO_SUSPENDIDO");
   frenar(`d:${data.id}`, 120, 60_000);
   const { data: p, error: e2 } = await sb.from("perfiles").select("host_aprobado, rol").eq("id", data.usuario).maybeSingle();
   db(e2, "autenticar.perfil");
@@ -121,7 +147,7 @@ async function emparejar(req: Request) {
   const codigo = v.codigo(b.codigo);
   const nombre = v.texto(b.nombre_pc, "nombre_pc", { max: CONFIG.limites.nombre_pc_max }) ?? "Mi PC";
   const version = v.texto(b.version_app, "version_app", { max: 20 });
-  if (version && compararVersion(version, CONFIG.version_app_min) < 0) throw new ErrorApi("APP_DESACTUALIZADA");
+  await controlarApp(version ?? req.headers.get("x-phoenix-version"), req.headers.get("x-phoenix-build"));
   const { data: c, error } = await sb.from("codigos_emparejamiento").select("id, usuario, expira, usado").eq("codigo_huella", await sha256(codigo)).maybeSingle();
   db(error, "emparejar.codigo");
   if (!c) { log("warn", "emparejar_fallido", { ip }); throw new ErrorApi("CODIGO_NO_ENCONTRADO"); }
@@ -137,8 +163,8 @@ async function emparejar(req: Request) {
   const token = tokenNuevo();
   const { data: d, error: e4 } = await sb.from("dispositivos_host").insert({ usuario: c.usuario, huella_token: await sha256(token), nombre, version_app: version }).select("id").single();
   db(e4, "emparejar.dispositivo");
-  log("info", "emparejado", { dispositivo: d.id, usuario: c.usuario });
-  return { token, dispositivo_id: d.id, usuario: { id: c.usuario, nombre: p.nombre_display || p.username } };
+  log("info", "emparejado", { dispositivo: d!.id, usuario: c.usuario });
+  return { token, dispositivo_id: d!.id, usuario: { id: c.usuario, nombre: p.nombre_display || p.username } };
 }
 
 async function abrir(req: Request) {
@@ -148,6 +174,10 @@ async function abrir(req: Request) {
     plazas_total: v.entero(b.plazas_total, "plazas_total", { min: 1, max: 16, opcional: false }),
     visibilidad: v.enumerado(b.visibilidad, "visibilidad", VISIBILIDADES_APP) ?? "amigos",
     limite_espectadores: v.entero(b.limite_espectadores, "limite_espectadores", { min: 0, max: 16 }) ?? 4,
+    publicar_en_pagina: v.booleano(b.publicar_en_pagina, "publicar_en_pagina", true),
+    avisar_amigos_host: v.booleano(b.avisar_amigos_host, "avisar_amigos_host", false),
+    avisar_amigos_jugadores: v.booleano(b.avisar_amigos_jugadores, "avisar_amigos_jugadores", false),
+    anunciar_discord: v.booleano(b.anunciar_discord, "anunciar_discord", false),
   };
   const enlace = v.enlace(b.enlace, "enlace");
   const retoId = v.entero(b.reto_id, "reto_id", { min: 1 });
@@ -169,13 +199,23 @@ async function abrir(req: Request) {
     salaId = viva.id; reabierta = true;
   } else {
     const { data, error } = await sb.from("salas").insert({ ...cambios, host: d.usuario, dispositivo: d.id, abierta_en: ahora }).select("id").single();
-    db(error, "abrir.crear"); salaId = data.id;
+    db(error, "abrir.crear"); salaId = data!.id;
   }
   if (enlace) { const { error } = await sb.from("salas_enlace").upsert({ sala_id: salaId, enlace, actualizado: ahora }); db(error, "abrir.enlace"); }
   await registrarEvento(salaId, "abrir", `abrir-${salaId}-${Date.now()}`, { reabierta, reto_id: retoId ?? null });
-  log("info", "sala_abierta", { salaId, dispositivo: d.id, reabierta, retoId });
+  // Avisos: una sola vez por sala (reabrir no vuelve a avisar). Un fallo aquí NUNCA impide abrir la sala.
+  let avisos: Record<string, unknown> = { enviado: false, motivo: "ERROR" };
+  try {
+    const { data, error } = await sb.rpc("sistema_avisar_sala", { p_sala: salaId });
+    if (error) throw new Error(error.message);
+    avisos = data as Record<string, unknown>;
+  } catch (err) { log("warn", "avisos_sala", { salaId, mensaje: String((err as Error).message) }); }
+  log("info", "sala_abierta", { salaId, dispositivo: d.id, reabierta, retoId, avisos });
+  const { cfg } = await cfgVigente();
   return { sala_id: salaId, reabierta, estado: "abierta", visibilidad: fila.visibilidad, limite_espectadores: fila.limite_espectadores,
-           latido_seg: CONFIG.intervalos.latido_seg, roles: await rolesDe(retoId) };
+           preferencias: { publicar_en_pagina: fila.publicar_en_pagina, avisar_amigos_host: fila.avisar_amigos_host,
+                           avisar_amigos_jugadores: fila.avisar_amigos_jugadores, anunciar_discord: fila.anunciar_discord },
+           avisos, latido_seg: cfg.intervalos.latido_seg, roles: await rolesDe(retoId) };
 }
 
 async function latido(req: Request) {
@@ -186,15 +226,16 @@ async function latido(req: Request) {
   const plazas_libres = v.entero(b.plazas_libres, "plazas_libres", { min: 0, max: 16, opcional: false });
   const invitados = limpiarInvitados(b.invitados);
   const enlace = v.enlace(b.enlace, "enlace");
+  const { cfg } = await cfgVigente();
   const desde = Date.now() - Date.parse(sala.latido);
-  if (desde < CONFIG.intervalos.latido_min_seg * 1000 && sala.estado !== "preparando") {
-    throw new ErrorApi("DEMASIADOS_INTENTOS", { reintentar_en: Math.ceil((CONFIG.intervalos.latido_min_seg * 1000 - desde) / 1000) });
+  if (desde < cfg.intervalos.latido_min_seg * 1000 && sala.estado !== "preparando") {
+    throw new ErrorApi("DEMASIADOS_INTENTOS", { reintentar_en: Math.ceil((cfg.intervalos.latido_min_seg * 1000 - desde) / 1000) });
   }
   const ahora = new Date().toISOString();
   const { error } = await sb.from("salas").update({ estado, plazas_libres, latido: ahora }).eq("id", sala.id).in("estado", VIVAS);
   db(error, "latido.sala");
   if (enlace) { const { error: e } = await sb.from("salas_enlace").upsert({ sala_id: sala.id, enlace, actualizado: ahora }); db(e, "latido.enlace"); }
-  if (CONFIG.interruptores.muestras_calidad && invitados.length) {
+  if (cfg.interruptores.muestras_calidad && invitados.length) {
     const quien = await usuariosPorParsec(invitados.map((g) => g.parsec_id));
     const filas = invitados.filter((g) => g.ping_ms !== null).map((g) => ({
       sala_id: sala.id, host: sala.host, region: sala.region, actor_parsec: g.parsec_id, usuario: quien.get(g.parsec_id) ?? null,
@@ -212,7 +253,7 @@ async function latido(req: Request) {
       }
     }
   }
-  return { estado, latido_seg: CONFIG.intervalos.latido_seg, servidor_hora: ahora };
+  return { estado, latido_seg: cfg.intervalos.latido_seg, servidor_hora: ahora };
 }
 
 async function cerrar(req: Request) {
@@ -230,6 +271,8 @@ async function cerrar(req: Request) {
 async function eventos(req: Request) {
   const d = await autenticar(req); const b = await leerJson(req);
   const sala = await salaPropia(d, v.uuid(b.sala_id, "sala_id"));
+  const { cfg } = await cfgVigente();
+  if (Array.isArray(b.eventos) && b.eventos.length > cfg.intervalos.eventos_lote_max) throw new ErrorApi("LOTE_DEMASIADO_GRANDE");
   const { validos, rechazados } = limpiarEventos(b.eventos);
   if (!validos.length) return { aceptados: 0, duplicados: 0, rechazados };
   const quien = await usuariosPorParsec([...new Set(validos.map((e) => e.actor_parsec).filter(Boolean))] as string[]);
@@ -241,9 +284,29 @@ async function eventos(req: Request) {
   return { aceptados, duplicados: validos.length - aceptados, rechazados };
 }
 
-function config() {
-  return { version_api: CONFIG.version_api, version_app_min: CONFIG.version_app_min, version_app_recomendada: CONFIG.version_app_recomendada,
-           intervalos: CONFIG.intervalos, interruptores: CONFIG.interruptores, limites: CONFIG.limites, servidor_hora: new Date().toISOString() };
+/** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */
+async function config(req: Request) {
+  const { cfg, builds } = await cfgVigente();
+  const ver = req.headers.get("x-phoenix-version");
+  let huella: string | null = null; let build = "sin_dato";
+  try { huella = v.huella(req.headers.get("x-phoenix-build")); } catch { build = "huella_invalida"; }
+  if (build !== "huella_invalida") {
+    const fallo = evaluarBuild({ huella, version: ver, builds, exigir: cfg.exigir_build });
+    build = fallo === "BUILD_DESACTIVADO" ? "desactivado" : fallo === "VERSION_DESACTIVADA" ? "version_desactivada"
+          : fallo === "BUILD_NO_OFICIAL" ? "no_oficial" : huella && builds.some((x) => x.huella_sha256 === huella) ? "oficial" : "sin_verificar";
+  }
+  let dispositivo = "sin_token";
+  const m = /^Bearer\s+(phx_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "");
+  if (m) {
+    const { data, error } = await sb.from("dispositivos_host").select("revocado, suspendido").eq("huella_token", await sha256(m[1])).maybeSingle();
+    db(error, "config.dispositivo");
+    dispositivo = !data ? "desconocido" : data.revocado ? "revocado" : data.suspendido ? "suspendido" : "activo";
+  }
+  const app = !ver ? "sin_dato" : compararVersion(ver, cfg.version_app_min) < 0 ? "desactualizada"
+            : compararVersion(ver, cfg.version_app_recomendada) < 0 ? "actualizable" : "al_dia";
+  return { version_api: CONFIG.version_api, version_app_min: cfg.version_app_min, version_app_recomendada: cfg.version_app_recomendada,
+           exigir_build: cfg.exigir_build, intervalos: cfg.intervalos, interruptores: cfg.interruptores, limites: CONFIG.limites,
+           estado: { app, build, dispositivo }, servidor_hora: new Date().toISOString() };
 }
 
 const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> = {

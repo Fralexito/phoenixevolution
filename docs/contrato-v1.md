@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.0.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.1.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
-Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). Desplegada el 6 oct 2026 (versión 1 de la función).
+Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.1.0 (compatibles hacia atrás):** cabecera `X-Phoenix-Build`; 4 campos booleanos nuevos en `sala/abrir` (+ `preferencias` y `avisos` en la respuesta); `config` acepta token opcional y devuelve `exigir_build` y `estado`; 4 errores nuevos (`DISPOSITIVO_SUSPENDIDO`, `BUILD_NO_OFICIAL`, `BUILD_DESACTIVADO`, `VERSION_DESACTIVADA`). Una app 1.0.0 sigue funcionando mientras `exigir_build` sea `false`.
 
 ## 0. Reglas generales
 
@@ -11,6 +13,7 @@ Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `b
 | Transporte | HTTPS, `Content-Type: application/json; charset=utf-8`, cuerpo ≤ 64 KB |
 | Autenticación | Todas las rutas salvo `emparejar` y `config`: cabecera `Authorization: Bearer phx_…` (token de dispositivo) |
 | Versión de la app | Enviar siempre `X-Phoenix-Version: 7.0.4` (versión de Smash Soda). Si es menor que `version_app_min` → `APP_DESACTUALIZADA` |
+| Huella del build | Enviar siempre `X-Phoenix-Build: <sha256 hex del SmashSoda.exe en ejecución, 64 car. minúsculas>` (calcularla una vez al arrancar). Ver sección 9 |
 | No hace falta | `apikey` ni JWT de Supabase |
 | Sobre de éxito | `{ "ok": true, …campos de la ruta…, "solicitud_id": "uuid" }`, HTTP 200 |
 | Sobre de error | `{ "ok": false, "codigo": "MAYUSCULAS", "mensaje": "texto para humanos", "reintentable": bool, "solicitud_id": "uuid", "campo"?: "…", "reintentar_en"?: seg }` |
@@ -22,11 +25,11 @@ Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `b
 
 ### Política de reintentos (obligatoria para no trabar el juego ni saturar el plan FREE)
 - `reintentable: true` (solo `DEMASIADOS_INTENTOS` y `ERROR_INTERNO`) o error de red/timeout → reintentar con espera exponencial + fluctuación: 2 s, 4 s, 8 s… tope `intervalos.reintento_max_seg` (300 s). Si viene `reintentar_en`, esperar al menos eso.
-- `reintentable: false` → **no reintentar la misma petición**. Actuar según la tabla de la sección 8.
+- `reintentable: false` → **no reintentar la misma petición**. Actuar según la tabla de la sección 7.
 - Eventos: reintentar el lote completo es seguro (idempotencia por `clave`).
 
-## 1. `GET /v1/config` (sin token)
-Leer al arrancar y cada 30 min. Si falla, usar los últimos valores guardados o estos por defecto.
+## 1. `GET /v1/config` (token opcional)
+Leer al arrancar y cada 30 min (y siempre tras un error `BUILD_*`, `VERSION_DESACTIVADA` o `DISPOSITIVO_SUSPENDIDO`). Mandar `Authorization`, `X-Phoenix-Version` y `X-Phoenix-Build` si se tienen: entonces responde también el estado de esa PC y ese build. **Nunca** devuelve error por el token: lo informa en `estado.dispositivo`. Si falla, usar los últimos valores guardados o estos por defecto.
 
 Respuesta:
 ```json
@@ -38,12 +41,18 @@ Respuesta:
   "intervalos": { "latido_seg": 30, "latido_min_seg": 10, "eventos_lote_max": 50, "eventos_envio_seg": 15, "ping_vivo_seg": 4, "reintento_max_seg": 300 },
   "interruptores": { "integracion": true, "muestras_calidad": true, "ping_en_vivo": false, "roles_reto": true },
   "limites": { "invitados_max": 16, "nombre_pc_max": 40, "enlace_max": 500, "datos_evento_bytes": 4096 },
+  "exigir_build": false,
+  "estado": { "app": "al_dia", "build": "oficial", "dispositivo": "activo" },
   "servidor_hora": "2026-10-06T19:00:00.000Z",
   "solicitud_id": "…"
 }
 ```
 - `interruptores.integracion = false` → la app deja de llamar a todo salvo `config` (interruptor de emergencia).
 - `muestras_calidad = false` → mandar latidos sin `invitados`.
+- `estado.app`: `al_dia` | `actualizable` (por debajo de la recomendada: sugerir actualizar) | `desactualizada` (por debajo de la mínima: pausar) | `sin_dato`.
+- `estado.build`: `oficial` | `sin_verificar` (huella no registrada y no se exige) | `no_oficial` (no registrada y se exige: pausar) | `desactivado` | `version_desactivada` | `huella_invalida` | `sin_dato`.
+- `estado.dispositivo`: `activo` | `suspendido` (pausar; el staff puede reactivarla) | `revocado` (borrar token) | `desconocido` (borrar token) | `sin_token`.
+- Intervalos e interruptores los puede cambiar el staff desde la web (tabla `phoenix_config`) sin redesplegar ni recompilar; la función los relee cada ≤ 60 s. Frenos fijos: `latido_seg` ≥ 10 y `latido_min_seg` ≥ 5.
 - `ping_en_vivo` y `roles_reto` → reservados para las fases 2.5 y 2.6; hoy solo informativos.
 
 ## 2. `POST /v1/emparejar` (sin token)
@@ -74,7 +83,8 @@ Petición:
 {
   "juego": "eFootball PES 2021", "parche": "Conmegol", "region": "Lima",
   "plazas_total": 4, "visibilidad": "amigos", "limite_espectadores": 4,
-  "enlace": "https://parsec.gg/g/…", "reto_id": 123
+  "enlace": "https://parsec.gg/g/…", "reto_id": 123,
+  "publicar_en_pagina": true, "avisar_amigos_host": true, "avisar_amigos_jugadores": false, "anunciar_discord": false
 }
 ```
 | Campo | Tipo | Obligatorio | Regla |
@@ -85,6 +95,10 @@ Petición:
 | `visibilidad` | texto | no | `publica` \| `amigos` \| `privada`; por defecto `amigos` |
 | `limite_espectadores` | entero | no | 0–16; por defecto 4 |
 | `enlace` | texto | no | debe empezar por `https://`, ≤ 500. Solo lo ven quienes pueden entrar |
+| `publicar_en_pagina` | bool | no | por defecto `true`. `false` = la sala no aparece en «Salas en vivo»: solo la ven el host, staff y los roles del reto |
+| `avisar_amigos_host` | bool | no | por defecto `false`. Notifica a los amigos del host que **puedan ver** la sala |
+| `avisar_amigos_jugadores` | bool | no | por defecto `false`. Solo salas de reto: notifica a los amigos de cada jugador (salvo jugadores con «mostrar conexión» apagado) |
+| `anunciar_discord` | bool | no | por defecto `false`. Solo se publica si la sala es `publica`, publicada y **sin reto**; si no, se ignora (`avisos.discord = "NO_PUBLICA"`) |
 | `reto_id` | entero | no | reto en estado ACEPTADO/EN_JUEGO del que esta cuenta es host (o jugador si el reto no tiene host fijo) |
 
 Respuesta:
@@ -92,6 +106,8 @@ Respuesta:
 {
   "ok": true, "sala_id": "uuid", "reabierta": false, "estado": "abierta",
   "visibilidad": "amigos", "limite_espectadores": 4, "latido_seg": 30,
+  "preferencias": { "publicar_en_pagina": true, "avisar_amigos_host": true, "avisar_amigos_jugadores": false, "anunciar_discord": false },
+  "avisos": { "enviado": true, "amigos_host": 5, "amigos_jugadores": 0, "discord": "NO_PEDIDO", "anti_spam": false },
   "roles": {
     "modo": "reto",
     "jugadores": [
@@ -105,6 +121,7 @@ Respuesta:
   }
 }
 ```
+- **Avisos** (los envía el servidor, no la app): una sola vez por sala; reabrir la misma sala no vuelve a avisar (`avisos = { "enviado": false, "motivo": "YA_AVISADA" }`). Si el mismo host avisó hace < 30 min, se omiten los avisos a amigos (`anti_spam: true`). Cada destinatario puede apagar la categoría «Salas» en sus avisos. Un fallo de avisos **nunca** impide abrir la sala (`motivo: "ERROR"`). Valores de `avisos.discord`: `NO_PEDIDO`, `NO_PUBLICA`, `ENVIADO`, `DUPLICADO`, `SIN_CONFIGURAR`, `ERROR`.
 - Sin `reto_id` → `roles = { "modo": "libre", "jugadores": [], "espectadores": [] }`: la app se comporta como hoy.
 - `modo: "reto"`: el lado A recibe mandos 1…n y el lado B los siguientes. Todo espectador/staff tiene `pad_limit: 0` (nunca juega).
 - `parsec_id: null` = ese jugador aún no vinculó su cuenta Parsec en la web; la app no puede reconocerlo automáticamente (decidir en fase 2.6 qué hacer: p. ej. pedir confirmación al host).
@@ -205,6 +222,10 @@ Respuesta:
 | `DEMASIADOS_INTENTOS` | 429 | **sí** | Esperar `reintentar_en` |
 | `SALA_NO_ENCONTRADA` | 404 | no | Olvidar `sala_id`; `abrir` si sigue hosteando |
 | `SALA_CERRADA` | 409 | no | `abrir` de nuevo si sigue hosteando |
+| `DISPOSITIVO_SUSPENDIDO` | 403 | no | Pausar integración; consultar `config` cada 30 min (el staff puede reactivarla) |
+| `BUILD_NO_OFICIAL` | 403 | no | Pausar; avisar «descarga el Smash Soda oficial» |
+| `BUILD_DESACTIVADO` | 403 | no | Pausar; avisar «este build fue retirado» |
+| `VERSION_DESACTIVADA` | 403 | no | Pausar; sugerir actualizar |
 | `RETO_NO_VALIDO` | 422 | no | Abrir sin `reto_id` o avisar al host |
 | `LOTE_DEMASIADO_GRANDE` | 413 | no | Partir el lote |
 | `ERROR_INTERNO` | 500 | **sí** | Espera exponencial |
@@ -216,7 +237,15 @@ Respuesta:
 3. Cada 30 s → `latido`. Cada 15 s (si hay) → `eventos`.
 4. Deja de hostear → `cerrar`. Si la app muere, el servidor marca `caida` a los 3 min.
 
-## 9. Garantías del servidor
+## 9. Builds oficiales y control remoto
+- **Huella**: SHA-256 del archivo `SmashSoda.exe` que se está ejecutando, en hex minúsculas. El chat de Smash Soda publica la huella de cada release y el staff la registra en la web (Panel staff → Builds).
+- **Orden de comprobación** (en `emparejar` y en toda ruta con token): build desactivado → versión con todos sus builds desactivados → si `exigir_build = true`, huella no registrada o ausente.
+- **Desactivar una versión** = desactivar todos sus builds (`VERSION_DESACTIVADA`), o subir `version_app_min` (`APP_DESACTUALIZADA`).
+- **Desactivar una PC** = suspenderla (reversible, `DISPOSITIVO_SUSPENDIDO`) o revocarla (definitivo, `TOKEN_REVOCADO`). Suspender o revocar cierra su sala viva.
+- `exigir_build` empieza en `false` y solo se activa cuando el primer build oficial esté registrado.
+- **Límite honesto**: la huella la calcula la propia app; un build manipulado podría enviar la de uno oficial. Esto evita builds viejos o no oficiales usados por error, no a un atacante decidido. La protección real sigue siendo token por PC + host aprobado por staff + revocación.
+
+## 10. Garantías del servidor
 - Una sola sala viva por PC. Visibilidad por defecto `amigos`. El enlace solo lo leen quienes pueden entrar (RLS).
 - Solo hosts aprobados por staff obtienen token y abren salas; si el staff retira el permiso, la sala se cierra y el siguiente latido recibe `SALA_CERRADA` / `HOST_NO_AUTORIZADO`.
 - Logs estructurados por `solicitud_id`: al reportar un fallo, incluir ese id.
