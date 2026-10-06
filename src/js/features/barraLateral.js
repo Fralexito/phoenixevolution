@@ -39,20 +39,35 @@ async function cargarAmigos() {
   } catch (e) { console.warn('[barra] amigos:', e?.message ?? e); estado = 'error'; pintarAmigos(); }
 }
 
-/** Indicador de desplazamiento propio (ronda 180): una barrita fina que muestra cuánto falta por ver, sin la barra nativa. Solo aparece si la barra desborda. */
+/** Indicador de desplazamiento propio (rondas 181 y 183): barrita fina en el borde IZQUIERDO de la cápsula (no se mueve cuando la barra se expande) que además se puede arrastrar. Solo aparece si la barra desborda. */
 function montarIndicador(rail) {
   try {
     const ind = document.createElement('div'); ind.className = 'barra-ind'; ind.setAttribute('aria-hidden', 'true');
     const th = document.createElement('span'); th.className = 'barra-ind-th'; ind.appendChild(th); rail.prepend(ind);
-    let raf = 0; let tmo = 0;
+    const arriba = 14; const abajo = 22;
+    let raf = 0; let tmo = 0; let arrastre = null;
+    const geo = () => { const ch = rail.clientHeight; const sh = rail.scrollHeight; const pista = ch - arriba - abajo; return { ch, sh, sobra: sh - ch, pista, alto: Math.max(28, (pista * ch) / sh) }; };
     const medir = () => {
-      raf = 0; const ch = rail.clientHeight; const sh = rail.scrollHeight; const sobra = sh - ch;
-      if (sobra <= 2 || ch < 60) { ind.dataset.on = '0'; return; }
-      ind.dataset.on = '1'; const arriba = 14; const abajo = 22; const pista = ch - arriba - abajo; const alto = Math.max(28, (pista * ch) / sh);
-      th.style.height = `${alto}px`; th.style.transform = `translateY(${arriba + (rail.scrollTop / sobra) * (pista - alto)}px)`;
+      raf = 0; const g = geo();
+      if (g.sobra <= 2 || g.ch < 60) { ind.dataset.on = '0'; return; }
+      ind.dataset.on = '1';
+      th.style.height = `${g.alto}px`; th.style.transform = `translateY(${arriba + (rail.scrollTop / g.sobra) * (g.pista - g.alto)}px)`;
     };
     const pedir = () => { if (!raf) raf = requestAnimationFrame(medir); };
-    rail.addEventListener('scroll', () => { pedir(); ind.dataset.act = '1'; clearTimeout(tmo); tmo = setTimeout(() => { delete ind.dataset.act; }, 900); }, { passive: true });
+    const activo = () => { ind.dataset.act = '1'; clearTimeout(tmo); if (!arrastre) tmo = setTimeout(() => { delete ind.dataset.act; }, 1500); };
+    rail.addEventListener('scroll', () => { pedir(); activo(); }, { passive: true });
+    th.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault(); arrastre = { y: e.clientY, top: rail.scrollTop };
+      try { th.setPointerCapture(e.pointerId); } catch { /* sin captura: el arrastre sigue mientras el puntero esté encima */ }
+      ind.dataset.arr = '1'; activo();
+    });
+    th.addEventListener('pointermove', (e) => {
+      if (!arrastre) return; const g = geo(); const recorrido = g.pista - g.alto; if (recorrido <= 0) return;
+      rail.scrollTop = arrastre.top + ((e.clientY - arrastre.y) * g.sobra) / recorrido;
+    });
+    const soltar = () => { if (!arrastre) return; arrastre = null; delete ind.dataset.arr; activo(); };
+    th.addEventListener('pointerup', soltar); th.addEventListener('pointercancel', soltar); th.addEventListener('lostpointercapture', soltar);
     if ('ResizeObserver' in window) new ResizeObserver(pedir).observe(rail);
     new MutationObserver(pedir).observe(rail, { childList: true, subtree: true });
     window.addEventListener('resize', pedir); pedir();
