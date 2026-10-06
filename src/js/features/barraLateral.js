@@ -39,9 +39,29 @@ async function cargarAmigos() {
   } catch (e) { console.warn('[barra] amigos:', e?.message ?? e); estado = 'error'; pintarAmigos(); }
 }
 
+/** Indicador de desplazamiento propio (ronda 180): una barrita fina que muestra cuánto falta por ver, sin la barra nativa. Solo aparece si la barra desborda. */
+function montarIndicador(rail) {
+  try {
+    const ind = document.createElement('div'); ind.className = 'barra-ind'; ind.setAttribute('aria-hidden', 'true');
+    const th = document.createElement('span'); th.className = 'barra-ind-th'; ind.appendChild(th); rail.prepend(ind);
+    let raf = 0; let tmo = 0;
+    const medir = () => {
+      raf = 0; const ch = rail.clientHeight; const sh = rail.scrollHeight; const sobra = sh - ch;
+      if (sobra <= 2 || ch < 60) { ind.dataset.on = '0'; return; }
+      ind.dataset.on = '1'; const arriba = 14; const abajo = 22; const pista = ch - arriba - abajo; const alto = Math.max(28, (pista * ch) / sh);
+      th.style.height = `${alto}px`; th.style.transform = `translateY(${arriba + (rail.scrollTop / sobra) * (pista - alto)}px)`;
+    };
+    const pedir = () => { if (!raf) raf = requestAnimationFrame(medir); };
+    rail.addEventListener('scroll', () => { pedir(); ind.dataset.act = '1'; clearTimeout(tmo); tmo = setTimeout(() => { delete ind.dataset.act; }, 900); }, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(pedir).observe(rail);
+    new MutationObserver(pedir).observe(rail, { childList: true, subtree: true });
+    window.addEventListener('resize', pedir); pedir();
+  } catch (e) { console.warn('[barra] indicador de scroll:', e); }
+}
+
 export function initBarraLateral() {
   const rail = $('barra-lat'); if (!rail) return;
-  rail.hidden = false;
+  rail.hidden = false; montarIndicador(rail);
   const fijar = $('barra-fijar');
   const aplicarFija = (v) => { document.documentElement.toggleAttribute('data-barra-fijada', v); fijar?.setAttribute('aria-pressed', String(v)); };
   try { aplicarFija(localStorage.getItem(KEY) === '1'); } catch { /* sin almacenamiento: queda plegada */ }
