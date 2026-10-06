@@ -743,3 +743,10 @@ html[data-tema='sudario'] .estado-liga { background: linear-gradient(90deg, rgb(
 .rank-n { width: 1.4rem; text-align: center; font-family: var(--font-display); font-weight: 700; color: #9ca3af; flex: none; }
 .rank-fila:nth-child(-n+3) .rank-n { color: #fbbf24; }
 .rank-val { margin-left: auto; font-family: var(--font-display); font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Selector «Ligas activas» de la página Liga: flota SOBRE la imagen de la portada (ya no es una franja suelta arriba). */
+.liga-flota { position: absolute; top: 0; left: 0; right: 0; z-index: 20; max-width: 80rem; margin: 0 auto; padding: 1rem 1.25rem 0; display: flex; align-items: center; flex-wrap: wrap; gap: .5rem .75rem; pointer-events: none; }
+.liga-flota > * { pointer-events: auto; }
+.liga-flota .liga-sel { background: rgb(0 0 0 / .45); backdrop-filter: blur(6px); }
+@media (min-width: 640px) { .liga-flota { padding: 1.25rem 2rem 0; } }
+@media (min-width: 1024px) { .liga-flota { padding-left: 3rem; padding-right: 3rem; } }

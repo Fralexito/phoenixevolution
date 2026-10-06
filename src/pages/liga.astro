@@ -35,10 +35,11 @@ const datos = LIGAS.map((l) => ({
 }));
 ---
 <Layout title="Liga" active="liga">
+  <div class="relative">
   <!-- Selector de liga: muestra una sola liga a la vez. Pulsar la otra vuelve al instante; el enlace (#liga-…) recuerda cuál. -->
   {LIGAS.length > 1 && (
-    <nav class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-5 flex items-center gap-3 flex-wrap" aria-label="Cambiar de liga">
-      <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-500">Ligas activas</span>
+    <nav class="liga-flota" aria-label="Cambiar de liga">
+      <span class="text-[10px] font-display font-bold tracking-[0.2em] uppercase text-gray-300 drop-shadow-[0_1px_4px_rgba(0,0,0,.9)]">Ligas activas</span>
       <div class="liga-sel" role="group" aria-label="Ligas activas"><span class="liga-thumb" aria-hidden="true"></span>{LIGAS.map((l, i) => <button type="button" data-liga-btn={l.id} aria-pressed={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono} mr-1.5`}></i>{l.titulo.join(' ')}</button>)}</div>
     </nav>
   )}
@@ -50,7 +51,7 @@ const datos = LIGAS.map((l) => ({
         <img src={l.imagen} alt="" loading="eager" class="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
         <div class="absolute inset-0 bg-gradient-to-r from-black via-galaxy-900/75 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-galaxy-dark via-transparent to-transparent"></div>
-        <div class="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-14 sm:py-24 min-h-[380px] sm:min-h-[500px] flex flex-col justify-center">
+        <div class="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-28 pb-14 sm:py-24 min-h-[380px] sm:min-h-[500px] flex flex-col justify-center">
           <div class="max-w-3xl text-center sm:text-left space-y-4">
             <div class="flex items-center justify-center sm:justify-start gap-3">
               <i class={`fa-solid ${l.icono} text-galaxy-400 text-3xl sm:text-4xl drop-shadow-[0_0_15px_rgba(0,229,255,0.8)] animate-float`}></i>
@@ -184,6 +185,7 @@ const datos = LIGAS.map((l) => ({
       </div>
     </section>
   ); })}
+  </div>
 </Layout>
 <script is:inline>
   // Antes de pintar: muestra solo la liga elegida en el enlace (#liga-…) o la primera. Si esto fallara, se ven todas.
