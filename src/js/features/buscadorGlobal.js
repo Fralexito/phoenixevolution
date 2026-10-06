@@ -4,23 +4,27 @@ import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { can } from '../core/session.js';
 import { indicePaginas, buscarPaginas } from '../core/buscador.js';
+import { indiceLiga, buscarEnLiga } from '../core/pulso.js';
 import { buscarPersonas } from './social/api.js';
 import { avatarHTML } from '../core/avatar.js';
 
 const ID = 'buscador-global';
-let indice = null, req = 0, timer = 0;
+let indice = null, indiceL = null, req = 0, timer = 0;   // indiceL (ligas, fechas, DT y clubes) se carga solo al abrir el buscador, para no pesar en cada página
 const SUGERIDAS = ['duelos', 'liga', 'tienda', 'eventos', 'clanes', 'ranking'];
 
 const filaPagina = (p, i) => `<a href="${escapeHTML(href(p.path))}" role="option" data-i="${i}" class="bg-fila"><span class="nav-item-ico"><i class="fa-solid ${escapeHTML(p.icon)}"></i></span><span class="min-w-0 flex-1"><b class="block truncate text-white">${escapeHTML(p.label)}</b><small class="block truncate text-gray-400">${escapeHTML(p.seccion)} · ${escapeHTML(p.info ?? '')}</small></span><i class="fa-solid fa-arrow-right text-xs text-gray-600"></i></a>`;
+const filaLiga = (x, i) => `<a href="${escapeHTML(href(x.path))}" role="option" data-i="${i}" class="bg-fila"><span class="nav-item-ico"><i class="fa-solid ${escapeHTML(x.icon)}"></i></span><span class="min-w-0 flex-1"><b class="block truncate text-white">${escapeHTML(x.label)}</b><small class="block truncate text-gray-400">${escapeHTML(x.info)}</small></span><i class="fa-solid fa-arrow-right text-xs text-gray-600"></i></a>`;
 const filaPersona = (u, i) => `<a href="${escapeHTML(href(`perfil/?u=${encodeURIComponent(u.username)}`))}" role="option" data-i="${i}" class="bg-fila"><span class="shrink-0">${avatarHTML(u.avatar, u.nombre, 32)}</span><span class="min-w-0 flex-1"><b class="block truncate text-white">${escapeHTML(u.nombre)}</b><small class="block truncate text-gray-400">@${escapeHTML(u.username)} · Persona</small></span><i class="fa-solid fa-arrow-right text-xs text-gray-600"></i></a>`;
 
 function pintar(m, q, personas = []) {
   const todas = indice.filter((p) => !p.staff || can(p.staff));
   const l = q.trim() ? buscarPaginas(q, todas) : SUGERIDAS.map((id) => todas.find((p) => p.id === id)).filter(Boolean);
+  const enLiga = q.trim() && indiceL ? buscarEnLiga(q, indiceL) : [];
   let i = 0;
   m.querySelector('#bg-res').innerHTML = `${l.length ? `<p class="bg-et">${q.trim() ? 'Páginas' : 'Atajos'}</p>${l.map((p) => filaPagina(p, i++)).join('')}` : ''}
+    ${enLiga.length ? `<p class="bg-et">En la liga</p>${enLiga.map((x) => filaLiga(x, i++)).join('')}` : ''}
     ${personas.length ? `<p class="bg-et">Personas</p>${personas.map((u) => filaPersona(u, i++)).join('')}` : ''}
-    ${!l.length && !personas.length ? `<p class="text-center text-xs text-gray-500 py-8">${q.trim().length >= 2 ? 'No encontré nada con eso. Prueba con otra palabra.' : 'Escribe para buscar.'}</p>` : ''}`;
+    ${!l.length && !enLiga.length && !personas.length ? `<p class="text-center text-xs text-gray-500 py-8">${q.trim().length >= 2 ? 'No encontré nada con eso. Prueba con otra palabra.' : 'Escribe para buscar.'}</p>` : ''}`;
   mover(m, 0);
 }
 function mover(m, n) { const f = [...m.querySelectorAll('.bg-fila')]; if (!f.length) return; const k = (n + f.length) % f.length; f.forEach((x, j) => x.toggleAttribute('data-sel', j === k)); f[k].scrollIntoView({ block: 'nearest' }); m.dataset.k = String(k); }
@@ -34,6 +38,7 @@ export function abrirBuscador() {
     <div id="bg-res" role="listbox" class="max-h-[55vh] overflow-y-auto space-y-0.5" aria-live="polite"></div>
     <p class="text-[10px] text-gray-600 text-center hidden sm:block">↑ ↓ para moverte · Enter para ir · / o Ctrl+K para abrir en cualquier momento</p></div>`, { id: ID });
   const inp = m.querySelector('#bg-q'); inp.focus(); pintar(m, '');
+  if (!indiceL) Promise.all([import('../../data/ligas.js'), import('../../data/ligaResultados.js')]).then(([{ LIGAS }, { EDICIONES }]) => { indiceL = indiceLiga(LIGAS, EDICIONES); if (document.getElementById(ID) && inp.value.trim()) pintar(m, inp.value); }).catch((e) => console.warn('[buscador] índice de la liga:', e?.message ?? e));
   inp.addEventListener('input', () => {
     const q = inp.value; pintar(m, q); clearTimeout(timer); const mi = ++req;
     if (q.trim().length < 2) return;

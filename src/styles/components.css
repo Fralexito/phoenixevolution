@@ -725,3 +725,21 @@ html[data-tema='sudario'] .plegable:hover, html[data-tema='sudario'] .plegable[o
 .plegable-cuerpo { padding: .25rem 1.1rem 1.1rem; animation: plegable-abre .35s cubic-bezier(.22, 1, .36, 1); }
 @keyframes plegable-abre { from { opacity: 0; transform: translateY(-6px); } }
 @media (prefers-reduced-motion: reduce) { .plegable-cuerpo { animation: none; } .plegable-flecha { transition: none; } }
+
+/* ===== PULSO DE LA LIGA (franja de estado, sellos de partido, rankings ELO/clubes) — ronda 171 ===== */
+.estado-liga { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem; padding: .6rem .95rem; border-radius: .8rem; border: 1px solid var(--color-galaxy-border); background: linear-gradient(90deg, rgb(128 0 255 / .18), rgb(0 0 0 / .35)); color: #e5e7eb; font-size: .8rem; transition: border-color .2s, box-shadow .2s; }
+.estado-liga:hover, .estado-liga:focus-visible { border-color: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(0 229 255 / .2); outline: none; }
+.estado-liga b { color: #fff; font-family: var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
+.estado-punto { width: .55rem; height: .55rem; border-radius: 9999px; background: #10b981; box-shadow: 0 0 0 0 rgb(16 185 129 / .6); animation: estado-pulso 1.8s infinite; flex: none; }
+.estado-punto.quieto { background: #9ca3af; animation: none; box-shadow: none; }
+@keyframes estado-pulso { 70% { box-shadow: 0 0 0 .5rem rgb(16 185 129 / 0); } 100% { box-shadow: 0 0 0 0 rgb(16 185 129 / 0); } }
+.estado-barra { flex: 1 1 7rem; min-width: 6rem; max-width: 14rem; height: .35rem; border-radius: 9999px; background: rgb(255 255 255 / .1); overflow: hidden; }
+.estado-barra > i { display: block; height: 100%; background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-400)); border-radius: inherit; }
+html[data-tema='sudario'] .estado-liga { background: linear-gradient(90deg, rgb(29 78 216 / .25), rgb(0 0 0 / .35)); }
+.sello-partido { display: inline-flex; align-items: center; gap: .3rem; font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: .1rem .45rem; border-radius: .35rem; border: 1px solid; }
+.sello-partido.oficial { color: #34d399; border-color: rgb(52 211 153 / .4); background: rgb(52 211 153 / .08); }
+.sello-partido.pendiente { color: #9ca3af; border-color: rgb(156 163 175 / .35); background: rgb(156 163 175 / .06); }
+.rank-fila { display: flex; align-items: center; gap: .6rem; padding: .4rem .1rem; border-bottom: 1px solid rgb(255 255 255 / .06); }
+.rank-n { width: 1.4rem; text-align: center; font-family: var(--font-display); font-weight: 700; color: #9ca3af; flex: none; }
+.rank-fila:nth-child(-n+3) .rank-n { color: #fbbf24; }
+.rank-val { margin-left: auto; font-family: var(--font-display); font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }

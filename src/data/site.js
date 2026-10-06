@@ -17,7 +17,11 @@ export const NAV_EXTRA = [
   { id: 'ranking', label: 'Ranking', path: 'ranking/', icon: 'fa-ranking-star' },
   { id: 'tienda', label: 'Tienda', path: 'tienda/', icon: 'fa-store' },
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
+  { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
 ];
+
+// Apoyo voluntario a la comunidad (tipo «invítanos un café»). Vacío = no se muestra el botón. Pon aquí el enlace cuando lo tengas (solo https).
+export const APOYO = { href: '', texto: 'Apoya la comunidad' };
 
 // Menú lateral, grupo "Mi cuenta": solo se muestra con sesión iniciada.
 // Para añadir una sección futura, agrega UNA línea aquí (con `path` para una página o `action` para algo del sistema).
