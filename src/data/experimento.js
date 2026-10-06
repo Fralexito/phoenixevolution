@@ -5,4 +5,5 @@
 //   rachas       → panel «En racha» en Central
 //   compartir    → botón «Compartir» (tarjeta-imagen de la fecha en Central y de la campaña en el perfil)
 //   visita       → aviso «novedades desde tu última visita» en Central
-export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true };
+//   barraLateral → barra lateral izquierda estilo red social (solo PC ≥ 1280 px): atajos, ligas y amigos. Pon false y desaparece por completo
+export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true };

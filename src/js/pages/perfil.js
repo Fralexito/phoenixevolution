@@ -18,7 +18,9 @@ import { logrosDe } from '../features/logros/api.js';
 import { cargarEncuestas, encuestaHTML } from '../features/encuestas/estado.js';
 import { abrirCrearEncuesta } from '../features/encuestas/crearUI.js';
 import { nivelDe } from '../core/logros.js';
-import { estadisticasDe } from '../features/resultados/api.js';
+import { estadisticasDe, eloDe } from '../features/resultados/api.js';
+import { progresoRango } from '../core/pulso.js';
+import { rangoBloque } from '../features/rango.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
 import * as amigosApi from '../features/amigos/api.js';
 import { relacion, accionesSociales } from '../core/red.js';
@@ -156,6 +158,7 @@ function franjaEstadisticas() {
   return `<section class="glass-panel rounded-2xl px-3 py-2.5 flex items-center gap-3 flex-wrap" aria-label="Estadísticas de duelos">
     <span class="text-[10px] font-display font-bold uppercase tracking-widest text-gray-400"><i class="fa-solid fa-chart-simple text-galaxy-400"></i> Duelos</span>
     ${caja(e.jugados, 'Jugados')}${caja(e.victorias, 'Ganados', 'text-ok')}${caja(e.empates, 'Empates')}${caja(e.derrotas, 'Perdidos', 'text-bad')}${caja(`${e.gf}-${e.gc}`, 'Goles')}${e.efectividad != null ? caja(`${e.efectividad}%`, 'Efectividad', 'text-galaxy-400') : ''}
+    ${S.elo ? `<div class="w-full border-t border-galaxy-border/40 pt-1">${rangoBloque(progresoRango(S.elo.elo, S.elo.jugados), S.elo.elo)}<span class="text-[10px] text-gray-500">ELO de amistosos 1v1 (${S.elo.jugados} jugado${S.elo.jugados === 1 ? '' : 's'}).</span></div>` : ''}
     <span class="w-full text-[10px] text-gray-500">Solo cuentan marcadores confirmados por los dos líderes.</span></section>`;
 }
 function franjaLogros(p) {
@@ -326,6 +329,7 @@ async function cargar() {
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
     await marcadoresMuro();
     S.stats = await estadisticasDe(p.id);             // nunca lanza
+    S.elo = await eloDe(p.id);                        // nunca lanza: sin ELO simplemente no hay rango
     S.logros = await logrosDe(p.id);                 // nunca lanza: sin logros el perfil se ve igual
     S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;
     await cargarExtras(p); await marcadoresMuro();     // clips ya cargados: marcadores de todo lo visible

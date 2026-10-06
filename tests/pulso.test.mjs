@@ -137,3 +137,25 @@ test('goles del partido: validar, ordenar, revisar y rankings', () => {
   assert.deepEqual(topGoleadores(gs), [{ nombre: 'A', total: 2 }, { nombre: 'B', total: 1 }]);   // el autogol de X no cuenta
   assert.deepEqual(topAsistentes(gs), [{ nombre: 'C', total: 1 }]); assert.deepEqual(topGoleadores(null), []);
 });
+
+import { normalizarElo, normalizarEloDe } from '../src/js/core/rankingComunidad.js';
+test('ELO de amistosos: normalizar filas del servidor', () => {
+  const l = normalizarElo([{ pos: 1, usuario_id: 'u1', username: 'a', nombre: 'Ana', avatar_url: null, elo: 1180.4, jugados: 6, delta: 12 }, { usuario_id: 'u2', username: 'b', nombre: '<b>', elo: 900, jugados: 2, delta: -9 }, null, { elo: 1000 }]);
+  assert.equal(l.length, 2); assert.equal(l[0].rango.id, 'diamante'); assert.equal(l[0].elo, 1180); assert.equal(l[1].rango.id, 'bronce'); assert.equal(l[1].delta, -9); assert.ok(!/[<>]/.test(l[1].nombre));
+  assert.deepEqual(normalizarElo(null), []);
+  assert.deepEqual(normalizarEloDe({ visible: true, elo: 1010.6, jugados: 3, delta: 7 }), { elo: 1011, jugados: 3, delta: 7 });
+  assert.equal(normalizarEloDe({ visible: false }), null); assert.equal(normalizarEloDe({ visible: true, elo: null, jugados: 0 }), null); assert.equal(normalizarEloDe(null), null); assert.equal(normalizarEloDe({ visible: true, elo: 'x' }), null);
+});
+
+import { ordenarAmigos, resumenAmigos, unirPerfiles } from '../src/js/core/barraLateral.js';
+test('barra lateral: ordenar, recortar y unir amigos', () => {
+  const a = [{ id: '3', nombre: 'Óscar' }, { id: '1', nombre: 'beto' }, { id: '2', nombre: 'Ana' }, { id: '4', nombre: 'Zeta' }, { nombre: 'sin id' }];
+  assert.deepEqual(ordenarAmigos(a).map((x) => x.id), ['2', '1', '3', '4']);
+  assert.deepEqual(ordenarAmigos(a, new Set(['4', '1'])).map((x) => x.id), ['1', '4', '2', '3']);   // en línea primero
+  assert.equal(a.length, 5);                                                                          // no muta
+  const r = resumenAmigos(a, new Set(['4']), 2); assert.deepEqual([r.visibles.map((x) => x.id), r.ocultos, r.enLinea], [['4', '2'], 2, 1]);
+  assert.deepEqual(resumenAmigos(null), { visibles: [], ocultos: 0, enLinea: 0 }); assert.equal(resumenAmigos(a, new Set(), 0).ocultos, 4);
+  const u = unirPerfiles(['1', '9', '2'], [{ id: '2', username: 'a<b>', nombre_display: '<i>Ana</i>', avatar_url: 'x' }, { id: '1', username: 'beto' }, null]);
+  assert.deepEqual(u.map((x) => x.id), ['1', '2']); assert.equal(u[0].nombre, 'beto'); assert.ok(!/[<>]/.test(u[1].nombre) && !/[<>]/.test(u[1].username));
+  assert.deepEqual(unirPerfiles(null, null), []);
+});

@@ -30,7 +30,8 @@ function rebuild() {
 const track = () => channel?.track({ name: me.name, estado }).catch((e) => console.error('[presence] track:', e));
 
 export function startPresence(user) {
-  if (channel) return;
+  if (channel && me) return;
+  if (channel) { supabase.removeChannel(channel); channel = null; }   // había solo un observador (p. ej. la barra lateral): se reemplaza por el canal que SÍ aparece en el radar
   me = user;
   channel = supabase.channel('radar-duelos', { config: { presence: { key: user.id } } });
   channel.on('presence', { event: 'sync' }, rebuild);

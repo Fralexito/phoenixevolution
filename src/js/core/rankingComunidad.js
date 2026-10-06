@@ -1,5 +1,7 @@
 // Ranking de la comunidad (migración 045): lógica PURA — meses de temporada (hora de Lima), normalización de filas y retos semanales.
 // Las reglas reales (puntos, desempates, quién se ve) viven en la BD; aquí solo se presentan.
+import { rangoElo } from './pulso.js';
+
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const LIMA_MS = 5 * 3600 * 1000;
 const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
@@ -33,4 +35,12 @@ export function textoFinSemana(fin, ahora = Date.now()) {
   const t = Date.parse(fin); if (!Number.isFinite(t)) return '';
   const h = Math.floor((t - ahora) / 3600000); if (h <= 0) return 'Termina ahora';
   const d = Math.floor(h / 24); return d ? `Termina en ${d} d ${h % 24} h` : `Termina en ${h} h`;
+}
+
+/** ranking_elo (migración 055) → filas con su rango por ELO. Solo cuentan amistosos 1v1 confirmados; nunca la liga oficial. */
+export const normalizarElo = (l) => (Array.isArray(l) ? l : []).filter((r) => r && r.usuario_id).map((r) => ({ ...persona(r), elo: Math.round(num(r.elo)), jugados: Math.max(0, Math.trunc(num(r.jugados))), delta: Math.trunc(num(r.delta)), rango: rangoElo(num(r.elo), num(r.jugados)) }));
+/** elo_de (migración 055) → { elo, jugados, delta } o null si no es visible o aún no hay amistosos confirmados. */
+export function normalizarEloDe(d) {
+  if (!d || d.visible !== true || d.elo == null || !Number.isFinite(Number(d.elo))) return null;
+  return { elo: Math.round(Number(d.elo)), jugados: Math.max(0, Math.trunc(num(d.jugados))), delta: Math.trunc(num(d.delta)) };
 }

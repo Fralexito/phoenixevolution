@@ -48,7 +48,7 @@ const base = import.meta.env.BASE_URL;
     <nav class="anclas" aria-label="Saltar a una sección">
       <a href="#central-partidos"><i class="fa-solid fa-futbol"></i>Partidos</a>
       <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
-      <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Rankings</a>
+      <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Clubes</a>
       <a href="#destacados-seccion"><i class="fa-solid fa-id-card"></i>Jugadores</a>
       <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>
     </nav>
@@ -115,20 +115,15 @@ const base = import.meta.env.BASE_URL;
       </aside>
     </div>
 
-    <!-- 3b. RANKINGS DE LA LIGA (plegado: ELO y clubes más usados). Los pinta js/pages/central.js. -->
-    <Plegable titulo="Rankings de la liga" icono="fa-ranking-star" resumen="ELO con rangos, clubes y goleadores · toca para ver" id="rank-liga" clase="scroll-mt-40">
-      <div class="grid gap-6 md:grid-cols-2">
-        <div>
-          <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Ranking ELO</h3>
-          <p class="text-[11px] text-gray-500 mb-2">Todos parten de 1000. Ganarle a un rival fuerte suma más, y las goleadas pesan más. Mide el nivel real, no solo los puntos de la tabla.</p>
-          <div id="elo-lista" class="text-sm"></div>
-        </div>
+    <!-- 3b. CLUBES Y GOLEADORES (plegado). Los pinta js/pages/central.js. El ELO NO va aquí: solo mide amistosos (página Ranking). -->
+    <Plegable titulo="Clubes y goleadores" icono="fa-ranking-star" resumen="Clubes más usados y máximos goleadores · toca para ver" id="rank-liga" clase="scroll-mt-40">
+      <div class="space-y-6">
         <div>
           <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Clubes más usados</h3>
           <p class="text-[11px] text-gray-500 mb-2">Partidos jugados por club en la edición en curso.</p>
-          <div id="clubes-lista" class="text-sm"></div>
+          <div id="clubes-lista" class="text-sm md:columns-2 md:gap-x-8"></div>
         </div>
-        <div id="goleadores-bloque" hidden class="grid gap-6 md:grid-cols-2 md:col-span-2 border-t border-galaxy-border/40 pt-5">
+        <div id="goleadores-bloque" hidden class="grid gap-6 md:grid-cols-2 border-t border-galaxy-border/40 pt-5">
           <div><h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Goleadores</h3><p class="text-[11px] text-gray-500 mb-2">Según el detalle cargado por el staff (sin autogoles).</p><div id="goleadores-lista" class="text-sm"></div></div>
           <div><h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Asistentes</h3><p class="text-[11px] text-gray-500 mb-2">Pases de gol registrados.</p><div id="asistentes-lista" class="text-sm"></div></div>
         </div>

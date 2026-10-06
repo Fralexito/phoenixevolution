@@ -1,0 +1,31 @@
+---
+// BARRA LATERAL IZQUIERDA (experimento FX.barraLateral en data/experimento.js). Solo en PC (≥ 1280 px): iconos siempre visibles, se expande al pasar el mouse o con el teclado,
+// y se puede «fijar» abierta. Atajos + tus ligas + (con sesión) tus amigos. El menú de la derecha sigue existiendo. La parte dinámica (amigos) la pinta features/barraLateral.js.
+import { NAV, NAV_EXTRA, ACCOUNT_NAV } from '../data/site.js';
+import { LIGAS } from '../data/ligas.js';
+const base = import.meta.env.BASE_URL;
+const { active } = Astro.props;
+const todos = [...NAV, ...NAV_EXTRA];
+const atajos = ['central', 'liga', 'competiciones', 'historial', 'database', 'duelos', 'ranking', 'eventos'].map((id) => todos.find((n) => n.id === id)).filter(Boolean);
+const cuenta = ['muro', 'partidos', 'mensajes'].map((id) => ACCOUNT_NAV.find((n) => n.id === id)).filter((n) => n?.path);
+const item = (n, id = n.id) => ({ ...n, actual: active === id });
+---
+<aside id="barra-lat" class="barra-lat" aria-label="Barra lateral" hidden>
+  <nav class="barra-sec" aria-label="Atajos">
+    <p class="barra-tit">Atajos</p>
+    {atajos.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
+  </nav>
+  <nav class="barra-sec" aria-label="Ligas">
+    <p class="barra-tit">Ligas</p>
+    {LIGAS.map((l) => (<a href={`${base}liga/#liga-${l.id}`} class="barra-item" title={l.titulo.join(' ')} data-liga-tema={l.id}><i class={`fa-solid ${l.icono}`}></i><span class="barra-txt">{l.titulo.join(' ')}</span></a>))}
+  </nav>
+  <nav id="barra-cuenta" class="barra-sec" aria-label="Mi cuenta" hidden>
+    <p class="barra-tit">Mi cuenta</p>
+    {cuenta.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
+  </nav>
+  <section class="barra-sec barra-amigos" aria-label="Amigos">
+    <p class="barra-tit">Amigos <span id="barra-en-linea" class="barra-badge" hidden></span></p>
+    <div id="barra-amigos" class="barra-lista"></div>
+  </section>
+  <button type="button" id="barra-fijar" class="barra-fijar" aria-pressed="false" title="Fijar abierta"><i class="fa-solid fa-thumbtack"></i><span class="barra-txt">Fijar abierta</span></button>
+</aside>

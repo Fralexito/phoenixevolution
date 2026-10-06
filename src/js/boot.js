@@ -12,6 +12,7 @@ import { initAvatarFallback } from './core/avatar.js';
 import { initBuscadorGlobal } from './features/buscadorGlobal.js';
 import { initReveal } from './features/reveal.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
+import { FX } from '../data/experimento.js';
 
 initAjustes();
 initSidebar();
@@ -25,4 +26,10 @@ initLiveDock();
 initAvisoSancion();
 initBuscadorGlobal();
 initReveal();
+// Barra lateral izquierda (experimento): solo en pantallas anchas; se descarga solo cuando hace falta.
+if (FX.barraLateral && document.getElementById('barra-lat')) {
+  const ancha = window.matchMedia('(min-width: 1280px)'); let lista = false;
+  const montar = () => { if (lista || !ancha.matches) return; lista = true; import('./features/barraLateral.js').then((m) => m.initBarraLateral()).catch((e) => console.error('[boot] barra lateral:', e)); };
+  montar(); ancha.addEventListener('change', montar);
+}
 initSession().catch((e) => console.error('[boot] sesión:', e));

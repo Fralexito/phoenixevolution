@@ -23,9 +23,11 @@ import Layout from '../layouts/Layout.astro';
       <div id="rk-tabs" class="flex gap-2" role="tablist" aria-label="Tipo de ranking">
         <button type="button" role="tab" data-tab="competitivo" aria-pressed="true" class="adv-chip !min-h-9">Competitivo</button>
         <button type="button" role="tab" data-tab="retos" aria-pressed="false" class="adv-chip !min-h-9">Retos</button>
+        <button type="button" role="tab" data-tab="elo" aria-pressed="false" class="adv-chip !min-h-9">ELO</button>
       </div>
-      <label class="ml-auto text-[11px] text-gray-400">Temporada <select id="rk-mes" class="field !py-1 ml-1"></select></label>
+      <label id="rk-mes-wrap" class="ml-auto text-[11px] text-gray-400">Temporada <select id="rk-mes" class="field !py-1 ml-1"></select></label>
     </div>
+    <p id="rk-elo-info" hidden class="glass-panel rounded-xl px-3 py-2 text-[11px] text-gray-300 leading-relaxed"><b class="text-white">ELO de amistosos.</b> Solo cuentan los duelos 1v1 con marcador confirmado por los dos líderes (nunca la liga oficial). Todos parten de 1000; ganarle a alguien con más ELO suma más, y las goleadas pesan más. Los rangos: Bronce, Plata (desde 925), Oro (1025), Platino (1100) y Diamante (1175). No es acumulativo por mes: dura toda la historia.</p>
     <div id="rk-lista" class="space-y-2" aria-live="polite"></div>
   </div>
 </Layout>

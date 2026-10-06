@@ -5,6 +5,7 @@ import { href } from '../core/config.js';
 import { avatarHTML } from '../core/avatar.js';
 import { toast } from '../core/toast.js';
 import * as api from '../features/ranking/api.js';
+import { rangoChip } from '../features/rango.js';
 import { mesesDisponibles, mesValido, diferencia, textoFinSemana } from '../core/rankingComunidad.js';
 
 const $ = (id) => document.getElementById(id);
@@ -18,14 +19,15 @@ function fila(r, extra) {
   return `<a href="${href(`perfil/?u=${encodeURIComponent(r.username)}`)}" class="glass-panel rounded-xl px-3 py-2 flex items-center gap-3 ${yo ? 'ring-1 ring-galaxy-400' : ''} hover:bg-white/5">
     <span class="w-7 text-center font-display font-extrabold text-sm ${r.pos <= 3 ? 'text-amber-300' : 'text-gray-400'}">${medalla(r.pos)}</span><span class="shrink-0">${avatarHTML(r.avatar, r.nombre, 32)}</span>
     <span class="flex-1 min-w-0"><b class="font-display uppercase text-white text-sm truncate block">${escapeHTML(r.nombre)}${yo ? ' <span class="text-galaxy-400 text-[10px]">(tú)</span>' : ''}</b><span class="text-[11px] text-gray-400">${extra}</span></span>
-    <b class="font-display text-galaxy-400 text-lg">${r.puntos}<span class="text-[10px] text-gray-400 ml-0.5">pts</span></b></a>`;
+    ${r.elo !== undefined ? `<span class="flex flex-col items-end gap-0.5">${rangoChip(r.rango)}<b class="font-display text-galaxy-400 text-lg leading-none">${r.elo}<span class="text-[10px] text-gray-400 ml-0.5">ELO</span></b></span>` : `<b class="font-display text-galaxy-400 text-lg">${r.puntos}<span class="text-[10px] text-gray-400 ml-0.5">pts</span></b>`}</a>`;
 }
 function pintarLista() {
   const l = S.filas;
   $('rk-lista').innerHTML = l.length ? l.map((r) => (S.tab === 'competitivo'
       ? fila(r, `${r.jugados} PJ · ${r.victorias}G ${r.empates}E ${r.derrotas}P · ${r.gf}-${r.gc} (${diferencia(r)})`)
+      : S.tab === 'elo' ? fila(r, `${r.jugados} amistoso${r.jugados === 1 ? '' : 's'} 1v1${r.delta ? ` · ${r.delta > 0 ? '▲' : '▼'}${Math.abs(r.delta)} en el último` : ''}`)
       : fila(r, `${r.retos} reto${r.retos === 1 ? '' : 's'} cobrado${r.retos === 1 ? '' : 's'}`))).join('')
-    : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${S.tab === 'competitivo' ? 'Nadie tiene partidos confirmados en esta temporada todavía.' : 'Nadie ha cobrado retos en esta temporada todavía.'}</div>`;
+    : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${S.tab === 'competitivo' ? 'Nadie tiene partidos confirmados en esta temporada todavía.' : S.tab === 'elo' ? 'Aún no hay amistosos 1v1 confirmados para calcular el ELO.' : 'Nadie ha cobrado retos en esta temporada todavía.'}</div>`;
   for (const b of document.querySelectorAll('#rk-tabs [data-tab]')) b.setAttribute('aria-pressed', String(b.dataset.tab === S.tab));
 }
 function pintarRetos() {
@@ -42,14 +44,14 @@ function pintarRetos() {
 async function cargar() {
   const mia = ++S.req;
   try {
-    const [filas, retos] = await Promise.all([S.tab === 'competitivo' ? api.rankingCompetitivo(S.mes) : api.rankingRetos(S.mes), S.yo ? api.misRetos() : Promise.resolve(null)]);
+    const [filas, retos] = await Promise.all([S.tab === 'competitivo' ? api.rankingCompetitivo(S.mes) : S.tab === 'elo' ? api.rankingElo() : api.rankingRetos(S.mes), S.yo ? api.misRetos() : Promise.resolve(null)]);
     if (mia !== S.req) return;
     S.filas = filas; S.retos = retos; avisoError(''); pintarLista(); pintarRetos();
   } catch (e) { if (mia !== S.req) return; console.error('[ranking] página:', e); S.filas = []; pintarLista(); avisoError(e?.message || 'Algo salió mal. Inténtalo de nuevo.'); }
 }
 $('rk-mes').innerHTML = mesesDisponibles().map((m) => `<option value="${m.valor}">${escapeHTML(m.etiqueta)}</option>`).join('');
 $('rk-mes').addEventListener('change', (e) => { S.mes = mesValido(e.target.value); S.filas = []; $('rk-lista').innerHTML = '<p class="text-gray-400 text-sm py-12 text-center">Cargando…</p>'; cargar(); });
-$('rk-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (!b || b.dataset.tab === S.tab) return; S.tab = b.dataset.tab === 'retos' ? 'retos' : 'competitivo'; S.filas = []; $('rk-lista').innerHTML = '<p class="text-gray-400 text-sm py-12 text-center">Cargando…</p>'; cargar(); });
+$('rk-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (!b || b.dataset.tab === S.tab) return; S.tab = ['retos', 'elo'].includes(b.dataset.tab) ? b.dataset.tab : 'competitivo'; $('rk-mes-wrap').hidden = S.tab === 'elo'; $('rk-elo-info').hidden = S.tab !== 'elo'; S.filas = []; $('rk-lista').innerHTML = '<p class="text-gray-400 text-sm py-12 text-center">Cargando…</p>'; cargar(); });
 $('rk-retos-lista').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-cobrar]'); if (!b || S.busy) return;
   S.busy = true; pintarRetos();

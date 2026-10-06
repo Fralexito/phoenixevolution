@@ -778,3 +778,36 @@ html[data-tema='sudario'] .anclas a[aria-current='true'] { background: rgb(245 1
   --color-galaxy-900: #081c4a; --color-galaxy-border: #1e3a8a;
 }
 [data-liga-tema='sudario'] .liga-sello { background: rgb(245 197 66 / .12); border-color: rgb(245 197 66 / .4); }
+
+/* ===== BARRA LATERAL IZQUIERDA (experimento FX.barraLateral). Solo ≥ 1280 px. Plegada = iconos; se abre con el mouse/teclado o fijada. ===== */
+.barra-lat { display: none; }
+@media (min-width: 1280px) {
+  html[data-fx-barra] .barra-lat:not([hidden]) { display: flex; flex-direction: column; gap: .35rem; position: fixed; left: 0; top: 7rem; bottom: 0; z-index: 35; width: 4rem; padding: .6rem .5rem; overflow: hidden auto; background: linear-gradient(180deg, rgb(10 4 28 / .96), rgb(3 1 15 / .98)); border-right: 1px solid var(--color-galaxy-border); transition: width .22s ease, box-shadow .22s ease; scrollbar-width: thin; }
+  html[data-fx-barra] .barra-lat:hover, html[data-fx-barra] .barra-lat:focus-within, html[data-fx-barra][data-barra-fijada] .barra-lat { width: 15rem; }
+  html[data-fx-barra]:not([data-barra-fijada]) .barra-lat:hover, html[data-fx-barra]:not([data-barra-fijada]) .barra-lat:focus-within { box-shadow: 8px 0 30px rgb(0 0 0 / .55); }
+  html[data-fx-barra] main, html[data-fx-barra] footer { padding-left: 4rem; }
+  html[data-fx-barra][data-barra-fijada] main, html[data-fx-barra][data-barra-fijada] footer { padding-left: 15rem; }
+}
+.barra-sec { display: flex; flex-direction: column; gap: .15rem; padding-bottom: .45rem; border-bottom: 1px solid rgb(255 255 255 / .06); }
+.barra-sec[hidden] { display: none; }
+.barra-tit { height: 1rem; margin: .15rem .5rem .1rem; font: 700 .6rem var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: #6b7280; white-space: nowrap; overflow: hidden; opacity: 0; transition: opacity .15s; display: flex; align-items: center; gap: .4rem; }
+.barra-lat:hover .barra-tit, .barra-lat:focus-within .barra-tit, [data-barra-fijada] .barra-tit { opacity: 1; }
+.barra-item, .barra-amigo, .barra-mas, .barra-fijar { display: flex; align-items: center; gap: .75rem; min-height: 2.25rem; padding: .3rem .55rem; border-radius: .6rem; color: #9ca3af; font: 600 .82rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: background .15s, color .15s; text-align: left; }
+.barra-item > i, .barra-fijar > i, .barra-mas > i { width: 1.2rem; flex: none; text-align: center; font-size: .95rem; }
+.barra-item:hover, .barra-amigo:hover, .barra-mas:hover, .barra-fijar:hover, .barra-item:focus-visible, .barra-amigo:focus-visible { background: rgb(255 255 255 / .06); color: #fff; outline: none; }
+.barra-item[aria-current='page'] { color: var(--color-galaxy-400); background: rgb(0 229 255 / .1); box-shadow: inset 3px 0 0 var(--color-galaxy-400); }
+html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245 197 66 / .1); }
+.barra-item i { color: var(--color-galaxy-400); opacity: .85; }
+.barra-txt { overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity .15s; min-width: 0; }
+.barra-lat:hover .barra-txt, .barra-lat:focus-within .barra-txt, [data-barra-fijada] .barra-txt { opacity: 1; }
+.barra-amigo { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: .85rem; }
+.barra-av { position: relative; flex: none; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; }
+.barra-on { position: absolute; right: -2px; bottom: -2px; width: .6rem; height: .6rem; border-radius: 9999px; background: #10b981; border: 2px solid #0a041c; }
+.barra-badge { padding: 0 .4rem; border-radius: 9999px; background: rgb(16 185 129 / .18); color: #34d399; font-size: .6rem; letter-spacing: 0; }
+.barra-lista { display: flex; flex-direction: column; gap: .1rem; }
+.barra-aviso { margin: .2rem .5rem; font-size: .7rem; line-height: 1.3; color: #6b7280; max-height: 0; overflow: hidden; opacity: 0; transition: opacity .15s; }
+.barra-lat:hover .barra-aviso, .barra-lat:focus-within .barra-aviso, [data-barra-fijada] .barra-aviso { max-height: 5rem; opacity: 1; }
+.barra-mas { font-size: .72rem; }
+.barra-fijar { margin-top: auto; border: 1px dashed rgb(255 255 255 / .12); background: transparent; cursor: pointer; }
+.barra-fijar[aria-pressed='true'] { color: var(--color-galaxy-400); border-color: var(--color-galaxy-400); }
+@media (prefers-reduced-motion: reduce) { .barra-lat, .barra-txt, .barra-tit { transition: none; } }

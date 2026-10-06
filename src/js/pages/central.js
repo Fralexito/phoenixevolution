@@ -17,8 +17,7 @@ import { onSession, can } from '../core/session.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { toast } from '../core/toast.js';
 import { borrarFilas } from '../features/escritura.js';
-import { estadoLiga, selloPartido, calcularElo, clubesMasUsados, rangoElo, ESTADOS_ESPECIALES } from '../core/pulso.js';
-import { rangoChip } from '../features/rango.js';
+import { estadoLiga, selloPartido, clubesMasUsados, ESTADOS_ESPECIALES } from '../core/pulso.js';
 import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/central.js';
 
 const $ = (id) => document.getElementById(id);
@@ -244,12 +243,9 @@ async function pintarGoleadores() {
 }
 window.addEventListener('goles-cambiaron', pintarGoleadores);
 function pintarRankings() {
-  const elo = $('elo-lista'), cl = $('clubes-lista'); if (!elo || !cl || !edicion) return;
+  const cl = $('clubes-lista'); if (!cl || !edicion) return;
   try {
-    const nombres = [...new Set([...jugadoresEd, ...Object.keys(edicion.clubes ?? {})])];
-    const filaElo = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(clubDe(x.nombre), 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.nombre)}</span>${rangoChip(rangoElo(x.elo, x.pj))}${x.delta ? `<span class="text-[10px] font-bold ${x.delta > 0 ? 'text-emerald-400' : 'text-rose-400'}">${x.delta > 0 ? '▲' : '▼'}${Math.abs(x.delta)}</span>` : ''}<span class="rank-val">${x.elo}</span></div>`;
-    elo.innerHTML = calcularElo(fechas, nombres).map(filaElo).join('') || '<p class="text-xs text-gray-500">Aún no hay partidos jugados.</p>';
-    const filaClub = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(x.club, 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.club)}<small class="block text-[10px] text-gray-500 truncate">${escapeHTML(x.dts.join(', '))}</small></span><span class="rank-val">${x.pj} <small class="text-[10px] text-gray-500 font-normal">PJ</small></span></div>`;
+    const filaClub = (x, i) => `<div class="rank-fila break-inside-avoid"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(x.club, 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.club)}<small class="block text-[10px] text-gray-500 truncate">${escapeHTML(x.dts.join(', '))}</small></span><span class="rank-val">${x.pj} <small class="text-[10px] text-gray-500 font-normal">PJ</small></span></div>`;
     cl.innerHTML = clubesMasUsados(fechas, edicion.clubes ?? {}).map(filaClub).join('') || '<p class="text-xs text-gray-500">Aún no hay partidos jugados.</p>';
   } catch (err) { console.error('[central] rankings:', err); }
 }
