@@ -18,6 +18,7 @@ import { openModal, closeModal } from '../core/modal.js';
 import { toast } from '../core/toast.js';
 import { borrarFilas } from '../features/escritura.js';
 import { estadoLiga, selloPartido, clubesMasUsados, ESTADOS_ESPECIALES } from '../core/pulso.js';
+import { contarHasta } from '../features/dopamina.js';
 import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/central.js';
 
 const $ = (id) => document.getElementById(id);
@@ -321,7 +322,7 @@ if ($('xi-det')) $('xi-det').open = window.matchMedia('(min-width: 1024px)').mat
 // ---- Pulso de la comunidad: cuatro conteos reales (head:true no descarga filas, solo el número). Si uno falla se queda en «—». ----
 async function contar(consulta, id) {
   const t0 = performance.now();
-  try { const { count, error } = await consulta; if (error) throw error; $(`pulso-${id}`).textContent = cifra(count); if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
+  try { const { count, error } = await consulta; if (error) throw error; { const t = cifra(count); if (t === '—') $(`pulso-${id}`).textContent = t; else contarHasta($(`pulso-${id}`), Number(t)); } if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
   catch (e) { console.error(`[central] pulso ${id}:`, e?.message ?? e); }
 }
 const head = { count: 'exact', head: true };

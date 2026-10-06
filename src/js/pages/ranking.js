@@ -1,4 +1,6 @@
 // Página /ranking/: ranking competitivo y de retos por temporada mensual + retos semanales. Esquema: pages/ranking → features/ranking/api → core/rankingComunidad (puro).
+import { vacioHTML } from '../core/vacio.js';
+import { rafaga } from '../features/dopamina.js';
 import { onSession } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
@@ -27,7 +29,7 @@ function pintarLista() {
       ? fila(r, `${r.jugados} PJ · ${r.victorias}G ${r.empates}E ${r.derrotas}P · ${r.gf}-${r.gc} (${diferencia(r)})`)
       : S.tab === 'elo' ? fila(r, `${r.jugados} amistoso${r.jugados === 1 ? '' : 's'} 1v1${r.delta ? ` · ${r.delta > 0 ? '▲' : '▼'}${Math.abs(r.delta)} en el último` : ''}`)
       : fila(r, `${r.retos} reto${r.retos === 1 ? '' : 's'} cobrado${r.retos === 1 ? '' : 's'}`))).join('')
-    : `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${S.tab === 'competitivo' ? 'Nadie tiene partidos confirmados en esta temporada todavía.' : S.tab === 'elo' ? 'Aún no hay amistosos 1v1 confirmados para calcular el ELO.' : 'Nadie ha cobrado retos en esta temporada todavía.'}</div>`;
+    : vacioHTML(S.tab === 'competitivo' ? 'Nadie tiene partidos confirmados en esta temporada todavía.' : S.tab === 'elo' ? 'Aún no hay amistosos 1v1 confirmados para calcular el ELO.' : 'Nadie ha cobrado retos en esta temporada todavía.', { icono: 'fa-ranking-star', accion: { texto: 'Ir a la Sala de Duelos', href: href('duelos/') } });
   for (const b of document.querySelectorAll('#rk-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
 }
 function pintarRetos() {
@@ -55,7 +57,7 @@ $('rk-tabs').addEventListener('click', (e) => { const b = e.target.closest('[dat
 $('rk-retos-lista').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-cobrar]'); if (!b || S.busy) return;
   S.busy = true; pintarRetos();
-  try { const p = await api.cobrarReto(b.dataset.cobrar); toast(`¡Reto cobrado! +${p} puntos.`, 'ok'); S.busy = false; await cargar(); }
+  try { const p = await api.cobrarReto(b.dataset.cobrar); toast(`¡Reto cobrado! +${p} puntos.`, 'ok'); rafaga(b, ['🏆', '⚡', '✨', '🔥'], { n: 14 }); S.busy = false; await cargar(); }
   catch (err) { console.error('[ranking] cobrar:', err); toast(err?.message || 'No se pudo cobrar el reto.', 'error'); }
   finally { S.busy = false; pintarRetos(); }
 });

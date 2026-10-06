@@ -98,3 +98,28 @@ html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item
   html[data-fx-dopamina] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org) { animation: none; }
   html[data-fx-dopamina] [data-tilt]:hover { transform: none; }
 }
+
+/* ───────── Ronda 182 ───────── */
+
+/* 11 · Aurora del hero: las manchas de luz derivan despacio (solo transform; 16–24 s para que no distraiga) */
+@keyframes dp-deriva-a { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(7vw, 6vh) scale(1.12); } }
+@keyframes dp-deriva-b { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-8vw, 5vh) scale(.92); } }
+@keyframes dp-deriva-c { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(5vw, -7vh) scale(1.1); } }
+html[data-fx-dopamina] .hero-aurora i { will-change: transform; }
+html[data-fx-dopamina] .hero-aurora i:nth-child(1) { animation: dp-deriva-a 19s ease-in-out infinite; }
+html[data-fx-dopamina] .hero-aurora i:nth-child(2) { animation: dp-deriva-b 23s ease-in-out infinite; }
+html[data-fx-dopamina] .hero-aurora i:nth-child(3) { animation: dp-deriva-c 17s ease-in-out infinite; }
+
+/* 12 · Estados vacíos: el icono flota suave (se ve poco y solo en pantallas vacías) */
+@keyframes dp-flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+html[data-fx-dopamina] .vacio-vivo:not(.vacio-error) .vacio-ico { animation: dp-flota 3.6s ease-in-out infinite; }
+
+/* 13 · Podio de Liga: las tres filas entran escalonadas al cargar la página (backwards: no pisa nada después) */
+@keyframes dp-podio { from { opacity: 0; transform: translateX(18px); } }
+html[data-fx-dopamina] .liga-podio-fila { animation: dp-podio 520ms var(--ease-out) backwards; animation-delay: calc(240ms + var(--i, 0) * 90ms); }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-fx-dopamina] .hero-aurora i,
+  html[data-fx-dopamina] .vacio-vivo .vacio-ico,
+  html[data-fx-dopamina] .liga-podio-fila { animation: none; }
+}

@@ -2,8 +2,10 @@
 //   · initDopamina()  → luz que sigue al cursor en tarjetas ([data-spot]) y ondulación al pulsar el botón principal.
 //   · rafaga(origen, emojis, {n}) → pequeñas partículas que salen de un elemento (reaccionar, publicar).
 //   · salto(el)       → el emoji «salta» una vez.
+//   · contarHasta(el, n) → el número sube de 0 a n (count-up; lógica en core/contador.js). Sin efecto, escribe el valor directo.
 // Solo se anima transform/opacity con WAAPI (acelerado por GPU, interrumpible). Si algo falla, la web sigue funcionando sin el efecto.
 import { FX } from '../../data/experimento.js';
+import { valorEn, duracionPara } from '../core/contador.js';
 
 const reducido = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 const activo = () => FX.dopamina && !reducido();
@@ -50,6 +52,22 @@ export function entrada(contenedor, desde = 0) {
     if (!activo() || !contenedor) return;
     [...contenedor.children].slice(desde).forEach((el, i) => { el.style.setProperty('--i', String(Math.min(i, 8))); el.classList.add('dp-entra'); el.addEventListener('animationend', () => el.classList.remove('dp-entra'), { once: true }); });
   } catch (e) { console.warn('[dopamina] entrada:', e); }
+}
+
+/** Count-up: el texto de `el` sube de 0 a `n`. Si el efecto está apagado (bandera o reduced-motion) o n no es válido, escribe el valor directo. */
+export function contarHasta(el, n) {
+  try {
+    if (!el) return;
+    const fin = valorEn(n, Infinity);
+    if (fin === null) return;                       // valor inválido: se deja el texto (p. ej. «—»)
+    if (!activo() || !window.requestAnimationFrame) { el.textContent = String(fin); return; }
+    const dur = duracionPara(n); const t0 = performance.now();
+    const paso = (ahora) => {
+      const v = valorEn(n, ahora - t0, dur); el.textContent = String(v);
+      if (ahora - t0 < dur) requestAnimationFrame(paso); else el.textContent = String(fin);
+    };
+    requestAnimationFrame(paso);
+  } catch (e) { console.warn('[dopamina] contador:', e); try { el.textContent = String(Math.trunc(n)); } catch { /* sin DOM */ } }
 }
 
 function ondaEn(btn, ev) {

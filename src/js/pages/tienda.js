@@ -1,5 +1,7 @@
 // Página /tienda/: cartera (nivel + tokens), catálogo, inventario, cómo ganar, compra de tokens, historial y panel de admin.
 // Esquema: pages/tienda → features/economia/api → core/economia (puro). Las reglas (precios, niveles, stock, edad) viven en la BD (049-051).
+import { vacioHTML } from '../core/vacio.js';
+import { rafaga } from '../features/dopamina.js';
 import { onSession, can } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
@@ -12,7 +14,7 @@ const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
 const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas' };
 const avisoError = (m) => { $('ti-error-txt').textContent = m; $('ti-error').hidden = !m; };
-const vacio = (t) => `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${escapeHTML(t)}</div>`;
+const vacio = (t) => vacioHTML(t, { icono: 'fa-store' });
 const fecha = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? '' : d.toLocaleString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
 const esAdmin = () => can('administrarTienda');
 
@@ -136,7 +138,7 @@ function modalCompra(i) {
     <dl class="text-sm space-y-1"><div class="flex justify-between"><dt class="text-gray-400">Precio</dt><dd class="text-amber-300 font-display font-bold"><i class="fa-solid fa-coins"></i> ${formatoTokens(i.precio)}</dd></div>
       <div class="flex justify-between"><dt class="text-gray-400">Tu saldo después</dt><dd class="text-white font-display font-bold">${formatoTokens(despues)}</dd></div></dl>
     <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="button" id="tm-ok" class="btn btn-primary">Comprar</button></div></div>`, { id: 'tienda-modal' })
-    .querySelector('#tm-ok').addEventListener('click', () => { closeModal('tienda-modal'); hacer(() => api.comprar(i.id), (r) => `¡Listo! Te quedan ${r?.saldo ?? ''} tokens.`); });
+    .querySelector('#tm-ok').addEventListener('click', () => { closeModal('tienda-modal'); const origen = document.querySelector(`[data-comprar="${i.id}"]`); hacer(() => api.comprar(i.id), (r) => { rafaga(origen, ['🛒', '✨', '🎉', '⭐'], { n: 12 }); return `¡Listo! Te quedan ${r?.saldo ?? ''} tokens.`; }); });
 }
 function modalAjuste(usuario, nombre) {
   const m = openModal(`<form id="tm-form" class="p-5 sm:p-6 space-y-4" novalidate>${cabecera('Ajustar tokens')}

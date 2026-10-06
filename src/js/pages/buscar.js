@@ -1,5 +1,6 @@
 // Página /buscar/: personas y publicaciones; si no hay texto, «A quién seguir». Requiere sesión (la BD lo exige).
 // Esquema: pages/buscar → features/social/{api, guardados} + features/amigos/api (seguir) + features/muro/tarjeta → core/social (lógica pura).
+import { vacioHTML } from '../core/vacio.js';
 import { onSession, can } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
@@ -33,7 +34,7 @@ function filaPersona(p, { sugerencia = false } = {}) {
       <button type="button" data-act="descartar" data-id="${escapeHTML(p.id)}" title="No me interesa" aria-label="No me interesa" class="w-8 h-8 rounded-lg text-gray-500 hover:text-bad shrink-0"><i class="fa-solid fa-xmark"></i></button>`
       : `<a href="${escapeHTML(perfilURL(p.username))}" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-user"></i><span>Ver perfil</span></a>`}</article>`;
 }
-const vacio = (t) => `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${t}</div>`;
+const vacio = (t) => vacioHTML(t, { icono: 'fa-magnifying-glass' });
 const tarjeta = (it) => tarjetaComunidadHTML(it, { yo: S.yo, puedeOcultar: can('resolverReportes') });
 
 function pintarTabs() {

@@ -2,6 +2,7 @@
 //   fila de historias (RPC historias_recientes, 056) → compositor (features/muro/compositor.js) → feed (muro_comunidad / siguiendo / destacado, ya existentes)
 //   → pie de acciones (features/muro/pieSocial.js; reacciones con mis_reacciones, 057). La lógica pura vive en core/feedSocial.js y core/feed.js.
 // Todo lo que se pinta de otros usuarios pasa por escapeHTML en los módulos que generan el HTML (tarjeta.js, render.js, pieSocial.js).
+import { vacioHTML } from '../core/vacio.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
 import { onSession, can, getState } from '../core/session.js';
@@ -118,7 +119,7 @@ async function cargar({ mas = false } = {}) {
     if (req === S.req) pintar();
   } catch (e) {
     console.error('[social] carga:', e);
-    if (mas) toast('No se pudo cargar más. Intenta de nuevo.', 'error'); else feedEl.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el feed. Intenta de nuevo en un momento.</div>';
+    if (mas) toast('No se pudo cargar más. Intenta de nuevo.', 'error'); else feedEl.innerHTML = vacioHTML('No se pudo cargar el feed. Intenta de nuevo en un momento.', { error: true });
   } finally { S.cargando = false; }
 }
 function reiniciarFeed() { S.items = []; S.hayMas = false; S.cargando = false; S.paleta = null; S.req += 1; feedEl.innerHTML = cargandoHTML; finEl.hidden = true; cargar(); }

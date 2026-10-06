@@ -51,7 +51,7 @@ const datos = LIGAS.map((l) => ({
         <img src={l.imagen} alt="" loading="eager" class="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
         <div class="absolute inset-0 bg-gradient-to-r from-black via-galaxy-900/75 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-galaxy-dark via-transparent to-transparent"></div>
-        <div class="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-28 pb-14 sm:py-24 min-h-[380px] sm:min-h-[500px] flex flex-col justify-center">
+        <div class="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-28 pb-14 sm:py-24 min-h-[380px] sm:min-h-[500px] flex flex-col justify-center lg:flex-row lg:items-center lg:justify-between lg:gap-10">
           <div class="max-w-3xl text-center sm:text-left space-y-4">
             <div class="flex items-center justify-center sm:justify-start gap-3">
               <i class={`fa-solid ${l.icono} text-galaxy-400 text-3xl sm:text-4xl drop-shadow-[0_0_15px_rgba(0,229,255,0.8)] animate-float`}></i>
@@ -74,6 +74,22 @@ const datos = LIGAS.map((l) => ({
               <a href={`${base}duelos/`} class="hero-cta hero-cta-s"><i class="fa-solid fa-gamepad"></i> Sala de Duelos</a>
             </div>
           </div>
+          <!-- PODIO de la cabecera (solo pantallas anchas): aprovecha el espacio de la derecha. Se calcula al construir la web con la misma tabla de abajo. -->
+          {ult && ult.tabla.filter((f) => f.pj > 0).length >= 2 && (
+            <aside class="liga-podio hidden lg:block" aria-label={`Podio de ${ult.nombre}`}>
+              <p class="liga-podio-tit"><i class="fa-solid fa-trophy"></i> Podio · {ult.nombre}</p>
+              <ol>
+                {ult.tabla.filter((f) => f.pj > 0).slice(0, 3).map((f, i) => (
+                  <li class:list={['liga-podio-fila', `liga-podio-${i + 1}`]} style={`--i:${i}`}>
+                    <span class="liga-podio-pos">{i + 1}</span>
+                    {escudoDe(ult.clubes?.[f.nombre]) ? <img src={escudoDe(ult.clubes[f.nombre])} alt="" width="34" height="34" loading="lazy" class="liga-podio-esc" /> : <span class="liga-podio-esc liga-podio-sin"><i class="fa-solid fa-shield-halved"></i></span>}
+                    <span class="liga-podio-nom"><b>{f.nombre}</b><small>{f.pj} PJ · {f.g}G {f.e}E {f.p}P</small></span>
+                    <span class="liga-podio-pts"><b>{f.pts}</b><small>pts</small></span>
+                  </li>
+                ))}
+              </ol>
+            </aside>
+          )}
         </div>
       </header>
 

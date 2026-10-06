@@ -1,5 +1,6 @@
 // Página /clanes/: mi clan (miembros, solicitudes, votación de capitán) y exploración. Esquema: pages/clanes → features/clanes/api → core/clan (puro).
 // Las reglas (adultos, edades, 70 %, 5 días…) viven en la BD (migración 043); aquí solo se muestran y se piden.
+import { vacioHTML } from '../core/vacio.js';
 import { onSession, can } from '../core/session.js';
 import { escapeHTML } from '../core/dom.js';
 import { href } from '../core/config.js';
@@ -17,7 +18,7 @@ const avisoError = (m) => { $('cl-error-txt').textContent = m; $('cl-error').hid
 const perfilHref = (u) => href(`perfil/?u=${encodeURIComponent(u)}`);
 const chipRol = (r) => `<span class="text-[12px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${ROLES[r].clase}"><i class="fa-solid ${ROLES[r].icono}"></i> ${ROLES[r].etiqueta}</span>`;
 const etiqueta = (e) => `<span class="font-display font-extrabold text-galaxy-400">[${escapeHTML(e)}]</span>`;
-const vacio = (t) => `<div class="glass-panel rounded-2xl p-8 text-center text-gray-500 text-xs">${escapeHTML(t)}</div>`;
+const vacio = (t) => vacioHTML(t, { icono: 'fa-shield-halved' });
 
 // ── Pintado ──────────────────────────────────────────────────────────────────────────────────────────────────
 function votacionHTML(m) {

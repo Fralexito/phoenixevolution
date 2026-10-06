@@ -839,3 +839,42 @@ html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245
 .sx-chip:hover:not(:disabled), .sx-chip[aria-expanded='true'] { border-color: var(--color-galaxy-400); color: #fff; }
 .sx-chip:disabled { opacity: .55; cursor: wait; }
 @media (prefers-reduced-motion: reduce) { .sx-anillo, .sx-tab, .sx-btn { transition: none; } .sx-hist-item:hover .sx-anillo { transform: none; } }
+
+/* ───────── Ronda 182 · estados vacíos, podio de Liga y aurora del hero ───────── */
+
+/* Estado vacío con personalidad (HTML en core/vacio.js) */
+.vacio-vivo { display: flex; flex-direction: column; align-items: center; gap: .6rem; padding: 2rem 1.25rem; border-radius: 1rem; text-align: center; }
+.vacio-ico { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border-radius: 9999px; font-size: 1.25rem; color: var(--color-galaxy-400);
+  background: color-mix(in srgb, var(--color-galaxy-400) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 35%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--color-galaxy-400) 25%, transparent); }
+.vacio-tit { font-family: var(--font-display); font-size: .875rem; letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.vacio-txt { max-width: 34rem; font-size: .8125rem; line-height: 1.45; color: #cbd5e1; }
+.vacio-acc { margin-top: .35rem; }
+.vacio-error .vacio-ico { color: #fca5a5; background: rgb(239 68 68 / .12); border-color: rgb(239 68 68 / .4); box-shadow: 0 0 22px rgb(239 68 68 / .25); }
+
+/* Podio en la cabecera de Liga (solo ≥1024 px; ver liga.astro) */
+.liga-podio { flex: none; width: 21rem; padding: 1rem 1.1rem 1.1rem; border-radius: 1.1rem; background: rgb(8 6 24 / .62); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 28%, transparent);
+  backdrop-filter: blur(10px); box-shadow: 0 18px 48px rgb(0 0 0 / .45), 0 0 34px color-mix(in srgb, var(--color-galaxy-600) 22%, transparent); }
+.liga-podio-tit { margin: 0 0 .7rem; font: 700 .75rem/1 var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: var(--color-galaxy-400); }
+.liga-podio ol { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.liga-podio-fila { display: grid; grid-template-columns: 1.6rem 2.1rem 1fr auto; align-items: center; gap: .65rem; padding: .5rem .6rem; border-radius: .75rem; background: rgb(255 255 255 / .04); border: 1px solid rgb(255 255 255 / .06); }
+.liga-podio-pos { font: 800 1.25rem/1 var(--font-display); text-align: center; color: #9ca3af; }
+.liga-podio-1 { background: linear-gradient(90deg, rgb(251 191 36 / .16), rgb(255 255 255 / .04)); border-color: rgb(251 191 36 / .4); }
+.liga-podio-1 .liga-podio-pos { color: #fbbf24; text-shadow: 0 0 14px rgb(251 191 36 / .7); }
+.liga-podio-2 .liga-podio-pos { color: #e5e7eb; }
+.liga-podio-3 .liga-podio-pos { color: #d6955b; }
+.liga-podio-esc { width: 2.1rem; height: 2.1rem; object-fit: contain; }
+.liga-podio-sin { display: grid; place-items: center; color: #6b7280; font-size: 1.1rem; }
+.liga-podio-nom { min-width: 0; display: grid; line-height: 1.2; }
+.liga-podio-nom b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display); font-size: .9375rem; color: #fff; text-transform: uppercase; letter-spacing: .04em; }
+.liga-podio-nom small, .liga-podio-pts small { font-size: .75rem; color: #9ca3af; letter-spacing: .04em; }
+.liga-podio-pts { display: grid; text-align: right; line-height: 1.1; }
+.liga-podio-pts b { font: 800 1.35rem/1 var(--font-display); color: var(--color-galaxy-400); font-variant-numeric: tabular-nums; }
+
+/* Aurora del hero de Central: tres manchas de luz detrás del título (el movimiento lo pone dopamina.css) */
+.hero-aurora { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.hero-aurora i { position: absolute; width: 34rem; height: 34rem; border-radius: 9999px; filter: blur(110px); opacity: .32; }
+.hero-aurora i:nth-child(1) { left: -8%; top: -12%; background: var(--color-galaxy-400); opacity: .2; }
+.hero-aurora i:nth-child(2) { right: -10%; top: 8%; background: var(--color-galaxy-600); opacity: .38; }
+.hero-aurora i:nth-child(3) { left: 30%; bottom: -22%; background: var(--color-galaxy-500); opacity: .26; }
+@media (max-width: 640px) { .hero-aurora i { width: 20rem; height: 20rem; filter: blur(80px); } }
