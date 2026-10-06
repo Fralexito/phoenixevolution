@@ -1,7 +1,7 @@
 // Pruebas del núcleo puro de la API /v1 (supabase/functions/phoenix/_lib/nucleo.js). El contrato vive en claude/contrato-v1.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild } from '../supabase/functions/phoenix/_lib/nucleo.js';
+import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, marcaDe } from '../supabase/functions/phoenix/_lib/nucleo.js';
 
 test('catálogo de errores: todos con http, reintentable y mensaje', () => {
   for (const [k, e] of Object.entries(ERRORES)) {
@@ -96,4 +96,18 @@ test('evaluarBuild: desactivado > versión desactivada > exigencia', () => {
   assert.equal(evaluarBuild({ huella: 'c'.repeat(64), version: '9.9.9', builds: [], exigir: false }), null);
   assert.equal(v.huella('A'.repeat(64)), 'a'.repeat(64)); assert.equal(v.huella(undefined), null);
   assert.throws(() => v.huella('xyz'), (e) => e.campo === 'x-phoenix-build');
+});
+
+test('código de instalación: XXXX-XXXX sin letras confusas', () => {
+  assert.equal(v.codigoInstalacion('abcd efgh'), 'ABCD-EFGH');
+  assert.equal(v.codigoInstalacion('K7PQ-2ZXM'), 'K7PQ-2ZXM');
+  for (const malo of ['ABCD-EFG', 'ABCD-EFGI', 'O0O0-1111', 123]) assert.throws(() => v.codigoInstalacion(malo), (e) => e.codigo === 'CODIGO_INVALIDO');
+});
+
+test('marcaDe: organización con su marca, liga con tema, y caída a Phoenix', () => {
+  const org = { nombre: 'Copa Andina', logo_url: 'https://x/l.png', color_primario: '#112233', color_secundario: '#445566' };
+  assert.deepEqual(marcaDe({ marca: 'organizacion' }, org), { tipo: 'organizacion', nombre: 'Copa Andina', logo_url: 'https://x/l.png', color_primario: '#112233', color_secundario: '#445566' });
+  assert.equal(marcaDe({ marca: 'organizacion' }, null).tipo, 'phoenix');
+  assert.equal(marcaDe({ marca: 'liga' }, org).tema, 'galaxy');
+  assert.equal(marcaDe(null, null).tipo, 'phoenix');
 });

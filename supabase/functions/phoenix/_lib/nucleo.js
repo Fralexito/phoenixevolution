@@ -3,7 +3,7 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.1.0',
+  version_api: '1.2.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
   intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300 }),
@@ -22,7 +22,7 @@ export const ERRORES = Object.freeze({
   TOKEN_REVOCADO:       { http: 401, reintentable: false, mensaje: 'Esta PC fue desvinculada desde la web.' },
   HOST_NO_AUTORIZADO:   { http: 403, reintentable: false, mensaje: 'Tu cuenta no está aprobada como host por el staff.' },
   APP_DESACTUALIZADA:   { http: 426, reintentable: false, mensaje: 'Actualiza Smash Soda para seguir usando la integración.' },
-  CODIGO_INVALIDO:      { http: 400, reintentable: false, mensaje: 'El código son 6 dígitos.' },
+  CODIGO_INVALIDO:      { http: 400, reintentable: false, mensaje: 'El código no tiene el formato correcto.' },
   CODIGO_NO_ENCONTRADO: { http: 404, reintentable: false, mensaje: 'Código incorrecto.' },
   CODIGO_VENCIDO:       { http: 410, reintentable: false, mensaje: 'El código venció: genera otro en la web.' },
   CODIGO_USADO:         { http: 410, reintentable: false, mensaje: 'Ese código ya se usó: genera otro en la web.' },
@@ -33,6 +33,12 @@ export const ERRORES = Object.freeze({
   BUILD_NO_OFICIAL:     { http: 403, reintentable: false, mensaje: 'Este Smash Soda no es un build oficial de Phoenix.' },
   BUILD_DESACTIVADO:    { http: 403, reintentable: false, mensaje: 'Este build fue desactivado: descarga el oficial más reciente.' },
   VERSION_DESACTIVADA:  { http: 403, reintentable: false, mensaje: 'Esta versión de Smash Soda fue desactivada: actualiza.' },
+  SIN_VERSION_PUBLICADA:{ http: 503, reintentable: false, mensaje: 'Aún no hay una versión de Phoenix Soda publicada.' },
+  MODO_NO_VALIDO:       { http: 422, reintentable: false, mensaje: 'Ese modo de sala necesita datos que faltan o no aplican.' },
+  TORNEO_NO_VALIDO:     { http: 422, reintentable: false, mensaje: 'El torneo privado no existe o no está en curso.' },
+  ORG_NO_AUTORIZADO:    { http: 403, reintentable: false, mensaje: 'No eres host de la organización de ese torneo.' },
+  LICENCIA_VENCIDA:     { http: 403, reintentable: false, mensaje: 'La licencia de la organización venció.' },
+  HOST_NO_NEUTRAL:      { http: 403, reintentable: false, mensaje: 'En un partido oficial el host no puede ser uno de los jugadores.' },
   RETO_NO_VALIDO:       { http: 422, reintentable: false, mensaje: 'El reto no existe, no está aceptado o no eres su host.' },
   LOTE_DEMASIADO_GRANDE:{ http: 413, reintentable: false, mensaje: 'Demasiados eventos en un lote.' },
   ERROR_INTERNO:        { http: 500, reintentable: true,  mensaje: 'Error del servidor: reintenta con espera.' },
@@ -113,6 +119,11 @@ export const v = {
     if (typeof t !== 'string' || !/^[0-9]{1,20}$/.test(t)) falla(campo, `${campo} son solo dígitos (ID de Parsec).`);
     return t;
   },
+  codigoInstalacion(x) {
+    const t = typeof x === 'string' ? x.toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+    if (!/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(t)) throw new ErrorApi('CODIGO_INVALIDO');
+    return `${t.slice(0, 4)}-${t.slice(4)}`;
+  },
   codigo(x) {
     const t = typeof x === 'string' ? x.replace(/\D/g, '') : '';
     if (t.length !== 6) throw new ErrorApi('CODIGO_INVALIDO');
@@ -122,6 +133,7 @@ export const v = {
 
 export const ESTADOS_LATIDO = ['abierta', 'en_partida'];
 export const VISIBILIDADES_APP = ['publica', 'amigos', 'privada'];
+export const MODOS_SALA = ['amistoso', 'torneo_privado', 'oficial'];
 export const TIPOS_EVENTO_APP = ['entra', 'sale', 'desconexion', 'reconexion', 'expulsion', 'cambio_mando',
   'partida_inicio', 'partida_fin', 'pausa', 'plazas_ampliadas', 'espera_rechazada'];
 
@@ -225,4 +237,17 @@ export function evaluarBuild({ huella, version, builds = [], exigir = false }) {
   }
   if (exigir && !propio) return 'BUILD_NO_OFICIAL';
   return null;
+}
+
+/**
+ * Marca que la app debe pintar en Phoenix Glass según las reglas: phoenix | organizacion | liga.
+ * `org`: { nombre, logo_url, color_primario, color_secundario } o null. Si las reglas piden la de la organización y no hay, cae a Phoenix.
+ */
+export function marcaDe(reglas, org) {
+  const phoenix = { tipo: 'phoenix', nombre: 'Phoenix Evolution Series', logo_url: null, color_primario: '#00e5ff', color_secundario: '#7c3aed' };
+  if (reglas?.marca === 'organizacion' && org) {
+    return { tipo: 'organizacion', nombre: org.nombre, logo_url: org.logo_url ?? null, color_primario: org.color_primario, color_secundario: org.color_secundario };
+  }
+  if (reglas?.marca === 'liga') return { ...phoenix, tipo: 'liga', tema: 'galaxy' };
+  return phoenix;
 }

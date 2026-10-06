@@ -6,12 +6,14 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   CONFIG, ErrorApi, cuerpoError, compararVersion, v, ESTADOS_LATIDO, VISIBILIDADES_APP,
-  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild,
+  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe,
 } from "./_lib/nucleo.js";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 const ROLES_STAFF = ["ayudante", "moderador", "admin"];
 const VIVAS = ["preparando", "abierta", "en_partida"];
+const BUCKET_FUENTE = "fuente-phoenix";
+const URL_FIRMADA_SEG = 900;     // 15 min para empezar la descarga
 
 // ── Utilidades ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 const hex = (b: ArrayBuffer) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -89,7 +91,7 @@ async function autenticar(req: Request): Promise<Dispositivo> {
 }
 
 async function salaPropia(d: Dispositivo, salaId: string) {
-  const { data, error } = await sb.from("salas").select("id, estado, reto_id, region, host, latido").eq("id", salaId).eq("dispositivo", d.id).maybeSingle();
+  const { data, error } = await sb.from("salas").select("id, estado, reto_id, region, host, latido, modo, reglas").eq("id", salaId).eq("dispositivo", d.id).maybeSingle();
   db(error, "salaPropia");
   if (!data) throw new ErrorApi("SALA_NO_ENCONTRADA");
   return data;
@@ -139,6 +141,89 @@ async function rolesDe(retoId: number | null) {
   });
 }
 
+type Org = { id: string; nombre: string; logo_url: string | null; color_primario: string; color_secundario: string; al_vencer: string };
+
+/** Perfil global por clave (amistoso / torneo_privado / oficial). */
+async function perfilGlobal(clave: string) {
+  const { data, error } = await sb.from("perfiles_reglas").select("id, clave, nombre, version, reglas").eq("clave", clave).is("organizacion", null).maybeSingle();
+  db(error, "perfilGlobal");
+  if (!data) { log("error", "perfil_global_falta", { clave }); throw new ErrorApi("ERROR_INTERNO"); }
+  return data;
+}
+
+/**
+ * Decide modo efectivo, reglas, organización y marca de una sala. Reglas de negocio:
+ *  · amistoso: perfil global.
+ *  · torneo_privado: exige torneo_privado_id en curso; el host debe ser miembro (host/staff/dueño) de su organización;
+ *    licencia vencida → «bloquear» = LICENCIA_VENCIDA, «amistoso» = degrada a amistoso sin organización.
+ *  · oficial: exige reto_id y que el host NO sea jugador de ese reto (host neutral).
+ */
+async function resolverModo(usuario: string, modo: string, torneoId: number | null, retoId: number | null) {
+  if (modo === "amistoso") {
+    if (torneoId) throw new ErrorApi("MODO_NO_VALIDO", { campo: "torneo_privado_id", mensaje: "torneo_privado_id solo aplica al modo torneo_privado." });
+    const p = await perfilGlobal("amistoso");
+    return { modo, perfil: p, org: null as Org | null, torneo: null as number | null, aviso: null as string | null };
+  }
+  if (modo === "oficial") {
+    if (!retoId) throw new ErrorApi("MODO_NO_VALIDO", { campo: "reto_id", mensaje: "Un partido oficial necesita reto_id." });
+    const { data: j, error } = await sb.from("retos_matchmaking").select("retador_id, rival_id").eq("id", retoId).maybeSingle();
+    db(error, "modo.oficial");
+    const { data: rp, error: e2 } = await sb.from("reto_participantes").select("usuario_id").eq("reto_id", retoId).eq("estado", "CONFIRMADO");
+    db(e2, "modo.oficial.participantes");
+    if ([j?.retador_id, j?.rival_id, ...(rp ?? []).map((x) => x.usuario_id)].includes(usuario)) throw new ErrorApi("HOST_NO_NEUTRAL");
+    return { modo, perfil: await perfilGlobal("oficial"), org: null, torneo: null, aviso: null };
+  }
+  // torneo_privado
+  if (!torneoId) throw new ErrorApi("MODO_NO_VALIDO", { campo: "torneo_privado_id", mensaje: "El modo torneo_privado necesita torneo_privado_id." });
+  const { data: t, error } = await sb.from("torneos_privados").select("id, organizacion, perfil_reglas, estado").eq("id", torneoId).maybeSingle();
+  db(error, "modo.torneo");
+  if (!t || t.estado !== "en_curso") throw new ErrorApi("TORNEO_NO_VALIDO");
+  const { data: m, error: e2 } = await sb.from("org_miembros").select("rol").eq("organizacion", t.organizacion).eq("usuario", usuario).maybeSingle();
+  db(e2, "modo.miembro");
+  if (!m) throw new ErrorApi("ORG_NO_AUTORIZADO");
+  const { data: o, error: e3 } = await sb.from("organizaciones").select("id, nombre, logo_url, color_primario, color_secundario, al_vencer").eq("id", t.organizacion).single();
+  db(e3, "modo.org");
+  const { data: vigente, error: e4 } = await sb.rpc("org_licencia_vigente", { p_org: t.organizacion });
+  db(e4, "modo.licencia");
+  if (!vigente) {
+    if (o!.al_vencer === "bloquear") throw new ErrorApi("LICENCIA_VENCIDA");
+    return { modo: "amistoso", perfil: await perfilGlobal("amistoso"), org: null, torneo: null, aviso: "licencia_vencida_degradada" };
+  }
+  let perfil;
+  if (t.perfil_reglas) {
+    const { data, error: e5 } = await sb.from("perfiles_reglas").select("id, clave, nombre, version, reglas").eq("id", t.perfil_reglas).maybeSingle();
+    db(e5, "modo.perfil_org"); perfil = data;
+  }
+  return { modo, perfil: perfil ?? await perfilGlobal("torneo_privado"), org: o as Org, torneo: t.id as number, aviso: null };
+}
+
+/** Perfiles que esta app puede usar: los 3 globales + los de las organizaciones del usuario (si hay token). */
+async function perfilesPara(usuario: string | null) {
+  const { data: globales, error } = await sb.from("perfiles_reglas").select("id, clave, nombre, version, reglas").is("organizacion", null);
+  db(error, "perfiles.globales");
+  let deOrgs: unknown[] = []; let orgs: unknown[] = [];
+  if (usuario) {
+    const { data: mem, error: e1 } = await sb.from("org_miembros").select("organizacion, rol").eq("usuario", usuario);
+    db(e1, "perfiles.miembro");
+    const ids = (mem ?? []).map((x) => x.organizacion);
+    if (ids.length) {
+      const [{ data: ps, error: e2 }, { data: os, error: e3 }, { data: ts, error: e4 }] = await Promise.all([
+        sb.from("perfiles_reglas").select("id, clave, nombre, version, reglas, organizacion").in("organizacion", ids),
+        sb.from("organizaciones").select("id, nombre, logo_url, color_primario, color_secundario, al_vencer, activa").in("id", ids),
+        sb.from("torneos_privados").select("id, organizacion, nombre, perfil_reglas").in("organizacion", ids).eq("estado", "en_curso"),
+      ]);
+      db(e2, "perfiles.org"); db(e3, "perfiles.orgs"); db(e4, "perfiles.torneos");
+      deOrgs = (ps ?? []).map((x) => ({ ...x, organizacion_id: x.organizacion, organizacion: undefined }));
+      orgs = await Promise.all((os ?? []).map(async (o) => {
+        const { data: vig } = await sb.rpc("org_licencia_vigente", { p_org: o.id });
+        return { id: o.id, nombre: o.nombre, rol: (mem ?? []).find((x) => x.organizacion === o.id)?.rol, licencia_vigente: !!vig, al_vencer: o.al_vencer,
+                 marca: marcaDe({ marca: "organizacion" }, o), torneos_en_curso: (ts ?? []).filter((t) => t.organizacion === o.id).map((t) => ({ id: t.id, nombre: t.nombre, perfil_reglas_id: t.perfil_reglas })) };
+      }));
+    }
+  }
+  return { perfiles: [...(globales ?? []).map((x) => ({ ...x, organizacion_id: null })), ...deOrgs], organizaciones: orgs };
+}
+
 // ── Rutas ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 async function emparejar(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?";
@@ -181,19 +266,28 @@ async function abrir(req: Request) {
   };
   const enlace = v.enlace(b.enlace, "enlace");
   const retoId = v.entero(b.reto_id, "reto_id", { min: 1 });
-  if (retoId) {
+  const modoPedido = v.enumerado(b.modo, "modo", MODOS_SALA) ?? "amistoso";
+  const torneoId = v.entero(b.torneo_privado_id, "torneo_privado_id", { min: 1 });
+  if (retoId && modoPedido !== "oficial") {
     const { data: r, error } = await sb.from("retos_matchmaking").select("estado, host_id, retador_id, rival_id").eq("id", retoId).maybeSingle();
     db(error, "abrir.reto");
     const esJugador = r && [r.retador_id, r.rival_id].includes(d.usuario);
     const valido = r && ["ACEPTADO", "EN_JUEGO"].includes(r.estado) && (r.host_id ? r.host_id === d.usuario : esJugador);
     if (!valido) throw new ErrorApi("RETO_NO_VALIDO");
   }
+  if (retoId && modoPedido === "oficial") {
+    const { data: r, error } = await sb.from("retos_matchmaking").select("estado").eq("id", retoId).maybeSingle();
+    db(error, "abrir.reto_oficial");
+    if (!r || !["ACEPTADO", "EN_JUEGO"].includes(r.estado)) throw new ErrorApi("RETO_NO_VALIDO");
+  }
+  const m = await resolverModo(d.usuario, modoPedido, torneoId, retoId);
   const ahora = new Date().toISOString();
   // ¿Esta PC ya tiene una sala viva? → se reabre la misma (la app pudo reiniciarse).
   const { data: viva, error: e1 } = await sb.from("salas").select("id").eq("dispositivo", d.id).in("estado", VIVAS).maybeSingle();
   db(e1, "abrir.viva");
   let salaId: string; let reabierta = false;
-  const cambios = { ...fila, estado: "abierta", latido: ahora, plazas_libres: fila.plazas_total, reto_id: retoId ?? null };
+  const cambios = { ...fila, estado: "abierta", latido: ahora, plazas_libres: fila.plazas_total, reto_id: retoId ?? null,
+                    modo: m.modo, organizacion: m.org?.id ?? null, torneo_privado: m.torneo, perfil_reglas: m.perfil.id, reglas: m.perfil.reglas };
   if (viva) {
     const { error } = await sb.from("salas").update(cambios).eq("id", viva.id); db(error, "abrir.reabrir");
     salaId = viva.id; reabierta = true;
@@ -205,7 +299,9 @@ async function abrir(req: Request) {
   await registrarEvento(salaId, "abrir", `abrir-${salaId}-${Date.now()}`, { reabierta, reto_id: retoId ?? null });
   // Avisos: una sola vez por sala (reabrir no vuelve a avisar). Un fallo aquí NUNCA impide abrir la sala.
   let avisos: Record<string, unknown> = { enviado: false, motivo: "ERROR" };
-  try {
+  const quienAvisa = (m.perfil.reglas as { notificaciones?: string })?.notificaciones;
+  if (quienAvisa !== "host") avisos = { enviado: false, motivo: quienAvisa === "organizador" ? "LAS_DECIDE_ORGANIZADOR" : "AUTOMATICAS_DE_LIGA" };
+  else try {
     const { data, error } = await sb.rpc("sistema_avisar_sala", { p_sala: salaId });
     if (error) throw new Error(error.message);
     avisos = data as Record<string, unknown>;
@@ -215,7 +311,10 @@ async function abrir(req: Request) {
   return { sala_id: salaId, reabierta, estado: "abierta", visibilidad: fila.visibilidad, limite_espectadores: fila.limite_espectadores,
            preferencias: { publicar_en_pagina: fila.publicar_en_pagina, avisar_amigos_host: fila.avisar_amigos_host,
                            avisar_amigos_jugadores: fila.avisar_amigos_jugadores, anunciar_discord: fila.anunciar_discord },
-           avisos, latido_seg: cfg.intervalos.latido_seg, roles: await rolesDe(retoId) };
+           avisos, latido_seg: cfg.intervalos.latido_seg, roles: await rolesDe(retoId),
+           modo: m.modo, modo_pedido: modoPedido, aviso_modo: m.aviso,
+           reglas: { perfil_id: m.perfil.id, nombre: m.perfil.nombre, version: m.perfil.version, ...(m.perfil.reglas as object) },
+           marca: marcaDe(m.perfil.reglas, m.org), organizacion_id: m.org?.id ?? null, torneo_privado_id: m.torneo };
 }
 
 async function latido(req: Request) {
@@ -253,7 +352,8 @@ async function latido(req: Request) {
       }
     }
   }
-  return { estado, latido_seg: cfg.intervalos.latido_seg, servidor_hora: ahora };
+  // modo/reglas pueden cambiar en caliente (p. ej. licencia vencida → amistoso): la app aplica siempre lo último recibido.
+  return { estado, latido_seg: cfg.intervalos.latido_seg, modo: sala.modo, reglas: sala.reglas, servidor_hora: ahora };
 }
 
 async function cerrar(req: Request) {
@@ -284,6 +384,28 @@ async function eventos(req: Request) {
   return { aceptados, duplicados: validos.length - aceptados, rechazados };
 }
 
+/** Instalador: código de un solo uso → URL firmada temporal del ZIP del código fuente (bucket privado). Sin token. */
+async function instalar(req: Request) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?";
+  frenar(`inst:${ip}`, 5, 10 * 60_000);
+  const b = await leerJson(req);
+  const codigo = v.codigoInstalacion(b.codigo);
+  const { data, error } = await sb.rpc("sistema_canjear_instalacion", { p_huella: await sha256(codigo), p_ip: ip });
+  db(error, "instalar.canje");
+  const r = data as { error?: string; usuario?: string; version?: string; ruta?: string; sha256?: string; notas?: string | null };
+  if (r.error) { log("warn", "instalar_rechazo", { ip, codigo: r.error }); throw new ErrorApi(r.error); }
+  const { data: firmada, error: e2 } = await sb.storage.from(BUCKET_FUENTE).createSignedUrl(r.ruta!, URL_FIRMADA_SEG, { download: `phoenix-soda-${r.version}.zip` });
+  if (e2 || !firmada?.signedUrl) {
+    // Sin URL no se consume el código: se libera para que el host pueda reintentar.
+    log("error", "instalar_firma", { mensaje: e2?.message, ruta: r.ruta });
+    await sb.from("codigos_instalacion").update({ usado: null, version_entregada: null, ip_canje: null }).eq("codigo_huella", await sha256(codigo));
+    throw new ErrorApi("ERROR_INTERNO");
+  }
+  log("info", "instalacion_entregada", { usuario: r.usuario, version: r.version, ip });
+  return { url: firmada.signedUrl, expira_en_seg: URL_FIRMADA_SEG, version: r.version, sha256: r.sha256, notas: r.notas ?? null,
+           nombre_archivo: `phoenix-soda-${r.version}.zip` };
+}
+
 /** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */
 async function config(req: Request) {
   const { cfg, builds } = await cfgVigente();
@@ -295,18 +417,19 @@ async function config(req: Request) {
     build = fallo === "BUILD_DESACTIVADO" ? "desactivado" : fallo === "VERSION_DESACTIVADA" ? "version_desactivada"
           : fallo === "BUILD_NO_OFICIAL" ? "no_oficial" : huella && builds.some((x) => x.huella_sha256 === huella) ? "oficial" : "sin_verificar";
   }
-  let dispositivo = "sin_token";
+  let dispositivo = "sin_token"; let usuario: string | null = null;
   const m = /^Bearer\s+(phx_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "");
   if (m) {
-    const { data, error } = await sb.from("dispositivos_host").select("revocado, suspendido").eq("huella_token", await sha256(m[1])).maybeSingle();
+    const { data, error } = await sb.from("dispositivos_host").select("usuario, revocado, suspendido").eq("huella_token", await sha256(m[1])).maybeSingle();
     db(error, "config.dispositivo");
     dispositivo = !data ? "desconocido" : data.revocado ? "revocado" : data.suspendido ? "suspendido" : "activo";
+    if (dispositivo === "activo") usuario = data!.usuario;
   }
   const app = !ver ? "sin_dato" : compararVersion(ver, cfg.version_app_min) < 0 ? "desactualizada"
             : compararVersion(ver, cfg.version_app_recomendada) < 0 ? "actualizable" : "al_dia";
   return { version_api: CONFIG.version_api, version_app_min: cfg.version_app_min, version_app_recomendada: cfg.version_app_recomendada,
            exigir_build: cfg.exigir_build, intervalos: cfg.intervalos, interruptores: cfg.interruptores, limites: CONFIG.limites,
-           estado: { app, build, dispositivo }, servidor_hora: new Date().toISOString() };
+           estado: { app, build, dispositivo }, ...(await perfilesPara(usuario)), servidor_hora: new Date().toISOString() };
 }
 
 const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> = {
@@ -316,6 +439,7 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/sala/cerrar": { metodo: "POST", fn: cerrar },
   "/v1/eventos": { metodo: "POST", fn: eventos },
   "/v1/config": { metodo: "GET", fn: config },
+  "/v1/instalar": { metodo: "POST", fn: instalar },
 };
 
 Deno.serve(async (req) => {
