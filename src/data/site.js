@@ -1,6 +1,10 @@
 // Datos globales del sitio: UNA sola lista de navegación para cabecera y menú lateral.
+import { FX } from './experimento.js';
+
 export const NAV = [
   { id: 'central',   label: 'Central',       path: '',           icon: 'fa-house' },
+  // «Social» va en la zona principal, justo después de Central. FX.social = false la quita del menú.
+  ...(FX.social ? [{ id: 'social', label: 'Social', path: 'social/', icon: 'fa-earth-americas' }] : []),
   { id: 'liga',      label: 'Liga',          path: 'liga/',      icon: 'fa-crown' },
   { id: 'noticias',  label: 'Noticias',      path: 'noticias/',  icon: 'fa-newspaper' },
   { id: 'database',  label: 'Jugadores', path: 'database/',  icon: 'fa-database' },

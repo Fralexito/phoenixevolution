@@ -29,6 +29,6 @@ export function tarjetaComunidadHTML(it, opciones = {}) {
       <div class="min-w-0 flex-1"><a href="${escapeHTML(perfil)}" class="font-display font-bold text-white text-sm truncate block hover:text-galaxy-400">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
         <p class="text-[11px] text-gray-500">${tiempoRelativo(it.created_at)} ${segmentoChipHTML(it.juego)}</p></div>${botonesHTML(it, opciones)}</header>
     ${contenidoHTML(it)}${encuestaHTML(it.id)}${opciones.extra ?? ''}
-    <footer class="mt-3 pt-2 border-t border-galaxy-border/60 flex flex-wrap items-center gap-1.5">${rx}
-      <a href="${escapeHTML(urlMuro)}" class="ml-auto text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'} · ` : ''}Ver en su muro</a></footer></article>`;
+    ${opciones.pie ?? `<footer class="mt-3 pt-2 border-t border-galaxy-border/60 flex flex-wrap items-center gap-1.5">${rx}
+      <a href="${escapeHTML(urlMuro)}" class="ml-auto text-[11px] text-gray-400 hover:text-galaxy-400"><i class="fa-regular fa-comment mr-1"></i>${n ? `${n} respuesta${n === 1 ? '' : 's'} · ` : ''}Ver en su muro</a></footer>`}</article>`;
 }

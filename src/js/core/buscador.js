@@ -7,7 +7,7 @@ const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toL
 const SINONIMOS = {
   central: 'inicio portada principal home', duelos: 'jugar partida reto rival matchmaking host parsec', partidos: 'resultados historial valorar', envivo: 'streaming transmitir directo kick',
   eventos: 'torneo quedada calendario', liga: 'tabla posiciones clasificacion calendario fixture', palmares: 'campeones titulos historia',
-  mercado: 'fichajes transferencias traspasos', database: 'jugadores fichas cartas comparar stats', comunidad: 'muro social radar',
+  mercado: 'fichajes transferencias traspasos', database: 'jugadores fichas cartas comparar stats', comunidad: 'muro radar', social: 'red social historias feed fotos videos publicaciones reels',
   noticias: 'novedades prensa articulos', clanes: 'equipo grupo tag', ranking: 'mejores top temporada retos semanales', amigos: 'solicitudes seguir bloquear',
   mensajes: 'chat privado grupos dm', buscar: 'encontrar personas publicaciones', tienda: 'tokens comprar cosmeticos marcos titulos xp nivel',
   logros: 'medallas insignias', guardados: 'favoritos marcadores', ajustes: 'configuracion preferencias tema zoom', muro: 'perfil publicaciones', perfil: 'cuenta avatar foto',

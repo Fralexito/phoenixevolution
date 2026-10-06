@@ -87,6 +87,8 @@ export async function borrarClip(id) { await limpiarArchivos(await rpc('clip_bor
 /** Feed global «Comunidad» (migración 027): publicaciones de todos los muros visibles para mí, con filtro opcional por juego. */
 export const comunidad = (juego = null, antes = null, limite = 20) => rpc('muro_comunidad', { ...(juego ? { p_juego: juego } : {}), p_antes: antes, p_limite: limite });
 export const siguiendo = (antes = null, limite = 20) => rpc('muro_siguiendo', { p_antes: antes, p_limite: limite });
+export const historiasRecientes = (limite = 24) => rpc('historias_recientes', { p_limite: limite });   // migración 056: círculos de /social/
+export const misReacciones = (ids) => rpc('mis_reacciones', { p_ids: ids });                           // migración 057: { "id": emoji } de MIS reacciones
 export const destacado = (desplazamiento = 0, limite = 20) => rpc('muro_destacado', { p_desplazamiento: desplazamiento, p_limite: limite });
 /** Hosting con varios juegos/parches y visibilidad (migración 026). */
 export const guardarHost = (software, catalogo, visible) => rpc('muro_guardar_host', { p_software: software, p_catalogo: catalogo, p_visible: visible });

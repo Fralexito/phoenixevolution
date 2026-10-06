@@ -1,0 +1,24 @@
+---
+// «Social»: la portada social de la comunidad (historias · publicar · feed de todos). Es una sección de la zona principal, casi un segundo inicio.
+// Los datos salen de las mismas publicaciones del muro que ya alimentan /comunidad/ (que se mantiene intacta). Lógica en js/pages/social.js.
+import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
+---
+<Layout title="Social" active="social" description="Lo que publican los jugadores de Phoenix Evolution Series: historias, fotos, videos y resultados de toda la comunidad.">
+  <div class="max-w-xl mx-auto px-3 sm:px-4 py-3 sm:py-5 w-full space-y-3">
+    <h1 class="sr-only">Social</h1>
+    <section id="sx-hist" hidden aria-label="Historias" class="glass-panel rounded-2xl px-3 py-3"></section>
+    <section id="sx-compositor" aria-label="Publicar"></section>
+    <div class="flex items-center gap-2">
+      <div id="sx-vistas" role="tablist" aria-label="Qué ver en el feed" class="flex flex-1 gap-1"></div>
+    </div>
+    <Plegable titulo="Filtrar por juego" icono="fa-tag" resumen="Solo en «Recientes»" id="sx-filtro-wrap">
+      <div id="sx-filtro" class="flex flex-wrap items-center gap-1.5 text-[11px]" role="group" aria-label="Filtrar por juego"></div>
+    </Plegable>
+    <div id="sx-feed" class="space-y-3" aria-live="polite"></div>
+    <div id="sx-fin" hidden class="py-3 text-center"><button type="button" id="sx-mas" class="btn btn-ghost !text-xs">Cargar más</button></div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/social.js';
+</script>
