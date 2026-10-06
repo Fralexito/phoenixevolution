@@ -17,6 +17,8 @@ export const NAV_EXTRA = [
   { id: 'ranking', label: 'Ranking', path: 'ranking/', icon: 'fa-ranking-star' },
   { id: 'tienda', label: 'Tienda', path: 'tienda/', icon: 'fa-store' },
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
+  { id: 'competiciones', label: 'Competiciones', path: 'competiciones/', icon: 'fa-trophy' },
+  { id: 'historial', label: 'Historial de partidos', path: 'historial/', icon: 'fa-clock-rotate-left' },
   { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
 ];
 

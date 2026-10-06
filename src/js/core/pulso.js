@@ -9,7 +9,7 @@ const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toL
  *  · `estado`: 'sin_datos' (no hay fechas) · 'por_empezar' (nada jugado) · 'en_juego' (algo jugado y algo pendiente) · 'terminada' (todo jugado)
  *  · `actual`: la fecha «en juego» = la primera que aún tiene partidos pendientes (si todo está jugado, la última)
  *  · `pct`: avance de la temporada (partidos jugados / total, entero 0–100)
- * @returns {{estado:string, actual:number|null, jugadosActual:number, totalActual:number, jugados:number, total:number, pct:number, restantes:number}}
+ * @returns {{estado:string, actual:number|null, jugadosActual:number, totalActual:number, jugados:number, total:number, pct:number, restantes:number, aplazados?:number}}
  */
 export function estadoLiga(fechas) {
   const f = (Array.isArray(fechas) ? fechas : []).filter((x) => Array.isArray(x?.partidos));
@@ -18,15 +18,56 @@ export function estadoLiga(fechas) {
   if (!total) return { estado: 'sin_datos', actual: null, jugadosActual: 0, totalActual: 0, jugados: 0, total: 0, pct: 0, restantes: 0 };
   const act = f.find((x) => x.partidos.some((m) => !jugado(m))) ?? f[f.length - 1];
   const jugadosActual = act.partidos.filter(jugado).length;
+  const aplazados = todos.filter((m) => selloPartido(m) === 'aplazado').length;
   return {
     estado: jugados === total ? 'terminada' : jugados === 0 ? 'por_empezar' : 'en_juego',
     actual: act.n, jugadosActual, totalActual: act.partidos.length,
-    jugados, total, pct: Math.round((jugados / total) * 100), restantes: total - jugados,
+    jugados, total, pct: Math.round((jugados / total) * 100), restantes: total - jugados, aplazados,
   };
 }
 
-/** Sello de un partido: 'oficial' si tiene marcador (los resultados se copian de CopaFácil), 'pendiente' si aún no se juega. */
-export const selloPartido = (m) => (jugado(m) ? 'oficial' : 'pendiente');
+/**
+ * Sello de un partido. Un partido puede llevar `estado` propio en data/ligaResultados.js:
+ *  · 'aplazado'   → no se juega en su fecha (sin marcador; NO cuenta como jugado)
+ *  · 'wo'         → walkover: el rival no se presentó; lleva marcador (p. ej. 3-0) y SÍ cuenta en la tabla
+ *  · 'incidencia' → se jugó pero el staff lo está revisando (desconexión, disputa…); mantiene su marcador
+ * Sin `estado`: 'oficial' si tiene marcador (copiado de CopaFácil) y 'pendiente' si aún no se juega.
+ * Un estado especial que no encaja con los datos se ignora (p. ej. 'aplazado' CON marcador es un partido jugado).
+ */
+export const ESTADOS_ESPECIALES = ['aplazado', 'wo', 'incidencia'];
+export function selloPartido(m) {
+  const e = m?.estado;
+  if (e === 'aplazado' && !jugado(m)) return 'aplazado';
+  if ((e === 'wo' || e === 'incidencia') && jugado(m)) return e;
+  return jugado(m) ? 'oficial' : 'pendiente';
+}
+
+/**
+ * Rangos por ELO (todos parten de 1000 = Plata). `min` = ELO mínimo del rango. Bronce lo es todo lo que queda por debajo de Plata.
+ * Los metales son universales: se ven igual en el tema Galaxy y en el Sudario.
+ */
+export const RANGOS = [
+  { id: 'bronce', nombre: 'Bronce', min: -Infinity, icon: 'fa-medal', color: '#cd7f32' },
+  { id: 'plata', nombre: 'Plata', min: 925, icon: 'fa-medal', color: '#cbd5e1' },
+  { id: 'oro', nombre: 'Oro', min: 1025, icon: 'fa-medal', color: '#fbbf24' },
+  { id: 'platino', nombre: 'Platino', min: 1100, icon: 'fa-gem', color: '#22d3ee' },
+  { id: 'diamante', nombre: 'Diamante', min: 1175, icon: 'fa-gem', color: '#a78bfa' },
+];
+
+/** Rango de un ELO. Sin partidos jugados (`pj` = 0) no hay rango (null): nadie se clasifica sin jugar. */
+export function rangoElo(elo, pj = 1) {
+  if (!Number.isFinite(elo) || !(pj > 0)) return null;
+  let r = RANGOS[0]; for (const x of RANGOS) if (elo >= x.min) r = x; return r;
+}
+
+/** Progreso hacia el siguiente rango: { rango, siguiente (null si ya es el máximo), faltan (puntos), pct (0–100 dentro del tramo) }. */
+export function progresoRango(elo, pj = 1) {
+  const rango = rangoElo(elo, pj); if (!rango) return null;
+  const i = RANGOS.indexOf(rango), siguiente = RANGOS[i + 1] ?? null;
+  if (!siguiente) return { rango, siguiente: null, faltan: 0, pct: 100 };
+  const base = Number.isFinite(rango.min) ? rango.min : siguiente.min - 100;
+  return { rango, siguiente, faltan: Math.ceil(siguiente.min - elo), pct: Math.round(Math.min(1, Math.max(0, (elo - base) / (siguiente.min - base))) * 100) };
+}
 
 /** Factor por diferencia de goles (el del Elo de selecciones): 1 gol → 1, 2 → 1.5, 3 → 1.75, 4+ → 1.75 + (d−3)/8. */
 export const factorGoles = (d) => { const a = Math.abs(d); return a <= 1 ? 1 : a === 2 ? 1.5 : 1.75 + (a - 3) / 8; };

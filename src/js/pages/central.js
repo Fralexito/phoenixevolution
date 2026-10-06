@@ -17,7 +17,8 @@ import { onSession, can } from '../core/session.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { toast } from '../core/toast.js';
 import { borrarFilas } from '../features/escritura.js';
-import { estadoLiga, selloPartido, calcularElo, clubesMasUsados } from '../core/pulso.js';
+import { estadoLiga, selloPartido, calcularElo, clubesMasUsados, rangoElo, ESTADOS_ESPECIALES } from '../core/pulso.js';
+import { rangoChip } from '../features/rango.js';
 import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/central.js';
 
 const $ = (id) => document.getElementById(id);
@@ -40,13 +41,17 @@ const manuales = new Map();                                    // fecha → elec
 const nFechaDestacado = () => (pestana === 'porfecha' ? fechaSel : pestana === 'resultados' ? (jornadas.resultados[0]?.n ?? ultimaJugada) : (jornadas.proximos?.n ?? ultimaJugada));
 
 const ladoFila = (n, gana, der) => `<span class="min-w-0 flex items-center gap-2.5 ${der ? 'flex-row-reverse text-right' : ''}"><span class="shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 border border-galaxy-border/60">${escudoHTML(clubDe(n), 26)}</span><span class="min-w-0"><span class="block truncate text-sm sm:text-base ${gana ? 'font-bold text-white' : 'font-semibold text-gray-300'}">${escapeHTML(n)}</span><span class="block truncate text-[10px] text-gray-500 tracking-wider">${club(n)}</span></span></span>`;
-const SELLO = { oficial: ['fa-circle-check', 'Oficial'], pendiente: ['fa-clock', 'Pendiente'] };
-const sello = (m) => { const k = selloPartido(m); return `<span class="sello-partido ${k}" title="${k === 'oficial' ? 'Resultado cargado desde CopaFácil por el staff' : 'Aún no se juega'}"><i class="fa-solid ${SELLO[k][0]}"></i>${SELLO[k][1]}</span>`; };
-const filaPartido = (m, conSello = false) => {
+const SELLO = {
+  oficial: ['fa-circle-check', 'Oficial', 'Resultado cargado desde CopaFácil por el staff'], pendiente: ['fa-clock', 'Pendiente', 'Aún no se juega'],
+  aplazado: ['fa-calendar-xmark', 'Aplazado', 'Se jugará en otra fecha'], wo: ['fa-flag', 'WO', 'Walkover: el rival no se presentó (el marcador es el de la regla)'],
+  incidencia: ['fa-triangle-exclamation', 'En revisión', 'El staff está revisando este partido'],
+};
+const sello = (m) => { const k = selloPartido(m); return `<span class="sello-partido ${k}" title="${SELLO[k][2]}"><i class="fa-solid ${SELLO[k][0]}"></i>${SELLO[k][1]}</span>`; };
+const filaPartido = (m, conSello = false, n = null) => {
   const jugado = jug(m);
-  return `<div class="glass-panel rounded-xl p-3 sm:p-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center text-white">
+  return `<div ${n == null ? '' : `data-detalle="${n}|${escapeHTML(m.l)}|${escapeHTML(m.v)}" role="button" tabindex="0" aria-label="Ver detalle: ${escapeHTML(m.l)} contra ${escapeHTML(m.v)}"`} class="glass-panel rounded-xl p-3 sm:p-4 ${n == null ? '' : 'cursor-pointer hover:border-galaxy-400/60 transition-colors'} grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 items-center text-white">
     ${ladoFila(m.l, jugado && m.gl > m.gv)}
-    <span class="flex flex-col items-center gap-1"><span class="text-center font-display font-bold text-lg sm:text-2xl bg-black/50 py-1 px-3 rounded border border-galaxy-border whitespace-nowrap">${jugado ? `${m.gl} - ${m.gv}` : 'VS'}</span>${conSello ? sello(m) : ''}</span>
+    <span class="flex flex-col items-center gap-1"><span class="text-center font-display font-bold text-lg sm:text-2xl bg-black/50 py-1 px-3 rounded border border-galaxy-border whitespace-nowrap">${jugado ? `${m.gl} - ${m.gv}` : 'VS'}</span>${conSello || ESTADOS_ESPECIALES.includes(selloPartido(m)) ? sello(m) : ''}</span>
     ${ladoFila(m.v, jugado && m.gv > m.gl, true)}
   </div>`;
 };
@@ -72,12 +77,12 @@ function pintarPartidos() {
     const e = estadisticasFecha(f);
     const stats = e.jugados ? `<div class="flex flex-wrap gap-2">${chipStat(ico.goles, `${e.goles} goles`)}${chipStat(ico.prom, `${e.promedio} por partido`)}${chipStat(ico.emp, `${e.empates} empate${e.empates === 1 ? '' : 's'}`)}${e.goleada ? chipStat(ico.gol, `Mayor goleada: ${escapeHTML(e.goleada.l)} ${e.goleada.gl}-${e.goleada.gv} ${escapeHTML(e.goleada.v)}`) : ''}<span class="pc-chip"><i class="fa-solid fa-house"></i>${e.local} local · ${e.visita} visita</span></div>` : `<p class="text-xs text-gray-500">Esta fecha todavía no se juega (${e.total} partidos programados).</p>`;
     const boton = FX.compartir ? `<button type="button" data-compartir-fecha class="btn btn-ghost !px-3 !py-1.5 text-xs"><i class="fa-solid fa-share-nodes"></i> Compartir fecha</button>` : '';
-    $('matches-container').innerHTML = `<div class="flex items-center justify-between gap-2"><div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${f.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${boton}</div>${stats}${f.partidos.map((m) => filaPartido(m, true)).join('')}`;
+    $('matches-container').innerHTML = `<div class="flex items-center justify-between gap-2"><div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${f.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${boton}</div>${stats}${f.partidos.map((m) => filaPartido(m, true, f.n)).join('')}`;
     return;
   }
   const grupos = pestana === 'proximos' ? (jornadas.proximos ? [jornadas.proximos] : []) : jornadas.resultados;
   if (!grupos.length) { $('matches-container').innerHTML = `<div class="text-center text-gray-500 text-sm py-6 glass-panel rounded-xl">${pestana === 'proximos' ? 'No hay partidos por jugar por ahora.' : 'Aún no hay resultados.'}</div>`; return; }
-  $('matches-container').innerHTML = grupos.map((j) => `<div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${j.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${j.partidos.map((m) => filaPartido(m, pestana === 'resultados')).join('')}`).join('');
+  $('matches-container').innerHTML = grupos.map((j) => `<div class="text-[11px] font-display font-bold text-galaxy-400 uppercase tracking-[0.2em]">Fecha ${j.n}${edicion ? ` · ${escapeHTML(edicion.nombre)}` : ''}</div>${j.partidos.map((m) => filaPartido(m, pestana === 'resultados', j.n)).join('')}`).join('');
 }
 
 /** Tabla de posiciones (derecha). Con `mov` (modo «Por fecha») muestra cómo se movió cada jugador en esa fecha. */
@@ -211,6 +216,8 @@ function avisoVisita() {
 }
 
 // ---- Estado de la liga (franja) + Rankings ELO y clubes (minisección plegada). Datos puros en core/pulso.js; aquí solo se pinta. ----
+let pingMs = null;   // tiempo de respuesta del servidor (se mide con la primera consulta del pulso); null = aún sin dato o sin conexión
+function mostrarPing() { const el = document.querySelector('#estado-liga [data-ping]'); if (el && pingMs !== null) { el.textContent = `· servidor ${pingMs} ms`; el.hidden = false; } }
 function pintarEstado() {
   const box = $('estado-liga'); if (!box || !edicion) return;
   try {
@@ -219,15 +226,28 @@ function pintarEstado() {
     const txt = { en_juego: `Fecha ${e.actual} en juego`, por_empezar: `Empieza en la fecha ${e.actual}`, terminada: 'Edición terminada' }[e.estado];
     const detalle = e.estado === 'terminada' ? `${e.jugados} partidos jugados` : `${e.jugadosActual} de ${e.totalActual} partidos de la fecha`;
     box.innerHTML = `<span class="estado-punto ${e.estado === 'en_juego' ? '' : 'quieto'}" aria-hidden="true"></span><b>${escapeHTML(nombre)} · ${escapeHTML(txt)}</b><span class="text-gray-400">${escapeHTML(detalle)}</span>
-      <span class="estado-barra" role="img" aria-label="Temporada completada al ${e.pct}%"><i style="width:${e.pct}%"></i></span><span class="text-gray-400 tabular-nums">${e.pct}% de la temporada</span><i class="fa-solid fa-arrow-right text-galaxy-400 ml-auto text-xs" aria-hidden="true"></i>`;
-    box.hidden = false;
+      <span class="estado-barra" role="img" aria-label="Temporada completada al ${e.pct}%"><i style="width:${e.pct}%"></i></span><span class="text-gray-400 tabular-nums">${e.pct}% de la temporada</span><span data-ping hidden class="text-gray-500 tabular-nums"></span><i class="fa-solid fa-arrow-right text-galaxy-400 ml-auto text-xs" aria-hidden="true"></i>`;
+    box.hidden = false; mostrarPing();
   } catch (err) { console.error('[central] estado de la liga:', err); }
 }
+async function pintarGoleadores() {
+  const bloque = $('goleadores-bloque'); if (!bloque || !edicion) return;
+  try {
+    const [{ leerGolesEdicion }, { topGoleadores, topAsistentes }] = await Promise.all([import('../features/detallePartido.js'), import('../core/golesPartido.js')]);
+    const goles = await leerGolesEdicion('galaxy', edicion.id); if (!goles.length) { bloque.hidden = true; return; }
+    const fila = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.nombre)}</span><span class="rank-val">${x.total}</span></div>`;
+    const g = topGoleadores(goles, 5), a = topAsistentes(goles, 5);
+    $('goleadores-lista').innerHTML = g.map(fila).join('') || '<p class="text-xs text-gray-500">Sin datos.</p>';
+    $('asistentes-lista').innerHTML = a.map(fila).join('') || '<p class="text-xs text-gray-500">Sin datos.</p>';
+    bloque.hidden = false;
+  } catch (err) { console.error('[central] goleadores:', err); }
+}
+window.addEventListener('goles-cambiaron', pintarGoleadores);
 function pintarRankings() {
   const elo = $('elo-lista'), cl = $('clubes-lista'); if (!elo || !cl || !edicion) return;
   try {
     const nombres = [...new Set([...jugadoresEd, ...Object.keys(edicion.clubes ?? {})])];
-    const filaElo = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(clubDe(x.nombre), 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.nombre)}</span>${x.delta ? `<span class="text-[10px] font-bold ${x.delta > 0 ? 'text-emerald-400' : 'text-rose-400'}">${x.delta > 0 ? '▲' : '▼'}${Math.abs(x.delta)}</span>` : ''}<span class="rank-val">${x.elo}</span></div>`;
+    const filaElo = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(clubDe(x.nombre), 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.nombre)}</span>${rangoChip(rangoElo(x.elo, x.pj))}${x.delta ? `<span class="text-[10px] font-bold ${x.delta > 0 ? 'text-emerald-400' : 'text-rose-400'}">${x.delta > 0 ? '▲' : '▼'}${Math.abs(x.delta)}</span>` : ''}<span class="rank-val">${x.elo}</span></div>`;
     elo.innerHTML = calcularElo(fechas, nombres).map(filaElo).join('') || '<p class="text-xs text-gray-500">Aún no hay partidos jugados.</p>';
     const filaClub = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="shrink-0 w-6 grid place-items-center">${escudoHTML(x.club, 20)}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.club)}<small class="block text-[10px] text-gray-500 truncate">${escapeHTML(x.dts.join(', '))}</small></span><span class="rank-val">${x.pj} <small class="text-[10px] text-gray-500 font-normal">PJ</small></span></div>`;
     cl.innerHTML = clubesMasUsados(fechas, edicion.clubes ?? {}).map(filaClub).join('') || '<p class="text-xs text-gray-500">Aún no hay partidos jugados.</p>';
@@ -235,7 +255,7 @@ function pintarRankings() {
 }
 renderDemo();
 pintarRachas(); avisoVisita();
-pintarEstado(); pintarRankings();
+pintarEstado(); pintarRankings(); pintarGoleadores();
 renderFeatured();
 // Podio: el pase del mouse agranda por CSS; en celular (sin mouse) el toque agranda/encoge la carta. Un solo jugador agrandado a la vez.
 // En celular las tres cartas miden ≈ 105 px y el CSS oculta sus estadísticas (< 135 px): ahí el toque abre la RÉPLICA completa (features/replicaCarta.js),
@@ -280,6 +300,16 @@ $('matches-container').addEventListener('click', async (e) => {   // «Compartir
     abrirTarjeta(datosFecha({ liga: liga ? liga.titulo.join(' ') : 'Galaxy League', edicion: edicion?.nombre ?? '', fecha: fechaObj(fechaSel), clubes: edicion?.clubes ?? {} }), 'galaxy');
   } catch (err) { console.error('[central] compartir:', err); toast('No se pudo preparar la tarjeta.', 'error'); }
 });
+// Clic (o Enter) en un partido → detalle con goles, minuto y asistencias (se descarga solo al pedirlo).
+async function abrirDetalleDe(el) {
+  const [n, l, v] = el.dataset.detalle.split('|'); const f = fechaObj(Number(n)); const partido = f?.partidos.find((x) => x.l === l && x.v === v); if (!partido || !edicion) return;
+  try {
+    const { abrirDetalle } = await import('../features/detallePartido.js'); const liga = LIGAS.find((x) => x.id === 'galaxy');
+    abrirDetalle({ liga: 'galaxy', ligaTitulo: liga ? liga.titulo.join(' ') : 'Galaxy League', edicion: edicion.id, edicionNombre: edicion.nombre, fecha: f.n, partido, clubes: edicion.clubes ?? {} });
+  } catch (err) { console.error('[central] detalle:', err); toast('No se pudo abrir el detalle.', 'error'); }
+}
+$('matches-container').addEventListener('click', (e) => { const el = e.target.closest('[data-detalle]'); if (el && !e.target.closest('[data-compartir-fecha]')) abrirDetalleDe(el); });
+$('matches-container').addEventListener('keydown', (e) => { if (e.key !== 'Enter' && e.key !== ' ') return; const el = e.target.closest('[data-detalle]'); if (el && el === e.target) { e.preventDefault(); abrirDetalleDe(el); } });
 function refrescar() { pintarPartidos(); pintarDestacado(); pintarPosiciones(); }
 $('fecha-nav').addEventListener('click', (e) => {
   const f = e.target.closest('[data-fecha]'); const p = e.target.closest('[data-fnav]');
@@ -294,7 +324,8 @@ if ($('xi-det')) $('xi-det').open = window.matchMedia('(min-width: 1024px)').mat
 
 // ---- Pulso de la comunidad: cuatro conteos reales (head:true no descarga filas, solo el número). Si uno falla se queda en «—». ----
 async function contar(consulta, id) {
-  try { const { count, error } = await consulta; if (error) throw error; $(`pulso-${id}`).textContent = cifra(count); }
+  const t0 = performance.now();
+  try { const { count, error } = await consulta; if (error) throw error; $(`pulso-${id}`).textContent = cifra(count); if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
   catch (e) { console.error(`[central] pulso ${id}:`, e?.message ?? e); }
 }
 const head = { count: 'exact', head: true };
@@ -302,3 +333,21 @@ contar(supabase.from('jugadores').select('id', head), 'jugadores');
 contar(supabase.from('perfiles').select('id', head), 'comunidad');
 contar(supabase.from('perfiles').select('id', head).eq('puede_hostear', true), 'hosts');
 contar(supabase.from('retos_matchmaking').select('id', head).eq('estado', 'BUSCANDO'), 'retos');
+
+// ---- Barra de anclas: al saltar a una minisección plegada se abre; la sección visible se marca con aria-current ----
+{
+  const nav = document.querySelector('.anclas');
+  if (nav) {
+    nav.addEventListener('click', (e) => { const a = e.target.closest('a[href^="#"]'); const d = a && document.querySelector(a.getAttribute('href')); if (d?.tagName === 'DETAILS') d.open = true; });
+    const enlaces = [...nav.querySelectorAll('a[href^="#"]')]; const por = new Map(enlaces.map((a) => [a.getAttribute('href').slice(1), a]));
+    if ('IntersectionObserver' in window) {
+      const vis = new Set();
+      const io = new IntersectionObserver((es) => {
+        es.forEach((x) => (x.isIntersecting ? vis.add(x.target.id) : vis.delete(x.target.id)));
+        const primero = enlaces.find((a) => vis.has(a.getAttribute('href').slice(1)));
+        enlaces.forEach((a) => (a === primero ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      }, { rootMargin: '-25% 0px -55% 0px' });
+      por.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+    }
+  }
+}

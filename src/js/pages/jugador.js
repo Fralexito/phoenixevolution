@@ -9,6 +9,8 @@ import { FX } from '../../data/experimento.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
 import { forma } from '../core/ligaStats.js';
+import { calcularElo, progresoRango } from '../core/pulso.js';
+import { rangoBloque } from '../features/rango.js';
 import { onSession, can } from '../core/session.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { abrirEditorPerfil } from '../features/perfilEditor.js';
@@ -50,6 +52,8 @@ function seccionEdicion(liga, ed, nombre) {
   const c = campana(ed, nombre); if (!c) return '';
   const f = c.fila; const rivales = contraRivales(c.jugados);
   const ult = forma(ed.fechas, nombre, 5);
+  const miElo = calcularElo(ed.fechas, [...new Set([...(ed.jugadores ?? []), ...Object.keys(ed.clubes ?? {})])]).find((x) => x.nombre === nombre);
+  const rango = miElo ? rangoBloque(progresoRango(miElo.elo, miElo.pj), miElo.elo) : '';
   const avance = c.total ? pct(c.jugados.length, c.jugados.length + c.proximos.length) : 0;
   const barra = f ? `<div><div class="flex h-3 rounded-full overflow-hidden bg-black/40 border border-galaxy-border/40" role="img" aria-label="${f.g} ganados, ${f.e} empatados, ${f.p} perdidos"><span class="bg-emerald-400" style="width:${pct(f.g, f.pj)}%"></span><span class="bg-amber-400" style="width:${pct(f.e, f.pj)}%"></span><span class="bg-rose-400" style="width:${pct(f.p, f.pj)}%"></span></div>
       <div class="flex justify-between text-[11px] mt-1.5"><span class="text-emerald-300">${f.g} ganados</span><span class="text-amber-300">${f.e} empates</span><span class="text-rose-300">${f.p} perdidos</span></div></div>` : '';
@@ -65,7 +69,7 @@ function seccionEdicion(liga, ed, nombre) {
         <span class="shrink-0 grid place-items-center w-14 h-14 rounded-2xl border border-galaxy-400/40 bg-black/40 shadow-[0_0_18px_rgba(0,229,255,.2)]">${escudoHTML(c.club, 40)}</span>
         <div class="min-w-0"><span class="text-[10px] font-display font-bold text-galaxy-400 uppercase tracking-widest">${escapeHTML(liga.titulo.join(' '))}</span>
           <h2 class="font-display font-bold text-xl text-white uppercase leading-tight">${escapeHTML(ed.nombre)}</h2>
-          ${c.club ? `<p class="text-sm text-gray-300 uppercase">${escapeHTML(c.club)}</p>` : ''}</div></div>
+          ${c.club ? `<p class="text-sm text-gray-300 uppercase">${escapeHTML(c.club)}</p>` : ''}${rango}</div></div>
       <div class="text-right">${ult.length ? `<span class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Racha reciente</span><div class="flex gap-1 justify-end">${ult.map(chip).join('')}</div>` : ''}
         ${FX.compartir && f ? `<button type="button" data-compartir-camp="${escapeHTML(`${liga.id}|${ed.id}`)}" class="btn btn-ghost !px-3 !py-1.5 text-xs mt-2"><i class="fa-solid fa-share-nodes"></i> Compartir mi campaña</button>` : ''}</div>
     </div>

@@ -1,0 +1,62 @@
+---
+// Página «Competiciones»: una tarjeta por liga (estado, sede, organizador, edición en curso, líder) con sus accesos. Todo sale de data/ligas.js + data/ligaResultados.js al compilar.
+import Layout from '../layouts/Layout.astro';
+import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
+import { EDICIONES } from '../data/ligaResultados.js';
+import { calcularTabla } from '../js/core/tabla.js';
+import { estadoLiga } from '../js/core/pulso.js';
+const base = import.meta.env.BASE_URL;
+// Dónde está la ficha de divisiones/ascensos de cada liga (cada una tiene su propio sistema).
+const DIVISIONES = { galaxy: 'temporada/', sudario: 'sudario-divisiones/' };
+const tarjetas = LIGAS.map((l) => {
+  const ed = (EDICIONES[l.id] ?? []).find((e) => e.estado === 'en_curso') ?? (EDICIONES[l.id] ?? [])[0] ?? null;
+  const tabla = ed ? calcularTabla(ed.fechas.flatMap((f) => f.partidos)).tabla : [];
+  const est = ed ? estadoLiga(ed.fechas) : null;
+  const chips = [
+    l.sede && ['fa-location-dot', `Sede: ${l.sede}`], l.organizador && ['fa-user-tie', `Organiza: ${l.organizador}`], ed && ['fa-calendar-day', ed.nombre],
+    ed?.jugadores?.length && ['fa-users', `${ed.jugadores.length} jugadores`],
+    est && est.estado === 'en_juego' && ['fa-futbol', `Fecha ${est.actual} en juego`], est && est.estado === 'por_empezar' && ['fa-hourglass-start', 'Por empezar'],
+    tabla[0] && est?.jugados ? ['fa-crown', `Líder: ${tabla[0].nombre} · ${tabla[0].pts} pts`] : null,
+  ].filter(Boolean);
+  return { l, est, chips };
+});
+---
+<Layout title="Competiciones" active="competiciones" description="Las competiciones de Phoenix Evolution Series: ligas activas, sedes, organizadores y accesos a cada una.">
+  <header class="relative overflow-hidden border-b border-galaxy-border/40">
+    <div class="absolute inset-0 bg-gradient-to-b from-galaxy-900/70 to-transparent"></div>
+    <div class="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-14 text-center space-y-3">
+      <span class="liga-sello">Todas las ligas</span>
+      <h1 class="text-4xl sm:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">Compe<span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">ticiones</span></h1>
+      <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto">Elige una liga para ver su tabla, sus partidos y cómo se juega.</p>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-20 grid gap-5 md:grid-cols-2">
+    {tarjetas.map(({ l, chips }) => (
+      <article class="liga-card relative overflow-hidden rounded-2xl border border-galaxy-border/60 min-h-[300px] flex flex-col" data-liga-tema={l.id}>
+        <img src={l.imagen} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-screen" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-galaxy-900/80 to-black/30"></div>
+        <div class="relative z-10 p-5 sm:p-6 flex flex-col gap-3 flex-1 justify-end">
+          <span class:list={['liga-sello self-start', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
+          <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase leading-none"><i class={`fa-solid ${l.icono} text-galaxy-400 mr-2 text-2xl`}></i>{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span></h2>
+          <p class="text-xs font-display tracking-[0.2em] text-gray-300 uppercase">{l.juego}</p>
+          {l.descripcion && <p class="text-sm text-gray-300 leading-relaxed">{l.descripcion}</p>}
+          <ul class="flex flex-wrap gap-1.5">{chips.map(([i, t]) => (<li class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-100 rounded-full border border-galaxy-400/30 bg-black/40 px-2.5 py-1"><i class={`fa-solid ${i} text-galaxy-400`}></i>{t}</li>))}</ul>
+          <div class="flex flex-wrap gap-2 pt-1">
+            <a href={`${base}liga/#liga-${l.id}`} class="btn btn-primary !py-1.5 text-xs"><i class="fa-solid fa-table-list"></i> Tabla y fechas</a>
+            <a href={`${base}historial/?liga=${l.id}`} class="btn btn-ghost !py-1.5 text-xs"><i class="fa-solid fa-clock-rotate-left"></i> Historial</a>
+            {DIVISIONES[l.id] && <a href={`${base}${DIVISIONES[l.id]}`} class="btn btn-ghost !py-1.5 text-xs"><i class="fa-solid fa-layer-group"></i> Divisiones</a>}
+            {l.copafacil && <a href={l.copafacil} target="_blank" rel="noopener noreferrer" class="btn btn-ghost !py-1.5 text-xs"><i class="fa-solid fa-arrow-up-right-from-square"></i> CopaFácil</a>}
+          </div>
+        </div>
+      </article>
+    ))}
+    <article class="rounded-2xl border border-dashed border-galaxy-border/70 bg-black/20 p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[300px]">
+      <span class="liga-sello liga-sello-prox">Próximamente</span>
+      <i class="fa-solid fa-trophy text-3xl text-galaxy-400/70 mt-2"></i>
+      <h2 class="font-display font-bold text-xl text-white uppercase tracking-wider">Más competiciones</h2>
+      <p class="text-sm text-gray-400 max-w-xs">Nuevas ligas y copas se anuncian primero en el Discord de la comunidad.</p>
+      <a href={`${base}unirme/`} class="btn btn-ghost !py-1.5 text-xs mt-1"><i class="fa-solid fa-door-open"></i> Cómo unirme</a>
+    </article>
+  </div>
+</Layout>

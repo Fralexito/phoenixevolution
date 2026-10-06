@@ -11,6 +11,7 @@ const SINONIMOS = {
   noticias: 'novedades prensa articulos', clanes: 'equipo grupo tag', ranking: 'mejores top temporada retos semanales', amigos: 'solicitudes seguir bloquear',
   mensajes: 'chat privado grupos dm', buscar: 'encontrar personas publicaciones', tienda: 'tokens comprar cosmeticos marcos titulos xp nivel',
   logros: 'medallas insignias', guardados: 'favoritos marcadores', ajustes: 'configuracion preferencias tema zoom', muro: 'perfil publicaciones', perfil: 'cuenta avatar foto',
+  competiciones: 'ligas modos copas divisiones', historial: 'partidos resultados pasados archivo goles', unirme: 'entrar registrarme empezar guia parsec',
   moderacion: 'reportes sanciones staff', auditoria: 'registro cambios staff',
 };
 

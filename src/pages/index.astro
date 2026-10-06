@@ -44,6 +44,15 @@ const base = import.meta.env.BASE_URL;
     <!-- 0. ESTADO DE LA LIGA: franja compacta («en juego · fecha · avance»). La pinta js/pages/central.js con los datos reales de la edición en curso. -->
     <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
 
+    <!-- 0b. SALTO RÁPIDO entre secciones (pegajosa bajo la cabecera). Las minisecciones plegadas se abren al saltar a ellas (js/pages/central.js). -->
+    <nav class="anclas" aria-label="Saltar a una sección">
+      <a href="#central-partidos"><i class="fa-solid fa-futbol"></i>Partidos</a>
+      <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
+      <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Rankings</a>
+      <a href="#destacados-seccion"><i class="fa-solid fa-id-card"></i>Jugadores</a>
+      <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>
+    </nav>
+
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
     {LIGAS.filter((l) => l.enCentral !== false).length > 1 && (
       <section aria-label="Competiciones" class="space-y-3">
@@ -88,7 +97,7 @@ const base = import.meta.env.BASE_URL;
       </section>
 
       <aside class="space-y-5">
-        <section class="glass-panel rounded-xl overflow-hidden">
+        <section id="pos-seccion" class="glass-panel rounded-xl overflow-hidden scroll-mt-40">
           <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
             <div><h3 id="pos-titulo" class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><p id="pos-sub" hidden class="text-[10px] text-gray-400"></p></div><i class="fa-solid fa-trophy text-galaxy-400"></i>
           </div>
@@ -107,7 +116,7 @@ const base = import.meta.env.BASE_URL;
     </div>
 
     <!-- 3b. RANKINGS DE LA LIGA (plegado: ELO y clubes más usados). Los pinta js/pages/central.js. -->
-    <Plegable titulo="Rankings de la liga" icono="fa-ranking-star" resumen="ELO y clubes más usados · toca para ver" id="rank-liga">
+    <Plegable titulo="Rankings de la liga" icono="fa-ranking-star" resumen="ELO con rangos, clubes y goleadores · toca para ver" id="rank-liga" clase="scroll-mt-40">
       <div class="grid gap-6 md:grid-cols-2">
         <div>
           <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Ranking ELO</h3>
@@ -119,11 +128,15 @@ const base = import.meta.env.BASE_URL;
           <p class="text-[11px] text-gray-500 mb-2">Partidos jugados por club en la edición en curso.</p>
           <div id="clubes-lista" class="text-sm"></div>
         </div>
+        <div id="goleadores-bloque" hidden class="grid gap-6 md:grid-cols-2 md:col-span-2 border-t border-galaxy-border/40 pt-5">
+          <div><h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Goleadores</h3><p class="text-[11px] text-gray-500 mb-2">Según el detalle cargado por el staff (sin autogoles).</p><div id="goleadores-lista" class="text-sm"></div></div>
+          <div><h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Asistentes</h3><p class="text-[11px] text-gray-500 mb-2">Pases de gol registrados.</p><div id="asistentes-lista" class="text-sm"></div></div>
+        </div>
       </div>
     </Plegable>
 
     <!-- 4. JUGADORES DESTACADOS: en celular, carrusel que se desliza de lado -->
-    <section class="space-y-4">
+    <section id="destacados-seccion" class="space-y-4 scroll-mt-40">
       <div class="flex items-center justify-between">
         <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
         <a href={`${base}database/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1.5 border border-galaxy-400/30 bg-galaxy-400/10 px-3 py-1.5 rounded hover:bg-galaxy-400/20 transition-colors">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
@@ -132,7 +145,7 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <!-- 5. HIGHLIGHTS: video principal grande + lista de clips al costado (en celular, debajo) -->
-    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver">
+    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver" id="highlights" clase="scroll-mt-40">
       <p class="mb-3 text-right"><a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase inline-flex items-center gap-1.5"><i class="fa-brands fa-youtube"></i> Ver canal</a></p>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden relative aspect-video w-full flex items-center justify-center group shadow-[0_0_35px_rgba(128,0,255,0.25)]">

@@ -750,3 +750,31 @@ html[data-tema='sudario'] .estado-liga { background: linear-gradient(90deg, rgb(
 .liga-flota .liga-sel { background: rgb(0 0 0 / .45); backdrop-filter: blur(6px); }
 @media (min-width: 640px) { .liga-flota { padding: 1.25rem 2rem 0; } }
 @media (min-width: 1024px) { .liga-flota { padding-left: 3rem; padding-right: 3rem; } }
+
+/* ===== RANGOS por ELO, estados especiales de partido (ronda 173) ===== */
+.rango-chip { display: inline-flex; align-items: center; gap: .3rem; font: 700 .6rem var(--font-display); letter-spacing: .12em; text-transform: uppercase; padding: .1rem .5rem; border-radius: 9999px; color: var(--rc); border: 1px solid color-mix(in srgb, var(--rc) 55%, transparent); background: color-mix(in srgb, var(--rc) 12%, transparent); white-space: nowrap; }
+.rango-bloque { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; margin-top: .45rem; }
+.rango-elo { font-size: .7rem; color: #9ca3af; } .rango-elo b { color: #fff; font-family: var(--font-display); }
+.rango-barra { flex: 1 1 5rem; min-width: 4.5rem; max-width: 9rem; height: .3rem; border-radius: 9999px; background: rgb(255 255 255 / .1); overflow: hidden; }
+.rango-barra > i { display: block; height: 100%; background: var(--rc); border-radius: inherit; }
+.rango-meta { font-size: .65rem; color: #9ca3af; }
+.sello-partido.aplazado { color: #fbbf24; border-color: rgb(251 191 36 / .4); background: rgb(251 191 36 / .08); }
+.sello-partido.wo { color: #f472b6; border-color: rgb(244 114 182 / .4); background: rgb(244 114 182 / .08); }
+.sello-partido.incidencia { color: #fb923c; border-color: rgb(251 146 60 / .45); background: rgb(251 146 60 / .1); }
+
+/* Barra de anclas de Central (pegajosa bajo la cabecera). En celular se desliza de lado. */
+.anclas { position: sticky; top: 6.1rem; z-index: 30; display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; padding: .35rem; border-radius: 9999px; background: rgb(3 1 15 / .78); backdrop-filter: blur(10px); border: 1px solid var(--color-galaxy-border); }
+.anclas::-webkit-scrollbar { display: none; }
+.anclas a { flex: none; display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .85rem; border-radius: 9999px; font: 700 .68rem var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; border: 1px solid transparent; transition: color .2s, background .2s, border-color .2s; }
+.anclas a:hover { color: #fff; }
+.anclas a[aria-current='true'] { color: #fff; background: rgb(0 229 255 / .16); border-color: rgb(0 229 255 / .4); }
+.anclas a[aria-current='true'] i { color: var(--color-galaxy-400); }
+html[data-tema='sudario'] .anclas a[aria-current='true'] { background: rgb(245 197 66 / .14); border-color: rgb(245 197 66 / .5); }
+@media (min-width: 640px) { .anclas { top: 7rem; justify-content: center; width: fit-content; margin-inline: auto; } }
+
+/* Tarjetas de «Competiciones»: cada liga lleva su propia paleta aunque la página no tenga el tema puesto (Sudario = azul y dorado). */
+[data-liga-tema='sudario'] {
+  --color-galaxy-400: #f5c542; --color-galaxy-500: #e0a82e; --color-galaxy-600: #1d4ed8; --color-galaxy-700: #1e40af;
+  --color-galaxy-900: #081c4a; --color-galaxy-border: #1e3a8a;
+}
+[data-liga-tema='sudario'] .liga-sello { background: rgb(245 197 66 / .12); border-color: rgb(245 197 66 / .4); }

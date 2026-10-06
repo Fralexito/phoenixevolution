@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { estadoLiga, selloPartido, factorGoles, calcularElo, clubesMasUsados, indiceLiga, buscarEnLiga } from '../src/js/core/pulso.js';
+import { estadoLiga, selloPartido, rangoElo, progresoRango, RANGOS, factorGoles, calcularElo, clubesMasUsados, indiceLiga, buscarEnLiga } from '../src/js/core/pulso.js';
 import { EDICIONES } from '../src/data/ligaResultados.js';
 import { LIGAS } from '../src/data/ligas.js';
 
@@ -72,4 +72,68 @@ test('pulso: búsqueda dentro de la liga', () => {
   assert.ok(buscarEnLiga('fecha 8', idx).some((e) => e.label === 'Fecha 8'));
   assert.deepEqual(buscarEnLiga('', idx), []); assert.deepEqual(buscarEnLiga('zzzzzz', idx), []);
   assert.deepEqual(indiceLiga(null, null), []);
+});
+
+test('pulso: estados especiales de partido', () => {
+  assert.equal(selloPartido({ l: 'A', v: 'B', gl: null, gv: null, estado: 'aplazado' }), 'aplazado');
+  assert.equal(selloPartido({ l: 'A', v: 'B', gl: 3, gv: 0, estado: 'wo' }), 'wo');
+  assert.equal(selloPartido({ l: 'A', v: 'B', gl: 1, gv: 1, estado: 'incidencia' }), 'incidencia');
+  // un estado que contradice los datos se ignora
+  assert.equal(selloPartido({ l: 'A', v: 'B', gl: 2, gv: 1, estado: 'aplazado' }), 'oficial');
+  assert.equal(selloPartido({ l: 'A', v: 'B', gl: null, gv: null, estado: 'wo' }), 'pendiente');
+  assert.equal(selloPartido({ l: 'A', v: 'B', gl: 2, gv: 1, estado: 'inventado' }), 'oficial');
+  const e = estadoLiga([{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }, { l: 'C', v: 'D', gl: null, gv: null, estado: 'aplazado' }] }]);
+  assert.equal(e.aplazados, 1); assert.equal(e.jugados, 1); assert.equal(e.estado, 'en_juego');
+});
+
+test('pulso: rangos por ELO', () => {
+  assert.equal(rangoElo(1000).id, 'plata'); assert.equal(rangoElo(924).id, 'bronce'); assert.equal(rangoElo(925).id, 'plata');
+  assert.equal(rangoElo(1025).id, 'oro'); assert.equal(rangoElo(1100).id, 'platino'); assert.equal(rangoElo(1175).id, 'diamante'); assert.equal(rangoElo(2000).id, 'diamante');
+  assert.equal(rangoElo(1200, 0), null); assert.equal(rangoElo(NaN), null);
+  assert.deepEqual(RANGOS.map((r) => r.id), ['bronce', 'plata', 'oro', 'platino', 'diamante']);
+  const p = progresoRango(1000); assert.equal(p.siguiente.id, 'oro'); assert.equal(p.faltan, 25); assert.equal(p.pct, 75);   // (1000−925)/(1025−925)
+  assert.equal(progresoRango(1300).siguiente, null); assert.equal(progresoRango(1300).pct, 100);
+  assert.equal(progresoRango(800).siguiente.id, 'plata'); assert.ok(progresoRango(800).pct >= 0);
+  assert.equal(progresoRango(900, 0), null);
+});
+
+import { aplanarPartidos, filtrarPartidos, paginar, leerFiltros } from '../src/js/core/partidosGlobal.js';
+test('historial global: aplanar, filtrar, paginar', () => {
+  const lista = aplanarPartidos(LIGAS, EDICIONES);
+  assert.ok(lista.length > 60);
+  assert.ok(lista.every((m) => m.liga && m.edicion && Number.isInteger(m.fecha) && typeof m.jugado === 'boolean'));
+  for (let i = 1; i < lista.length; i++) assert.ok(lista[i - 1].fecha >= lista[i].fecha, 'más reciente primero');
+  assert.equal(new Set(lista.map((m) => m.clave)).size, lista.length, 'claves únicas');
+  const g = filtrarPartidos(lista, { liga: 'galaxy', estado: 'jugados' }); assert.ok(g.length && g.every((m) => m.liga === 'galaxy' && m.jugado));
+  const h = filtrarPartidos(lista, { liga: 'galaxy', q: 'HUGO arsenal' }); assert.ok(h.length && h.every((m) => m.l === 'Hugo' || m.v === 'Hugo'));
+  assert.ok(filtrarPartidos(lista, { q: 'fecha 8' }).every((m) => m.fecha === 8));
+  assert.ok(filtrarPartidos(lista, { estado: 'pendientes' }).every((m) => m.sello === 'pendiente'));
+  assert.deepEqual(filtrarPartidos(lista, { q: 'zzzzzzz' }), []); assert.deepEqual(filtrarPartidos(null), []);
+  const p = paginar(lista, 2, 10); assert.equal(p.items.length, 10); assert.equal(p.pagina, 2); assert.equal(p.paginas, Math.ceil(lista.length / 10));
+  assert.equal(paginar(lista, 9999, 10).pagina, p.paginas); assert.equal(paginar(lista, -3, 10).pagina, 1); assert.equal(paginar([], 1).paginas, 1);
+  const f = leerFiltros('?liga=galaxy&estado=raro&q=hugo&p=3', ['galaxy', 'sudario']);
+  assert.deepEqual(f, { liga: 'galaxy', estado: 'jugados', q: 'hugo', pagina: 3 });
+  assert.equal(leerFiltros('?liga=xx', ['galaxy']).liga, ''); assert.equal(leerFiltros('', []).pagina, 1);
+  const esp = aplanarPartidos([{ id: 'x', titulo: ['X'] }], { x: [{ id: 'e', nombre: 'E', clubes: {}, fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: null, gv: null, estado: 'aplazado' }, { l: 'C', v: 'D', gl: 3, gv: 0, estado: 'wo' }] }] }] });
+  assert.deepEqual(esp.map((m) => [m.sello, m.jugado]), [['aplazado', false], ['wo', true]]);
+});
+
+import { validarGol, ordenarGoles, marcadorDeGoles, revisarMarcador, topGoleadores, topAsistentes } from '../src/js/core/golesPartido.js';
+test('goles del partido: validar, ordenar, revisar y rankings', () => {
+  const ok = validarGol({ lado: 'l', goleador: '  Hugo  ', minuto: '23', asistente: ' Fralex ', tipo: 'gol' });
+  assert.deepEqual(ok, { ok: true, errores: [], gol: { lado: 'l', goleador: 'Hugo', minuto: 23, asistente: 'Fralex', tipo: 'gol' } });
+  assert.equal(validarGol({ lado: 'v', goleador: 'A', minuto: 0 }).gol.tipo, 'gol');
+  assert.equal(validarGol({ lado: 'v', goleador: 'A', minuto: 130 }).ok, true);
+  for (const mal of [{ goleador: 'A', minuto: 5 }, { lado: 'l', goleador: '', minuto: 5 }, { lado: 'l', goleador: 'A', minuto: 131 }, { lado: 'l', goleador: 'A', minuto: -1 }, { lado: 'l', goleador: 'A', minuto: 'x' }, { lado: 'l', goleador: 'A', minuto: 4.5 },
+    { lado: 'l', goleador: '<b>', minuto: 5 }, { lado: 'l', goleador: 'A', minuto: 5, asistente: 'a' }, { lado: 'l', goleador: 'A', minuto: 5, tipo: 'penal', asistente: 'B' }, { lado: 'l', goleador: 'A'.repeat(61), minuto: 5 }]) assert.equal(validarGol(mal).ok, false, JSON.stringify(mal));
+  assert.equal(validarGol({ lado: 'l', goleador: 'A', minuto: 5, tipo: 'raro' }).gol.tipo, 'gol');
+  const gs = [{ lado: 'v', goleador: 'B', minuto: 70 }, { lado: 'l', goleador: 'A', minuto: 10, asistente: 'C' }, { lado: 'l', goleador: 'A', minuto: 70, tipo: 'penal' }, { lado: 'l', goleador: 'X', minuto: 80, tipo: 'en_contra' }];
+  assert.deepEqual(ordenarGoles(gs).map((g) => g.minuto), [10, 70, 70, 80]); assert.equal(gs[0].minuto, 70);
+  assert.deepEqual(marcadorDeGoles(gs), { l: 3, v: 1 });
+  assert.equal(revisarMarcador(gs, { gl: 3, gv: 1 }).estado, 'completo');
+  assert.equal(revisarMarcador(gs, { gl: 4, gv: 1 }).estado, 'faltan'); assert.equal(revisarMarcador(gs, { gl: 2, gv: 1 }).estado, 'sobran');
+  assert.equal(revisarMarcador(gs, { gl: 4, gv: 0 }).estado, 'sobran');
+  assert.equal(revisarMarcador([], { gl: 1, gv: 0 }).estado, 'sin_detalle'); assert.equal(revisarMarcador(gs, { gl: null, gv: null }).estado, 'sin_marcador'); assert.equal(revisarMarcador(null, null).estado, 'sin_marcador');
+  assert.deepEqual(topGoleadores(gs), [{ nombre: 'A', total: 2 }, { nombre: 'B', total: 1 }]);   // el autogol de X no cuenta
+  assert.deepEqual(topAsistentes(gs), [{ nombre: 'C', total: 1 }]); assert.deepEqual(topGoleadores(null), []);
 });
