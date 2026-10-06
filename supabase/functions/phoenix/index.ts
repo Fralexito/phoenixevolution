@@ -6,7 +6,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   CONFIG, ErrorApi, cuerpoError, compararVersion, v, ESTADOS_LATIDO, VISIBILIDADES_APP,
-  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe,
+  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido,
 } from "./_lib/nucleo.js";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
@@ -384,6 +384,75 @@ async function eventos(req: Request) {
   return { aceptados, duplicados: validos.length - aceptados, rechazados };
 }
 
+/** Semáforo con los umbrales de unas reglas (la regla vive en la BD: private.semaforo). */
+async function semaforoDe(reglas: unknown, ping: number | null, jitter: number | null, perdida: number | null) {
+  const { data, error } = await sb.rpc("sistema_semaforo", { p_reglas: reglas ?? null, p_ping: ping, p_jitter: jitter, p_perdida: perdida });
+  db(error, "semaforo");
+  return data as { semaforo: string; umbrales: Record<string, number> };
+}
+
+/** Eco para el pre-chequeo del navegador: respuesta mínima y SIN tocar la BD (cuanto menos trabajo, más honesta la medición). */
+function eco(req: Request) {
+  // Freno: es público y cada llamada gasta cuota de Edge Functions (plan FREE). Un pre-chequeo hace ~14 llamadas.
+  frenar(`eco:${req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?"}`, 60, 60_000);
+  return { t: Date.now() };
+}
+
+/** Autodiagnóstico del host (la app, antes de abrir sala): red del host contra servidores de referencia. */
+async function diagnostico(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  const f = {
+    latencia_ms: v.numero(b.latencia_ms, "latencia_ms", { max: 10000, opcional: false }),
+    jitter_ms: v.numero(b.jitter_ms, "jitter_ms", { max: 5000 }),
+    perdida_pct: v.numero(b.perdida_pct, "perdida_pct", { max: 100 }),
+    subida_kbps: v.entero(b.subida_kbps, "subida_kbps", { max: 10_000_000, opcional: false }),
+    bajada_kbps: v.entero(b.bajada_kbps, "bajada_kbps", { max: 10_000_000 }),
+    muestras: v.entero(b.muestras, "muestras", { min: 1, max: 1000 }),
+    duracion_seg: v.entero(b.duracion_seg, "duracion_seg", { min: 1, max: 600 }),
+    referencia: v.texto(b.referencia, "referencia", { max: 80 }),
+  };
+  const jugadores = v.entero(b.jugadores_esperados, "jugadores_esperados", { min: 1, max: 8 }) ?? 2;
+  const salaId = b.sala_id === undefined || b.sala_id === null ? null : v.uuid(b.sala_id, "sala_id");
+  let reglas: unknown = null;
+  if (salaId) reglas = (await salaPropia(d, salaId)).reglas;
+  else reglas = (await perfilGlobal("amistoso")).reglas;
+  const sem = await semaforoDe(reglas, f.latencia_ms, f.jitter_ms, f.perdida_pct);
+  const sugerencias = sugerenciasHost(f.subida_kbps!, jugadores);
+  const { data, error } = await sb.from("pruebas_conexion").insert({
+    tipo: "autodiagnostico_host", usuario: d.usuario, host: d.usuario, sala_id: salaId, dispositivo: d.id, ...f, semaforo: sem.semaforo,
+    detalles: { jugadores_esperados: jugadores, sugerencias },
+  }).select("id").single();
+  db(error, "diagnostico");
+  return { id: data!.id, semaforo: sem.semaforo, umbrales: sem.umbrales, sugerencias };
+}
+
+/** Prueba real en sala: la app mide al jugador conectado por Parsec (~10 s) y la manda. El jugador la ve en vivo en la web. */
+async function pruebaSala(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  const sala = await salaPropia(d, v.uuid(b.sala_id, "sala_id"));
+  if (!VIVAS.includes(sala.estado)) throw new ErrorApi("SALA_CERRADA");
+  const parsec = v.parsecId(b.parsec_id, "parsec_id");
+  const f = {
+    latencia_ms: v.numero(b.latencia_ms, "latencia_ms", { max: 10000, opcional: false }),
+    p95_ms: v.numero(b.p95_ms, "p95_ms", { max: 10000 }),
+    jitter_ms: v.numero(b.jitter_ms, "jitter_ms", { max: 5000 }),
+    perdida_pct: v.numero(b.perdida_pct, "perdida_pct", { max: 100 }),
+    bitrate_kbps: v.entero(b.bitrate_kbps, "bitrate_kbps", { max: 1_000_000 }),
+    muestras: v.entero(b.muestras, "muestras", { min: 1, max: 1000 }),
+    duracion_seg: v.entero(b.duracion_seg, "duracion_seg", { min: 1, max: 600 }),
+  };
+  const quien = await usuariosPorParsec([parsec]);
+  const usuario = quien.get(parsec) ?? null;
+  const sem = await semaforoDe(sala.reglas, f.latencia_ms, f.jitter_ms, f.perdida_pct);
+  const retraso = retrasoSugerido(f.latencia_ms!, Number((sala.reglas as { retraso_host_ms?: number })?.retraso_host_ms ?? 0));
+  const { data, error } = await sb.from("pruebas_conexion").insert({
+    tipo: "prueba_sala", usuario, host: sala.host, sala_id: sala.id, dispositivo: d.id, actor_parsec: parsec, ...f, semaforo: sem.semaforo,
+    referencia: "parsec", detalles: { retraso },
+  }).select("id").single();
+  db(error, "prueba_sala");
+  return { id: data!.id, usuario_id: usuario, semaforo: sem.semaforo, umbrales: sem.umbrales, retraso };
+}
+
 /** Instalador: código de un solo uso → URL firmada temporal del ZIP del código fuente (bucket privado). Sin token. */
 async function instalar(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?";
@@ -440,19 +509,26 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/eventos": { metodo: "POST", fn: eventos },
   "/v1/config": { metodo: "GET", fn: config },
   "/v1/instalar": { metodo: "POST", fn: instalar },
+  "/v1/eco": { metodo: "GET", fn: eco },
+  "/v1/diagnostico": { metodo: "POST", fn: diagnostico },
+  "/v1/sala/prueba": { metodo: "POST", fn: pruebaSala },
 };
 
 Deno.serve(async (req) => {
   const solicitudId = crypto.randomUUID();
-  const cab = { "content-type": "application/json; charset=utf-8", "x-request-id": solicitudId, "cache-control": "no-store" };
   const ruta = new URL(req.url).pathname.replace(/^.*?\/phoenix(?=\/)/, "").replace(/\/+$/, "");
+  // Solo /v1/eco se llama desde navegadores: CORS abierto + Timing-Allow-Origin (para medir con Resource Timing) y sin logs por petición.
+  const navegador = ruta === "/v1/eco";
+  const cab: Record<string, string> = { "content-type": "application/json; charset=utf-8", "x-request-id": solicitudId, "cache-control": "no-store",
+    ...(navegador ? { "access-control-allow-origin": "*", "timing-allow-origin": "*", "access-control-allow-methods": "GET, OPTIONS" } : {}) };
+  if (navegador && req.method === "OPTIONS") return new Response(null, { status: 204, headers: cab });
   const t0 = Date.now();
   try {
     const r = RUTAS[ruta];
     if (!r) throw new ErrorApi("RUTA_NO_EXISTE");
     if (req.method !== r.metodo) throw new ErrorApi("METODO_NO_PERMITIDO");
     const datos = await r.fn(req);
-    log("info", "ok", { ruta, ms: Date.now() - t0, solicitudId });
+    if (!navegador) log("info", "ok", { ruta, ms: Date.now() - t0, solicitudId });
     return new Response(JSON.stringify({ ok: true, ...(datos as object), solicitud_id: solicitudId }), { status: 200, headers: cab });
   } catch (err) {
     const e = err instanceof ErrorApi ? err : new ErrorApi("ERROR_INTERNO");

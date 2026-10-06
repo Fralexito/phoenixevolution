@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.2.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.3.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.3.0 (compatibles, requieren migración 061):** rutas `POST /v1/diagnostico` (autodiagnóstico del host), `POST /v1/sala/prueba` (prueba real en sala) y `GET /v1/eco` (solo navegador); campo `semaforo` en las reglas (sección 12); `retraso_host_ms` pasa a significar **retraso máximo permitido**.
 
 **Cambios 1.2.0 (compatibles hacia atrás, requieren migración 060):** ruta nueva `POST /v1/instalar` (instalador); `sala/abrir` acepta `modo` y `torneo_privado_id` y devuelve `modo`, `reglas`, `marca`; `latido` devuelve `modo` y `reglas` (pueden cambiar en caliente); `config` devuelve `perfiles` y `organizaciones`; 7 errores nuevos (sección 7). Sin `modo`, todo funciona como antes (amistoso).
 
@@ -293,7 +295,7 @@ Respuesta:
 |---|---|---|---|---|
 | `host` | `cualquier_verificado` \| `hosts_organizacion` \| `neutral` | cualquier_verificado | hosts_organizacion | neutral |
 | `modo_competitivo` (Puppet + HidHide) | `opcional` \| `obligatorio` \| `desactivado` \| `no_aplica` | opcional | opcional (lo cambia el organizador) | no_aplica |
-| `retraso_host_ms` | 0–500 | 0 | 0 (configurable) | 0 |
+| `retraso_host_ms` | 0–500: **máximo** retraso al host que el perfil permite aplicar (0 = no se aplica) | 0 | 0 (configurable) | 0 |
 | `deteccion_partido` (inicio/fin) | `opcional` \| `activa` \| `obligatoria` | opcional | activa | obligatoria |
 | `captura` | bool | false | true | true |
 | `verificacion_parche` | `aviso` \| `lista` \| `huella_oficial` | aviso | lista | huella_oficial |
@@ -304,7 +306,52 @@ Respuesta:
 | `anti_trampa` | `registro` \| `alertas_organizador` \| `alertas_staff` | registro | alertas_organizador | alertas_staff |
 | `marca` | `phoenix` \| `organizacion` \| `liga` | phoenix | organizacion | liga |
 | `notificaciones` | `host` \| `organizador` \| `automaticas` | host | organizador | automaticas |
+| `semaforo` (opcional) | objeto con `ping_verde_ms`, `ping_ambar_ms`, `jitter_verde_ms`, `jitter_ambar_ms`, `perdida_verde_pct`, `perdida_ambar_pct` | 60 / 100 · 10 / 25 · 1 / 3 | 50 / 90 · 8 / 20 · 0,5 / 2 | 40 / 80 · 6 / 15 · 0,5 / 1,5 |
 
 - Los valores de la tabla son los **por defecto**; el staff de Phoenix puede editar los globales y cada organización crea sus propios perfiles de torneo (nunca puede usar `neutral` ni `alertas_staff`, y su `marca`/`notificaciones` quedan fijas en `organizacion`/`organizador`).
 - Campos desconocidos: ignorarlos (se podrán añadir campos sin subir versión mayor).
 - `pausas = libres` → `pausas_max`/`pausa_max_seg` no aplican (vienen en 0).
+
+## 13. Semáforo de conexión (regla única)
+Cada métrica presente se compara con su par de umbrales del perfil: `≤ verde` → verde, `≤ ámbar` → ámbar, `> ámbar` → rojo. **Manda la peor.** Sin ninguna métrica → `sin_datos`. Si el perfil no trae `semaforo`, se usan 60/100 ms, 10/25 ms, 1/3 %. La regla vive en la base (`private.semaforo`); la app no la recalcula: muestra el `semaforo` que devuelve el servidor. En rojo, Glass debe proponer otro host (o uno neutral).
+
+## 14. `POST /v1/diagnostico` (token) — autodiagnóstico del host
+Antes de abrir sala (y cuando el host lo pida). La app mide contra sus servidores de referencia.
+```json
+{ "latencia_ms": 18.5, "jitter_ms": 2.1, "perdida_pct": 0, "subida_kbps": 30000, "bajada_kbps": 200000,
+  "muestras": 20, "duracion_seg": 15, "referencia": "speedtest:lima-1", "jugadores_esperados": 2, "sala_id": null }
+```
+| Campo | Obligatorio | Regla |
+|---|---|---|
+| `latencia_ms` | sí | número 0–10000 (mediana) |
+| `subida_kbps` | sí | entero 0–10 000 000 |
+| `jitter_ms`, `perdida_pct`, `bajada_kbps`, `muestras`, `duracion_seg`, `referencia` (≤ 80) | no | |
+| `jugadores_esperados` | no | 1–8, por defecto 2 |
+| `sala_id` | no | si se manda, el semáforo usa las reglas de esa sala; si no, las de amistoso |
+
+Respuesta:
+```json
+{ "ok": true, "id": 123, "semaforo": "verde", "umbrales": { "ping_verde_ms": 60, "…": "…" },
+  "sugerencias": { "bitrate_total_kbps": 21000, "limite_espectadores": 1, "alcanza_para_jugadores": true } }
+```
+- `sugerencias`: 70 % de la subida (tope 50 000 kbps) como `encoderMaxBitrate` total; ~8 000 kbps por jugador y ~3 000 por espectador. La app las aplica sola salvo que el host las cambie. `alcanza_para_jugadores: false` = avisar al host que su subida no da para una imagen buena.
+
+## 15. `POST /v1/sala/prueba` (token) — prueba real en sala
+Con el jugador conectado por Parsec ~10 s antes del partido. Es la medición **exacta** (camino real host↔jugador).
+```json
+{ "sala_id": "uuid", "parsec_id": "111", "latencia_ms": 42.0, "p95_ms": 55.0, "jitter_ms": 4.2, "perdida_pct": 0.3,
+  "bitrate_kbps": 9000, "muestras": 40, "duracion_seg": 10 }
+```
+`sala_id`, `parsec_id` y `latencia_ms` obligatorios; el resto opcional (mismos rangos que la sección 14).
+
+Respuesta:
+```json
+{ "ok": true, "id": 124, "usuario_id": "uuid o null", "semaforo": "ambar", "umbrales": { "…": "…" },
+  "retraso": { "sugerido_ms": 21, "permitido_ms": 0, "aplicar_ms": 0 } }
+```
+- `retraso.sugerido_ms` = mitad del ping del jugador (tope 250). `aplicar_ms` = mínimo entre lo sugerido y `reglas.retraso_host_ms`: **la app solo aplica `aplicar_ms`**; en amistoso viene 0 (no se aplica).
+- `usuario_id: null` = ese `parsec_id` no está vinculado a ningún perfil (la prueba se guarda igual, sin dueño).
+- El jugador ve el resultado al instante en la web (Realtime). Sala cerrada → `SALA_CERRADA`.
+
+## 16. `GET /v1/eco` (sin token) — solo para navegadores
+Lo usa la web para el pre-chequeo del jugador (≈ 14 llamadas por chequeo, máx. 60/min por IP). Responde `{ "ok": true, "t": 1791313521069, "solicitud_id": "…" }` con CORS abierto y `Timing-Allow-Origin: *`. **La app no lo usa.**

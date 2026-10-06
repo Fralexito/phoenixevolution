@@ -3,7 +3,7 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.2.0',
+  version_api: '1.3.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
   intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300 }),
@@ -96,6 +96,11 @@ export const v = {
   enumerado(x, campo, opciones, { opcional = true } = {}) {
     if (x === undefined || x === null) { if (opcional) return null; falla(campo, `${campo} es obligatorio.`); }
     if (!opciones.includes(x)) falla(campo, `${campo} debe ser uno de: ${opciones.join(', ')}.`);
+    return x;
+  },
+  numero(x, campo, { min = 0, max = 1e9, opcional = true } = {}) {
+    if (x === undefined || x === null) { if (opcional) return null; falla(campo, `${campo} es obligatorio.`); }
+    if (typeof x !== 'number' || !Number.isFinite(x) || x < min || x > max) falla(campo, `${campo} debe ser un número entre ${min} y ${max}.`);
     return x;
   },
   booleano(x, campo, porDefecto) {
@@ -250,4 +255,28 @@ export function marcaDe(reglas, org) {
   }
   if (reglas?.marca === 'liga') return { ...phoenix, tipo: 'liga', tema: 'galaxy' };
   return phoenix;
+}
+
+/**
+ * Sugerencias automáticas a partir de la SUBIDA medida del host (autodiagnóstico).
+ * Regla: usar como máximo el 70 % de la subida (margen para picos y para el resto de la casa); cada jugador necesita ~8 Mbps
+ * para buena imagen y cada espectador ~3 Mbps. Son SUGERENCIAS: la app puede ajustarlas y el host decide.
+ */
+export function sugerenciasHost(subidaKbps, jugadores = 2) {
+  if (!Number.isFinite(subidaKbps) || subidaKbps <= 0) return { bitrate_total_kbps: null, limite_espectadores: null, alcanza_para_jugadores: false };
+  const util = Math.floor(subidaKbps * 0.7);
+  const bitrate = Math.min(util, 50000);
+  const sobra = bitrate - jugadores * 8000;
+  return { bitrate_total_kbps: bitrate, limite_espectadores: Math.max(0, Math.min(16, Math.floor(sobra / 3000))), alcanza_para_jugadores: sobra >= 0 };
+}
+
+/**
+ * Retraso al host sugerido para igualar al rival: la mitad de su ida y vuelta (lo que tarda su mando en llegar).
+ * `maximoMs` = reglas.retraso_host_ms (lo que el perfil permite; 0 = no se aplica). Tope absoluto 250 ms.
+ */
+export function retrasoSugerido(latenciaMs, maximoMs = 0) {
+  if (!Number.isFinite(latenciaMs) || latenciaMs <= 0) return { sugerido_ms: 0, permitido_ms: Math.max(0, maximoMs || 0), aplicar_ms: 0 };
+  const sugerido = Math.min(250, Math.round(latenciaMs / 2));
+  const permitido = Math.max(0, Math.min(500, maximoMs || 0));
+  return { sugerido_ms: sugerido, permitido_ms: permitido, aplicar_ms: Math.min(sugerido, permitido) };
 }

@@ -1,7 +1,7 @@
 // Pruebas del núcleo puro de la API /v1 (supabase/functions/phoenix/_lib/nucleo.js). El contrato vive en claude/contrato-v1.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, marcaDe } from '../supabase/functions/phoenix/_lib/nucleo.js';
+import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, marcaDe, sugerenciasHost, retrasoSugerido } from '../supabase/functions/phoenix/_lib/nucleo.js';
 
 test('catálogo de errores: todos con http, reintentable y mensaje', () => {
   for (const [k, e] of Object.entries(ERRORES)) {
@@ -110,4 +110,18 @@ test('marcaDe: organización con su marca, liga con tema, y caída a Phoenix', (
   assert.equal(marcaDe({ marca: 'organizacion' }, null).tipo, 'phoenix');
   assert.equal(marcaDe({ marca: 'liga' }, org).tema, 'galaxy');
   assert.equal(marcaDe(null, null).tipo, 'phoenix');
+});
+
+test('sugerenciasHost: 70 % de la subida, 8 Mbps por jugador, 3 Mbps por espectador', () => {
+  assert.deepEqual(sugerenciasHost(30000, 2), { bitrate_total_kbps: 21000, limite_espectadores: 1, alcanza_para_jugadores: true });
+  assert.deepEqual(sugerenciasHost(100000, 2), { bitrate_total_kbps: 50000, limite_espectadores: 11, alcanza_para_jugadores: true });
+  assert.equal(sugerenciasHost(15000, 2).alcanza_para_jugadores, false);
+  assert.equal(sugerenciasHost(0).bitrate_total_kbps, null);
+});
+
+test('retrasoSugerido: mitad del RTT, recortado por lo que permite el perfil', () => {
+  assert.deepEqual(retrasoSugerido(60, 0), { sugerido_ms: 30, permitido_ms: 0, aplicar_ms: 0 });
+  assert.deepEqual(retrasoSugerido(60, 20), { sugerido_ms: 30, permitido_ms: 20, aplicar_ms: 20 });
+  assert.equal(retrasoSugerido(900, 500).sugerido_ms, 250);
+  assert.equal(retrasoSugerido(null, 50).aplicar_ms, 0);
 });
