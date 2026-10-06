@@ -12,6 +12,8 @@ body {
   overflow-x: hidden;
 }
 ::selection { background: var(--color-galaxy-600); color: #fff; }
+/* Scroll moderno en todo el sitio: fino, oscuro, sin carril blanco. Las propiedades estándar mandan en Chrome/Firefox/Safari recientes; las -webkit- quedan de respaldo. */
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--color-galaxy-600) 70%, transparent) transparent; }
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--color-galaxy-dark); }
 ::-webkit-scrollbar-thumb { background: var(--color-galaxy-600); border-radius: 4px; }

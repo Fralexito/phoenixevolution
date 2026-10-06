@@ -782,11 +782,13 @@ html[data-tema='sudario'] .anclas a[aria-current='true'] { background: rgb(245 1
 /* ===== BARRA LATERAL IZQUIERDA (experimento FX.barraLateral). Solo ≥ 1280 px. Plegada = iconos; se abre con el mouse/teclado o fijada. ===== */
 .barra-lat { display: none; }
 @media (min-width: 1280px) {
-  html[data-fx-barra] .barra-lat:not([hidden]) { display: flex; flex-direction: column; gap: .35rem; position: fixed; left: 0; top: 7rem; bottom: 0; z-index: 35; width: 4rem; padding: .6rem .5rem; overflow: hidden auto; background: linear-gradient(180deg, rgb(10 4 28 / .96), rgb(3 1 15 / .98)); border-right: 1px solid var(--color-galaxy-border); transition: width .22s ease, box-shadow .22s ease; scrollbar-width: thin; }
+  /* Barra flotante (ronda 180): cápsula con bordes redondeados y cristal, sin barra de scroll nativa (el scroll sigue con rueda/touch/teclado; los bordes se difuminan para sugerirlo). */
+  html[data-fx-barra] .barra-lat:not([hidden]) { display: flex; flex-direction: column; gap: .35rem; position: fixed; left: .55rem; top: 7.4rem; bottom: .8rem; z-index: 35; width: 4rem; padding: .7rem .5rem; overflow: hidden auto; background: linear-gradient(180deg, rgb(14 6 38 / .88), rgb(4 2 18 / .92)); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 22%, var(--color-galaxy-border)); border-radius: 1.25rem; box-shadow: 0 10px 30px rgb(0 0 0 / .35); transition: width .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease; scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior: contain; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 .9rem, #000 calc(100% - 1.4rem), transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 .9rem, #000 calc(100% - 1.4rem), transparent 100%); }
+  html[data-fx-barra] .barra-lat::-webkit-scrollbar { display: none; width: 0; height: 0; }
   html[data-fx-barra] .barra-lat:hover, html[data-fx-barra] .barra-lat:focus-within, html[data-fx-barra][data-barra-fijada] .barra-lat { width: 15rem; }
-  html[data-fx-barra]:not([data-barra-fijada]) .barra-lat:hover, html[data-fx-barra]:not([data-barra-fijada]) .barra-lat:focus-within { box-shadow: 8px 0 30px rgb(0 0 0 / .55); }
-  html[data-fx-barra] main, html[data-fx-barra] footer { padding-left: 4rem; }
-  html[data-fx-barra][data-barra-fijada] main, html[data-fx-barra][data-barra-fijada] footer { padding-left: 15rem; }
+  html[data-fx-barra]:not([data-barra-fijada]) .barra-lat:hover, html[data-fx-barra]:not([data-barra-fijada]) .barra-lat:focus-within { box-shadow: 14px 14px 44px rgb(0 0 0 / .6), 0 0 26px color-mix(in srgb, var(--color-galaxy-400) 14%, transparent); }
+  html[data-fx-barra] main, html[data-fx-barra] footer { padding-left: 4.9rem; }
+  html[data-fx-barra][data-barra-fijada] main, html[data-fx-barra][data-barra-fijada] footer { padding-left: 15.9rem; }
 }
 .barra-sec { display: flex; flex-direction: column; gap: .15rem; padding-bottom: .45rem; border-bottom: 1px solid rgb(255 255 255 / .06); }
 .barra-sec[hidden] { display: none; }
