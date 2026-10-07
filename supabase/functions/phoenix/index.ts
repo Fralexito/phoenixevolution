@@ -141,6 +141,23 @@ async function rolesDe(retoId: number | null) {
   });
 }
 
+// Lista de roles de una sala: si tiene reto, la del reto; si no, host = mando 1 y rival (quien aceptó en el radar) = mando 2.
+// En ambos casos se suman los espectadores registrados con «Ver» en la web (pad_limit 0).
+type PersonaSala = { usuario_id: string; nombre: string | null; parsec_id: string | null };
+async function rolesDeSala(salaId: string, retoId: number | null) {
+  const { data, error } = await sb.rpc("sistema_roles_sala", { p_sala: salaId });
+  db(error, "roles.sala");
+  const r = (data ?? {}) as { host?: PersonaSala; rival?: PersonaSala | null; espectadores?: PersonaSala[] };
+  const base = retoId ? await rolesDe(retoId) : {
+    modo: "sala",
+    jugadores: [r.host, r.rival].filter(Boolean).map((p, i) => ({ ...p!, lado: i === 0 ? "A" : "B", mando: i + 1 })),
+    espectadores: [] as Record<string, unknown>[],
+  };
+  const ya = new Set([...base.jugadores, ...base.espectadores].map((x) => (x as { usuario_id: string }).usuario_id));
+  const extra = (r.espectadores ?? []).filter((e) => !ya.has(e.usuario_id)).map((e) => ({ ...e, rol: "espectador", pad_limit: 0 }));
+  return { ...base, espectadores: [...base.espectadores, ...extra] };
+}
+
 type Org = { id: string; nombre: string; logo_url: string | null; color_primario: string; color_secundario: string; al_vencer: string };
 
 /** Perfil global por clave (amistoso / torneo_privado / oficial). */
@@ -263,6 +280,7 @@ async function abrir(req: Request) {
     avisar_amigos_host: v.booleano(b.avisar_amigos_host, "avisar_amigos_host", false),
     avisar_amigos_jugadores: v.booleano(b.avisar_amigos_jugadores, "avisar_amigos_jugadores", false),
     anunciar_discord: v.booleano(b.anunciar_discord, "anunciar_discord", false),
+    acepta_espectadores: v.booleano(b.acepta_espectadores, "acepta_espectadores", true),
   };
   const enlace = v.enlace(b.enlace, "enlace");
   const retoId = v.entero(b.reto_id, "reto_id", { min: 1 });
@@ -308,10 +326,10 @@ async function abrir(req: Request) {
   } catch (err) { log("warn", "avisos_sala", { salaId, mensaje: String((err as Error).message) }); }
   log("info", "sala_abierta", { salaId, dispositivo: d.id, reabierta, retoId, avisos });
   const { cfg } = await cfgVigente();
-  return { sala_id: salaId, reabierta, estado: "abierta", visibilidad: fila.visibilidad, limite_espectadores: fila.limite_espectadores,
+  return { sala_id: salaId, reabierta, estado: "abierta", visibilidad: fila.visibilidad, limite_espectadores: fila.limite_espectadores, acepta_espectadores: fila.acepta_espectadores,
            preferencias: { publicar_en_pagina: fila.publicar_en_pagina, avisar_amigos_host: fila.avisar_amigos_host,
                            avisar_amigos_jugadores: fila.avisar_amigos_jugadores, anunciar_discord: fila.anunciar_discord },
-           avisos, latido_seg: cfg.intervalos.latido_seg, roles: await rolesDe(retoId),
+           avisos, latido_seg: cfg.intervalos.latido_seg, roles: await rolesDeSala(salaId, retoId),
            modo: m.modo, modo_pedido: modoPedido, aviso_modo: m.aviso,
            reglas: { perfil_id: m.perfil.id, nombre: m.perfil.nombre, version: m.perfil.version, ...(m.perfil.reglas as object) },
            marca: marcaDe(m.perfil.reglas, m.org), organizacion_id: m.org?.id ?? null, torneo_privado_id: m.torneo };
@@ -353,7 +371,8 @@ async function latido(req: Request) {
     }
   }
   // modo/reglas pueden cambiar en caliente (p. ej. licencia vencida → amistoso): la app aplica siempre lo último recibido.
-  return { estado, latido_seg: cfg.intervalos.latido_seg, modo: sala.modo, reglas: sala.reglas, servidor_hora: ahora };
+  const roles = await rolesDeSala(sala.id, sala.reto_id);
+  return { estado, latido_seg: cfg.intervalos.latido_seg, modo: sala.modo, reglas: sala.reglas, roles, roles_etag: huellaContenido(roles), servidor_hora: ahora };
 }
 
 async function cerrar(req: Request) {
@@ -455,6 +474,16 @@ async function pruebaSala(req: Request) {
 
 // ── Sondeo barato (ETag) ─────────────────────────────────────────────────────────────────────────────────────────────
 /** Marca de «no cambió nada»: el servidor responde 304 sin cuerpo (la app reutiliza lo que ya tenía). */
+async function soltarRival(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  const sala = await salaPropia(d, v.uuid(b.sala_id, "sala_id"));
+  if (!VIVAS.includes(sala.estado)) throw new ErrorApi("SALA_CERRADA");
+  const { error } = await sb.rpc("sistema_soltar_rival", { p_sala: sala.id });
+  db(error, "soltar_rival");
+  const roles = await rolesDeSala(sala.id, sala.reto_id);
+  return { roles, roles_etag: huellaContenido(roles) };
+}
+
 type NoModificado = { __noModificado: true; etag: string };
 /** Si el ETag del cliente (If-None-Match o ?etag=) coincide → 304. Si no, devuelve los datos con su `etag`. */
 function conEtag(req: Request, datos: Record<string, unknown>, volatiles: string[] = []): Record<string, unknown> | NoModificado {
@@ -570,6 +599,7 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/presencia": { metodo: "POST", fn: presencia },
   "/v1/presencia/amigos": { metodo: "GET", fn: presenciaAmigos },
   "/v1/invitar": { metodo: "POST", fn: invitar },
+  "/v1/sala/soltar_rival": { metodo: "POST", fn: soltarRival },
 };
 
 Deno.serve(async (req) => {

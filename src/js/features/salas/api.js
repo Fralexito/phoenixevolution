@@ -10,7 +10,7 @@ const COLUMNAS_SALA = 'id, host, estado, visibilidad, juego, parche, region, pla
 function fallo(nombre, e) {
   console.error(`[salas] ${nombre}:`, e?.code, e?.message);
   const sinMigracion = e?.code === 'PGRST202' || e?.code === '42P01' || /could not find|schema cache|does not exist/i.test(e?.message ?? '');
-  return new Error(sinMigracion ? 'La base de datos aún no tiene activadas las salas (faltan migraciones 058–063).' : (e?.message || 'No se pudo completar la acción.'));
+  return new Error(sinMigracion ? 'La base de datos aún no tiene activadas las salas (faltan migraciones 058–067).' : (e?.message || 'No se pudo completar la acción.'));
 }
 
 // ── Salas en vivo ────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -39,11 +39,43 @@ export function escucharSalas(alCambiar) {
   return () => { vivo = false; if (canal) supabase.removeChannel(canal); };
 }
 
-/** Enlace para entrar (solo si RLS me deja ENTRAR, no solo ver). null = no tengo permiso o no hay enlace. */
+/** Enlace para entrar: desde 067 solo con rol (host, rival, espectador registrado, invitado, jugador del reto, staff).
+ *  Quien solo «ve» la sala debe usar aceptarSala() o verSala(), que lo registran en la lista de roles. */
 export async function enlaceSala(salaId) {
   const { data, error } = await supabase.from('salas_enlace').select('enlace').eq('sala_id', salaId).maybeSingle();
   if (error) throw fallo('enlaceSala', error);
   return data?.enlace ?? null;
+}
+
+// ── Radar y «En vivo» (067) ──────────────────────────────────────────────────────────────────────────────────────────
+/** Salas públicas/amigos sin rival: tarjetas para «Retos en el radar». */
+export async function radarSalas() {
+  const { data, error } = await supabase.rpc('radar_salas');
+  if (error) throw fallo('radarSalas', error);
+  return Array.isArray(data) ? data : [];
+}
+/** Salas que admiten espectadores: tarjetas para «Salas en vivo». */
+export async function salasEnVivo() {
+  const { data, error } = await supabase.rpc('salas_en_vivo');
+  if (error) throw fallo('salasEnVivo', error);
+  return Array.isArray(data) ? data : [];
+}
+/** Aceptar el reto de una sala → quedo como rival (mando 2). → { rol, enlace } */
+export async function aceptarSala(salaId) {
+  const { data, error } = await supabase.rpc('aceptar_sala', { p_sala: salaId });
+  if (error) throw fallo('aceptarSala', error);
+  return data;
+}
+/** «Ver» → quedo registrado como espectador. → { rol, enlace } */
+export async function verSala(salaId) {
+  const { data, error } = await supabase.rpc('ver_sala', { p_sala: salaId });
+  if (error) throw fallo('verSala', error);
+  return data;
+}
+/** Me bajo como rival o espectador. */
+export async function dejarSala(salaId) {
+  const { error } = await supabase.rpc('dejar_sala', { p_sala: salaId });
+  if (error) throw fallo('dejarSala', error);
 }
 
 /** Host: cambiar visibilidad y/o límite de espectadores de su sala viva. */

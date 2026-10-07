@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.4.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.5.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.5.0 (compatibles, requieren migración 067):** `sala/abrir` acepta `acepta_espectadores`; `sala/abrir` y `sala/latido` devuelven la **lista de roles viva** (`roles` + `roles_etag`), que ahora incluye al **rival que aceptó en el radar** (mando 2) y a los **espectadores que entraron con «Ver»** (`pad_limit 0`); nueva ruta `POST /v1/sala/soltar_rival`. El enlace de una sala solo se entrega a quien tiene rol (sección 22).
 
 **Cambios 1.4.0 (compatibles, requieren migración 064):** `GET /v1/salas`, `POST /v1/presencia`, `GET /v1/presencia/amigos`, `POST /v1/invitar` (secciones 17–20); sondeo barato con **ETag** (sección 21); error `NO_SON_AMIGOS`; intervalos `presencia_seg`, `sondeo_salas_seg`, `sondeo_amigos_seg` en `config`.
 
@@ -418,3 +420,60 @@ Respuesta: `{ "ok": true, "invitacion_id": 12, "notificado": true, "expira": "�
   | App abierta 6 h/día | ≈ 580 k | No |
   | 6 h/día y sondeo **solo con la ventana visible** (≈ ⅓ del tiempo) | ≈ 195 k | Sí (≈ 410 k en total) |
   Regla para la app: **sondear salas y amigos solo con la ventana de Phoenix Soda visible** (minimizada = pausa; al volver, sondeo inmediato). Si aun así aprieta, el staff sube `sondeo_salas_seg` / `sondeo_amigos_seg` desde `phoenix_config` sin recompilar.
+
+## 22. Abrir sala → «Retos en el radar» y «Salas en vivo» (1.5.0 · migración 067)
+
+### Qué envía la app al abrir (`POST /v1/sala/abrir`)
+| Campo | Tipo | Por defecto | Nota |
+|---|---|---|---|
+| `visibilidad` | `publica` · `amigos` · `privada` | `amigos` | |
+| `acepta_espectadores` | bool | `true` | **nuevo**. `false` = nunca sale en «Salas en vivo» |
+| `limite_espectadores` | 0–16 | 4 | 0 equivale a no aceptar espectadores |
+| `modo` | `amistoso` · `torneo_privado` · `oficial` | `amistoso` | solo `amistoso` sin `reto_id` aparece en el radar |
+| `juego`, `parche`, `region` | texto | — | se muestran en las tarjetas |
+
+### Dónde aparece la sala en la web
+| Condición | «Retos en el radar» (Duelos) | «Salas en vivo» |
+|---|---|---|
+| `publica` · amistosa · sin reto · **sin rival** · estado `abierta` | ✅ con botón **Aceptar** | si acepta espectadores |
+| Ya tiene rival, o estado `en_partida` | ❌ sale del radar | ✅ si acepta espectadores |
+| `amigos` | lo mismo, pero **solo la ven los amigos del host** | ídem |
+| `privada` | ❌ nunca | ❌ nunca (solo entran invitados o roles del reto) |
+| `cerrar`, o **sin latido 3 min** (pasa a `caida`) | ❌ | ❌ |
+
+Las listas también descartan salas con latido de más de 3 min aunque el cron aún no las haya marcado.
+
+### Aceptar y Ver (los hace la web, no la app)
+- **Aceptar** (radar): el usuario queda en `salas.rival` y es el **jugador 2 (mando 2)**. Si dos aceptan a la vez, gana el primero; el segundo ve «Alguien aceptó antes que tú». El host recibe el aviso «Tienes rival».
+- **Ver** (en vivo): el usuario queda registrado como **espectador** (respetando `limite_espectadores`) y recibe el enlace.
+- **El enlace solo se entrega a quien tiene rol**: host, rival, espectador registrado, invitado (§20), jugador o espectador aprobado del reto, staff o miembro de la organización. Quien solo «ve» la tarjeta no puede leerlo directamente: tiene que pasar por Aceptar o Ver, y así **siempre queda en la lista de roles**.
+- Si alguien entra por Parsec sin estar en la lista, la puerta de mandos lo trata como espectador (no juega). La lista sirve para ponerle nombre y reservar el mando 2.
+
+### Lista de roles que descarga la app
+Llega en la respuesta de `sala/abrir` y en **cada** `sala/latido` (así la app se entera en ≤ 30 s de que alguien aceptó o entró a mirar):
+```json
+"roles": {
+  "modo": "sala",
+  "jugadores": [
+    { "usuario_id": "…host…",  "nombre": "Kaiser", "parsec_id": "1234567", "lado": "A", "mando": 1 },
+    { "usuario_id": "…rival…", "nombre": "Mirko",  "parsec_id": "7654321", "lado": "B", "mando": 2 }
+  ],
+  "espectadores": [
+    { "usuario_id": "…", "nombre": "Lucho", "parsec_id": "5550001", "rol": "espectador", "pad_limit": 0 }
+  ]
+},
+"roles_etag": "W/\"9f2c…\""
+```
+- Sin rival todavía: `jugadores` trae solo al host.
+- Sala con `reto_id`: `modo` = `"reto"` y los jugadores salen del reto (como antes); los espectadores que entraron con «Ver» se suman al final.
+- `parsec_id` puede ser `null` si el usuario no vinculó Parsec: la app debe esperar a que entre y emparejarlo por nombre, o tratarlo como espectador.
+- **`roles_etag`**: si no cambió desde el latido anterior, la app puede saltarse reaplicar la lista.
+
+### `POST /v1/sala/soltar_rival` (token) — el host libera el puesto de rival
+Cuerpo `{ "sala_id": "uuid" }`. Quita al rival; si la sala sigue `abierta`, **vuelve a aparecer en el radar**. Respuesta: `{ ok, roles, roles_etag }`. Errores: `SALA_NO_ENCONTRADA`, `SALA_CERRADA`. (Desde la web, el propio rival puede bajarse con «Dejar sala».)
+
+### Lo que la app debe hacer
+1. Enviar `acepta_espectadores` y `limite_espectadores` al abrir.
+2. Mandar `estado: "en_partida"` en el latido al empezar el partido (así sale del radar).
+3. Aplicar `roles` de cada latido: reservar el mando 2 al `parsec_id` del rival y `pad_limit 0` a los espectadores.
+4. Cerrar la sala con `sala/cerrar` al terminar (si no, desaparece sola a los 3 min sin latido).

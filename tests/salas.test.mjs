@@ -42,3 +42,13 @@ test('utilidades de códigos y Parsec', () => {
   assert.equal(segundosRestantes(new Date(AHORA + 90_500).toISOString(), AHORA), 90);
   assert.equal(segundosRestantes(hace(10), AHORA), 0);
 });
+
+import { pildoraSemaforo, textoErrorUnirse } from '../src/js/core/salas.js';
+test('pildoraSemaforo y textoErrorUnirse (067)', () => {
+  assert.equal(pildoraSemaforo({ color: 'verde', ping_ms: 41.6, fuente: 'par' }).texto, '42 ms');
+  assert.match(pildoraSemaforo({ color: 'rojo', ping_ms: 140 }).clase, /rose/);
+  assert.equal(pildoraSemaforo(null).texto, 'Ping ?');
+  assert.equal(pildoraSemaforo({ fuente: 'sin_datos', ping_ms: null }).texto, 'Ping ?');
+  assert.match(textoErrorUnirse('SALA_OCUPADA'), /antes que tú/);
+  assert.match(textoErrorUnirse('algo raro'), /Reintenta/);
+});

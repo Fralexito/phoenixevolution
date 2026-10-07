@@ -427,7 +427,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 196: migración 066 (aplicada por MCP): apuestas en saltos de 50 (mínimo 50) y comisión redondeada hacia arriba a múltiplos de 10 (private.comision_monto) → el premio siempre termina en 0.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 196)
+- Ronda 197: §6 de smash-soda-producto: migración 067 (pendiente de aplicar por el usuario: acepta_espectadores, salas.rival, salas_espectadores, enlace solo con rol, radar_salas/salas_en_vivo/aceptar_sala/ver_sala/dejar_sala, sistema_roles_sala) + Edge Function v1.5.0 LOCAL (roles en abrir y latido, /v1/sala/soltar_rival; desplegar DESPUÉS de 067) + tarjetas en Duelos («Retos en el radar») y En vivo (features/salas/tarjetas.js) + contrato §22.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 197)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**

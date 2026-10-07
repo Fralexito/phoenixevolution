@@ -45,3 +45,27 @@ export const segundosRestantes = (expira, ahora = Date.now()) => Math.max(0, Mat
 /** Etiquetas legibles. */
 export const MODO_TXT = Object.freeze({ amistoso: 'Amistoso', torneo_privado: 'Torneo privado', oficial: 'Oficial' });
 export const SALUD_TXT = Object.freeze({ viva: 'Abierta', en_partida: 'En partido', inestable: 'Señal inestable', cerrada: 'Cerrada', caida: 'Caída' });
+
+// ── Tarjetas de salas en el radar y en «En vivo» (migración 067) ──────────────────────────────────────────────────────
+/** Semáforo → { clase, texto } para la píldora de ping. Acepta lo que devuelve private.semaforo_para. */
+export function pildoraSemaforo(s) {
+  const c = s?.color;
+  const ping = Number.isFinite(Number(s?.ping_ms)) && s?.ping_ms !== null ? `${Math.round(Number(s.ping_ms))} ms` : null;
+  const fuente = s?.fuente === 'par' ? 'tu ping real con este host' : s?.fuente === 'host' ? 'promedio del host' : 'sin mediciones aún';
+  const base = { verde: 'text-emerald-300 border-emerald-400/40 bg-emerald-500/10', ambar: 'text-amber-300 border-amber-400/40 bg-amber-500/10', rojo: 'text-rose-300 border-rose-400/40 bg-rose-500/10' }[c];
+  return { clase: base ?? 'text-gray-400 border-galaxy-border bg-galaxy-800/40', texto: ping ?? 'Ping ?', titulo: fuente };
+}
+
+/** Código de error del servidor (unirse_sala) → frase para el usuario. */
+export const ERROR_UNIRSE = Object.freeze({
+  SALA_OCUPADA: 'Alguien aceptó este reto antes que tú, o el partido ya empezó.',
+  SALA_CERRADA: 'La sala ya se cerró.',
+  SALA_NO_ENCONTRADA: 'La sala ya no existe.',
+  SIN_PERMISO: 'Esta sala no está abierta para ti.',
+  SIN_ESPECTADORES: 'Esta sala no admite espectadores.',
+  CUPO_LLENO: 'Ya no hay cupo para espectadores.',
+});
+export function textoErrorUnirse(msg) {
+  const k = Object.keys(ERROR_UNIRSE).find((x) => String(msg ?? '').includes(x));
+  return k ? ERROR_UNIRSE[k] : 'No se pudo entrar a la sala. Reintenta.';
+}

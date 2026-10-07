@@ -9,6 +9,7 @@ import { data, loadPerfiles } from '../features/duelos/data.js';
 import { MODOS, modoDe, accionPara, clampMax } from '../core/espectadores.js';
 import * as api from '../features/espectadores/api.js';
 import { regionAhora } from '../features/ajustes.js';
+import { montarTarjetasSalas } from '../features/salas/tarjetas.js';
 
 const $ = (id) => document.getElementById(id);
 const S = { partidos: [], salas: [], enlaces: new Map(), ocupado: false };
@@ -111,3 +112,7 @@ let t; const soon = () => { clearTimeout(t); t = setTimeout(cargar, 300); };
 supabase.channel('en-vivo').on('postgres_changes', { event: '*', schema: 'public', table: 'reto_espectadores' }, soon)
   .on('postgres_changes', { event: '*', schema: 'public', table: 'retos_matchmaking' }, soon).subscribe();
 setInterval(() => { if (!document.hidden) cargar(); }, 60000);
+
+// Salas de Smash Soda que admiten espectadores (migración 067).
+montarTarjetasSalas({ contenedor: document.getElementById('lista-salas-vivo'), tipo: 'vivo',
+  alContar: (n) => { document.getElementById('bloque-salas-vivo').hidden = !n; document.getElementById('cnt-salas-vivo').textContent = n ? `(${n})` : ''; } });
