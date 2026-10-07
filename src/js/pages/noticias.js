@@ -11,6 +11,7 @@ import { normalizar, ordenar, elegirDestacada, ligasPresentes, filtrar, fechaRel
 import { abrirEditor, borrarNoticia, ocultarNoticia, guardarDiseno } from '../features/noticiasAdmin.js';
 import { tarjetaHTML, lecturaHTML } from '../features/noticias/tarjetas.js';
 import { abrirCatalogo } from '../features/noticias/catalogo.js';
+import { entrarAcomodar } from '../features/noticias/acomodar.js';
 import { asignarDiseno } from '../core/noticiasPlantillas.js';
 
 const $ = (id) => document.getElementById(id);
@@ -29,8 +30,15 @@ function paintLigas() {
   box.innerHTML = ids.length < 2 ? '' : ['TODAS', ...ids].map((id) => `<button type="button" data-liga="${escapeHTML(id)}" aria-pressed="${String(id === state.liga)}" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">${id === 'TODAS' ? 'Todas las ligas' : escapeHTML(nombreLiga(id))}</button>`).join('');
 }
 
+let acomodo = null;   // modo «Acomodar» activo
 function paint() {
   const list = filtrar(state.lista, state);
+  if (acomodo) {   // todo en una sola grilla (portada incluida) para poder moverla
+    disenos.clear(); asignarDiseno(state.lista, { heroIdx: -1 }).forEach((d, i) => disenos.set(state.lista[i].slug, d));
+    $('news-featured').innerHTML = '';
+    $('news-grid').innerHTML = state.lista.map((n) => tarjetaHTML(n, disenos.get(n.slug).plantilla, disenos.get(n.slug).estilo, ctx)).join('');
+    return;
+  }
   const dest = elegirDestacada(list); const resto = list.filter((n) => n !== dest);
   const orden = dest ? [dest, ...resto] : resto;
   disenos.clear(); asignarDiseno(orden, { heroIdx: dest ? 0 : -1 }).forEach((d, i) => disenos.set(orden[i].slug, d));
@@ -99,8 +107,18 @@ const pulsar = (cont, attr, clave) => (e) => {
 };
 $('news-filters').addEventListener('click', pulsar($('news-filters'), 'data-cat', 'cat'));
 $('news-ligas').addEventListener('click', pulsar($('news-ligas'), 'data-liga', 'liga'));
-$('news-root').addEventListener('click', (e) => { const b = e.target.closest('[data-slug]'); if (b) read(b.dataset.slug); });
+$('news-root').addEventListener('click', (e) => { if (acomodo) return; const b = e.target.closest('[data-slug]'); if (b) read(b.dataset.slug); });
 $('news-disenos').addEventListener('click', () => abrirDisenos());
+const barraAcomodo = (on) => { $('news-acomodar').hidden = on; $('news-acomodar-barra').hidden = !on; $('news-disenos').hidden = on; $('news-filters').classList.toggle('opacity-40', on); $('news-filters').classList.toggle('pointer-events-none', on); };
+$('news-acomodar').addEventListener('click', async () => {
+  if (!state.lista.some((n) => n.editable)) { toast('Aún no hay noticias reales para acomodar.', 'warn'); return; }
+  state.cat = 'TODOS'; state.liga = 'TODAS'; state.term = ''; $('news-search').value = '';
+  acomodo = true; barraAcomodo(true); paint();
+  try { acomodo = await entrarAcomodar({ grid: $('news-grid'), alSalir: async (ok) => { acomodo = null; barraAcomodo(false); if (ok) await cargar(); else paint(); } }); }
+  catch (e) { console.error('[noticias] sortable:', e); toast('No se pudo activar el modo acomodar.', 'error'); acomodo = null; barraAcomodo(false); paint(); }
+});
+$('news-acomodar-ok').addEventListener('click', () => acomodo?.guardar?.());
+$('news-acomodar-no').addEventListener('click', () => acomodo?.cancelar?.());
 $('news-nueva').addEventListener('click', () => abrirEditor({ slugsUsados: state.lista.map((x) => x.slug), onGuardada: cargar }));
 // Los admins ven el botón «Nueva noticia» y los borradores (la BD solo se los entrega a ellos).
-onSession(() => { $('news-nueva').hidden = !can('editarLiga'); $('news-disenos').hidden = !can('editarLiga'); cargar().then(() => { const s = new URLSearchParams(location.search).get('n'); if (s && !document.getElementById('news-modal')) read(s); }); });
+onSession(() => { $('news-nueva').hidden = !can('editarLiga'); $('news-disenos').hidden = !can('editarLiga'); $('news-acomodar').hidden = !can('editarLiga'); cargar().then(() => { const s = new URLSearchParams(location.search).get('n'); if (s && !document.getElementById('news-modal')) read(s); }); });

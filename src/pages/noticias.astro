@@ -22,7 +22,9 @@ const cats = [['TODOS', 'Todos'], ['OFICIAL', 'Oficial'], ['JORNADA', 'Jornadas'
     </div>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div id="news-ligas" hidden class="flex flex-wrap gap-1.5 text-xs font-display font-bold uppercase tracking-wider bg-black/40 p-1 rounded-lg border border-galaxy-border/60"></div>
-      <button type="button" id="news-disenos" hidden class="btn btn-ghost ml-auto"><i class="fa-solid fa-palette"></i> Catálogo de diseños</button>
+      <button type="button" id="news-acomodar" hidden class="btn btn-ghost ml-auto" title="Agarra y suelta las noticias para ordenarlas"><i class="fa-solid fa-up-down-left-right"></i> Acomodar</button>
+      <span id="news-acomodar-barra" hidden class="ml-auto flex gap-2"><span class="text-xs text-gray-400 self-center">Arrastra las tarjetas · la 1.ª es la portada</span><button type="button" id="news-acomodar-ok" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar orden</button><button type="button" id="news-acomodar-no" class="btn btn-ghost">Cancelar</button></span>
+      <button type="button" id="news-disenos" hidden class="btn btn-ghost"><i class="fa-solid fa-palette"></i> Catálogo de diseños</button>
       <button type="button" id="news-nueva" hidden class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nueva noticia</button>
     </div>
     <div id="news-featured"></div>

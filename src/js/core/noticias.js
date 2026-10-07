@@ -33,7 +33,7 @@ export function fechaRelativa(iso, ahora = new Date()) {
 export function normalizar(f) {
   return {
     id: f.id, slug: f.slug, titulo: f.titulo, resumen: f.resumen, cuerpo: partirCuerpo(f.cuerpo), categoria: f.categoria, tag: f.tag ?? '',
-    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, fecha: f.fecha ?? '', plantilla: esPlantilla(f.plantilla) ? f.plantilla : 'auto', estilo: limpiarEstilo(f.estilo), discordEn: f.discord_en ?? f.discordEn ?? null,
+    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, fecha: f.fecha ?? '', plantilla: esPlantilla(f.plantilla) ? f.plantilla : 'auto', estilo: limpiarEstilo(f.estilo), orden: Number.isInteger(f.orden) ? f.orden : null, discordEn: f.discord_en ?? f.discordEn ?? null,
   };
 }
 /** Valida un borrador del editor con los mismos límites que la base. Devuelve { ok, errores: string[] }. */
@@ -48,9 +48,17 @@ export function validar(b) {
   return { ok: e.length === 0, errores: e };
 }
 /** Más recientes primero. No modifica la lista original. */
-export const ordenar = (lista) => [...lista].sort((a, b) => String(b.publicadaEn).localeCompare(String(a.publicadaEn)));
+/** Orden de la grilla: las nuevas sin acomodar (orden null) arriba por fecha; luego el orden manual del staff. */
+export const ordenar = (lista) => [...lista].sort((a, b) => {
+  const an = a.orden == null; const bn = b.orden == null;
+  if (an !== bn) return an ? -1 : 1;
+  if (!an && a.orden !== b.orden) return a.orden - b.orden;
+  return String(b.publicadaEn).localeCompare(String(a.publicadaEn));
+});
+/** true si el staff ya acomodó la página a mano (entonces la primera es la portada). */
+export const hayOrdenManual = (lista) => lista.some((n) => n.orden != null);
 /** La destacada de la lista (la marcada; si no hay, la más reciente). null si la lista está vacía. */
-export const elegirDestacada = (lista) => lista.find((n) => n.destacada) ?? lista[0] ?? null;
+export const elegirDestacada = (lista) => (hayOrdenManual(lista) ? lista[0] : lista.find((n) => n.destacada) ?? lista[0]) ?? null;
 /** Ids de liga que aparecen en las noticias, sin repetir y en orden de aparición. */
 export const ligasPresentes = (lista) => [...new Set(lista.map((n) => n.liga))];
 /** Filtra por categoría ('TODOS' = todas), liga ('TODAS' = todas) y texto (título, resumen o etiqueta). */

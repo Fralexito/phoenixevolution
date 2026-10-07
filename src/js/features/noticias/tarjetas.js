@@ -53,7 +53,7 @@ export function tarjetaHTML(n, plantillaId, e, c) {
   const p = plantillaDe(plantillaId) ?? plantillaDe('clasica'); const dibujo = DIBUJOS[p.id] ?? DIBUJOS.clasica;
   const tono = !FX.noticiasTono ? '' : n.categoria === 'TRIBUNA' ? 'tono-joda' : 'tono-serio';
   const sticker = tono === 'tono-joda' ? '<span class="nt-sticker" aria-hidden="true">😂 JODA</span>' : '';
-  return `<button type="button" data-slug="${esc(n.slug)}" class="nt ${tono} nt-${p.id} nc-${p.cols} nf-${e.forma} nb-${e.brillo} na-${e.anim} nu-${e.fuente}" style="--na:${rgbDe(e)}">${sticker}${dibujo(n, c)}</button>`;
+  return `<button type="button" data-slug="${esc(n.slug)}" data-id="${esc(n.id ?? '')}" class="nt ${tono} nt-${p.id} nc-${p.cols} nf-${e.forma} nb-${e.brillo} na-${e.anim} nu-${e.fuente}" style="--na:${rgbDe(e)}">${sticker}${dibujo(n, c)}</button>`;
 }
 
 // ---------------- Lector ----------------
