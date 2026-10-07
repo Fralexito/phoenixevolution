@@ -12,6 +12,7 @@ import { toast } from '../core/toast.js';
 import { switchHTML, segHTML, bindSeg } from './formControls.js';
 import { bindHandle } from './handleCheck.js';
 import { montarEditorJuegos } from './hosting/editorJuegos.js';
+import { montarVincularPC } from './salas/vincularPC.js';
 import { catalogoDe } from '../core/hostCatalogo.js';
 import { guardarHost } from './muro/api.js';
 
@@ -39,7 +40,7 @@ export function openProfileModal() {
       ${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user })}
 
       <div role="tablist" class="flex gap-1 border-b border-galaxy-border font-display text-sm uppercase tracking-wider">
-        ${['identidad:Identidad', 'social:Social', 'host:Sistema Host'].map((t, i) => { const [k, l] = t.split(':'); return `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}" class="px-3 py-2 text-gray-400 aria-selected:text-galaxy-400 aria-selected:border-b-2 aria-selected:border-galaxy-400">${l}</button>`; }).join('')}
+        ${['identidad:Identidad', 'social:Social', 'host:Sistema Host', 'soda:Smash Soda'].map((t, i) => { const [k, l] = t.split(':'); return `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}" class="px-3 py-2 text-gray-400 aria-selected:text-galaxy-400 aria-selected:border-b-2 aria-selected:border-galaxy-400">${l}</button>`; }).join('')}
       </div>
 
       <div data-pane="identidad" class="space-y-4">
@@ -60,6 +61,10 @@ export function openProfileModal() {
         <div><label class="label" for="p-stream">Enlace de stream (https://…)</label><input id="p-stream" class="field" maxlength="200" value="${escapeHTML(prof.stream_url)}"></div>
       </div>
 
+      <div data-pane="soda" hidden class="space-y-3">
+        <p class="text-xs text-gray-300"><i class="fa-solid fa-desktop text-galaxy-400 mr-1.5"></i><b>Vincular Smash Soda</b>: genera un código de 6 dígitos (vale 10 minutos y un solo uso) y escríbelo en la app para que tu PC pueda abrir salas.</p>
+        <div id="p-soda" class="text-sm text-gray-300">Cargando…</div>
+      </div>
       <div data-pane="host" hidden class="space-y-4">
         ${switchHTML({ id: 'p-host', checked: !!prof.puede_hostear, title: 'Puedo ser host', hint: 'Te avisamos cuando alguien necesite que le hosteen una partida.' })}
         <div id="host-fields" class="space-y-4">
@@ -100,6 +105,7 @@ export function openProfileModal() {
   const syncHost = () => { hostFields.style.opacity = $('#p-host').checked ? '1' : '.4'; hostFields.inert = !$('#p-host').checked; };
   syncHost(); $('#p-host').addEventListener('change', syncHost);
   const juegos = montarEditorJuegos($('#p-hjuegos'), catalogoDe(prof));
+  montarVincularPC($('#p-soda'), { esHost: !!prof.host_aprobado || ['ayudante', 'moderador', 'admin'].includes(prof.rol) });
   bindSeg($('#p-speed'), (v) => { speed = Number(v); });
   bindSeg($('#p-soft'), (v) => { soft = v; });
 
