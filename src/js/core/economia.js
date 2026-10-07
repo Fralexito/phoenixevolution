@@ -1,4 +1,4 @@
-// ECONOMÍA — normalizadores y utilidades PURAS (sin navegador ni red; se prueban en Node). Reglas reales: migraciones 049-051.
+// ECONOMÍA — normalizadores y utilidades PURAS (sin navegador ni red; se prueban en Node). Reglas reales: migraciones 049-051 y 065 (ascuas = saldo, gemas = compradas).
 import { escapeHTML } from './dom.js';
 
 export const CATEGORIAS = Object.freeze({
@@ -23,7 +23,7 @@ export function estiloSeguro(e) {
 export function normalizarEconomia(d) {
   const o = d && typeof d === 'object' ? d : {};
   const xp = Math.max(0, entero(o.xp)), base = Math.max(0, entero(o.xp_nivel)), sig = Math.max(base + 1, entero(o.xp_siguiente, base + 1));
-  return { saldo: entero(o.saldo), xp, nivel: Math.max(1, entero(o.nivel, 1)), xpNivel: base, xpSiguiente: sig, progreso: Math.min(1, Math.max(0, (xp - base) / (sig - base))) };
+  return { saldo: entero(o.saldo), gemas: entero(o.gemas), enGarantia: Math.max(0, entero(o.en_garantia)), puedeApostar: o.puede_apostar === true, motivoNoApostar: o.motivo_no_apostar ? String(o.motivo_no_apostar) : null, xp, nivel: Math.max(1, entero(o.nivel, 1)), xpNivel: base, xpSiguiente: sig, progreso: Math.min(1, Math.max(0, (xp - base) / (sig - base))) };
 }
 export function normalizarItem(r) {
   const o = r && typeof r === 'object' ? r : {};
@@ -46,7 +46,7 @@ export function normalizarPaquetes(d) {
     paquetes: (Array.isArray(o.paquetes) ? o.paquetes : []).map((p) => ({ id: entero(p.id), nombre: String(p.nombre ?? ''), tokens: Math.max(0, entero(p.tokens)), precioCentimos: Math.max(0, entero(p.precio_centimos)), moneda: String(p.moneda ?? 'PEN') })) };
 }
 
-export const TIPOS_MOVIMIENTO = Object.freeze({ ganado: 'Ganados jugando', compra_tienda: 'Compra en la tienda', compra_dinero: 'Compra de tokens', reembolso: 'Reembolso', ajuste_admin: 'Ajuste del staff', devolucion: 'Devolución' });
+export const TIPOS_MOVIMIENTO = Object.freeze({ ganado: 'Ganados jugando', compra_tienda: 'Compra en la tienda', compra_dinero: 'Compra de tokens', reembolso: 'Reembolso', ajuste_admin: 'Ajuste del staff', devolucion: 'Devolución', apuesta_garantia: 'Ascuas puestas en un reto', apuesta_premio: 'Pozo ganado', apuesta_devolucion: 'Pozo devuelto' });
 export const textoTipo = (t) => TIPOS_MOVIMIENTO[t] ?? 'Movimiento';
 
 /** 500 + 'PEN' → «S/ 5.00». Para otras monedas, «5.00 USD». */
