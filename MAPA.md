@@ -425,7 +425,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 195: migración 065 (aplicada y probada en transacción revertida): dos monedas (ascuas = billeteras.saldo, se ganan y se apuestan; gemas = billeteras.gemas, se compran, solo tienda) y retos 1v1 con pozo en ascuas (apuestas_reto; apostar_en_reto/aceptar_apuesta/rechazar_apuesta; liquidación por trigger en resultados_duelo; devolución al cancelar; staff_revisar/anular; comisión 5 % ≤500 y 10 % >500; >2000 por jugador = revisión del staff; 18+, 7 días, 3 partidos; todo en economia_config). economia.js normaliza gemas/en_garantia.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 195)
+- Ronda 196: migración 066 (aplicada por MCP): apuestas en saltos de 50 (mínimo 50) y comisión redondeada hacia arriba a múltiplos de 10 (private.comision_monto) → el premio siempre termina en 0.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 196)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**
