@@ -55,8 +55,9 @@ document.addEventListener('submit', async (ev) => {
       const { error } = await supabase.rpc('solicitar_creador', { p_plataformas: pl, p_juegos: String(d.get('juegos') || '').split(',').map((x) => x.trim()).filter(Boolean), p_descripcion: d.get('desc') });
       if (error) throw error; toast('Solicitud enviada al staff.', 'ok');
     } else {
-      const { error } = await supabase.rpc('creador_en_vivo', { p_en_vivo: !mio.en_vivo, p_titulo: d.get('t'), p_enlace: String(d.get('u') || '').trim() || null });
-      if (error) throw error; toast(mio.en_vivo ? 'Directo terminado.' : '¡Estás en vivo!', 'ok');
+      const { data: r, error } = await supabase.rpc('creador_en_vivo', { p_en_vivo: !mio.en_vivo, p_titulo: d.get('t'), p_enlace: String(d.get('u') || '').trim() || null });
+      if (error) throw error;
+      toast(mio.en_vivo ? 'Directo terminado.' : `¡Estás en vivo!${r?.avisados ? ` Avisamos a ${r.avisados} seguidor${r.avisados === 1 ? '' : 'es'}.` : ''}${r?.discord === 'ENVIADO' ? ' Anunciado en Discord.' : ''}`, 'ok');
     }
     await cargarMio(); cargar();
   } catch (e) { toast(e.message, 'error'); }
