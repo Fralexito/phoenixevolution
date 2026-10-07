@@ -6,6 +6,7 @@ import { confirmar, pedirTexto } from '../../core/dialogo.js';
 import { escapeHTML } from '../../core/dom.js';
 import { mostrarCodigoPC, segundosRestantes } from '../../core/salas.js';
 import * as api from './api.js';
+import { NOMBRE_APP } from '../../../data/site.js';
 
 const fecha = (iso) => (iso ? new Date(iso).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) : '—');
 const btn = (attrs, html, extra = '') => `<button type="button" class="btn !min-h-9 !text-xs ${extra}" ${attrs}>${html}</button>`;
@@ -45,7 +46,7 @@ export function montarVincularPC(caja, { esHost }) {
     b.disabled = true;
     try {
       const a = b.dataset.vpc;
-      if (a === 'codigo') { const r = await api.generarCodigoPC(); mostrar('Escríbelo en Smash Soda → Vincular', mostrarCodigoPC(r.codigo), r.expira, 'Un solo uso'); }
+      if (a === 'codigo') { const r = await api.generarCodigoPC(); mostrar(`Escríbelo en ${NOMBRE_APP} → Vincular`, mostrarCodigoPC(r.codigo), r.expira, 'Un solo uso'); }
       else if (a === 'instalar') { const r = await api.generarCodigoInstalacion(); mostrar('Código para PhoenixSetup', r.codigo, r.expira, 'Un solo uso · máx. 3 por día'); }
       else if (a === 'renombrar') { const n = await pedirTexto('Nuevo nombre de la PC:', { valor: b.dataset.nombre, maximo: 40, obligatorio: true }); if (n) { await api.renombrarDispositivo(b.dataset.id, n); await pintar(); } }
       else if (a === 'revocar') { if (await confirmar('Esta PC ya no podrá abrir salas hasta que la vuelvas a vincular. ¿Seguir?', { aceptar: 'Desvincular', peligro: true })) { await api.revocarDispositivo(b.dataset.id); toast('PC desvinculada.', 'ok'); await pintar(); } }

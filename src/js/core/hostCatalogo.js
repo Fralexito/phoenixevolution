@@ -8,8 +8,8 @@ export const HOST_MAX_OPCIONES = 8;   // [BD]
 export const HOST_MAX_TEXTO = 40;     // [BD]
 /** Juegos que se pueden ofrecer, con sus opciones sugeridas (el usuario puede añadir otras a mano) y el nombre de lo que son. */
 export const HOST_JUEGOS = [
-  { id: 'PES 2021', opcion: 'Parches', sugeridas: PARCHES_PES },
-  { id: 'SP Football Life', opcion: 'Versiones', sugeridas: SP_VERSIONES },
+  { id: 'PES 2021', principal: true, opcion: 'Parches', sugeridas: PARCHES_PES },
+  { id: 'SP Football Life', principal: true, opcion: 'Versiones', sugeridas: SP_VERSIONES },
   { id: 'eFootball', opcion: 'Versiones o mods', sugeridas: ['2025', '2026', '2027'] },
   { id: 'FIFA', opcion: 'Versiones o mods', sugeridas: ['FIFA 22', 'FIFA 23'] },
   { id: 'EA FC', opcion: 'Versiones o mods', sugeridas: ['24', '25', '26', '27'] },

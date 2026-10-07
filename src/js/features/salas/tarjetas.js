@@ -6,6 +6,7 @@ import { onSession } from '../../core/session.js';
 import { toast } from '../../core/toast.js';
 import { escapeHTML, safeUrl } from '../../core/dom.js';
 import { pildoraSemaforo, textoErrorUnirse } from '../../core/salas.js';
+import { NOMBRE_APP } from '../../../data/site.js';
 import { radarSalas, salasEnVivo, aceptarSala, verSala } from './api.js';
 
 const SONDEO_MS = 25_000;
@@ -29,7 +30,7 @@ function tarjetaRadar(s) {
     ${avatar(s.host)}
     <div class="min-w-0 flex-1">
       <p class="text-sm text-white font-bold truncate">${escapeHTML(s.host?.nombre ?? 'Host')} ${s.host?.amigo ? '<i class="fa-solid fa-user-group text-galaxy-400 text-[11px]" title="Amigo"></i>' : ''}
-        <span class="ml-1 text-[10px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">Smash Soda</span></p>
+        <span class="ml-1 text-[10px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">${NOMBRE_APP}</span></p>
       <p class="text-[12px] text-gray-300 truncate">${escapeHTML(juegoTxt(s))}${s.region ? ` · ${escapeHTML(s.region)}` : ''}</p>
       <div class="mt-1">${pildora(s.semaforo)}</div>
     </div>

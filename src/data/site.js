@@ -71,3 +71,6 @@ export const TICKER = [
   'FAIR PLAY: Fralex lidera la tabla de reputación con Rango S (100 pts).',
   'MERCADO: Sistema de pases en pausa reglamentaria hasta nuevo aviso.',
 ];
+
+// Nombre visible de la app de salas (cámbialo aquí y se actualiza en toda la web).
+export const NOMBRE_APP = 'Phoenix Soda';

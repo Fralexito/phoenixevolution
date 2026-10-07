@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { NOMBRE_APP } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 ---
 <Layout title="Salas en vivo" active="envivo">
@@ -19,7 +20,7 @@ const base = import.meta.env.BASE_URL;
     </section>
 
     <section id="bloque-salas-vivo" hidden class="space-y-3" aria-labelledby="h-salas-vivo">
-      <h2 id="h-salas-vivo" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-gamepad text-galaxy-400 mr-2"></i>Salas Smash Soda <b id="cnt-salas-vivo" class="text-galaxy-400"></b></h2>
+      <h2 id="h-salas-vivo" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-gamepad text-galaxy-400 mr-2"></i>Salas {NOMBRE_APP} <b id="cnt-salas-vivo" class="text-galaxy-400"></b></h2>
       <div id="lista-salas-vivo" class="grid md:grid-cols-2 gap-3"></div>
     </section>
 
