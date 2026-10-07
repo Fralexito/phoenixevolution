@@ -24,7 +24,7 @@ function pintarPendientes({ mensajes, solicitudes }) {
 }
 
 /** Atajos de «Mi cuenta» para móvil (en PC ya están en la barra lateral): cuadrícula 2x2 pequeña y discreta dentro del menú de la foto. */
-const ATAJOS_MOVIL = ACCOUNT_NAV.filter((n) => n.path && !n.abajo)
+const ATAJOS_MOVIL = ACCOUNT_NAV.filter((n) => n.path && !n.abajo && n.menu !== false)
   .map((n) => `<a href="${escapeHTML(href(n.path))}" ${n.staff ? `data-solo-staff="${escapeHTML(n.staff)}" hidden` : ''} class="flex items-center gap-2 px-3 py-2 text-[12px] text-gray-400 hover:text-galaxy-400"><i class="fa-solid ${n.icon} w-4 text-center text-gray-500"></i><span class="truncate">${escapeHTML(n.label)}</span></a>`).join('');
 
 function render({ session, profile }) {

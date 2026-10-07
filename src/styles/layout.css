@@ -125,3 +125,15 @@ html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute;
   #live-wrap:not([data-movido]) { left: auto; right: .75rem; bottom: .75rem; }
   #live-row .live-toggle-txt { display: none; }
 }
+/* Panel «Mi cuenta» (Sidebar.astro): bloques con mosaico de iconos */
+.cuenta-grupo + .cuenta-grupo { margin-top: .6rem; }
+.cuenta-tit { padding: 0 .25rem .35rem; font-size: .7rem; letter-spacing: .25em; color: #6b7280; }
+.cuenta-mosaico { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
+.cuenta-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .35rem; min-height: 4.2rem; padding: .5rem .25rem; border-radius: .7rem; border: 1px solid var(--color-galaxy-border); background: rgb(255 255 255 / .02); color: #9ca3af; font-size: .68rem; line-height: 1.1; text-align: center; letter-spacing: .06em; text-transform: uppercase; transition: color .15s, border-color .15s, background .15s, transform .15s; }
+.cuenta-tile i { font-size: 1.05rem; color: #6b7280; transition: color .15s; }
+.cuenta-tile:hover { color: #fff; border-color: rgb(34 211 238 / .5); background: rgb(34 211 238 / .06); transform: translateY(-1px); }
+.cuenta-tile:hover i, .cuenta-tile[aria-current='page'] i { color: var(--color-galaxy-400); }
+.cuenta-tile[aria-current='page'] { color: var(--color-galaxy-400); border-color: rgb(34 211 238 / .5); background: rgb(34 211 238 / .1); }
+.cuenta-grupo[data-grupo='jugar'] .cuenta-tile { border-color: rgb(16 185 129 / .3); }
+.cuenta-grupo[data-grupo='staff'] .cuenta-tile { border-style: dashed; }
+.cuenta-tile[hidden], .cuenta-grupo[hidden] { display: none !important; }

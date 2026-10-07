@@ -33,27 +33,34 @@ export const APOYO = { href: '', texto: 'Apoya la comunidad' };
 // Menú lateral, grupo "Mi cuenta": solo se muestra con sesión iniciada.
 // Para añadir una sección futura, agrega UNA línea aquí (con `path` para una página o `action` para algo del sistema).
 export const ACCOUNT_NAV = [
-  { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user' },
-  { id: 'muro',     label: 'Mi muro',      path: 'perfil/',        icon: 'fa-newspaper' },
-  { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad' },
-  { id: 'ahora',    label: 'Ahora mismo', path: 'ahora/',        icon: 'fa-satellite-dish' },
-  { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast' },
-  { id: 'missalas', label: 'Phoenix Soda', path: 'mis-salas/',    icon: 'fa-desktop' },
-  { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments' },
-  { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group' },
-  { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass' },
-  { id: 'guardados', label: 'Guardados',   path: 'guardados/',     icon: 'fa-bookmark' },
-  { id: 'logros',   label: 'Logros',       path: 'logros/',        icon: 'fa-medal' },
-  { id: 'eventos',  label: 'Eventos',      path: 'eventos/',       icon: 'fa-calendar-day' },
-  { id: 'clanes',   label: 'Clanes',       path: 'clanes/',        icon: 'fa-shield-halved' },
-  { id: 'ranking',  label: 'Ranking',      path: 'ranking/',       icon: 'fa-ranking-star' },
-  { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store' },
+  { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user', grupo: 'tu' },
+  { id: 'muro',     label: 'Mi muro',      path: 'perfil/',        icon: 'fa-newspaper', grupo: 'tu' },
+  { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad', grupo: 'tu' },
+  { id: 'ahora',    label: 'Ahora mismo', path: 'ahora/',        icon: 'fa-satellite-dish', grupo: 'jugar' },
+  { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast', grupo: 'jugar' },
+  { id: 'missalas', label: 'Phoenix Soda', path: 'mis-salas/',    icon: 'fa-desktop', grupo: 'jugar' },
+  { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments', grupo: 'social' },
+  { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group', grupo: 'social' },
+  { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass', grupo: 'social', menu: false },
+  { id: 'guardados', label: 'Guardados',   path: 'guardados/',     icon: 'fa-bookmark', grupo: 'tu' },
+  { id: 'logros',   label: 'Logros',       path: 'logros/',        icon: 'fa-medal', grupo: 'tu' },
+  { id: 'eventos',  label: 'Eventos',      path: 'eventos/',       icon: 'fa-calendar-day', grupo: 'comunidad' },
+  { id: 'clanes',   label: 'Clanes',       path: 'clanes/',        icon: 'fa-shield-halved', grupo: 'social' },
+  { id: 'ranking',  label: 'Ranking',      path: 'ranking/',       icon: 'fa-ranking-star', grupo: 'comunidad' },
+  { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store', grupo: 'comunidad' },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
-  { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes' },
-  { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria' },
+  { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
+  { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
+  // `grupo` = bloque del panel «Mi cuenta» (ver GRUPOS_CUENTA). `menu: false` = no sale en el panel (ya está a la vista: la lupa del header), pero sí en el buscador.
   // `abajo: true` = va en el bloque inferior del menú, pegado al fondo del panel.
   { id: 'ajustes',  label: 'Configuración', path: 'ajustes/',            icon: 'fa-gear',  abajo: true },
   { id: 'salir',    label: 'Salir',        action: 'logout',               icon: 'fa-right-from-bracket', abajo: true },
+];
+
+// Bloques del panel «Mi cuenta», en este orden.
+export const GRUPOS_CUENTA = [
+  { id: 'tu', label: 'Tú' }, { id: 'jugar', label: 'Jugar' }, { id: 'social', label: 'Social' },
+  { id: 'comunidad', label: 'Comunidad' }, { id: 'staff', label: 'Staff' },
 ];
 
 // Font Awesome gratis no trae el logo de Kick, así que usamos su trazo oficial de Simple Icons (licencia CC0).

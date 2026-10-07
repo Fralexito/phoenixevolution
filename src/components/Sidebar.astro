@@ -1,6 +1,8 @@
 ---
 import SocialIcon from './SocialIcon.astro';
-import { NAV, NAV_EXTRA, ACCOUNT_NAV, SOCIALS } from '../data/site.js';
+import { NAV, NAV_EXTRA, ACCOUNT_NAV, GRUPOS_CUENTA, SOCIALS } from '../data/site.js';
+// Panel «Mi cuenta» en bloques con mosaico de 3 columnas: todo cabe sin scroll y cada cosa tiene su lugar.
+const grupos = GRUPOS_CUENTA.map((g) => ({ ...g, items: ACCOUNT_NAV.filter((n) => n.grupo === g.id && !n.abajo && n.menu !== false) })).filter((g) => g.items.length);
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
 ---
@@ -34,11 +36,17 @@ const { active } = Astro.props;
     </div>
     <!-- «Mi cuenta» solo en PC: en móvil vive en el menú de la foto de perfil (navbar.js). -->
     <div id="sidebar-account" hidden class="max-lg:!hidden flex flex-col flex-1 gap-1.5 mt-3 pt-3 border-t border-galaxy-border lg:mt-0 lg:pt-0 lg:border-t-0">
-      <div class="px-3 pb-1 text-[12px] text-gray-500 tracking-[0.25em]">Mi cuenta</div>
-      {ACCOUNT_NAV.filter((n) => !n.abajo).map((n) => (
-        n.path
-          ? <a href={`${base}${n.path}`} data-solo-staff={n.staff ? n.staff : undefined} hidden={n.staff ? true : undefined} aria-current={active === n.id ? 'page' : undefined} class={`flex items-center gap-4 p-3 rounded-lg hover:text-white hover:bg-white/5 ${active === n.id ? 'text-galaxy-400 bg-galaxy-400/10' : 'text-gray-400'}`}><i class={`fa-solid ${n.icon} w-5 text-center ${active === n.id ? 'text-galaxy-400' : 'text-gray-500'}`}></i> {n.label}</a>
-          : <button type="button" data-action={n.action} class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-left uppercase"><i class={`fa-solid ${n.icon} w-5 text-center text-gray-500`}></i> {n.label}</button>
+      {grupos.map((g) => (
+        <section class="cuenta-grupo" data-grupo={g.id} data-solo-staff={g.id === 'staff' ? 'verReportes' : undefined} hidden={g.id === 'staff' ? true : undefined}>
+          <p class="cuenta-tit">{g.label}</p>
+          <div class="cuenta-mosaico">
+            {g.items.map((n) => (
+              n.path
+                ? <a href={`${base}${n.path}`} data-solo-staff={n.staff ? n.staff : undefined} hidden={n.staff ? true : undefined} aria-current={active === n.id ? 'page' : undefined} class="cuenta-tile"><i class={`fa-solid ${n.icon}`}></i><span>{n.label}</span></a>
+                : <button type="button" data-action={n.action} class="cuenta-tile"><i class={`fa-solid ${n.icon}`}></i><span>{n.label}</span></button>
+            ))}
+          </div>
+        </section>
       ))}
       <!-- Bloque inferior: Configuración y Salir, pegados al fondo del panel -->
       <div class="mt-auto sticky bottom-0 pt-2 border-t border-galaxy-border/70 flex flex-col gap-1.5 bg-galaxy-panel">
