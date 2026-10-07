@@ -881,3 +881,21 @@ html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245
 .hero-aurora i:nth-child(2) { right: -10%; top: 8%; background: var(--color-galaxy-600); opacity: .38; }
 .hero-aurora i:nth-child(3) { left: 30%; bottom: -22%; background: var(--color-galaxy-500); opacity: .26; }
 @media (max-width: 640px) { .hero-aurora i { width: 20rem; height: 20rem; filter: blur(80px); } }
+
+
+/* ── Vitrina (FX.vitrina): el primer reto del radar es el «Destacado» ── */
+@property --vt-giro { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+[data-fx-vitrina] #lista-retos > article:first-child {
+  position: relative; border-color: transparent;
+  background: linear-gradient(var(--color-galaxy-panel, #0f1130), var(--color-galaxy-panel, #0f1130)) padding-box,
+              conic-gradient(from var(--vt-giro), #00e5ff, #8000ff, #ff3b5c, #00e5ff) border-box;
+  border-width: 2px; animation: vt-giro 6s linear infinite; box-shadow: 0 0 28px -8px rgb(128 0 255 / .6);
+}
+[data-fx-vitrina] #lista-retos > article:first-child::before {
+  content: '🔥 Destacado'; position: absolute; top: -.7rem; left: .9rem; z-index: 1; padding: .1rem .55rem; border-radius: 999px;
+  font: 800 .62rem/1.4 var(--font-display, inherit); letter-spacing: .12em; text-transform: uppercase; color: #fff;
+  background: linear-gradient(90deg, #e11d48, #9333ea); box-shadow: 0 4px 12px -2px rgb(225 29 72 / .5);
+}
+[data-fx-vitrina] #lista-retos > article:first-child { margin-top: .5rem; }
+@keyframes vt-giro { to { --vt-giro: 360deg; } }
+@media (prefers-reduced-motion: reduce) { [data-fx-vitrina] #lista-retos > article:first-child { animation: none; } }

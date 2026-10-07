@@ -2,6 +2,8 @@
 // en celular, al bajar queda una versión sutil y compacta justo debajo de la cabecera),
 // (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco IRREGULAR entre ellas (no simétrico); pueden coincidir varias.
 import { factorTicker } from '../core/ajustes.js';
+import { FX } from '../../data/experimento.js';
+import { piezasTicker } from '../core/tickerVivo.js';
 
 const EL_ID = 'ticker';
 const ARRIBA = 80;   // por encima de esta posición (px) se ve completa; por debajo se esconde (PC) o pasa a versión sutil (celular)
@@ -26,6 +28,20 @@ function initMarquee() {
   const movil = () => window.matchMedia('(max-width: 639px)').matches;
   const vivas = []; let i = 0; let pausa = false; let previo = 0; let vw = view.clientWidth;
   base.remove();                                                          // la noticia estática de respaldo (sin JS) ya no hace falta
+  // Actividad real de la comunidad (FX.tickerVivo): se mezcla con las noticias fijas y se renueva cada 60 s. Si falla, quedan solo las noticias.
+  if (FX.tickerVivo) {
+    const fijas = [...items];
+    const vivo = async () => {
+      if (document.hidden) return;
+      try {
+        const { supabase } = await import('../core/supabase.js');   // import diferido: este módulo también se prueba en Node
+        const { data, error } = await supabase.rpc('ticker_comunidad'); if (error) throw error;
+        const extra = piezasTicker(data).map((p) => (p.tipo === 'vivo' ? `🔴 EN VIVO · ${p.texto}` : `⚽ ${p.texto}`));
+        items.splice(0, items.length, ...extra, ...fijas);
+      } catch (e) { console.warn('[ticker] actividad:', e.message); }
+    };
+    vivo(); setInterval(vivo, 60_000);
+  }
 
   const crear = () => {
     const el = document.createElement('span'); el.className = 'ticker-item font-sans text-xs sm:text-sm text-galaxy-50';

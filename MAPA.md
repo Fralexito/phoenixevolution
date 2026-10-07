@@ -431,7 +431,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 198: página /mis-salas/ «Phoenix Soda» (menú Mi cuenta): vincular Parsec, mis salas abiertas (rival y espectadores), mis PCs para hosts (código de vinculación, código de instalación, renombrar, desvincular). pages/misSalas.js.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 198)
+- Ronda 199 (prueba de dinamismo, reversible por interruptor): FX.tickerVivo (la barra «Última hora» mezcla actividad real: RPC ticker_comunidad, migración 068 aplicada por MCP; core/tickerVivo.js) y FX.vitrina (primer reto del radar = «Destacado» con borde animado, solo CSS). Para deshacer: poner false en src/data/experimento.js.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 199)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**
