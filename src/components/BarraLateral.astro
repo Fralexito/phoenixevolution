@@ -6,13 +6,15 @@ import { LIGAS } from '../data/ligas.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
 const todos = [...NAV, ...NAV_EXTRA];
-const atajos = ['central', 'social', 'liga', 'competiciones', 'historial', 'database', 'duelos', 'creadores', 'ranking', 'eventos'].map((id) => todos.find((n) => n.id === id)).filter(Boolean);
+// Solo lo que NO está en el menú de arriba (evita duplicar): lo en vivo + accesos de comunidad.
+const todosMas = [...todos, ...ACCOUNT_NAV];
+const atajos = ['ahora', 'envivo', 'missalas', 'ranking', 'eventos', 'competiciones', 'historial', 'comunidad'].map((id) => todosMas.find((n) => n.id === id && n.path)).filter(Boolean);
 const cuenta = ['muro', 'partidos', 'mensajes'].map((id) => ACCOUNT_NAV.find((n) => n.id === id)).filter((n) => n?.path);
 const item = (n, id = n.id) => ({ ...n, actual: active === id });
 ---
 <aside id="barra-lat" class="barra-lat" aria-label="Barra lateral" hidden>
   <nav class="barra-sec" aria-label="Atajos">
-    <p class="barra-tit">Atajos</p>
+    <p class="barra-tit">En vivo y comunidad</p>
     {atajos.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
   </nav>
   <nav class="barra-sec" aria-label="Ligas">

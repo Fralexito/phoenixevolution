@@ -63,7 +63,7 @@ export const ETIQUETAS_OPCION = {
   recto: 'Recta', redondo: 'Redondeada', corte: 'Esquina cortada', suave: 'Suave', neon: 'Neón', ninguno: 'Sin brillo',
   sube: 'Se eleva', zoom: 'Zoom a la imagen', inclina: 'Se inclina', ninguna: 'Quieta', display: 'Deportiva', serif: 'Prensa', mono: 'Técnica',
 };
-const ACENTO_POR_CAT = { OFICIAL: 'galaxy', JORNADA: 'esmeralda', TRIBUNAL: 'rojo' };
+const ACENTO_POR_CAT = { OFICIAL: 'galaxy', JORNADA: 'esmeralda', TRIBUNAL: 'rojo', TRIBUNA: 'naranja' };
 
 export const plantillaDe = (id) => TARJETAS.find((t) => t.id === id) ?? null;
 export const esPlantilla = (id) => id === 'auto' || !!plantillaDe(id);

@@ -2,7 +2,7 @@
 import { esPlantilla, limpiarEstilo } from './noticiasPlantillas.js';
 // Forma en pantalla de una noticia: { id, slug, titulo, resumen, cuerpo: string[], categoria, tag, imagen, liga, destacada, publicada, publicadaEn (ISO), editable }.
 
-export const CATEGORIAS = ['OFICIAL', 'JORNADA', 'TRIBUNAL'];
+export const CATEGORIAS = ['OFICIAL', 'JORNADA', 'TRIBUNAL', 'TRIBUNA'];
 export const LIMITES = { titulo: [3, 140], resumen: [3, 400], cuerpo: [3, 20000], tag: [0, 40] };   // [BD] iguales a los check de la tabla `noticias`
 
 /** «Auditoría Antifraude: Actas» → «auditoria-antifraude-actas» (minúsculas, sin tildes, solo a-z 0-9 y guiones; máx. 70). */

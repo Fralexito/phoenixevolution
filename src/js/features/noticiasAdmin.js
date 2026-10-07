@@ -17,7 +17,7 @@ import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 
 const ID = 'news-editor';
-const ETIQUETA_CAT = { OFICIAL: 'Oficial', JORNADA: 'Jornadas', TRIBUNAL: 'Tribunal' };
+const ETIQUETA_CAT = { OFICIAL: 'Oficial', JORNADA: 'Jornadas', TRIBUNAL: 'Tribunal', TRIBUNA: 'Tribuna (joda)' };
 const edicionActual = (ligaId) => (EDICIONES[ligaId] ?? []).at(-1) ?? null;
 const ligaDe = (id) => LIGAS.find((l) => l.id === id);
 

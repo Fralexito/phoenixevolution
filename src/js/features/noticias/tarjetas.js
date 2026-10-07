@@ -1,6 +1,7 @@
 // Dibujo de las tarjetas y del lector de Noticias (solo construye texto HTML: sin DOM, sin red → probable con `npm test`).
 // Cada plantilla de core/noticiasPlantillas.js tiene aquí su dibujo; los estilos (CSS) están en styles/components.css (.nt-*, .nl-*).
 import { escapeHTML as esc, safeImg } from '../../core/dom.js';
+import { FX } from '../../../data/experimento.js';
 import { ACENTOS, plantillaDe, LECTURAS } from '../../core/noticiasPlantillas.js';
 
 /** @typedef {{cuando:(n:object)=>string, ligaNombre:(id:string)=>string, borrador:(n:object)=>string}} Ctx */
@@ -50,7 +51,9 @@ export const PLANTILLAS_DIBUJADAS = Object.keys(DIBUJOS);
 /** Tarjeta completa lista para insertar en la página. `e` = estilo ya resuelto (acento, forma, brillo, anim, fuente). */
 export function tarjetaHTML(n, plantillaId, e, c) {
   const p = plantillaDe(plantillaId) ?? plantillaDe('clasica'); const dibujo = DIBUJOS[p.id] ?? DIBUJOS.clasica;
-  return `<button type="button" data-slug="${esc(n.slug)}" class="nt nt-${p.id} nc-${p.cols} nf-${e.forma} nb-${e.brillo} na-${e.anim} nu-${e.fuente}" style="--na:${rgbDe(e)}">${dibujo(n, c)}</button>`;
+  const tono = !FX.noticiasTono ? '' : n.categoria === 'TRIBUNA' ? 'tono-joda' : 'tono-serio';
+  const sticker = tono === 'tono-joda' ? '<span class="nt-sticker" aria-hidden="true">😂 JODA</span>' : '';
+  return `<button type="button" data-slug="${esc(n.slug)}" class="nt ${tono} nt-${p.id} nc-${p.cols} nf-${e.forma} nb-${e.brillo} na-${e.anim} nu-${e.fuente}" style="--na:${rgbDe(e)}">${sticker}${dibujo(n, c)}</button>`;
 }
 
 // ---------------- Lector ----------------
