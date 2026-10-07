@@ -44,7 +44,7 @@ const base = import.meta.env.BASE_URL;
     <div id="live-wrap" class="fixed left-3 right-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:w-[22rem] z-[60] flex flex-col items-start md:items-end gap-2 pointer-events-none">
       <div id="live-feed" aria-hidden="true" class="flex flex-col items-start md:items-end gap-1.5 max-w-full"></div>
       <div id="live-row" class="flex items-center gap-2 pointer-events-auto">
-        <a id="live-hist-btn" href={`${import.meta.env.BASE_URL}historial-en-vivo/`} target="_blank" rel="noopener" class="live-toggle" aria-label="Abrir el historial de hoy en otra pestaña"><i class="fa-solid fa-clock-rotate-left"></i><span class="live-toggle-txt">Historial</span></a>
+        <a id="live-hist-btn" title="Historial de hoy" href={`${import.meta.env.BASE_URL}historial-en-vivo/`} target="_blank" rel="noopener" class="live-toggle" aria-label="Abrir el historial de hoy en otra pestaña"><i class="fa-solid fa-clock-rotate-left"></i><span class="live-toggle-txt">Historial</span></a>
         <button id="live-toggle" type="button" aria-pressed="true" class="live-toggle live-movible" title="Mantén pulsado y arrastra para mover"><span class="live-dot"></span><span class="live-toggle-txt">En vivo</span></button>
       </div>
     </div>

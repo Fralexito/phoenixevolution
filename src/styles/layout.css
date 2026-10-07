@@ -116,3 +116,12 @@ html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute;
 #hv-filtros code, .hv-ayuda code { padding: 0 .3rem; border-radius: .3rem; background: rgb(255 255 255 / .08); color: var(--color-galaxy-400); font-size: .75rem; }
 .live-nom { color: inherit; text-decoration: none; border-bottom: 1px dotted rgb(255 255 255 / .35); }
 .live-nom:hover { color: var(--color-galaxy-400); border-bottom-color: var(--color-galaxy-400); }
+
+/* Pulso «En vivo» más discreto: «Historial» solo con ícono, y en celular un único mensaje a la vez. */
+#live-hist-btn .live-toggle-txt { display: none; }
+#live-hist-btn { padding-inline: .6rem; }
+@media (max-width: 767.98px) {
+  #live-feed > .live-msg:nth-last-child(n+2) { display: none; }
+  #live-wrap:not([data-movido]) { left: auto; right: .75rem; bottom: .75rem; }
+  #live-row .live-toggle-txt { display: none; }
+}

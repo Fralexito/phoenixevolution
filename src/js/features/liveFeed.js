@@ -7,7 +7,7 @@ import { formatEvento, demoDelay, horaExacta, podarHistorialHoy } from '../core/
 import { leerAjustes, regionAhora } from './ajustes.js';
 import { DEMO_NOMBRES, DEMO_FORMATOS, DEMO_JUEGOS } from '../../data/liveDemo.js';
 
-const LIVE_DEMO = true;          // ← poner en false cuando haya actividad real
+const LIVE_DEMO = false;         // apagado: ya no se inventan eventos; el pulso solo muestra actividad real
 const MAX_VISIBLES = 5;
 const KEY_OFF = 'pes-live-off';
 export const KEY_HIST = 'pes-live-hist';

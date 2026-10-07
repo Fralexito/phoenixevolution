@@ -51,7 +51,7 @@ const base = import.meta.env.BASE_URL;
       <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
       <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Clubes</a>
       <a href="#destacados-seccion"><i class="fa-solid fa-id-card"></i>Jugadores</a>
-      <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>
+      {FX.highlightsDemo && <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>}
     </nav>
 
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
@@ -142,8 +142,8 @@ const base = import.meta.env.BASE_URL;
       <div class="podio" id="featured-players-container"><div class="grid grid-cols-3 gap-3 w-full" role="status" aria-label="Cargando jugadores"><div class="esqueleto h-56"></div><div class="esqueleto h-64"></div><div class="esqueleto h-56"></div></div></div>
     </section>
 
-    <!-- 5. HIGHLIGHTS: video principal grande + lista de clips al costado (en celular, debajo) -->
-    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver" id="highlights" clase="scroll-mt-40">
+    <!-- 5. HIGHLIGHTS (oculto mientras sean clips de ejemplo: FX.highlightsDemo) -->
+    {FX.highlightsDemo && <>    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver" id="highlights" clase="scroll-mt-40">
       <p class="mb-3 text-right"><a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase inline-flex items-center gap-1.5"><i class="fa-brands fa-youtube"></i> Ver canal</a></p>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden relative aspect-video w-full flex items-center justify-center group shadow-[0_0_35px_rgba(128,0,255,0.25)]">
@@ -167,7 +167,7 @@ const base = import.meta.env.BASE_URL;
           ))}
         </div>
       </div>
-    </Plegable>
+    </Plegable></>}
 
     <!-- 6. INVITACIÓN FINAL -->
     <section class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">

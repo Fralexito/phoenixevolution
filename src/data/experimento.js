@@ -12,5 +12,6 @@
 //   vitrina      → jerarquía tipo transmisión: el primer reto del radar se muestra como «Destacado» (más grande, borde animado). Pon false y todas las tarjetas vuelven a ser iguales
 //   palmaresNuevo → Palmarés rediseñado (sala de trofeos: podio en escalones, galardones en lista, récords tipo marcador). Pon false y vuelve el anterior
 //   palmaresVitrina → Palmarés con vitrina de trofeos (neón) + carta del campeón al tocar + más vida en los premios. Pon false y vuelve el anterior
+//   highlightsDemo → bloque «Highlights de la jornada» de Central (hoy son clips de ejemplo e imagen de stock). false = oculto hasta tener clips reales
 //   barraLateral → barra lateral izquierda estilo red social (solo PC ≥ 1280 px): atajos, ligas y amigos. Pon false y desaparece por completo
-export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true, dopamina: true, contactos: true, tickerVivo: true, vitrina: true, palmaresNuevo: false, palmaresVitrina: true };
+export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true, dopamina: true, contactos: true, tickerVivo: true, vitrina: true, palmaresNuevo: false, palmaresVitrina: true, highlightsDemo: false };

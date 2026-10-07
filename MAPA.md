@@ -441,7 +441,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 203: 072 (aviso a seguidores + Discord al marcar En vivo) y 073 (sistema_perfiles_parsec; ticker con creadores en vivo pulsables) aplicadas por el usuario. Edge Function phoenix v1.6.0 desplegada (versión 5): POST /v1/perfiles. Contrato §23.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 203)
+- Ronda 204 (limpieza): LIVE_DEMO=false (el pulso ya no inventa eventos), Highlights de Central ocultos (FX.highlightsDemo=false, eran clips de ejemplo + Unsplash), carta-experimento fuera del sitio (_carta-experimento.astro), pulso «En vivo» más discreto (Historial solo ícono; en celular un mensaje y solo los botones a la derecha). Inicio: portada sin altura forzada, título en 2 líneas «…DE / LA GALAXY LEAGUE». Palmarés con vitrina (FX.palmaresVitrina). Contexto completo en claude/ESTADO-ACTUAL.md.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 204)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**
