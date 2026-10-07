@@ -439,7 +439,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 202: migración 071 (pendiente de aplicar por el usuario): creadores verificados (/creadores/, solicitar, «Estoy en vivo», staff verifica en Moderación) y alquiler de host verificado (ofertas_host, alquileres_host; pago por fuera o gemas en garantía: se pagan al host cuando el cliente confirma, se devuelven al rechazar/cancelar). Botón «Alquilar host» en el encabezado del radar de Duelos (modal, features/alquiler.js); oferta del host en /mis-salas/.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 202)
+- Ronda 203: 072 (aviso a seguidores + Discord al marcar En vivo) y 073 (sistema_perfiles_parsec; ticker con creadores en vivo pulsables) aplicadas por el usuario. Edge Function phoenix v1.6.0 desplegada (versión 5): POST /v1/perfiles. Contrato §23.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 203)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**
