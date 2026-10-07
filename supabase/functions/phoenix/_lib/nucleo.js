@@ -3,7 +3,7 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.5.0',
+  version_api: '1.6.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
   intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30 }),

@@ -484,6 +484,20 @@ async function soltarRival(req: Request) {
   return { roles, roles_etag: huellaContenido(roles) };
 }
 
+/** POST /v1/perfiles — tarjeta de jugador (nombre, avatar, carta) por parsec_id, para que la app muestre quién está en la sala. */
+async function perfiles(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  frenar(`perf:${d.id}`, 1, 5_000);
+  if (!Array.isArray(b.parsec_ids)) throw new ErrorApi("CAMPO_INVALIDO", { campo: "parsec_ids", mensaje: "parsec_ids debe ser una lista." });
+  if (b.parsec_ids.length > 16) throw new ErrorApi("CAMPO_INVALIDO", { campo: "parsec_ids", mensaje: "Máximo 16 parsec_ids." });
+  const ids = [...new Set(b.parsec_ids.map((x, i) => v.parsecId(x, `parsec_ids[${i}]`)))];
+  if (!ids.length) return { perfiles: [] };
+  const { data, error } = await sb.rpc("sistema_perfiles_parsec", { p_ids: ids });
+  db(error, "perfiles");
+  const lista = ((data ?? []) as Record<string, unknown>[]).map((p) => ({ ...p, parsec_id: /^\d{1,15}$/.test(String(p.parsec_id)) ? Number(p.parsec_id) : p.parsec_id }));
+  return { perfiles: lista };
+}
+
 type NoModificado = { __noModificado: true; etag: string };
 /** Si el ETag del cliente (If-None-Match o ?etag=) coincide → 304. Si no, devuelve los datos con su `etag`. */
 function conEtag(req: Request, datos: Record<string, unknown>, volatiles: string[] = []): Record<string, unknown> | NoModificado {
@@ -600,6 +614,7 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/presencia/amigos": { metodo: "GET", fn: presenciaAmigos },
   "/v1/invitar": { metodo: "POST", fn: invitar },
   "/v1/sala/soltar_rival": { metodo: "POST", fn: soltarRival },
+  "/v1/perfiles": { metodo: "POST", fn: perfiles },
 };
 
 Deno.serve(async (req) => {

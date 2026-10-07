@@ -13,3 +13,18 @@ export function piezasTicker(d) {
   }
   return out;
 }
+
+/** Plataforma por el dominio del enlace (para mostrarla en el ticker). */
+export function plataformaDe(url) {
+  const h = (() => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } })();
+  if (/tiktok\.com$/.test(h)) return 'TikTok';
+  if (/twitch\.tv$/.test(h)) return 'Twitch';
+  if (/(youtube\.com|youtu\.be)$/.test(h)) return 'YouTube';
+  if (/kick\.com$/.test(h)) return 'Kick';
+  if (/facebook\.com|fb\.gg$/.test(h)) return 'Facebook';
+  return h ? 'su canal' : null;
+}
+/** Creadores en vivo → piezas con enlace: «🔴 Kaiser está en vivo en TikTok». Solo enlaces https. */
+export const piezasCreadores = (lista) => (Array.isArray(lista) ? lista : [])
+  .filter((c) => c?.nombre && /^https:\/\//.test(c?.url ?? ''))
+  .map((c) => ({ tipo: 'creador', texto: `🔴 ${c.nombre} está en vivo en ${plataformaDe(c.url)}${c.titulo ? ` · ${c.titulo}` : ''}`, url: c.url }));

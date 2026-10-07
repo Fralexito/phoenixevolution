@@ -3,7 +3,7 @@
 // (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco IRREGULAR entre ellas (no simétrico); pueden coincidir varias.
 import { factorTicker } from '../core/ajustes.js';
 import { FX } from '../../data/experimento.js';
-import { piezasTicker } from '../core/tickerVivo.js';
+import { piezasTicker, piezasCreadores } from '../core/tickerVivo.js';
 
 const EL_ID = 'ticker';
 const ARRIBA = 80;   // por encima de esta posición (px) se ve completa; por debajo se esconde (PC) o pasa a versión sutil (celular)
@@ -36,7 +36,8 @@ function initMarquee() {
       try {
         const { supabase } = await import('../core/supabase.js');   // import diferido: este módulo también se prueba en Node
         const { data, error } = await supabase.rpc('ticker_comunidad'); if (error) throw error;
-        const extra = piezasTicker(data).map((p) => (p.tipo === 'vivo' ? `🔴 EN VIVO · ${p.texto}` : `⚽ ${p.texto}`));
+        const extra = [...piezasCreadores(data?.creadores_en_vivo).map((p) => ({ texto: p.texto, url: p.url })),
+          ...piezasTicker(data).map((p) => (p.tipo === 'vivo' ? `🔴 EN VIVO · ${p.texto}` : `⚽ ${p.texto}`))];
         items.splice(0, items.length, ...extra, ...fijas);
       } catch (e) { console.warn('[ticker] actividad:', e.message); }
     };
@@ -46,7 +47,12 @@ function initMarquee() {
   const crear = () => {
     const el = document.createElement('span'); el.className = 'ticker-item font-sans text-xs sm:text-sm text-galaxy-50';
     const d = document.createElement('span'); d.className = 'text-galaxy-400 mr-2'; d.textContent = '◆';
-    el.append(d, document.createTextNode(items[i % items.length])); i += 1;
+    const it = items[i % items.length]; i += 1;
+    if (it && typeof it === 'object' && /^https:\/\//.test(it.url ?? '')) {      // creador en vivo: se puede pulsar para ir a su directo
+      const a = document.createElement('a'); a.href = it.url; a.target = '_blank'; a.rel = 'noopener';
+      a.className = 'underline decoration-rose-400/60 hover:text-white pointer-events-auto'; a.textContent = it.texto;
+      el.append(d, a);
+    } else el.append(d, document.createTextNode(typeof it === 'object' ? String(it?.texto ?? '') : it));
     view.append(el); const w = el.offsetWidth;
     if (!w) { el.remove(); i -= 1; return; }                              // aún sin medidas (fuentes cargando): reintenta en el siguiente cuadro
     vivas.push({ el, x: vw, w, hueco: huecoIrregular(movil() ? HUECO_MOVIL : HUECO_PC, Math.random()) });   // cada noticia trae su propio hueco de salida

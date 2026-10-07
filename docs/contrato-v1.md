@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.5.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.6.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.6.0 (compatibles, requieren migración 073):** nueva ruta `POST /v1/perfiles` (sección 23): nombre, avatar y carta de jugador por `parsec_id`.
 
 **Cambios 1.5.0 (compatibles, requieren migración 067):** `sala/abrir` acepta `acepta_espectadores`; `sala/abrir` y `sala/latido` devuelven la **lista de roles viva** (`roles` + `roles_etag`), que ahora incluye al **rival que aceptó en el radar** (mando 2) y a los **espectadores que entraron con «Ver»** (`pad_limit 0`); nueva ruta `POST /v1/sala/soltar_rival`. El enlace de una sala solo se entrega a quien tiene rol (sección 22).
 
@@ -477,3 +479,28 @@ Cuerpo `{ "sala_id": "uuid" }`. Quita al rival; si la sala sigue `abierta`, **vu
 2. Mandar `estado: "en_partida"` en el latido al empezar el partido (así sale del radar).
 3. Aplicar `roles` de cada latido: reservar el mando 2 al `parsec_id` del rival y `pad_limit 0` a los espectadores.
 4. Cerrar la sala con `sala/cerrar` al terminar (si no, desaparece sola a los 3 min sin latido).
+
+## 23. `POST /v1/perfiles` (token) — tarjetas de jugador por parsec_id (1.6.0 · migración 073)
+Para que la app muestre nombre, avatar y carta de quien está en la sala. Mismo token y cabeceras que `sala/latido`.
+
+**Cuerpo:** `{ "parsec_ids": [123456, 789012] }` — números o textos de dígitos, **máx. 16**; los repetidos se ignoran.
+
+**Respuesta 200:**
+```json
+{ "ok": true, "perfiles": [
+  { "parsec_id": 123456, "usuario_id": "uuid", "nombre": "Mirko", "avatar_url": "https://…", "actualizado": "2026-10-07T07:00:00Z",
+    "carta": { "media": 87, "posicion": "DC", "club": "Galaxy FC", "escudo_url": null, "rareza": "oro", "pais": "PE",
+               "apodo": "El Mago", "foto_url": "https://…", "pie": "Derecho",
+               "stats": { "rit": 90, "tir": 85, "pas": 80, "reg": 88, "def": 40, "fis": 75 } } }
+] }
+```
+- Los `parsec_id` **sin cuenta vinculada no aparecen**. Se usa el mismo `parsec_id` de `cuentas_parsec` que va en los roles.
+- `carta` es `null` si el usuario no tiene ficha en «Jugadores». Si tiene varias, se usa la de mayor media.
+- **Origen de cada campo** (tabla `jugadores`): `media` = `ovr`; `stats` = `pac`→`rit`, `sho`→`tir`, `pas`→`pas`, `dri`→`reg`, `def`→`def`, `phy`→`fis`. `pais` sale del perfil (`pais_codigo`).
+- **`rareza` se calcula** porque no existe en la base: `leyenda` ≥ 90, `oro` ≥ 75, `plata` ≥ 65, si no `bronce`.
+- **`escudo_url` siempre es `null` por ahora**: los clubes son texto libre y no tienen escudo guardado.
+- `avatar_url` es la URL pública del perfil (puede ser de Discord, Google o Storage público). No se redimensiona: la app debe escalarla.
+- `actualizado` es la fecha más reciente entre la creación del perfil y la de la ficha (no hay marca de edición en `perfiles`).
+- **Campos extra** que también existen en la ficha y no se envían (dímelo si los quieres): `descripcion`, `biografia`, `altura_cm`, `peso_kg`, `estilo_juego`, `ciudad`, `redes` y las stats detalladas `atq, fin, pot, efe, cor, cre, pre, pos, ant, men`.
+
+**Errores:** `401` (`TOKEN_FALTANTE` / `TOKEN_INVALIDO` / `TOKEN_REVOCADO`), `422 CAMPO_INVALIDO` (no es lista, más de 16 o un id no numérico), `429 DEMASIADOS_INTENTOS` si se llama más de **1 vez cada 5 s** por PC (`retry-after` indica cuánto esperar).
