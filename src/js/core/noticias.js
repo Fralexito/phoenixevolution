@@ -1,3 +1,4 @@
+import { limpiarLienzo } from './noticiasLienzo.js';
 // Lógica pura de Noticias (sin DOM ni red → probable con `npm test`).
 import { esPlantilla, limpiarEstilo } from './noticiasPlantillas.js';
 // Forma en pantalla de una noticia: { id, slug, titulo, resumen, cuerpo: string[], categoria, tag, imagen, liga, destacada, publicada, publicadaEn (ISO), editable }.
@@ -33,7 +34,7 @@ export function fechaRelativa(iso, ahora = new Date()) {
 export function normalizar(f) {
   return {
     id: f.id, slug: f.slug, titulo: f.titulo, resumen: f.resumen, cuerpo: partirCuerpo(f.cuerpo), categoria: f.categoria, tag: f.tag ?? '',
-    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, fecha: f.fecha ?? '', plantilla: esPlantilla(f.plantilla) ? f.plantilla : 'auto', estilo: limpiarEstilo(f.estilo), orden: Number.isInteger(f.orden) ? f.orden : null, discordEn: f.discord_en ?? f.discordEn ?? null,
+    imagen: f.imagen ?? '', liga: f.liga ?? 'galaxy', destacada: !!f.destacada, publicada: f.publicada !== false, publicadaEn: f.publicada_en ?? f.publicadaEn ?? '', editable: !!f.editable, fecha: f.fecha ?? '', plantilla: esPlantilla(f.plantilla) ? f.plantilla : 'auto', estilo: limpiarEstilo(f.estilo), orden: Number.isInteger(f.orden) ? f.orden : null, lienzo: limpiarLienzo(f.lienzo), discordEn: f.discord_en ?? f.discordEn ?? null,
   };
 }
 /** Valida un borrador del editor con los mismos límites que la base. Devuelve { ok, errores: string[] }. */

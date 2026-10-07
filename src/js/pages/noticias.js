@@ -12,7 +12,8 @@ import { abrirEditor, borrarNoticia, ocultarNoticia, guardarDiseno } from '../fe
 import { tarjetaHTML, lecturaHTML } from '../features/noticias/tarjetas.js';
 import { abrirCatalogo } from '../features/noticias/catalogo.js';
 import { entrarAcomodar } from '../features/noticias/acomodar.js';
-import { asignarDiseno } from '../core/noticiasPlantillas.js';
+import { asignarDiseno, plantillaDe } from '../core/noticiasPlantillas.js';
+import { hayLienzo, ordenLectura, FILA_PX } from '../core/noticiasLienzo.js';
 
 const $ = (id) => document.getElementById(id);
 const state = { lista: [], cat: 'TODOS', liga: 'TODAS', term: '' };
@@ -33,19 +34,27 @@ function paintLigas() {
 let acomodo = null;   // modo «Acomodar» activo
 function paint() {
   const list = filtrar(state.lista, state);
-  if (acomodo) {   // todo en una sola grilla (portada incluida) para poder moverla
-    disenos.clear(); asignarDiseno(state.lista, { heroIdx: -1 }).forEach((d, i) => disenos.set(state.lista[i].slug, d));
-    $('news-featured').innerHTML = '';
-    $('news-grid').innerHTML = state.lista.map((n) => tarjetaHTML(n, disenos.get(n.slug).plantilla, disenos.get(n.slug).estilo, ctx)).join('');
-    return;
-  }
+  if (acomodo) return;   // GridStack es dueño de la grilla mientras se acomoda
+  if (hayLienzo(state.lista)) return paintLienzo(list);
   const dest = elegirDestacada(list); const resto = list.filter((n) => n !== dest);
   const orden = dest ? [dest, ...resto] : resto;
   disenos.clear(); asignarDiseno(orden, { heroIdx: dest ? 0 : -1 }).forEach((d, i) => disenos.set(orden[i].slug, d));
   $('news-featured').innerHTML = dest ? tarjetaHTML(dest, disenos.get(dest.slug).plantilla, disenos.get(dest.slug).estilo, ctx) : '';
+  $('news-grid').className = '';
   $('news-grid').innerHTML = !list.length
     ? `<div class="col-span-full text-center py-16 text-gray-500 text-sm">No hay noticias que coincidan con la búsqueda.</div>`
     : resto.map((n) => tarjetaHTML(n, disenos.get(n.slug).plantilla, disenos.get(n.slug).estilo, ctx)).join('');
+}
+
+const tarjetaDe = (n) => { const d = disenos.get(n.slug); return tarjetaHTML(n, d.plantilla, d.estilo, ctx); };
+/** Lienzo libre: cada tarjeta en la posición y tamaño que eligió el staff (en PC). En celular, una columna en orden de lectura. */
+function paintLienzo(list) {
+  const orden = ordenLectura(list);
+  disenos.clear(); asignarDiseno(orden, { heroIdx: -1 }).forEach((d, i) => disenos.set(orden[i].slug, d));
+  $('news-featured').innerHTML = '';
+  const g = $('news-grid'); g.className = 'nt-lienzo'; g.style.setProperty('--fila', `${FILA_PX}px`);
+  g.innerHTML = !list.length ? '<div class="text-center py-16 text-gray-500 text-sm">No hay noticias que coincidan con la búsqueda.</div>'
+    : orden.map((n) => { const l = n.lienzo; return `<div class="nt-celda" style="${l ? `--x:${l.x + 1};--y:${l.y + 1};--w:${l.w};--h:${l.h}` : '--w:4;--h:4'}">${tarjetaDe(n)}</div>`; }).join('');
 }
 
 /** Mantiene ?n=<slug> en la URL mientras el lector está abierto (para compartir/copiar). */
@@ -113,9 +122,11 @@ const barraAcomodo = (on) => { $('news-acomodar').hidden = on; $('news-acomodar-
 $('news-acomodar').addEventListener('click', async () => {
   if (!state.lista.some((n) => n.editable)) { toast('Aún no hay noticias reales para acomodar.', 'warn'); return; }
   state.cat = 'TODOS'; state.liga = 'TODAS'; state.term = ''; $('news-search').value = '';
-  acomodo = true; barraAcomodo(true); paint();
-  try { acomodo = await entrarAcomodar({ grid: $('news-grid'), alSalir: async (ok) => { acomodo = null; barraAcomodo(false); if (ok) await cargar(); else paint(); } }); }
-  catch (e) { console.error('[noticias] sortable:', e); toast('No se pudo activar el modo acomodar.', 'error'); acomodo = null; barraAcomodo(false); paint(); }
+  barraAcomodo(true); paintLienzo(state.lista);   // asegura diseños asignados para todas
+  const items = ordenLectura(state.lista).map((n) => { const d = disenos.get(n.slug); return { id: n.id, html: tarjetaDe(n), lienzo: n.lienzo, cols: plantillaDe(d.plantilla)?.cols ?? 1 }; });
+  acomodo = true;
+  try { acomodo = await entrarAcomodar({ grid: $('news-grid'), items, alSalir: async (ok) => { acomodo = null; barraAcomodo(false); if (ok) await cargar(); else paint(); } }); }
+  catch (e) { console.error('[noticias] gridstack:', e); toast('No se pudo activar el modo acomodar.', 'error'); acomodo = null; barraAcomodo(false); paint(); }
 });
 $('news-acomodar-ok').addEventListener('click', () => acomodo?.guardar?.());
 $('news-acomodar-no').addEventListener('click', () => acomodo?.cancelar?.());
