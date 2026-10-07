@@ -6,7 +6,7 @@ import { LIGAS } from '../data/ligas.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
 const todos = [...NAV, ...NAV_EXTRA];
-const atajos = ['central', 'social', 'liga', 'competiciones', 'historial', 'database', 'duelos', 'ranking', 'eventos'].map((id) => todos.find((n) => n.id === id)).filter(Boolean);
+const atajos = ['central', 'social', 'liga', 'competiciones', 'historial', 'database', 'duelos', 'creadores', 'ranking', 'eventos'].map((id) => todos.find((n) => n.id === id)).filter(Boolean);
 const cuenta = ['muro', 'partidos', 'mensajes'].map((id) => ACCOUNT_NAV.find((n) => n.id === id)).filter((n) => n?.path);
 const item = (n, id = n.id) => ({ ...n, actual: active === id });
 ---
