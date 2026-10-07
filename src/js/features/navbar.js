@@ -44,7 +44,7 @@ function render({ session, profile }) {
     box.innerHTML = `
       <div class="relative mr-2 sm:mr-3"><button type="button" id="btn-notif" aria-label="Notificaciones" class="relative text-gray-400 hover:text-galaxy-400">
         <i class="fa-solid fa-bell text-lg"></i><span id="notif-dot" hidden class="absolute -top-2 -right-2 min-w-4 h-4 px-1 rounded-full bg-bad text-white text-[12px] font-bold leading-4 text-center"></span></button>
-        <div id="dropdown-notif" hidden class="fixed left-2 right-2 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-80 bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden"></div></div>
+        <div id="dropdown-notif" hidden class="fixed left-2 right-2 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[26rem] bg-galaxy-panel border border-galaxy-border rounded-xl shadow-2xl z-[300] overflow-hidden"></div></div>
       <div class="relative">
         <button type="button" data-act="menu" aria-haspopup="true" class="flex items-center gap-2">
           <span class="relative w-9 h-9 rounded-full border border-galaxy-400/50 bg-galaxy-card flex items-center justify-center"><i id="avatar-dot" hidden class="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-bad border-2 border-galaxy-panel z-10"></i><span class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">${avatarHTML(profile?.avatar_url, profile?.nombre_display || session.user.email, 36)}</span></span>

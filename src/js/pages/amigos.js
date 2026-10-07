@@ -13,6 +13,8 @@ import * as avisosApi from '../features/avisos/api.js';
 import { CATEGORIAS_AVISO, NOTA_SISTEMA, normalizarPreferencias } from '../core/avisos.js';
 
 const $ = (id) => document.getElementById(id);
+// ?tab=avisos (o cualquier pestaña válida) abre directamente esa pestaña: lo usa el acceso directo de la campana.
+const tabInicial = new URLSearchParams(location.search).get('tab');
 const S = { red: normalizarRed(null), tab: 'amigos', texto: '', ocupado: false, avisos: normalizarPreferencias(null), avisosError: '' };
 const perfil = (id) => data.perfiles.get(id) ?? { id, nombre_display: 'Jugador' };
 
@@ -20,6 +22,7 @@ const TABS = [
   ['amigos', 'Amigos', 'fa-user-group'], ['solicitudes', 'Solicitudes', 'fa-inbox'], ['buscar', 'Buscar', 'fa-magnifying-glass'],
   ['seguidores', 'Seguidores', 'fa-heart'], ['siguiendo', 'Siguiendo', 'fa-eye'], ['bloqueados', 'Bloqueados', 'fa-ban'], ['privacidad', 'Privacidad', 'fa-shield-halved'], ['avisos', 'Avisos', 'fa-bell'],
 ];
+if (TABS.some(([id]) => id === tabInicial)) S.tab = tabInicial;
 const vacio = (t) => `<div class="text-center py-8 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
 
 const btn = (act, id, texto, icono, tono = '') => `<button type="button" data-act="${act}" data-id="${escapeHTML(id)}" class="btn btn-ghost !min-h-9 !px-3 !text-[12px] ${tono}"><i class="fa-solid ${icono}"></i><span>${texto}</span></button>`;
