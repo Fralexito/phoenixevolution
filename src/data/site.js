@@ -9,6 +9,7 @@ export const NAV = [
   { id: 'noticias',  label: 'Noticias',      path: 'noticias/',  icon: 'fa-newspaper' },
   { id: 'database',  label: 'Jugadores', path: 'database/',  icon: 'fa-database' },
   { id: 'duelos',    label: 'Duelos',        path: 'duelos/',    icon: 'fa-gamepad' },
+  { id: 'creadores', label: 'Creadores',     path: 'creadores/', icon: 'fa-video' },
   { id: 'mercado',   label: 'Mercado',       path: 'mercado/',   icon: 'fa-handshake' },
   { id: 'palmares',  label: 'Palmarés',      path: 'palmares/',  icon: 'fa-trophy' },
 ];
@@ -16,7 +17,6 @@ export const NAV = [
 // Enlaces secundarios (no saturan la cabecera de PC): aparecen en el menú de celular y en el pie de página.
 export const NAV_EXTRA = [
   { id: 'comunidad', label: 'Comunidad', path: 'comunidad/', icon: 'fa-people-group' },
-  { id: 'creadores', label: 'Creadores', path: 'creadores/', icon: 'fa-video' },
   { id: 'eventos', label: 'Eventos', path: 'eventos/', icon: 'fa-calendar-day' },
   { id: 'clanes', label: 'Clanes', path: 'clanes/', icon: 'fa-shield-halved' },
   { id: 'ranking', label: 'Ranking', path: 'ranking/', icon: 'fa-ranking-star' },
