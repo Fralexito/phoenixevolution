@@ -79,5 +79,6 @@ onSession((st) => {
   if (!yo) return;
   esHost = !!st.profile?.host_aprobado || ['ayudante', 'moderador', 'admin'].includes(st.profile?.rol);
   pintarParsec(); pintarSalas(); pintarHost();
+  if (esHost) { $('ms-bloque-oferta').hidden = false; import('../features/alquiler.js').then((m) => m.montarOfertaHost($('ms-oferta'))); }
 });
 setInterval(() => { if (yo && !document.hidden) pintarSalas(); }, 30_000);

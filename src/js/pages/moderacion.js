@@ -9,7 +9,7 @@ import { listaReportesHTML, historialHTML } from '../features/moderacion/vista.j
 import { abrirOcultar, abrirSancionar, abrirNota } from '../features/moderacion/acciones.js';
 import { tipoInfo, NOTA_SANCION_MAX } from '../core/moderacion.js';
 import { crearColaMarcadores } from '../features/resultados/staffPanel.js';
-import { montarPanelHosts } from '../features/salas/panelStaff.js';
+import { montarPanelHosts, montarPanelCreadores } from '../features/salas/panelStaff.js';
 
 const $ = (id) => document.getElementById(id);
 const PAGINA = 30;
@@ -96,5 +96,5 @@ onSession(({ session }) => {
   $('mod-app').hidden = !permitido;
   $('mod-solo-lectura').hidden = !permitido || can('resolverReportes');
   if (permitido && !S.iniciado) { S.iniciado = true; pintarTabs(); conectar(); recargar(); crearColaMarcadores($('mod-marcadores'), { puedeResolver: can('resolverReportes') }).cargar();
-    if (can('resolverReportes')) { $('mod-hosts').hidden = false; montarPanelHosts($('mod-hosts')); } }
+    if (can('resolverReportes')) { $('mod-hosts').hidden = false; montarPanelHosts($('mod-hosts')); $('mod-creadores').hidden = false; montarPanelCreadores($('mod-creadores')); } }
 });

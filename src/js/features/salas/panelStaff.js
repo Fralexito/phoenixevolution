@@ -4,6 +4,7 @@ import { toast } from '../../core/toast.js';
 import { confirmar, pedirTexto } from '../../core/dialogo.js';
 import { escapeHTML } from '../../core/dom.js';
 import * as staff from './staff.js';
+import { supabase } from '../../core/supabase.js';
 
 const btn = (attrs, html, extra = '') => `<button type="button" class="btn !min-h-8 !px-2.5 !text-[11px] ${extra}" ${attrs}>${html}</button>`;
 const nombre = (p) => escapeHTML(p?.nombre_display || p?.username || 'Jugador');
@@ -41,6 +42,37 @@ export function montarPanelHosts(caja) {
       if (hp === 'reactivar') { await staff.suspenderDispositivo(id, false); toast('PC reactivada.', 'ok'); }
       if (hp === 'revocar') { if (!(await confirmar('Revocar es definitivo: el dueño tendrá que vincular la PC de nuevo. ¿Seguir?', { aceptar: 'Revocar', peligro: true }))) return; await staff.revocarDispositivo(id); toast('PC revocada.', 'ok'); }
       await pintar();
+    } catch (e) { toast(e.message, 'error'); } finally { b.disabled = false; }
+  });
+  pintar();
+}
+
+/** Panel staff «Creadores»: solicitudes pendientes y verificados (verificar / retirar). */
+export function montarPanelCreadores(caja) {
+  if (!caja) return;
+  const lista = caja.querySelector('[data-cr-lista]');
+  const pintar = async () => {
+    try {
+      const { data, error } = await supabase.from('creadores').select('usuario, verificado, plataformas, juegos, descripcion, solicitado_at').order('verificado').order('solicitado_at', { ascending: false });
+      if (error) throw error;
+      const ids = data.map((c) => c.usuario);
+      const { data: pf } = ids.length ? await supabase.from('perfiles').select('id, nombre_display, username').in('id', ids) : { data: [] };
+      const nom = (id) => nombre((pf ?? []).find((p) => p.id === id));
+      lista.innerHTML = data.map((c) => `<article class="bg-galaxy-panel rounded-xl border border-galaxy-border p-3 space-y-1 text-xs">
+        <div class="flex items-center gap-2"><b class="text-white flex-1">${nom(c.usuario)}</b>
+          ${c.verificado ? btn(`data-cr="quitar" data-id="${c.usuario}"`, 'Retirar') : btn(`data-cr="verificar" data-id="${c.usuario}"`, '<i class="fa-solid fa-check"></i> Verificar', 'btn-primary')}</div>
+        <p class="text-gray-400">${c.verificado ? 'Verificado' : 'Pendiente'} · ${escapeHTML((c.juegos ?? []).join(', '))}</p>
+        <p class="break-all">${Object.entries(c.plataformas ?? {}).map(([k, u]) => `<a class="text-galaxy-400 underline mr-2" href="${escapeHTML(u)}" target="_blank" rel="noopener">${escapeHTML(k)}</a>`).join('')}</p>
+      </article>`).join('') || '<p class="text-xs text-gray-400">No hay solicitudes de creadores.</p>';
+    } catch (e) { lista.textContent = e.message; }
+  };
+  caja.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('[data-cr]'); if (!b || b.disabled) return; b.disabled = true;
+    try {
+      const ok = b.dataset.cr === 'verificar';
+      const m = ok ? null : await pedirTexto('Motivo:', { maximo: 200, obligatorio: true }); if (!ok && !m) return;
+      const { error } = await supabase.rpc('staff_verificar_creador', { p_usuario: b.dataset.id, p_verificado: ok, p_motivo: m }); if (error) throw error;
+      toast(ok ? 'Creador verificado.' : 'Verificación retirada.', 'ok'); pintar();
     } catch (e) { toast(e.message, 'error'); } finally { b.disabled = false; }
   });
   pintar();

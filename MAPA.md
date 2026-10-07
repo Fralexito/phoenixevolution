@@ -437,7 +437,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 201 (enganche, migración 070 por MCP): mi_racha (racha diaria + meta en Duelos y Ahora), perfil_historia (bloque «Historia» en el muro: G-E-P, forma, rival frecuente, mejor victoria), ranking_semanal (reinicia lunes 00:00 Lima), cron resumen-semanal (domingo 18:00 Lima, aviso LOGRO). Página nueva /ahora/ «Ahora mismo». Tarjetas de sala con chips + detalles (069). Nombre visible de la app en site.js NOMBRE_APP.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 201)
+- Ronda 202: migración 071 (pendiente de aplicar por el usuario): creadores verificados (/creadores/, solicitar, «Estoy en vivo», staff verifica en Moderación) y alquiler de host verificado (ofertas_host, alquileres_host; pago por fuera o gemas en garantía: se pagan al host cuando el cliente confirma, se devuelven al rechazar/cancelar). Botón «Alquilar host» en el encabezado del radar de Duelos (modal, features/alquiler.js); oferta del host en /mis-salas/.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 202)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**

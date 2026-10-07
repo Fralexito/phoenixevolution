@@ -176,3 +176,4 @@ setInterval(() => { if (!document.hidden) renderAll(); }, 20000);
 // Salas de Smash Soda abiertas sin rival (migración 067): van arriba del radar.
 montarTarjetasSalas({ contenedor: document.getElementById('lista-salas-radar'), tipo: 'radar' });
 alSesion((st) => { if (st?.session) montarRacha(document.getElementById('racha-diaria')); });
+document.getElementById('btn-alquilar')?.addEventListener('click', () => import('../features/alquiler.js').then((m) => m.abrirAlquiler()));
