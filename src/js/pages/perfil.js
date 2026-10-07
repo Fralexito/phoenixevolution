@@ -414,7 +414,7 @@ function pintarPanelHost() {
     ${S.p.puede_hostear ? '' : '<p class="text-[12px] text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Aún no tienes activado «Puedo ser host» en Mi perfil → Sistema Host: mientras tanto no se mostrará.</p>'}
     <div><p class="text-[12px] text-gray-400 mb-1.5">Plataforma</p><div class="flex gap-1.5">${['Ambos', 'Smash Soda', 'Parsec'].map((v) => `<button type="button" data-act="host-soft" data-v="${v}" aria-pressed="${h.soft === v}" class="adv-chip !min-h-8 !px-3 !text-[12px]">${v}</button>`).join('')}</div></div>
     <div class="space-y-2">${juegos}</div>
-    <p class="text-[12px] text-gray-500">Marca todos los juegos que hosteas y, en cada uno, todos los parches o versiones que ofreces. La velocidad, las aclaraciones y «Puedo ser host» siguen en Mi perfil.</p>
+    <p class="text-[12px] text-gray-500">Marca todos los juegos que hosteas y, en cada uno, todos los parches o versiones que ofreces. También puedes editarlos en Mi perfil → Sistema Host, junto a «Puedo ser host».</p>
     <div class="flex gap-2"><button type="button" data-act="guardar-host" class="btn btn-primary !min-h-9 !text-xs">Guardar hosting</button><button type="button" data-act="cerrar-panel" class="btn btn-ghost !min-h-9 !text-xs">Cerrar</button></div>`;
 }
 

@@ -11,6 +11,9 @@ import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from
 import { toast } from '../core/toast.js';
 import { switchHTML, segHTML, bindSeg } from './formControls.js';
 import { bindHandle } from './handleCheck.js';
+import { montarEditorJuegos } from './hosting/editorJuegos.js';
+import { catalogoDe } from '../core/hostCatalogo.js';
+import { guardarHost } from './muro/api.js';
 
 const PLATAFORMAS = ['Ambos', 'Smash Soda', 'Parsec'];
 
@@ -67,7 +70,7 @@ export function openProfileModal() {
             </div>
           </div>
           <div><span class="label">Plataforma</span>${segHTML({ id: 'p-soft', options: PLATAFORMAS.map((v) => ({ v, label: v })), current: soft, label: 'Plataforma' })}</div>
-          <div class="rounded-xl border border-galaxy-border/70 bg-black/20 px-3 py-2.5 text-xs text-gray-300"><i class="fa-solid fa-server text-galaxy-400 mr-1.5"></i>Tus <b>juegos y parches</b> (puedes elegir varios) y si se muestran en tu perfil se editan desde <a href="${href('perfil/')}" class="text-galaxy-400 underline">tu muro</a>, botón «Hosting».</div>
+          <div><p class="label">Juegos y parches que hosteas <span class="text-gray-500 normal-case">(puedes elegir varios)</span></p><div id="p-hjuegos" class="space-y-2"></div></div>
           <div><label class="label" for="p-hnotas">Aclaraciones sobre tu host <span class="text-gray-500 normal-case">(opcional)</span></label><textarea id="p-hnotas" class="field" rows="3" maxlength="300" placeholder="Horarios, ping, reglas de tu sala…">${escapeHTML(prof.host_notas)}</textarea></div>
         </div>
       </div>
@@ -96,6 +99,7 @@ export function openProfileModal() {
   const hostFields = $('#host-fields');
   const syncHost = () => { hostFields.style.opacity = $('#p-host').checked ? '1' : '.4'; hostFields.inert = !$('#p-host').checked; };
   syncHost(); $('#p-host').addEventListener('change', syncHost);
+  const juegos = montarEditorJuegos($('#p-hjuegos'), catalogoDe(prof));
   bindSeg($('#p-speed'), (v) => { speed = Number(v); });
   bindSeg($('#p-soft'), (v) => { soft = v; });
 
@@ -129,6 +133,7 @@ export function openProfileModal() {
       if (nuevaFoto !== undefined) patch.avatar_url = nuevaFoto;
       const { error } = await supabase.from('perfiles').update(patch).eq('id', uid);
       if (error) throw error;
+      await guardarHost(soft, juegos.get(), prof.host_visible !== false);
       await refreshProfile();
       closeModal('profile-modal');
       toast('Perfil actualizado.', 'ok');
