@@ -6,6 +6,8 @@ import { toast } from '../core/toast.js';
 import { escapeHTML } from '../core/dom.js';
 import { setRadar, isRadarOn } from '../features/radar.js';
 import { montarTarjetasSalas } from '../features/salas/tarjetas.js';
+import { montarRacha } from '../features/enganche.js';
+import { onSession as alSesion } from '../core/session.js';
 import { startPresence, stopPresence, setEstado, onPresence, ESTADOS } from '../features/presence.js';
 import { openAuthModal } from '../features/auth.js';
 import { data, me, myProfile, myPart, isMine, isActive, loadPerfiles, loadRetos, visibleRetos } from '../features/duelos/data.js';
@@ -173,3 +175,4 @@ setInterval(() => { if (!document.hidden) renderAll(); }, 20000);
 
 // Salas de Smash Soda abiertas sin rival (migración 067): van arriba del radar.
 montarTarjetasSalas({ contenedor: document.getElementById('lista-salas-radar'), tipo: 'radar' });
+alSesion((st) => { if (st?.session) montarRacha(document.getElementById('racha-diaria')); });

@@ -310,7 +310,7 @@ function seccionClips(p) {
 function pintar() {
   const p = S.p;
   const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${franjaEstadisticas()}${franjaLogros(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
+  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${franjaEstadisticas()}<div id="pf-historia" hidden></div>${franjaLogros(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
     <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
@@ -343,6 +343,7 @@ async function cargar() {
       const c = document.getElementById('pf-clan'); if (q.color_clan && c) c.style.cssText = estiloColor(q.color_clan.estilo);
       const av = document.querySelector('#pf-clan')?.closest('div')?.parentElement?.querySelector('[data-avatar], img, span.rounded-full'); if (q.marco && av) av.style.cssText += ';' + estiloMarco(q.marco.estilo);
     });
+    import('../features/enganche.js').then((m) => m.montarHistoria(document.getElementById('pf-historia'), p.id)).catch(() => {});
     reputacionDe(p.id).then((r) => { const e = document.getElementById('pf-rep'); if (r && e && S.p?.id === p.id) { e.className = `ml-1 text-[12px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5 ${r.clase}`; e.innerHTML = `<i class="fa-solid ${r.icono}"></i> ${textoSello(r).replace(/[<>&]/g, '')}`; e.title = r.valoraciones ? `${r.valoraciones} valoraciones de rivales` : 'Aún sin valoraciones suficientes'; e.hidden = false; } });
   } catch (e) { console.error('[perfil] carga:', e); root.innerHTML = '<div class="glass-panel rounded-2xl p-8 text-center text-bad text-sm">No se pudo cargar el perfil. Intenta de nuevo en un momento.</div>'; }
 }
