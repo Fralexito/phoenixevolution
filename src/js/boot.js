@@ -34,4 +34,6 @@ if (FX.barraLateral && document.getElementById('barra-lat')) {
   const montar = () => { if (lista || !ancha.matches) return; lista = true; import('./features/barraLateral.js').then((m) => m.initBarraLateral()).catch((e) => console.error('[boot] barra lateral:', e)); };
   montar(); ancha.addEventListener('change', montar);
 }
+// Chat flotante (experimento): contactos + ventanitas. Se descarga aparte para no frenar la primera carga.
+if (FX.contactos) import('./features/chatFlotante/index.js').then((m) => m.initChatFlotante()).catch((e) => console.error('[boot] chat flotante:', e));
 initSession().catch((e) => console.error('[boot] sesión:', e));

@@ -18,7 +18,7 @@ const { title, active = '', description = 'Phoenix Evolution Series — la liga 
 const base = import.meta.env.BASE_URL;
 ---
 <!doctype html>
-<html lang="es" data-fx-reveal={FX.reveal ? '' : undefined} data-fx-esqueletos={FX.esqueletos ? '' : undefined} data-fx-barra={FX.barraLateral ? '' : undefined} data-fx-dopamina={FX.dopamina ? '' : undefined}>
+<html lang="es" data-fx-reveal={FX.reveal ? '' : undefined} data-fx-esqueletos={FX.esqueletos ? '' : undefined} data-fx-barra={FX.barraLateral ? '' : undefined} data-fx-dopamina={FX.dopamina ? '' : undefined} data-fx-contactos={FX.contactos ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,6 +28,7 @@ const base = import.meta.env.BASE_URL;
     {import.meta.env.PUBLIC_PREVIEW && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href={`${base}favicon.png`} />
       <script is:inline>document.documentElement.classList.add('js');</script>
+    {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
     {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; } @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }`}</style>}
   </head>
   <body class="flex flex-col min-h-screen">
