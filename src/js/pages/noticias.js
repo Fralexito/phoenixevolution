@@ -123,9 +123,9 @@ $('news-acomodar').addEventListener('click', async () => {
   if (!state.lista.some((n) => n.editable)) { toast('Aún no hay noticias reales para acomodar.', 'warn'); return; }
   state.cat = 'TODOS'; state.liga = 'TODAS'; state.term = ''; $('news-search').value = '';
   barraAcomodo(true); paintLienzo(state.lista);   // asegura diseños asignados para todas
-  const items = ordenLectura(state.lista).map((n) => { const d = disenos.get(n.slug); return { id: n.id, html: tarjetaDe(n), lienzo: n.lienzo, cols: plantillaDe(d.plantilla)?.cols ?? 1 }; });
+  const items = ordenLectura(state.lista).map((n) => { const d = disenos.get(n.slug); return { id: n.id, html: tarjetaDe(n), lienzo: n.lienzo, cols: plantillaDe(d.plantilla)?.cols ?? 1, joda: n.categoria === 'TRIBUNA', imagen: !!n.imagen, titulo: n.titulo }; });
   acomodo = true;
-  try { acomodo = await entrarAcomodar({ grid: $('news-grid'), items, alSalir: async (ok) => { acomodo = null; barraAcomodo(false); if (ok) await cargar(); else paint(); } }); }
+  try { acomodo = await entrarAcomodar({ grid: $('news-grid'), panel: $('news-asistente'), items, alSalir: async (ok) => { acomodo = null; barraAcomodo(false); if (ok) await cargar(); else paint(); } }); }
   catch (e) { console.error('[noticias] gridstack:', e); toast('No se pudo activar el modo acomodar.', 'error'); acomodo = null; barraAcomodo(false); paint(); }
 });
 $('news-acomodar-ok').addEventListener('click', () => acomodo?.guardar?.());
