@@ -51,7 +51,7 @@ export const SALUD_TXT = Object.freeze({ viva: 'Abierta', en_partida: 'En partid
 export function pildoraSemaforo(s) {
   const c = s?.color;
   const ping = Number.isFinite(Number(s?.ping_ms)) && s?.ping_ms !== null ? `${Math.round(Number(s.ping_ms))} ms` : null;
-  const fuente = s?.fuente === 'par' ? 'tu ping real con este host' : s?.fuente === 'host' ? 'promedio del host' : 'sin mediciones aún';
+  const fuente = s?.fuente === 'par' ? 'tu ping real con este host' : s?.fuente === 'host' ? 'promedio del host' : s?.fuente === 'diagnostico' ? 'autodiagnóstico del host' : 'sin mediciones aún';
   const base = { verde: 'text-emerald-300 border-emerald-400/40 bg-emerald-500/10', ambar: 'text-amber-300 border-amber-400/40 bg-amber-500/10', rojo: 'text-rose-300 border-rose-400/40 bg-rose-500/10' }[c];
   return { clase: base ?? 'text-gray-400 border-galaxy-border bg-galaxy-800/40', texto: ping ?? 'Ping ?', titulo: fuente };
 }

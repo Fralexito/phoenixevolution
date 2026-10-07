@@ -6,6 +6,7 @@ import { onSession } from '../../core/session.js';
 import { toast } from '../../core/toast.js';
 import { escapeHTML, safeUrl } from '../../core/dom.js';
 import { pildoraSemaforo, textoErrorUnirse } from '../../core/salas.js';
+import { haceCuanto } from '../../core/notifs.js';
 import { NOMBRE_APP } from '../../../data/site.js';
 import { radarSalas, salasEnVivo, aceptarSala, verSala } from './api.js';
 
@@ -22,42 +23,57 @@ function avatar(h) {
              : '<span class="w-9 h-9 rounded-full bg-galaxy-800 grid place-items-center shrink-0"><i class="fa-solid fa-user text-gray-500"></i></span>';
 }
 
-function tarjetaRadar(s) {
-  const boton = s.mia
-    ? '<span class="text-[11px] text-gray-400 uppercase font-bold">Tu sala · esperando rival</span>'
-    : `<button type="button" class="btn btn-primary !min-h-9 !text-xs" data-aceptar="${escapeHTML(s.sala_id)}"><i class="fa-solid fa-handshake"></i> Aceptar</button>`;
-  return `<article class="bg-galaxy-panel rounded-xl border border-galaxy-400/30 p-3 flex items-center gap-3">
-    ${avatar(s.host)}
-    <div class="min-w-0 flex-1">
-      <p class="text-sm text-white font-bold truncate">${escapeHTML(s.host?.nombre ?? 'Host')} ${s.host?.amigo ? '<i class="fa-solid fa-user-group text-galaxy-400 text-[11px]" title="Amigo"></i>' : ''}
-        <span class="ml-1 text-[10px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">${NOMBRE_APP}</span></p>
-      <p class="text-[12px] text-gray-300 truncate">${escapeHTML(juegoTxt(s))}${s.region ? ` · ${escapeHTML(s.region)}` : ''}</p>
-      <div class="mt-1">${pildora(s.semaforo)}</div>
-    </div>
-    ${boton}
-  </article>`;
-}
+const MODO = { amistoso: 'Amistoso', torneo_privado: 'Torneo', oficial: 'Oficial' };
+const chip = (html, cls = 'text-gray-300 border-galaxy-border bg-black/20') => `<span class="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border ${cls}">${html}</span>`;
+const fuenteTxt = { par: 'tu ping real con este host', host: 'promedio histórico del host', diagnostico: 'autodiagnóstico del host', sin_datos: 'sin mediciones aún' };
 
-function tarjetaVivo(s) {
-  const lleno = s.espectadores >= s.limite_espectadores;
-  const rival = s.rival?.nombre ?? (s.reto_id ? 'reto' : 'esperando rival');
-  const boton = s.soy_espectador
-    ? `<button type="button" class="btn !min-h-9 !text-xs" data-ver="${escapeHTML(s.sala_id)}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir</button>`
-    : `<button type="button" class="btn btn-primary !min-h-9 !text-xs" data-ver="${escapeHTML(s.sala_id)}" ${lleno ? 'disabled' : ''}><i class="fa-solid fa-eye"></i> ${lleno ? 'Lleno' : 'Ver'}</button>`;
-  return `<article class="bg-galaxy-panel rounded-xl border border-galaxy-border p-3 flex items-center gap-3">
-    ${avatar(s.host)}
-    <div class="min-w-0 flex-1">
-      <p class="text-sm text-white font-bold truncate">${escapeHTML(s.host?.nombre ?? 'Host')} <span class="text-galaxy-400 mx-1">vs</span> ${escapeHTML(rival)}</p>
-      <p class="text-[12px] text-gray-300 truncate">${escapeHTML(juegoTxt(s))}${s.region ? ` · ${escapeHTML(s.region)}` : ''}</p>
-      <div class="mt-1 flex flex-wrap items-center gap-2">
-        ${s.estado === 'en_partida' ? '<span class="text-[11px] font-bold text-rose-300"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> EN PARTIDO</span>' : '<span class="text-[11px] text-gray-400">Calentando</span>'}
-        <span class="text-[11px] text-gray-400"><i class="fa-solid fa-eye"></i> ${Number(s.espectadores) || 0}/${Number(s.limite_espectadores) || 0}</span>
-        ${pildora(s.semaforo)}
+/** Una sola tarjeta para radar y «En vivo»: chips compactos arriba y los detalles en un desplegable. */
+function tarjeta(s, tipo) {
+  const enPartido = s.estado === 'en_partida';
+  const estado = enPartido ? chip('<i class="fa-solid fa-circle text-[7px] text-rose-400 animate-pulse"></i> En partido', 'text-rose-200 border-rose-400/40 bg-rose-500/10')
+    : s.rival ? chip('<i class="fa-solid fa-user-check"></i> Rival listo', 'text-emerald-200 border-emerald-400/40 bg-emerald-500/10')
+    : chip('<i class="fa-solid fa-hourglass-half"></i> Esperando rival', 'text-amber-200 border-amber-400/40 bg-amber-500/10');
+  const espect = s.acepta_espectadores && s.limite_espectadores > 0 ? chip(`<i class="fa-solid fa-eye"></i> ${Number(s.espectadores) || 0}/${s.limite_espectadores}`) : '';
+  const lleno = espect && s.espectadores >= s.limite_espectadores;
+  const accion = tipo === 'radar'
+    ? (s.mia ? '<span class="text-[11px] text-gray-400 uppercase font-bold">Tu sala</span>'
+             : `<button type="button" class="btn btn-primary !min-h-9 !text-xs" data-aceptar="${escapeHTML(s.sala_id)}"><i class="fa-solid fa-handshake"></i> Aceptar</button>`)
+    : `<button type="button" class="btn ${s.soy_espectador ? '' : 'btn-primary'} !min-h-9 !text-xs" data-ver="${escapeHTML(s.sala_id)}" ${lleno && !s.soy_espectador ? 'disabled' : ''}>
+        <i class="fa-solid ${s.soy_espectador ? 'fa-arrow-up-right-from-square' : 'fa-eye'}"></i> ${s.soy_espectador ? 'Abrir' : lleno ? 'Lleno' : 'Ver'}</button>`;
+  const sem = s.semaforo ?? {}; const dg = sem.diagnostico;
+  const titulo = tipo === 'vivo' ? `${escapeHTML(s.host?.nombre ?? 'Host')} <span class="text-galaxy-400 mx-1">vs</span> ${escapeHTML(s.rival?.nombre ?? (s.reto_id ? 'reto' : '—'))}`
+    : `${escapeHTML(s.host?.nombre ?? 'Host')} ${s.host?.amigo ? '<i class="fa-solid fa-user-group text-galaxy-400 text-[11px]" title="Amigo"></i>' : ''}`;
+  return `<article class="bg-galaxy-panel rounded-xl border ${tipo === 'radar' ? 'border-galaxy-400/30' : 'border-galaxy-border'} p-3">
+    <div class="flex items-center gap-3">
+      ${avatar(s.host)}
+      <div class="min-w-0 flex-1">
+        <p class="text-sm text-white font-bold truncate">${titulo}
+          <span class="ml-1 text-[10px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">${NOMBRE_APP}</span></p>
+        <div class="mt-1 flex flex-wrap gap-1">
+          ${estado}${pildora(sem)}
+          ${s.parche || s.juego ? chip(`<i class="fa-solid fa-futbol"></i> ${escapeHTML(s.parche || s.juego)}`) : ''}
+          ${s.region ? chip(`<i class="fa-solid fa-location-dot"></i> ${escapeHTML(s.region)}`) : ''}
+          ${espect}
+        </div>
       </div>
+      ${accion}
     </div>
-    ${boton}
+    <details class="mt-2 group">
+      <summary class="text-[11px] text-gray-400 cursor-pointer select-none list-none flex items-center gap-1"><i class="fa-solid fa-chevron-down text-[9px] transition-transform group-open:rotate-180"></i> Detalles</summary>
+      <dl class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[12px]">
+        <dt class="text-gray-500">Juego</dt><dd class="text-gray-200">${escapeHTML(juegoTxt(s))}</dd>
+        <dt class="text-gray-500">Modo</dt><dd class="text-gray-200">${escapeHTML(MODO[s.modo] ?? s.modo ?? '—')}</dd>
+        <dt class="text-gray-500">Plazas libres</dt><dd class="text-gray-200">${Number(s.plazas_libres) || 0}/${Number(s.plazas_total) || 0}</dd>
+        <dt class="text-gray-500">Espectadores</dt><dd class="text-gray-200">${s.acepta_espectadores && s.limite_espectadores > 0 ? `${Number(s.espectadores) || 0}/${s.limite_espectadores}` : 'No admite'}</dd>
+        <dt class="text-gray-500">Abierta</dt><dd class="text-gray-200">${escapeHTML(haceCuanto(s.abierta_en) ?? 'hace más de una semana')}</dd>
+        <dt class="text-gray-500">Ping estimado</dt><dd class="text-gray-200">${sem.ping_ms != null ? `${Math.round(sem.ping_ms)} ms` : '—'} <span class="text-gray-500">(${escapeHTML(fuenteTxt[sem.fuente] ?? '—')})</span></dd>
+        ${dg ? `<dt class="text-gray-500">Red del host</dt><dd class="text-gray-200">${dg.latencia_ms != null ? `${Math.round(dg.latencia_ms)} ms` : '—'}${dg.jitter_ms != null ? ` · jitter ${Math.round(dg.jitter_ms)}` : ''}${dg.subida_kbps ? ` · subida ${(dg.subida_kbps / 1000).toFixed(1)} Mbps` : ''}</dd>` : ''}
+      </dl>
+    </details>
   </article>`;
 }
+const tarjetaRadar = (s) => tarjeta(s, 'radar');
+const tarjetaVivo = (s) => tarjeta(s, 'vivo');
 
 /** Abre el enlace de Parsec/Smash Soda que entregó el servidor. */
 function abrirEnlace(r, rol) {
