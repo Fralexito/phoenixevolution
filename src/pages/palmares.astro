@@ -3,7 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import { FX } from '../data/experimento.js';
 import PalmaresNuevo from '../components/palmares/PalmaresNuevo.astro';
 import PalmaresClasico from '../components/palmares/PalmaresClasico.astro';
+import PalmaresVitrina from '../components/palmares/PalmaresVitrina.astro';
 ---
 <Layout title="Palmarés" active="palmares">
-  {FX.palmaresNuevo ? <PalmaresNuevo /> : <PalmaresClasico />}
+  {FX.palmaresVitrina ? <PalmaresVitrina /> : FX.palmaresNuevo ? <PalmaresNuevo /> : <PalmaresClasico />}
 </Layout>
