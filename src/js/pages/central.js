@@ -348,3 +348,6 @@ contar(supabase.from('retos_matchmaking').select('id', head).eq('estado', 'BUSCA
     }
   }
 }
+
+// Enganche (070/071): creadores en vivo y ranking semanal en la columna lateral del inicio.
+import('../features/enganche.js').then((m) => { m.montarCreadoresVivo(document.getElementById('inicio-creadores')); m.montarRankingSemanal(document.getElementById('inicio-semanal'), { limite: 5 }); }).catch((e) => console.warn('[central] enganche:', e));

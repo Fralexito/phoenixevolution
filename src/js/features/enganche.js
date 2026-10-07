@@ -55,3 +55,20 @@ export async function montarRankingSemanal(el, { limite = 10 } = {}) {
     el.hidden = false;
   } catch (e) { ocultar(el, e, 'ranking'); }
 }
+
+/** Creadores verificados en vivo ahora (se oculta si no hay ninguno). */
+export async function montarCreadoresVivo(el) {
+  if (!el) return;
+  try {
+    const vivos = ((await rpc('creadores_lista')) ?? []).filter((c) => c.en_vivo).slice(0, 4);
+    if (!vivos.length) { el.hidden = true; return; }
+    el.className = 'glass-panel rounded-xl p-4 space-y-2 border border-rose-400/30';
+    el.innerHTML = `<h3 class="font-display font-bold uppercase tracking-wider text-white text-sm flex items-center gap-2"><i class="fa-solid fa-circle text-[8px] text-rose-400 animate-pulse"></i>Creadores en vivo</h3>
+      ${vivos.map((c) => { const url = safeUrl(c.enlace_live) || Object.values(c.plataformas ?? {}).map((u) => safeUrl(u)).find(Boolean) || href('creadores/');
+        return `<a href="${escapeHTML(url)}" target="_blank" rel="noopener" class="flex items-center gap-2 text-sm hover:bg-white/5 rounded-lg p-1">
+          ${safeUrl(c.avatar_url) ? `<img src="${escapeHTML(c.avatar_url)}" alt="" class="w-8 h-8 rounded-full object-cover ring-2 ring-rose-400" loading="lazy">` : '<span class="w-8 h-8 rounded-full bg-galaxy-800"></span>'}
+          <span class="min-w-0"><b class="text-white block truncate">${escapeHTML(c.nombre)}</b><span class="text-[11px] text-gray-400 truncate block">${escapeHTML(c.titulo_live ?? 'En vivo')}</span></span></a>`; }).join('')}
+      <a href="${href('creadores/')}" class="text-[11px] text-galaxy-400 underline">Ver todos los creadores</a>`;
+    el.hidden = false;
+  } catch (e) { ocultar(el, e, 'creadores'); }
+}
