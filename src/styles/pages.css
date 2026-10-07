@@ -87,3 +87,67 @@
 .holo-scan { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--color-galaxy-400), transparent); animation: holo-scan 2.2s linear infinite; opacity: .7; }
 @keyframes holo-scan { from { top: 0; } to { top: 100%; } }
 @media (prefers-reduced-motion: reduce) { .holo-card, .holo-scan { animation: none; } }
+
+/* ── Palmarés rediseñado (FX.palmaresNuevo) ── */
+.pal-cabecera { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgb(251 191 36 / .25); }
+.pal-kicker { color: var(--color-gold-400); font: 700 .8rem/1 var(--font-display, inherit); letter-spacing: .12em; text-transform: uppercase; display: flex; gap: .4rem; align-items: center; }
+.pal-titulo { font: 900 clamp(2.4rem, 6vw, 4.5rem)/.95 var(--font-display, inherit); color: #fff; letter-spacing: -.01em; margin-top: .35rem; text-wrap: balance; }
+.pal-sub { color: #cbd5e1; font-size: .95rem; margin-top: .5rem; max-width: 60ch; }
+.pal-ediciones { display: flex; gap: .4rem; }
+.pal-ed { padding: .45rem .9rem; border-radius: 999px; font-size: .8rem; font-weight: 700; border: 1px solid rgb(251 191 36 / .35); color: #fde68a; }
+.pal-ed[aria-pressed="true"] { background: var(--color-gold-400); color: #1a1205; border-color: transparent; }
+.pal-ed:disabled { opacity: .45; cursor: not-allowed; border-style: dashed; }
+
+.pal-podio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: .75rem; max-width: 900px; margin: 0 auto; }
+.pal-escalon { display: flex; flex-direction: column; align-items: stretch; animation: pal-subir .9s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i) * 120ms); }
+.pal-campeon { text-align: center; padding: 0 .5rem 1rem; }
+.pal-copa { font-size: 2.2rem; color: var(--metal); filter: drop-shadow(0 0 14px color-mix(in oklab, var(--metal) 55%, transparent)); }
+.pal-oro .pal-copa { font-size: 3.4rem; }
+.pal-torneo { margin-top: .5rem; font: 700 .75rem/1.2 var(--font-display, inherit); letter-spacing: .1em; text-transform: uppercase; color: var(--metal); }
+.pal-dt { font: 900 clamp(1.4rem, 3.4vw, 2.4rem)/1 var(--font-display, inherit); color: #fff; margin-top: .3rem; overflow-wrap: anywhere; }
+.pal-oro .pal-dt { font-size: clamp(1.8rem, 4.6vw, 3.2rem); }
+.pal-club { margin-top: .5rem; display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; color: #e2e8f0; font-weight: 600; }
+.pal-sigla { font: 800 .65rem/1 var(--font-display, inherit); padding: .3rem .4rem; border-radius: .35rem; background: color-mix(in oklab, var(--metal) 22%, transparent); color: var(--metal); }
+.pal-base { display: grid; place-items: center; border-radius: .6rem .6rem 0 0; background: linear-gradient(180deg, color-mix(in oklab, var(--metal) 32%, #0b0b1a), #0b0b1a); border: 1px solid color-mix(in oklab, var(--metal) 45%, transparent); border-bottom: 0; }
+.pal-base span { font: 900 2.5rem/1 var(--font-display, inherit); color: color-mix(in oklab, var(--metal) 70%, #fff); opacity: .5; }
+.pal-plata { --metal: var(--color-silver-300); } .pal-plata .pal-base { height: 6.5rem; }
+.pal-oro { --metal: var(--color-gold-400); } .pal-oro .pal-base { height: 9.5rem; }
+.pal-bronce { --metal: var(--color-bronze-400); } .pal-bronce .pal-base { height: 4.5rem; }
+@keyframes pal-subir { from { opacity: 0; transform: translateY(24px); } }
+
+.pal-bloque { margin-top: 3.5rem; }
+.pal-h2 { font: 800 clamp(1.4rem, 2.6vw, 1.9rem)/1.1 var(--font-display, inherit); color: #fff; text-wrap: balance; }
+.pal-nota { color: #94a3b8; font-size: .875rem; margin-top: .3rem; }
+.pal-lista { margin-top: 1rem; border-top: 1px solid rgb(255 255 255 / .08); }
+.pal-fila { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; padding: .9rem .25rem; border-bottom: 1px solid rgb(255 255 255 / .08); transition: background .2s; }
+.pal-fila:hover { background: rgb(255 255 255 / .03); }
+.pal-ico { width: 2.4rem; height: 2.4rem; border-radius: .6rem; display: grid; place-items: center; }
+.pal-premio { color: #fff; font-weight: 700; } .pal-premio span { color: #94a3b8; font-weight: 500; }
+.pal-motivo { color: #cbd5e1; font-size: .85rem; margin-top: .1rem; }
+.pal-ganador { font: 900 clamp(1.1rem, 2.4vw, 1.6rem)/1 var(--font-display, inherit); text-align: right; }
+
+.pal-placas { margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; }
+.pal-placa { padding: 1.1rem 1rem; border-radius: .75rem; background: rgb(255 255 255 / .03); border: 1px solid rgb(255 255 255 / .08); text-align: center; }
+.pal-placa > i { font-size: 1.5rem; }
+.pal-placa-t { margin-top: .5rem; font: 700 .72rem/1 var(--font-display, inherit); letter-spacing: .1em; text-transform: uppercase; }
+.pal-placa-n { margin-top: .4rem; font: 900 1.35rem/1.05 var(--font-display, inherit); color: #fff; }
+.pal-placa-x { margin-top: .2rem; color: #94a3b8; font-size: .8rem; }
+
+.pal-marcador { margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-radius: .75rem; overflow: hidden; border: 1px solid rgb(255 255 255 / .1); background: #07070f; }
+.pal-record { padding: 1.1rem 1rem; text-align: center; border-right: 1px solid rgb(255 255 255 / .08); }
+.pal-record:last-child { border-right: 0; }
+.pal-record-t { color: #94a3b8; font-size: .75rem; font-weight: 600; }
+.pal-record-v { font: 900 2.4rem/1 var(--font-display, inherit); margin: .4rem 0 .3rem; font-variant-numeric: tabular-nums; }
+.pal-record-d { color: #e2e8f0; font-size: .8rem; }
+
+.pal-com { margin-top: .8rem; color: #e2e8f0; font-size: .95rem; line-height: 2; }
+.pal-sep { color: #475569; margin: 0 .6rem; }
+
+@media (max-width: 640px) {
+  .pal-podio { gap: .4rem; }
+  .pal-copa { font-size: 1.6rem; } .pal-oro .pal-copa { font-size: 2.4rem; }
+  .pal-club { font-size: .7rem; } .pal-sigla { display: none; }
+  .pal-fila { grid-template-columns: auto 1fr; } .pal-ganador { grid-column: 2; text-align: left; }
+  .pal-record { border-right: 0; border-bottom: 1px solid rgb(255 255 255 / .08); }
+}
+@media (prefers-reduced-motion: reduce) { .pal-escalon { animation: none; } .pal-fila { transition: none; } }

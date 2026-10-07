@@ -1,0 +1,92 @@
+---
+// Palmarés rediseñado: una sola página que se lee de arriba abajo (sin pestañas), con jerarquía clara:
+// campeón de liga → las tres coronas en escalones → galardones de DT → Olimpo de fichas → comunidad → récords en marcador.
+import { PODIO, TABS } from '../../data/palmares.js';
+const liga = PODIO.find((p) => p.gold) ?? PODIO[0];
+const orden = [PODIO[0], liga, PODIO[2]].filter(Boolean);        // izquierda · centro (liga) · derecha
+const tab = (id) => TABS.find((t) => t.id === id)?.items ?? [];
+const pizarra = tab('pizarra'); const comunidad = tab('comunidad'); const olimpo = tab('olimpo'); const records = tab('records');
+const METAL = ['pal-plata', 'pal-oro', 'pal-bronce'];
+---
+<div class="pal max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full pb-20">
+
+  <!-- Encabezado: el campeón manda -->
+  <header class="pal-cabecera">
+    <div class="min-w-0">
+      <p class="pal-kicker"><i class="fa-solid fa-crown"></i> Salón de la Fama</p>
+      <h1 class="pal-titulo">Palmarés</h1>
+      <p class="pal-sub">Quién ganó qué en la Galaxy League. La historia que no se borra.</p>
+    </div>
+    <div class="pal-ediciones" role="group" aria-label="Edición">
+      <button type="button" aria-pressed="true" class="pal-ed">1.ª Edición</button>
+      <button type="button" disabled class="pal-ed" title="Próximamente">Libertadores · pronto</button>
+    </div>
+  </header>
+
+  <!-- Las tres coronas: escalones de distinta altura, la Liga en el centro y más alta -->
+  <section aria-labelledby="pal-h-coronas" class="mt-8">
+    <h2 id="pal-h-coronas" class="sr-only">Campeones de la edición</h2>
+    <ol class="pal-podio">
+      {orden.map((p, i) => (
+        <li class={`pal-escalon ${METAL[i]}`} style={`--i:${i}`}>
+          <div class="pal-campeon">
+            <i class="fa-solid fa-trophy pal-copa" aria-hidden="true"></i>
+            <p class="pal-torneo">{p.copa}</p>
+            <p class="pal-dt">{p.dt}</p>
+            <p class="pal-club"><span class="pal-sigla">{p.sigla}</span>{p.club}</p>
+          </div>
+          <div class="pal-base" aria-hidden="true"><span>{i === 1 ? '1' : i === 0 ? '2' : '3'}</span></div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Galardones de pizarra: lista editorial, no tarjetas iguales -->
+  <section aria-labelledby="pal-h-pizarra" class="pal-bloque">
+    <h2 id="pal-h-pizarra" class="pal-h2">Galardones de pizarra</h2>
+    <p class="pal-nota">Premios al entrenador: ingenio, defensa y estilo.</p>
+    <ul class="pal-lista">
+      {pizarra.map((x) => (
+        <li class="pal-fila">
+          <span class={`pal-ico ${x.chip}`}><i class={`fa-solid ${x.icon}`}></i></span>
+          <div class="min-w-0"><p class="pal-premio">{x.t} <span>· {x.s}</span></p><p class="pal-motivo">{x.d}</p></div>
+          <p class={`pal-ganador ${x.name}`}>{x.who}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- Olimpo: placas de las fichas -->
+  <section aria-labelledby="pal-h-olimpo" class="pal-bloque">
+    <h2 id="pal-h-olimpo" class="pal-h2">El Olimpo de las fichas</h2>
+    <p class="pal-nota">Los jugadores virtuales que rompieron las estadísticas.</p>
+    <div class="pal-placas">
+      {olimpo.map((x) => (
+        <article class="pal-placa">
+          <i class={`fa-solid ${x.icon} ${x.col}`} aria-hidden="true"></i>
+          <p class={`pal-placa-t ${x.col}`}>{x.t}</p>
+          <p class="pal-placa-n">{x.who}</p>
+          <p class="pal-placa-x">{x.extra}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Récords: marcador -->
+  <section aria-labelledby="pal-h-records" class="pal-bloque">
+    <h2 id="pal-h-records" class="pal-h2">Récords absolutos</h2>
+    <div class="pal-marcador">
+      {records.map((x) => (
+        <div class="pal-record"><p class="pal-record-t">{x.t}</p><p class={`pal-record-v ${x.col}`}>{x.v}</p><p class="pal-record-d">{x.d}</p></div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Comunidad: en línea, con humor -->
+  <section aria-labelledby="pal-h-com" class="pal-bloque">
+    <h2 id="pal-h-com" class="pal-h2">Premios de la comunidad</h2>
+    <p class="pal-com">
+      {comunidad.map((x, i) => (<>{i > 0 && <span class="pal-sep" aria-hidden="true">·</span>}<span class="whitespace-nowrap"><i class={`fa-solid ${x.icon} ${x.ico}`}></i> <b>{x.t}</b> <span class="text-gray-400">({x.s})</span> <b class={x.name}>{x.who}</b></span></>))}
+    </p>
+  </section>
+</div>
