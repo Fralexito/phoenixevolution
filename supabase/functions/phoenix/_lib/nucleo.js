@@ -3,10 +3,10 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.3.0',
+  version_api: '1.4.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
-  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300 }),
+  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30 }),
   interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true }),
   limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096 }),
 });
@@ -39,6 +39,7 @@ export const ERRORES = Object.freeze({
   ORG_NO_AUTORIZADO:    { http: 403, reintentable: false, mensaje: 'No eres host de la organización de ese torneo.' },
   LICENCIA_VENCIDA:     { http: 403, reintentable: false, mensaje: 'La licencia de la organización venció.' },
   HOST_NO_NEUTRAL:      { http: 403, reintentable: false, mensaje: 'En un partido oficial el host no puede ser uno de los jugadores.' },
+  NO_SON_AMIGOS:        { http: 403, reintentable: false, mensaje: 'Solo puedes invitar a tus amigos (y sin bloqueos entre ustedes).' },
   RETO_NO_VALIDO:       { http: 422, reintentable: false, mensaje: 'El reto no existe, no está aceptado o no eres su host.' },
   LOTE_DEMASIADO_GRANDE:{ http: 413, reintentable: false, mensaje: 'Demasiados eventos en un lote.' },
   ERROR_INTERNO:        { http: 500, reintentable: true,  mensaje: 'Error del servidor: reintenta con espera.' },
@@ -139,6 +140,7 @@ export const v = {
 export const ESTADOS_LATIDO = ['abierta', 'en_partida'];
 export const VISIBILIDADES_APP = ['publica', 'amigos', 'privada'];
 export const MODOS_SALA = ['amistoso', 'torneo_privado', 'oficial'];
+export const ESTADOS_PRESENCIA_APP = ['disponible', 'ausente', 'en_sala', 'en_partida'];
 export const TIPOS_EVENTO_APP = ['entra', 'sale', 'desconexion', 'reconexion', 'expulsion', 'cambio_mando',
   'partida_inicio', 'partida_fin', 'pausa', 'plazas_ampliadas', 'espera_rechazada'];
 
@@ -279,4 +281,23 @@ export function retrasoSugerido(latenciaMs, maximoMs = 0) {
   const sugerido = Math.min(250, Math.round(latenciaMs / 2));
   const permitido = Math.max(0, Math.min(500, maximoMs || 0));
   return { sugerido_ms: sugerido, permitido_ms: permitido, aplicar_ms: Math.min(sugerido, permitido) };
+}
+
+/**
+ * Huella de contenido para ETag (FNV-1a de 64 bits, en hex). No es criptográfica: solo detecta «¿cambió algo?».
+ * `sinCampos`: claves que cambian a cada rato sin importar (p. ej. «desde») y no deben invalidar la caché del cliente.
+ */
+export function huellaContenido(datos, sinCampos = []) {
+  const quitar = new Set(sinCampos);
+  const texto = JSON.stringify(datos, (k, v) => (quitar.has(k) ? undefined : v));
+  let h = 0xcbf29ce484222325n; const P = 0x100000001b3n; const M = (1n << 64n) - 1n;
+  for (const b of new TextEncoder().encode(texto)) { h ^= BigInt(b); h = (h * P) & M; }
+  return `W/"${h.toString(16).padStart(16, '0')}"`;
+}
+
+/** ¿El ETag que trae el cliente (If-None-Match o ?etag=) coincide? Acepta lista separada por comas, con o sin «W/», y «*». */
+export function coincideEtag(delCliente, actual) {
+  if (!delCliente || !actual) return false;
+  const limpio = (x) => x.trim().replace(/^W\//, '');
+  return delCliente.split(',').some((x) => x.trim() === '*' || limpio(x) === limpio(actual));
 }

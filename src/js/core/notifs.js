@@ -1,5 +1,5 @@
 // Campana de notificaciones · lógica PURA (sin DOM ni red → `npm test`): categorías, filtros, grupos por día y «hace 5 min».
-// ESPEJO de private.categoria_notif (migraciones 033/042/043/059): si allí se añade un tipo, se añade aquí.
+// ESPEJO de private.categoria_notif (migraciones 033/042/043/059/064): si allí se añade un tipo, se añade aquí.
 
 /** Tipo de aviso → categoría (la misma que el usuario puede apagar en Amigos → Avisos). */
 export function categoriaDe(tipo) {
@@ -8,7 +8,7 @@ export function categoriaDe(tipo) {
   if (tipo === 'MENCION') return 'menciones';
   if (tipo === 'LOGRO') return 'logros';
   if (tipo === 'EVENTO') return 'eventos';
-  if (tipo === 'SALA_ABIERTA') return 'salas';
+  if (tipo === 'SALA_ABIERTA' || tipo === 'INVITACION_SALA') return 'salas';
   if (tipo === 'MODERACION') return 'sistema';
   return 'duelos';
 }
@@ -68,7 +68,7 @@ export function haceCuanto(iso, ahora = new Date()) {
 }
 
 /** ¿Merece animación de «llegó algo importante»? (retos directos, salas listas, avisos finales, invitaciones). */
-export const URGENTES = new Set(['RETO_DIRECTO', 'INVITACION_RETO', 'SALA_LISTA', 'AVISO_FINAL', 'CONFIRMAR_PARTIDO', 'RESULTADO_DISPUTADO']);
+export const URGENTES = new Set(['RETO_DIRECTO', 'INVITACION_RETO', 'INVITACION_SALA', 'SALA_LISTA', 'AVISO_FINAL', 'CONFIRMAR_PARTIDO', 'RESULTADO_DISPUTADO']);
 export const esUrgente = (tipo) => URGENTES.has(tipo);
 
 /** Deslizar para descartar: ¿la distancia/velocidad del gesto alcanza? (px recorridos, ancho del elemento, px/ms). */

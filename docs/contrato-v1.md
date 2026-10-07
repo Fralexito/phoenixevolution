@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.3.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.4.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.4.0 (compatibles, requieren migración 064):** `GET /v1/salas`, `POST /v1/presencia`, `GET /v1/presencia/amigos`, `POST /v1/invitar` (secciones 17–20); sondeo barato con **ETag** (sección 21); error `NO_SON_AMIGOS`; intervalos `presencia_seg`, `sondeo_salas_seg`, `sondeo_amigos_seg` en `config`.
 
 **Cambios 1.3.0 (compatibles, requieren migración 061):** rutas `POST /v1/diagnostico` (autodiagnóstico del host), `POST /v1/sala/prueba` (prueba real en sala) y `GET /v1/eco` (solo navegador); campo `semaforo` en las reglas (sección 12); `retraso_host_ms` pasa a significar **retraso máximo permitido**.
 
@@ -251,6 +253,7 @@ Respuesta:
 | `ORG_NO_AUTORIZADO` | 403 | no | El host no es miembro de esa organización |
 | `LICENCIA_VENCIDA` | 403 | no | Avisar al host; abrir como amistoso si quiere |
 | `HOST_NO_NEUTRAL` | 403 | no | En oficial el host no puede jugar: otro host debe abrir |
+| `NO_SON_AMIGOS` | 403 | no | Solo se invita a amigos sin bloqueos: quitar la opción de invitar a esa persona |
 | `RETO_NO_VALIDO` | 422 | no | Abrir sin `reto_id` o avisar al host |
 | `LOTE_DEMASIADO_GRANDE` | 413 | no | Partir el lote |
 | `ERROR_INTERNO` | 500 | **sí** | Espera exponencial |
@@ -355,3 +358,63 @@ Respuesta:
 
 ## 16. `GET /v1/eco` (sin token) — solo para navegadores
 Lo usa la web para el pre-chequeo del jugador (≈ 14 llamadas por chequeo, máx. 60/min por IP). Responde `{ "ok": true, "t": 1791313521069, "solicitud_id": "…" }` con CORS abierto y `Timing-Allow-Origin: *`. **La app no lo usa.**
+
+## 17. `GET /v1/salas` (token) — salas que ve el dueño de esta PC
+Mismas reglas que la web: visibilidad (pública / amigos / privada), publicada o no, organización, reto, bloqueos e **invitaciones vigentes**. Sondear cada `intervalos.sondeo_salas_seg` (25 s) con ETag (sección 21).
+
+Respuesta:
+```json
+{ "ok": true, "etag": "W/\"9f2c1a…\"", "sondeo_seg": 25,
+  "salas": [ {
+    "sala_id": "uuid", "soy_host": false, "invitado": true,
+    "host": { "id": "uuid", "nombre": "Kaiser", "avatar_url": "https://… o preset:fenix o null", "amigo": true },
+    "juego": "eFootball PES 2021", "parche": "Conmegol", "region": "Lima", "modo": "amistoso", "visibilidad": "amigos",
+    "estado": "abierta", "salud": "viva", "plazas_total": 4, "plazas_libres": 2, "limite_espectadores": 4,
+    "abierta_en": "…", "reto_id": null, "organizacion_id": null,
+    "calidad": { "ping_mediana_ms": 38, "ping_p95_ms": 61, "perdida_pct": 0.4, "muestras": 812, "semaforo": "verde" },
+    "enlace": "https://parsec.gg/g/… o null" } ] }
+```
+- Orden: primero donde **estoy invitado**, luego las de **amigos**, luego con plazas libres, luego las más nuevas. Máx. 100.
+- `salud`: `viva` | `en_partida` | `inestable` (sin latido > 90 s). `calidad` = histórico del host (14 días; `null` si aún no hay muestras), con el semáforo según las reglas de esa sala.
+- `enlace` solo viene si este usuario puede **entrar** (no basta con ver). `avatar_url` puede ser `preset:<id>` (avatar predefinido de la web): mostrar la inicial.
+
+## 18. `POST /v1/presencia` (token) — latido de presencia de la app
+Cada `intervalos.presencia_seg` (60 s) mientras la app esté abierta, aunque no hostee.
+Petición: `{ "estado": "disponible", "sala_id": null }` — `estado`: `disponible` | `ausente` | `en_sala` | `en_partida`; `sala_id` opcional (debe ser una sala de esta PC).
+Respuesta: `{ "ok": true, "estado": "disponible", "siguiente_seg": 60 }`.
+- Si la app deja de enviarlo 150 s, el usuario pasa a desconectado. **No hace falta avisar al cerrar.**
+- `en_sala` / `en_partida` de un host se deducen solos de su sala viva: la app puede mandar `disponible` siempre.
+
+## 19. `GET /v1/presencia/amigos` (token) — estado de cada amigo
+Sondear cada `intervalos.sondeo_amigos_seg` (30 s) con ETag (el campo `desde` NO cambia el ETag).
+```json
+{ "ok": true, "etag": "W/\"…\"", "sondeo_seg": 30,
+  "amigos": [ { "usuario_id": "uuid", "nombre": "Mirko", "avatar_url": null, "estado": "en_partida", "sala_id": "uuid o null", "desde": "…" } ] }
+```
+- `estado`, de más a menos activo (y así viene ordenado): `en_partida` · `en_sala` · `disponible` · `ausente` · `desconectado`.
+- Cómo se decide (servidor): hostea una sala viva → `en_sala`/`en_partida`; aparece como invitado en las muestras de una sala viva (últimos 2 min) → `en_sala`/`en_partida`; latido de su app < 150 s → lo que mandó; si no → `desconectado`.
+- `sala_id` solo si este usuario puede **ver** esa sala; si no, `null` (y si estaba «en sala» se muestra `disponible`, para no revelar salas ajenas).
+- Privacidad: quien apagó «Mostrar mi conexión» aparece siempre `desconectado`. Bloqueados no aparecen.
+- **Límite honesto:** quien está solo en la **web** (sin la app ni sala) figura `desconectado` aquí: la presencia de la web vive en el navegador, no en el servidor.
+
+## 20. `POST /v1/invitar` (token) — invitar a un amigo a la sala de esta PC
+Petición: `{ "usuario_id": "uuid del amigo", "sala_id": "uuid de mi sala viva" }`
+Respuesta: `{ "ok": true, "invitacion_id": 12, "notificado": true, "expira": "…" }`
+- Efecto: el amigo puede **ver y entrar** a esa sala durante **2 h** (aunque sea privada o de amigos) y la ve primero en su `GET /v1/salas` con `invitado: true`. En la web recibe el aviso **«Te invitan a jugar»** en la campana (categoría «Salas»).
+- `notificado: false` = el amigo apagó los avisos de «Salas»: la invitación existe igual (la verá en Phoenix Soda y en la web de salas).
+- Reinvitar renueva las 2 h. Límites: mismo amigo y sala, 1 cada 2 min; máx. 15 invitaciones cada 10 min por host → `DEMASIADOS_INTENTOS` (`reintentar_en`).
+- Errores: `SALA_NO_ENCONTRADA`, `SALA_CERRADA`, `NO_SON_AMIGOS`, `DEMASIADOS_INTENTOS`, `CAMPO_INVALIDO`, `TOKEN_*`.
+
+## 21. Sondeo barato con ETag (rutas 17 y 19)
+1. La respuesta trae `etag` (en el cuerpo y en la cabecera `ETag`), p. ej. `W/"9f2c1a0b77e1d034"`.
+2. En el siguiente sondeo, enviar `If-None-Match: <ese etag>` (o `?etag=<ese etag>` si la librería HTTP no deja poner la cabecera).
+3. Si nada relevante cambió → **HTTP 304 sin cuerpo**: conservar la lista anterior. Si cambió → 200 con datos y `etag` nuevo.
+- El ETag ignora lo que cambia a cada rato sin importar (el `desde` de la presencia; la hora del latido de las salas no se envía).
+- Tras un error o reinicio de la app, sondear sin `If-None-Match`.
+- **Coste (importante):** un 304 sigue siendo UNA llamada a la función (cuenta para la cuota del plan FREE: 500 k llamadas/mes en total), solo que sin cuerpo. Por host: salas cada 25 s + amigos cada 30 s + presencia cada 60 s ≈ 7 800 llamadas/día si la app está abierta todo el día.
+  | Escenario (10 hosts) | Llamadas/mes | ¿Cabe en FREE con el latido (~216 k)? |
+  |---|---|---|
+  | App abierta 24 h | ≈ 2,3 M | No |
+  | App abierta 6 h/día | ≈ 580 k | No |
+  | 6 h/día y sondeo **solo con la ventana visible** (≈ ⅓ del tiempo) | ≈ 195 k | Sí (≈ 410 k en total) |
+  Regla para la app: **sondear salas y amigos solo con la ventana de Phoenix Soda visible** (minimizada = pausa; al volver, sondeo inmediato). Si aun así aprieta, el staff sube `sondeo_salas_seg` / `sondeo_amigos_seg` desde `phoenix_config` sin recompilar.

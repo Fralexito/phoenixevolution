@@ -10,6 +10,7 @@ test('categoriaDe = espejo de private.categoria_notif', () => {
   assert.equal(categoriaDe('RETO_DIRECTO'), 'duelos');
   assert.equal(categoriaDe('CLAN'), 'social');
   assert.equal(categoriaDe('SALA_ABIERTA'), 'salas');
+  assert.equal(categoriaDe('INVITACION_SALA'), 'salas');
   assert.equal(categoriaDe('MODERACION'), 'sistema');
   assert.equal(categoriaDe('DESCONOCIDO'), 'duelos');
 });

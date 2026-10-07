@@ -1,7 +1,7 @@
 // Pruebas del núcleo puro de la API /v1 (supabase/functions/phoenix/_lib/nucleo.js). El contrato vive en claude/contrato-v1.md.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, marcaDe, sugerenciasHost, retrasoSugerido } from '../supabase/functions/phoenix/_lib/nucleo.js';
+import { CONFIG, ERRORES, ErrorApi, cuerpoError, compararVersion, v, limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, marcaDe, sugerenciasHost, retrasoSugerido, huellaContenido, coincideEtag } from '../supabase/functions/phoenix/_lib/nucleo.js';
 
 test('catálogo de errores: todos con http, reintentable y mensaje', () => {
   for (const [k, e] of Object.entries(ERRORES)) {
@@ -124,4 +124,24 @@ test('retrasoSugerido: mitad del RTT, recortado por lo que permite el perfil', (
   assert.deepEqual(retrasoSugerido(60, 20), { sugerido_ms: 30, permitido_ms: 20, aplicar_ms: 20 });
   assert.equal(retrasoSugerido(900, 500).sugerido_ms, 250);
   assert.equal(retrasoSugerido(null, 50).aplicar_ms, 0);
+});
+
+test('huellaContenido: estable, sensible al contenido e ignora campos volátiles', () => {
+  const a = [{ sala_id: 'x', plazas_libres: 2, desde: '2026-10-06T20:00:00Z' }];
+  const b = [{ sala_id: 'x', plazas_libres: 2, desde: '2026-10-06T20:00:30Z' }];
+  assert.match(huellaContenido(a), /^W\/"[0-9a-f]{16}"$/);
+  assert.equal(huellaContenido(a), huellaContenido(JSON.parse(JSON.stringify(a))));
+  assert.notEqual(huellaContenido(a), huellaContenido(b));
+  assert.equal(huellaContenido(a, ['desde']), huellaContenido(b, ['desde']));
+  assert.notEqual(huellaContenido(a, ['desde']), huellaContenido([{ ...a[0], plazas_libres: 1 }], ['desde']));
+});
+
+test('coincideEtag: débil/fuerte, listas y comodín', () => {
+  const e = 'W/"00000000000000ab"';
+  assert.equal(coincideEtag(e, e), true);
+  assert.equal(coincideEtag('"00000000000000ab"', e), true);
+  assert.equal(coincideEtag('"zz", W/"00000000000000ab"', e), true);
+  assert.equal(coincideEtag('*', e), true);
+  assert.equal(coincideEtag('"otro"', e), false);
+  assert.equal(coincideEtag(null, e), false);
 });

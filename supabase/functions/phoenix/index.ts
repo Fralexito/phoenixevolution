@@ -6,7 +6,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   CONFIG, ErrorApi, cuerpoError, compararVersion, v, ESTADOS_LATIDO, VISIBILIDADES_APP,
-  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido,
+  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido, ESTADOS_PRESENCIA_APP, huellaContenido, coincideEtag,
 } from "./_lib/nucleo.js";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
@@ -453,6 +453,60 @@ async function pruebaSala(req: Request) {
   return { id: data!.id, usuario_id: usuario, semaforo: sem.semaforo, umbrales: sem.umbrales, retraso };
 }
 
+// ── Sondeo barato (ETag) ─────────────────────────────────────────────────────────────────────────────────────────────
+/** Marca de «no cambió nada»: el servidor responde 304 sin cuerpo (la app reutiliza lo que ya tenía). */
+type NoModificado = { __noModificado: true; etag: string };
+/** Si el ETag del cliente (If-None-Match o ?etag=) coincide → 304. Si no, devuelve los datos con su `etag`. */
+function conEtag(req: Request, datos: Record<string, unknown>, volatiles: string[] = []): Record<string, unknown> | NoModificado {
+  const etag = huellaContenido(datos, volatiles);
+  const delCliente = req.headers.get("if-none-match") ?? new URL(req.url).searchParams.get("etag");
+  if (coincideEtag(delCliente, etag)) return { __noModificado: true, etag };
+  return { ...datos, etag };
+}
+
+/** GET /v1/salas — salas que el dueño de esta PC puede ver (mismas reglas que la web), con calidad y enlace si puede entrar. */
+async function salas(req: Request) {
+  const d = await autenticar(req);
+  const { data, error } = await sb.rpc("sistema_salas_para", { p_usuario: d.usuario });
+  db(error, "salas");
+  const { cfg } = await cfgVigente();
+  return conEtag(req, { salas: data ?? [], sondeo_seg: cfg.intervalos.sondeo_salas_seg });
+}
+
+/** POST /v1/presencia — latido de presencia de la app (cada `presencia_seg`). */
+async function presencia(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  const estado = v.enumerado(b.estado, "estado", ESTADOS_PRESENCIA_APP, { opcional: false });
+  let salaId: string | null = null;
+  if (b.sala_id !== undefined && b.sala_id !== null) salaId = (await salaPropia(d, v.uuid(b.sala_id, "sala_id"))).id;
+  const { error } = await sb.rpc("sistema_presencia", { p_usuario: d.usuario, p_estado: estado, p_sala: salaId, p_dispositivo: d.id });
+  db(error, "presencia");
+  const { cfg } = await cfgVigente();
+  return { estado, siguiente_seg: cfg.intervalos.presencia_seg };
+}
+
+/** GET /v1/presencia/amigos — estado de cada amigo. «desde» no invalida el ETag (cambia a cada rato). */
+async function presenciaAmigos(req: Request) {
+  const d = await autenticar(req);
+  const { data, error } = await sb.rpc("sistema_presencia_amigos_completa", { p_usuario: d.usuario });
+  db(error, "presencia_amigos");
+  const { cfg } = await cfgVigente();
+  return conEtag(req, { amigos: data ?? [], sondeo_seg: cfg.intervalos.sondeo_amigos_seg }, ["desde"]);
+}
+
+/** POST /v1/invitar — el host invita a un amigo a SU sala: permiso de ver/entrar 2 h + aviso en la web. */
+async function invitar(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  frenar(`inv:${d.id}`, 30, 10 * 60_000);
+  const invitado = v.uuid(b.usuario_id, "usuario_id"); const sala = v.uuid(b.sala_id, "sala_id");
+  const { data, error } = await sb.rpc("sistema_invitar", { p_host: d.usuario, p_dispositivo: d.id, p_sala: sala, p_invitado: invitado });
+  db(error, "invitar");
+  const r = data as { error?: string; invitacion_id?: number; notificado?: boolean; expira?: string };
+  if (r.error) throw new ErrorApi(r.error, r.error === "DEMASIADOS_INTENTOS" ? { reintentar_en: 120 } : {});
+  log("info", "invitacion", { sala, invitado, notificado: r.notificado });
+  return { invitacion_id: r.invitacion_id, notificado: !!r.notificado, expira: r.expira };
+}
+
 /** Instalador: código de un solo uso → URL firmada temporal del ZIP del código fuente (bucket privado). Sin token. */
 async function instalar(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "?";
@@ -512,6 +566,10 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/eco": { metodo: "GET", fn: eco },
   "/v1/diagnostico": { metodo: "POST", fn: diagnostico },
   "/v1/sala/prueba": { metodo: "POST", fn: pruebaSala },
+  "/v1/salas": { metodo: "GET", fn: salas },
+  "/v1/presencia": { metodo: "POST", fn: presencia },
+  "/v1/presencia/amigos": { metodo: "GET", fn: presenciaAmigos },
+  "/v1/invitar": { metodo: "POST", fn: invitar },
 };
 
 Deno.serve(async (req) => {
@@ -527,7 +585,11 @@ Deno.serve(async (req) => {
     const r = RUTAS[ruta];
     if (!r) throw new ErrorApi("RUTA_NO_EXISTE");
     if (req.method !== r.metodo) throw new ErrorApi("METODO_NO_PERMITIDO");
-    const datos = await r.fn(req);
+    const datos = await r.fn(req) as Record<string, unknown>;
+    if (datos && (datos as NoModificado).__noModificado) {
+      return new Response(null, { status: 304, headers: { ...cab, etag: (datos as NoModificado).etag } });
+    }
+    if (typeof datos?.etag === "string") cab.etag = datos.etag;
     if (!navegador) log("info", "ok", { ruta, ms: Date.now() - t0, solicitudId });
     return new Response(JSON.stringify({ ok: true, ...(datos as object), solicitud_id: solicitudId }), { status: 200, headers: cab });
   } catch (err) {
