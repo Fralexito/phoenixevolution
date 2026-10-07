@@ -198,3 +198,14 @@
 @keyframes vit-entrar { from { opacity: .001; transform: translateY(10px); } }
 @media (max-width: 640px) { .vit-copa { font-size: 2.2rem; } .vit-oro .vit-copa { font-size: 3rem; } .vit-dt { font-size: .85rem; } .vit-oro .vit-dt { font-size: 1rem; } .vit-repisa { padding: .75rem .5rem 0; } }
 @media (prefers-reduced-motion: reduce) { .vit-copa, .vit-carta, .vit-carta-brillo, #palmares-root [data-pane] > div > div { animation: none; } .vit-trofeo, #palmares-root [data-pane] > div > div { transition: none; } }
+
+/* Duelos: en PC el formulario «Lanzar reto» se puede plegar para que el radar ocupe todo el ancho (se recuerda por navegador). */
+.lanzar-flotante { display: none; }
+@media (min-width: 1024px) {
+  #duelos-grid[data-plegado] { grid-template-columns: minmax(0, 1fr) !important; }
+  #duelos-grid[data-plegado] #col-lanzar { display: none; }
+  #duelos-grid[data-plegado] .lanzar-flotante { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; padding: .85rem 1rem; border-radius: 1rem;
+    font-family: var(--font-display, inherit); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #fff;
+    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 22px rgb(128 0 255 / .45); transition: transform .2s, box-shadow .2s; }
+  #duelos-grid[data-plegado] .lanzar-flotante:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgb(128 0 255 / .65); }
+}

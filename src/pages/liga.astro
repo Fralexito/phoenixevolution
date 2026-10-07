@@ -57,7 +57,7 @@ const datos = LIGAS.map((l) => ({
               <i class={`fa-solid ${l.icono} text-galaxy-400 text-3xl sm:text-4xl drop-shadow-[0_0_15px_rgba(0,229,255,0.8)] animate-float`}></i>
               <span class:list={['liga-sello', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
             </div>
-            <h1 class="text-5xl sm:text-7xl md:text-8xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">{l.titulo[0]} <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">{l.titulo[1]}</span></h1>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">{l.titulo[0]} <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">{l.titulo[1]}</span></h1>
             <p class="text-sm sm:text-2xl font-display font-light tracking-[0.25em] sm:tracking-[0.3em] text-gray-300 uppercase">{l.juego}</p>
             {ult && (
               <ul class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5" aria-label="Datos de la liga">

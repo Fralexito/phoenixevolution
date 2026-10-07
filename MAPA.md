@@ -443,7 +443,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 204 (limpieza): LIVE_DEMO=false (el pulso ya no inventa eventos), Highlights de Central ocultos (FX.highlightsDemo=false, eran clips de ejemplo + Unsplash), carta-experimento fuera del sitio (_carta-experimento.astro), pulso «En vivo» más discreto (Historial solo ícono; en celular un mensaje y solo los botones a la derecha). Inicio: portada sin altura forzada, título en 2 líneas «…DE / LA GALAXY LEAGUE». Palmarés con vitrina (FX.palmaresVitrina). Contexto completo en claude/ESTADO-ACTUAL.md.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 204)
+- Ronda 205: títulos de Liga/Organizadores/Competiciones/Historial unificados (text-4xl sm:5xl md:6xl, como Central); Duelos: «Lanzar reto» plegable en PC (botón Ocultar → radar a todo el ancho + botón grande «Lanzar reto»; se recuerda en localStorage pe.duelos.formPlegado).
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 205)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**

@@ -110,7 +110,7 @@ function initRadar() {
   });
   $('radar-list').addEventListener('click', (e) => {
     const id = e.target.closest('[data-retar]')?.dataset.retar; if (!id) return;
-    setVista('lanzar'); targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setVista('lanzar'); delete document.getElementById('duelos-grid')?.dataset.plegado; targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
   $('seg-estado').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setNivel(b.dataset.v); });
 }
@@ -143,7 +143,7 @@ function retoDesdeEnlace() {
   const id = new URLSearchParams(location.search).get('retar') ?? '';
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) || id === me()) return;
   if (!data.perfiles.has(id)) { if (me()) toast('No encontré a ese jugador para retarlo.', 'error', { key: 'retar-enlace' }); return; }
-  setVista('lanzar'); targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setVista('lanzar'); delete document.getElementById('duelos-grid')?.dataset.plegado; targetRival(id); $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 loadPerfiles().then(refreshForm).then(retoDesdeEnlace).catch((e) => console.error('[duelos] perfiles:', e));
 $('form-crear-reto').addEventListener('submit', submitReto);
@@ -177,3 +177,12 @@ setInterval(() => { if (!document.hidden) renderAll(); }, 20000);
 montarTarjetasSalas({ contenedor: document.getElementById('lista-salas-radar'), tipo: 'radar' });
 alSesion((st) => { if (st?.session) montarRacha(document.getElementById('racha-diaria')); });
 document.getElementById('btn-alquilar')?.addEventListener('click', () => import('../features/alquiler.js').then((m) => m.abrirAlquiler()));
+
+// PC: plegar/desplegar «Lanzar reto» (el radar gana todo el ancho). Se recuerda en este navegador; si no hay almacenamiento, funciona igual sin recordar.
+{
+  const grid = document.getElementById('duelos-grid'); const CLAVE = 'pe.duelos.formPlegado';
+  const plegar = (si) => { if (!grid) return; if (si) grid.dataset.plegado = ''; else delete grid.dataset.plegado; try { localStorage.setItem(CLAVE, si ? '1' : '0'); } catch { /* sin almacenamiento */ } };
+  try { if (localStorage.getItem(CLAVE) === '1') grid?.setAttribute('data-plegado', ''); } catch { /* sin almacenamiento */ }
+  document.getElementById('btn-plegar-form')?.addEventListener('click', () => plegar(true));
+  document.getElementById('btn-abrir-form')?.addEventListener('click', () => { plegar(false); document.getElementById('form-crear-reto')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+}
