@@ -1,7 +1,7 @@
 ---
 // Pestañas del pilar (FX.pilares): bajo la cabecera, enlaza las secciones hermanas de la página actual.
 // Ej.: en Liga se ve «Liga · Competiciones · Historial · Palmarés · Ranking». No aparece en Central ni en páginas de cuenta.
-import { pilarDe } from '../data/site.js';
+import { pilarDe, esDe } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
 const p = pilarDe(active);
@@ -11,7 +11,7 @@ const p = pilarDe(active);
     <span class="pilar-tabs-tit"><i class={`fa-solid ${p.icon}`}></i> {p.label}</span>
     <div class="pilar-tabs-lista">
       {p.items.map((n) => (
-        <a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined}><i class={`fa-solid ${n.icon}`}></i>{n.label}</a>
+        <a href={`${base}${n.path}`} aria-current={esDe(n, active) ? 'page' : undefined}><i class={`fa-solid ${n.icon}`}></i>{n.label}</a>
       ))}
     </div>
   </nav>

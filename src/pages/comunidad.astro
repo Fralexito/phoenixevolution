@@ -1,22 +1,11 @@
 ---
+// /comunidad/ se fusionó con /social/ (mismo feed de muros). Se deja esta página para que los enlaces viejos no den 404.
+// El «radar» que vivía aquí ya está en Jugar → En vivo (/ahora/). Lo viejo sigue en git (pages/comunidad.js) por si se quiere recuperar.
 import Layout from '../layouts/Layout.astro';
+const destino = `${import.meta.env.BASE_URL}social/`;
 ---
-<Layout title="Comunidad" active="comunidad">
-  <div class="max-w-2xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
-    <header>
-      <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl">Comunidad</h1>
-      <p class="text-xs text-gray-400 mt-1">Lo que publican los jugadores en sus muros: lo más reciente, lo de quienes sigues y lo que más se mueve ahora.</p>
-    </header>
-    <section id="com-radar" hidden class="glass-panel rounded-2xl px-4 py-3" aria-labelledby="com-radar-t">
-      <h2 id="com-radar-t" class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest"><i class="fa-solid fa-tower-broadcast mr-1"></i>En el radar ahora <span id="com-radar-n" class="text-gray-400"></span></h2>
-      <div id="com-radar-lista" class="flex flex-wrap gap-1.5 mt-2" aria-live="polite"></div>
-      <p class="text-[12px] text-gray-500 mt-2">Quienes activaron el radar en Duelos y están conectados. Es información informativa: la BD decide quién puede retar a quién.</p>
-    </section>
-    <div id="com-vistas" class="flex flex-wrap gap-1.5" role="group" aria-label="Vista del feed"></div>
-    <div id="com-filtro" class="flex flex-wrap items-center gap-1.5 text-[12px]" role="group" aria-label="Filtrar por juego"></div>
-    <div id="com-feed" class="space-y-3" aria-live="polite"><p class="text-gray-400 text-sm py-12 text-center">Cargando…</p></div>
-  </div>
+<Layout title="Comunidad" active="social">
+  <meta http-equiv="refresh" content={`0; url=${destino}`} />
+  <div class="max-w-xl mx-auto px-4 py-16 text-center text-gray-400 text-sm">La comunidad ahora vive en <a class="text-galaxy-400 underline" href={destino}>Social</a>…</div>
+  <script is:inline define:vars={{ destino }}>location.replace(destino);</script>
 </Layout>
-<script>
-  import '../js/pages/comunidad.js';
-</script>

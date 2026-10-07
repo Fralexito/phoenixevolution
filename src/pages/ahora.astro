@@ -15,7 +15,8 @@ const base = import.meta.env.BASE_URL;
         <section class="space-y-2"><h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-tower-broadcast text-galaxy-400 mr-2"></i>Retos esperando rival</h2>
           <div id="ah-radar" class="grid gap-2"></div><p id="ah-radar-vacio" class="text-xs text-gray-400">Nadie espera rival ahora. <a class="text-galaxy-400 underline" href={`${base}duelos/`}>Lanza un reto</a>.</p></section>
         <section class="space-y-2"><h2 class="font-display font-bold text-white uppercase text-sm tracking-wider"><i class="fa-solid fa-eye text-galaxy-400 mr-2"></i>Para mirar</h2>
-          <div id="ah-vivo" class="grid gap-2"></div><p id="ah-vivo-vacio" class="text-xs text-gray-400">No hay salas abiertas a espectadores ahora.</p></section>
+          <div id="ah-vivo" class="grid gap-2"></div><p id="ah-vivo-vacio" class="text-xs text-gray-400">No hay salas abiertas a espectadores ahora.</p>
+          <a href={`${base}en-vivo/`} class="inline-flex items-center gap-1 text-xs text-galaxy-400 hover:underline">Ver todas las salas y tus espectadores <i class="fa-solid fa-arrow-right text-[10px]"></i></a></section>
       </div>
       <aside class="space-y-4"><div id="ah-ranking" hidden></div></aside>
     </div>

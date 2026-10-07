@@ -1,5 +1,5 @@
 ---
-import { NAV, PILARES, pilarDe } from '../data/site.js';
+import { NAV, PILARES, pilarDe, esDe } from '../data/site.js';
 import { FX } from '../data/experimento.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
@@ -29,7 +29,7 @@ const pilarActual = pilarDe(active)?.id;
                 <p class="pilar-lema"><i class={`fa-solid ${p.icon}`}></i> {p.lema}</p>
                 <div class="pilar-grid">
                   {p.items.map((n) => (
-                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" aria-current={active === n.id ? 'page' : undefined}>
+                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" aria-current={esDe(n, active) ? 'page' : undefined}>
                       <i class={`fa-solid ${n.icon}`}></i><span><b>{n.label}</b><small>{n.desc}</small></span>
                     </a>
                   ))}
@@ -37,7 +37,7 @@ const pilarActual = pilarDe(active)?.id;
               </div>
             </div>
       )) : NAV.map((n) => (
-        <a href={`${base}${n.path}`} class="nav-link" aria-current={active === n.id ? 'page' : undefined}>{n.label}</a>
+        <a href={`${base}${n.path}`} class="nav-link" aria-current={esDe(n, active) ? 'page' : undefined}>{n.label}</a>
       ))}
     </div>
 

@@ -8,7 +8,7 @@ const { active } = Astro.props;
 const todos = [...NAV, ...NAV_EXTRA];
 // Solo lo que NO está en el menú de arriba (evita duplicar): lo en vivo + accesos de comunidad.
 const todosMas = [...todos, ...ACCOUNT_NAV];
-const atajos = ['ahora', 'envivo', 'missalas', 'ranking', 'eventos', 'competiciones', 'historial', 'comunidad'].map((id) => todosMas.find((n) => n.id === id && n.path)).filter(Boolean);
+const atajos = ['ahora', 'missalas', 'duelos', 'creadores', 'ranking', 'eventos'].map((id) => todosMas.find((n) => n.id === id && n.path)).filter(Boolean);
 const cuenta = ['muro', 'partidos', 'mensajes'].map((id) => ACCOUNT_NAV.find((n) => n.id === id)).filter((n) => n?.path);
 const item = (n, id = n.id) => ({ ...n, actual: active === id });
 ---

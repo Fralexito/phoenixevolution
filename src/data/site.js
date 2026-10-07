@@ -16,7 +16,6 @@ export const NAV = [
 
 // Enlaces secundarios (no saturan la cabecera de PC): aparecen en el menú de celular y en el pie de página.
 export const NAV_EXTRA = [
-  { id: 'comunidad', label: 'Comunidad', path: 'comunidad/', icon: 'fa-people-group' },
   { id: 'eventos', label: 'Eventos', path: 'eventos/', icon: 'fa-calendar-day' },
   { id: 'clanes', label: 'Clanes', path: 'clanes/', icon: 'fa-shield-halved' },
   { id: 'ranking', label: 'Ranking', path: 'ranking/', icon: 'fa-ranking-star' },
@@ -91,19 +90,23 @@ const TODAS = () => [...NAV, ...NAV_EXTRA, ...ACCOUNT_NAV];
 const DESC = {
   liga: 'Tabla, fechas y resultados de cada división', competiciones: 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
   palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
-  duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Qué está pasando en este momento',
+  duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
   missalas: 'Vincula tu PC y abre salas', mercado: 'Fichajes y traspasos entre clubes',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores',
   tienda: 'Estética y mejoras para tu perfil',
 };
+// En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
+const RENOMBRE = { ahora: 'En vivo' };
 const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra,
-  items: ids.map((i) => TODAS().find((n) => n.id === i && n.path != null)).filter(Boolean).map((n) => ({ ...n, desc: DESC[n.id] ?? '' })) });
+  items: ids.map((spec) => { const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
+    return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
 export const PILARES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'historial', 'palmares', 'ranking'], { lema: 'La Galaxy League en serio' }),
-  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'envivo', 'ahora', 'missalas', 'mercado'], { lema: 'Del clic al partido' }),
+  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'missalas', 'mercado'], { lema: 'Del clic al partido' }),
   pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'creadores', 'clanes', 'eventos', 'database'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];
 /** Pilar al que pertenece una página (por su `active`), o null (Central, cuenta, etc.). */
-export const pilarDe = (active) => PILARES.find((p) => p.items.some((n) => n.id === active)) ?? null;
+export const esDe = (n, active) => n.id === active || n.tambien?.includes(active);
+export const pilarDe = (active) => PILARES.find((p) => p.items.some((n) => esDe(n, active))) ?? null;
