@@ -933,3 +933,32 @@ html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245
 .nt-prop { display: flex; flex-direction: column; gap: .35rem; padding: .5rem; border-radius: .6rem; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .3); font: 700 .7rem var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: #cbd5e1; text-align: left; transition: border-color .2s, transform .2s; }
 .nt-prop:hover { border-color: #22d3ee; transform: translateY(-2px); color: #fff; }
 .nt-asis-tit { margin: .25rem 0 .5rem; font: 800 .7rem var(--font-display); letter-spacing: .2em; text-transform: uppercase; color: #67e8f9; }
+/* ── Pilares (FX.pilares): desplegable grande del menú de arriba ── */
+.pilar { position: relative; }
+.pilar-btn { display: inline-flex; align-items: center; }
+.pilar-flecha { transition: transform .2s; }
+.pilar-panel { position: absolute; top: calc(100% + .6rem); left: 50%; width: min(36rem, 90vw); padding: 1rem; border-radius: 1rem; background: rgb(8 6 24 / .97); backdrop-filter: blur(14px); border: 1px solid rgb(34 211 238 / .25); box-shadow: 0 24px 60px #000c, 0 0 40px rgb(128 0 255 / .15);
+  opacity: 0; visibility: hidden; transform: translate(-50%, -6px); transition: opacity .18s, transform .18s, visibility 0s .18s; z-index: 70; }
+.pilar-panel::before { content: ''; position: absolute; inset: -.7rem 0 auto; height: .7rem; }   /* puente: el mouse no «se cae» entre botón y panel */
+.pilar:hover .pilar-panel, .pilar:focus-within .pilar-panel, .pilar[data-abierto] .pilar-panel { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+.pilar:hover .pilar-flecha, .pilar[data-abierto] .pilar-flecha { transform: rotate(180deg); }
+.pilar-lema { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; font: 800 .7rem var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: #67e8f9; }
+.pilar-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem; }
+.pilar-item { display: flex; align-items: flex-start; gap: .75rem; padding: .65rem .7rem; border-radius: .7rem; border: 1px solid transparent; transition: background .15s, border-color .15s; }
+.pilar-item > i { width: 2rem; height: 2rem; flex-shrink: 0; display: grid; place-items: center; border-radius: .55rem; background: rgb(34 211 238 / .08); color: var(--color-galaxy-400); font-size: .9rem; }
+.pilar-item b { display: block; font: 700 .9rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; }
+.pilar-item small { display: block; margin-top: .1rem; font-size: .75rem; line-height: 1.25; color: #9ca3af; text-transform: none; letter-spacing: 0; font-family: var(--font-sans, inherit); font-weight: 400; }
+.pilar-item:hover, .pilar-item:focus-visible { background: rgb(255 255 255 / .04); border-color: rgb(34 211 238 / .3); }
+.pilar-item[aria-current='page'] { background: rgb(34 211 238 / .08); border-color: rgb(34 211 238 / .45); }
+@media (prefers-reduced-motion: reduce) { .pilar-panel { transition: none; } }
+
+/* Pestañas del pilar bajo la cabecera */
+.pilar-tabs { display: flex; align-items: center; gap: 1rem; max-width: 80rem; margin: 1rem auto 0; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; }
+.pilar-tabs::-webkit-scrollbar { display: none; }
+.pilar-tabs-tit { flex-shrink: 0; font: 800 .7rem var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: #6b7280; display: flex; gap: .4rem; align-items: center; }
+.pilar-tabs-lista { display: flex; gap: .35rem; padding: .25rem; border-radius: 999px; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .25); }
+.pilar-tabs-lista a { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; padding: .4rem .9rem; border-radius: 999px; font: 700 .75rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; transition: color .15s, background .15s; }
+.pilar-tabs-lista a i { font-size: .8em; opacity: .7; }
+.pilar-tabs-lista a:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.pilar-tabs-lista a[aria-current='page'] { color: #000; background: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(34 211 238 / .45); }
+.pilar-tabs-lista a[aria-current='page'] i { opacity: 1; }

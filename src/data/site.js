@@ -23,7 +23,7 @@ export const NAV_EXTRA = [
   { id: 'tienda', label: 'Tienda', path: 'tienda/', icon: 'fa-store' },
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
   { id: 'competiciones', label: 'Competiciones', path: 'competiciones/', icon: 'fa-trophy' },
-  { id: 'historial', label: 'Historial de partidos', path: 'historial/', icon: 'fa-clock-rotate-left' },
+  { id: 'historial', label: 'Historial', path: 'historial/', icon: 'fa-clock-rotate-left' },
   { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
 ];
 
@@ -83,3 +83,27 @@ export const TICKER = [
 
 // Nombre visible de la app de salas (cámbialo aquí y se actualiza en toda la web).
 export const NOMBRE_APP = 'Phoenix Soda';
+
+// ───────── Mapa del sitio en PILARES (FX.pilares) ─────────
+// Cada sección vive en UN solo pilar. El menú de arriba muestra los pilares (desplegable con descripción) y cada página
+// muestra las pestañas de su pilar para saltar entre hermanas. Para mover una sección de pilar, cambia su id de lista aquí.
+const TODAS = () => [...NAV, ...NAV_EXTRA, ...ACCOUNT_NAV];
+const DESC = {
+  liga: 'Tabla, fechas y resultados de cada división', competiciones: 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
+  palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
+  duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Qué está pasando en este momento',
+  missalas: 'Vincula tu PC y abre salas', mercado: 'Fichajes y traspasos entre clubes',
+  noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
+  clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores',
+  tienda: 'Estética y mejoras para tu perfil',
+};
+const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra,
+  items: ids.map((i) => TODAS().find((n) => n.id === i && n.path != null)).filter(Boolean).map((n) => ({ ...n, desc: DESC[n.id] ?? '' })) });
+export const PILARES = [
+  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'historial', 'palmares', 'ranking'], { lema: 'La Galaxy League en serio' }),
+  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'envivo', 'ahora', 'missalas', 'mercado'], { lema: 'Del clic al partido' }),
+  pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'creadores', 'clanes', 'eventos', 'database'], { lema: 'Lo que se dice y quién lo dice' }),
+  pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
+];
+/** Pilar al que pertenece una página (por su `active`), o null (Central, cuenta, etc.). */
+export const pilarDe = (active) => PILARES.find((p) => p.items.some((n) => n.id === active)) ?? null;

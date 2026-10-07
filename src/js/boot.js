@@ -36,4 +36,5 @@ if (FX.barraLateral && document.getElementById('barra-lat')) {
 }
 // Chat flotante (experimento): contactos + ventanitas. Se descarga aparte para no frenar la primera carga.
 if (FX.contactos) import('./features/chatFlotante/index.js').then((m) => m.initChatFlotante()).catch((e) => console.error('[boot] chat flotante:', e));
+if (FX.pilares) import('./features/pilares.js').then((m) => m.montarPilares()).catch((e) => console.error('[boot] pilares:', e));
 initSession().catch((e) => console.error('[boot] sesión:', e));

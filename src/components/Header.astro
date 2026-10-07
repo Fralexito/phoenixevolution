@@ -1,7 +1,9 @@
 ---
-import { NAV } from '../data/site.js';
+import { NAV, PILARES, pilarDe } from '../data/site.js';
+import { FX } from '../data/experimento.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
+const pilarActual = pilarDe(active)?.id;
 ---
 <nav class="glass-panel pointer-events-auto relative z-20 border-b border-galaxy-border/80 shadow-[0_6px_24px_rgba(128,0,255,0.14)]">
   <div class="w-full pl-6 pr-4 md:pl-12 md:pr-8 flex items-center justify-between h-16 relative">
@@ -17,7 +19,24 @@ const { active } = Astro.props;
     </a>
 
     <div class="hidden lg:flex items-center gap-1 font-display text-[0.95rem] xl:text-[1.05rem] ml-auto">
-      {NAV.map((n) => (
+      {FX.pilares && <a href={base} class="nav-link" aria-current={active === 'central' ? 'page' : undefined} title="Central"><i class="fa-solid fa-house text-[.85em]"></i><span class="sr-only">Central</span></a>}
+      {FX.pilares ? PILARES.map((p) => (
+        p.items.length === 1
+          ? <a href={`${base}${p.items[0].path}`} class="nav-link" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}</a>
+          : <div class="pilar" data-pilar={p.id}>
+              <button type="button" class="nav-link pilar-btn" aria-expanded="false" aria-haspopup="true" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}<i class="fa-solid fa-chevron-down text-[.6em] ml-1.5 opacity-60 pilar-flecha"></i></button>
+              <div class="pilar-panel" role="menu">
+                <p class="pilar-lema"><i class={`fa-solid ${p.icon}`}></i> {p.lema}</p>
+                <div class="pilar-grid">
+                  {p.items.map((n) => (
+                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" aria-current={active === n.id ? 'page' : undefined}>
+                      <i class={`fa-solid ${n.icon}`}></i><span><b>{n.label}</b><small>{n.desc}</small></span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+      )) : NAV.map((n) => (
         <a href={`${base}${n.path}`} class="nav-link" aria-current={active === n.id ? 'page' : undefined}>{n.label}</a>
       ))}
     </div>

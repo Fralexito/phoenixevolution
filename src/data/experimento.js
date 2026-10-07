@@ -14,5 +14,6 @@
 //   palmaresVitrina → Palmarés con vitrina de trofeos (neón) + carta del campeón al tocar + más vida en los premios. Pon false y vuelve el anterior
 //   highlightsDemo → bloque «Highlights de la jornada» de Central (hoy son clips de ejemplo e imagen de stock). false = oculto hasta tener clips reales
 //   noticiasTono → Noticias con dos tonos: serio (Oficial/Jornadas/Tribunal, marco sobrio, sin serif) y joda (Tribuna: sticker, inclinación, color naranja). false = como antes
+//   pilares → menú de arriba en 4 pilares (Competir · Jugar · Comunidad · Tienda) con desplegable grande + pestañas del pilar en cada página. false = menú clásico de 9 enlaces
 //   barraLateral → barra lateral izquierda estilo red social (solo PC ≥ 1280 px): atajos, ligas y amigos. Pon false y desaparece por completo
-export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true, dopamina: true, contactos: true, tickerVivo: true, vitrina: true, palmaresNuevo: false, palmaresVitrina: true, highlightsDemo: false, noticiasTono: true };
+export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true, dopamina: true, contactos: true, tickerVivo: true, vitrina: true, palmaresNuevo: false, palmaresVitrina: true, highlightsDemo: false, noticiasTono: true, pilares: true };
