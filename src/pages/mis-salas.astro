@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Phoenix Soda" active="missalas">
+  <div class="max-w-4xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Salas</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-desktop text-galaxy-400 mr-2"></i>Phoenix Soda</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Vincula tu cuenta de Parsec y, si eres host, tu PC. Desde aquí ves tus salas abiertas y quién está dentro.</p>
+    </header>
+    <p id="ms-sin-sesion" hidden class="text-center py-10 text-gray-400 text-sm bg-galaxy-panel rounded-xl border border-galaxy-border">Inicia sesión para ver esta sección.</p>
+    <div id="ms-contenido" hidden class="space-y-4">
+      <section class="bg-galaxy-panel rounded-xl border border-galaxy-border p-4 space-y-3" aria-labelledby="h-parsec">
+        <h2 id="h-parsec" class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-id-card text-galaxy-400 mr-2"></i>Mi cuenta de Parsec</h2>
+        <div id="ms-parsec" class="text-sm text-gray-300">Cargando…</div>
+      </section>
+      <section id="ms-bloque-salas" class="bg-galaxy-panel rounded-xl border border-galaxy-border p-4 space-y-3" aria-labelledby="h-salas">
+        <h2 id="h-salas" class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-gamepad text-galaxy-400 mr-2"></i>Mis salas abiertas</h2>
+        <div id="ms-salas" class="space-y-2 text-sm text-gray-300">Cargando…</div>
+      </section>
+      <section id="ms-bloque-host" class="bg-galaxy-panel rounded-xl border border-galaxy-border p-4 space-y-3" aria-labelledby="h-pcs">
+        <h2 id="h-pcs" class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-computer text-galaxy-400 mr-2"></i>Mis PCs (host)</h2>
+        <div id="ms-host" class="space-y-3 text-sm text-gray-300">Cargando…</div>
+      </section>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/misSalas.js';
+</script>

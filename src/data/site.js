@@ -36,6 +36,7 @@ export const ACCOUNT_NAV = [
   { id: 'muro',     label: 'Mi muro',      path: 'perfil/',        icon: 'fa-newspaper' },
   { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad' },
   { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast' },
+  { id: 'missalas', label: 'Phoenix Soda', path: 'mis-salas/',    icon: 'fa-desktop' },
   { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments' },
   { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group' },
   { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass' },

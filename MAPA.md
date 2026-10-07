@@ -429,7 +429,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 
 - Ronda 197: §6 de smash-soda-producto: migración 067 (aplicada y probada: acepta_espectadores, salas.rival, salas_espectadores, enlace solo con rol, radar_salas/salas_en_vivo/aceptar_sala/ver_sala/dejar_sala, sistema_roles_sala) + Edge Function v1.5.0 desplegada (versión 4) + tarjetas en Duelos («Retos en el radar») y En vivo (features/salas/tarjetas.js) + contrato §22.
 
-## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 197)
+- Ronda 198: página /mis-salas/ «Phoenix Soda» (menú Mi cuenta): vincular Parsec, mis salas abiertas (rival y espectadores), mis PCs para hosts (código de vinculación, código de instalación, renombrar, desvincular). pages/misSalas.js.
+
+## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 198)
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**
