@@ -74,3 +74,30 @@ Texto canónico (Mercado debe generarlo **idéntico** desde el option file y la 
 - **Agente libre** = jugador sin club (`club_hacia` / `club_id` nulo).
 - DT→CPU y CPU→DT generan cambios de liga igual que DT↔DT (misma `version_liga`).
 - **Tope de plantilla: 40.** Un traspaso a un club lleno se rechaza con `PLANTILLA_LLENA`.
+
+## Equivalencias entre parches (2026-10-08, migración 089)
+
+### `POST /v1/equivalencias` (staff, token manager si se exige)
+Informe de emparejamiento. **Máx. 3000 filas por llamada** (jugadores + clubes): mandar en lotes. Idempotente.
+```json
+{ "formato": "phoenix-mercado/emparejamiento@0.1", "perfil_parche": "conmegol-26",
+  "clubes":    [{ "phoenix_id": 12, "pes_id_local": 101, "estado": "automatico", "puntaje": 92, "metodo": "id+plantilla" }],
+  "jugadores": [{ "phoenix_id": 5501, "pes_id_local": 40213, "estado": "automatico", "puntaje": 98, "metodo": "id+datos" },
+                { "phoenix_id": 5502, "estado": "revisar", "candidatos": [{ "pes_id_local": 40300, "nombre": "J. Pérez", "puntaje": 61 }] },
+                { "phoenix_id": 5503, "estado": "sin_candidato" }] }
+```
+- `phoenix_id` = `lm_jugadores.id` (clubes: `lm_clubes.id`). `perfil_parche`: `[A-Za-z0-9._-]{1,60}`.
+- `estado`: `automatico` | `revisar` | `sin_candidato`. **`confirmado` solo lo pone el staff** (si llega, se trata como `revisar`).
+- En `revisar`/`sin_candidato` el `pes_id_local` no se reserva: se guarda dentro de `candidatos` (`sugerido: true`).
+- Una fila confirmada por el staff **nunca** se pisa con un informe nuevo.
+- Si dos `phoenix_id` reclaman el mismo `pes_id_local` → ambos quedan en `revisar` (candidato con `conflicto_con`).
+- `phoenix_id` que no existe en la web → se ignora y se cuenta.
+- Campos desconocidos se ignoran (en candidatos se guardan tal cual, máx. ~8 KB por fila).
+
+Respuesta: `{ perfil_parche, clubes:{guardados, conservados_confirmados, conflictos, ignorados, ignorados_muestra}|null, jugadores:{…}|null }`.
+
+### `GET /v1/equivalencias?perfil_parche=…&tipo=jugadores|clubes&desde=<id>`
+Solo filas `automatico` y `confirmado`. Páginas de 5000; repetir con `desde=siguiente` hasta `siguiente: null`.
+`{ filas:[{ id, phoenix_id, pes_id_local, estado }], siguiente }`
+
+Revisión del staff en la web: Modo Mánager → Centro de control → «Equivalencias entre parches».

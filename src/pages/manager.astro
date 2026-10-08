@@ -105,7 +105,23 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
         </div>
         <div id="mg-staff-clubes" class="mg-clubes-grid"></div>
       </div>
+
+      <!-- Equivalencias entre parches (informe de Phoenix Mercado) -->
+      <div id="eq" class="space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-link"></i> Equivalencias entre parches</h3>
+          <select id="eq-perfil" class="field !min-h-8 !py-1 !text-xs w-auto" aria-label="Parche"></select>
+          <div class="flex gap-1">
+            <button type="button" class="mg-chip" data-eq-tipo="jugadores" aria-pressed="true">Jugadores</button>
+            <button type="button" class="mg-chip" data-eq-tipo="clubes" aria-pressed="false">Clubes</button>
+          </div>
+          <label class="relative ml-auto"><i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-[11px]"></i><input id="eq-buscar" type="search" placeholder="Buscar nombre…" class="field !min-h-8 !py-1 !pl-7 !text-xs w-44"></label>
+        </div>
+        <div id="eq-conteo" class="flex flex-wrap gap-1.5"></div>
+        <div id="eq-lista" class="space-y-2"></div>
+        <button id="eq-mas" type="button" class="mg-chip" hidden>Cargar más</button>
+      </div>
     </section>
   </div>
 </Layout>
-<script>import '../js/pages/manager.js';</script>
+<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js';</script>

@@ -324,11 +324,52 @@ async function ligaAplicado(req: Request) {
   return { version_actual: actual, al_dia: alDia, coincide };
 }
 
+/**
+ * POST /v1/equivalencias (staff) — informe de emparejamiento de Phoenix Mercado.
+ * { formato:"phoenix-mercado/emparejamiento@0.1", perfil_parche:"conmegol-26",
+ *   jugadores:[{ phoenix_id, pes_id_local?, estado:"automatico"|"revisar"|"sin_candidato", puntaje?, metodo?, candidatos?:[{pes_id_local,...}] }],
+ *   clubes:[ mismo formato; phoenix_id = lm_clubes.id ] }
+ * Máx. 3000 filas por llamada (mandar en lotes). Campos desconocidos se ignoran. Idempotente: reenviar el mismo lote no duplica.
+ */
+async function equivalencias(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); await exigirStaff(d.usuario); frenar(`eq:${d.usuario}`, 120, 60 * 60_000);
+  const txt = await req.text(); if (txt.length > 4_000_000) throw err("DATOS_INVALIDOS", { campo: "cuerpo", detalle: "máx. 4 MB" });
+  let b: Record<string, unknown>; try { b = JSON.parse(txt); } catch { throw err("DATOS_INVALIDOS", { campo: "cuerpo" }); }
+  if (!/^phoenix-mercado\/emparejamiento@0\./.test(String(b.formato ?? ""))) throw err("DATOS_INVALIDOS", { campo: "formato", detalle: "se espera phoenix-mercado/emparejamiento@0.x" });
+  const perfil = texto(b.perfil_parche ?? b.perfil, "perfil_parche", 60, false)!;
+  if (!/^[A-Za-z0-9._-]{1,60}$/.test(perfil)) throw err("DATOS_INVALIDOS", { campo: "perfil_parche" });
+  const jug = b.jugadores ?? [], clu = b.clubes ?? [];
+  if (!Array.isArray(jug) || !Array.isArray(clu)) throw err("DATOS_INVALIDOS", { campo: "jugadores/clubes" });
+  if (jug.length + clu.length === 0 || jug.length + clu.length > 3000) throw err("DATOS_INVALIDOS", { campo: "jugadores/clubes", detalle: "entre 1 y 3000 filas por llamada" });
+  const res: Record<string, unknown> = { perfil_parche: perfil };
+  for (const [tipo, items] of [["clubes", clu], ["jugadores", jug]] as const) {   // clubes primero
+    if (!items.length) { res[tipo] = null; continue; }
+    const { data, error } = await sb.rpc("sistema_mercado_equivalencias", { p_perfil: perfil, p_tipo: tipo, p_items: items });
+    if (error) { log("warn", "equivalencias", { tipo, m: error.message }); throw err("DATOS_INVALIDOS", { tipo, detalle: error.message }); }
+    res[tipo] = data;
+  }
+  log("info", "equivalencias", { usuario: d.usuario, perfil, jugadores: jug.length, clubes: clu.length });
+  return res;
+}
+
+/** GET /v1/equivalencias?perfil_parche=…&tipo=jugadores|clubes&desde=<id> → { filas:[{id,phoenix_id,pes_id_local,estado}], siguiente } (solo automatico/confirmado; 5000 por página) */
+async function leerEquivalencias(req: Request) {
+  await autenticar(req, { exigeManager: true });
+  const q = new URL(req.url).searchParams; const perfil = q.get("perfil_parche") ?? "";
+  if (!/^[A-Za-z0-9._-]{1,60}$/.test(perfil)) throw err("DATOS_INVALIDOS", { campo: "perfil_parche" });
+  const tabla = q.get("tipo") === "clubes" ? "mercado_equivalencias_clubes" : "mercado_equivalencias";
+  const { data, error } = await sb.from(tabla).select("id, phoenix_id, pes_id_local, estado").eq("perfil_parche", perfil)
+    .in("estado", ["automatico", "confirmado"]).gt("id", Math.max(0, Number(q.get("desde")) || 0)).order("id").limit(5000);
+  if (error) { log("error", "leer_equivalencias", { m: error.message }); throw err("ERROR_INTERNO"); }
+  return { filas: data ?? [], siguiente: data && data.length === 5000 ? data[data.length - 1].id : null };
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
   "/v1/reportes": { POST: crearReporte, GET: misReportes },
   "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella },
   "/v1/clave-publica": { GET: clavePublica }, "/v1/plantillas": { GET: plantillas }, "/v1/correcciones": { POST: correcciones }, "/v1/reportes/lote": { POST: reportesLote },
+  "/v1/equivalencias": { POST: equivalencias, GET: leerEquivalencias },
   "/v1/liga/cambios": { GET: ligaCambios }, "/v1/liga/aplicado": { POST: ligaAplicado }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 
