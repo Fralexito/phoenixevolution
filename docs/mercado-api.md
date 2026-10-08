@@ -16,6 +16,9 @@ Cabeceras del programa: `Authorization: Bearer <token>` (salvo /vincular y /eco)
 | GET | `/yo` | — | `{ usuario: { id, nombre, avatar_url }, dispositivo_id }` |
 | GET | `/option/actual` | — | `{ version, sha256, tamano, notas, publicado, url, expira_en_seg }` |
 | POST | `/reportes` | `{ option_version, hash_antes, hash_despues, resumen, cambios: [ ... ] }` | `{ id, estado: "pendiente", created_at }` |
+| POST | `/catalogo` (staff) | `{ equipos:[{pes_team_id,nombre}], jugadores:[{pes_id,nombre,pes_team_id,posicion,media,edad,nacionalidad,fecha_nac,altura,dorsal,valor}] }` | `{ equipos, jugadores }` (equipos entran sin aprobar) |
+| GET | `/fichajes` (`?todos=1`) | — | `{ fichajes:[{ id, tipo, phoenix_id, pes_id, jugador, de_pes_team_id, a_pes_team_id, a_club, monto, aplicado_en, fecha }] }` — pendientes por defecto; `a_pes_team_id: null` = agente libre |
+| POST | `/fichajes/aplicados` (staff) | `{ ids:[1,2,3] }` | `{ marcados }` — tras generar el option file oficial |
 | GET | `/reportes` | — | `{ reportes: [ { id, option_version, resumen, estado, motivo, created_at, revisado_en } ] }` |
 
 ## Flujo
@@ -34,4 +37,4 @@ Cabeceras del programa: `Authorization: Bearer <token>` (salvo /vincular y /eco)
 Libre mientras sea un arreglo JSON (máx. 2000 elementos, ~200 KB). La web muestra `tipo`, `de` → `a` y el resto como texto.
 
 ## Errores
-`TOKEN_FALTANTE` · `TOKEN_INVALIDO` · `TOKEN_REVOCADO` (volver a vincular) · `CODIGO_NO_ENCONTRADO` · `CODIGO_USADO` · `CODIGO_VENCIDO` · `SIN_OPTION_FILE` (el staff aún no publicó uno) · `DEMASIADOS_INTENTOS` (+ `reintentar_en` seg) · `DATOS_INVALIDOS` (+ `campo`) · `DISPOSITIVO_SUSPENDIDO` · `CODIGO_MANAGER_REQUERIDO` · `ERROR_INTERNO`.
+`TOKEN_FALTANTE` · `TOKEN_INVALIDO` · `TOKEN_REVOCADO` (volver a vincular) · `CODIGO_NO_ENCONTRADO` · `CODIGO_USADO` · `CODIGO_VENCIDO` · `SIN_OPTION_FILE` (el staff aún no publicó uno) · `DEMASIADOS_INTENTOS` (+ `reintentar_en` seg) · `DATOS_INVALIDOS` (+ `campo`) · `DISPOSITIVO_SUSPENDIDO` · `CODIGO_MANAGER_REQUERIDO` · `NO_AUTORIZADO` (ruta de staff) · `ERROR_INTERNO`.

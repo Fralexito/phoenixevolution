@@ -10,7 +10,7 @@ const URL_FIRMADA_SEG = 300;
 
 class ErrorApi extends Error { constructor(public codigo: string, public http = 400, public extra: Record<string, unknown> = {}) { super(codigo); } }
 const HTTP: Record<string, number> = { TOKEN_FALTANTE: 401, TOKEN_INVALIDO: 401, TOKEN_REVOCADO: 401, CODIGO_NO_ENCONTRADO: 404, CODIGO_USADO: 409,
-  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, ERROR_INTERNO: 500 };
+  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, NO_AUTORIZADO: 403, ERROR_INTERNO: 500 };
 const err = (codigo: string, extra: Record<string, unknown> = {}) => new ErrorApi(codigo, HTTP[codigo] ?? 400, extra);
 const log = (nivel: string, evento: string, datos: Record<string, unknown> = {}) => console.log(JSON.stringify({ nivel, evento, ...datos, t: new Date().toISOString() }));
 
@@ -126,9 +126,49 @@ async function misReportes(req: Request) {
   return { reportes: data ?? [] };
 }
 
+// ───────── Modo Mánager (migración 081) ─────────
+const ROLES_STAFF = ["moderador", "admin"];
+async function exigirStaff(usuario: string) {
+  const { data } = await sb.from("perfiles").select("rol").eq("id", usuario).maybeSingle();
+  if (!data || !ROLES_STAFF.includes(data.rol)) throw err("NO_AUTORIZADO");
+}
+const LIGA = "galaxy";
+
+/** POST /v1/catalogo (staff) { equipos:[{pes_team_id,nombre}], jugadores:[{pes_id,nombre,pes_team_id,posicion,media,edad,nacionalidad,fecha_nac,altura,dorsal,valor}] } → { equipos, jugadores } */
+async function subirCatalogo(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); await exigirStaff(d.usuario); frenar(`cat:${d.usuario}`, 10, 60 * 60_000);
+  const txt = await req.text(); if (txt.length > 5_000_000) throw err("DATOS_INVALIDOS", { campo: "cuerpo", detalle: "máx. 5 MB" });
+  let datos: Record<string, unknown>; try { datos = JSON.parse(txt); } catch { throw err("DATOS_INVALIDOS", { campo: "cuerpo" }); }
+  if (!Array.isArray(datos.equipos) || !Array.isArray(datos.jugadores)) throw err("DATOS_INVALIDOS", { campo: "equipos/jugadores" });
+  const { data, error } = await sb.rpc("sistema_lm_importar", { p_liga: LIGA, p_datos: datos });
+  if (error) { log("warn", "catalogo", { m: error.message }); throw err("DATOS_INVALIDOS", { detalle: error.message }); }
+  log("info", "catalogo_importado", { usuario: d.usuario, ...(data as object) });
+  return data;
+}
+
+/** GET /v1/fichajes?todos=1 → { fichajes:[{ id, tipo, phoenix_id, pes_id, jugador, de_pes_team_id, a_pes_team_id (null = libre), a_club, monto, aplicado_en, fecha }] } (por defecto solo pendientes) */
+async function fichajes(req: Request) {
+  await autenticar(req, { exigeManager: true });
+  const todos = new URL(req.url).searchParams.get("todos") === "1";
+  const { data, error } = await sb.rpc("sistema_lm_fichajes", { p_liga: LIGA, p_pendientes: !todos });
+  if (error) throw err("ERROR_INTERNO");
+  return { fichajes: data ?? [] };
+}
+
+/** POST /v1/fichajes/aplicados (staff) { ids:[...] } → { marcados } — tras generar el option file oficial con esos fichajes. */
+async function marcarAplicados(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); await exigirStaff(d.usuario);
+  const b = await leerJson(req);
+  if (!Array.isArray(b.ids) || !b.ids.length || b.ids.length > 5000 || !b.ids.every((x) => Number.isInteger(x))) throw err("DATOS_INVALIDOS", { campo: "ids" });
+  const { data, error } = await sb.rpc("sistema_lm_marcar_aplicados", { p_liga: LIGA, p_ids: b.ids });
+  if (error) throw err("ERROR_INTERNO");
+  return { marcados: data };
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
-  "/v1/reportes": { POST: crearReporte, GET: misReportes }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
+  "/v1/reportes": { POST: crearReporte, GET: misReportes },
+  "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 
 Deno.serve(async (req) => {
