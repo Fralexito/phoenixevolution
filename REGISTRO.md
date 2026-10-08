@@ -31,3 +31,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 ---
 2026-10-08 08:40 (Lima) | Cuenta A | — | Registro creado, protocolo de dos cuentas, desfases de migraciones, ECONOMIA actualizada | REGISTRO.md, docs/REGLAS-ECOSISTEMA.md, supabase/migrations/REGISTRO_DESFASES.md, ECONOMIA.md, MAPA.md, CLAUDE.md | HECHO | La otra cuenta: leer este registro, subir sus 088/089 renumerados (090/091) y comparar su trabajo legal con /legal/*
 2026-10-08 08:40 (Lima) | Cuenta A | — | RESERVADO migración 092 en adelante libre; 090–091 reservadas para renumerar las de la otra cuenta | — | PENDIENTE | —
+2026-10-08 08:22 (Lima) | Cuenta A | WEB | Protocolo de 2 cuentas × 3 frentes (WEB, LINK, MERCADO) con prompts para cada chat | docs/PROTOCOLO-MULTICUENTA.md; proyecto claude/PROTOCOLO-MULTICUENTA.md y claude/mercado-api.md | HECHO | Fralex pega los prompts en WEB-B, LINK-A/B y MERCADO-A/B
