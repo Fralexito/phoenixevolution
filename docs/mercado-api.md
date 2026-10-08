@@ -19,6 +19,7 @@ Cabeceras del programa: `Authorization: Bearer <token>` (salvo /vincular y /eco)
 | POST | `/catalogo` (staff) | `{ equipos:[{pes_team_id,nombre}], jugadores:[{pes_id,nombre,pes_team_id,posicion,media,edad,nacionalidad,fecha_nac,altura,dorsal,valor}] }` | `{ equipos, jugadores }` (equipos entran sin aprobar). **Obligatorios:** `pes_id`, `nombre`. **Opcionales:** `pes_team_id`, `posicion`, `edad`, `nacionalidad`, `altura`, `peso`, `dorsal`, `media`, `valor`, `fecha_nac`, `fuente` (`option`|`parche`), `habilidades` (objeto o arreglo, máx. ~4 KB), `otros_equipos` (arreglo, p. ej. su selección). Formato inválido o campos desconocidos se ignoran sin error. Al reimportar, un campo ausente conserva lo que ya tenía la web (p. ej. el `valor` que fijó el staff). |
 | GET | `/fichajes` (`?todos=1`) | — | `{ fichajes:[{ id, tipo, phoenix_id, pes_id, jugador, de_pes_team_id, a_pes_team_id, a_club, monto, aplicado_en, fecha }] }` — pendientes por defecto; `a_pes_team_id: null` = agente libre |
 | POST | `/fichajes/aplicados` (staff) | `{ ids:[1,2,3] }` | `{ marcados }` — tras generar el option file oficial |
+| GET | `/huella` (`?liga=galaxy`, `&texto=1` para depurar) | — | `{ liga, algoritmo: "sha256", huella, clubes, jugadores, calculada[, texto] }` |
 | GET | `/reportes` | — | `{ reportes: [ { id, option_version, resumen, estado, motivo, created_at, revisado_en } ] }` |
 
 ## Flujo
@@ -38,3 +39,11 @@ Libre mientras sea un arreglo JSON (máx. 2000 elementos, ~200 KB). La web muest
 
 ## Errores
 `TOKEN_FALTANTE` · `TOKEN_INVALIDO` · `TOKEN_REVOCADO` (volver a vincular) · `CODIGO_NO_ENCONTRADO` · `CODIGO_USADO` · `CODIGO_VENCIDO` · `SIN_OPTION_FILE` (el staff aún no publicó uno) · `DEMASIADOS_INTENTOS` (+ `reintentar_en` seg) · `DATOS_INVALIDOS` (+ `campo`) · `DISPOSITIVO_SUSPENDIDO` · `CODIGO_MANAGER_REQUERIDO` · `NO_AUTORIZADO` (ruta de staff) · `ERROR_INTERNO`.
+
+## Huella de plantillas (anti-trampa)
+Texto canónico (Mercado debe generarlo **idéntico** desde el option file y la tabla de equivalencias):
+- Una línea por club con ≥1 jugador: `<clave_club>:<phoenix_id>,<phoenix_id>,…`
+- `clave_club` = `pes_team_id`; si el club no tiene, `c<id_club_web>`.
+- `phoenix_id` en orden numérico ascendente. Líneas ordenadas por `clave_club` como **texto** (orden byte a byte, p. ej. `"100" < "21" < "c5"`).
+- Líneas unidas con `\n`, sin salto final. UTF-8 → **SHA-256 hex en minúsculas**. Agentes libres no cuentan.
+`POST /reportes` acepta además `huella_plantillas_antes` y `huella_plantillas_despues`; la web guarda junto a ellas la huella esperada de ese momento.

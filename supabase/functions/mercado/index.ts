@@ -112,7 +112,11 @@ async function crearReporte(req: Request) {
   const b = await leerJson(req);
   if (!Array.isArray(b.cambios) || b.cambios.length > 2000) throw err("DATOS_INVALIDOS", { campo: "cambios" });
   const fila = { usuario: d.usuario, dispositivo: d.origen === "manager" ? d.id : null, dispositivo_link: d.origen === "link" ? d.id : null, origen: d.origen, option_version: texto(b.option_version, "option_version", 40), hash_antes: hash(b.hash_antes, "hash_antes"),
-    hash_despues: hash(b.hash_despues, "hash_despues"), resumen: texto(b.resumen, "resumen", 500), cambios: b.cambios };
+    hash_despues: hash(b.hash_despues, "hash_despues"), resumen: texto(b.resumen, "resumen", 500), cambios: b.cambios,
+    huella_plantillas_antes: hash(b.huella_plantillas_antes, "huella_plantillas_antes"), huella_plantillas_despues: hash(b.huella_plantillas_despues, "huella_plantillas_despues"),
+    huella_esperada: null as string | null };
+  // Guardamos la huella esperada en ese momento para que el staff vea si el jugador tenía las plantillas oficiales.
+  if (fila.huella_plantillas_antes || fila.huella_plantillas_despues) { const { data: h } = await sb.rpc("lm_huella", { p_liga: LIGA }); fila.huella_esperada = (h as { huella?: string })?.huella ?? null; }
   const { data, error } = await sb.from("mercado_reportes").insert(fila).select("id, estado, created_at").single();
   if (error) { log("warn", "reporte.insert", { m: error.message }); throw err("DATOS_INVALIDOS", { detalle: error.message }); }
   return data;
@@ -165,10 +169,21 @@ async function marcarAplicados(req: Request) {
   return { marcados: data };
 }
 
+/** GET /v1/huella?liga=galaxy[&texto=1] → { liga, algoritmo, huella, clubes, jugadores, calculada[, texto] }
+ *  Huella esperada de las plantillas (SHA-256 del texto canónico club→phoenix_ids; formato en docs/mercado-api.md). */
+async function huella(req: Request) {
+  await autenticar(req);
+  const u = new URL(req.url); const liga = (u.searchParams.get("liga") || LIGA).slice(0, 40);
+  const { data, error } = await sb.rpc("lm_huella", { p_liga: liga });
+  if (error) throw err("ERROR_INTERNO");
+  if (u.searchParams.get("texto") === "1") { const { data: t } = await sb.rpc("lm_huella_texto", { p_liga: liga }); return { ...(data as object), texto: t ?? "" }; }
+  return data;
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
   "/v1/reportes": { POST: crearReporte, GET: misReportes },
-  "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
+  "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 
 Deno.serve(async (req) => {
