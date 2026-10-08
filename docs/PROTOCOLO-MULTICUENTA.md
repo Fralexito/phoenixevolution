@@ -9,7 +9,7 @@ Fralex usa **2 cuentas de Claude (A y B)**. Cuando una se queda sin tokens, sigu
 | **MERCADO** (Phoenix Mercado, option file ↔ Liga Máster) | `Fralexito/smash-soda-fork` · `mercado-fase0`, carpeta `PhoenixMercado/` | MERCADO-A | MERCADO-B |
 
 ## Reglas para TODOS los chats
-1. **La memoria es el repo, no el chat.** Cada repo tiene un `REGISTRO.md` en la raíz (bitácora, **solo se añade**). Al empezar: `git fetch` + `git pull --rebase`, leer el final de `REGISTRO.md`. Si no existe, crearlo.
+1. **La memoria es el repo, no el chat.** Cada frente tiene su bitácora: WEB `REGISTRO.md`, LINK `REGISTRO-LINK.md` (rama rediseño-phoenix-portal), MERCADO `PhoenixMercado/REGISTRO.md` (rama mercado-fase0); en el fork, además, `COORDINACION.md` y `CLAUDE.md` (bitácora, **solo se añade**). Al empezar: `git fetch` + `git pull --rebase`, leer el final de `REGISTRO.md`. Si no existe, crearlo.
 2. **Una línea por cambio**, empujada enseguida:
    `AAAA-MM-DD HH:MM (Lima) | Cuenta A/B | Frente | Qué cambió | Archivos/migración/commit | HECHO / A MEDIAS / PENDIENTE | Siguiente paso`
    Si algo queda a medias: punto exacto y qué falta. Antes de quedarse sin tokens: commit + push + línea en el registro.
@@ -38,7 +38,7 @@ Confírmame en 5 líneas el estado actual antes de cambiar algo.
 ```
 Eres LINK-<A|B> (Cuenta <A|B>) del proyecto Phoenix Evolution. Fralex usa 2 cuentas de Claude; otra cuenta puede haber trabajado este mismo frente. Tu frente: el fork de Smash Soda (Fralexito/smash-soda-fork, local C:\dev\smash-soda-fork) que se llama «Phoenix Link» en todos lados, y su overlay. NO tocas la web, la base de datos ni la carpeta PhoenixMercado/.
 Al empezar:
-1) git fetch y pull de tu rama de trabajo. Lee el final de REGISTRO.md en la raíz del repo del fork (si no existe, créalo con el formato de abajo y vuelca ahí TODO lo que sepas del estado: ramas, tags como v1.0-base-estable, rama rediseño-phoenix-portal / experimental-html, qué compila, qué está a medias, decisiones de Fralex).
+1) git fetch y pull de tu rama de trabajo. Lee COORDINACION.md y el final de REGISTRO-LINK.md (rama rediseño-phoenix-portal). El volcado inicial lo escribió el chat WEB desde git: complétalo debajo con lo que solo tú sabes (qué compila, qué está a medias, lo que Fralex pidió aquí).
 2) Lee del proyecto: claude/PROTOCOLO-MULTICUENTA.md, claude/REGLAS-ECOSISTEMA.md y claude/contrato-v1.md (API /phoenix que usa la app; no cambia sin pedírselo a WEB).
 Reglas: una línea por cambio en REGISTRO.md:
 AAAA-MM-DD HH:MM (Lima) | Cuenta A/B | LINK | Qué cambió | Archivos/commit | HECHO / A MEDIAS / PENDIENTE | Siguiente paso
@@ -51,7 +51,7 @@ Confírmame en 5 líneas el estado actual antes de cambiar algo.
 ```
 Eres MERCADO-<A|B> (Cuenta <A|B>) del proyecto Phoenix Evolution. Fralex usa 2 cuentas de Claude; otra cuenta puede haber trabajado este mismo frente. Tu frente: Phoenix Mercado (repo Fralexito/smash-soda-fork, rama mercado-fase0, carpeta PhoenixMercado/, C++20), que lee/escribe el option file de PES 2021 y lo sincroniza con la Liga Máster de la web. Más adelante se integra dentro de Phoenix Link. NO tocas SmashSoda/ ni la web.
 Al empezar:
-1) git fetch y pull de mercado-fase0. Lee el final de REGISTRO.md de la carpeta PhoenixMercado/ (si no existe, créalo y vuelca ahí TODO el estado; base: claude/phoenix-mercado-estado.md del proyecto).
+1) git fetch y pull de mercado-fase0. Lee COORDINACION.md y el final de PhoenixMercado/REGISTRO.md. El volcado inicial lo escribió el chat WEB: complétalo debajo con lo que solo tú sabes.
 2) Lee del proyecto: claude/PROTOCOLO-MULTICUENTA.md, claude/REGLAS-ECOSISTEMA.md y claude/mercado-api.md (contrato completo; copia de docs/mercado-api.md del repo web).
 Estado de la web que ya puedes usar: /v1/catalogo, /fichajes, /fichajes/aplicados, /huella, /clave-publica (Ed25519 id k67bd032d50), /plantillas, /correcciones, /reportes/lote, /liga/cambios (firmado), /liga/aplicado, /equivalencias (POST informe phoenix-mercado/emparejamiento@0.1, máx. 3000 filas por llamada, solo staff; GET para descargar lo aprobado). Phoenix ID = lm_jugadores.id. Orden: subir el catálogo real ANTES que las equivalencias.
 Reglas: una línea por cambio en REGISTRO.md:
