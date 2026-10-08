@@ -39,7 +39,7 @@ export const FECHAS = [
     { l: 'Degox', v: 'Jeremi', gl: null, gv: null }, { l: 'Arens', v: 'Fralex', gl: 4, gv: 2 }, { l: 'Beto', v: 'Morgado', gl: null, gv: null },
   ] },
   { n: 9, partidos: [
-    { l: 'Hugo', v: 'Victor', gl: null, gv: null }, { l: 'Camilo', v: 'Jack', gl: 4, gv: 1 }, { l: 'Roberto', v: 'Degox', gl: null, gv: null },
+    { l: 'Hugo', v: 'Victor', gl: 2, gv: 3 }, { l: 'Camilo', v: 'Jack', gl: 4, gv: 1 }, { l: 'Roberto', v: 'Degox', gl: null, gv: null },
     { l: 'Axel', v: 'Arens', gl: 0, gv: 3 }, { l: 'Jeremi', v: 'Beto', gl: null, gv: null }, { l: 'Fralex', v: 'Morgado', gl: null, gv: null },
   ] },
   { n: 10, partidos: [
