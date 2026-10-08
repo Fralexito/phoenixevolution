@@ -180,10 +180,118 @@ async function huella(req: Request) {
   return data;
 }
 
+// ───────── Firma Ed25519 de la lista oficial (085) ─────────
+const b64 = (u: Uint8Array) => btoa(String.fromCharCode(...u));
+const desdeB64 = (t: string) => Uint8Array.from(atob(t), (c) => c.charCodeAt(0));
+let claveCache: { id: string; privada: CryptoKey; publica: string } | null = null;
+/** Clave activa: la lee de la BD; si no existe, la genera (una sola vez) y la guarda. La privada nunca sale del servidor. */
+async function claveFirma() {
+  if (claveCache) return claveCache;
+  let { data } = await sb.rpc("sistema_mercado_clave");
+  if (!data) {
+    const par = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]) as CryptoKeyPair;
+    const priv = new Uint8Array(await crypto.subtle.exportKey("pkcs8", par.privateKey));
+    const pub = new Uint8Array(await crypto.subtle.exportKey("raw", par.publicKey));
+    const id = "k" + (await sha256(b64(pub))).slice(0, 10);
+    const r = await sb.rpc("sistema_mercado_guardar_clave", { p_id: id, p_privada: b64(priv), p_publica: b64(pub) });
+    if (r.error) { log("error", "clave.guardar", { m: r.error.message }); throw err("ERROR_INTERNO"); }
+    data = r.data; log("info", "clave_generada", { id });
+  }
+  const d = data as { id: string; privada: string; publica: string };
+  const privada = await crypto.subtle.importKey("pkcs8", desdeB64(d.privada), { name: "Ed25519" }, false, ["sign"]);
+  claveCache = { id: d.id, privada, publica: d.publica };
+  return claveCache;
+}
+
+/** GET /v1/clave-publica → { clave_id, algoritmo: "Ed25519", publica (base64, 32 bytes) } — sin token. */
+async function clavePublica() { const k = await claveFirma(); return { clave_id: k.id, algoritmo: "Ed25519", publica: k.publica }; }
+
+/** GET /v1/plantillas?liga=galaxy → { contenido (texto JSON), firma (base64), clave_id, algoritmo }
+ *  Se firma el texto EXACTO de «contenido» (UTF-8). Mercado verifica la firma con la pública y recién entonces hace JSON.parse(contenido).
+ *  contenido = { liga, generado, huella, clubes:[{ clave, pes_team_id, club, jugadores:[{ phoenix_id, pes_id }] }] } */
+async function plantillas(req: Request) {
+  await autenticar(req);
+  const liga = (new URL(req.url).searchParams.get("liga") || LIGA).slice(0, 40);
+  const [{ data: clubes, error: e1 }, { data: h, error: e2 }] = await Promise.all([sb.rpc("lm_plantillas", { p_liga: liga }), sb.rpc("lm_huella", { p_liga: liga })]);
+  if (e1 || e2) throw err("ERROR_INTERNO");
+  const contenido = JSON.stringify({ liga, generado: new Date().toISOString(), huella: (h as { huella: string }).huella, clubes });
+  const k = await claveFirma();
+  const firma = new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, k.privada, new TextEncoder().encode(contenido)));
+  return { contenido, firma: b64(firma), clave_id: k.id, algoritmo: "Ed25519" };
+}
+
+// ───────── Correcciones automáticas y envíos atrasados (085) ─────────
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const fechaValida = (t: unknown) => { if (typeof t !== "string" || t.length > 40) return null; const ms = Date.parse(t); return Number.isFinite(ms) && ms > Date.UTC(2020, 0) && ms < Date.now() + 86_400_000 ? new Date(ms).toISOString() : null; };
+
+/** POST /v1/correcciones { correcciones:[{ id_cliente, phoenix_id?, pes_id?, jugador?, cambio:{...}, huella_antes?, huella_despues?, hora_local, atrasado? }] }
+ *  Lote de 1–500. Idempotente por id_cliente (reenviar no duplica). → { recibidas, duplicadas, rechazadas:[{ indice, campo }] } */
+async function correcciones(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); frenar(`corr:${d.usuario}`, 60, 60 * 60_000);
+  const b = await leerJson(req);
+  if (!Array.isArray(b.correcciones) || !b.correcciones.length || b.correcciones.length > 500) throw err("DATOS_INVALIDOS", { campo: "correcciones" });
+  const filas: Record<string, unknown>[] = []; const rechazadas: { indice: number; campo: string }[] = [];
+  b.correcciones.forEach((c: Record<string, unknown>, i: number) => {
+    try {
+      if (!c || typeof c !== "object") throw "item";
+      if (typeof c.id_cliente !== "string" || !UUID.test(c.id_cliente)) throw "id_cliente";
+      if (!c.cambio || typeof c.cambio !== "object" || Array.isArray(c.cambio) || JSON.stringify(c.cambio).length > 1500) throw "cambio";
+      const h = (v: unknown, n: string) => { try { return hash(v, n); } catch { throw n; } };
+      filas.push({ usuario: d.usuario, origen: d.origen, dispositivo: d.id, id_cliente: c.id_cliente, liga: LIGA,
+        phoenix_id: Number.isInteger(c.phoenix_id) ? c.phoenix_id : null, pes_id: Number.isInteger(c.pes_id) ? c.pes_id : null,
+        jugador: typeof c.jugador === "string" ? c.jugador.slice(0, 80) : null, cambio: c.cambio,
+        huella_antes: h(c.huella_antes, "huella_antes"), huella_despues: h(c.huella_despues, "huella_despues"),
+        hora_local: typeof c.hora_local === "string" ? c.hora_local.slice(0, 40) : null, ocurrido: fechaValida(c.hora_local), atrasado: c.atrasado === true });
+    } catch (campo) { rechazadas.push({ indice: i, campo: String(campo) }); }
+  });
+  let recibidas = 0;
+  if (filas.length) {
+    const { data, error } = await sb.from("mercado_correcciones").upsert(filas, { onConflict: "usuario,id_cliente", ignoreDuplicates: true }).select("id");
+    if (error) { log("warn", "correcciones", { m: error.message }); throw err("DATOS_INVALIDOS", { detalle: error.message }); }
+    recibidas = data?.length ?? 0;
+  }
+  return { recibidas, duplicadas: filas.length - recibidas, rechazadas };
+}
+
+/** POST /v1/reportes/lote { reportes:[{ id_cliente, ...mismos campos que /reportes, atrasado? }] } (1–100) — para enviar lo acumulado sin conexión.
+ *  → { recibidos, duplicados, rechazados:[{ indice, campo }] } */
+async function reportesLote(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); frenar(`replote:${d.id}`, 20, 60 * 60_000);
+  const b = await leerJson(req);
+  if (!Array.isArray(b.reportes) || !b.reportes.length || b.reportes.length > 100) throw err("DATOS_INVALIDOS", { campo: "reportes" });
+  let esperada: string | null = null;
+  const filas: Record<string, unknown>[] = []; const rechazados: { indice: number; campo: string }[] = [];
+  for (const [i, r] of (b.reportes as Record<string, unknown>[]).entries()) {
+    try {
+      if (typeof r?.id_cliente !== "string" || !UUID.test(r.id_cliente)) throw "id_cliente";
+      if (!Array.isArray(r.cambios) || r.cambios.length > 2000) throw "cambios";
+      const h = (v: unknown, n: string) => { try { return hash(v, n); } catch { throw n; } };
+      const t = (v: unknown, n: string, m: number) => { try { return texto(v, n, m); } catch { throw n; } };
+      const fila: Record<string, unknown> = { usuario: d.usuario, dispositivo: d.origen === "manager" ? d.id : null, dispositivo_link: d.origen === "link" ? d.id : null, origen: d.origen,
+        id_cliente: r.id_cliente, atrasado: r.atrasado !== false, option_version: t(r.option_version, "option_version", 40), resumen: t(r.resumen, "resumen", 500), cambios: r.cambios,
+        hash_antes: h(r.hash_antes, "hash_antes"), hash_despues: h(r.hash_despues, "hash_despues"),
+        huella_plantillas_antes: h(r.huella_plantillas_antes, "huella_plantillas_antes"), huella_plantillas_despues: h(r.huella_plantillas_despues, "huella_plantillas_despues") };
+      if (fila.huella_plantillas_antes || fila.huella_plantillas_despues) {
+        if (esperada === null) { const { data: hh } = await sb.rpc("lm_huella", { p_liga: LIGA }); esperada = (hh as { huella?: string })?.huella ?? ""; }
+        fila.huella_esperada = esperada || null;
+      }
+      filas.push(fila);
+    } catch (campo) { rechazados.push({ indice: i, campo: String(campo) }); }
+  }
+  let recibidos = 0;
+  if (filas.length) {
+    const { data, error } = await sb.from("mercado_reportes").upsert(filas, { onConflict: "usuario,id_cliente", ignoreDuplicates: true }).select("id");
+    if (error) { log("warn", "reportes.lote", { m: error.message }); throw err("DATOS_INVALIDOS", { detalle: error.message }); }
+    recibidos = data?.length ?? 0;
+  }
+  return { recibidos, duplicados: filas.length - recibidos, rechazados };
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
   "/v1/reportes": { POST: crearReporte, GET: misReportes },
-  "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
+  "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella },
+  "/v1/clave-publica": { GET: clavePublica }, "/v1/plantillas": { GET: plantillas }, "/v1/correcciones": { POST: correcciones }, "/v1/reportes/lote": { POST: reportesLote }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 
 Deno.serve(async (req) => {

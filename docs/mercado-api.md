@@ -47,3 +47,17 @@ Texto canónico (Mercado debe generarlo **idéntico** desde el option file y la 
 - `phoenix_id` en orden numérico ascendente. Líneas ordenadas por `clave_club` como **texto** (orden byte a byte, p. ej. `"100" < "21" < "c5"`).
 - Líneas unidas con `\n`, sin salto final. UTF-8 → **SHA-256 hex en minúsculas**. Agentes libres no cuentan.
 `POST /reportes` acepta además `huella_plantillas_antes` y `huella_plantillas_despues`; la web guarda junto a ellas la huella esperada de ese momento.
+
+## Firma de la lista oficial (Ed25519)
+- `GET /clave-publica` (sin token) → `{ clave_id, algoritmo: "Ed25519", publica }` (base64, 32 bytes). **Incrustarla en Mercado**; si llega otro `clave_id`, no confiar.
+- `GET /plantillas?liga=galaxy` → `{ contenido, firma, clave_id, algoritmo }`.
+  1. Verificar Ed25519(`publica`, bytes UTF-8 de `contenido` tal cual, `firma` base64).
+  2. Solo si es válida: `JSON.parse(contenido)` → `{ liga, generado, huella, clubes:[{ clave, pes_team_id, club, jugadores:[{ phoenix_id, pes_id }] }] }`.
+  3. `huella` debe coincidir con la que Mercado calcula (formato canónico de arriba).
+- La clave privada la genera y guarda el propio servidor (nunca sale de él).
+
+## Correcciones automáticas y envíos atrasados
+- `POST /correcciones` `{ correcciones:[{ id_cliente (uuid), phoenix_id?, pes_id?, jugador?, cambio:{campo, de, a, …}, huella_antes?, huella_despues?, hora_local ("2026-10-07T23:05:00-05:00"), atrasado? }] }` (1–500)
+  → `{ recibidas, duplicadas, rechazadas:[{ indice, campo }] }`
+- `POST /reportes/lote` `{ reportes:[{ id_cliente, …campos de /reportes… }] }` (1–100) → `{ recibidos, duplicados, rechazados }`
+- **Idempotente:** Mercado genera un `id_cliente` (UUID v4) por evento y lo guarda en su cola local; al reconectarse reenvía la cola. Lo repetido cuenta como `duplicadas` y no se guarda dos veces. Se pueden borrar de la cola los que vuelvan como `recibidas` o `duplicadas`; los `rechazadas` traen el campo inválido.
