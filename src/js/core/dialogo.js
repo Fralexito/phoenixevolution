@@ -31,3 +31,20 @@ export function pedirTexto(texto, { titulo = 'Escribe aquí', valor = '', placeh
     });
   });
 }
+
+/** Elegir una opción de una lista (con buscador si hay más de 6).
+ *  await elegir('¿A qué club?', [{ valor: 3, texto: 'Club A', detalle: '25 jugadores' }]) → valor | null (cancelado) */
+export function elegir(texto, opciones, { titulo = 'Elige una opción' } = {}) {
+  return new Promise((resolve) => {
+    let hecho = false; const fin = (v) => { if (!hecho) { hecho = true; resolve(v); } };
+    const fila = (o, i) => `<li><button type="button" data-i="${i}" class="w-full text-left px-3 py-2.5 rounded-lg border border-galaxy-border/60 hover:border-galaxy-400 hover:bg-galaxy-400/10 focus-visible:border-galaxy-400 transition-colors"><b class="text-white text-sm">${escapeHTML(o.texto)}</b>${o.detalle ? `<span class="block text-[12px] text-gray-400">${escapeHTML(o.detalle)}</span>` : ''}</button></li>`;
+    const m = openModal(`<div class="p-5 sm:p-6 space-y-3">${cabecera(titulo)}<p class="text-sm text-gray-200">${escapeHTML(texto)}</p>
+      ${opciones.length > 6 ? '<input id="dlg-buscar" type="search" class="field" placeholder="Buscar…" autocomplete="off">' : ''}
+      <ul id="dlg-lista" class="space-y-1.5 max-h-[55vh] overflow-y-auto pr-1">${opciones.map(fila).join('')}</ul>
+      <div class="flex justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button></div></div>`, { id: ID, onClose: () => fin(null) });
+    m.querySelector('#dlg-lista').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (!b) return; fin(opciones[Number(b.dataset.i)].valor); closeModal(ID); });
+    const q = m.querySelector('#dlg-buscar');
+    if (q) { q.focus(); q.addEventListener('input', () => { const t = q.value.trim().toLowerCase(); m.querySelectorAll('#dlg-lista li').forEach((li, i) => { li.hidden = !!t && !opciones[i].texto.toLowerCase().includes(t); }); }); }
+    else m.querySelector('[data-i]')?.focus();
+  });
+}

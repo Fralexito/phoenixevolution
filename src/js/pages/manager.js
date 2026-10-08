@@ -2,7 +2,7 @@
 import { supabase } from '../core/supabase.js';
 import { onSession, can } from '../core/session.js';
 import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
+import { confirmar, elegir, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { haceCuanto } from '../core/notifs.js';
 
@@ -203,17 +203,16 @@ document.addEventListener('click', async (ev) => {
     else if (b.dataset.vender) {
       const cpus = [...clubes.values()].filter((c) => c.aprobado && !c.dueno);
       if (!cpus.length) { toast('No hay clubes CPU aprobados.', 'warn'); return; }
-      const lista = cpus.map((c, i) => `${i + 1}. ${c.nombre}`).join('\n');
-      const t = prompt(`¿A qué club CPU vendes a ${b.dataset.nombre} por ${millones(b.dataset.valor)}? Escribe el número:\n\n${lista}`); if (t === null) return;
-      const c = cpus[Number(t) - 1]; if (!c) { toast('Número no válido.', 'warn'); return; }
-      const r = await rpc('lm_vender_cpu', { p_jugador: Number(b.dataset.vender), p_club_cpu: c.id }); toast(`Vendido a ${r.club} por ${millones(r.monto)}.`, 'ok'); await refrescar();
+      const id = await elegir(`¿A qué club CPU vendes a ${b.dataset.nombre} por ${millones(b.dataset.valor)}?`, cpus.map((c) => ({ valor: c.id, texto: c.nombre })), { titulo: 'Vender a la CPU' });
+      if (id == null) return;
+      const r = await rpc('lm_vender_cpu', { p_jugador: Number(b.dataset.vender), p_club_cpu: id }); toast(`Vendido a ${r.club} por ${millones(r.monto)}.`, 'ok'); await refrescar();
     }
     else if (b.dataset.liberar) { if (!(await confirmar('¿Liberar a este jugador? Quedará como agente libre, sin cobro.', { peligro: true }))) return; await rpc('lm_liberar', { p_jugador: Number(b.dataset.liberar) }); toast('Jugador liberado.', 'ok'); await refrescar(); }
     else if (b.dataset.ofertar) {
       const directo = b.dataset.directo === '1'; const valor = Number(b.dataset.valor);
       let monto = valor;
       if (directo) { if (!(await confirmar(`¿Fichar a ${b.dataset.nombre} por ${plata(valor)}?`))) return; }
-      else { const t = prompt(`¿Cuánto ofreces por ${b.dataset.nombre}? (valor ${plata(valor)})`, String(valor)); if (t === null) return; monto = Math.round(Number(String(t).replace(/[^\d]/g, ''))); if (!monto && monto !== 0) return; }
+      else { const t = await pedirTexto(`¿Cuánto ofreces por ${b.dataset.nombre}? (valor ${plata(valor)})`, { titulo: 'Hacer oferta', valor: String(valor), maximo: 15, aceptar: 'Ofertar' }); if (t === null) return; monto = Math.round(Number(String(t).replace(/[^\d]/g, ''))); if (!monto && monto !== 0) return; }
       const r = await rpc('lm_ofertar', { p_jugador: Number(b.dataset.ofertar), p_monto: monto });
       toast(r?.estado === 'cerrada' ? `¡Fichaje cerrado por ${plata(r.monto)}!` : 'Oferta enviada. Te avisaremos cuando respondan.', 'ok'); await refrescar();
     }

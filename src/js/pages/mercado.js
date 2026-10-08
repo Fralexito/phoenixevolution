@@ -2,6 +2,7 @@
 // BD: migración 078 (mercado_*). Todas las escrituras por RPC o con RLS de staff; el programa usa la Edge Function «mercado».
 import { supabase } from '../core/supabase.js';
 import { onSession, can } from '../core/session.js';
+import { pedirTexto } from '../core/dialogo.js';
 import { toast } from '../core/toast.js';
 import { confirmar } from '../core/dialogo.js';
 import { escapeHTML as esc } from '../core/dom.js';
@@ -125,7 +126,7 @@ document.addEventListener('click', async (ev) => {
     else if (b.dataset.publicar) { const { error } = await supabase.rpc('mercado_publicar_option', { p_id: Number(b.dataset.publicar) }); if (error) throw error; toast('Ahora es el option file oficial.', 'ok'); pintarVersiones(); pintarOficial(); }
     else {
       const aprobar = 'aprobar' in b.dataset; const id = Number(b.dataset.aprobar ?? b.dataset.rechazar);
-      const motivo = aprobar ? null : (prompt('Motivo del rechazo (lo verá el jugador):') ?? null);
+      const motivo = aprobar ? null : await pedirTexto('Motivo del rechazo (lo verá el jugador):', { titulo: 'Rechazar reporte', maximo: 500, obligatorio: false, aceptar: 'Rechazar' });
       if (!aprobar && motivo === null) return;
       const { error } = await supabase.rpc('mercado_revisar', { p_id: id, p_aprobar: aprobar, p_motivo: motivo }); if (error) throw error;
       toast(aprobar ? 'Cambios aprobados.' : 'Cambios rechazados.', 'ok'); pintarPendientes();
