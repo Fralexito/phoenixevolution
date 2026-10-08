@@ -39,6 +39,14 @@ async function pintarDispositivos() {
         <i class="fa-solid fa-desktop text-galaxy-400"></i><span class="flex-1"><b class="text-white">${esc(d.nombre)}</b>${d.version_app ? ` · v${esc(d.version_app)}` : ''}<br><span class="text-gray-500">${d.ultimo_uso ? `Usada ${cuando(d.ultimo_uso)}` : 'Sin uso aún'}</span></span>
         <button type="button" class="btn !min-h-8 !text-[11px]" data-revocar="${esc(d.id)}">Desvincular</button></div>`).join('');
 }
+async function pintarAjuste() {
+  const { data } = await supabase.from('mercado_ajustes').select('exigir_codigo').eq('usuario', yo).maybeSingle();
+  $('mk-exigir').checked = !!data?.exigir_codigo;
+}
+$('mk-exigir')?.addEventListener('change', async (e) => {
+  try { const { error } = await supabase.rpc('mercado_exigir_codigo', { p_exigir: e.target.checked }); if (error) throw error; toast(e.target.checked ? 'Ahora se exige el código manager.' : 'Phoenix Link ya puede usar el Modo Mánager.', 'ok'); }
+  catch (err) { e.target.checked = !e.target.checked; toast(`No se pudo guardar: ${err.message}`, 'error'); }
+});
 async function pintarMisReportes() {
   const { data, error } = await supabase.from('mercado_reportes').select('id, option_version, resumen, estado, motivo, created_at').eq('usuario', yo).order('created_at', { ascending: false }).limit(10);
   if (error) { $('mk-mis-reportes').innerHTML = '<p class="text-xs text-rose-300">No se pudieron cargar.</p>'; return; }
@@ -131,6 +139,6 @@ onSession((st) => {
   yo = st?.session?.user?.id ?? null; esStaff = !!yo && can('resolverReportes');   // moderador o admin: igual que private.es_moderador() en la BD
   $('mk-sin-sesion').hidden = !!yo; $('mk-jugador').hidden = !yo; $('mk-staff').hidden = !esStaff;
   if (!yo) return;
-  pintarDispositivos(); pintarMisReportes(); pintarOficial();
+  pintarDispositivos(); pintarMisReportes(); pintarOficial(); pintarAjuste();
   if (esStaff) { pintarPendientes(); pintarVersiones(); }
 });

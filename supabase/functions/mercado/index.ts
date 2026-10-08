@@ -10,7 +10,7 @@ const URL_FIRMADA_SEG = 300;
 
 class ErrorApi extends Error { constructor(public codigo: string, public http = 400, public extra: Record<string, unknown> = {}) { super(codigo); } }
 const HTTP: Record<string, number> = { TOKEN_FALTANTE: 401, TOKEN_INVALIDO: 401, TOKEN_REVOCADO: 401, CODIGO_NO_ENCONTRADO: 404, CODIGO_USADO: 409,
-  CODIGO_VENCIDO: 410, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, ERROR_INTERNO: 500 };
+  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, ERROR_INTERNO: 500 };
 const err = (codigo: string, extra: Record<string, unknown> = {}) => new ErrorApi(codigo, HTTP[codigo] ?? 400, extra);
 const log = (nivel: string, evento: string, datos: Record<string, unknown> = {}) => console.log(JSON.stringify({ nivel, evento, ...datos, t: new Date().toISOString() }));
 
@@ -33,17 +33,40 @@ function frenar(clave: string, max: number, ventanaMs: number) {
   if (l.length >= max) throw err("DEMASIADOS_INTENTOS", { reintentar_en: Math.ceil(ventanaMs / 1000) }); l.push(ahora); golpes.set(clave, l);
 }
 
-type Disp = { id: string; usuario: string };
-async function autenticar(req: Request): Promise<Disp> {
-  const m = /^Bearer\s+(pml_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "");
+type Disp = { id: string; usuario: string; origen: "manager" | "link" };
+/**
+ * Acepta dos tokens:
+ *  · pml_… → «código manager» (mercado_dispositivos). Siempre válido para todo.
+ *  · cualquier otro (p. ej. phx_… de Phoenix Link) → se busca por la MISMA huella SHA-256 en dispositivos_host,
+ *    respetando revocado y suspendido. Si el usuario o el staff exigen código manager, las acciones del modo
+ *    manager (`exigeManager`) responden CODIGO_MANAGER_REQUERIDO.
+ */
+async function autenticar(req: Request, { exigeManager = false } = {}): Promise<Disp> {
+  const m = /^Bearer\s+([A-Za-z0-9_-]{20,120})$/.exec(req.headers.get("authorization") ?? "");
   if (!m) throw err(req.headers.get("authorization") ? "TOKEN_INVALIDO" : "TOKEN_FALTANTE");
-  const { data, error } = await sb.from("mercado_dispositivos").select("id, usuario, revocado").eq("huella_token", await sha256(m[1])).maybeSingle();
-  if (error) { log("error", "autenticar", { m: error.message }); throw err("ERROR_INTERNO"); }
-  if (!data) throw err("TOKEN_INVALIDO"); if (data.revocado) throw err("TOKEN_REVOCADO");
-  frenar(`d:${data.id}`, 60, 60_000);
+  const huella = await sha256(m[1]);
   const ver = req.headers.get("x-mercado-version")?.slice(0, 20);
-  sb.from("mercado_dispositivos").update({ ultimo_uso: new Date().toISOString(), ...(ver ? { version_app: ver } : {}) }).eq("id", data.id).then(() => {});
-  return { id: data.id, usuario: data.usuario };
+  if (m[1].startsWith("pml_")) {
+    const { data, error } = await sb.from("mercado_dispositivos").select("id, usuario, revocado").eq("huella_token", huella).maybeSingle();
+    if (error) { log("error", "autenticar", { m: error.message }); throw err("ERROR_INTERNO"); }
+    if (!data) throw err("TOKEN_INVALIDO"); if (data.revocado) throw err("TOKEN_REVOCADO");
+    frenar(`d:${data.id}`, 60, 60_000);
+    sb.from("mercado_dispositivos").update({ ultimo_uso: new Date().toISOString(), ...(ver ? { version_app: ver } : {}) }).eq("id", data.id).then(() => {});
+    return { id: data.id, usuario: data.usuario, origen: "manager" };
+  }
+  // Token de Phoenix Link
+  const { data, error } = await sb.from("dispositivos_host").select("id, usuario, revocado, suspendido").eq("huella_token", huella).maybeSingle();
+  if (error) { log("error", "autenticar.link", { m: error.message }); throw err("ERROR_INTERNO"); }
+  if (!data) throw err("TOKEN_INVALIDO"); if (data.revocado) throw err("TOKEN_REVOCADO"); if (data.suspendido) throw err("DISPOSITIVO_SUSPENDIDO");
+  frenar(`l:${data.id}`, 60, 60_000);
+  if (exigeManager) {
+    const [{ data: g }, { data: u }] = await Promise.all([
+      sb.from("lm_config").select("exigir_codigo_manager").eq("liga", "galaxy").maybeSingle(),
+      sb.from("mercado_ajustes").select("exigir_codigo").eq("usuario", data.usuario).maybeSingle(),
+    ]);
+    if (g?.exigir_codigo_manager || u?.exigir_codigo) throw err("CODIGO_MANAGER_REQUERIDO");
+  }
+  return { id: data.id, usuario: data.usuario, origen: "link" };
 }
 
 /** POST /v1/vincular { codigo, nombre_pc? } → { token, usuario } — el código se genera en la web (Mercado → Vincular programa). */
@@ -75,7 +98,7 @@ async function yo(req: Request) {
 
 /** GET /v1/option/actual — versión oficial vigente + URL firmada (5 min) para descargarla. Comparar sha256 al bajar. */
 async function optionActual(req: Request) {
-  await autenticar(req);
+  await autenticar(req, { exigeManager: true });
   const { data, error } = await sb.from("mercado_option_files").select("version, ruta, sha256, tamano, notas, created_at").eq("actual", true).maybeSingle();
   if (error) throw err("ERROR_INTERNO"); if (!data) throw err("SIN_OPTION_FILE");
   const { data: f, error: e2 } = await sb.storage.from("option-files").createSignedUrl(data.ruta, URL_FIRMADA_SEG, { download: "EDIT00000000" });
@@ -85,10 +108,10 @@ async function optionActual(req: Request) {
 
 /** POST /v1/reportes { option_version?, hash_antes?, hash_despues?, resumen?, cambios: [...] } → { id, estado } */
 async function crearReporte(req: Request) {
-  const d = await autenticar(req); frenar(`rep:${d.id}`, 20, 60 * 60_000);
+  const d = await autenticar(req, { exigeManager: true }); frenar(`rep:${d.id}`, 20, 60 * 60_000);
   const b = await leerJson(req);
   if (!Array.isArray(b.cambios) || b.cambios.length > 2000) throw err("DATOS_INVALIDOS", { campo: "cambios" });
-  const fila = { usuario: d.usuario, dispositivo: d.id, option_version: texto(b.option_version, "option_version", 40), hash_antes: hash(b.hash_antes, "hash_antes"),
+  const fila = { usuario: d.usuario, dispositivo: d.origen === "manager" ? d.id : null, dispositivo_link: d.origen === "link" ? d.id : null, origen: d.origen, option_version: texto(b.option_version, "option_version", 40), hash_antes: hash(b.hash_antes, "hash_antes"),
     hash_despues: hash(b.hash_despues, "hash_despues"), resumen: texto(b.resumen, "resumen", 500), cambios: b.cambios };
   const { data, error } = await sb.from("mercado_reportes").insert(fila).select("id, estado, created_at").single();
   if (error) { log("warn", "reporte.insert", { m: error.message }); throw err("DATOS_INVALIDOS", { detalle: error.message }); }
@@ -97,7 +120,7 @@ async function crearReporte(req: Request) {
 
 /** GET /v1/reportes — mis últimos 20 reportes y su estado (pendiente / aprobado / rechazado + motivo). */
 async function misReportes(req: Request) {
-  const d = await autenticar(req);
+  const d = await autenticar(req, { exigeManager: true });
   const { data, error } = await sb.from("mercado_reportes").select("id, option_version, resumen, estado, motivo, created_at, revisado_en").eq("usuario", d.usuario).order("created_at", { ascending: false }).limit(20);
   if (error) throw err("ERROR_INTERNO");
   return { reportes: data ?? [] };

@@ -2,7 +2,12 @@
 
 Base: `https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/mercado/v1/`
 Todas las respuestas: `{ "ok": true, "version_api": "...", "datos": {...} }` o `{ "ok": false, "error": { "codigo": "..." }, "solicitud_id": "..." }`.
-Cabeceras del programa: `Authorization: Bearer pml_…` (salvo /vincular y /eco) y `X-Mercado-Version: 0.1.0`.
+Cabeceras del programa: `Authorization: Bearer <token>` (salvo /vincular y /eco) y `X-Mercado-Version: 0.1.0`.
+
+**Tokens aceptados**
+- `pml_…` — «código manager» (de `/vincular`). Vale para todo.
+- Token de **Phoenix Link** (el de `/phoenix/v1/emparejar`, `phx_…`). Se busca por la misma huella SHA-256 en los dispositivos de Phoenix Link; respeta revocado (`TOKEN_REVOCADO`) y suspendido (`DISPOSITIVO_SUSPENDIDO`).
+  Si el usuario (Mercado → «Exigir código manager») o el staff (global) lo exigen, `/option/actual` y `/reportes` responden `CODIGO_MANAGER_REQUERIDO` (403) con ese token; `/yo` sigue funcionando.
 
 | Método | Ruta | Cuerpo | Respuesta (`datos`) |
 |---|---|---|---|
@@ -29,4 +34,4 @@ Cabeceras del programa: `Authorization: Bearer pml_…` (salvo /vincular y /eco)
 Libre mientras sea un arreglo JSON (máx. 2000 elementos, ~200 KB). La web muestra `tipo`, `de` → `a` y el resto como texto.
 
 ## Errores
-`TOKEN_FALTANTE` · `TOKEN_INVALIDO` · `TOKEN_REVOCADO` (volver a vincular) · `CODIGO_NO_ENCONTRADO` · `CODIGO_USADO` · `CODIGO_VENCIDO` · `SIN_OPTION_FILE` (el staff aún no publicó uno) · `DEMASIADOS_INTENTOS` (+ `reintentar_en` seg) · `DATOS_INVALIDOS` (+ `campo`) · `ERROR_INTERNO`.
+`TOKEN_FALTANTE` · `TOKEN_INVALIDO` · `TOKEN_REVOCADO` (volver a vincular) · `CODIGO_NO_ENCONTRADO` · `CODIGO_USADO` · `CODIGO_VENCIDO` · `SIN_OPTION_FILE` (el staff aún no publicó uno) · `DEMASIADOS_INTENTOS` (+ `reintentar_en` seg) · `DATOS_INVALIDOS` (+ `campo`) · `DISPOSITIVO_SUSPENDIDO` · `CODIGO_MANAGER_REQUERIDO` · `ERROR_INTERNO`.

@@ -128,6 +128,7 @@ async function pintarMovimientos() {
 
 // ── Staff ──
 function pintarStaff() {
+  $('mg-exigir').checked = !!cfg?.exigir_codigo_manager;
   const f = $('mg-cfg'); f.ventana.checked = !!cfg?.ventana_abierta; f.presupuesto.value = cfg?.presupuesto_inicial ?? 0; f.max.value = cfg?.max_plantilla ?? 30;
   const lista = [...clubes.values()];
   $('mg-staff-clubes').innerHTML = !lista.length ? '<p class="text-xs text-gray-500">Importa el catálogo para ver los clubes.</p>' : lista.map((c) => `<label class="flex items-center gap-2 text-xs rounded-lg border border-galaxy-border px-2 py-1.5">
@@ -180,6 +181,10 @@ document.addEventListener('change', async (ev) => {
     try { const datos = JSON.parse(await file.text()); const r = await rpc('lm_importar', { p_liga: LIGA, p_datos: datos }); toast(`Importados: ${r.equipos} equipos y ${r.jugadores} jugadores.`, 'ok'); await refrescar(); }
     catch (e) { console.error('[manager] importar', e); toast(e instanceof SyntaxError ? 'El archivo no es un JSON válido.' : msg(e), 'error'); }
     finally { ev.target.value = ''; }
+  }
+  if (ev.target.id === 'mg-exigir') {
+    try { await rpc('lm_staff_exigir_codigo', { p_liga: LIGA, p_exigir: ev.target.checked }); toast(ev.target.checked ? 'Código manager obligatorio para todos.' : 'Phoenix Link habilitado para el Modo Mánager.', 'ok'); }
+    catch (e) { ev.target.checked = !ev.target.checked; toast(msg(e), 'error'); }
   }
   if (['mg-pos', 'mg-libres'].includes(ev.target.id)) pintarMercado();
 });
