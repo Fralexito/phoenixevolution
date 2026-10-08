@@ -1,0 +1,70 @@
+---
+// MODO MÁNAGER (Liga Máster de la web): opcional y por jugador. Cada usuario puede activar su carrera de DT,
+// elegir un club aprobado, y fichar/vender en ventanas. Los movimientos se reflejan en el juego vía option file (claude/liga-master-plan.md).
+// BD: migración 079 (lm_*). Lógica: js/pages/manager.js. Conexión con el juego: /mercado/ (programa Phoenix Mercado).
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL;
+const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-magnifying-glass-dollar', 'Mercado'], ['oficina', 'fa-envelope-open-text', 'Oficina'], ['movimientos', 'fa-right-left', 'Movimientos']];
+---
+<Layout title="Modo Mánager" active="manager" description="Tu carrera de DT en la Galaxy League: club, presupuesto y fichajes que llegan al juego.">
+  <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6">
+
+    <header id="mg-portada" class="glass-panel rounded-2xl px-5 py-5 relative overflow-hidden">
+      <span class="text-[11px] font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta · Galaxy League</span>
+      <h1 class="text-3xl sm:text-5xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-user-tie text-galaxy-400 mr-2"></i>Modo Mánager</h1>
+      <p class="text-gray-300 text-sm mt-1 max-w-3xl">Tu carrera de DT: eliges un club, manejas su presupuesto y fichas jugadores. Al cerrar cada ventana, los movimientos llegan al juego con el option file oficial.</p>
+      <div id="mg-club" class="mt-4"></div>
+    </header>
+
+    <p id="mg-sin-sesion" class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Inicia sesión para activar tu carrera de mánager.</p>
+
+    <!-- Sin club: elegir uno -->
+    <section id="mg-elegir" hidden class="space-y-3">
+      <h2 class="font-display font-bold text-white uppercase tracking-wider">Elige tu club</h2>
+      <p class="text-xs text-gray-400">Es opcional: si no activas tu carrera, todo lo demás de la web sigue igual. Puedes dejar el club cuando quieras.</p>
+      <div id="mg-clubes-libres" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </section>
+
+    <!-- Con club -->
+    <div id="mg-panel" hidden class="space-y-4">
+      <nav class="pilar-tabs-lista w-fit" role="tablist">
+        {TABS.map(([id, ic, t], i) => <a href={`#${id}`} role="tab" data-tab={id} aria-current={i === 0 ? 'page' : undefined}><i class={`fa-solid ${ic}`}></i>{t}</a>)}
+      </nav>
+      <section data-panel="plantilla" class="glass-panel rounded-2xl p-4"><div id="mg-plantilla"></div></section>
+      <section data-panel="mercado" hidden class="glass-panel rounded-2xl p-4 space-y-3">
+        <div class="flex flex-wrap gap-2">
+          <input id="mg-buscar" type="search" placeholder="Buscar jugador…" class="field flex-1 min-w-48">
+          <select id="mg-pos" class="field w-32"><option value="">Posición</option>{['PT','DEC','LD','LI','MCD','MC','MO','MD','MI','ED','EI','SD','DC'].map((p) => <option>{p}</option>)}</select>
+          <label class="text-xs text-gray-300 flex items-center gap-1"><input id="mg-libres" type="checkbox"> Solo libres</label>
+        </div>
+        <div id="mg-mercado"></div>
+      </section>
+      <section data-panel="oficina" hidden class="grid md:grid-cols-2 gap-4">
+        <div class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white uppercase text-sm mb-2">Ofertas recibidas</h3><div id="mg-recibidas"></div></div>
+        <div class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white uppercase text-sm mb-2">Ofertas enviadas</h3><div id="mg-enviadas"></div></div>
+      </section>
+      <section data-panel="movimientos" hidden class="glass-panel rounded-2xl p-4"><div id="mg-movs"></div></section>
+      <div class="flex flex-wrap gap-2 text-xs">
+        <a href={`${base}mercado/`} class="btn btn-ghost !min-h-9 !text-xs"><i class="fa-solid fa-plug"></i> Conectar el juego (Phoenix Mercado)</a>
+        <button type="button" id="mg-dejar" class="btn btn-ghost !min-h-9 !text-xs !text-rose-300"><i class="fa-solid fa-door-open"></i> Dejar mi club</button>
+      </div>
+    </div>
+
+    <!-- Staff -->
+    <section id="mg-staff" hidden class="glass-panel rounded-2xl p-4 space-y-4 border border-amber-400/30">
+      <h2 class="font-display font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-shield-halved text-amber-300 mr-2"></i>Staff · Modo Mánager</h2>
+      <form id="mg-cfg" class="flex flex-wrap items-end gap-3 text-xs text-gray-300">
+        <label class="flex items-center gap-2"><input type="checkbox" name="ventana"> Ventana de fichajes abierta</label>
+        <label>Presupuesto inicial<input name="presupuesto" type="number" min="0" step="1000000" class="field mt-1 w-40"></label>
+        <label>Máx. plantilla<input name="max" type="number" min="11" max="60" class="field mt-1 w-24"></label>
+        <button class="btn btn-primary !min-h-9 !text-xs">Guardar</button>
+      </form>
+      <div class="flex flex-wrap items-center gap-2 text-xs text-gray-300">
+        <label>Importar catálogo (JSON del programa)<input id="mg-json" type="file" accept=".json,application/json" class="field mt-1"></label>
+        <span class="text-gray-500">Equipos y jugadores entran como <b>no aprobados</b>; luego apruebas los clubes que juegan.</span>
+      </div>
+      <div><p class="text-[11px] text-gray-500 uppercase tracking-widest mb-2">Clubes</p><div id="mg-staff-clubes" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-96 overflow-auto"></div></div>
+    </section>
+  </div>
+</Layout>
+<script>import '../js/pages/manager.js';</script>
