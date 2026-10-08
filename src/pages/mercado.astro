@@ -1,13 +1,59 @@
 ---
+// Mercado (FX.mercadoLink): puente web ↔ juego con el programa de PC «Phoenix Mercado» (beta; luego vive dentro de Phoenix Link).
+// Jugador: vincula el programa y ve el estado de sus reportes. Staff: sube el option file oficial y aprueba/rechaza cambios.
+// API del programa: docs/mercado-api.md · BD: migración 078 · Lógica: js/pages/mercado.js
 import Layout from '../layouts/Layout.astro';
-const base = import.meta.env.BASE_URL;
+import MercadoProximamente from '../components/MercadoProximamente.astro';
+import { FX } from '../data/experimento.js';
 ---
 <Layout title="Mercado" active="mercado">
-  <div class="max-w-3xl mx-auto px-4 py-24 text-center space-y-5">
-    <div class="animate-float"><i class="fa-solid fa-handshake text-galaxy-400 text-6xl drop-shadow-[0_0_15px_rgba(0,229,255,0.6)]"></i></div>
-    <span class="inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30">Próximamente</span>
-    <h1 class="text-4xl md:text-5xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow">MERCADO DE FICHAJES</h1>
-    <p class="text-gray-400 text-sm">El sistema de fichajes está en pausa reglamentaria. Muy pronto podrás comprar, vender y negociar jugadores aquí.</p>
-    <a href={base} class="btn btn-primary inline-flex"><i class="fa-solid fa-house"></i> Volver a Central</a>
+  {!FX.mercadoLink ? <MercadoProximamente /> : (
+  <div class="max-w-5xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6">
+    <header class="glass-panel rounded-2xl px-5 py-4">
+      <span class="text-[11px] font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta</span>
+      <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-handshake text-galaxy-400 mr-2"></i>Mercado</h1>
+      <p class="text-gray-300 text-sm mt-1 max-w-3xl">Los fichajes de la liga llegan a tu juego. El programa <b class="text-white">Phoenix Mercado</b> descarga el option file oficial, lo verifica y, después de jugar, envía los cambios para que el staff los apruebe.</p>
+      <ol class="mt-4 grid sm:grid-cols-3 gap-2 text-xs">
+        <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">1 · Vincula</b><br>Genera un código aquí y pégalo en el programa.</li>
+        <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">2 · Descarga</b><br>El programa baja el option file oficial y comprueba que esté intacto.</li>
+        <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">3 · Juega y reporta</b><br>Los cambios se envían solos y el staff los revisa.</li>
+      </ol>
+    </header>
+
+    <p id="mk-sin-sesion" class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Inicia sesión para vincular el programa y ver tus reportes.</p>
+
+    <div id="mk-jugador" hidden class="grid lg:grid-cols-2 gap-4">
+      <section class="glass-panel rounded-2xl p-4 space-y-3">
+        <h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-link text-galaxy-400 mr-2"></i>Vincular programa</h2>
+        <div id="mk-codigo"></div>
+        <button type="button" id="mk-generar" class="btn btn-primary"><i class="fa-solid fa-key"></i> Generar código</button>
+        <div id="mk-dispositivos" class="space-y-2"></div>
+      </section>
+      <section class="glass-panel rounded-2xl p-4 space-y-3">
+        <h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-inbox text-galaxy-400 mr-2"></i>Mis reportes</h2>
+        <div id="mk-mis-reportes" class="space-y-2 text-sm"></div>
+        <div id="mk-oficial" class="text-xs text-gray-400 border-t border-galaxy-border pt-3"></div>
+      </section>
+    </div>
+
+    <div id="mk-staff" hidden class="space-y-4">
+      <h2 class="font-display font-extrabold text-white uppercase tracking-wider text-lg border-b border-galaxy-border pb-2"><i class="fa-solid fa-shield-halved text-amber-300 mr-2"></i>Staff</h2>
+      <section class="glass-panel rounded-2xl p-4 space-y-3">
+        <h3 class="font-display font-bold text-white uppercase tracking-wider text-sm">Cambios pendientes <b id="mk-n-pend" class="text-galaxy-400"></b></h3>
+        <div id="mk-pendientes" class="space-y-3"></div>
+      </section>
+      <section class="glass-panel rounded-2xl p-4 space-y-3">
+        <h3 class="font-display font-bold text-white uppercase tracking-wider text-sm">Option file oficial</h3>
+        <form id="mk-subir" class="grid sm:grid-cols-[1fr_10rem_auto] gap-2 items-end">
+          <label class="text-xs text-gray-400">Archivo (EDIT00000000)<input type="file" name="archivo" required class="field mt-1"></label>
+          <label class="text-xs text-gray-400">Versión<input name="version" required pattern="[A-Za-z0-9._-]{1,40}" placeholder="2026-10-07a" class="field mt-1"></label>
+          <button class="btn btn-primary"><i class="fa-solid fa-upload"></i> Subir</button>
+          <label class="text-xs text-gray-400 sm:col-span-3">Notas (opcional)<input name="notas" maxlength="1000" class="field mt-1" placeholder="Qué cambió en esta versión"></label>
+        </form>
+        <div id="mk-versiones" class="space-y-2 text-sm"></div>
+      </section>
+    </div>
   </div>
+  )}
 </Layout>
+{FX.mercadoLink && <script>import '../js/pages/mercado.js';</script>}
