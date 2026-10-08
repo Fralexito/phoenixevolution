@@ -11,7 +11,7 @@ const LIGA = 'galaxy';
 const plata = (n) => `€ ${Number(n || 0).toLocaleString('es-PE')}`;
 const ERR = { YA_TIENES_CLUB: 'Ya tienes un club.', CLUB_OCUPADO: 'Ese club ya tiene DT.', CLUB_NO_DISPONIBLE: 'Ese club no está disponible.', VENTANA_CERRADA: 'La ventana de fichajes está cerrada.',
   PRESUPUESTO_INSUFICIENTE: 'No te alcanza el presupuesto.', OFERTA_BAJA: 'La oferta es menor al valor del jugador.', YA_OFERTASTE: 'Ya tienes una oferta pendiente por él.',
-  PLANTILLA_LLENA: 'La plantilla está llena.', YA_ES_TUYO: 'Ya es tu jugador.', YA_NO_ES_TUYO: 'Ese jugador ya no está en tu club.', SIN_CLUB: 'Primero elige un club.' };
+  PLANTILLA_LLENA: 'Plantilla llena (máx. 40). Libera o vende a un jugador antes de fichar.', JUGADOR_NO_DISPONIBLE: 'Ese jugador acaba de cambiar de club. Recarga.', NO_ES_CPU: 'Ese club tiene DT: hazle una oferta.', YA_ES_TUYO: 'Ya es tu jugador.', YA_NO_ES_TUYO: 'Ese jugador ya no está en tu club.', SIN_CLUB: 'Primero elige un club.' };
 const msg = (e) => { const k = Object.keys(ERR).find((x) => String(e?.message).includes(x)); return k ? ERR[k] : (e?.message || 'Error'); };
 let yo = null; let club = null; let cfg = null; let clubes = new Map();
 const escudo = (c, cls = 'w-10 h-10') => safeUrl(c?.escudo_url) ? `<img src="${esc(safeUrl(c.escudo_url))}" alt="" class="${cls} object-contain">` : `<span class="${cls} rounded-full bg-galaxy-800 grid place-items-center text-galaxy-400"><i class="fa-solid fa-shield-halved"></i></span>`;
@@ -50,7 +50,7 @@ function pintarCabecera() {
       ${stat('Presupuesto', millones(club.presupuesto), 'fa-wallet')}
       ${stat('Valor plantilla', millones(resumen.valor), 'fa-chart-line')}
       ${stat('Media XI', resumen.mediaXI ?? '—', 'fa-star')}
-      ${stat('Plantilla', `${resumen.n}/${cfg?.max_plantilla ?? 30}`, 'fa-people-group')}
+      ${stat('Plantilla', `${resumen.n}/${cfg?.max_plantilla ?? 40}`, 'fa-people-group')}
     </div>`;
 }
 
@@ -72,7 +72,8 @@ async function pintarPlantilla() {
   resumen = { n: data.length, valor: data.reduce((s, j) => s + Number(j.valor || 0), 0), mediaXI: xi.length ? Math.round(xi.reduce((s, j) => s + (j.media || 0), 0) / xi.length) : null };
   pintarCabecera();
   if (!data.length) { $('mg-plantilla').innerHTML = vacio('fa-people-group', 'Tu plantilla está vacía', 'Ficha jugadores en el Mercado.'); return; }
-  const btn = (j) => `<button type="button" class="mg-mini" data-liberar="${j.id}" ${cfg.ventana_abierta ? '' : 'disabled'} title="Liberar"><i class="fa-solid fa-user-minus"></i></button>`;
+  const off = cfg.ventana_abierta ? '' : 'disabled';
+  const btn = (j) => `<div class="mg-acciones"><button type="button" class="mg-mini" data-vender="${j.id}" data-nombre="${esc(j.nombre)}" data-valor="${j.valor}" ${off} title="Vender a un club CPU por su valor"><i class="fa-solid fa-hand-holding-dollar"></i></button><button type="button" class="mg-mini" data-liberar="${j.id}" ${off} title="Liberar (queda agente libre)"><i class="fa-solid fa-user-minus"></i></button></div>`;
   $('mg-plantilla').innerHTML = LINEAS.map(([id, t]) => { const g = data.filter((j) => linea(j.posicion) === id); return g.length ? `<div class="mg-linea" data-linea="${id}">
       <h3 class="mg-linea-tit"><span></span>${t} <small>${g.length}</small></h3><div class="mg-grid">${g.map((j) => carta(j, btn(j))).join('')}</div></div>` : ''; }).join('');
 }
@@ -144,7 +145,7 @@ function pintarControles() {
   $('mg-exigir').checked = !!cfg?.exigir_codigo_manager;
   $('mg-c-presu').value = cfg?.presupuesto_inicial ?? 50e6; $('mg-c-presu-v').textContent = millones(cfg?.presupuesto_inicial);
   document.querySelectorAll('[data-presu]').forEach((b) => b.classList.toggle('activo', Number(b.dataset.presu) === Number(cfg?.presupuesto_inicial)));
-  $('mg-c-max').textContent = cfg?.max_plantilla ?? 30;
+  $('mg-c-max').textContent = cfg?.max_plantilla ?? 40;
 }
 function pintarClubesStaff() {
   const lista = [...clubes.values()]; const q = filtroClub.toLowerCase();
@@ -153,7 +154,7 @@ function pintarClubesStaff() {
   const vis = lista.filter((c) => !q || c.nombre.toLowerCase().includes(q));
   $('mg-staff-clubes').innerHTML = !lista.length ? vacio('fa-file-import', 'Sin clubes todavía', 'Importa el catálogo para verlos aquí.')
     : !vis.length ? '<p class="text-xs text-gray-500 col-span-full">Ningún club coincide.</p>'
-    : vis.map((c) => `<label class="mg-club-t ${c.aprobado ? 'activo' : ''}">${escudo(c, 'w-8 h-8')}<span class="flex-1 min-w-0"><b>${esc(c.nombre)}</b><small>${c.dueno ? '<i class="fa-solid fa-user-tie"></i> Tiene DT · ' + millones(c.presupuesto) : c.aprobado ? 'Disponible' : 'No participa'}</small></span>
+    : vis.map((c) => `<label class="mg-club-t ${c.aprobado ? 'activo' : ''}">${escudo(c, 'w-8 h-8')}<span class="flex-1 min-w-0"><b>${esc(c.nombre)}</b><small>${c.dueno ? '<i class="fa-solid fa-user-tie"></i> Tiene DT · ' + millones(c.presupuesto) : c.aprobado ? '<i class="fa-solid fa-microchip"></i> CPU · sin DT' : 'No participa'}</small></span>
         <input type="checkbox" class="mg-switch" data-aprobar-club="${c.id}" ${c.aprobado ? 'checked' : ''}></label>`).join('');
 }
 function pintarStaff() { pintarControles(); pintarClubesStaff(); }
@@ -194,11 +195,19 @@ async function refrescar() {
 
 const rpc = async (fn, args) => { const { data, error } = await supabase.rpc(fn, args); if (error) throw error; return data; };
 document.addEventListener('click', async (ev) => {
-  const b = ev.target.closest('[data-elegir],[data-liberar],[data-ofertar],[data-responder],[data-cancelar],#mg-dejar'); if (!b || b.disabled) return;
+  const b = ev.target.closest('[data-elegir],[data-vender],[data-liberar],[data-ofertar],[data-responder],[data-cancelar],#mg-dejar'); if (!b || b.disabled) return;
   b.disabled = true;
   try {
     if (b.dataset.elegir) { const c = clubes.get(Number(b.dataset.elegir)); if (!(await confirmar(`¿Ser el DT de ${c?.nombre}? Recibirás ${plata(cfg?.presupuesto_inicial)} de presupuesto.`))) return; await rpc('lm_activar', { p_club: c.id }); toast('¡Bienvenido a tu club, mánager!', 'ok'); await refrescar(); }
     else if (b.id === 'mg-dejar') { if (!(await confirmar('¿Dejar tu club? Vuelve a la IA y tus ofertas pendientes se cancelan.', { peligro: true }))) return; await rpc('lm_abandonar'); toast('Dejaste tu club.', 'ok'); await refrescar(); }
+    else if (b.dataset.vender) {
+      const cpus = [...clubes.values()].filter((c) => c.aprobado && !c.dueno);
+      if (!cpus.length) { toast('No hay clubes CPU aprobados.', 'warn'); return; }
+      const lista = cpus.map((c, i) => `${i + 1}. ${c.nombre}`).join('\n');
+      const t = prompt(`¿A qué club CPU vendes a ${b.dataset.nombre} por ${millones(b.dataset.valor)}? Escribe el número:\n\n${lista}`); if (t === null) return;
+      const c = cpus[Number(t) - 1]; if (!c) { toast('Número no válido.', 'warn'); return; }
+      const r = await rpc('lm_vender_cpu', { p_jugador: Number(b.dataset.vender), p_club_cpu: c.id }); toast(`Vendido a ${r.club} por ${millones(r.monto)}.`, 'ok'); await refrescar();
+    }
     else if (b.dataset.liberar) { if (!(await confirmar('¿Liberar a este jugador? Quedará como agente libre, sin cobro.', { peligro: true }))) return; await rpc('lm_liberar', { p_jugador: Number(b.dataset.liberar) }); toast('Jugador liberado.', 'ok'); await refrescar(); }
     else if (b.dataset.ofertar) {
       const directo = b.dataset.directo === '1'; const valor = Number(b.dataset.valor);
@@ -238,7 +247,7 @@ if (drop) {
 document.addEventListener('click', async (ev) => {
   const t = ev.target.closest('[data-presu],[data-max],[data-todos],#mg-importar,#mg-cancelar-imp'); if (!t) return;
   if (t.dataset.presu) { cfg.presupuesto_inicial = Number(t.dataset.presu); pintarControles(); guardarPronto(); }
-  else if (t.dataset.max) { cfg.max_plantilla = Math.min(60, Math.max(11, (cfg.max_plantilla ?? 30) + Number(t.dataset.max))); pintarControles(); guardarPronto(); }
+  else if (t.dataset.max) { cfg.max_plantilla = Math.min(60, Math.max(11, (cfg.max_plantilla ?? 40) + Number(t.dataset.max))); pintarControles(); guardarPronto(); }
   else if (t.dataset.todos) {
     const si = t.dataset.todos === '1'; const lista = [...clubes.values()].filter((c) => c.aprobado !== si && (!c.dueno || si));
     if (!lista.length) return; if (!(await confirmar(`¿${si ? 'Aprobar' : 'Quitar'} ${lista.length} club(es)?${si ? '' : ' Los clubes con DT se mantienen.'}`))) return;

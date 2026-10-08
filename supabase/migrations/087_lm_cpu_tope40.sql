@@ -1,0 +1,9 @@
+-- 087 · Clubes CPU, traspasos DT↔CPU, tope 40 y agente libre.
+-- · Club CPU = lm_clubes con dueno NULL (lo maneja la máquina). Cada equipo del juego que entra al universo de la liga
+--   (catálogo importado + aprobado por el staff) ES un club CPU hasta que un DT lo elige.
+-- · Agente libre = lm_jugadores.club_id NULL.
+-- · Los clubes CPU no tienen presupuesto: compran y venden sin límite de dinero (solo se mueve el dinero del DT).
+-- · DT→CPU: public.lm_vender_cpu(jugador, club_cpu) por el valor del jugador. CPU→DT: lm_ofertar (cierre instantáneo).
+--   Ambos pasan por private.lm_traspasar → misma transacción, version_liga++ y lm_cambios_liga.
+-- · Tope de plantilla: 40 (lm_config.max_plantilla). Si el club destino está lleno → PLANTILLA_LLENA (hay que liberar o vender antes).
+-- (Aplicada en Supabase: 087_lm_cpu_tope40 y 087b_lm_cpu_sin_presupuesto.)

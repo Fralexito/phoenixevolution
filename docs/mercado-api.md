@@ -68,3 +68,9 @@ Texto canónico (Mercado debe generarlo **idéntico** desde el option file y la 
 - `GET /liga/cambios?desde=<version>` → **firmado** igual que `/plantillas`. `contenido = { liga, desde, version_actual, generado, cambios:[…] }` (máx. 1000; si quedan más, repetir con `desde` = última `version` recibida). Aplicar en orden de `version`.
 - `POST /liga/aplicado { version, huella_plantillas }` → `{ version_actual, al_dia, coincide }`. `coincide` = la huella reportada es igual a la esperada (solo se compara si `version` = `version_actual`; si no, `null`).
 - `/plantillas` incluye ahora `version_liga` dentro de `contenido` (sirve como punto de partida tras una instalación limpia).
+
+## Clubes CPU y agentes libres
+- **Club CPU** = club sin DT (`dueno` nulo). Todo equipo del juego que entra al universo de la liga (catálogo + aprobado) es CPU hasta que un DT lo elige. No tiene presupuesto.
+- **Agente libre** = jugador sin club (`club_hacia` / `club_id` nulo).
+- DT→CPU y CPU→DT generan cambios de liga igual que DT↔DT (misma `version_liga`).
+- **Tope de plantilla: 40.** Un traspaso a un club lleno se rechaza con `PLANTILLA_LLENA`.

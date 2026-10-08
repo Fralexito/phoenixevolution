@@ -327,3 +327,6 @@
 .mg-club-t b { display: block; font-size: .82rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .mg-club-t small { display: block; font-size: .68rem; color: #9ca3af; }
 .mg-club-t small i { color: var(--color-galaxy-400); }
 @media (prefers-reduced-motion: reduce) { .mg-switch::after, .mg-drop { transition: none; } .mg-prev { animation: none; } }
+.mg-acciones { position: absolute; top: .55rem; right: .55rem; display: flex; gap: .3rem; }
+.mg-acciones .mg-mini { position: static; }
+.mg-carta:hover .mg-acciones .mg-mini { opacity: 1; }
