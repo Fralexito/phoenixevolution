@@ -1,0 +1,3 @@
+-- 082 · /catalogo: fecha_nac, media y valor son OPCIONALES (el option file solo trae edad; la media se calculará
+-- desde las habilidades y el valor lo define la web). Al reimportar, un campo ausente NO borra el valor que ya había.
+-- (Aplicada en Supabase; ver cuerpo completo de public.sistema_lm_importar allí — mismo contrato que 081.)

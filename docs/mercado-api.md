@@ -16,7 +16,7 @@ Cabeceras del programa: `Authorization: Bearer <token>` (salvo /vincular y /eco)
 | GET | `/yo` | — | `{ usuario: { id, nombre, avatar_url }, dispositivo_id }` |
 | GET | `/option/actual` | — | `{ version, sha256, tamano, notas, publicado, url, expira_en_seg }` |
 | POST | `/reportes` | `{ option_version, hash_antes, hash_despues, resumen, cambios: [ ... ] }` | `{ id, estado: "pendiente", created_at }` |
-| POST | `/catalogo` (staff) | `{ equipos:[{pes_team_id,nombre}], jugadores:[{pes_id,nombre,pes_team_id,posicion,media,edad,nacionalidad,fecha_nac,altura,dorsal,valor}] }` | `{ equipos, jugadores }` (equipos entran sin aprobar) |
+| POST | `/catalogo` (staff) | `{ equipos:[{pes_team_id,nombre}], jugadores:[{pes_id,nombre,pes_team_id,posicion,media,edad,nacionalidad,fecha_nac,altura,dorsal,valor}] }` | `{ equipos, jugadores }` (equipos entran sin aprobar). **Obligatorios:** `pes_id`, `nombre`. **Opcionales:** `pes_team_id`, `posicion`, `edad`, `nacionalidad`, `altura`, `dorsal`, `media`, `valor`, `fecha_nac`. Al reimportar, un campo ausente conserva lo que ya tenía la web (p. ej. el `valor` que fijó el staff). |
 | GET | `/fichajes` (`?todos=1`) | — | `{ fichajes:[{ id, tipo, phoenix_id, pes_id, jugador, de_pes_team_id, a_pes_team_id, a_club, monto, aplicado_en, fecha }] }` — pendientes por defecto; `a_pes_team_id: null` = agente libre |
 | POST | `/fichajes/aplicados` (staff) | `{ ids:[1,2,3] }` | `{ marcados }` — tras generar el option file oficial |
 | GET | `/reportes` | — | `{ reportes: [ { id, option_version, resumen, estado, motivo, created_at, revisado_en } ] }` |
