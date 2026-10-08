@@ -1,8 +1,12 @@
+/* Fuentes «de reserva» con medidas ajustadas: mientras carga Rajdhani/Inter, el texto ocupa casi el mismo espacio
+   y la página no salta al cambiar de fuente (CLS). size-adjust aproxima el ancho medio de cada fuente sobre Arial. */
+@font-face { font-family: 'Rajdhani Fallback'; src: local('Arial Narrow'), local('ArialNarrow'), local('Arial'), local('Helvetica'); size-adjust: 88%; ascent-override: 108%; descent-override: 40%; line-gap-override: 0%; }
+@font-face { font-family: 'Inter Fallback'; src: local('Arial'), local('Helvetica'); size-adjust: 107%; ascent-override: 90%; descent-override: 22%; line-gap-override: 0%; }
 /* CAPA 1 · TOKENS — la ÚNICA fuente de colores, fuentes y animaciones.
    Para cambiar un color del sitio, se cambia aquí y en ningún otro lado. */
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Rajdhani', 'Rajdhani Fallback', ui-sans-serif, system-ui, sans-serif;
 
   --color-galaxy-50: #ccffff;
   --color-galaxy-100: #e2e8f0;

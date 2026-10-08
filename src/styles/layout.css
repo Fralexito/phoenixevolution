@@ -137,3 +137,7 @@ html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute;
 .cuenta-grupo[data-grupo='jugar'] .cuenta-tile { border-color: rgb(16 185 129 / .3); }
 .cuenta-grupo[data-grupo='staff'] .cuenta-tile { border-style: dashed; }
 .cuenta-tile[hidden], .cuenta-grupo[hidden] { display: none !important; }
+/* Estabilidad visual (CLS): reserva el espacio de la barra de desplazamiento para que la página no «salte» de lado
+   cuando el contenido crece, y reserva el lugar de Entrar/Registrarse o del avatar antes de que cargue la sesión. */
+html { scrollbar-gutter: stable; }
+@media (min-width: 640px) { #nav-auth { min-width: 11.5rem; justify-content: flex-end; } }

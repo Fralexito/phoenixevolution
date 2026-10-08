@@ -5,7 +5,16 @@ import '@fontsource/rajdhani/600.css';
 import '@fontsource/rajdhani/700.css';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/600.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+// Font Awesome SIN «brands» (113 KB menos por visita): las marcas van como máscaras SVG en styles/marcas.css.
+import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+import '@fortawesome/fontawesome-free/css/solid.min.css';
+import '@fortawesome/fontawesome-free/css/regular.min.css';
+import '../styles/marcas.css';
+// Precarga de las fuentes que se ven arriba de todo (títulos y texto): evita que la página «salte» al cambiar de fuente (CLS).
+import fRaj700 from '@fontsource/rajdhani/files/rajdhani-latin-700-normal.woff2?url';
+import fRaj600 from '@fontsource/rajdhani/files/rajdhani-latin-600-normal.woff2?url';
+import fInter400 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
+import fFaSolid from '@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2?url';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Ticker from '../components/Ticker.astro';
@@ -27,6 +36,7 @@ const base = import.meta.env.BASE_URL;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#03010f" />
     {import.meta.env.PUBLIC_PREVIEW && <meta name="robots" content="noindex, nofollow" />}
+    {[fRaj700, fRaj600, fInter400, fFaSolid].map((f) => <link rel="preload" as="font" type="font/woff2" href={f} crossorigin />)}
     <link rel="icon" type="image/png" href={`${base}favicon.png`} />
       <script is:inline>document.documentElement.classList.add('js');</script>
     {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
