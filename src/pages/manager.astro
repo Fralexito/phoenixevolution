@@ -50,21 +50,61 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </div>
     </div>
 
-    <!-- Staff -->
-    <section id="mg-staff" hidden class="glass-panel rounded-2xl p-4 space-y-4 border border-amber-400/30">
-      <h2 class="font-display font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-shield-halved text-amber-300 mr-2"></i>Staff · Modo Mánager</h2>
-      <form id="mg-cfg" class="flex flex-wrap items-end gap-3 text-xs text-gray-300">
-        <label class="flex items-center gap-2"><input type="checkbox" name="ventana"> Ventana de fichajes abierta</label>
-        <label>Presupuesto inicial<input name="presupuesto" type="number" min="0" step="1000000" class="field mt-1 w-40"></label>
-        <label>Máx. plantilla<input name="max" type="number" min="11" max="60" class="field mt-1 w-24"></label>
-        <button class="btn btn-primary !min-h-9 !text-xs">Guardar</button>
-      </form>
-      <label class="flex items-center gap-2 text-xs text-gray-300"><input id="mg-exigir" type="checkbox"> Exigir código manager a todos (Phoenix Link no podrá usar su propia vinculación para el Modo Mánager)</label>
-      <div class="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-        <label>Importar catálogo (JSON del programa)<input id="mg-json" type="file" accept=".json,application/json" class="field mt-1"></label>
-        <span class="text-gray-500">Equipos y jugadores entran como <b>no aprobados</b>; luego apruebas los clubes que juegan.</span>
+    <!-- Staff: todo se guarda al instante (sin botón Guardar) -->
+    <section id="mg-staff" hidden class="mg-staff">
+      <header class="flex flex-wrap items-center gap-3">
+        <h2 class="mg-staff-tit"><i class="fa-solid fa-shield-halved"></i> Centro de control</h2>
+        <span class="text-[11px] text-gray-500">Staff · los cambios se guardan solos</span>
+        <span id="mg-guardado" class="mg-guardado" aria-live="polite"></span>
+      </header>
+
+      <div class="mg-ctrl-grid">
+        <!-- Ventana -->
+        <label class="mg-ctrl mg-ctrl-ventana" for="mg-c-ventana">
+          <span class="mg-ctrl-ic"><i class="fa-solid fa-door-open"></i></span>
+          <span class="flex-1"><b>Ventana de fichajes</b><small id="mg-c-ventana-txt">—</small></span>
+          <input id="mg-c-ventana" type="checkbox" class="mg-switch">
+        </label>
+        <!-- Exigir código -->
+        <label class="mg-ctrl" for="mg-exigir">
+          <span class="mg-ctrl-ic"><i class="fa-solid fa-key"></i></span>
+          <span class="flex-1"><b>Exigir código manager</b><small>Phoenix Link no podrá usar su propia vinculación</small></span>
+          <input id="mg-exigir" type="checkbox" class="mg-switch">
+        </label>
+        <!-- Presupuesto -->
+        <div class="mg-ctrl mg-ctrl-col">
+          <div class="flex items-center gap-3 w-full"><span class="mg-ctrl-ic"><i class="fa-solid fa-wallet"></i></span>
+            <span class="flex-1"><b>Presupuesto inicial</b><small>Lo recibe cada DT al elegir club</small></span><output id="mg-c-presu-v" class="mg-ctrl-num">—</output></div>
+          <input id="mg-c-presu" type="range" min="5000000" max="300000000" step="5000000" class="mg-range">
+          <div class="flex flex-wrap gap-1.5">{[25, 50, 100, 200].map((m) => <button type="button" class="mg-chip" data-presu={m * 1e6}>€{m} M</button>)}</div>
+        </div>
+        <!-- Máx plantilla -->
+        <div class="mg-ctrl">
+          <span class="mg-ctrl-ic"><i class="fa-solid fa-people-group"></i></span>
+          <span class="flex-1"><b>Máx. plantilla</b><small>Jugadores por club</small></span>
+          <div class="mg-stepper"><button type="button" data-max="-1" aria-label="Menos">−</button><output id="mg-c-max">30</output><button type="button" data-max="1" aria-label="Más">+</button></div>
+        </div>
       </div>
-      <div><p class="text-[11px] text-gray-500 uppercase tracking-widest mb-2">Clubes</p><div id="mg-staff-clubes" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-96 overflow-auto"></div></div>
+
+      <!-- Importar catálogo -->
+      <label id="mg-drop" class="mg-drop" for="mg-json">
+        <input id="mg-json" type="file" accept=".json,application/json" class="sr-only">
+        <i class="fa-solid fa-file-import"></i>
+        <b>Arrastra aquí el catálogo (JSON del programa)</b>
+        <small>o haz clic para elegirlo · los clubes entran sin aprobar</small>
+      </label>
+      <div id="mg-prev" hidden class="mg-prev"></div>
+
+      <!-- Clubes -->
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-shield-halved"></i> Clubes</h3>
+          <span id="mg-c-resumen" class="text-xs text-gray-400"></span>
+          <label class="relative ml-auto"><i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-[11px]"></i><input id="mg-c-buscar" type="search" placeholder="Buscar club…" class="field !min-h-8 !py-1 !pl-7 !text-xs w-44"></label>
+          <button type="button" class="mg-chip" data-todos="1">Aprobar todos</button><button type="button" class="mg-chip" data-todos="0">Ninguno</button>
+        </div>
+        <div id="mg-staff-clubes" class="mg-clubes-grid"></div>
+      </div>
     </section>
   </div>
 </Layout>

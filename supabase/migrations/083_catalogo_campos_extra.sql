@@ -1,0 +1,2 @@
+-- 083 · /catalogo acepta peso, fuente ('option'|'parche'), habilidades (objeto/arreglo) y otros_equipos (p. ej. selección).
+-- Si vienen con formato inválido se ignoran sin error; los campos desconocidos también. Aplicada en Supabase (sistema_lm_importar actualizada).

@@ -126,13 +126,53 @@ async function pintarMovimientos() {
         <div class="text-right shrink-0">${m.monto ? `<p class="mg-monto">${millones(m.monto)}</p>` : ''}<p class="text-[11px] text-gray-500">${m.aplicado_en ? '<i class="fa-solid fa-gamepad text-emerald-400" title="Ya está en el juego"></i>' : '<i class="fa-regular fa-clock" title="Llega al juego al cerrar la ventana"></i>'} ${esc(haceCuanto(m.created_at) ?? '')}</p></div></li>`; }).join('')}</ol>`;
 }
 
-// ── Staff ──
-function pintarStaff() {
+// ── Staff: centro de control (autoguardado) ──
+let tGuardar = null; let filtroClub = '';
+const avisoGuardado = (estado) => { const el = $('mg-guardado'); if (!el) return;
+  el.dataset.estado = estado; el.innerHTML = estado === 'guardando' ? '<i class="fa-solid fa-circle-notch fa-spin"></i> Guardando…' : estado === 'ok' ? '<i class="fa-solid fa-check"></i> Guardado' : '<i class="fa-solid fa-triangle-exclamation"></i> No se guardó';
+  if (estado === 'ok') setTimeout(() => { if (el.dataset.estado === 'ok') el.innerHTML = ''; }, 1800); };
+async function guardarCfg() {
+  avisoGuardado('guardando');
+  try { await rpc('lm_staff_config', { p_liga: LIGA, p_ventana: cfg.ventana_abierta, p_presupuesto: cfg.presupuesto_inicial, p_max: cfg.max_plantilla }); avisoGuardado('ok'); pintarCabecera(); }
+  catch (e) { avisoGuardado('error'); toast(msg(e), 'error'); }
+}
+const guardarPronto = () => { clearTimeout(tGuardar); tGuardar = setTimeout(guardarCfg, 500); };
+function pintarControles() {
+  $('mg-c-ventana').checked = !!cfg?.ventana_abierta;
+  $('mg-c-ventana-txt').textContent = cfg?.ventana_abierta ? 'Abierta: los DT pueden fichar y vender' : 'Cerrada: nadie puede fichar';
+  $('mg-c-ventana').closest('.mg-ctrl').classList.toggle('activo', !!cfg?.ventana_abierta);
   $('mg-exigir').checked = !!cfg?.exigir_codigo_manager;
-  const f = $('mg-cfg'); f.ventana.checked = !!cfg?.ventana_abierta; f.presupuesto.value = cfg?.presupuesto_inicial ?? 0; f.max.value = cfg?.max_plantilla ?? 30;
-  const lista = [...clubes.values()];
-  $('mg-staff-clubes').innerHTML = !lista.length ? '<p class="text-xs text-gray-500">Importa el catálogo para ver los clubes.</p>' : lista.map((c) => `<label class="flex items-center gap-2 text-xs rounded-lg border border-galaxy-border px-2 py-1.5">
-      <input type="checkbox" data-aprobar-club="${c.id}" ${c.aprobado ? 'checked' : ''}><span class="flex-1 truncate ${c.aprobado ? 'text-white' : 'text-gray-500'}">${esc(c.nombre)}</span>${c.dueno ? '<i class="fa-solid fa-user-tie text-galaxy-400" title="Tiene DT"></i>' : ''}</label>`).join('');
+  $('mg-c-presu').value = cfg?.presupuesto_inicial ?? 50e6; $('mg-c-presu-v').textContent = millones(cfg?.presupuesto_inicial);
+  document.querySelectorAll('[data-presu]').forEach((b) => b.classList.toggle('activo', Number(b.dataset.presu) === Number(cfg?.presupuesto_inicial)));
+  $('mg-c-max').textContent = cfg?.max_plantilla ?? 30;
+}
+function pintarClubesStaff() {
+  const lista = [...clubes.values()]; const q = filtroClub.toLowerCase();
+  const ap = lista.filter((c) => c.aprobado).length; const dts = lista.filter((c) => c.dueno).length;
+  $('mg-c-resumen').innerHTML = `<b class="text-white">${ap}</b>/${lista.length} aprobados · <b class="text-galaxy-400">${dts}</b> con DT`;
+  const vis = lista.filter((c) => !q || c.nombre.toLowerCase().includes(q));
+  $('mg-staff-clubes').innerHTML = !lista.length ? vacio('fa-file-import', 'Sin clubes todavía', 'Importa el catálogo para verlos aquí.')
+    : !vis.length ? '<p class="text-xs text-gray-500 col-span-full">Ningún club coincide.</p>'
+    : vis.map((c) => `<label class="mg-club-t ${c.aprobado ? 'activo' : ''}">${escudo(c, 'w-8 h-8')}<span class="flex-1 min-w-0"><b>${esc(c.nombre)}</b><small>${c.dueno ? '<i class="fa-solid fa-user-tie"></i> Tiene DT · ' + millones(c.presupuesto) : c.aprobado ? 'Disponible' : 'No participa'}</small></span>
+        <input type="checkbox" class="mg-switch" data-aprobar-club="${c.id}" ${c.aprobado ? 'checked' : ''}></label>`).join('');
+}
+function pintarStaff() { pintarControles(); pintarClubesStaff(); }
+
+// Vista previa del catálogo antes de importar
+let catalogoPendiente = null;
+async function prepararCatalogo(file) {
+  try {
+    const datos = JSON.parse(await file.text());
+    if (!Array.isArray(datos.equipos) || !Array.isArray(datos.jugadores)) throw new Error('Falta «equipos» o «jugadores».');
+    catalogoPendiente = datos;
+    const sinId = datos.jugadores.filter((j) => j.pes_id == null || !j.nombre).length;
+    const muestra = datos.jugadores.slice(0, 6).map((j) => `<span class="mg-chip">${esc(j.nombre ?? '?')} <small class="text-gray-500">${esc(j.posicion ?? '')}</small></span>`).join('');
+    $('mg-prev').hidden = false;
+    $('mg-prev').innerHTML = `<div class="flex flex-wrap items-center gap-3"><i class="fa-solid fa-file-circle-check text-emerald-300 text-xl"></i>
+      <span class="flex-1"><b class="text-white">${esc(file.name)}</b><br><span class="text-xs text-gray-400">${datos.equipos.length} equipos · ${datos.jugadores.length} jugadores${sinId ? ` · <span class="text-amber-300">${sinId} sin pes_id o nombre (se ignorarán o fallarán)</span>` : ''}</span></span>
+      <button type="button" class="btn btn-primary !min-h-9 !text-xs" id="mg-importar"><i class="fa-solid fa-upload"></i> Importar</button><button type="button" class="btn btn-ghost !min-h-9 !text-xs" id="mg-cancelar-imp">Cancelar</button></div>
+      <div class="flex flex-wrap gap-1.5 mt-3">${muestra}${datos.jugadores.length > 6 ? `<span class="text-xs text-gray-500 self-center">y ${datos.jugadores.length - 6} más…</span>` : ''}</div>`;
+  } catch (e) { catalogoPendiente = null; $('mg-prev').hidden = true; toast(e instanceof SyntaxError ? 'El archivo no es un JSON válido.' : e.message, 'error'); }
 }
 
 // ── Tabs ──
@@ -175,24 +215,43 @@ document.addEventListener('click', async (ev) => {
 });
 document.addEventListener('change', async (ev) => {
   const c = ev.target.closest('[data-aprobar-club]');
-  if (c) { try { await rpc('lm_staff_club', { p_id: Number(c.dataset.aprobarClub), p_aprobado: c.checked }); clubes.get(Number(c.dataset.aprobarClub)).aprobado = c.checked; pintarStaff(); } catch (e) { c.checked = !c.checked; toast(msg(e), 'error'); } }
-  if (ev.target.id === 'mg-json') {
-    const file = ev.target.files?.[0]; if (!file) return;
-    try { const datos = JSON.parse(await file.text()); const r = await rpc('lm_importar', { p_liga: LIGA, p_datos: datos }); toast(`Importados: ${r.equipos} equipos y ${r.jugadores} jugadores.`, 'ok'); await refrescar(); }
-    catch (e) { console.error('[manager] importar', e); toast(e instanceof SyntaxError ? 'El archivo no es un JSON válido.' : msg(e), 'error'); }
-    finally { ev.target.value = ''; }
-  }
+  if (c) { try { await rpc('lm_staff_club', { p_id: Number(c.dataset.aprobarClub), p_aprobado: c.checked }); clubes.get(Number(c.dataset.aprobarClub)).aprobado = c.checked; pintarClubesStaff(); avisoGuardado('ok'); } catch (e) { c.checked = !c.checked; avisoGuardado('error'); toast(msg(e), 'error'); } }
   if (ev.target.id === 'mg-exigir') {
-    try { await rpc('lm_staff_exigir_codigo', { p_liga: LIGA, p_exigir: ev.target.checked }); toast(ev.target.checked ? 'Código manager obligatorio para todos.' : 'Phoenix Link habilitado para el Modo Mánager.', 'ok'); }
-    catch (e) { ev.target.checked = !ev.target.checked; toast(msg(e), 'error'); }
+    avisoGuardado('guardando');
+    try { await rpc('lm_staff_exigir_codigo', { p_liga: LIGA, p_exigir: ev.target.checked }); cfg.exigir_codigo_manager = ev.target.checked; avisoGuardado('ok'); }
+    catch (e) { ev.target.checked = !ev.target.checked; avisoGuardado('error'); toast(msg(e), 'error'); }
   }
+  if (ev.target.id === 'mg-c-ventana') { cfg.ventana_abierta = ev.target.checked; pintarControles(); guardarCfg(); }
+  if (ev.target.id === 'mg-json') { const f = ev.target.files?.[0]; if (f) prepararCatalogo(f); ev.target.value = ''; }
   if (['mg-pos', 'mg-libres'].includes(ev.target.id)) pintarMercado();
 });
 $('mg-buscar').addEventListener('input', () => { clearTimeout(tBuscar); tBuscar = setTimeout(pintarMercado, 300); });
-$('mg-cfg').addEventListener('submit', async (e) => {
-  e.preventDefault(); const f = e.target;
-  try { await rpc('lm_staff_config', { p_liga: LIGA, p_ventana: f.ventana.checked, p_presupuesto: Number(f.presupuesto.value), p_max: Number(f.max.value) }); toast('Configuración guardada.', 'ok'); await refrescar(); }
-  catch (err) { toast(msg(err), 'error'); }
+// Staff: controles con autoguardado
+$('mg-c-presu')?.addEventListener('input', (e) => { cfg.presupuesto_inicial = Number(e.target.value); pintarControles(); guardarPronto(); });
+$('mg-c-buscar')?.addEventListener('input', (e) => { filtroClub = e.target.value; pintarClubesStaff(); });
+const drop = $('mg-drop');
+if (drop) {
+  ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('encima'); }));
+  ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('encima')));
+  drop.addEventListener('drop', (e) => { e.preventDefault(); const f = e.dataTransfer?.files?.[0]; if (f) prepararCatalogo(f); });
+}
+document.addEventListener('click', async (ev) => {
+  const t = ev.target.closest('[data-presu],[data-max],[data-todos],#mg-importar,#mg-cancelar-imp'); if (!t) return;
+  if (t.dataset.presu) { cfg.presupuesto_inicial = Number(t.dataset.presu); pintarControles(); guardarPronto(); }
+  else if (t.dataset.max) { cfg.max_plantilla = Math.min(60, Math.max(11, (cfg.max_plantilla ?? 30) + Number(t.dataset.max))); pintarControles(); guardarPronto(); }
+  else if (t.dataset.todos) {
+    const si = t.dataset.todos === '1'; const lista = [...clubes.values()].filter((c) => c.aprobado !== si && (!c.dueno || si));
+    if (!lista.length) return; if (!(await confirmar(`¿${si ? 'Aprobar' : 'Quitar'} ${lista.length} club(es)?${si ? '' : ' Los clubes con DT se mantienen.'}`))) return;
+    avisoGuardado('guardando');
+    try { for (const c of lista) { await rpc('lm_staff_club', { p_id: c.id, p_aprobado: si }); c.aprobado = si; } avisoGuardado('ok'); pintarClubesStaff(); }
+    catch (e) { avisoGuardado('error'); toast(msg(e), 'error'); pintarClubesStaff(); }
+  }
+  else if (t.id === 'mg-cancelar-imp') { catalogoPendiente = null; $('mg-prev').hidden = true; }
+  else if (t.id === 'mg-importar' && catalogoPendiente) {
+    t.disabled = true; t.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Importando…';
+    try { const r = await rpc('lm_importar', { p_liga: LIGA, p_datos: catalogoPendiente }); toast(`Importados: ${r.equipos} equipos y ${r.jugadores} jugadores.`, 'ok'); catalogoPendiente = null; $('mg-prev').hidden = true; await refrescar(); }
+    catch (e) { toast(msg(e), 'error'); t.disabled = false; t.textContent = 'Reintentar'; }
+  }
 });
 
 onSession((st) => { yo = st?.session?.user?.id ?? null; refrescar(); });
