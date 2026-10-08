@@ -9,6 +9,7 @@ import { href } from '../core/config.js';
 import { toast } from '../core/toast.js';
 import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { iniciarVistas } from '../features/ajustesVista.js';
+import { pintarDerechos } from '../features/derechos.js';
 
 const estado = document.getElementById('aj-estado');
 const avisar = (t) => { if (estado) estado.textContent = t; };
@@ -65,6 +66,7 @@ onSession(({ session, profile }) => {
     <button type="button" id="aj-salir" class="btn btn-ghost !text-bad !border-bad/50"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button></div>`;
   cuenta.querySelector('#aj-perfil').addEventListener('click', openProfileModal);
   cuenta.querySelector('#aj-salir').addEventListener('click', logout);
+  const der = document.createElement('div'); cuenta.append(der); pintarDerechos(der);
 });
 pintar();
 

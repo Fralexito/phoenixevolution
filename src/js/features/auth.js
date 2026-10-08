@@ -1,6 +1,6 @@
 // Login, registro y OAuth (Discord / Google).
 import { supabase } from '../core/supabase.js';
-import { siteHome } from '../core/config.js';
+import { siteHome, href } from '../core/config.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { escapeHTML } from '../core/dom.js';
 import { toast } from '../core/toast.js';
@@ -36,6 +36,7 @@ export function openAuthModal(mode = 'login') {
         <div><label class="label" for="a-tag">Apodo (nombre visible)</label><input id="a-tag" class="field" maxlength="30" required autocomplete="nickname" placeholder="Ej: El Fénix"><p class="text-[12px] text-gray-500 mt-1">El @ es único y es tu identidad (como en TikTok). El apodo es el nombre que verán en tus partidos. Puedes cambiar ambos después.</p></div>` : ''}
         <div><label class="label" for="a-mail">Correo</label><input id="a-mail" type="email" class="field" required autocomplete="email"></div>
         <div><label class="label" for="a-pass">Contraseña</label><input id="a-pass" type="password" class="field" required minlength="8" autocomplete="${isReg ? 'new-password' : 'current-password'}"></div>
+        ${isReg ? `<label class="flex items-start gap-2 text-[12px] text-gray-400"><input id="a-legal" type="checkbox" required class="mt-0.5 w-4 h-4 shrink-0 accent-cyan-400"><span>Tengo 13 años o más y acepto los <a href="${escapeHTML(href('legal/terminos/'))}" target="_blank" class="text-galaxy-400 hover:underline">Términos</a>, el <a href="${escapeHTML(href('legal/reglamento/'))}" target="_blank" class="text-galaxy-400 hover:underline">Reglamento</a> y la <a href="${escapeHTML(href('legal/privacidad/'))}" target="_blank" class="text-galaxy-400 hover:underline">Política de privacidad</a>.</span></label>` : ''}
         <p id="a-err" class="text-xs text-bad min-h-4" role="alert"></p>
         <button class="btn btn-primary w-full" type="submit">${isReg ? 'Registrarme' : 'Entrar'}</button>
       </form>
@@ -50,6 +51,7 @@ export function openAuthModal(mode = 'login') {
   m.querySelector('#auth-form').addEventListener('submit', async (ev) => {
     ev.preventDefault();
     err.textContent = '';
+    if (m.querySelector('#a-legal') && !m.querySelector('#a-legal').checked) { err.textContent = 'Para crear tu cuenta debes aceptar los Términos, el Reglamento y la Política de privacidad.'; return; }
     const btn = ev.target.querySelector('button[type=submit]');
     const email = m.querySelector('#a-mail').value.trim();
     const password = m.querySelector('#a-pass').value;

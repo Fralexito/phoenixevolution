@@ -1,0 +1,31 @@
+---
+// /legal/terminos/, /legal/privacidad/, /legal/reglamento/ — una sola plantilla, textos en src/data/legal.js
+import Layout from '../../layouts/Layout.astro';
+import { DOCS, TEXTOS, VERSION, DESCARGO } from '../../data/legal.js';
+export function getStaticPaths() { return DOCS.map((d) => ({ params: { doc: d.id } })); }
+const { doc } = Astro.params;
+const info = DOCS.find((d) => d.id === doc);
+const secciones = TEXTOS[doc];
+const base = import.meta.env.BASE_URL;
+const fecha = new Date(VERSION + 'T12:00:00').toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Layout title={info.titulo} description={info.resumen}>
+  <div class="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <nav aria-label="Documentos legales" class="flex flex-wrap gap-2">
+      {DOCS.map((d) => <a href={`${base}legal/${d.id}/`} aria-current={d.id === doc ? 'page' : undefined} class={`btn !min-h-9 !text-xs ${d.id === doc ? 'btn-primary' : 'btn-ghost'}`}><i class={`fa-solid ${d.icono}`}></i> {d.titulo}</a>)}
+    </nav>
+    <header class="space-y-1">
+      <h1 class="text-2xl md:text-3xl font-display font-extrabold text-white uppercase tracking-wider"><i class={`fa-solid ${info.icono} text-galaxy-400 mr-2`}></i>{info.titulo}</h1>
+      <p class="text-xs text-gray-500">Versión vigente desde el {fecha}</p>
+    </header>
+    <article class="legal space-y-5 text-sm text-gray-300 leading-relaxed">
+      {secciones.map((s) => (
+        <section class="space-y-2">
+          <h2 class="font-display font-bold text-white text-base uppercase tracking-wide">{s.t}</h2>
+          {s.p.map((p) => <p>{p}</p>)}
+        </section>
+      ))}
+    </article>
+    <aside class="rounded-xl border border-galaxy-border bg-black/30 p-4 text-xs text-gray-400"><i class="fa-solid fa-circle-info text-galaxy-400 mr-1.5"></i>{DESCARGO}</aside>
+  </div>
+</Layout>

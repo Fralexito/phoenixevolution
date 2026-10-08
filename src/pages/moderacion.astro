@@ -41,6 +41,12 @@ import Layout from '../layouts/Layout.astro';
         <div data-cr-lista class="grid md:grid-cols-2 gap-2"></div>
       </section>
 
+      <section id="mod-privacidad" hidden class="space-y-2" aria-labelledby="h-mod-priv">
+        <h2 id="h-mod-priv" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-user-shield text-galaxy-400 mr-2"></i>Solicitudes de privacidad <b data-pv-cuenta class="text-galaxy-400"></b></h2>
+        <p class="text-[12px] text-gray-500">Plazo máximo de respuesta: 30 días. Para eliminar una cuenta, hazlo desde Supabase (Authentication → Users) y luego márcala como resuelta.</p>
+        <div data-pv-lista class="space-y-2"></div>
+      </section>
+
       <div id="mod-tabs" class="flex flex-wrap gap-1.5" role="group" aria-label="Estado de los reportes"></div>
       <section id="mod-lista" class="space-y-3" aria-live="polite"></section>
       <div class="text-center"><button type="button" id="mod-mas" hidden class="btn btn-ghost">Cargar más</button></div>
@@ -49,4 +55,5 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 <script>
   import '../js/pages/moderacion.js';
+  import '../js/pages/moderacionPrivacidad.js';
 </script>
