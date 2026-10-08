@@ -335,6 +335,12 @@ async function abrir(req: Request) {
            marca: marcaDe(m.perfil.reglas, m.org), organizacion_id: m.org?.id ?? null, torneo_privado_id: m.torneo };
 }
 
+/** Versión actual de la Liga Máster (Galaxy) para que Phoenix Link sepa si debe pedir /mercado/v1/liga/cambios. Nunca rompe el latido. */
+async function versionLiga(): Promise<number | null> {
+  try { const { data } = await sb.from("lm_config").select("version_liga").eq("liga", "galaxy").maybeSingle(); return data ? Number(data.version_liga) : null; }
+  catch { return null; }
+}
+
 async function latido(req: Request) {
   const d = await autenticar(req); const b = await leerJson(req);
   const sala = await salaPropia(d, v.uuid(b.sala_id, "sala_id"));
@@ -372,7 +378,7 @@ async function latido(req: Request) {
   }
   // modo/reglas pueden cambiar en caliente (p. ej. licencia vencida → amistoso): la app aplica siempre lo último recibido.
   const roles = await rolesDeSala(sala.id, sala.reto_id);
-  return { estado, latido_seg: cfg.intervalos.latido_seg, modo: sala.modo, reglas: sala.reglas, roles, roles_etag: huellaContenido(roles), servidor_hora: ahora };
+  return { estado, latido_seg: cfg.intervalos.latido_seg, modo: sala.modo, reglas: sala.reglas, roles, roles_etag: huellaContenido(roles), servidor_hora: ahora, version_liga: await versionLiga() };
 }
 
 async function cerrar(req: Request) {
@@ -525,7 +531,7 @@ async function presencia(req: Request) {
   const { error } = await sb.rpc("sistema_presencia", { p_usuario: d.usuario, p_estado: estado, p_sala: salaId, p_dispositivo: d.id });
   db(error, "presencia");
   const { cfg } = await cfgVigente();
-  return { estado, siguiente_seg: cfg.intervalos.presencia_seg };
+  return { estado, siguiente_seg: cfg.intervalos.presencia_seg, version_liga: await versionLiga() };
 }
 
 /** GET /v1/presencia/amigos — estado de cada amigo. «desde» no invalida el ETag (cambia a cada rato). */

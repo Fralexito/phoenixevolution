@@ -504,3 +504,6 @@ Para que la app muestre nombre, avatar y carta de quien está en la sala. Mismo 
 - **Campos extra** que también existen en la ficha y no se envían (dímelo si los quieres): `descripcion`, `biografia`, `altura_cm`, `peso_kg`, `estilo_juego`, `ciudad`, `redes` y las stats detalladas `atq, fin, pot, efe, cor, cre, pre, pos, ant, men`.
 
 **Errores:** `401` (`TOKEN_FALTANTE` / `TOKEN_INVALIDO` / `TOKEN_REVOCADO`), `422 CAMPO_INVALIDO` (no es lista, más de 16 o un id no numérico), `429 DEMASIADOS_INTENTOS` si se llama más de **1 vez cada 5 s** por PC (`retry-after` indica cuánto esperar).
+
+## §24 · version_liga en latidos (aditivo)
+Las respuestas de `POST /v1/presencia` y `POST /v1/sala/latido` incluyen `version_liga` (entero o `null` si no se pudo leer): versión actual de la Liga Máster de la Galaxy League. Si es mayor que la última que la PC aplicó, pedir `GET /mercado/v1/liga/cambios?desde=<última>` (ver docs/mercado-api.md). Ningún otro campo cambió.

@@ -61,3 +61,10 @@ Texto canónico (Mercado debe generarlo **idéntico** desde el option file y la 
   → `{ recibidas, duplicadas, rechazadas:[{ indice, campo }] }`
 - `POST /reportes/lote` `{ reportes:[{ id_cliente, …campos de /reportes… }] }` (1–100) → `{ recibidos, duplicados, rechazados }`
 - **Idempotente:** Mercado genera un `id_cliente` (UUID v4) por evento y lo guarda en su cola local; al reconectarse reenvía la cola. Lo repetido cuenta como `duplicadas` y no se guarda dos veces. Se pueden borrar de la cola los que vuelvan como `recibidas` o `duplicadas`; los `rechazadas` traen el campo inválido.
+
+## Versión de liga (sincronización incremental)
+- Cada traspaso cerrado, en **una sola transacción**: cambia el club, `version_liga += 1` y se guarda en `lm_cambios_liga` (`version, phoenix_id, pes_id, club_desde, club_hacia, club_desde_pes, club_hacia_pes, tipo`).
+- Phoenix Link recibe `version_liga` en la respuesta de `/phoenix/v1/presencia` y `/phoenix/v1/sala/latido`. Si es mayor que la última aplicada → pedir cambios.
+- `GET /liga/cambios?desde=<version>` → **firmado** igual que `/plantillas`. `contenido = { liga, desde, version_actual, generado, cambios:[…] }` (máx. 1000; si quedan más, repetir con `desde` = última `version` recibida). Aplicar en orden de `version`.
+- `POST /liga/aplicado { version, huella_plantillas }` → `{ version_actual, al_dia, coincide }`. `coincide` = la huella reportada es igual a la esperada (solo se compara si `version` = `version_actual`; si no, `null`).
+- `/plantillas` incluye ahora `version_liga` dentro de `contenido` (sirve como punto de partida tras una instalación limpia).

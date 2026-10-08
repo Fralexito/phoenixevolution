@@ -214,10 +214,8 @@ async function plantillas(req: Request) {
   const liga = (new URL(req.url).searchParams.get("liga") || LIGA).slice(0, 40);
   const [{ data: clubes, error: e1 }, { data: h, error: e2 }] = await Promise.all([sb.rpc("lm_plantillas", { p_liga: liga }), sb.rpc("lm_huella", { p_liga: liga })]);
   if (e1 || e2) throw err("ERROR_INTERNO");
-  const contenido = JSON.stringify({ liga, generado: new Date().toISOString(), huella: (h as { huella: string }).huella, clubes });
-  const k = await claveFirma();
-  const firma = new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, k.privada, new TextEncoder().encode(contenido)));
-  return { contenido, firma: b64(firma), clave_id: k.id, algoritmo: "Ed25519" };
+  const { data: v } = await sb.from("lm_config").select("version_liga").eq("liga", liga).maybeSingle();
+  return firmar(JSON.stringify({ liga, generado: new Date().toISOString(), version_liga: Number(v?.version_liga ?? 0), huella: (h as { huella: string }).huella, clubes }));
 }
 
 // ───────── Correcciones automáticas y envíos atrasados (085) ─────────
@@ -287,11 +285,51 @@ async function reportesLote(req: Request) {
   return { recibidos, duplicados: filas.length - recibidos, rechazados };
 }
 
+// ───────── Versión de liga (086) ─────────
+async function firmar(contenido: string) {
+  const k = await claveFirma();
+  const firma = new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, k.privada, new TextEncoder().encode(contenido)));
+  return { contenido, firma: b64(firma), clave_id: k.id, algoritmo: "Ed25519" };
+}
+
+/** GET /v1/liga/cambios?desde=<version>[&liga=galaxy] → firmado { contenido, firma, clave_id, algoritmo }
+ *  contenido = { liga, desde, version_actual, cambios:[{ version, phoenix_id, pes_id, club_desde, club_hacia, club_desde_pes, club_hacia_pes, tipo, fecha }] }
+ *  Máx. 1000 cambios por respuesta: si version_actual > último version recibido, volver a pedir con desde=<último>. */
+async function ligaCambios(req: Request) {
+  await autenticar(req, { exigeManager: true });
+  const u = new URL(req.url); const liga = (u.searchParams.get("liga") || LIGA).slice(0, 40);
+  const desde = Number(u.searchParams.get("desde") ?? "0");
+  if (!Number.isInteger(desde) || desde < 0) throw err("DATOS_INVALIDOS", { campo: "desde" });
+  const { data, error } = await sb.rpc("lm_cambios_desde", { p_liga: liga, p_desde: desde, p_limite: 1000 });
+  if (error) throw err("ERROR_INTERNO");
+  return firmar(JSON.stringify({ ...(data as object), generado: new Date().toISOString() }));
+}
+
+/** POST /v1/liga/aplicado { version, huella_plantillas, liga? } → { version_actual, al_dia, coincide }
+ *  coincide: true/false si se aplicó la versión actual (se compara con la huella esperada); null si la versión ya es vieja. */
+async function ligaAplicado(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); frenar(`apl:${d.id}`, 60, 60 * 60_000);
+  const b = await leerJson(req);
+  const liga = (typeof b.liga === "string" ? b.liga : LIGA).slice(0, 40);
+  if (!Number.isInteger(b.version) || (b.version as number) < 0) throw err("DATOS_INVALIDOS", { campo: "version" });
+  const huellaRep = hash(b.huella_plantillas, "huella_plantillas");
+  const { data: cfg, error } = await sb.from("lm_config").select("version_liga").eq("liga", liga).maybeSingle();
+  if (error) throw err("ERROR_INTERNO"); if (!cfg) throw err("DATOS_INVALIDOS", { campo: "liga" });
+  const actual = Number(cfg.version_liga); const alDia = b.version === actual;
+  let esperada: string | null = null;
+  if (alDia) { const { data: h } = await sb.rpc("lm_huella", { p_liga: liga }); esperada = (h as { huella?: string })?.huella ?? null; }
+  const coincide = alDia && huellaRep && esperada ? huellaRep === esperada : null;
+  const { error: e2 } = await sb.from("lm_aplicados").insert({ usuario: d.usuario, origen: d.origen, dispositivo: d.id, liga, version: b.version, huella_plantillas: huellaRep, huella_esperada: esperada, coincide });
+  if (e2) { log("warn", "aplicado", { m: e2.message }); throw err("ERROR_INTERNO"); }
+  return { version_actual: actual, al_dia: alDia, coincide };
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
   "/v1/reportes": { POST: crearReporte, GET: misReportes },
   "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella },
-  "/v1/clave-publica": { GET: clavePublica }, "/v1/plantillas": { GET: plantillas }, "/v1/correcciones": { POST: correcciones }, "/v1/reportes/lote": { POST: reportesLote }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
+  "/v1/clave-publica": { GET: clavePublica }, "/v1/plantillas": { GET: plantillas }, "/v1/correcciones": { POST: correcciones }, "/v1/reportes/lote": { POST: reportesLote },
+  "/v1/liga/cambios": { GET: ligaCambios }, "/v1/liga/aplicado": { POST: ligaAplicado }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 
 Deno.serve(async (req) => {
