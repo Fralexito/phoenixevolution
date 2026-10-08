@@ -31,3 +31,12 @@ Mayoría de edad para comprar; términos y reembolsos; comprobantes y tributaci�
 - Saldo negativo por reembolso: bloquea compras en la tienda hasta compensar.
 - Auditoría: ajustes, reglas, catálogo, paquetes y el interruptor de pagos quedan en la auditoría del staff.
 - Riesgo conocido: amigos que fabrican partidos confirmados; mitigado con topes diarios y rivales distintos.
+
+## Actualización (2026-10-08, Cuenta A)
+- **Dos monedas (065):** **ascuas** = se ganan jugando (columna histórica `billeteras.saldo`); **gemas** = se compran con dinero real (`billeteras.gemas`). Sin conversión entre ellas. `movimientos_tokens.moneda` indica cuál.
+- **Retos con pozo (065, 066):** apuestas 1 vs 1 **solo en ascuas** (nunca gemas), solo mayores de 18 con fecha declarada, antigüedad y partidos confirmados mínimos; montos en saltos de 50; comisión escalonada redondeada a 10 que se retira de circulación (nadie la cobra); montos altos pasan por revisión del staff.
+- **Alquiler de host verificado (071):** pago por fuera o con gemas en garantía.
+- **Liga Máster:** el dinero de cada club es una economía aparte (`lm_clubes.presupuesto`), sin relación con ascuas/gemas; cada cambio queda en `lm_club_libro` (088 de la Cuenta A).
+- **Pasarela:** sigue pendiente; `pagos_activos` apagado.
+
+> ⚠️ **Antes de activar dinero real o los retos con pozo: revisar con un abogado en Perú** (juegos y apuestas, protección al consumidor, comprobantes y tributación, menores de edad).

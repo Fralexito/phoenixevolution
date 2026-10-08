@@ -446,6 +446,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - Ronda 205: títulos de Liga/Organizadores/Competiciones/Historial unificados (text-4xl sm:5xl md:6xl, como Central); Duelos: «Lanzar reto» plegable en PC (botón Ocultar → radar a todo el ancho + botón grande «Lanzar reto»; se recuerda en localStorage pe.duelos.formPlegado).
 
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 205)
+> **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **092**. Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
+
 **Qué es:** web de «Phoenix Evolution Series» (ligas Galaxy League y Liga Sudario). Astro estático + Tailwind 4 + Supabase JS v2, Node 22. Repo `Fralexito/phoenixevolution` (público). Oficial: `https://fralexito.github.io/phoenixevolution/` (rama `main`); vista previa: `/borrador/` (rama `borrador`). Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Usuario «Fralex» (admin, Lima UTC-05:00, español, poco conocimiento de programación).
 
 **Reglas fijas (no romperlas):**

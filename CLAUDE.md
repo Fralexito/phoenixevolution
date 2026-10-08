@@ -1,6 +1,6 @@
 # Phoenix Evolution Series — guía para Claude
 
-Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Football Life 2026. Estado detallado, historial de rondas y pendientes: **`MAPA.md`** (léelo primero; la sección «RETOMAR» resume el estado).
+Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Football Life 2026. Estado detallado, historial de rondas y pendientes: **`MAPA.md`** (léelo primero; la sección «RETOMAR» resume el estado). **Dos cuentas trabajan a la vez:** lee también el final de `REGISTRO.md` y `docs/REGLAS-ECOSISTEMA.md` §7 antes de tocar nada.
 
 ## Entorno
 - Astro (estático) + Tailwind 4 + JS vanilla + Supabase JS v2. Node 22.
