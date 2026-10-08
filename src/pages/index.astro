@@ -88,7 +88,7 @@ const ACCIONES = [
     <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
 
     <!-- 0b. SALTO RÁPIDO entre secciones (pegajosa bajo la cabecera). Las minisecciones plegadas se abren al saltar a ellas (js/pages/central.js). -->
-{!FX.limpio && (    <nav class="anclas" aria-label="Saltar a una sección">
+{(<nav class="anclas" aria-label="Saltar a una sección">
       <a href="#central-partidos"><i class="fa-solid fa-futbol"></i>Partidos</a>
       <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
       <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Clubes</a>
