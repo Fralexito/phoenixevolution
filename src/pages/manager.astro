@@ -9,7 +9,7 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
 <Layout title="Modo Mánager" active="manager" description="Tu carrera de DT en la Galaxy League: club, presupuesto y fichajes que llegan al juego.">
   <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6">
 
-    <header id="mg-portada" class="glass-panel rounded-2xl px-5 py-5 relative overflow-hidden">
+    <header id="mg-portada" class="mg-portada">
       <span class="text-[11px] font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta · Galaxy League</span>
       <h1 class="text-3xl sm:text-5xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-user-tie text-galaxy-400 mr-2"></i>Modo Mánager</h1>
       <p class="text-gray-300 text-sm mt-1 max-w-3xl">Tu carrera de DT: eliges un club, manejas su presupuesto y fichas jugadores. Al cerrar cada ventana, los movimientos llegan al juego con el option file oficial.</p>
@@ -22,28 +22,28 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
     <section id="mg-elegir" hidden class="space-y-3">
       <h2 class="font-display font-bold text-white uppercase tracking-wider">Elige tu club</h2>
       <p class="text-xs text-gray-400">Es opcional: si no activas tu carrera, todo lo demás de la web sigue igual. Puedes dejar el club cuando quieras.</p>
-      <div id="mg-clubes-libres" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      <div id="mg-clubes-libres" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
     </section>
 
     <!-- Con club -->
     <div id="mg-panel" hidden class="space-y-4">
-      <nav class="pilar-tabs-lista w-fit" role="tablist">
+      <nav class="mg-tabs" role="tablist">
         {TABS.map(([id, ic, t], i) => <a href={`#${id}`} role="tab" data-tab={id} aria-current={i === 0 ? 'page' : undefined}><i class={`fa-solid ${ic}`}></i>{t}</a>)}
       </nav>
-      <section data-panel="plantilla" class="glass-panel rounded-2xl p-4"><div id="mg-plantilla"></div></section>
-      <section data-panel="mercado" hidden class="glass-panel rounded-2xl p-4 space-y-3">
-        <div class="flex flex-wrap gap-2">
-          <input id="mg-buscar" type="search" placeholder="Buscar jugador…" class="field flex-1 min-w-48">
+      <section data-panel="plantilla" class="space-y-5"><div id="mg-plantilla" class="space-y-6"></div></section>
+      <section data-panel="mercado" hidden class="space-y-4">
+        <div class="mg-filtros">
+          <label class="relative flex-1 min-w-48"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i><input id="mg-buscar" type="search" placeholder="Buscar jugador…" class="field w-full !pl-8"></label>
           <select id="mg-pos" class="field w-32"><option value="">Posición</option>{['PT','DEC','LD','LI','MCD','MC','MO','MD','MI','ED','EI','SD','DC'].map((p) => <option>{p}</option>)}</select>
-          <label class="text-xs text-gray-300 flex items-center gap-1"><input id="mg-libres" type="checkbox"> Solo libres</label>
+          <label class="mg-toggle"><input id="mg-libres" type="checkbox"><span><i class="fa-solid fa-unlock"></i> Solo libres</span></label>
         </div>
         <div id="mg-mercado"></div>
       </section>
       <section data-panel="oficina" hidden class="grid md:grid-cols-2 gap-4">
-        <div class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white uppercase text-sm mb-2">Ofertas recibidas</h3><div id="mg-recibidas"></div></div>
-        <div class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white uppercase text-sm mb-2">Ofertas enviadas</h3><div id="mg-enviadas"></div></div>
+        <div class="mg-caja"><h3 class="mg-caja-tit"><i class="fa-solid fa-inbox"></i> Ofertas recibidas</h3><div id="mg-recibidas" class="space-y-2"></div></div>
+        <div class="mg-caja"><h3 class="mg-caja-tit"><i class="fa-solid fa-paper-plane"></i> Ofertas enviadas</h3><div id="mg-enviadas" class="space-y-2"></div></div>
       </section>
-      <section data-panel="movimientos" hidden class="glass-panel rounded-2xl p-4"><div id="mg-movs"></div></section>
+      <section data-panel="movimientos" hidden class="mg-caja"><h3 class="mg-caja-tit"><i class="fa-solid fa-right-left"></i> Diario de fichajes · Galaxy League</h3><div id="mg-movs"></div></section>
       <div class="flex flex-wrap gap-2 text-xs">
         <a href={`${base}mercado/`} class="btn btn-ghost !min-h-9 !text-xs"><i class="fa-solid fa-plug"></i> Conectar el juego (Phoenix Mercado)</a>
         <button type="button" id="mg-dejar" class="btn btn-ghost !min-h-9 !text-xs !text-rose-300"><i class="fa-solid fa-door-open"></i> Dejar mi club</button>
