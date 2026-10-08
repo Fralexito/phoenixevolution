@@ -57,6 +57,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; } @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }`}</style>}
   </head>
   <body class="flex flex-col min-h-screen">
+    {import.meta.env.PUBLIC_PREVIEW && <div class="fase-beta-cinta" role="note" aria-label="Fase beta: versión privada de pruebas"><i class="fa-solid fa-flask"></i> FASE BETA · versión privada de pruebas</div>}
     <div class="sticky top-0 z-50 flex flex-col pointer-events-none">
       <Header active={active} />
       <Ticker />

@@ -9,7 +9,7 @@ Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Footb
 - Proyecto Supabase `fiibiyijojkxqlsrhcil` (plan FREE). DDL pequeño por MCP `apply_migration`; si es grande, entregar el `.sql` al usuario. Las migraciones del repo llevan comentarios; el SQL que se le manda al usuario va **sin** comentarios, código puro.
 
 ## Flujo de ramas (regla fija)
-- Trabajar SOLO en la rama `borrador` (vista previa en `/borrador/`).
+- Trabajar SOLO en la rama `borrador` (vista previa privada «FASE BETA» en `/fase-beta/`; la antigua `/borrador/` ya no existe).
 - Pasar a `main` (web oficial) ÚNICAMENTE cuando el usuario diga «Súbelo» o «Publícalo».
 - Tras cada cambio: añadir «ronda N» a `MAPA.md`, commit con los trailers de atribución, `git pull --rebase origin borrador`, push a `borrador`.
 

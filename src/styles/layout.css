@@ -141,3 +141,9 @@ html[data-aj-ticker='no'] .aj-tk::after { content: 'Oculta'; position: absolute;
    cuando el contenido crece, y reserva el lugar de Entrar/Registrarse o del avatar antes de que cargue la sesión. */
 html { scrollbar-gutter: stable; }
 @media (min-width: 640px) { #nav-auth { min-width: 11.5rem; justify-content: flex-end; } }
+
+/* Cinta «FASE BETA» (solo en la vista previa, PUBLIC_PREVIEW): fija abajo a la izquierda, no tapa la navegación ni recibe clics. */
+.fase-beta-cinta { position: fixed; left: .75rem; bottom: .75rem; z-index: 60; pointer-events: none; display: inline-flex; align-items: center; gap: .4rem;
+  padding: .3rem .7rem; border-radius: 999px; font: 700 12px/1 var(--font-display, sans-serif); letter-spacing: .14em; text-transform: uppercase;
+  color: #fff; background: linear-gradient(90deg, rgb(168 85 247 / .9), rgb(0 229 255 / .85)); box-shadow: 0 0 18px rgb(0 229 255 / .35); }
+@media (max-width: 640px) { .fase-beta-cinta { bottom: auto; top: .5rem; left: 50%; transform: translateX(-50%); font-size: 11px; opacity: .92; } }
