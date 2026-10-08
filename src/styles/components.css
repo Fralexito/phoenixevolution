@@ -987,7 +987,7 @@ html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245
 .accion:hover .accion-flecha { transform: translateX(3px); color: var(--color-galaxy-400); }
 .accion-primaria { border-color: rgb(168 85 247 / .6); background: linear-gradient(135deg, rgb(128 0 255 / .25), var(--color-galaxy-panel) 70%); }
 .accion-primaria > i:first-child { background: rgb(168 85 247 / .25); color: #e9d5ff; }
-html[data-sesion] .solo-invitado, html:not([data-sesion]) .solo-cuenta { display: none; }
+html[data-sesion='si'] .solo-invitado, html:not([data-sesion='si']) .solo-cuenta { display: none; }
 /* Central limpia (FX.limpio) */
 @media (min-width: 1024px) { .acciones-hero { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 .acciones-hero .accion { text-align: left; background: rgb(8 6 24 / .55); backdrop-filter: blur(8px); }

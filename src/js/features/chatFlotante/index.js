@@ -16,7 +16,7 @@ export function initChatFlotante() {
     let actual = null;
     onSession(({ session }) => {
       const uid = session?.user?.id ?? null;
-      document.documentElement.toggleAttribute('data-sesion', !!uid);
+      document.documentElement.dataset.sesion = uid ? 'si' : 'no';
       if (uid === actual) return;
       if (actual) reiniciarDatos();
       actual = uid;

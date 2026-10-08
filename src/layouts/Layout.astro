@@ -53,7 +53,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
       <script is:inline>document.documentElement.classList.add('js');</script>
-    {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
+    {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','si');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
     {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; } @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }`}</style>}
   </head>
   <body class="flex flex-col min-h-screen">

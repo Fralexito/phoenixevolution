@@ -37,18 +37,18 @@ html[data-cf-compacto] { --cf-col-w: 4.25rem; }
 /* ── Columna fija (solo PC ≥ 1280 px con sesión) ── */
 .cf-columna { display: none; }
 @media (min-width: 1280px) {
-  html[data-fx-contactos][data-sesion] .cf-columna {
+  html[data-fx-contactos][data-sesion='si'] .cf-columna {
     display: flex; flex-direction: column; position: fixed; right: .55rem; top: 7.4rem; bottom: .8rem; z-index: 35; width: var(--cf-col-w); padding: .6rem .3rem;
     background: linear-gradient(180deg, rgb(14 6 38 / .88), rgb(4 2 18 / .92)); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
     border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 22%, var(--color-galaxy-border)); border-radius: 1.25rem; box-shadow: 0 10px 30px rgb(0 0 0 / .35);
     transition: width .22s cubic-bezier(.22, 1, .36, 1); scrollbar-width: thin;
   }
-  html[data-fx-contactos][data-sesion] main, html[data-fx-contactos][data-sesion] footer { padding-right: calc(var(--cf-col-w) + .95rem); }
-  html[data-fx-contactos][data-sesion] .cf-chats-btn { display: none; }
-  html[data-fx-contactos][data-sesion] .cf-dock { right: calc(var(--cf-col-w) + 1.1rem); }
-  html[data-fx-contactos][data-sesion] #live-wrap:not([data-movido]) { right: calc(var(--cf-col-w) + 1.1rem + var(--cf-dock-w) + .5rem); }
+  html[data-fx-contactos][data-sesion='si'] main, html[data-fx-contactos][data-sesion='si'] footer { padding-right: calc(var(--cf-col-w) + .95rem); }
+  html[data-fx-contactos][data-sesion='si'] .cf-chats-btn { display: none; }
+  html[data-fx-contactos][data-sesion='si'] .cf-dock { right: calc(var(--cf-col-w) + 1.1rem); }
+  html[data-fx-contactos][data-sesion='si'] #live-wrap:not([data-movido]) { right: calc(var(--cf-col-w) + 1.1rem + var(--cf-dock-w) + .5rem); }
   /* La barra izquierda ya no repite la lista de amigos: ahora vive aquí, con quién está en línea en TODA la web. */
-  html[data-fx-contactos][data-sesion] .barra-amigos { display: none; }
+  html[data-fx-contactos][data-sesion='si'] .barra-amigos { display: none; }
   /* Modo compacto: solo avatares, con su punto verde y su contador. */
   html[data-cf-compacto] .cf-columna .cf-col-tit, html[data-cf-compacto] .cf-columna .cf-buscar, html[data-cf-compacto] .cf-columna .cf-nom,
   html[data-cf-compacto] .cf-columna .cf-sub, html[data-cf-compacto] .cf-columna .cf-aviso, html[data-cf-compacto] .cf-columna a.cf-ico { display: none; }
