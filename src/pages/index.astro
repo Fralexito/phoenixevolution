@@ -5,6 +5,15 @@ import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 const base = import.meta.env.BASE_URL;
+// «¿Qué quieres hacer?»: las acciones más buscadas, a un clic desde Central. `invitado` = solo sin sesión; `cuenta` = solo con sesión (lo decide html[data-sesion]).
+const ACCIONES = [
+  { href: 'duelos/', icono: 'fa-gamepad', titulo: 'Jugar un reto', txt: 'Reta a alguien y arma la sala', tono: 'primario' },
+  { href: 'ahora/', icono: 'fa-tower-broadcast', titulo: 'Ver en vivo', txt: 'Partidos y retos en este momento' },
+  { href: 'liga/', icono: 'fa-table-list', titulo: 'Tabla de la liga', txt: 'Posiciones, fechas y resultados' },
+  { href: 'noticias/', icono: 'fa-newspaper', titulo: 'Noticias', txt: 'Lo oficial y la Tribuna' },
+  { href: 'mis-salas/', icono: 'fa-desktop', titulo: 'Vincular mi PC', txt: 'Phoenix Soda y Parsec', cuenta: true },
+  { href: 'unirme/', icono: 'fa-door-open', titulo: 'Unirme a la liga', txt: 'Inscríbete para la próxima edición', invitado: true },
+];
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
@@ -41,6 +50,18 @@ const base = import.meta.env.BASE_URL;
   </header>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full space-y-8 sm:space-y-10">
+
+    <!-- 00. ¿QUÉ QUIERES HACER? Accesos directos a lo más usado (que nada importante quede escondido en menús). -->
+    <section aria-labelledby="acc-t" class="acciones">
+      <h2 id="acc-t" class="acciones-tit">¿Qué quieres hacer?</h2>
+      <div class="acciones-grid">
+        {ACCIONES.map((a) => (
+          <a href={`${base}${a.href}`} class:list={['accion', a.tono === 'primario' && 'accion-primaria', a.invitado && 'solo-invitado', a.cuenta && 'solo-cuenta']}>
+            <i class={`fa-solid ${a.icono}`}></i><span><b>{a.titulo}</b><small>{a.txt}</small></span><i class="fa-solid fa-arrow-right accion-flecha"></i>
+          </a>
+        ))}
+      </div>
+    </section>
 
     <!-- 0. ESTADO DE LA LIGA: franja compacta («en juego · fecha · avance»). La pinta js/pages/central.js con los datos reales de la edición en curso. -->
     <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
