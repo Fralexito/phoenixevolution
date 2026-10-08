@@ -45,7 +45,7 @@ async function pintarAjuste() {
   $('mk-exigir').checked = !!data?.exigir_codigo;
 }
 $('mk-exigir')?.addEventListener('change', async (e) => {
-  try { const { error } = await supabase.rpc('mercado_exigir_codigo', { p_exigir: e.target.checked }); if (error) throw error; toast(e.target.checked ? 'Ahora se exige el código manager.' : 'Phoenix Link ya puede usar el Modo Mánager.', 'ok'); }
+  try { const { error } = await supabase.rpc('mercado_exigir_codigo', { p_exigir: e.target.checked }); if (error) throw error; toast(e.target.checked ? 'Ahora se exige el código manager.' : 'Phoenix Link ya puede usar el Liga Máster.', 'ok'); }
   catch (err) { e.target.checked = !e.target.checked; toast(`No se pudo guardar: ${err.message}`, 'error'); }
 });
 async function pintarMisReportes() {

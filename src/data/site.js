@@ -37,7 +37,7 @@ export const ACCOUNT_NAV = [
   { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad', grupo: 'tu' },
   { id: 'ahora',    label: 'Ahora mismo', path: 'ahora/',        icon: 'fa-satellite-dish', grupo: 'jugar' },
   { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast', grupo: 'jugar' },
-  { id: 'missalas', label: 'Phoenix Soda', path: 'mis-salas/',    icon: 'fa-desktop', grupo: 'jugar' },
+  { id: 'missalas', label: 'Phoenix Link', path: 'mis-salas/',    icon: 'fa-desktop', grupo: 'jugar' },
   { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments', grupo: 'social' },
   { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group', grupo: 'social' },
   { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass', grupo: 'social', menu: false },
@@ -47,7 +47,7 @@ export const ACCOUNT_NAV = [
   { id: 'clanes',   label: 'Clanes',       path: 'clanes/',        icon: 'fa-shield-halved', grupo: 'social' },
   { id: 'ranking',  label: 'Ranking',      path: 'ranking/',       icon: 'fa-ranking-star', grupo: 'comunidad' },
   { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store', grupo: 'comunidad' },
-  { id: 'manager',  label: 'Modo Mánager', path: 'manager/',       icon: 'fa-user-tie', grupo: 'jugar' },
+  { id: 'manager',  label: 'Liga Máster', path: 'manager/',       icon: 'fa-user-tie', grupo: 'jugar' },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
@@ -103,9 +103,9 @@ const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra
   items: ids.map((spec) => { const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
     return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
 export const PILARES = [
-  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'historial', 'palmares', 'ranking'], { lema: 'La Galaxy League en serio' }),
-  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado', 'missalas'], { lema: 'Del clic al partido' }),
-  pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'creadores', 'clanes', 'eventos', 'database'], { lema: 'Lo que se dice y quién lo dice' }),
+  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
+  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado'], { lema: 'Del clic al partido' }),
+  pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];
 /** Pilar al que pertenece una página (por su `active`), o null (Central, cuenta, etc.). */

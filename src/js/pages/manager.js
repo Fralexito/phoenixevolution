@@ -186,7 +186,7 @@ const tabActual = () => (['plantilla', 'mercado', 'oficina', 'movimientos'].incl
 window.addEventListener('hashchange', () => club && mostrarTab(tabActual()));
 
 async function refrescar() {
-  try { await cargarBase(); } catch (e) { console.error('[manager]', e); toast('No se pudo cargar el Modo Mánager.', 'error'); return; }
+  try { await cargarBase(); } catch (e) { console.error('[manager]', e); toast('No se pudo cargar la Liga Máster.', 'error'); return; }
   $('mg-sin-sesion').hidden = !!yo; $('mg-elegir').hidden = !yo || !!club; $('mg-panel').hidden = !club;
   pintarCabecera(); if (yo && !club) pintarElegir();
   if (club) { if (tabActual() !== 'plantilla') pintarPlantilla(); mostrarTab(tabActual()); }   // la plantilla alimenta las cifras de la cabecera
