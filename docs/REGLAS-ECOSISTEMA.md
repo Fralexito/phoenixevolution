@@ -47,4 +47,5 @@ Un chat que no es dueño **no cambia** la pieza: entrega un prompt al dueño.
 ## 6. Registro de cambios importantes
 Añadir aquí una línea por cambio que afecte a otra pieza:
 - 2026-10-08 · `lm_club_libro` (088): historial del dinero de cada club. No cambia ningún endpoint.
+- 2026-10-08 · `/mercado/v1/liga/cambios` (094): cada cambio añade `monto, sueldo, clausula, fin_contrato, dorsal` (opcionales, `null` si no hay dato). No cambia nada existente. Contrato en `docs/mercado-api.md`.
 - 2026-10-08 · Equivalencias (089): `mercado_equivalencias(_clubes)` + `POST/GET /mercado/v1/equivalencias` (nuevos, no cambian nada existente). Contrato en `docs/mercado-api.md`.

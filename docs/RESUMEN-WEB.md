@@ -8,7 +8,7 @@ Pegar al inicio de cualquier chat que toque la web, la base o los programas. **A
 - Repo `Fralexito/phoenixevolution`, rama de trabajo **`borrador`**, publicada en la vista previa privada **`/phoenixevolution/fase-beta/`** (la URL `/borrador/` se retiró porque se compartía sin permiso). A `main` solo cuando Fralex dice **«Súbelo»** (aún no se ha subido lo de abajo).
 - Stack: Astro + Tailwind 4 + JS vanilla + Supabase (proyecto `fiibiyijojkxqlsrhcil`). Hosting: GitHub Pages.
 - Funciones experimentales con interruptores en `src/data/experimento.js` (FX).
-- Migraciones en `supabase/migrations/` (última: **093**; siguiente libre **094**). Si la aplicación automática falla, Fralex pega el SQL en el SQL Editor. Edge Functions: Fralex pega el archivo y despliega.
+- Migraciones en `supabase/migrations/` (última: **094**; siguiente libre **095**). Si la aplicación automática falla, Fralex pega el SQL en el SQL Editor. Edge Functions: Fralex pega el archivo y despliega.
 - Commits terminan con las líneas de co-autoría de Claude.
 
 ## Quién hace qué
