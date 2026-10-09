@@ -578,6 +578,31 @@ async function instalar(req: Request) {
            nombre_archivo: `phoenix-soda-${r.version}.zip` };
 }
 
+// ── Buzón del juego (1.7.0 · migración 096): avisos de la web → avisos.txt de PES 2021 (lo escribe Phoenix Link) ─────────
+/** GET /v1/juego/buzon — avisos vigentes de esta PC (máx. 10, del más nuevo al más viejo). Sondeo con ETag (§21): 304 si nada cambió. */
+async function juegoBuzon(req: Request) {
+  const d = await autenticar(req);
+  frenar(`buz:${d.id}`, 1, 5_000);
+  const { cfg } = await cfgVigente();
+  const sondeo_seg = cfg.intervalos.sondeo_buzon_seg;
+  if (!cfg.interruptores.buzon_juego) return conEtag(req, { avisos: [], pausado: true, sondeo_seg });
+  const { data, error } = await sb.rpc("sistema_buzon_listar", { p_usuario: d.usuario, p_dispositivo: d.id, p_limite: 10 });
+  db(error, "buzon");
+  return conEtag(req, { avisos: data ?? [], sondeo_seg });
+}
+
+/** POST /v1/juego/buzon/entregado { ids:[…] } — la app ya escribió esos avisos en el juego. Idempotente; solo cuenta los que esta PC podía ver. */
+async function juegoBuzonEntregado(req: Request) {
+  const d = await autenticar(req); const b = await leerJson(req);
+  frenar(`buzent:${d.id}`, 1, 5_000);
+  if (!Array.isArray(b.ids) || b.ids.length < 1 || b.ids.length > 20 || !b.ids.every((x) => Number.isInteger(x) && (x as number) > 0)) {
+    throw new ErrorApi("CAMPO_INVALIDO", { campo: "ids", mensaje: "ids debe ser una lista de 1 a 20 números enteros positivos." });
+  }
+  const { data, error } = await sb.rpc("sistema_buzon_entregado", { p_usuario: d.usuario, p_dispositivo: d.id, p_ids: b.ids });
+  db(error, "buzon_entregado");
+  return { marcados: Number(data ?? 0) };
+}
+
 /** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */
 async function config(req: Request) {
   const { cfg, builds } = await cfgVigente();
@@ -621,6 +646,8 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/invitar": { metodo: "POST", fn: invitar },
   "/v1/sala/soltar_rival": { metodo: "POST", fn: soltarRival },
   "/v1/perfiles": { metodo: "POST", fn: perfiles },
+  "/v1/juego/buzon": { metodo: "GET", fn: juegoBuzon },
+  "/v1/juego/buzon/entregado": { metodo: "POST", fn: juegoBuzonEntregado },
 };
 
 Deno.serve(async (req) => {

@@ -3,11 +3,11 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.6.0',
+  version_api: '1.7.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
-  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30 }),
-  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true }),
+  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15 }),
+  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true }),
   limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096 }),
 });
 
@@ -227,6 +227,7 @@ export function fusionarConfig(base, filas = []) {
   }
   if (out.intervalos.latido_seg < 10) out.intervalos.latido_seg = 10;      // frenos de seguridad: un error de staff no puede saturar el plan FREE
   if (out.intervalos.latido_min_seg < 5) out.intervalos.latido_min_seg = 5;
+  if (out.intervalos.sondeo_buzon_seg < 5) out.intervalos.sondeo_buzon_seg = 5;
   return out;
 }
 

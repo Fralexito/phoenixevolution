@@ -507,3 +507,34 @@ Para que la app muestre nombre, avatar y carta de quien está en la sala. Mismo 
 
 ## §24 · version_liga en latidos (aditivo)
 Las respuestas de `POST /v1/presencia` y `POST /v1/sala/latido` incluyen `version_liga` (entero o `null` si no se pudo leer): versión actual de la Liga Máster de la Galaxy League. Si es mayor que la última que la PC aplicó, pedir `GET /mercado/v1/liga/cambios?desde=<última>` (ver docs/mercado-api.md). Ningún otro campo cambió.
+
+## 25. Buzón del juego — avisos web → PES 2021 en vivo (1.7.0 · migración 096, aditivo)
+La web deja avisos; **Phoenix Link** los consulta y los escribe en `<juego>\SiderAddons\content\phoenix\avisos.txt` (lo lee el módulo `phoenix.lua` de Sider cada 2 s). Mismo token `phx_…` y cabeceras que `sala/latido`.
+
+### `GET /v1/juego/buzon` (token)
+Avisos **vigentes** para esta PC: los del usuario no expirados con `dispositivo` nulo o igual a esta PC, más los **globales** del staff no expirados. Del más nuevo al más viejo, **máx. 10**.
+```json
+{ "ok": true,
+  "avisos": [ { "id": 12, "texto": "hola causa", "tipo": "aviso", "creado_en": "2026-10-09T05:42:31.000Z", "global": false, "entregado_en": null } ],
+  "sondeo_seg": 15, "etag": "W/\"…\"", "solicitud_id": "…" }
+```
+- **Sondeo con ETag (como §21):** enviar `If-None-Match` o `?etag=`; si nada cambió responde **304** sin cuerpo.
+- **El ETag depende de los `id` y de `entregado_en`** (no de la hora). `entregado_en` es **por PC**: en un global, cada PC ve el suyo.
+- Lista vacía: `avisos: []` con 200 y su etag.
+- Interruptor `buzon_juego` apagado: `avisos: []` y `pausado: true`. Link deja de preguntar hasta el próximo `GET /v1/config`.
+- `sondeo_seg` sale de `phoenix_config.intervalos.sondeo_buzon_seg` (defecto 15, **mínimo 5**).
+- Un aviso ya entregado sigue en la lista hasta que expire (24 h): Link decide si lo vuelve a escribir en el archivo según `entregado_en`.
+
+### `POST /v1/juego/buzon/entregado` (token)
+Cuerpo `{ "ids": [12, 13] }` (1 a 20 enteros positivos). Marca `entregado_en` **solo** en avisos que esta PC podía ver; **idempotente** (repetir no cambia la hora). Respuesta `{ "ok": true, "marcados": 2 }`. Los globales guardan su entrega por PC en `juego_avisos_entregas`.
+
+### Límites y errores
+- 1 llamada cada **5 s** por PC en cada ruta → `429 DEMASIADOS_INTENTOS` (`retry-after`).
+- Los de siempre: `TOKEN_*`, `HOST_NO_AUTORIZADO`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (ids), `ERROR_INTERNO`.
+- Quien escribe en la web: texto 1–600 caracteres, máx. 8 líneas, 20 avisos por usuario por hora.
+
+### Coste estimado (plan FREE, 500 000 invocaciones/mes)
+Link pregunta **solo mientras `PES2021.exe` está abierto**, cada 15 s → 240 llamadas/hora por PC.
+- 10 PCs × 2 h/día × 30 días ≈ **144 000**/mes · con 3 h/día ≈ **216 000**/mes.
+- Se suma a las ~410 000 ya estimadas en §21: **se pasaría del tope**. Palancas: subir `sondeo_buzon_seg` (30 s lo reduce a la mitad), el 304 no cuesta BD pero sí invocación, o apagar `buzon_juego`.
+- Recomendación: empezar con 2–3 PCs y vigilar el uso en Supabase antes de abrirlo a todos.

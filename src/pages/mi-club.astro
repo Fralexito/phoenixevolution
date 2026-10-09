@@ -3,6 +3,7 @@
 // Los datos los sube Phoenix Mercado (POST /mercado/v1/vestuario/subir); lo que cambies aquí queda «pendiente» y el programa lo aplica al juego.
 // BD: migración 095 (vestuario_*). Lógica: js/core/vestuario.js · pantalla: js/pages/miClub.js · estilos: styles/miClub.css
 import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
 ---
 <Layout title="Mi club" active="miclub" description="Edita la ficha de los jugadores de tu equipo de Liga Máster y mándala a tu juego.">
   <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-5">
@@ -23,6 +24,20 @@ import Layout from '../layouts/Layout.astro';
         <section id="mc-detalle" class="mc-detalle" aria-live="polite"></section>
       </div>
     </div>
+
+    <div id="bz-card" hidden>
+      <Plegable titulo="Mandar aviso a mi juego" icono="fa-bell" resumen="Sale en PES 2021 (barra espaciadora) con Phoenix Link abierto">
+        <div class="space-y-3">
+          <label class="block text-xs text-gray-300" for="bz-texto">Tu mensaje <span id="bz-contador" class="text-gray-400 ml-1">0/600</span></label>
+          <textarea id="bz-texto" rows="3" maxlength="600" class="w-full rounded-lg bg-black/30 border border-white/15 p-2 text-sm text-white" placeholder="Ej.: Partido a las 9, conéctate"></textarea>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="bz-pc" class="rounded-lg bg-black/30 border border-white/15 p-2 text-sm text-white" aria-label="PC de destino"><option value="">Todas mis PCs</option></select>
+            <button type="button" id="bz-enviar" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+          </div>
+          <div id="bz-lista" class="space-y-2" aria-live="polite"></div>
+        </div>
+      </Plegable>
+    </div>
   </div>
-  <script>import '../js/pages/miClub.js';</script>
+  <script>import '../js/pages/miClub.js'; import '../js/features/buzon.js';</script>
 </Layout>

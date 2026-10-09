@@ -47,6 +47,12 @@ import Layout from '../layouts/Layout.astro';
         <div data-pv-lista class="space-y-2"></div>
       </section>
 
+      <section id="bzs-card" hidden class="space-y-2" aria-labelledby="h-bzs">
+        <h2 id="h-bzs" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-bullhorn text-galaxy-400 mr-2"></i>Aviso global a todos los juegos</h2>
+        <textarea id="bzs-texto" rows="2" maxlength="600" class="w-full rounded-lg bg-black/30 border border-white/15 p-2 text-sm text-white" placeholder="Ej.: Mantenimiento a las 22:00"></textarea>
+        <button type="button" id="bzs-enviar" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Enviar a todos</button>
+      </section>
+
       <div id="mod-tabs" class="flex flex-wrap gap-1.5" role="group" aria-label="Estado de los reportes"></div>
       <section id="mod-lista" class="space-y-3" aria-live="polite"></section>
       <div class="text-center"><button type="button" id="mod-mas" hidden class="btn btn-ghost">Cargar más</button></div>
@@ -56,4 +62,5 @@ import Layout from '../layouts/Layout.astro';
 <script>
   import '../js/pages/moderacion.js';
   import '../js/pages/moderacionPrivacidad.js';
+  import '../js/features/buzon.js';
 </script>
