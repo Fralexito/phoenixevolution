@@ -38,6 +38,7 @@ export const PERMISOS = Object.freeze({
   gestionarClanes:      ['moderador', 'admin'],   // ocultar clanes y sacar gente de un clan (migración 043)
   administrarTienda:    ['admin'],                // catálogo, reglas, ajustes de tokens y pagos (migraciones 049-051)
   avisarJuego:          ['moderador', 'admin'],   // aviso global a todos los juegos (migración 096)
+  gestionarTorneos:     ['moderador', 'admin'],   // ocultar/cancelar torneos propios y ajustar topes (migración 097)
   gestionarEventos:     ['moderador', 'admin'],   // crear, editar y cancelar eventos de la comunidad (migración 042)
 });
 

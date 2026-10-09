@@ -5,6 +5,7 @@ import Layout from '../layouts/Layout.astro';
 import Plegable from '../components/Plegable.astro';
 import { FORMATOS } from '../js/core/formatos.js';
 import { MODALIDADES, NOCHES_TEMATICAS } from '../data/modalidades.js';
+import { href } from '../js/core/config.js';
 const TONO = { serio: 'Serio', casual: 'Casual', divertido: 'Divertido' };
 ---
 <Layout title="Formatos" active="formatos" description="Arma torneos con el formato que quieras, gira la ruleta de reglas y mira el reto del día.">
@@ -14,6 +15,7 @@ const TONO = { serio: 'Serio', casual: 'Casual', divertido: 'Divertido' };
       <span class="liga-sello">Torneos y dinámicas</span>
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">For<span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">matos</span></h1>
       <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto">Elige cómo se juega, pon a los jugadores y la web arma los cruces.</p>
+      <a class="btn btn-primary" href={href('torneos/')}><i class="fa-solid fa-trophy"></i> Crear un torneo de verdad</a>
     </div>
   </header>
 

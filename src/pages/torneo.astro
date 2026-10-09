@@ -1,0 +1,12 @@
+---
+// DETALLE de un torneo propio (/torneo/?id=N): inscripción, cruces, resultados, tablas y guía. Guía: docs/TORNEOS-LIBRES.md
+import Layout from '../layouts/Layout.astro';
+import { href } from '../js/core/config.js';
+---
+<Layout title="Torneo" active="torneos" description="Cruces, resultados y tabla de un torneo de la comunidad.">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 space-y-5">
+    <a href={href('torneos/')} class="inline-flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-galaxy-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i> Torneos</a>
+    <div id="to-raiz" aria-live="polite"><div class="esqueleto h-40"></div><div class="esqueleto h-64 mt-4"></div></div>
+  </div>
+  <script>import '../js/pages/torneo.js';</script>
+</Layout>

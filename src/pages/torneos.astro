@@ -1,0 +1,100 @@
+---
+// TORNEOS: lista de torneos propios de la comunidad + ficha para crear el tuyo (migración 097). Guía: docs/TORNEOS-LIBRES.md
+import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
+import { href } from '../js/core/config.js';
+---
+<Layout title="Torneos" active="torneos" description="Crea tu propio torneo con el formato y las reglas que quieras, o apúntate a uno de la comunidad.">
+  <header class="relative overflow-hidden border-b border-galaxy-border/40">
+    <div class="absolute inset-0 bg-gradient-to-b from-galaxy-900/70 to-transparent"></div>
+    <div class="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-12 text-center space-y-3">
+      <span class="liga-sello">Hazlo a tu manera</span>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">Tor<span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">neos</span></h1>
+      <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto">Crea el tuyo con el formato que quieras o apúntate a uno. Sin límites raros: el staff solo vigila que todo sea sano.</p>
+      <div class="flex flex-wrap justify-center gap-2 pt-1">
+        <button type="button" id="tn-nuevo" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Crear mi torneo</button>
+        <a class="btn btn-ghost" href={href('formatos/')}><i class="fa-solid fa-sitemap"></i> Probar formatos</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 space-y-6">
+    <Plegable titulo="¿Cómo funciona esto?" icono="fa-circle-question" resumen="Léelo una vez y listo">
+      <div class="tn-guia">
+        <ol>
+          <li><b>Crea</b> tu torneo con la ficha: nombre, formato (hay 10), cupo, reglas y dinámicas divertidas.</li>
+          <li><b>Invita</b> a la gente: se apuntan solos desde su cuenta, o tú añades nombres a mano (aunque no tengan cuenta).</li>
+          <li><b>Empieza</b> cuando quieras: la web arma los cruces sola.</li>
+          <li><b>Anota</b> los resultados: el organizador o los propios jugadores. Las llaves avanzan automáticamente.</li>
+          <li><b>Cierra</b> el torneo y se queda el campeón de recuerdo.</li>
+        </ol>
+        <p class="tn-guia-ojo"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> El staff puede ocultar o cancelar torneos que no cumplan las normas de la comunidad.</p>
+      </div>
+      <div id="tn-leyenda"></div>
+    </Plegable>
+
+    <section id="tn-ficha" class="glass-panel rounded-2xl p-4 sm:p-6 space-y-5" aria-labelledby="h-ficha" hidden>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="h-ficha" class="tn-titulo"><i class="fa-solid fa-file-pen"></i> Ficha de tu torneo</h2>
+        <button type="button" id="tn-cerrar-ficha" class="btn btn-ghost" aria-label="Cerrar la ficha"><i class="fa-solid fa-xmark"></i> Cerrar</button>
+      </div>
+      <p id="tn-sin-sesion" class="tn-aviso" hidden>Inicia sesión para crear un torneo.</p>
+      <form id="tn-form" class="space-y-5" autocomplete="off">
+        <fieldset class="tn-bloque">
+          <legend>1 · Nombre y descripción</legend>
+          <label class="tn-campo" for="tn-nombre">Nombre del torneo</label>
+          <div class="tn-fila"><input id="tn-nombre" name="nombre" class="field" maxlength="80" required placeholder="Ej.: Copa del Pollo Veloz"><button type="button" id="tn-azar" class="btn btn-ghost" title="Inventar un nombre"><i class="fa-solid fa-dice"></i> Sorpréndeme</button></div>
+          <label class="tn-campo" for="tn-desc">Descripción (opcional)</label>
+          <textarea id="tn-desc" name="descripcion" rows="3" maxlength="2000" class="field" placeholder="Cuenta de qué trata, cuándo se juega, qué se gana…"></textarea>
+        </fieldset>
+
+        <fieldset class="tn-bloque">
+          <legend>2 · Formato</legend>
+          <div class="tn-chips" id="tn-chips" role="group" aria-label="Formato"></div>
+          <div id="tn-guia-formato"></div>
+          <div id="tn-opciones-formato" class="tn-opts"></div>
+        </fieldset>
+
+        <fieldset class="tn-bloque">
+          <legend>3 · Gente y fechas</legend>
+          <div class="tn-rejilla">
+            <div><label class="tn-campo" for="tn-cupo">Cupo máximo (vacío = sin tope)</label><input id="tn-cupo" name="cupo" type="number" min="2" max="2048" class="field" placeholder="Sin tope"></div>
+            <div><label class="tn-campo" for="tn-vis">Quién lo ve</label>
+              <select id="tn-vis" name="visibilidad" class="field"><option value="publico">Público (sale en la lista)</option><option value="enlace">Solo con enlace</option><option value="privado">Privado</option></select></div>
+            <div><label class="tn-campo" for="tn-inicia">Cuándo empieza (opcional)</label><input id="tn-inicia" name="inicia" type="datetime-local" class="field"></div>
+          </div>
+          <label class="tn-check"><input type="checkbox" name="juega" checked> Yo también juego</label>
+          <label class="tn-check"><input type="checkbox" name="reportan" checked> Los jugadores pueden anotar sus propios resultados <small>(tú siempre puedes corregirlos)</small></label>
+          <label class="tn-check"><input type="checkbox" name="sorteo"> Sortear el orden al empezar <small>(si no, cuenta el orden de inscripción como siembra)</small></label>
+        </fieldset>
+
+        <fieldset class="tn-bloque">
+          <legend>4 · Dinámicas divertidas <small>(opcional, elige las que quieras)</small></legend>
+          <p class="tn-ayuda">Cada una tiene su guía. Marca las que quieras y se mostrarán en el torneo para que todos sepan cómo se juega.</p>
+          <div id="tn-dinamicas"></div>
+        </fieldset>
+
+        <fieldset class="tn-bloque">
+          <legend>5 · Extras</legend>
+          <label class="tn-campo" for="tn-premio">Premio o título para el campeón</label>
+          <input id="tn-premio" name="premio" class="field" maxlength="120" placeholder="Ej.: Rol «Campeón» en Discord">
+          <label class="tn-campo" for="tn-reglas">Reglas propias</label>
+          <textarea id="tn-reglas" name="reglas" rows="3" maxlength="1500" class="field" placeholder="Escribe aquí tus reglas, una por línea."></textarea>
+          <label class="tn-campo" for="tn-enlace">Enlace de la sala o la transmisión (opcional)</label>
+          <input id="tn-enlace" name="enlace" class="field" maxlength="300" placeholder="https://…">
+        </fieldset>
+
+        <div class="tn-pie"><button class="btn btn-primary" id="tn-crear"><i class="fa-solid fa-rocket"></i> Crear torneo</button><span id="tn-estado-form" class="tn-ayuda" role="status"></span></div>
+      </form>
+    </section>
+
+    <section aria-labelledby="h-lista" class="space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="h-lista" class="tn-titulo"><i class="fa-solid fa-trophy"></i> Torneos</h2>
+        <div class="tn-tabs" id="tn-tabs" role="group" aria-label="Filtrar"></div>
+      </div>
+      <div id="tn-lista" class="tn-lista" aria-live="polite"><div class="esqueleto h-24"></div><div class="esqueleto h-24"></div></div>
+    </section>
+  </div>
+  <script>import '../js/pages/torneos.js';</script>
+</Layout>

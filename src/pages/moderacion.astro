@@ -53,6 +53,18 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" id="bzs-enviar" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Enviar a todos</button>
       </section>
 
+      <section id="tls-card" hidden class="space-y-2" aria-labelledby="h-tls">
+        <h2 id="h-tls" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-trophy text-galaxy-400 mr-2"></i>Torneos propios</h2>
+        <p class="text-xs text-gray-400">Los usuarios crean torneos libremente. Aquí los vigilas: pausa la creación, aprieta los topes u oculta/cancela uno.</p>
+        <form id="tls-topes" class="flex flex-wrap items-end gap-2">
+          <label class="text-xs text-gray-300 flex items-center gap-1.5"><input type="checkbox" id="tls-hab"> Creación activa</label>
+          <label class="text-xs text-gray-300">Máx. torneos activos por usuario <input id="tls-act" type="number" min="0" max="1000" class="field !w-24"></label>
+          <label class="text-xs text-gray-300">Máx. jugadores por torneo <input id="tls-jug" type="number" min="2" max="2048" class="field !w-24"></label>
+          <button class="btn btn-primary !min-h-10">Guardar topes</button>
+        </form>
+        <div id="tls-lista" class="space-y-1.5"></div>
+      </section>
+
       <div id="mod-tabs" class="flex flex-wrap gap-1.5" role="group" aria-label="Estado de los reportes"></div>
       <section id="mod-lista" class="space-y-3" aria-live="polite"></section>
       <div class="text-center"><button type="button" id="mod-mas" hidden class="btn btn-ghost">Cargar más</button></div>
@@ -63,4 +75,5 @@ import Layout from '../layouts/Layout.astro';
   import '../js/pages/moderacion.js';
   import '../js/pages/moderacionPrivacidad.js';
   import '../js/features/buzon.js';
+  import '../js/features/torneos/staff.js';
 </script>

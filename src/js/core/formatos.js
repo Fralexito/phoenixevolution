@@ -4,7 +4,7 @@
 
 export const FORMATOS = Object.freeze([
   { id: 'eliminacion', nombre: 'Eliminatoria simple', icono: 'fa-bolt', tono: 'casual', min: 2, max: 64, frase: 'Pierdes y te vas.', cuando: 'Torneo rápido de un día.' },
-  { id: 'doble', nombre: 'Doble eliminatoria', icono: 'fa-heart', tono: 'serio', min: 4, max: 32, exacto: [4, 8, 16, 32], frase: 'Tienes dos vidas.', cuando: 'Torneo serio donde un mal día no debe sacarte.' },
+  { id: 'doble', nombre: 'Doble eliminatoria', icono: 'fa-heart', tono: 'serio', min: 4, max: 32, exacto: [4, 8, 16, 32, 64], frase: 'Tienes dos vidas.', cuando: 'Torneo serio donde un mal día no debe sacarte.' },
   { id: 'liguilla', nombre: 'Liguilla', icono: 'fa-table-list', tono: 'serio', min: 3, max: 12, frase: 'Juegas contra todos una vez.', cuando: 'Liga corta y justa.' },
   { id: 'idavuelta', nombre: 'Liguilla ida y vuelta', icono: 'fa-repeat', tono: 'serio', min: 3, max: 10, frase: 'Cada rival, dos veces: en casa y fuera.', cuando: 'Liga larga con remontadas.' },
   { id: 'grupos', nombre: 'Grupos + playoffs', icono: 'fa-layer-group', tono: 'serio', min: 6, max: 64, frase: 'Fase de grupos y luego eliminatoria, como el Mundial.', cuando: 'Evento grande.' },
@@ -266,11 +266,11 @@ export function acumularCircuito(fechas, baremo = BAREMO_CIRCUITO) {
 }
 
 // ── Entrada única ──────────────────────────────────────────────────────────────────────────────────────────────────────
-export function validarFormato(id, n) {
+export function validarFormato(id, n, { sinTope = false } = {}) {
   const f = formatoPorId(id);
   if (!f) return { ok: false, motivo: 'Ese formato no existe.' };
   if (n < f.min) return { ok: false, motivo: `${f.nombre} necesita al menos ${f.min} jugadores.` };
-  if (n > f.max) return { ok: false, motivo: `${f.nombre} admite hasta ${f.max} jugadores.` };
+  if (n > f.max && !sinTope) return { ok: false, motivo: `${f.nombre} admite hasta ${f.max} jugadores.` };
   if (f.exacto && !f.exacto.includes(n)) return { ok: false, motivo: `${f.nombre} se arma con ${f.exacto.join(', ')} jugadores.` };
   return { ok: true };
 }
@@ -282,8 +282,8 @@ const contar = (rondas) => rondas.reduce((s, r) => s + r.partidos.filter((m) => 
  * `tipo`: 'llave' (eliminatorias), 'fechas' (liguillas), 'grupos', 'suizo', 'colina', 'escalera', 'circuito'.
  */
 export function generar(id, jugadoresCrudos, opciones = {}) {
-  const jugadores = limpiarJugadores(jugadoresCrudos);
-  const v = validarFormato(id, jugadores.length);
+  const jugadores = limpiarJugadores(jugadoresCrudos, opciones.sinTope ? 256 : 64);
+  const v = validarFormato(id, jugadores.length, { sinTope: Boolean(opciones.sinTope) });
   if (!v.ok) return v;
   const f = formatoPorId(id);
   const base = { ok: true, formato: f, jugadores };
