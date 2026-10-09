@@ -55,7 +55,7 @@ function pintarSelector() {
 function pintarCabecera() {
   const c = st.club; const f = c.finanzas ?? {};
   const fin = Object.entries(f).filter(([, v]) => v != null && typeof v !== 'object').slice(0, 4).map(([k, v]) => `<span class="text-xs text-gray-400">${esc(k.replace(/_/g, ' '))}: <b class="text-white">${typeof v === 'number' ? euros(v) : esc(v)}</b></span>`).join('');
-  $('mc-cabecera').innerHTML = `${img(c.escudo_url, 'mc-escudo', 'Escudo')}<div class="min-w-0 flex-1"><h2 class="font-display font-bold text-white text-xl">${esc(c.nombre)}</h2>
+  $('mc-cabecera').innerHTML = `${img(c.escudo_url, 'mc-escudo', 'Escudo')}<div class="min-w-0 flex-1"><span class="mc-etiqueta">Mi club · Liga Máster</span><h2 class="mc-titulo">${esc(c.nombre)}</h2>
     <p class="text-xs text-gray-400">${esc(c.partida ?? 'Partida')} · ${esc(c.fecha_partida ?? 'sin fecha')}${esMio() ? '' : ' · solo lectura'}</p><div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">${fin}</div></div>
     <button type="button" class="btn btn-ghost" id="mc-refrescar"><i class="fa-solid fa-rotate"></i> Actualizar</button>`;
 }
@@ -77,7 +77,7 @@ function pintarDetalle() {
   const f = j.ficha ?? {}; const nCambios = cambiosDe(f, st.borrador).length; const rech = st.rechazados.get(j.id) ?? [];
   const posActual = valorActual(f, st.borrador, 'posicion');
   box.innerHTML = `<div class="glass-panel rounded-2xl p-4">
-    <div class="flex items-center gap-3">${img(j.foto_url, 'mc-cara', f.nombre)}<div class="min-w-0"><h2 class="font-display font-bold text-white text-xl truncate">${esc(f.nombre ?? 'Jugador ' + j.pid)}</h2><p class="text-xs text-gray-400">${esc(f.nacionalidad ?? '')}</p></div></div>
+    <div class="flex items-center gap-3">${img(j.foto_url, 'mc-cara', f.nombre)}<div class="min-w-0"><h2 class="mc-titulo truncate">${esc(f.nombre ?? 'Jugador ' + j.pid)}</h2><p class="text-xs text-gray-400">#${esc(valorActual(f, st.borrador, 'dorsal') ?? '–')} · ${esc(posActual ?? '')} · ${esc(f.nacionalidad ?? '')}</p></div>${f.media != null ? `<div class="mc-media"><b>${esc(f.media)}</b><small>MEDIA</small></div>` : ''}</div>
     ${rech.length ? `<p class="mc-aviso mt-2"><i class="fa-solid fa-triangle-exclamation"></i> El juego rechazó: ${rech.map((r) => `${esc(r.campo)} (${esc(r.motivo_rechazo ?? 'sin motivo')})`).join(', ')}</p>` : ''}
     <div class="mc-bloque"><h3>Datos básicos</h3><div class="mc-basicos">
       ${BASICOS.map(([c, t, a, b]) => campoNum(f, c, t, a, b)).join('')}
