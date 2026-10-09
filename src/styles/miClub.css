@@ -1,0 +1,42 @@
+/* Mi club (vestuario). Identidad Galaxy/Sudario por variables; texto mínimo 12 px. */
+.mc-cabecera { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.mc-escudo { width: 64px; height: 64px; object-fit: contain; border-radius: .75rem; background: rgba(255,255,255,.04); }
+.mc-cuerpo { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .mc-cuerpo { grid-template-columns: 320px 1fr; align-items: start; } }
+.mc-grupo-t { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: #00e5ff; margin: .75rem 0 .35rem; }
+html[data-tema='sudario'] .mc-grupo-t { color: #f5c542; }
+.mc-fila { display: flex; width: 100%; align-items: center; gap: .6rem; padding: .4rem .5rem; border-radius: .6rem; border-left: 3px solid transparent; text-align: left; color: #e5e7eb; background: rgba(255,255,255,.03); margin-bottom: .3rem; transition: transform 160ms cubic-bezier(.22,1,.36,1), background-color 160ms; }
+.mc-fila[aria-pressed='true'] { border-left-color: #00e5ff; background: rgba(0,229,255,.1); }
+html[data-tema='sudario'] .mc-fila[aria-pressed='true'] { border-left-color: #f5c542; background: rgba(245,197,66,.1); }
+@media (hover: hover) { .mc-fila:hover { transform: translateX(3px); } }
+.mc-cara { width: 40px; height: 40px; border-radius: 9999px; object-fit: cover; background: rgba(255,255,255,.06); flex: none; }
+.mc-num { font-weight: 800; min-width: 1.6rem; text-align: center; color: #9ca3af; font-size: 13px; }
+.mc-fila small { display: block; font-size: 12px; color: #9ca3af; }
+.mc-punto { width: 8px; height: 8px; border-radius: 9999px; background: #facc15; margin-left: auto; flex: none; }
+.mc-bloque { margin-top: 1rem; }
+.mc-bloque > h3 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: #9ca3af; margin-bottom: .5rem; }
+.mc-basicos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .5rem; }
+.mc-campo { display: flex; flex-direction: column; gap: .2rem; font-size: 12px; color: #9ca3af; }
+.mc-campo input, .mc-campo select { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: .5rem; padding: .4rem .5rem; color: #fff; font-size: 14px; width: 100%; }
+.mc-campo input:disabled, .mc-campo select:disabled { opacity: .55; cursor: not-allowed; }
+.mc-cambiado input, .mc-cambiado select { border-color: #facc15; background: rgba(250,204,21,.1); }
+.mc-habs { display: grid; gap: .45rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .mc-habs { grid-template-columns: 1fr 1fr; column-gap: 1.25rem; } }
+.mc-hab { display: grid; grid-template-columns: 1fr 64px; gap: .1rem .6rem; align-items: center; font-size: 13px; color: #d1d5db; }
+.mc-hab input { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: .4rem; padding: .2rem .3rem; color: #fff; font-size: 14px; text-align: center; width: 64px; }
+.mc-hab input:disabled { opacity: .55; cursor: not-allowed; }
+.mc-hab.mc-cambiado input { border-color: #facc15; background: rgba(250,204,21,.1); }
+.mc-barra { grid-column: 1 / -1; height: 6px; border-radius: 9999px; background: rgba(255,255,255,.08); overflow: hidden; }
+.mc-barra i { display: block; height: 100%; border-radius: inherit; transition: width 200ms cubic-bezier(.22,1,.36,1); }
+.mc-cancha { position: relative; width: 100%; max-width: 360px; aspect-ratio: 3 / 4; margin: 0 auto; border-radius: 1rem; border: 1px solid rgba(255,255,255,.15); background: linear-gradient(180deg, rgba(0,120,70,.35), rgba(0,80,50,.35)); }
+.mc-cancha::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid rgba(255,255,255,.18); }
+.mc-pos { position: absolute; transform: translate(-50%, -50%); width: 44px; height: 44px; border-radius: 9999px; font-size: 12px; font-weight: 800; color: #fff; border: 2px solid rgba(255,255,255,.3); background: rgba(0,0,0,.45); transition: transform 140ms cubic-bezier(.22,1,.36,1), background-color 140ms; z-index: 1; }
+.mc-pos[data-v='1'] { background: #2563eb; border-color: #93c5fd; }
+.mc-pos[data-v='2'] { background: #16a34a; border-color: #86efac; }
+.mc-pos.mc-cambiado { box-shadow: 0 0 0 3px #facc15; }
+.mc-pos:active:not(:disabled) { transform: translate(-50%, -50%) scale(.92); }
+.mc-pos:disabled { opacity: .5; cursor: not-allowed; }
+.mc-leyenda { font-size: 12px; color: #9ca3af; text-align: center; margin-top: .5rem; }
+.mc-barra-acciones { position: sticky; bottom: .5rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; justify-content: space-between; padding: .6rem .8rem; border-radius: 1rem; background: rgba(10,14,30,.92); border: 1px solid rgba(250,204,21,.4); margin-top: 1rem; z-index: 5; }
+.mc-aviso { font-size: 12px; color: #fca5a5; }
+@media (prefers-reduced-motion: reduce) { .mc-fila, .mc-pos, .mc-barra i { transition: none; } }
