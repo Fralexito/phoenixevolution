@@ -47,4 +47,4 @@ Un chat no toca la pieza de otro: le pasa un prompt. Endpoints publicados no se 
 ## Pendiente
 - Fralex: Redirect URL `https://fralexito.github.io/phoenixevolution/fase-beta/**` en Supabase Auth; protección de contraseñas filtradas; GitHub Pages Source = GitHub Actions; ¿borrar `backup_20261003`?; ¿beta solo para cuentas autorizadas?; probar con 2–3 DTs; «Súbelo».
 - Chat Mercado: subir catálogo real (`/catalogo`) **antes** de las equivalencias; luego mandar el informe Conmegol→Sudamerican en lotes ≤3000. Al llegar el catálogo real, borrar los datos demo.
-- Web (opcional): salto de Liga en PC; selector bonito de club CPU al vender; pantalla para cargar traspasos reales (Capa 1); en el libro, cambios hechos a mano por SQL se etiquetan «traspaso» (cambiar a «sin_motivo» en el próximo SQL).
+- Web: pantalla del staff para cargar traspasos reales (Capa 1); ordenar el interior de páginas con capturas de Fralex. (Ya hechos: salto de Liga, selector de club CPU, «sin_motivo».)
