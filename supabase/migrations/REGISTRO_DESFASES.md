@@ -7,7 +7,7 @@ Supabase solo registra (`supabase_migrations.schema_migrations`) lo aplicado por
 |---|---|---|
 | 088 | `088_lm_libro_dinero_club.sql` (lm_club_libro + trigger) | `088_endurecer_permisos_tablas` (revoca insert/update/delete a anon) |
 | 089 | `089_mercado_equivalencias.sql` (equivalencias por parche) | `089_cumplimiento_legal_y_derechos_datos` y `089_legal_privacidad` (solicitudes_privacidad, aceptaciones_legales con tutor, mi_aceptacion_legal…) |
-Todo está aplicado y no se pisa (objetos distintos). **Pendiente:** que la otra cuenta suba sus archivos al repo con números nuevos (p. ej. 090/091) y deje aquí la equivalencia. Siguiente número libre: **094** (092 y 093 usadas por la Cuenta A) (reservar en `REGISTRO.md`).
+Todo está aplicado y no se pisa (objetos distintos). **Resuelto (8 oct, noche):** subidas como `090_endurecer_permisos_tablas.sql` (= 088 de Supabase) y `091_legal_privacidad.sql` (= estado final de las dos 089 de Supabase). No volver a ejecutarlas. Siguiente número libre: **094** (092 y 093 usadas por la Cuenta A) (reservar en `REGISTRO.md`).
 
 ## Aplicadas por SQL Editor (no figuran en la lista de Supabase)
 016–019, 023–053, 056–061 (056/057 figuran con otro nombre), 064, 065, 067, 071–074, 078–080, 084–086, 088 y 089 de la Cuenta A. **No verificado una por una**: se deduce porque sus tablas existen en la base (lista de tablas revisada el 8 oct). 088 y 089 de la Cuenta A sí verificadas.

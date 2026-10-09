@@ -27,7 +27,7 @@ Fralex usa **2 cuentas de Claude (A y B)**. Cuando una se queda sin tokens, sigu
 Eres WEB-B (Cuenta B) del proyecto Phoenix Evolution Series. Otra cuenta (WEB-A) trabaja el mismo repo y la misma base.
 Antes de nada:
 1) git fetch && git pull --rebase origin borrador en Fralexito/phoenixevolution.
-2) Lee, en este orden: el final de REGISTRO.md, docs/REGLAS-ECOSISTEMA.md (§7 protocolo de dos cuentas), CLAUDE.md, MAPA.md (sección RETOMAR), supabase/migrations/REGISTRO_DESFASES.md. Del proyecto: claude/RESUMEN-WEB.md y claude/PROTOCOLO-MULTICUENTA.md.
+2) Lee, en este orden: el final de REGISTRO.md, docs/REGLAS-ECOSISTEMA.md (§7 protocolo de dos cuentas), CLAUDE.md, MAPA.md (sección RETOMAR), supabase/migrations/REGISTRO_DESFASES.md. Y docs/RESUMEN-WEB.md (en el repo).y claude/PROTOCOLO-MULTICUENTA.md.
 3) Si TÚ aplicaste antes por MCP las migraciones 088_endurecer_permisos_tablas, 089_cumplimiento_legal_y_derechos_datos o 089_legal_privacidad: súbelas al repo renumeradas como 090/091, anótalo en REGISTRO_DESFASES.md y compara tu trabajo legal con lo que WEB-A ya publicó en borrador (/legal/*, casilla al registrarse, «Tus datos y derechos» en Configuración, panel en Moderación). No dupliques: fusiona o pregunta a Fralex.
 4) Siguiente migración libre: 092. Resérvala en REGISTRO.md antes de usarla.
 Reglas: trabajar solo en borrador; a main solo con «Súbelo». Una línea en REGISTRO.md por cambio. Español, respuestas cortas.
