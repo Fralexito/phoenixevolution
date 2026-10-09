@@ -1,0 +1,68 @@
+---
+// FORMATOS: generador de torneos (eliminatoria, doble, liguilla, grupos, suizo, rey de la colina, escalera, circuito), reto del día y ruleta de reglas.
+// Todo se calcula en el navegador con js/core/formatos.js y js/core/retos.js (sin base de datos: sirve para planear antes de crear el torneo real). Guía: docs/FORMATOS.md
+import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
+import { FORMATOS } from '../js/core/formatos.js';
+import { MODALIDADES, NOCHES_TEMATICAS } from '../data/modalidades.js';
+const TONO = { serio: 'Serio', casual: 'Casual', divertido: 'Divertido' };
+---
+<Layout title="Formatos" active="formatos" description="Arma torneos con el formato que quieras, gira la ruleta de reglas y mira el reto del día.">
+  <header class="relative overflow-hidden border-b border-galaxy-border/40">
+    <div class="absolute inset-0 bg-gradient-to-b from-galaxy-900/70 to-transparent"></div>
+    <div class="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-12 text-center space-y-3">
+      <span class="liga-sello">Torneos y dinámicas</span>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">For<span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">matos</span></h1>
+      <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto">Elige cómo se juega, pon a los jugadores y la web arma los cruces.</p>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 space-y-6">
+    <section class="fm-hoy" aria-label="Hoy en la liga">
+      <article class="glass-panel fm-tarjeta"><span class="fm-etiqueta">Reto del día</span><h2 id="fm-reto-t"></h2><p id="fm-reto-x"></p></article>
+      <article class="glass-panel fm-tarjeta"><span class="fm-etiqueta">Reto semanal</span><h2 id="fm-sem-t"></h2><p id="fm-sem-x"></p></article>
+      <article class="glass-panel fm-tarjeta"><span class="fm-etiqueta">Noche de la semana</span><h2 id="fm-noche-t"></h2><p id="fm-noche-x"></p></article>
+      <article class="glass-panel fm-tarjeta fm-ruleta">
+        <span class="fm-etiqueta">Ruleta de reglas</span>
+        <p id="fm-ruleta-x" class="fm-regla" aria-live="polite">Gira para que el destino elija una regla.</p>
+        <button type="button" id="fm-girar" class="btn btn-primary"><i class="fa-solid fa-dice"></i> Girar</button>
+      </article>
+    </section>
+
+    <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4" aria-labelledby="h-gen">
+      <h2 id="h-gen" class="fm-titulo"><i class="fa-solid fa-sitemap"></i> Generador de torneos</h2>
+      <div class="fm-chips" role="group" aria-label="Formato">
+        {FORMATOS.map((f, i) => (
+          <button type="button" class="fm-chip" data-formato={f.id} data-tono={f.tono} aria-pressed={i === 0 ? 'true' : 'false'}>
+            <i class={`fa-solid ${f.icono}`} aria-hidden="true"></i><span>{f.nombre}</span><small>{TONO[f.tono]}</small>
+          </button>
+        ))}
+      </div>
+      <p id="fm-frase" class="fm-frase"></p>
+      <div class="fm-form">
+        <label class="fm-campo" for="fm-jugadores">Jugadores (uno por línea) <b id="fm-cuenta">0</b></label>
+        <textarea id="fm-jugadores" rows="8" placeholder="Fralex&#10;Mirko&#10;Hugo&#10;…"></textarea>
+        <div class="fm-opciones">
+          <button type="button" id="fm-ejemplo" class="btn btn-ghost">Poner 8 de ejemplo</button>
+          <label class="fm-check"><input type="checkbox" id="fm-sortear"> Sortear el orden</label>
+          <label class="fm-check"><input type="checkbox" id="fm-tercer"> Partido por el 3.er puesto</label>
+          <button type="button" id="fm-generar" class="btn btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Armar torneo</button>
+        </div>
+      </div>
+      <p id="fm-aviso" class="fm-aviso" role="status" hidden></p>
+      <div id="fm-resultado" aria-live="polite"></div>
+    </section>
+
+    <Plegable titulo="Modalidades de juego" icono="fa-gamepad" resumen="Cambia una regla y el mismo torneo se siente distinto">
+      <ul class="fm-modalidades">
+        {MODALIDADES.map((m) => (<li data-tono={m.tono}><i class={`fa-solid ${m.icono}`} aria-hidden="true"></i><div><b>{m.nombre}</b><span>{m.texto}</span></div></li>))}
+      </ul>
+    </Plegable>
+    <Plegable titulo="Noches temáticas" icono="fa-moon" resumen="Una idea distinta cada semana">
+      <ul class="fm-modalidades">
+        {NOCHES_TEMATICAS.map((m) => (<li data-tono="divertido"><i class={`fa-solid ${m.icono}`} aria-hidden="true"></i><div><b>{m.nombre}</b><span>{m.texto}</span></div></li>))}
+      </ul>
+    </Plegable>
+  </div>
+  <script>import '../js/pages/formatos.js';</script>
+</Layout>

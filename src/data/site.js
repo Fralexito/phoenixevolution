@@ -48,6 +48,7 @@ export const ACCOUNT_NAV = [
   { id: 'ranking',  label: 'Ranking',      path: 'ranking/',       icon: 'fa-ranking-star', grupo: 'comunidad' },
   { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store', grupo: 'comunidad' },
   { id: 'manager',  label: 'Liga Máster', path: 'manager/',       icon: 'fa-user-tie', grupo: 'jugar' },
+  { id: 'formatos', label: 'Formatos',     path: 'formatos/',      icon: 'fa-sitemap', grupo: 'comunidad' },
   { id: 'miclub',   label: 'Mi club',      path: 'mi-club/',       icon: 'fa-shirt', grupo: 'jugar' },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
@@ -93,7 +94,7 @@ const DESC = {
   liga: 'Tabla, fechas y resultados de cada división', competiciones: 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
   palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
   duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
-  missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores',
+  missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores',
   tienda: 'Estética y mejoras para tu perfil',
@@ -104,7 +105,7 @@ const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra
   items: ids.map((spec) => { const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
     return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
 export const PILARES = [
-  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
+  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
   pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado', 'miclub'], { lema: 'Del clic al partido' }),
   pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),

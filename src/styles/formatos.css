@@ -1,0 +1,85 @@
+/* Formatos (generador de torneos). Identidad: Galaxy = cian + púrpura; Sudario = azul + dorado. Texto mínimo 12 px; movimiento corto y solo transform/opacity. */
+.fm-hoy { display: grid; gap: .75rem; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .fm-hoy { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .fm-hoy { grid-template-columns: repeat(4, 1fr); } }
+.fm-tarjeta { border-radius: 1rem; padding: 1rem; border-left: 4px solid #00e5ff; display: flex; flex-direction: column; gap: .35rem; }
+html[data-tema='sudario'] .fm-tarjeta { border-left-color: #f5c542; }
+.fm-tarjeta h2 { font-family: var(--font-display, inherit); font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .04em; font-size: 1.1rem; line-height: 1.15; }
+.fm-tarjeta p { font-size: 14px; color: #cbd5e1; }
+.fm-etiqueta { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; color: #00e5ff; }
+html[data-tema='sudario'] .fm-etiqueta { color: #f5c542; }
+.fm-regla { font-weight: 700; color: #fff; min-height: 2.6em; }
+.fm-pop { animation: fm-pop 220ms cubic-bezier(.22,1,.36,1); }
+@keyframes fm-pop { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.fm-titulo { font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .08em; font-size: 1rem; }
+.fm-titulo i { color: #00e5ff; margin-right: .5rem; }
+html[data-tema='sudario'] .fm-titulo i { color: #f5c542; }
+.fm-chips { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.fm-chip { display: grid; grid-template-columns: auto 1fr; grid-template-areas: 'i n' 'i t'; column-gap: .6rem; align-items: center; text-align: left; padding: .55rem .7rem; border-radius: .75rem; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-left: 3px solid transparent; color: #e5e7eb; transition: transform 160ms cubic-bezier(.22,1,.36,1), background-color 160ms; }
+.fm-chip i { grid-area: i; font-size: 1.1rem; color: #9ca3af; }
+.fm-chip span { grid-area: n; font-weight: 700; font-size: 14px; }
+.fm-chip small { grid-area: t; font-size: 12px; color: #9ca3af; }
+.fm-chip[aria-pressed='true'] { background: rgba(0,229,255,.12); border-color: rgba(0,229,255,.45); border-left-color: #00e5ff; }
+.fm-chip[aria-pressed='true'] i { color: #00e5ff; }
+html[data-tema='sudario'] .fm-chip[aria-pressed='true'] { background: rgba(245,197,66,.12); border-color: rgba(245,197,66,.45); border-left-color: #f5c542; }
+html[data-tema='sudario'] .fm-chip[aria-pressed='true'] i { color: #f5c542; }
+@media (hover: hover) { .fm-chip:hover { transform: translateY(-2px); } }
+.fm-frase { font-size: 14px; color: #cbd5e1; }
+.fm-frase span { color: #9ca3af; }
+.fm-form { display: grid; gap: .6rem; }
+.fm-campo { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: #9ca3af; }
+.fm-campo b { color: #00e5ff; margin-left: .35rem; }
+html[data-tema='sudario'] .fm-campo b { color: #f5c542; }
+.fm-form textarea, .fm-form-escalera select { width: 100%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); border-radius: .6rem; padding: .55rem .7rem; color: #fff; font-size: 14px; }
+.fm-opciones { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.fm-check { display: inline-flex; align-items: center; gap: .4rem; font-size: 13px; color: #d1d5db; }
+.fm-aviso { font-size: 13px; color: #fca5a5; background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.35); border-radius: .6rem; padding: .5rem .7rem; }
+.fm-resumen { font-size: 14px; color: #e5e7eb; margin-bottom: .75rem; }
+.fm-llave, .fm-fechas { display: grid; gap: .75rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 720px) { .fm-llave { grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); overflow-x: auto; padding-bottom: .5rem; } .fm-fechas { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); } }
+.fm-ronda { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: .75rem; padding: .6rem; }
+.fm-ronda h3, .fm-sub { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 800; color: #00e5ff; margin-bottom: .45rem; }
+html[data-tema='sudario'] .fm-ronda h3, html[data-tema='sudario'] .fm-sub { color: #f5c542; }
+.fm-ronda ul { display: grid; gap: .4rem; }
+.fm-partido { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: .4rem; align-items: center; font-size: 13px; padding: .4rem .5rem; border-radius: .5rem; background: rgba(0,0,0,.25); border-left: 3px solid rgba(0,229,255,.5); }
+html[data-tema='sudario'] .fm-partido { border-left-color: rgba(245,197,66,.6); }
+.fm-partido b { font-size: 12px; color: #9ca3af; text-transform: uppercase; }
+.fm-partido em { grid-column: 2 / -1; font-size: 12px; color: #9ca3af; font-style: normal; }
+.fm-id { font-size: 12px; color: #6b7280; font-weight: 700; }
+.fm-nombre { color: #fff; font-weight: 700; overflow-wrap: anywhere; }
+.fm-ref { color: #9ca3af; font-style: italic; overflow-wrap: anywhere; }
+.fm-bye { border-left-color: #6b7280; opacity: .85; }
+.fm-tercero { border-left-color: #c084fc; }
+.fm-descansa { font-size: 12px; color: #9ca3af; margin-top: .4rem; }
+.fm-grupos { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-bottom: 1rem; }
+.fm-grupo { background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.35); border-radius: .75rem; padding: .7rem; }
+.fm-grupo h3 { font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .08em; }
+.fm-grupo p { font-size: 13px; color: #cbd5e1; margin: .3rem 0; }
+.fm-grupo summary { font-size: 12px; color: #00e5ff; cursor: pointer; }
+.fm-colina { display: grid; grid-template-columns: 1fr auto 1fr; gap: .75rem; align-items: center; }
+.fm-trono { background: rgba(0,229,255,.1); border: 1px solid rgba(0,229,255,.4); border-radius: 1rem; padding: .8rem; text-align: center; display: grid; gap: .2rem; }
+.fm-trono b { color: #fff; font-size: 1.2rem; font-weight: 800; overflow-wrap: anywhere; }
+.fm-trono small { font-size: 12px; color: #9ca3af; }
+.fm-retador { background: rgba(124,58,237,.12); border-color: rgba(124,58,237,.45); }
+html[data-tema='sudario'] .fm-trono { background: rgba(245,197,66,.1); border-color: rgba(245,197,66,.4); }
+.fm-vs { font-weight: 800; color: #9ca3af; text-transform: uppercase; }
+.fm-botones { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
+.fm-coronas, .fm-baremo { display: flex; flex-wrap: wrap; gap: .4rem; font-size: 13px; color: #d1d5db; }
+.fm-coronas li, .fm-baremo li { background: rgba(255,255,255,.05); border-radius: 9999px; padding: .2rem .7rem; }
+.fm-baremo li span { color: #9ca3af; margin-right: .35rem; }
+.fm-escalera { display: grid; gap: .35rem; max-width: 420px; }
+.fm-escalera li { display: flex; gap: .6rem; align-items: center; padding: .4rem .6rem; border-radius: .6rem; background: rgba(255,255,255,.04); color: #fff; font-weight: 700; }
+.fm-pos { min-width: 1.6rem; text-align: center; color: #00e5ff; }
+html[data-tema='sudario'] .fm-pos { color: #f5c542; }
+.fm-form-escalera { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+.fm-form-escalera select { width: auto; }
+.fm-ayuda { font-size: 13px; color: #9ca3af; margin: .5rem 0; }
+.fm-notas { margin-top: .75rem; display: grid; gap: .25rem; font-size: 13px; color: #9ca3af; }
+.fm-notas li::before { content: '• '; color: #00e5ff; }
+.fm-modalidades { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.fm-modalidades li { display: flex; gap: .7rem; align-items: flex-start; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: .75rem; padding: .65rem .75rem; }
+.fm-modalidades i { color: #00e5ff; margin-top: .2rem; }
+html[data-tema='sudario'] .fm-modalidades i { color: #f5c542; }
+.fm-modalidades b { display: block; color: #fff; font-size: 14px; }
+.fm-modalidades span { font-size: 13px; color: #9ca3af; }
+@media (prefers-reduced-motion: reduce) { .fm-pop { animation: none; } .fm-chip { transition: none; } }
