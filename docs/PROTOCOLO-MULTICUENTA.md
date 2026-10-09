@@ -18,7 +18,8 @@ Fralex usa **2 cuentas de Claude (A y B)**. Cuando una se queda sin tokens, sigu
 5. **Contratos:** endpoints publicados no se borran ni cambian de significado; solo se añaden campos opcionales. Fuente de verdad: `docs/contrato-v1.md` (Phoenix Link) y `docs/mercado-api.md` (Mercado), en el repo web. Leerlos antes de llamar a la API.
 6. **Avisos cruzados solo cuando hace falta** (no constantes): si un cambio afecta a otro frente, una línea en el registro del otro repo o un prompt corto para Fralex.
 7. **Principio de Fralex:** «Si algo se rompe o deja de funcionar por un cambio, mejor no lo hagas.» Compilar/probar antes de commitear. Nada a `main`/rama estable sin su permiso («Súbelo»).
-8. **Fralex:** español, sabe poco de programación, respuestas cortas y claras; nunca pedir secretos en el chat; Windows 10/11; repos locales en `C:\dev\`.
+8. **Copia en Google Drive (pedido de Fralex, 2026-10-08):** cada cambio importante, avance importante o contexto que otros chats necesiten se sube además como documento a la carpeta del proyecto en Google Drive (la misma donde están la base de conocimiento y los informes de Mercado). Un documento nuevo por cambio, con título «WEB — <qué> (AAAA-MM-DD HH:MM)» y lenguaje simple. Sin claves ni secretos. REGISTRO.md sigue siendo la bitácora oficial; Drive es el resumen para leer rápido.
+9. **Fralex:** español, sabe poco de programación, respuestas cortas y claras; nunca pedir secretos en el chat; Windows 10/11; repos locales en `C:\dev\`.
 
 ---
 
