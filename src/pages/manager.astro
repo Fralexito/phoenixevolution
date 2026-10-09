@@ -121,7 +121,28 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
         <div id="eq-lista" class="space-y-2"></div>
         <button id="eq-mas" type="button" class="mg-chip" hidden>Cargar más</button>
       </div>
+
+      <!-- Capa 1: traspasos reales por ventana -->
+      <div id="tr" class="space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-right-left"></i> Traspasos reales (Capa 1)</h3>
+          <select id="tr-ventana" class="field !min-h-8 !py-1 !text-xs w-auto" aria-label="Ventana"></select>
+          <button id="tr-nueva" type="button" class="mg-chip"><i class="fa-solid fa-plus"></i> Nueva ventana</button>
+          <div id="tr-estado" class="flex gap-1 ml-auto"></div>
+        </div>
+        <p id="tr-resumen" class="text-xs text-gray-400"></p>
+        <form id="tr-form" hidden class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" autocomplete="off">
+          <input name="pes_id" inputmode="numeric" placeholder="ID del jugador (pes_id)" class="field !min-h-9 !text-xs" aria-label="ID del jugador" required>
+          <input name="jugador" maxlength="80" placeholder="Nombre del jugador" class="field !min-h-9 !text-xs" aria-label="Nombre del jugador" required>
+          <select id="tr-tipo" name="tipo" class="field !min-h-9 !text-xs" aria-label="Tipo de movimiento"></select>
+          <input name="de" inputmode="numeric" placeholder="Equipo de origen (ID)" class="field !min-h-9 !text-xs" aria-label="ID del equipo de origen">
+          <input name="a" inputmode="numeric" placeholder="Equipo de destino (ID)" class="field !min-h-9 !text-xs" aria-label="ID del equipo de destino">
+          <input name="nota" maxlength="200" placeholder="Nota (opcional)" class="field !min-h-9 !text-xs" aria-label="Nota">
+          <button type="submit" class="btn btn-primary !min-h-9 !text-xs sm:col-span-2 lg:col-span-3"><i class="fa-solid fa-plus"></i> Guardar movimiento</button>
+        </form>
+        <div id="tr-lista" class="space-y-2"></div>
+      </div>
     </section>
   </div>
 </Layout>
-<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js';</script>
+<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js'; import '../js/pages/managerTraspasosReales.js';</script>
