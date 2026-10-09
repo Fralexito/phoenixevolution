@@ -10,14 +10,14 @@ const URL_FIRMADA_SEG = 300;
 
 class ErrorApi extends Error { constructor(public codigo: string, public http = 400, public extra: Record<string, unknown> = {}) { super(codigo); } }
 const HTTP: Record<string, number> = { TOKEN_FALTANTE: 401, TOKEN_INVALIDO: 401, TOKEN_REVOCADO: 401, CODIGO_NO_ENCONTRADO: 404, CODIGO_USADO: 409,
-  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, NO_AUTORIZADO: 403, ERROR_INTERNO: 500 };
+  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, CLUB_NO_ENCONTRADO: 404, NO_AUTORIZADO: 403, ERROR_INTERNO: 500 };
 const err = (codigo: string, extra: Record<string, unknown> = {}) => new ErrorApi(codigo, HTTP[codigo] ?? 400, extra);
 const log = (nivel: string, evento: string, datos: Record<string, unknown> = {}) => console.log(JSON.stringify({ nivel, evento, ...datos, t: new Date().toISOString() }));
 
 async function sha256(t: string) { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join(""); }
 function tokenNuevo() { const b = crypto.getRandomValues(new Uint8Array(32)); return "pml_" + btoa(String.fromCharCode(...b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
-async function leerJson(req: Request): Promise<Record<string, unknown>> {
-  const txt = await req.text(); if (txt.length > 300_000) throw err("DATOS_INVALIDOS", { campo: "cuerpo", detalle: "demasiado grande" });
+async function leerJson(req: Request, maxChars = 300_000): Promise<Record<string, unknown>> {
+  const txt = await req.text(); if (txt.length > maxChars) throw err("DATOS_INVALIDOS", { campo: "cuerpo", detalle: "demasiado grande" });
   try { const j = JSON.parse(txt || "{}"); if (typeof j !== "object" || Array.isArray(j) || !j) throw 0; return j; } catch { throw err("DATOS_INVALIDOS", { campo: "cuerpo" }); }
 }
 const texto = (x: unknown, campo: string, max: number, opcional = true) => {
@@ -364,13 +364,81 @@ async function leerEquivalencias(req: Request) {
   return { filas: data ?? [], siguiente: data && data.length === 5000 ? data[data.length - 1].id : null };
 }
 
+// ── Mi club (vestuario) ─────────────────────────────────────────────────────────────────────────────
+const PNG_B64 = /^iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$/;
+async function clubDelDispositivo(d: Disp, id: unknown) {
+  const n = Number(id); if (!Number.isInteger(n) || n < 1) throw err("DATOS_INVALIDOS", { campo: "club" });
+  const { data, error } = await sb.from("vestuario_club").select("id").eq("id", n).eq("usuario_id", d.usuario).maybeSingle();
+  if (error) throw err("ERROR_INTERNO"); if (!data) throw err("CLUB_NO_ENCONTRADO"); return n;
+}
+/** POST /v1/vestuario/subir { pes_team_id, nombre, partida, fecha_partida, finanzas, jugadores:[{pid,orden,ficha}], imagenes:{ "<pid>"|"escudo": png_base64 } } → { club_id, jugadores, imagenes } */
+async function vestuarioSubir(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); frenar(`vsub:${d.id}`, 30, 60 * 60_000);
+  const b = await leerJson(req, 12_000_000);
+  const team = b.pes_team_id; if (!Number.isInteger(team) || (team as number) < 1 || (team as number) > 99999) throw err("DATOS_INVALIDOS", { campo: "pes_team_id" });
+  const nombre = texto(b.nombre, "nombre", 80, false)!;
+  const partida = texto(b.partida, "partida", 80); const fecha = texto(b.fecha_partida, "fecha_partida", 40);
+  const fin = b.finanzas == null ? {} : b.finanzas; if (typeof fin !== "object" || Array.isArray(fin)) throw err("DATOS_INVALIDOS", { campo: "finanzas" });
+  if (!Array.isArray(b.jugadores) || b.jugadores.length < 1 || b.jugadores.length > 80) throw err("DATOS_INVALIDOS", { campo: "jugadores" });
+  const pids = new Set<string>();
+  for (const j of b.jugadores as Record<string, unknown>[]) {
+    if (!j || !Number.isInteger(j.pid) || (j.pid as number) < 1 || typeof j.ficha !== "object" || !j.ficha || Array.isArray(j.ficha)) throw err("DATOS_INVALIDOS", { campo: "jugadores" });
+    if (j.orden != null && !Number.isInteger(j.orden)) throw err("DATOS_INVALIDOS", { campo: "orden" });
+    pids.add(String(j.pid));
+  }
+  const imgs = b.imagenes == null ? {} : b.imagenes as Record<string, unknown>;
+  if (typeof imgs !== "object" || Array.isArray(imgs)) throw err("DATOS_INVALIDOS", { campo: "imagenes" });
+  for (const [k, v] of Object.entries(imgs)) {
+    if (k !== "escudo" && !pids.has(k)) throw err("DATOS_INVALIDOS", { campo: "imagenes", clave: k });
+    if (typeof v !== "string" || v.length > 160_000 || !PNG_B64.test(v)) throw err("DATOS_INVALIDOS", { campo: "imagenes", clave: k });
+  }
+  const { data, error } = await sb.rpc("sistema_vestuario_subir", { p_usuario: d.usuario, p_pes_team_id: team, p_nombre: nombre, p_partida: partida, p_fecha: fecha, p_finanzas: fin, p_jugadores: b.jugadores });
+  if (error) { log("error", "vestuario_subir", { m: error.message }); throw err("ERROR_INTERNO"); }
+  const clubId = (data as { club_id: number }).club_id; const jug = (data as { jugadores: number }).jugadores;
+  const rutas: Record<string, string> = {}; const claves = Object.keys(imgs); let fallos = 0;
+  for (let i = 0; i < claves.length; i += 8) {
+    await Promise.all(claves.slice(i, i + 8).map(async (k) => {
+      const ruta = `${d.usuario}/${clubId}/${k}.png`;
+      const bin = Uint8Array.from(atob(imgs[k] as string), (c) => c.charCodeAt(0));
+      const { error: e } = await sb.storage.from("vestuario").upload(ruta, bin, { contentType: "image/png", upsert: true });
+      if (e) { fallos++; log("warn", "vestuario_img", { k, m: e.message }); } else rutas[k] = ruta;
+    }));
+  }
+  if (Object.keys(rutas).length) { const { error: e } = await sb.rpc("sistema_vestuario_fotos", { p_club: clubId, p_fotos: rutas }); if (e) throw err("ERROR_INTERNO"); }
+  return { club_id: clubId, jugadores: jug, imagenes: Object.keys(rutas).length, imagenes_fallidas: fallos };
+}
+/** GET /v1/vestuario/cambios?club=<id>&desde=<version> → firmado { contenido, firma, clave_id, algoritmo }
+ *  contenido = { club_id, desde, version_actual, cambios:[{ version, pid, campo, valor }], generado } (máx. 1000; repetir con desde=<último>) */
+async function vestuarioCambios(req: Request) {
+  const d = await autenticar(req, { exigeManager: true });
+  const u = new URL(req.url); const club = await clubDelDispositivo(d, u.searchParams.get("club"));
+  const desde = Number(u.searchParams.get("desde") ?? "0"); if (!Number.isInteger(desde) || desde < 0) throw err("DATOS_INVALIDOS", { campo: "desde" });
+  const { data, error } = await sb.rpc("sistema_vestuario_cambios", { p_club: club, p_desde: desde, p_limite: 1000 });
+  if (error) throw err("ERROR_INTERNO");
+  return firmar(JSON.stringify({ ...(data as object), generado: new Date().toISOString() }));
+}
+/** POST /v1/vestuario/aplicado { club_id, version, resultados:[{ version, estado:"aplicado"|"rechazado", motivo }] } → { actualizados, ignorados, version_actual } */
+async function vestuarioAplicado(req: Request) {
+  const d = await autenticar(req, { exigeManager: true }); frenar(`vapl:${d.id}`, 120, 60 * 60_000);
+  const b = await leerJson(req); const club = await clubDelDispositivo(d, b.club_id);
+  if (!Array.isArray(b.resultados) || b.resultados.length > 1000) throw err("DATOS_INVALIDOS", { campo: "resultados" });
+  const res = (b.resultados as Record<string, unknown>[]).map((r) => {
+    if (!r || !Number.isInteger(r.version) || (r.version as number) < 1 || (r.estado !== "aplicado" && r.estado !== "rechazado")) throw err("DATOS_INVALIDOS", { campo: "resultados" });
+    return { version: r.version, estado: r.estado, motivo: texto(r.motivo, "motivo", 200) };
+  });
+  const { data, error } = await sb.rpc("sistema_vestuario_aplicado", { p_club: club, p_resultados: res });
+  if (error) { log("error", "vestuario_aplicado", { m: error.message }); throw err("ERROR_INTERNO"); }
+  return data;
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
   "/v1/reportes": { POST: crearReporte, GET: misReportes },
   "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella },
   "/v1/clave-publica": { GET: clavePublica }, "/v1/plantillas": { GET: plantillas }, "/v1/correcciones": { POST: correcciones }, "/v1/reportes/lote": { POST: reportesLote },
   "/v1/equivalencias": { POST: equivalencias, GET: leerEquivalencias },
-  "/v1/liga/cambios": { GET: ligaCambios }, "/v1/liga/aplicado": { POST: ligaAplicado }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
+  "/v1/liga/cambios": { GET: ligaCambios }, "/v1/liga/aplicado": { POST: ligaAplicado },
+  "/v1/vestuario/subir": { POST: vestuarioSubir }, "/v1/vestuario/cambios": { GET: vestuarioCambios }, "/v1/vestuario/aplicado": { POST: vestuarioAplicado }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 
 Deno.serve(async (req) => {
