@@ -4,7 +4,7 @@
 import { supabase } from '../../core/supabase.js';
 import { onSession } from '../../core/session.js';
 import { toast } from '../../core/toast.js';
-import { escapeHTML, safeUrl } from '../../core/dom.js';
+import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/dom.js';
 import { pildoraSemaforo, textoErrorUnirse } from '../../core/salas.js';
 import { haceCuanto } from '../../core/notifs.js';
 import { NOMBRE_APP } from '../../../data/site.js';
@@ -79,7 +79,8 @@ const tarjetaVivo = (s) => tarjeta(s, 'vivo');
 function abrirEnlace(r, rol) {
   const url = safeUrl(r?.enlace, { allowParsec: true });
   if (!url) { toast(rol === 'rival' ? 'Eres el rival. El host aún no compartió el enlace: te llegará en la app.' : 'Quedaste como espectador. El host aún no compartió el enlace.', 'info'); return; }
-  window.open(url, '_blank', 'noopener');
+  const directo = parsecDirecto(url);
+  if (directo) abrirParsec(directo, url); else window.open(url, '_blank', 'noopener');
 }
 
 /**

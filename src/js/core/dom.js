@@ -33,3 +33,21 @@ export function safeImg(value) {
 
 /** Convierte a entero 0-99 con valor por defecto. */
 export const stat = (v, def = 75) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n > 0 ? Math.min(n, 99) : def; };
+
+/** Si es una invitación web de Parsec (dash.parsec.app/join-computer?peer=…&secret=…), devuelve el enlace que abre la app directo
+ *  (parsec://peer_id=…&secret=…); si no, ''. El formato directo no está documentado por Parsec: siempre se deja la invitación web de respaldo. */
+export function parsecDirecto(value) {
+  let u; try { u = new URL(String(value ?? '').trim()); } catch { return ''; }
+  if (u.protocol !== 'https:' || !/^(dash\.)?parsec\.app$/i.test(u.hostname) || !/^\/join-computer\/?$/i.test(u.pathname)) return '';
+  const peer = u.searchParams.get('peer'), secret = u.searchParams.get('secret');
+  if (!peer || !/^[A-Za-z0-9_-]{8,80}$/.test(peer) || (secret && !/^[A-Za-z0-9_-]{4,80}$/.test(secret))) return '';
+  return `parsec://peer_id=${peer}${secret ? `&secret=${secret}` : ''}`;
+}
+
+/** Abre Parsec directo; si en ~2,5 s la pestaña no perdió el foco (la app no abrió), abre la invitación web. */
+export function abrirParsec(directo, respaldo) {
+  let abierto = false; const marca = () => { abierto = true; };
+  window.addEventListener('blur', marca, { once: true }); document.addEventListener('visibilitychange', marca, { once: true });
+  window.location.href = directo;
+  setTimeout(() => { window.removeEventListener('blur', marca); document.removeEventListener('visibilitychange', marca); if (!abierto && respaldo) window.open(respaldo, '_blank', 'noopener'); }, 2500);
+}

@@ -1,5 +1,5 @@
 // Pinta las tarjetas de reto. Solo devuelve HTML (no toca la red); todo dato de la BD pasa por escapeHTML.
-import { escapeHTML, safeUrl } from '../../core/dom.js';
+import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/dom.js';
 import { regionAhora } from '../ajustes.js';
 import { confirmPhase } from '../../core/schedule.js';
 import { CONFIRM_OPEN_MIN, CONFIRM_CLOSE_MIN } from '../../core/rules.js';
@@ -91,7 +91,7 @@ function linkBlock(r, id) {
   }
   const url = safeUrl(c?.link, { allowParsec: true });
   return c && url
-    ? `<div class="mt-3 space-y-2"><a href="${escapeHTML(url)}" target="_blank" rel="noopener" class="btn btn-primary w-full !min-h-11">Conectar a ${escapeHTML(nm(r.host_id))}</a>${c.detalle ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-key mr-1 text-galaxy-400"></i>${escapeHTML(c.detalle)}</p>` : ''}</div>`
+    ? `<div class="mt-3 space-y-2"><a href="${escapeHTML(url)}" target="_blank" rel="noopener" ${parsecDirecto(url) ? `data-parsec="${escapeHTML(parsecDirecto(url))}"` : ''} class="btn btn-primary w-full !min-h-11">Conectar a ${escapeHTML(nm(r.host_id))}</a>${c.detalle ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-key mr-1 text-galaxy-400"></i>${escapeHTML(c.detalle)}</p>` : ''}</div>`
     : `<p class="mt-3 text-[12px] text-gray-400"><i class="fa-solid fa-hourglass-half mr-1"></i>Esperando el enlace del host (${escapeHTML(nm(r.host_id))})…</p>`;
 }
 
@@ -146,3 +146,9 @@ export function cardHistorial(r, id, { tarjeta = false } = {}) {
     ${cuando ? `<p class="text-[12px] text-gray-400 mt-1"><i class="fa-regular fa-calendar-check mr-1"></i>${escapeHTML(cuando)}</p>` : ''}${btnTarjeta}
   </article>`;
 }
+
+// «Conectar»: si el enlace es una invitación web de Parsec, abre la app directo (con la invitación web de respaldo).
+document.addEventListener('click', (e) => {
+  const a = e.target.closest?.('a[data-parsec]'); if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  e.preventDefault(); abrirParsec(a.dataset.parsec, a.href);
+});
