@@ -358,10 +358,10 @@ test('tabla: un partido sin jugar (gl y gv null) no suma ni se descarta; solo se
   assert.equal(calcularTabla([{ l: 'A', v: 'B', gl: 1, gv: null }]).descartados.length, 1);   // medio marcador = dato inválido
 });
 
-test('tabla: coincide fila por fila con la tabla real de CopaFácil (fechas 1-9 parciales; incluye Axel 0-3 Arens de la fecha 9, cargado el 5 oct 2026), incluido el desempate por enfrentamiento directo', () => {
+test('tabla: coincide fila por fila con la tabla real de CopaFácil (fechas 1-9 parciales; incluye Axel 0-3 Arens de la fecha 9, cargado el 5 oct 2026, y Beto 2-0 Morgado de la fecha 8, cargado el 8 oct 2026), incluido el desempate por enfrentamiento directo', () => {
   const esperado = [ // nombre, pts, j, g, e, p, gf, gc
-    ['Victor', 24, 8, 8, 0, 0, 57, 4], ['Degox', 21, 7, 7, 0, 0, 36, 6], ['Beto', 18, 7, 6, 0, 1, 37, 14], ['Axel', 13, 9, 4, 1, 4, 22, 28],
-    ['Arens', 12, 9, 4, 0, 5, 20, 27], ['Roberto', 10, 8, 3, 1, 4, 9, 22], ['Morgado', 9, 7, 3, 0, 4, 14, 14], ['Camilo', 9, 9, 3, 0, 6, 11, 39],
+    ['Victor', 24, 8, 8, 0, 0, 57, 4], ['Degox', 21, 7, 7, 0, 0, 36, 6], ['Beto', 21, 8, 7, 0, 1, 39, 14], ['Axel', 13, 9, 4, 1, 4, 22, 28],
+    ['Arens', 12, 9, 4, 0, 5, 20, 27], ['Roberto', 10, 8, 3, 1, 4, 9, 22], ['Morgado', 9, 8, 3, 0, 5, 14, 16], ['Camilo', 9, 9, 3, 0, 6, 11, 39],
     ['Jeremi', 8, 7, 2, 2, 3, 14, 16], ['Fralex', 6, 8, 2, 0, 6, 20, 33], ['Hugo', 6, 8, 1, 3, 4, 11, 19], ['Jack', 4, 9, 1, 1, 7, 9, 38],
   ];
   const { tabla } = calcularTabla(FECHAS.flatMap((f) => f.partidos));
@@ -409,7 +409,7 @@ test('noticias: orden, destacada, filtros y ligas', () => {
 test('crónica: borrador de la fecha 8 (victor golea) y casos límite', () => {
   const ed = EDICIONES.galaxy[0]; const c = generarCronica({ fechas: ed.fechas, n: 8, clubes: ed.clubes, nombreLiga: 'Galaxy League', nombreEdicion: 'Apertura 2026' });
   assert.equal(c.titulo, 'Fecha 8: Victor golea a Roberto 9-0'); assert.equal(c.categoria, 'JORNADA'); assert.equal(c.tag, 'Fecha 8');
-  assert.match(c.resumen, /4 partidos y 25 goles/); assert.match(c.cuerpo, /Quedan por jugarse de esta fecha: Degox – Jeremi; Beto – Morgado/); assert.match(c.cuerpo, /Victor \(BAYERN MÚNICH\) ante Roberto/);
+  assert.match(c.resumen, /5 partidos y 27 goles/); assert.match(c.cuerpo, /Quedan por jugarse de esta fecha: Degox – Jeremi\./); assert.match(c.cuerpo, /Victor \(BAYERN MÚNICH\) ante Roberto/);
   assert.equal(validar({ ...c, imagen: '', liga: 'galaxy' }).ok, true);   // lo generado cumple los límites de la base
   assert.equal(generarCronica({ fechas: ed.fechas, n: 99 }), null); assert.equal(generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: null, gv: null }] }], n: 1 }), null);
   const empate = generarCronica({ fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 1 }] }], n: 1, nombreLiga: 'X' }); assert.match(empate.titulo, /reparto de puntos/);
