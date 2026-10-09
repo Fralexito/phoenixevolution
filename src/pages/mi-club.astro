@@ -1,6 +1,6 @@
 ---
 // MI CLUB (vestuario): edita la ficha de los jugadores de TU equipo de Liga Máster desde la web.
-// Los datos los sube Phoenix Mercado (POST /mercado/v1/vestuario/subir); lo que cambies aquí queda «pendiente» y el programa lo aplica al juego.
+// Los datos los sube Phoenix Sync (POST /mercado/v1/vestuario/subir); lo que cambies aquí queda «pendiente» y el programa lo aplica al juego.
 // BD: migración 095 (vestuario_*). Lógica: js/core/vestuario.js · pantalla: js/pages/miClub.js · estilos: styles/miClub.css
 import Layout from '../layouts/Layout.astro';
 import Plegable from '../components/Plegable.astro';
@@ -8,13 +8,13 @@ import Plegable from '../components/Plegable.astro';
 <Layout title="Mi club" active="miclub" description="Edita la ficha de los jugadores de tu equipo de Liga Máster y mándala a tu juego.">
   <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-5">
     <header>
-      <span class="text-xs font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta · Phoenix Mercado</span>
+      <span class="text-xs font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta · Phoenix Sync</span>
       <h1 class="text-3xl sm:text-5xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-shirt text-galaxy-400 mr-2"></i>Mi club</h1>
-      <p class="text-gray-300 text-sm mt-1 max-w-3xl">El vestuario de tu equipo de Liga Máster. Cambia la ficha de tus jugadores y Phoenix Mercado la aplicará en tu partida.</p>
+      <p class="text-gray-300 text-sm mt-1 max-w-3xl">El vestuario de tu equipo de Liga Máster. Cambia la ficha de tus jugadores y Phoenix Sync la aplicará en tu partida.</p>
     </header>
 
     <p id="mc-sin-sesion" class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Inicia sesión para ver tu club.</p>
-    <p id="mc-vacio" hidden class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Todavía no has subido tu club. En Phoenix Mercado elige «Subir mi club a la web» y vuelve aquí.</p>
+    <p id="mc-vacio" hidden class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Todavía no has subido tu club. En Phoenix Sync elige «Subir mi club a la web» y vuelve aquí.</p>
 
     <div id="mc-app" hidden class="space-y-4">
       <div id="mc-selector" class="flex flex-wrap gap-2" hidden></div>

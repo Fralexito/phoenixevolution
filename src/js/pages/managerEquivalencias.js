@@ -53,7 +53,7 @@ function fila(r) {
 
 async function cargarLista(append = false) {
   if (!append) st.desde = 0;
-  if (!st.perfil) { $('eq-lista').innerHTML = '<p class="text-xs text-gray-500">Todavía no llegó ningún informe de Phoenix Mercado.</p>'; $('eq-mas').hidden = true; return; }
+  if (!st.perfil) { $('eq-lista').innerHTML = '<p class="text-xs text-gray-500">Todavía no llegó ningún informe de Phoenix Sync.</p>'; $('eq-mas').hidden = true; return; }
   let q = supabase.from(tabla()).select(`id, phoenix_id, pes_id_local, estado, puntaje, metodo, candidatos, ${embed()}`)
     .eq('perfil_parche', st.perfil).eq('estado', st.estado).order('puntaje', { ascending: false, nullsFirst: false }).order('id').range(st.desde, st.desde + POR_PAGINA - 1);
   if (st.q) q = q.ilike('ref.nombre', `%${st.q.replace(/[%_]/g, '')}%`);

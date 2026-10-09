@@ -16,6 +16,6 @@
 //   noticiasTono → Noticias con dos tonos: serio (Oficial/Jornadas/Tribunal, marco sobrio, sin serif) y joda (Tribuna: sticker, inclinación, color naranja). false = como antes
 //   pilares → menú de arriba en 4 pilares (Competir · Jugar · Comunidad · Tienda) con desplegable grande + pestañas del pilar en cada página. false = menú clásico de 9 enlaces
 //   limpio → Central despejada: los accesos «¿Qué quieres hacer?» reemplazan los botones de la portada, el pulso pasa a una línea y se quita la barra de anclas. false = como antes
-//   mercadoLink → Mercado conectado al juego (programa de PC «Phoenix Mercado», beta): vincular, option file oficial y revisión de cambios. false = aviso «Próximamente»
+//   mercadoLink → Mercado conectado al juego (programa de PC «Phoenix Sync», beta): vincular, option file oficial y revisión de cambios. false = aviso «Próximamente»
 //   barraLateral → barra lateral izquierda estilo red social (solo PC ≥ 1280 px): atajos, ligas y amigos. Pon false y desaparece por completo
 export const FX = { transiciones: true, reveal: true, esqueletos: true, rachas: true, visita: true, compartir: true, barraLateral: true, social: true, dopamina: true, contactos: true, tickerVivo: true, vitrina: true, palmaresNuevo: false, palmaresVitrina: true, highlightsDemo: false, noticiasTono: true, pilares: true, limpio: true, mercadoLink: true };

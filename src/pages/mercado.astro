@@ -1,5 +1,5 @@
 ---
-// Mercado (FX.mercadoLink): puente web ↔ juego con el programa de PC «Phoenix Mercado» (beta; luego vive dentro de Phoenix Link).
+// Mercado (FX.mercadoLink): puente web ↔ juego con el programa de PC «Phoenix Sync» (beta; luego vive dentro de Phoenix Link).
 // Jugador: vincula el programa y ve el estado de sus reportes. Staff: sube el option file oficial y aprueba/rechaza cambios.
 // API del programa: docs/mercado-api.md · BD: migración 078 · Lógica: js/pages/mercado.js
 import Layout from '../layouts/Layout.astro';
@@ -12,7 +12,7 @@ import { FX } from '../data/experimento.js';
     <header class="glass-panel rounded-2xl px-5 py-4">
       <span class="text-[11px] font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta</span>
       <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-handshake text-galaxy-400 mr-2"></i>Mercado</h1>
-      <p class="text-gray-300 text-sm mt-1 max-w-3xl">Los fichajes de la liga llegan a tu juego. El programa <b class="text-white">Phoenix Mercado</b> descarga el option file oficial, lo verifica y, después de jugar, envía los cambios para que el staff los apruebe.</p>
+      <p class="text-gray-300 text-sm mt-1 max-w-3xl">Los fichajes de la liga llegan a tu juego. El programa <b class="text-white">Phoenix Sync</b> descarga el option file oficial, lo verifica y, después de jugar, envía los cambios para que el staff los apruebe.</p>
       <ol class="mt-4 grid sm:grid-cols-3 gap-2 text-xs">
         <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">1 · Vincula</b><br>Genera un código aquí y pégalo en el programa.</li>
         <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">2 · Descarga</b><br>El programa baja el option file oficial y comprueba que esté intacto.</li>
@@ -24,7 +24,7 @@ import { FX } from '../data/experimento.js';
 
     <div id="mk-jugador" hidden class="grid lg:grid-cols-2 gap-4">
       <section class="glass-panel rounded-2xl p-4 space-y-3">
-        <h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-link text-galaxy-400 mr-2"></i>Vincular programa</h2>
+        <h2 class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-link text-galaxy-400 mr-2"></i>Vincular Phoenix Sync</h2>
         <div id="mk-codigo"></div>
         <button type="button" id="mk-generar" class="btn btn-primary"><i class="fa-solid fa-key"></i> Generar código</button>
         <div id="mk-dispositivos" class="space-y-2"></div>

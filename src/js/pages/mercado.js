@@ -1,4 +1,4 @@
-// Mercado (beta): vincular el programa Phoenix Mercado, ver mis reportes; staff: option file oficial + revisar cambios.
+// Mercado (beta): vincular el programa Phoenix Sync, ver mis reportes; staff: option file oficial + revisar cambios.
 // BD: migración 078 (mercado_*). Todas las escrituras por RPC o con RLS de staff; el programa usa la Edge Function «mercado».
 import { supabase } from '../core/supabase.js';
 import { onSession, can } from '../core/session.js';
@@ -23,7 +23,7 @@ async function generarCodigo() {
     const pintar = () => {
       const s = Math.max(0, Math.round((fin - Date.now()) / 1000));
       $('mk-codigo').innerHTML = s ? `<div class="rounded-xl border border-galaxy-400/40 bg-galaxy-400/5 p-3 text-center">
-          <p class="text-[11px] text-gray-400 uppercase tracking-widest">Pega este código en Phoenix Mercado</p>
+          <p class="text-[11px] text-gray-400 uppercase tracking-widest">Pega este código en Phoenix Sync</p>
           <p class="font-mono text-3xl tracking-[0.3em] text-white my-1 select-all">${esc(data.codigo)}</p>
           <p class="text-[11px] text-gray-500">Vence en ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} · un solo uso</p></div>`
         : '<p class="text-xs text-gray-500">El código venció. Genera otro.</p>';

@@ -1,7 +1,7 @@
 ---
 // MODO MÁNAGER (Liga Máster de la web): opcional y por jugador. Cada usuario puede activar su carrera de DT,
 // elegir un club aprobado, y fichar/vender en ventanas. Los movimientos se reflejan en el juego vía option file (claude/liga-master-plan.md).
-// BD: migración 079 (lm_*). Lógica: js/pages/manager.js. Conexión con el juego: /mercado/ (programa Phoenix Mercado).
+// BD: migración 079 (lm_*). Lógica: js/pages/manager.js. Conexión con el juego: /mercado/ (programa Phoenix Sync).
 import Layout from '../layouts/Layout.astro';
 const base = import.meta.env.BASE_URL;
 const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-magnifying-glass-dollar', 'Mercado'], ['oficina', 'fa-envelope-open-text', 'Oficina'], ['movimientos', 'fa-right-left', 'Movimientos']];
@@ -45,7 +45,7 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </section>
       <section data-panel="movimientos" hidden class="mg-caja"><h3 class="mg-caja-tit"><i class="fa-solid fa-right-left"></i> Diario de fichajes · Galaxy League</h3><div id="mg-movs"></div></section>
       <div class="flex flex-wrap gap-2 text-xs">
-        <a href={`${base}mercado/`} class="btn btn-ghost !min-h-9 !text-xs"><i class="fa-solid fa-plug"></i> Conectar el juego (Phoenix Mercado)</a>
+        <a href={`${base}mercado/`} class="btn btn-ghost !min-h-9 !text-xs"><i class="fa-solid fa-plug"></i> Conectar el juego (Phoenix Sync)</a>
         <button type="button" id="mg-dejar" class="btn btn-ghost !min-h-9 !text-xs !text-rose-300"><i class="fa-solid fa-door-open"></i> Dejar mi club</button>
       </div>
     </div>
@@ -106,7 +106,7 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
         <div id="mg-staff-clubes" class="mg-clubes-grid"></div>
       </div>
 
-      <!-- Equivalencias entre parches (informe de Phoenix Mercado) -->
+      <!-- Equivalencias entre parches (informe de Phoenix Sync) -->
       <div id="eq" class="space-y-3">
         <div class="flex flex-wrap items-center gap-2">
           <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-link"></i> Equivalencias entre parches</h3>
