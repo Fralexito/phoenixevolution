@@ -19,4 +19,4 @@ montarTarjetasSalas({ contenedor: $('ah-radar'), tipo: 'radar', alContar: (n) =>
 montarTarjetasSalas({ contenedor: $('ah-vivo'), tipo: 'vivo', alContar: (n) => { $('ah-vivo-vacio').hidden = !!n; } });
 montarRankingSemanal($('ah-ranking'));
 onSession((st) => { if (st?.session) montarRacha($('ah-racha')); });
-cifras(); setInterval(cifras, 30_000); setInterval(() => { if (!document.hidden) montarRankingSemanal($('ah-ranking')); }, 120_000);
+cifras(); setInterval(() => { if (!document.hidden) cifras(); }, 30_000); document.addEventListener('visibilitychange', () => { if (!document.hidden) cifras(); }); setInterval(() => { if (!document.hidden) montarRankingSemanal($('ah-ranking')); }, 120_000);
