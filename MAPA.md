@@ -471,6 +471,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ### Ronda 219 — Anti-spam configurable por el admin
 - Tabla `chat_ajustes` (espera_seg 0–60, defecto 3), RPC `chat_global_ajustar` (solo admin, auditada), migración 099f/099g aplicadas por MCP. Web: panel «Ajustes del chat» en /chat-general/ (solo admin) y botón con cuenta atrás según `espera_seg`. API: GET /v1/chat/global añade `espera_seg`. Edge **v12 desplegada** por MCP (freno 1/1 s de cortesía; comprobada contra el repo). Tests 405, 45 páginas. Siguiente migración libre: 100.
 
+### Ronda 221 — Resultados Galaxy League: fechas 8 y 9
+- Marcadores cargados en `src/data/ligaResultados.js` (solo datos, sin migración ni cambios de BD): fecha 8 Degox 0–1 Jeremi y Beto 2–0 Morgado; fecha 9 Jeremi 0–6 Beto. Hugo 2–3 Víctor, Camilo 4–1 Jack y Axel 0–3 Arens ya estaban. Quedan sin jugar en fecha 9: Roberto–Degox y Fralex–Morgado. Pruebas: el archivo se carga bien (fecha 8: 6 jugados; fecha 9: 4 jugados). Se subió a `borrador` (FASE BETA).
+
 ### Ronda 220 — «Última hora» para Phoenix Link (API 1.10.0)
 - Migración **100** (aplicada por MCP como 100a/100b): tabla `noticias_ultima_hora` (texto ≤200, nivel info/importante/urgente, enlace https opcional, expira 1 h–7 días, máx. 5 vigentes), RPC `uh_crear`/`uh_cerrar` (moderador/admin, auditadas) y `noticias_api_ultima_hora` (service_role).
 - Edge: `GET /v1/noticias/ultima-hora` (ETag, freno 1/30 s), interruptor `noticias`, intervalo `sondeo_noticias_seg` (mín. 60). Contrato §28 (v1.10.0). Web: tarjeta «Última hora en Phoenix Link» en Moderación (`core/ultimaHora.js`, `features/ultimaHora.js`). Tests 410. **PENDIENTE-DEPLOY** (Edge v13) y PENDIENTE-WEB. Siguiente ronda = 221; siguiente migración libre = 101.
