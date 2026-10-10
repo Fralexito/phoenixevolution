@@ -1,0 +1,71 @@
+---
+// MI CLUB · Resumen (rama rediseno). La «casa» de cada jugador: lo que busca seguido, en una sola pantalla.
+// Sin sesión muestra la invitación a crear cuenta. Con sesión: saludo, Primeros pasos (hasta completarlos), mi liga, mis pendientes y las puertas a cada sección.
+// Lógica pura en js/core/club.js (con pruebas); datos y pintado en js/pages/club.js.
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL;
+const PUERTAS = [
+  { id: 'perfil', href: 'perfil/', icono: 'fa-user', t: 'Mi perfil y muro', p: 'Quién eres, tus publicaciones y tus estadísticas.' },
+  { id: 'carta', href: 'database/', icono: 'fa-id-card', t: 'Mi carta', p: 'Tu ficha oficial: posición, estadísticas y OVR.' },
+  { id: 'partidos', href: 'mis-partidos/', icono: 'fa-gamepad', t: 'Mis partidos', p: 'Agendados, por confirmar e historial con cada rival.' },
+  { id: 'manager', href: 'manager/', icono: 'fa-user-tie', t: 'Liga Máster', p: 'Tu club de DT: plantilla, presupuesto y fichajes.' },
+  { id: 'vestuario', href: 'mi-club/', icono: 'fa-shirt', t: 'Vestuario', p: 'La ficha de tus futbolistas dentro del juego.' },
+  { id: 'pc', href: 'mis-salas/', icono: 'fa-desktop', t: 'Mi PC · Phoenix Link', p: 'Vincula tu PC, abre salas y conecta el juego con la web.' },
+  { id: 'logros', href: 'logros/', icono: 'fa-medal', t: 'Logros', p: 'Insignias que ganas jugando.' },
+  { id: 'mensajes', href: 'mensajes/', icono: 'fa-comments', t: 'Mensajes y amigos', p: 'Privados, solicitudes y tu red.' },
+];
+---
+<Layout title="Mi club" active="club">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 w-full">
+
+    <!-- Sin sesión -->
+    <section class="solo-invitado in-card in-acc cl-invitado">
+      <span class="in-eti">Mi club</span>
+      <h1 class="in-tit !text-2xl">Tu casa en <em>Phoenix</em></h1>
+      <p class="in-leyenda">Aquí vas a ver tu próximo partido, tu puesto en la tabla, tu carta de jugador y tus pendientes. Primero necesitas una cuenta: es gratis y toma un minuto.</p>
+      <div class="in-cta !mt-4"><button type="button" class="in-btn in-btn-p" data-auth="register"><i class="fa-solid fa-rocket"></i> Crear mi cuenta</button><button type="button" class="in-btn in-btn-s" data-auth="login">Ya tengo cuenta</button><a href={`${base}#empezar`} class="in-enlace">Ver los 4 pasos →</a></div>
+    </section>
+
+    <!-- Con sesión -->
+    <div class="solo-cuenta">
+      <!-- 1. Saludo -->
+      <header class="cl-saludo">
+        <div class="cl-yo">
+          <span id="cl-avatar" class="cl-avatar"></span>
+          <div class="min-w-0">
+            <span class="in-eti">Mi club · <span id="cl-hola">Hola</span></span>
+            <h1 class="in-tit !text-2xl sm:!text-3xl" id="cl-titulo"><span>Tu casa en</span> <em>Phoenix</em></h1>
+            <p class="in-leyenda" id="cl-sub">Cargando tu resumen…</p>
+          </div>
+        </div>
+        <div class="cl-acciones">
+          <button type="button" class="in-btn in-btn-g" data-act="profile"><i class="fa-solid fa-pen"></i> Editar perfil</button>
+          <a href={`${base}duelos/`} class="in-btn in-btn-p"><i class="fa-solid fa-gamepad"></i> Lanzar un reto</a>
+        </div>
+      </header>
+
+      <!-- 2. Primeros pasos (se oculta solo al completar los 5, o con «Ocultar») -->
+      <section id="cl-pasos" hidden class="in-card in-acc cl-pasos" aria-labelledby="cl-pasos-t"></section>
+
+      <!-- 3. Mi liga + pendientes (3 tarjetas) -->
+      <section class="cl-fila3" aria-label="Lo que busca seguido">
+        <article class="in-card cl-tarjeta" id="cl-liga"><span class="in-mini">Mi liga</span><div class="cl-cargando"><div class="esqueleto h-5 w-2/3"></div><div class="esqueleto h-10"></div></div></article>
+        <article class="in-card cl-tarjeta" id="cl-pend"><span class="in-mini">Pendientes</span><div class="cl-cargando"><div class="esqueleto h-5 w-2/3"></div><div class="esqueleto h-10"></div></div></article>
+        <article class="in-card cl-tarjeta" id="cl-nums"><span class="in-mini">Mis números</span><div class="cl-cargando"><div class="esqueleto h-5 w-2/3"></div><div class="esqueleto h-10"></div></div></article>
+      </section>
+
+      <!-- 4. Puertas -->
+      <section class="in-sec" aria-labelledby="cl-puertas-t">
+        <div class="in-cab"><div><span class="in-eti">Todo lo tuyo</span><h2 id="cl-puertas-t" class="in-tit">Las puertas de <em>tu club</em></h2><p class="in-leyenda">Cada tarjeta es una sección tuya. Las mismas que ves en el menú «Mi club».</p></div></div>
+        <div class="cl-puertas">
+          {PUERTAS.map((x) => (
+            <a href={`${base}${x.href}`} class="in-card cl-puerta" data-puerta={x.id}><i class={`fa-solid ${x.icono}`}></i><span class="min-w-0"><b>{x.t}</b><small>{x.p}</small><em data-extra hidden></em></span><i class="fa-solid fa-arrow-right cl-flecha"></i></a>
+          ))}
+        </div>
+      </section>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/club.js';
+</script>

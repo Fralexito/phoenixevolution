@@ -353,3 +353,13 @@ contar(supabase.from('retos_matchmaking').select('id', head).eq('estado', 'BUSCA
 
 // Enganche (070/071): creadores en vivo y ranking semanal en la columna lateral del inicio.
 import('../features/enganche.js').then((m) => { m.montarCreadoresVivo(document.getElementById('inicio-creadores')); m.montarRankingSemanal(document.getElementById('inicio-semanal'), { limite: 5 }); }).catch((e) => console.warn('[central] enganche:', e));
+
+// Inicio nuevo (rama rediseno): con sesión, el panel «Primeros pasos» ocupa el lugar de «Tu camino» hasta completar los 5 pasos.
+onSession(async ({ session, profile }) => {
+  const box = $('primeros-pasos'); if (!box || !session || !profile) return;
+  try {
+    const [{ montarPrimerosPasos, pasosDe }, { openProfileModal }] = await Promise.all([import('../features/primerosPasos.js'), import('../features/profile.js')]);
+    const { pasos } = await pasosDe(session.user.id, profile);
+    montarPrimerosPasos(box, pasos, { href: (p) => `${import.meta.env.BASE_URL}${p}`, onProfile: openProfileModal, compacto: true });
+  } catch (e) { console.warn('[central] primeros pasos:', e); }
+});

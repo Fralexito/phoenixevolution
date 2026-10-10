@@ -7,7 +7,7 @@ const { active } = Astro.props;
 const p = pilarDe(active);
 ---
 {p && p.items.length > 1 && (
-  <nav class="pilar-tabs" aria-label={`Secciones de ${p.label}`}>
+  <nav class:list={["pilar-tabs", p.soloCuenta && "solo-cuenta"]} aria-label={`Secciones de ${p.label}`}>
     <span class="pilar-tabs-tit"><i class={`fa-solid ${p.icon}`}></i> {p.label}</span>
     <div class="pilar-tabs-lista">
       {p.items.map((n) => (

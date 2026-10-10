@@ -20,10 +20,11 @@ const pilarActual = pilarDe(active)?.id;
 
     <div class="hidden lg:flex items-center gap-1 font-display text-[0.95rem] xl:text-[1.05rem] ml-auto">
       {FX.pilares && <a href={base} class="nav-link" aria-current={active === 'central' ? 'page' : undefined} title="Central"><i class="fa-solid fa-house text-[.85em]"></i><span class="sr-only">Central</span></a>}
+      {FX.pilares && <a href={`${base}#empezar`} class="nav-link solo-invitado" title="Guía para empezar"><i class="fa-solid fa-rocket text-[.8em] mr-1.5 opacity-70"></i>Empieza aquí</a>}
       {FX.pilares ? PILARES.map((p) => (
         p.items.length === 1
           ? <a href={`${base}${p.items[0].path}`} class="nav-link" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}</a>
-          : <div class="pilar" data-pilar={p.id}>
+          : <div class:list={['pilar', p.soloCuenta && 'solo-cuenta']} data-pilar={p.id}>
               <button type="button" class="nav-link pilar-btn" aria-expanded="false" aria-haspopup="true" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}<i class="fa-solid fa-chevron-down text-[.6em] ml-1.5 opacity-60 pilar-flecha"></i></button>
               <div class="pilar-panel" role="menu">
                 <p class="pilar-lema"><i class={`fa-solid ${p.icon}`}></i> {p.lema}</p>

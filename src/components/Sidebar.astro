@@ -24,7 +24,7 @@ const { active } = Astro.props;
     {FX.pilares ? (<>
       <a href={base} aria-current={active === 'central' ? 'page' : undefined} class="cuenta-tile !flex-row !justify-start !min-h-0 !py-3 !px-3 !gap-3 !text-[.8rem]"><i class="fa-solid fa-house"></i><span>Central</span></a>
       {PILARES.map((p) => (
-        <section class="cuenta-grupo">
+        <section class:list={['cuenta-grupo', p.soloCuenta && 'solo-cuenta']}>
           <p class="cuenta-tit"><i class={`fa-solid ${p.icon} mr-1`}></i> {p.label}</p>
           <div class="cuenta-mosaico">{p.items.map((n) => (<a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class="cuenta-tile"><i class={`fa-solid ${n.icon}`}></i><span>{n.label}</span></a>))}</div>
         </section>

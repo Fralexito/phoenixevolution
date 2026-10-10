@@ -41,3 +41,10 @@ python3 docs/rediseno/maquetas/build.py      # crea dist/_mock_*.html
 - «Tu camino» y «¿Qué es?» solo se ven sin sesión (`.solo-invitado`). Con sesión queda el hueco `#primeros-pasos` para el panel de la propuesta 2.
 - Se quitó la barra de anclas y los 5 accesos iguales. Clubes/goleadores, Jugadores destacados y Discord se mantienen.
 - Para volver al inicio anterior: `git checkout borrador -- src/pages/index.astro src/styles/global.css` (y borrar `inicio.css`).
+
+## Mi club + pilares (10 oct 2026, 2.ª entrega)
+- `src/data/site.js`: pilar nuevo **Mi club** (`soloCuenta: true`; sin sesión el header muestra «Empieza aquí»). Formatos pasa a Jugar; «Unirme» entra en Jugar como «Cómo se juega»; Quiénes somos entra en Comunidad. Liga Máster + Vestuario y Phoenix Link se muestran como una sola entrada cada uno.
+- Página nueva `/club/` (`src/pages/club.astro`, `src/js/pages/club.js`, lógica pura `src/js/core/club.js` con `tests/club.test.mjs`): saludo, Primeros pasos, Mi liga (puesto y próximo partido desde `ligaResultados.js`), Pendientes (marcadores por confirmar, retos), Mis números (RPC `estadisticas_de`/`elo_de`) y las 8 puertas.
+- Panel **Primeros pasos** (`src/js/features/primerosPasos.js`): se usa en `/club/` y en el Inicio con sesión (`#primeros-pasos`). Se oculta solo al completar los 5 o con «Ocultar» (se recuerda en el navegador).
+- Header / Sidebar / PilarTabs: respetan `soloCuenta`.
+- Nada de Supabase cambió (solo lecturas que ya existían).

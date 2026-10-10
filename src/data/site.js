@@ -32,6 +32,7 @@ export const APOYO = { href: '', texto: 'Apoya la comunidad' };
 // Menú lateral, grupo "Mi cuenta": solo se muestra con sesión iniciada.
 // Para añadir una sección futura, agrega UNA línea aquí (con `path` para una página o `action` para algo del sistema).
 export const ACCOUNT_NAV = [
+  { id: 'club',     label: 'Mi club',     path: 'club/',          icon: 'fa-shield-halved', grupo: 'tu' },
   { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user', grupo: 'tu' },
   { id: 'muro',     label: 'Mi muro',      path: 'perfil/',        icon: 'fa-newspaper', grupo: 'tu' },
   { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad', grupo: 'tu' },
@@ -100,16 +101,21 @@ const DESC = {
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores',
   tienda: 'Estética y mejoras para tu perfil',
+  // Pilar «Mi club» (rama rediseno): la casa de cada jugador
+  club: 'Tu resumen: próximo partido, puesto, carta y pendientes', muro: 'Quién eres, tus publicaciones y estadísticas', partidos: 'Pendientes, por confirmar e historial con cada rival',
+  logros: 'Insignias que ganas jugando', unirme: 'Parsec, host y Phoenix Link explicados paso a paso',
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
-const RENOMBRE = { ahora: 'En vivo' };
+const RENOMBRE = { ahora: 'En vivo', muro: 'Mi perfil y muro', manager: 'Liga Máster y vestuario', missalas: 'Mi PC · Phoenix Link', unirme: 'Cómo se juega' };
 const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra,
   items: ids.map((spec) => { const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
     return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
 export const PILARES = [
-  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
-  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado', 'miclub'], { lema: 'Del clic al partido' }),
-  pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'chatgeneral', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
+  // «Mi club» solo se ve con sesión (`soloCuenta`); sin sesión el header muestra «Empieza aquí» en su lugar.
+  pilar('club', 'Mi club', 'fa-shield-halved', ['club', 'muro>perfil', 'partidos', 'manager>mercado,miclub', 'missalas', 'logros'], { lema: 'Tu casa en Phoenix', soloCuenta: true }),
+  pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'database', 'ranking', 'palmares', 'historial'], { lema: 'La liga y sus jugadores' }),
+  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'formatos', 'unirme'], { lema: 'Del clic al partido' }),
+  pilar('comunidad', 'Comunidad', 'fa-people-group', ['social', 'noticias', 'chatgeneral', 'creadores', 'clanes', 'eventos', 'organizadores'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];
 /** Pilar al que pertenece una página (por su `active`), o null (Central, cuenta, etc.). */
