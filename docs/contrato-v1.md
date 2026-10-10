@@ -3,9 +3,9 @@
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
 
-**Cambios 1.9.0 (compatibles, requieren migración 099; `PENDIENTE-WEB`: la función aún no está desplegada):** Chat general compartido con la web: `GET/POST /v1/chat/global` (sección 27); interruptor `chat_global`; intervalo `sondeo_chat_seg`; errores `MENSAJE_INVALIDO` (400), `CUENTA_SANCIONADA` (403), `CHAT_PAUSADO` (503). Solo añade: nada de lo publicado cambia.
+**Cambios 1.9.0 (compatibles, requieren migraciones 099 a 099g; función DESPLEGADA como v12 el 09-10-2026; la web oficial sigue `PENDIENTE-WEB`):** Chat general compartido con la web: `GET/POST /v1/chat/global` (sección 27), con `espera_seg` (anti-spam que fija el admin); interruptor `chat_global`; intervalo `sondeo_chat_seg`; errores `MENSAJE_INVALIDO` (400), `CUENTA_SANCIONADA` (403), `CHAT_PAUSADO` (503). Solo añade: nada de lo publicado cambia.
 
-**Cambios 1.8.0 (compatibles, requieren migración 098; `PENDIENTE-WEB`: la función aún no está desplegada):** Phoenix Sync compartido, sección 26: rutas `/v1/sync/config`, `/v1/sync/operaciones`, `/v1/sync/operaciones/aplicada`, `/v1/sync/option`, `/v1/sync/option/listo`; interruptor `sync_compartido`; intervalo `sondeo_sync_seg`; errores `SIN_PERMISO`, `GRUPO_NO_ENCONTRADO`, `OPERACION_INVALIDA`, `OPERACION_NO_ENCONTRADA`, `OPTION_INVALIDA`, `OPTION_NO_ENCONTRADA`, `LIMITE_EXCEDIDO`, `SYNC_PAUSADO`.
+**Cambios 1.8.0 (compatibles, requieren migración 098; función DESPLEGADA como v11/v12; la web oficial sigue `PENDIENTE-WEB`):** Phoenix Sync compartido, sección 26: rutas `/v1/sync/config`, `/v1/sync/operaciones`, `/v1/sync/operaciones/aplicada`, `/v1/sync/option`, `/v1/sync/option/listo`; interruptor `sync_compartido`; intervalo `sondeo_sync_seg`; errores `SIN_PERMISO`, `GRUPO_NO_ENCONTRADO`, `OPERACION_INVALIDA`, `OPERACION_NO_ENCONTRADA`, `OPTION_INVALIDA`, `OPTION_NO_ENCONTRADA`, `LIMITE_EXCEDIDO`, `SYNC_PAUSADO`.
 
 **Cambios 1.6.0 (compatibles, requieren migración 073):** nueva ruta `POST /v1/perfiles` (sección 23): nombre, avatar y carta de jugador por `parsec_id`.
 
@@ -544,7 +544,7 @@ Link pregunta **solo mientras `PES2021.exe` está abierto**, cada 15 s → 240 l
 - Recomendación: empezar con 2–3 PCs y vigilar el uso en Supabase antes de abrirlo a todos.
 
 
-## 26. Phoenix Sync compartido — fichajes entre PCs (1.8.0 · migración 098, aditivo · `PENDIENTE-WEB` hasta desplegar)
+## 26. Phoenix Sync compartido — fichajes entre PCs (1.8.0 · migración 098, aditivo · desplegado v11/v12)
 Mismo token `phx_…` y cabeceras que el resto. **Diferencia:** estas rutas **no exigen** `host_aprobado` ni `X-Phoenix-Version` (Phoenix Sync es otro programa); el permiso real lo da el **rol en el grupo**. Todas: 1 llamada cada **5 s** por ruta y método → `429 DEMASIADOS_INTENTOS` con `reintentar_en`/`retry-after`. Si el staff apaga `interruptores.sync_compartido` → `503 SYNC_PAUSADO`.
 
 **Roles del grupo:** `admin` (todo, incluido el interruptor y los permisos), `publica` (publica fichajes), `miembro` (recibe/aplica). Cada miembro tiene además `puede_aplicar`. El admin del sitio cuenta como `admin` de cualquier grupo.
@@ -609,19 +609,24 @@ Más los de siempre: `TOKEN_*`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (con 
 Con `sondeo_sync_seg` = 10 y solo mientras Sync está abierto: 360 llamadas/hora por PC. 2 PCs × 3 h/día × 30 días ≈ **65 000**/mes. Se suma a lo de §21 y §25: vigilar el uso antes de sumar más PCs.
 
 
-## 27. Chat general — el MISMO chat global de la web (1.9.0 · migración 099, aditivo · `PENDIENTE-WEB` hasta desplegar)
+## 27. Chat general — el MISMO chat global de la web (1.9.0 · migración 099, aditivo · desplegado v12)
 Lo que se escribe en Phoenix Link aparece en la web (`/chat-general/`) y al revés. El chat de **sala** sigue siendo local de Smash Soda y no pasa por aquí. Mismo token `phx_…` y cabeceras que el resto (`Authorization`, `X-Phoenix-Version`, `X-Phoenix-Build`). Mensajes: texto de **1 a 300 caracteres**; el servidor junta espacios y saltos de línea en un solo espacio.
 
 **Quién ve qué (misma regla que los mensajes privados):** los menores de 18 y los mayores se ven solo entre sí; el staff (moderador/admin) ve y es visto por todos. Una cuenta sin fecha de nacimiento declarada cuenta como mayor. Menores de 13 no escriben (`SIN_PERMISO`).
 
 ### `GET /v1/chat/global?desde=<id>&limite=50` (token)
 - `desde` = el `id` del último mensaje que ya tienes (entero ≥ 0). Sin `desde` (o `0`) devuelve **los últimos `limite` mensajes**. Con `desde` devuelve los **siguientes** (más viejo primero, hasta `limite`). `limite` de 1 a 100 (defecto 50). *No se acepta una fecha ISO: usa el `id`.*
-- Ejemplo (respuesta generada con los datos reales de la prueba en la base):
+- Ejemplo de respuesta (misma forma que devuelve el servidor; nombres, ids y textos de muestra):
 ```json
 { "ok": true,
-  "mensajes": [ { "id": 11, "usuario_id": "9c910092-4a0a-4554-bbba-e7f7fe2af64b", "nombre": "TU PAPI CHULO", "texto": "Hola, soy admin", "creado_en": "2026-10-10T03:39:31.298447+00:00", "rol": "admin" } ],
-  "borrados": [10], "ultimo_id": 11, "sondeo_seg": 5, "etag": "W/\"…\"", "solicitud_id": "…" }
+  "mensajes": [
+    { "id": 15, "usuario_id": "00000000-0000-4000-8000-000000000001", "nombre": "Jugador Uno", "texto": "Hola a todos", "creado_en": "2026-10-10T04:00:40.462488+00:00", "rol": "admin" },
+    { "id": 16, "usuario_id": "00000000-0000-4000-8000-000000000002", "nombre": "Jugador Dos", "texto": "¿Quién juega?", "creado_en": "2026-10-10T04:00:44.111751+00:00", "rol": "jugador" }
+  ],
+  "borrados": [10], "ultimo_id": 16, "espera_seg": 3, "sondeo_seg": 5, "etag": "W/\"…\"", "solicitud_id": "…" }
 ```
+- Campos de cada mensaje: `id` (entero, crece siempre), `usuario_id` (uuid del autor), `nombre` (nombre visible), `texto`, `creado_en` (ISO 8601 UTC) y `rol`.
+- **Anti-spam:** `espera_seg` (entero 0 a 60) = segundos mínimos entre dos mensajes de la misma persona; lo cambia el admin desde la web y vale igual para web y Link. Úsalo para mostrar una cuenta atrás y bloquear el botón de enviar; **no inventes tu propio valor** (0 = sin espera). Si el interruptor `chat_global` está apagado, `espera_seg` no viene.
 - `rol` = `admin` | `moderador` | `ayudante` | `arbitro` | `jugador` (para la insignia; no existe «vip» todavía).
 - **Borrados por moderación:** `borrados` trae los `id` de mensajes **borrados dentro de los últimos 200** mensajes del chat. Si ya mostrabas alguno, quítalo de la pantalla (y del contador de no leídos). Los mensajes borrados nunca vuelven en `mensajes`. Un mod que borra en la web lo ves borrado en Link en el siguiente sondeo.
 - `ultimo_id` = el mayor `id` de esta respuesta (o el `desde` que mandaste si no hay nada nuevo): úsalo como `desde` la próxima vez.
@@ -630,7 +635,7 @@ Lo que se escribe en Phoenix Link aparece en la web (`/chat-general/`) y al rev�
 - Interruptor `chat_global` apagado → `mensajes: []`, `pausado: true`: deja de preguntar hasta el próximo `GET /v1/config`.
 
 ### `POST /v1/chat/global` (token)
-Cuerpo `{ "texto": "hola a todos" }` → `{ "ok": true, "id": 12, "creado_en": "2026-10-10T03:40:02.114+00:00", "solicitud_id": "…" }`. El mensaje sale con el nombre y el rol de **quien es dueño del token**. Después de enviar, pide `GET desde=<tu último id>` para verlo con su `id` oficial.
+Cuerpo `{ "texto": "hola a todos" }` → `{ "ok": true, "id": 17, "creado_en": "2026-10-10T04:01:02.114+00:00", "solicitud_id": "…" }`. Si escribes antes de que pase `espera_seg` → `429` (`LIMITE_EXCEDIDO` o `DEMASIADOS_INTENTOS`, tratar igual) con `reintentar_en` en segundos: espera ese tiempo y reintenta. El mensaje sale con el nombre y el rol de **quien es dueño del token**. Después de enviar, pide `GET desde=<tu último id>` para verlo con su `id` oficial.
 
 ### Errores
 | Código | HTTP | Cuándo | Qué hacer |
@@ -649,5 +654,3 @@ Sanciones (suspensión/baneo), separación por edad, límite de ritmo y borrado 
 ### Coste estimado (plan FREE, 500 000 invocaciones/mes)
 Link pregunta cada 5 s **solo mientras PES2021.exe está abierto**: 720 llamadas/hora por PC. 5 PCs × 2 h/día × 30 días ≈ **216 000**/mes, sumadas a §21, §25 y §26 se **pasaría del tope**. Palancas: subir `sondeo_chat_seg` (10 s lo reduce a la mitad), pedir solo si el panel de chat está abierto, o apagar `chat_global`.
 
-
-> **§27 · añadido 1.9.0 (anti-spam configurable):** `GET /v1/chat/global` devuelve además `espera_seg` (entero 0–60): segundos mínimos entre dos mensajes de la misma persona. El admin lo cambia desde la web. Si `POST` llega antes → `429 LIMITE_EXCEDIDO` con `reintentar_en`. La app debe mostrar cuenta atrás con `espera_seg` y no inventar su propio valor.
