@@ -1,9 +1,9 @@
 // Página «Phoenix Sync»: interruptor (solo admin del grupo), fichajes con estado por miembro y permisos. Datos: features/sync/api.js. Lógica: core/sync.js.
 import { onSession, isAdmin } from '../core/session.js';
 import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
+import { confirmar, pedirTexto, elegir } from '../core/dialogo.js';
 import { escapeHTML as esc } from '../core/dom.js';
-import { MODOS, ESTADOS, ROLES, LEYENDA_MODO, AVISO_AUTOMATICO, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, usernameValido } from '../core/sync.js';
+import { MODOS, ESTADOS, ROLES, LEYENDA_MODO, AVISO_AUTOMATICO, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, terminoValido } from '../core/sync.js';
 import * as api from '../features/sync/api.js';
 
 const $ = (id) => document.getElementById(id);
@@ -100,9 +100,18 @@ $('sy-miembros').addEventListener('click', (e) => { const f = e.target.closest('
 $('sy-form-miembro').addEventListener('submit', async (e) => {
   e.preventDefault();
   const t = $('sy-usuario').value.trim();
-  if (!usernameValido(t)) { toast('Escribe el usuario tal cual aparece en la web (sin espacios).', 'warn'); return; }
-  try { const p = await api.buscarUsuario(t); await api.ponerMiembro(st.grupo, p.id, 'miembro', true); $('sy-usuario').value = ''; toast(`${p.nombre_display || p.username} añadido`, 'ok'); await cargarGrupo(); }
-  catch (err) { toast(err.message, 'error'); }
+  if (!terminoValido(t)) { toast('Escribe al menos 2 letras del usuario o del nombre.', 'warn'); return; }
+  try {
+    const hallados = (await api.buscarUsuarios(t)).filter((p) => !st.miembros.some((m) => m.usuario_id === p.id && m.activo !== false));
+    if (!hallados.length) { toast('No encontramos a nadie con ese nombre (o ya está en el grupo).', 'warn'); return; }
+    let p = hallados[0];
+    if (hallados.length > 1) {
+      const id = await elegir('¿A quién quieres añadir?', hallados.map((x) => ({ valor: x.id, texto: x.nombre_display || x.username, detalle: `@${x.username}` })), { titulo: 'Añadir al grupo' });
+      p = hallados.find((x) => x.id === id);
+    }
+    if (!p) return;
+    await api.ponerMiembro(st.grupo, p.id, 'miembro', true); $('sy-usuario').value = ''; toast(`${p.nombre_display || p.username} añadido`, 'ok'); await cargarGrupo();
+  } catch (err) { toast(err.message, 'error'); }
 });
 $('sy-nuevo').addEventListener('click', async () => {
   const n = await pedirTexto('Nombre del grupo (ej.: Fichajes FRALEX + amigo)', { titulo: 'Nuevo grupo', maximo: 60, aceptar: 'Crear' });

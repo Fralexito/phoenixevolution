@@ -3,12 +3,12 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.8.0',
+  version_api: '1.9.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
-  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15, sondeo_sync_seg: 10 }),
-  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true, sync_compartido: true }),
-  limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096, sync_option_bytes_max: 8388608, sync_resultados_max: 50 }),
+  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15, sondeo_sync_seg: 10, sondeo_chat_seg: 5 }),
+  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true, sync_compartido: true, chat_global: true }),
+  limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096, sync_option_bytes_max: 8388608, sync_resultados_max: 50, chat_texto_max: 300 }),
 });
 
 /** Catálogo cerrado de errores: la app reacciona por `codigo`, nunca por `mensaje`. */
@@ -49,6 +49,9 @@ export const ERRORES = Object.freeze({
   OPTION_INVALIDA:      { http: 422, reintentable: false, mensaje: 'El archivo no coincide con lo declarado (tamaño o subida incompleta).' },
   OPTION_NO_ENCONTRADA: { http: 404, reintentable: false, mensaje: 'Aún no hay una versión del archivo para este grupo.' },
   LIMITE_EXCEDIDO:      { http: 429, reintentable: true,  mensaje: 'Límite por hora alcanzado: espera y reintenta.' },
+  MENSAJE_INVALIDO:     { http: 400, reintentable: false, mensaje: 'El mensaje está vacío o supera el largo permitido.' },
+  CUENTA_SANCIONADA:    { http: 403, reintentable: false, mensaje: 'Tu cuenta está sancionada y no puede escribir ahora.' },
+  CHAT_PAUSADO:         { http: 503, reintentable: true,  mensaje: 'El chat general está en pausa por el staff.' },
   SYNC_PAUSADO:         { http: 503, reintentable: true,  mensaje: 'Phoenix Sync está en pausa por el staff.' },
   ERROR_INTERNO:        { http: 500, reintentable: true,  mensaje: 'Error del servidor: reintenta con espera.' },
 });
@@ -237,6 +240,7 @@ export function fusionarConfig(base, filas = []) {
   if (out.intervalos.latido_min_seg < 5) out.intervalos.latido_min_seg = 5;
   if (out.intervalos.sondeo_buzon_seg < 5) out.intervalos.sondeo_buzon_seg = 5;
   if (out.intervalos.sondeo_sync_seg < 5) out.intervalos.sondeo_sync_seg = 5;
+  if (out.intervalos.sondeo_chat_seg < 3) out.intervalos.sondeo_chat_seg = 3;
   return out;
 }
 
@@ -360,4 +364,25 @@ export function limpiarOption(b) {
   return { grupo_id: v.uuid(b.grupo_id, 'grupo_id'), d: { sha256: sha,
     tamano: v.entero(b.tamano, 'tamano', { min: 1, max: CONFIG.limites.sync_option_bytes_max, opcional: false }),
     resumen: v.texto(b.resumen, 'resumen', { max: 200 }), parche: v.texto(b.parche, 'parche', { max: 60 }), huella_bd: v.texto(b.huella_bd, 'huella_bd', { max: 128 }) } };
+}
+
+// ── Chat general compartido con Phoenix Link (1.9.0 · migración 099) ───────────────────────────────────────────────────
+/** POST /v1/chat/global { texto } → texto limpio (espacios y saltos de línea juntos en uno). Vacío o > 300 → MENSAJE_INVALIDO (400). */
+export function limpiarMensajeChat(b) {
+  const max = CONFIG.limites.chat_texto_max;
+  const t = typeof b?.texto === 'string' ? b.texto.replace(/[\s\u0000-\u001f\u007f]+/g, ' ').trim() : '';
+  if (!t) throw new ErrorApi('MENSAJE_INVALIDO', { campo: 'texto', mensaje: 'Escribe algo antes de enviar.' });
+  if ([...t].length > max) throw new ErrorApi('MENSAJE_INVALIDO', { campo: 'texto', mensaje: `El mensaje admite hasta ${max} caracteres.` });
+  return t;
+}
+
+/** GET /v1/chat/global?desde=<id>&limite=50 → { desde, limite }. Sin `desde` (o 0) = los últimos `limite` mensajes. */
+export function limpiarConsultaChat(q) {
+  const crudo = q.get('desde');
+  const desde = crudo === null || crudo === '' ? 0 : Number(crudo);
+  if (!Number.isInteger(desde) || desde < 0) falla('desde', 'desde debe ser el id (entero ≥ 0) del último mensaje que ya tienes.');
+  const lim = q.get('limite');
+  const limite = lim === null || lim === '' ? 50 : Number(lim);
+  if (!Number.isInteger(limite) || limite < 1 || limite > 100) falla('limite', 'limite debe ser un entero entre 1 y 100.');
+  return { desde, limite };
 }

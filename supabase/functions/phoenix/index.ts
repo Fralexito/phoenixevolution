@@ -1,4 +1,4 @@
-// Edge Function «phoenix» (1.8.0) · API /v1 para Smash Soda (módulo 2, fase 2.2). Contrato: claude/contrato-v1.md.
+// Edge Function «phoenix» (1.9.0) · API /v1 para Smash Soda (módulo 2, fase 2.2). Contrato: claude/contrato-v1.md.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/phoenix/v1/<ruta>
 // Desplegar con verify_jwt = false: la app NO usa sesión de Supabase, usa su token de dispositivo (Authorization: Bearer phx_…).
 // Variables: SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase solas). Ninguna otra.
@@ -6,7 +6,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   CONFIG, ErrorApi, cuerpoError, compararVersion, v, ESTADOS_LATIDO, VISIBILIDADES_APP,
-  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido, ESTADOS_PRESENCIA_APP, huellaContenido, coincideEtag, MODOS_SYNC, limpiarOperacion, limpiarResultados, limpiarOption,
+  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido, ESTADOS_PRESENCIA_APP, huellaContenido, coincideEtag, MODOS_SYNC, limpiarOperacion, limpiarResultados, limpiarOption, limpiarMensajeChat, limpiarConsultaChat,
 } from "./_lib/nucleo.js";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
@@ -626,7 +626,10 @@ async function rpcSync(nombre: string, args: Record<string, unknown>): Promise<R
   const { data, error } = await sb.rpc(nombre, args);
   db(error, nombre);
   const r = (data ?? {}) as Record<string, unknown>;
-  if (r.error) throw new ErrorApi(String(r.error), typeof r.reintentar_en === "number" ? { reintentar_en: r.reintentar_en } : {});
+  if (r.error) throw new ErrorApi(String(r.error), {
+    ...(typeof r.reintentar_en === "number" ? { reintentar_en: r.reintentar_en } : {}),
+    ...(typeof r.mensaje === "string" ? { mensaje: r.mensaje } : {}), ...(typeof r.campo === "string" ? { campo: r.campo } : {}),
+  });
   return r;
 }
 const grupoDeQuery = (req: Request) => v.uuid(new URL(req.url).searchParams.get("grupo_id"), "grupo_id");
@@ -722,6 +725,27 @@ async function syncOptionListo(req: Request) {
   return { id, estado: "lista", archivadas: viejas.length };
 }
 
+// ── Chat general (1.9.0 · migración 099): el MISMO chat global de la web, visto desde Phoenix Link ─────────────────────
+/** GET /v1/chat/global?desde=<id>&limite=50 (mensajes nuevos + ids borrados, ETag/304) · POST { texto } (escribe como el dueño del token). */
+async function chatGlobal(req: Request) {
+  const d = await autenticar(req);
+  const { cfg } = await cfgVigente();
+  if (req.method === "POST") {
+    if (!cfg.interruptores.chat_global) throw new ErrorApi("CHAT_PAUSADO", { reintentar_en: 300 });
+    frenar(`chat:post:${d.id}`, 1, 1_000);
+    const texto = limpiarMensajeChat(await leerJson(req));
+    const r = await rpcSync("chat_api_enviar", { p_usuario: d.usuario, p_texto: texto });
+    return { id: r.id, creado_en: r.creado_en };
+  }
+  frenar(`chat:get:${d.id}`, 1, 3_000);
+  const sondeo_seg = cfg.intervalos.sondeo_chat_seg;
+  const { desde, limite } = limpiarConsultaChat(new URL(req.url).searchParams);
+  if (!cfg.interruptores.chat_global) return conEtag(req, { mensajes: [], borrados: [], ultimo_id: desde, pausado: true, sondeo_seg });
+  const r = await rpcSync("chat_api_listar", { p_usuario: d.usuario, p_desde: desde, p_limite: limite });
+  const mensajes = (r.mensajes as { id: number }[]) ?? [];
+  return conEtag(req, { mensajes, borrados: r.borrados ?? [], ultimo_id: mensajes.length ? mensajes[mensajes.length - 1].id : desde, sondeo_seg });
+}
+
 /** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */
 async function config(req: Request) {
   const { cfg, builds } = await cfgVigente();
@@ -772,6 +796,7 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/sync/operaciones/aplicada": { metodo: "POST", fn: syncAplicada },
   "/v1/sync/option": { metodo: "GET|POST", fn: syncOption },
   "/v1/sync/option/listo": { metodo: "POST", fn: syncOptionListo },
+  "/v1/chat/global": { metodo: "GET|POST", fn: chatGlobal },
 };
 
 Deno.serve(async (req) => {

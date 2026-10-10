@@ -1085,7 +1085,7 @@ test('buscador: encuentra por nombre, por sinónimo y por varias palabras', () =
   assert.equal(buscarPaginas('liga', ix)[0].id, 'liga'); assert.equal(buscarPaginas('LIGA', ix)[0].id, 'liga');
   assert.equal(buscarPaginas('palmares', ix)[0].id, 'palmares'); assert.equal(buscarPaginas('palmarés', ix)[0].id, 'palmares');
   assert.equal(buscarPaginas('fichajes', ix)[0].id, 'mercado'); assert.equal(buscarPaginas('torneo', ix)[0].id, 'torneos');
-  assert.equal(buscarPaginas('comprar tokens', ix)[0].id, 'tienda'); assert.equal(buscarPaginas('chat', ix)[0].id, 'mensajes');
+  assert.equal(buscarPaginas('comprar tokens', ix)[0].id, 'tienda'); assert.equal(buscarPaginas('chat', ix)[0].id, 'chatgeneral'); assert.ok(buscarPaginas('chat', ix).some((p) => p.id === 'mensajes'));
   assert.deepEqual(buscarPaginas('', ix), []); assert.deepEqual(buscarPaginas('zzzzqq', ix), []);
   assert.ok(buscarPaginas('a', ix, 3).length <= 3);
   assert.ok(ix.some((p) => p.id === 'moderacion' && p.staff));

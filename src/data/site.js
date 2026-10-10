@@ -39,6 +39,7 @@ export const ACCOUNT_NAV = [
   { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast', grupo: 'jugar' },
   { id: 'missalas', label: 'Phoenix Link', path: 'mis-salas/',    icon: 'fa-desktop', grupo: 'jugar' },
   { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments', grupo: 'social' },
+  { id: 'chatgeneral', label: 'Chat general', path: 'chat-general/', icon: 'fa-comments', grupo: 'social' },
   { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group', grupo: 'social' },
   { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass', grupo: 'social', menu: false },
   { id: 'guardados', label: 'Guardados',   path: 'guardados/',     icon: 'fa-bookmark', grupo: 'tu' },
@@ -95,7 +96,7 @@ const DESC = {
   liga: 'Tabla, fechas y resultados de cada división', competiciones: 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
   palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
   duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
-  missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
+  missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores',
   tienda: 'Estética y mejoras para tu perfil',
@@ -108,7 +109,7 @@ const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra
 export const PILARES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
   pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado', 'miclub'], { lema: 'Del clic al partido' }),
-  pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
+  pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'chatgeneral', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];
 /** Pilar al que pertenece una página (por su `active`), o null (Central, cuenta, etc.). */

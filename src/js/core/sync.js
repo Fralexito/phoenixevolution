@@ -55,5 +55,5 @@ export function lineaHistorial(h, nombres = {}) {
   return h.modo_anterior ? `${quien}: ${MODOS[modoSeguro(h.modo_anterior)].nombre} → ${a}` : `${quien} creó el grupo en «${a}»`;
 }
 
-/** ¿Un nombre de usuario escrito en el cuadro es válido para buscarlo? (letras, números, punto, guion, guion bajo) */
-export const usernameValido = (t) => /^[A-Za-z0-9._-]{2,32}$/.test(String(t ?? '').trim().replace(/^@/, ''));
+/** ¿Lo escrito en el buscador de personas sirve? Letras (con tildes), números, espacio, punto, guion y guion bajo; de 2 a 32. Sin comas ni paréntesis (rompen el filtro). */
+export const terminoValido = (t) => /^[\p{L}\p{N}._ -]{2,32}$/u.test(String(t ?? '').trim().replace(/^@/, ''));

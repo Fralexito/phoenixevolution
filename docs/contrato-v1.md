@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.8.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.9.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.9.0 (compatibles, requieren migración 099; `PENDIENTE-WEB`: la función aún no está desplegada):** Chat general compartido con la web: `GET/POST /v1/chat/global` (sección 27); interruptor `chat_global`; intervalo `sondeo_chat_seg`; errores `MENSAJE_INVALIDO` (400), `CUENTA_SANCIONADA` (403), `CHAT_PAUSADO` (503). Solo añade: nada de lo publicado cambia.
 
 **Cambios 1.8.0 (compatibles, requieren migración 098; `PENDIENTE-WEB`: la función aún no está desplegada):** Phoenix Sync compartido, sección 26: rutas `/v1/sync/config`, `/v1/sync/operaciones`, `/v1/sync/operaciones/aplicada`, `/v1/sync/option`, `/v1/sync/option/listo`; interruptor `sync_compartido`; intervalo `sondeo_sync_seg`; errores `SIN_PERMISO`, `GRUPO_NO_ENCONTRADO`, `OPERACION_INVALIDA`, `OPERACION_NO_ENCONTRADA`, `OPTION_INVALIDA`, `OPTION_NO_ENCONTRADA`, `LIMITE_EXCEDIDO`, `SYNC_PAUSADO`.
 
@@ -605,3 +607,44 @@ Más los de siempre: `TOKEN_*`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (con 
 
 ### Coste estimado (plan FREE)
 Con `sondeo_sync_seg` = 10 y solo mientras Sync está abierto: 360 llamadas/hora por PC. 2 PCs × 3 h/día × 30 días ≈ **65 000**/mes. Se suma a lo de §21 y §25: vigilar el uso antes de sumar más PCs.
+
+
+## 27. Chat general — el MISMO chat global de la web (1.9.0 · migración 099, aditivo · `PENDIENTE-WEB` hasta desplegar)
+Lo que se escribe en Phoenix Link aparece en la web (`/chat-general/`) y al revés. El chat de **sala** sigue siendo local de Smash Soda y no pasa por aquí. Mismo token `phx_…` y cabeceras que el resto (`Authorization`, `X-Phoenix-Version`, `X-Phoenix-Build`). Mensajes: texto de **1 a 300 caracteres**; el servidor junta espacios y saltos de línea en un solo espacio.
+
+**Quién ve qué (misma regla que los mensajes privados):** los menores de 18 y los mayores se ven solo entre sí; el staff (moderador/admin) ve y es visto por todos. Una cuenta sin fecha de nacimiento declarada cuenta como mayor. Menores de 13 no escriben (`SIN_PERMISO`).
+
+### `GET /v1/chat/global?desde=<id>&limite=50` (token)
+- `desde` = el `id` del último mensaje que ya tienes (entero ≥ 0). Sin `desde` (o `0`) devuelve **los últimos `limite` mensajes**. Con `desde` devuelve los **siguientes** (más viejo primero, hasta `limite`). `limite` de 1 a 100 (defecto 50). *No se acepta una fecha ISO: usa el `id`.*
+- Ejemplo (respuesta generada con los datos reales de la prueba en la base):
+```json
+{ "ok": true,
+  "mensajes": [ { "id": 11, "usuario_id": "9c910092-4a0a-4554-bbba-e7f7fe2af64b", "nombre": "TU PAPI CHULO", "texto": "Hola, soy admin", "creado_en": "2026-10-10T03:39:31.298447+00:00", "rol": "admin" } ],
+  "borrados": [10], "ultimo_id": 11, "sondeo_seg": 5, "etag": "W/\"…\"", "solicitud_id": "…" }
+```
+- `rol` = `admin` | `moderador` | `ayudante` | `arbitro` | `jugador` (para la insignia; no existe «vip» todavía).
+- **Borrados por moderación:** `borrados` trae los `id` de mensajes **borrados dentro de los últimos 200** mensajes del chat. Si ya mostrabas alguno, quítalo de la pantalla (y del contador de no leídos). Los mensajes borrados nunca vuelven en `mensajes`. Un mod que borra en la web lo ves borrado en Link en el siguiente sondeo.
+- `ultimo_id` = el mayor `id` de esta respuesta (o el `desde` que mandaste si no hay nada nuevo): úsalo como `desde` la próxima vez.
+- **ETag/304** como §21: manda `If-None-Match` o `?etag=`; si nada cambió (ni mensajes nuevos ni borrados) responde **304** sin cuerpo.
+- Sondeo: `sondeo_seg` (defecto **5**, mínimo 3). Frena a 1 llamada cada 3 s por PC → `429 DEMASIADOS_INTENTOS` con `reintentar_en`.
+- Interruptor `chat_global` apagado → `mensajes: []`, `pausado: true`: deja de preguntar hasta el próximo `GET /v1/config`.
+
+### `POST /v1/chat/global` (token)
+Cuerpo `{ "texto": "hola a todos" }` → `{ "ok": true, "id": 12, "creado_en": "2026-10-10T03:40:02.114+00:00", "solicitud_id": "…" }`. El mensaje sale con el nombre y el rol de **quien es dueño del token**. Después de enviar, pide `GET desde=<tu último id>` para verlo con su `id` oficial.
+
+### Errores
+| Código | HTTP | Cuándo | Qué hacer |
+|---|---|---|---|
+| `MENSAJE_INVALIDO` | 400 | Texto vacío o de más de 300 caracteres (`campo: "texto"`) | Corregir; no reintentar igual |
+| `CUENTA_SANCIONADA` | 403 | La cuenta está suspendida o baneada. `mensaje` trae el texto exacto con motivo y fecha | Mostrar el `mensaje` al usuario; no reintentar |
+| `SIN_PERMISO` | 403 | Cuenta sin permiso para escribir (menor de 13 años) | Avisar al usuario |
+| `DEMASIADOS_INTENTOS` | 429 | Más de 1 mensaje por segundo (o 1 consulta cada 3 s) por PC; trae `reintentar_en` | Esperar `reintentar_en` |
+| `LIMITE_EXCEDIDO` | 429 | Más de 200 mensajes por hora (el staff no tiene tope); trae `reintentar_en` | Esperar |
+| `CHAT_PAUSADO` | 503 | El staff apagó `chat_global` | Reintentar más tarde |
+Más los de siempre: `TOKEN_*`, `HOST_NO_AUTORIZADO`, `APP_DESACTUALIZADA`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (`desde`/`limite` mal), `ERROR_INTERNO`. Política de reintentos: la del §0.
+
+### Moderación y filtros (lo que existe hoy)
+Sanciones (suspensión/baneo), separación por edad, límite de ritmo y borrado por moderador. **La web no tiene filtro de groserías**, así que este chat tampoco; si se agrega después, se aplicará a los dos lados a la vez en el servidor.
+
+### Coste estimado (plan FREE, 500 000 invocaciones/mes)
+Link pregunta cada 5 s **solo mientras PES2021.exe está abierto**: 720 llamadas/hora por PC. 5 PCs × 2 h/día × 30 días ≈ **216 000**/mes, sumadas a §21, §25 y §26 se **pasaría del tope**. Palancas: subir `sondeo_chat_seg` (10 s lo reduce a la mitad), pedir solo si el panel de chat está abierto, o apagar `chat_global`.

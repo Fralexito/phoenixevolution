@@ -33,11 +33,12 @@ export async function nombresDe(ids) {
   const { data } = await supabase.from('perfiles').select('id, nombre_display, username').in('id', u);
   return Object.fromEntries((data ?? []).map((p) => [p.id, p.nombre_display || p.username || 'Jugador']));
 }
-export async function buscarUsuario(username) {
-  const { data, error } = await supabase.from('perfiles').select('id, nombre_display, username').ilike('username', username.replace(/^@/, '')).limit(1);
+/** Busca por pedazo del usuario o del nombre (no hace falta escribirlo entero). Devuelve hasta 8 personas. */
+export async function buscarUsuarios(termino) {
+  const t = termino.trim().replace(/^@/, '');
+  const { data, error } = await supabase.from('perfiles').select('id, nombre_display, username').or(`username.ilike.%${t}%,nombre_display.ilike.%${t}%`).limit(8);
   if (error) throw new Error(mensajeError(error));
-  if (!data?.[0]) throw new Error(MENSAJES.USUARIO_NO_ENCONTRADO);
-  return data[0];
+  return data ?? [];
 }
 export const crearGrupo = (nombre) => rpc('sync_grupo_crear', { p_nombre: nombre });
 export const cambiarModo = (g, modo) => rpc('sync_config_cambiar', { p_grupo: g, p_modo: modo });

@@ -151,7 +151,7 @@ import { modoSeguro, limpiarOperacion, limpiarResultados, limpiarOption } from '
 const G = '11111111-1111-4111-8111-111111111111'; const OP = '22222222-2222-4222-8222-222222222222';
 
 test('sync: versión 1.8.0, interruptor, sondeo mínimo 5 s y errores nuevos', () => {
-  assert.equal(CONFIG.version_api, '1.8.0');
+  assert.ok(CONFIG.version_api >= '1.8.0');
   assert.equal(CONFIG.interruptores.sync_compartido, true);
   assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_sync_seg: 1 } }]).intervalos.sondeo_sync_seg, 5);
   for (const c of ['SIN_PERMISO', 'GRUPO_NO_ENCONTRADO', 'OPERACION_INVALIDA', 'OPERACION_NO_ENCONTRADA', 'OPTION_INVALIDA', 'OPTION_NO_ENCONTRADA', 'LIMITE_EXCEDIDO', 'SYNC_PAUSADO']) assert.ok(ERRORES[c], c);
@@ -192,4 +192,26 @@ test('sync: limpiarOption exige sha256, tamaño dentro del tope', () => {
   assert.throws(() => limpiarOption({ grupo_id: G, sha256: 'b'.repeat(64), tamano: 0 }), (e) => e.campo === 'tamano');
   assert.throws(() => limpiarOption({ grupo_id: G, sha256: 'b'.repeat(64), tamano: CONFIG.limites.sync_option_bytes_max + 1 }), (e) => e.campo === 'tamano');
   assert.throws(() => limpiarOption({ grupo_id: G, sha256: 'nope', tamano: 5 }), (e) => e.campo === 'sha256');
+});
+
+// ── Chat general (1.9.0) ─────────────────────────────────────────────────────────────────────────────────────────────
+import { limpiarMensajeChat, limpiarConsultaChat } from '../supabase/functions/phoenix/_lib/nucleo.js';
+
+test('chat: versión 1.9.0, interruptor, sondeo mínimo 3 s y errores nuevos', () => {
+  assert.equal(CONFIG.version_api, '1.9.0'); assert.equal(CONFIG.interruptores.chat_global, true);
+  assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_chat_seg: 1 } }]).intervalos.sondeo_chat_seg, 3);
+  assert.equal(ERRORES.MENSAJE_INVALIDO.http, 400); assert.equal(ERRORES.CUENTA_SANCIONADA.http, 403); assert.equal(ERRORES.CHAT_PAUSADO.http, 503);
+});
+test('chat: limpiarMensajeChat junta espacios, rechaza vacío y > 300', () => {
+  assert.equal(limpiarMensajeChat({ texto: '  hola \n  mundo\t!  ' }), 'hola mundo !');
+  assert.equal(limpiarMensajeChat({ texto: 'x'.repeat(300) }).length, 300);
+  for (const b of [{}, { texto: '' }, { texto: '   \n ' }, { texto: 5 }, { texto: 'x'.repeat(301) }, null]) {
+    assert.throws(() => limpiarMensajeChat(b), (e) => e.codigo === 'MENSAJE_INVALIDO' && e.http === 400 && e.campo === 'texto');
+  }
+});
+test('chat: limpiarConsultaChat (desde y limite)', () => {
+  const q = (s) => new URLSearchParams(s);
+  assert.deepEqual(limpiarConsultaChat(q('')), { desde: 0, limite: 50 });
+  assert.deepEqual(limpiarConsultaChat(q('desde=12&limite=100')), { desde: 12, limite: 100 });
+  for (const s of ['desde=-1', 'desde=abc', 'desde=1.5', 'limite=0', 'limite=101']) assert.throws(() => limpiarConsultaChat(q(s)), (e) => e.codigo === 'CAMPO_INVALIDO');
 });

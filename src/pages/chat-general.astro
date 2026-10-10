@@ -1,0 +1,33 @@
+---
+// CHAT GENERAL: el mismo chat global que ve Phoenix Link en el juego (migración 099). Guía: docs/CHAT-GENERAL.md
+import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
+---
+<Layout title="Chat general" active="chatgeneral" description="El chat de toda la comunidad, también dentro del juego con Phoenix Link.">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-5 pb-16 space-y-4">
+    <header class="glass-panel rounded-2xl px-5 py-4 space-y-1">
+      <h1 class="text-3xl font-display font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-comments text-galaxy-400 mr-2"></i>Chat <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">general</span></h1>
+      <p class="text-sm text-gray-300">Lo que escribas aquí también lo ven, dentro del juego, quienes usan Phoenix Link. Y al revés.</p>
+    </header>
+    <Plegable titulo="Cómo funciona y reglas" icono="fa-circle-question" resumen="Léelo una vez">
+      <ul class="cg-guia">
+        <li><b>Un solo chat:</b> web y Phoenix Link muestran los mismos mensajes (se actualiza cada pocos segundos).</li>
+        <li><b>Hasta 300 letras</b> por mensaje y <b>un mensaje por segundo</b>.</li>
+        <li><b>Menores y mayores de 18</b> se ven solo entre sí, igual que en los mensajes privados. El staff ve a todos.</li>
+        <li><b>Si el staff borra un mensaje</b>, desaparece también en Phoenix Link.</li>
+        <li>Una cuenta sancionada no puede escribir mientras dure la sanción.</li>
+      </ul>
+    </Plegable>
+    <p id="cg-sin-sesion" class="cg-aviso" hidden>Inicia sesión para leer y escribir en el chat.</p>
+    <section id="cg-caja" class="glass-panel rounded-2xl p-3 sm:p-4 space-y-3" hidden aria-label="Chat general">
+      <ol id="cg-lista" class="cg-lista" aria-live="polite" tabindex="0"><li class="cg-vacio">Cargando…</li></ol>
+      <button type="button" id="cg-nuevos" class="btn btn-ghost cg-nuevos" hidden><i class="fa-solid fa-arrow-down"></i> Mensajes nuevos</button>
+      <form id="cg-form" class="cg-form" autocomplete="off">
+        <label class="cg-sr" for="cg-texto">Escribe un mensaje</label>
+        <textarea id="cg-texto" class="field" rows="2" maxlength="400" placeholder="Escribe un mensaje…"></textarea>
+        <div class="cg-pie"><span id="cg-cuenta" class="cg-ayuda">300</span><button id="cg-enviar" class="btn btn-primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Enviar</button></div>
+      </form>
+    </section>
+  </div>
+  <script>import '../js/pages/chat-general.js';</script>
+</Layout>

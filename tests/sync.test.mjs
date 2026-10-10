@@ -1,7 +1,7 @@
 // Pruebas de la lógica pura de la pantalla Phoenix Sync (src/js/core/sync.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MODOS, ESTADOS, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, usernameValido, LEYENDA_MODO, AVISO_AUTOMATICO } from '../src/js/core/sync.js';
+import { MODOS, ESTADOS, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, terminoValido, LEYENDA_MODO, AVISO_AUTOMATICO } from '../src/js/core/sync.js';
 
 test('modoSeguro: cualquier valor raro es «autorizacion»', () => {
   assert.equal(modoSeguro('automatico'), 'automatico');
@@ -37,6 +37,7 @@ test('lineaHistorial y textos de ayuda', () => {
   assert.match(lineaHistorial({ por: 'z', modo_anterior: null, modo_nuevo: 'autorizacion' }), /creó el grupo/);
   assert.match(LEYENDA_MODO, /Automático.*Con autorización/); assert.match(AVISO_AUTOMATICO, /respaldo/);
 });
-test('usernameValido', () => {
-  assert.equal(usernameValido('@juan.perez'), true); assert.equal(usernameValido('a'), false); assert.equal(usernameValido('con espacio'), false);
+test('terminoValido: pedazos de nombre, con tildes y espacios', () => {
+  assert.equal(terminoValido('@juan.perez'), true); assert.equal(terminoValido('Ñandú Gómez'), true); assert.equal(terminoValido('a'), false);
+  assert.equal(terminoValido('a,b'), false); assert.equal(terminoValido('x)'), false);
 });
