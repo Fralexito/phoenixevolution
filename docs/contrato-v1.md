@@ -3,7 +3,7 @@
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
 
-**Cambios 1.10.0 (compatibles, requieren migración 100; función PENDIENTE-DEPLOY como v13; la web oficial sigue `PENDIENTE-WEB`):** «Última hora» para Phoenix Link: `GET /v1/noticias/ultima-hora` (sección 28); interruptor `noticias`; intervalo `sondeo_noticias_seg` (mínimo 60). Solo añade: nada de lo publicado cambia.
+**Cambios 1.10.0 (compatibles, requieren migración 100; función DESPLEGADA como v13 el 10-10-2026; la web oficial sigue `PENDIENTE-WEB`):** «Última hora» para Phoenix Link: `GET /v1/noticias/ultima-hora` (sección 28); interruptor `noticias`; intervalo `sondeo_noticias_seg` (mínimo 60). Solo añade: nada de lo publicado cambia.
 
 **Cambios 1.9.0 (compatibles, requieren migraciones 099 a 099g; función DESPLEGADA como v12 el 09-10-2026; la web oficial sigue `PENDIENTE-WEB`):** Chat general compartido con la web: `GET/POST /v1/chat/global` (sección 27), con `espera_seg` (anti-spam que fija el admin); interruptor `chat_global`; intervalo `sondeo_chat_seg`; errores `MENSAJE_INVALIDO` (400), `CUENTA_SANCIONADA` (403), `CHAT_PAUSADO` (503). Solo añade: nada de lo publicado cambia.
 
