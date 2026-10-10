@@ -466,6 +466,8 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ### Ronda 218 — Anti-spam del chat general
 - Un mensaje cada **3 s** por persona (web y Link, misma función `private.chat_poner`; migración 099e). `reintentar_en` = segundos que faltan. Edge: `frenar` 1/3 s. Web: botón con cuenta atrás. Pendiente-deploy junto con v11.
 
+- Despliegue (Cuenta B, 09-10-2026): Edge Function `phoenix` **v11** subida por MCP (verify_jwt=false, 1.9.0: Phoenix Sync + chat general + anti-spam 3 s). Comprobada contra el repo (idéntica salvo rayas decorativas). Sin pruebas con curl (el shell no llega a Supabase). Ya NO está PENDIENTE-DEPLOY; sigue PENDIENTE-WEB.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
