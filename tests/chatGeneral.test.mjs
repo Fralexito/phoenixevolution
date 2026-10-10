@@ -30,7 +30,7 @@ test('horaCorta: hora de Lima', () => {
   assert.equal(horaCorta('2026-10-10T03:05:00Z'), '22:05'); assert.equal(horaCorta('basura'), '');
 });
 test('mensajeError: frases amables y texto del servidor', () => {
-  assert.match(mensajeError(new Error('LIMITE_EXCEDIDO: LIMITE_EXCEDIDO')), /muy rápido/);
+  assert.match(mensajeError(new Error('LIMITE_EXCEDIDO: LIMITE_EXCEDIDO')), /cada 3 segundos/);
   assert.equal(mensajeError(new Error('CUENTA_SANCIONADA: Tu cuenta está suspendida hasta mañana.')), 'Tu cuenta está suspendida hasta mañana.');
   assert.equal(mensajeError(new Error('MENSAJE_INVALIDO: Escribe algo antes de enviar.')), 'Escribe algo antes de enviar.');
   assert.match(mensajeError(new Error('NO_AUTORIZADO')), /Inicia sesión/);

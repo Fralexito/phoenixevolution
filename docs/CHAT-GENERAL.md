@@ -4,7 +4,7 @@
 
 **Cómo está hecho:** reutiliza la tabla vieja `mensajes_chat` (estaba vacía y cerrada). Nadie escribe directo: la web llama a `chat_global_enviar` y Link, por la API, a `chat_api_enviar`. Las dos pasan por las mismas reglas (`private.chat_poner`).
 
-**Reglas:** 1–300 caracteres · 1 mensaje por segundo (200 por hora, staff sin tope) · cuentas sancionadas no escriben · menores de 13 no escriben · menores de 18 y mayores se ven entre sí por separado (el staff ve todo).
+**Reglas:** 1–300 caracteres · 1 mensaje cada 3 segundos (anti-spam) (200 por hora, staff sin tope) · cuentas sancionadas no escriben · menores de 13 no escriben · menores de 18 y mayores se ven entre sí por separado (el staff ve todo).
 
 **Borrar:** un moderador/admin pulsa el tacho. La fila queda con `borrado = true` y el texto vacío; el original se guarda en la auditoría del staff. Link recibe los `id` en `borrados` y lo quita.
 

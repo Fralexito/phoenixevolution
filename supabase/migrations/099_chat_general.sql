@@ -1,5 +1,5 @@
 -- 099 · CHAT GENERAL (compartido entre la web y Phoenix Link). REUTILIZA la tabla vieja y vacía public.mensajes_chat (cerrada en la 030).
--- Reglas: el usuario escribe solo por RPC (nadie inserta/borra directo); sancionados y bloqueados por edad no escriben; 1 mensaje/segundo;
+-- Reglas: el usuario escribe solo por RPC (nadie inserta/borra directo); sancionados y bloqueados por edad no escriben; 1 mensaje cada 3 s (anti-spam);
 -- los menores (13-17) y los mayores solo se ven entre sí (igual que el chat privado); el staff ve y es visto por todos.
 -- Un mod que borra deja la fila con borrado=true y el texto vacío (el original queda en auditoria_staff): así se ve «eliminado» en web y en Link.
 
@@ -46,7 +46,7 @@ begin
   if v_cat = 'bloqueado' then return jsonb_build_object('error', 'SIN_PERMISO'); end if;
   v_staff := p.rol in ('moderador', 'admin');
   select max(created_at) into v_ult from public.mensajes_chat where autor_id = p_uid;
-  if v_ult is not null and now() - v_ult < interval '1 second' then return jsonb_build_object('error', 'LIMITE_EXCEDIDO', 'reintentar_en', 1); end if;
+  if v_ult is not null and now() - v_ult < interval '3 seconds' then return jsonb_build_object('error', 'LIMITE_EXCEDIDO', 'reintentar_en', greatest(1, ceil(3 - extract(epoch from (now() - v_ult)))::int), 'mensaje', 'Anti-spam: un mensaje cada 3 segundos.'); end if;
   if not v_staff then
     select count(*) into v_n from public.mensajes_chat where autor_id = p_uid and created_at > now() - interval '1 hour';
     if v_n >= 200 then return jsonb_build_object('error', 'LIMITE_EXCEDIDO', 'reintentar_en', 60); end if;

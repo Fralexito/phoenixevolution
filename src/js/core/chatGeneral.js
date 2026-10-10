@@ -36,7 +36,7 @@ export function horaCorta(iso, tz = 'America/Lima') {
 
 const FRASES = {
   CUENTA_SANCIONADA: null, // el servidor manda el texto exacto de la sanción
-  LIMITE_EXCEDIDO: 'Vas muy rápido: espera un momento antes de escribir otra vez.',
+  LIMITE_EXCEDIDO: 'Anti-spam: solo se puede enviar un mensaje cada 3 segundos.',
   MENSAJE_INVALIDO: null,
   NO_AUTORIZADO: 'Inicia sesión para escribir en el chat.',
   MENSAJE_NO_ENCONTRADO: 'Ese mensaje ya no existe.',

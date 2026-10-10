@@ -638,7 +638,7 @@ Cuerpo `{ "texto": "hola a todos" }` → `{ "ok": true, "id": 12, "creado_en": "
 | `MENSAJE_INVALIDO` | 400 | Texto vacío o de más de 300 caracteres (`campo: "texto"`) | Corregir; no reintentar igual |
 | `CUENTA_SANCIONADA` | 403 | La cuenta está suspendida o baneada. `mensaje` trae el texto exacto con motivo y fecha | Mostrar el `mensaje` al usuario; no reintentar |
 | `SIN_PERMISO` | 403 | Cuenta sin permiso para escribir (menor de 13 años) | Avisar al usuario |
-| `DEMASIADOS_INTENTOS` | 429 | Más de 1 mensaje por segundo (o 1 consulta cada 3 s) por PC; trae `reintentar_en` | Esperar `reintentar_en` |
+| `DEMASIADOS_INTENTOS` | 429 | Más de 1 mensaje cada 3 s (o 1 consulta cada 3 s) por PC; trae `reintentar_en` | Esperar `reintentar_en` |
 | `LIMITE_EXCEDIDO` | 429 | Más de 200 mensajes por hora (el staff no tiene tope); trae `reintentar_en` | Esperar |
 | `CHAT_PAUSADO` | 503 | El staff apagó `chat_global` | Reintentar más tarde |
 Más los de siempre: `TOKEN_*`, `HOST_NO_AUTORIZADO`, `APP_DESACTUALIZADA`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (`desde`/`limite` mal), `ERROR_INTERNO`. Política de reintentos: la del §0.

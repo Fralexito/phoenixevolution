@@ -8,7 +8,8 @@ import * as api from '../features/chatGeneral/api.js';
 
 const $ = (id) => document.getElementById(id);
 const SONDEO_MS = 6000;
-const st = { yo: null, lista: [], ultimoId: 0, timer: null, cargando: false, primera: true };
+const ESPERA_MS = 3000;
+const st = { yo: null, lista: [], ultimoId: 0, timer: null, cargando: false, primera: true, hasta: 0, enf: null };
 const esMod = () => can('moderarChat');
 
 function filaHTML(m) {
@@ -39,14 +40,25 @@ function arrancar() { clearInterval(st.timer); st.timer = setInterval(refrescar,
 function actualizarCuenta() {
   const e = estadoEscritura($('cg-texto').value);
   $('cg-cuenta').textContent = `${e.restan} caracteres restantes`; $('cg-cuenta').dataset.mal = e.restan < 0 ? '1' : '';
-  $('cg-enviar').disabled = !e.puede;
+  $('cg-enviar').disabled = !e.puede || Date.now() < st.hasta;
+}
+function enfriar() {
+  st.hasta = Date.now() + ESPERA_MS;
+  const btn = $('cg-enviar'); const base = st.base || btn.innerHTML; st.base = base;
+  clearInterval(st.enf);
+  const paso = () => {
+    const resta = Math.ceil((st.hasta - Date.now()) / 1000);
+    if (resta <= 0) { clearInterval(st.enf); btn.innerHTML = base; actualizarCuenta(); return; }
+    btn.innerHTML = `${base.replace(/ Enviar/, '')} ${resta}s`; btn.disabled = true;
+  };
+  st.enf = setInterval(paso, 250); paso();
 }
 async function enviar(ev) {
   ev.preventDefault();
-  const e = estadoEscritura($('cg-texto').value); if (!e.puede) return;
+  const e = estadoEscritura($('cg-texto').value); if (!e.puede || Date.now() < st.hasta) return;
   $('cg-enviar').disabled = true;
-  try { await api.enviar(e.limpio); $('cg-texto').value = ''; actualizarCuenta(); await refrescar(true); }
-  catch (err) { toast(err.message, 'error', { key: 'cg-error' }); actualizarCuenta(); }
+  try { await api.enviar(e.limpio); enfriar(); $('cg-texto').value = ''; actualizarCuenta(); await refrescar(true); }
+  catch (err) { toast(err.message, 'error', { key: 'cg-error' }); if (/LIMITE_EXCEDIDO|DEMASIADOS/.test(String(err.code || err.message))) enfriar(); else actualizarCuenta(); }
 }
 async function borrar(id) {
   if (!(await confirmar('¿Borrar este mensaje? También desaparece en Phoenix Link.', { titulo: 'Borrar mensaje', aceptar: 'Borrar', peligro: true }))) return;

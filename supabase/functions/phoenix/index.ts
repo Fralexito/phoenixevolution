@@ -732,7 +732,7 @@ async function chatGlobal(req: Request) {
   const { cfg } = await cfgVigente();
   if (req.method === "POST") {
     if (!cfg.interruptores.chat_global) throw new ErrorApi("CHAT_PAUSADO", { reintentar_en: 300 });
-    frenar(`chat:post:${d.id}`, 1, 1_000);
+    frenar(`chat:post:${d.id}`, 1, 3_000);
     const texto = limpiarMensajeChat(await leerJson(req));
     const r = await rpcSync("chat_api_enviar", { p_usuario: d.usuario, p_texto: texto });
     return { id: r.id, creado_en: r.creado_en };
