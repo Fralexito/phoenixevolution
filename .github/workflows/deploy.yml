@@ -1,11 +1,14 @@
 name: Desplegar a GitHub Pages
-# Publica DOS cosas en el mismo sitio:
+# Publica TRES cosas en el mismo sitio:
 #   · /phoenixevolution/            → la rama `main`      (web oficial)
 #   · /phoenixevolution/fase-beta/  → la rama `borrador`  (FASE BETA: vista previa privada; no sale en Google)
-# Se ejecuta al subir cambios a cualquiera de las dos ramas, y siempre reconstruye ambas.
+#   · /phoenixevolution/rediseno/   → la rama `rediseno`  (REDISEÑO: vista previa del nuevo orden; no sale en Google)
+# Se ejecuta al subir cambios a cualquiera de las ramas, y siempre reconstruye las tres.
+# Ojo: esta versión del archivo vive en la rama `rediseno`. Si el deploy lo dispara `main` o `borrador` (cuyo deploy.yml no conoce
+# /rediseno/), la carpeta /rediseno/ desaparece hasta el siguiente push a `rediseno`. Para que no pase, copiar este bloque a las otras ramas.
 on:
   push:
-    branches: [main, borrador]
+    branches: [main, borrador, rediseno]
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,6 +31,11 @@ jobs:
         with:
           ref: borrador
           path: previa
+      - name: Rediseño (rama rediseno)
+        uses: actions/checkout@v4
+        with:
+          ref: rediseno
+          path: rediseno
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -40,12 +48,20 @@ jobs:
           PES_BASE: /phoenixevolution/fase-beta
           PUBLIC_PREVIEW: "1"
         run: npm ci && npm run build
-      - name: Juntar ambas
+      - name: Compilar rediseño
+        working-directory: rediseno
+        env:
+          PES_BASE: /phoenixevolution/rediseno
+          PUBLIC_PREVIEW: "rediseno"
+        run: npm ci && npm run build
+      - name: Juntar las tres
         run: |
           mkdir site
           cp -r oficial/dist/. site/
           mkdir site/fase-beta
           cp -r previa/dist/. site/fase-beta/
+          mkdir site/rediseno
+          cp -r rediseno/dist/. site/rediseno/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
