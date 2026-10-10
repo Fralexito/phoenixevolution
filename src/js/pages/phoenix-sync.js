@@ -18,6 +18,10 @@ function leyendaEstados() {
 function pintarGrupos() {
   $('sy-grupos').innerHTML = st.grupos.length > 1 ? st.grupos.map((g) => `<button type="button" class="sy-tab" data-g="${g.id}" aria-pressed="${g.id === st.grupo}">${esc(g.nombre)}</button>`).join('') : '';
 }
+function pintarId() {
+  const g = st.grupos.find((x) => x.id === st.grupo); if (!g) return;
+  $('sy-id').innerHTML = `Código del grupo (se pega en Phoenix Sync): <code>${esc(g.id)}</code> <button type="button" class="btn btn-ghost" id="sy-copiar"><i class="fa-solid fa-copy"></i> Copiar</button>`;
+}
 function pintarModo() {
   const verlo = soyAdminGrupo();
   $('sy-modo').hidden = !verlo;
@@ -57,7 +61,7 @@ async function cargarGrupo() {
   st.miembros = miembros; st.config = config; st.historial = historial; st.ops = ops;
   st.apl = await api.aplicacionesDe(ops.map((o) => o.id));
   st.nombres = await api.nombresDe([...miembros.map((m) => m.usuario_id), config?.actualizado_por, ...historial.map((h) => h.por), ...ops.map((o) => o.autor_usuario_id)]);
-  pintarGrupos(); pintarModo(); pintarOps(); pintarPermisos();
+  pintarGrupos(); pintarId(); pintarModo(); pintarOps(); pintarPermisos();
 }
 async function cargar() {
   $('sy-sin-sesion').hidden = !!st.yo;
@@ -87,6 +91,7 @@ async function cambiarMiembro(fila, quitar) {
 }
 
 leyendaEstados();
+$('sy-id').addEventListener('click', async (e) => { if (!e.target.closest('#sy-copiar')) return; try { await navigator.clipboard.writeText(st.grupo); toast('Código copiado', 'ok'); } catch { toast('No se pudo copiar: selecciónalo a mano.', 'warn'); } });
 $('sy-grupos').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if (!b) return; st.grupo = b.dataset.g; cargarGrupo().catch((er) => toast(er.message, 'error')); });
 $('sy-interruptor').addEventListener('click', (e) => { const b = e.target.closest('[data-modo]'); if (b) elegirModo(b.dataset.modo); });
 $('sy-recargar').addEventListener('click', () => cargarGrupo().catch((er) => toast(er.message, 'error')));
