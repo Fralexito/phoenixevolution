@@ -1,0 +1,182 @@
+<style>
+/* ===== PORTADA: dos columnas. Izquierda = mensaje + 1 acción principal. Derecha = lo que pasa AHORA (protagonista real). ===== */
+.x-hero{ position:relative; overflow:hidden; padding:2.5rem 0 2.25rem; border-bottom:1px solid rgb(42 22 96 / .4); }
+.x-hero .brillo{ position:absolute; left:28%; top:50%; width:620px; height:620px; transform:translate(-50%,-50%); background:rgb(128 0 255 / .2); filter:blur(130px); border-radius:50%; pointer-events:none; }
+.x-hero .brillo2{ position:absolute; right:-6%; top:20%; width:420px; height:420px; background:rgb(0 229 255 / .10); filter:blur(120px); border-radius:50%; pointer-events:none; }
+.x-hero-g{ position:relative; z-index:1; display:grid; grid-template-columns:1.15fr .85fr; gap:2.5rem; align-items:center; }
+.x-h1{ font:800 3.6rem/1.02 var(--font-display); text-transform:uppercase; letter-spacing:.03em; color:#fff; margin:.9rem 0 .8rem; }
+.x-h1 em{ font-style:normal; background:linear-gradient(90deg,#00e5ff,#00c3ff,#8000ff); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 0 18px rgb(0 229 255 / .35)); }
+.x-bajada{ color:#cbd5e1; font-size:1rem; line-height:1.55; max-width:34rem; }
+.x-bajada b{ color:#fff; }
+.x-cta{ display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1.4rem; align-items:center; }
+.x-confianza{ display:flex; gap:1.25rem; margin-top:1.4rem; }
+.x-confianza div{ display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:var(--txt2); }
+.x-confianza i{ color:var(--cian); }
+/* tarjeta AHORA */
+.x-ahora{ padding:1.1rem 1.2rem 1rem; position:relative; }
+.x-ahora::before{ content:''; position:absolute; inset:-1px; border-radius:1.1rem; padding:1px; background:linear-gradient(135deg,rgb(0 229 255 / .5),rgb(128 0 255 / .35) 60%,transparent); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+.x-ahora-cab{ display:flex; justify-content:space-between; align-items:center; margin-bottom:.9rem; }
+.x-partido{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:.75rem; padding:.85rem .9rem; border-radius:.9rem; background:rgb(128 0 255 / .08); border:1px solid rgb(128 0 255 / .25); }
+.x-eq{ display:flex; align-items:center; gap:.6rem; font:800 .95rem var(--font-display); color:#fff; text-transform:uppercase; letter-spacing:.04em; }
+.x-eq.der{ justify-content:end; text-align:right; }
+.x-eq small{ display:block; font:500 .68rem var(--font-sans); color:var(--txt2); letter-spacing:0; text-transform:none; }
+.x-esc{ width:2rem; height:2rem; border-radius:50%; background:radial-gradient(circle at 30% 30%,#334155,#0f172a); border:1px solid #475569; }
+.x-marc{ font:800 1.5rem var(--font-display); color:#fff; background:#03010f; padding:.2rem .7rem; border-radius:.6rem; border:1px solid var(--borde); }
+.x-ahora-fila{ display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; margin-top:.8rem; }
+.x-dato{ padding:.65rem .75rem; border-radius:.75rem; background:rgb(3 1 15 / .6); border:1px solid var(--borde); }
+.x-dato .x-num{ font-size:1.35rem; }
+.x-barra{ height:5px; border-radius:3px; background:#1a0b36; margin-top:.8rem; overflow:hidden; }
+.x-barra i{ display:block; height:100%; width:41%; background:linear-gradient(90deg,var(--cian),var(--pur)); box-shadow:0 0 12px var(--cian); }
+.x-ahora-pie{ display:flex; justify-content:space-between; margin-top:.45rem; font-size:.7rem; color:var(--txt2); }
+/* ===== EMPIEZA AQUÍ: la ruta del nuevo, en una fila, con progreso ===== */
+.x-ruta{ padding:1.1rem 1.25rem 1.2rem; }
+.x-ruta-cab{ display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; }
+.x-pasos{ display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; position:relative; }
+.x-paso{ position:relative; padding:.9rem .95rem .95rem; border-radius:.9rem; border:1px solid var(--borde); background:rgb(3 1 15 / .55); }
+.x-paso .x-n{ width:1.75rem; height:1.75rem; border-radius:50%; display:grid; place-items:center; font:800 .8rem var(--font-display); color:#fff; background:linear-gradient(135deg,#8000ff,#00c3ff); margin-bottom:.6rem; box-shadow:0 0 14px rgb(0 229 255 / .3); }
+.x-paso b{ display:block; font:800 .85rem var(--font-display); text-transform:uppercase; letter-spacing:.06em; color:#fff; }
+.x-paso p{ font-size:.74rem; color:var(--txt2); line-height:1.35; margin:.25rem 0 .55rem; }
+.x-paso .t{ font-size:.66rem; color:#6b7280; display:flex; gap:.35rem; align-items:center; }
+.x-paso .t i{ color:var(--cian); }
+.x-paso.act{ border-color:rgb(0 229 255 / .55); box-shadow:0 0 22px rgb(0 229 255 / .12); }
+.x-paso.act::after{ content:'EMPIEZA AQUÍ'; position:absolute; top:-.6rem; right:.7rem; font:800 .55rem var(--font-display); letter-spacing:.2em; padding:.15rem .5rem; border-radius:999px; background:var(--cian); color:#03010f; }
+/* ===== QUÉ ES ESTO (3 tarjetas, para el que no entiende nada) ===== */
+.x-que{ padding:1.1rem 1.1rem; display:flex; gap:.9rem; align-items:flex-start; }
+.x-que i{ width:2.6rem; height:2.6rem; flex:none; display:grid; place-items:center; border-radius:.8rem; background:rgb(0 229 255 / .1); color:var(--cian); font-size:1.1rem; }
+.x-que b{ display:block; font:800 .85rem var(--font-display); text-transform:uppercase; letter-spacing:.06em; color:#fff; }
+.x-que p{ font-size:.78rem; color:var(--txt2); line-height:1.4; margin-top:.2rem; }
+/* ===== LIGA + NOTICIAS ===== */
+.x-dos{ display:grid; grid-template-columns:1.1fr .9fr; gap:1rem; }
+.x-tabla{ padding:.6rem .9rem .5rem; }
+.x-tabla table{ width:100%; border-collapse:collapse; font-size:.8rem; }
+.x-tabla th{ text-align:left; font:700 .62rem var(--font-display); letter-spacing:.16em; text-transform:uppercase; color:#6b7280; padding:.5rem .4rem; border-bottom:1px solid var(--borde); }
+.x-tabla td{ padding:.55rem .4rem; border-bottom:1px solid rgb(42 22 96 / .35); color:#e5e7eb; }
+.x-tabla tr.x-l td{ background:linear-gradient(90deg,rgb(0 229 255 / .08),transparent); }
+.x-tabla td.x-p{ font:800 .95rem var(--font-display); color:var(--cian); width:2rem; }
+.x-tabla td.x-n{ font:800 .85rem var(--font-display); text-transform:uppercase; letter-spacing:.04em; color:#fff; }
+.x-tabla td.x-n small{ display:block; font:400 .66rem var(--font-sans); color:var(--txt2); text-transform:none; letter-spacing:0; }
+.x-tabla td.x-pts{ font:800 .95rem var(--font-display); color:#fff; }
+.x-noti{ display:grid; grid-template-rows:auto 1fr 1fr; gap:.6rem; }
+.x-nt{ padding:.9rem 1rem; display:flex; gap:.8rem; align-items:center; }
+.x-nt .x-img{ width:4.4rem; height:3.2rem; flex:none; border-radius:.6rem; background:linear-gradient(135deg,#1e1b4b,#312e81); border:1px solid var(--borde); }
+.x-nt b{ display:block; font:800 .85rem var(--font-display); color:#fff; letter-spacing:.03em; text-transform:uppercase; }
+.x-nt small{ font-size:.7rem; color:var(--txt2); }
+.x-nt.dest{ display:block; padding:0; overflow:hidden; }
+.x-nt.dest .x-img{ width:100%; height:7.5rem; border-radius:0; border:0; background:linear-gradient(135deg,#1e1b4b,#4c1d95 60%,#0e7490); }
+.x-nt.dest .x-cu{ padding:.8rem 1rem; }
+/* ===== COMUNIDAD EN VIVO (muro + Discord) ===== */
+.x-com{ display:grid; grid-template-columns:2fr 1fr; gap:1rem; }
+.x-post{ padding:.8rem .9rem; display:flex; gap:.7rem; }
+.x-av{ width:2rem; height:2rem; border-radius:50%; background:linear-gradient(135deg,#8000ff,#00c3ff); flex:none; }
+.x-post b{ font:700 .78rem var(--font-sans); color:#fff; }
+.x-post p{ font-size:.78rem; color:#cbd5e1; margin-top:.1rem; }
+.x-post .re{ display:flex; gap:.8rem; margin-top:.4rem; font-size:.68rem; color:var(--txt2); }
+.x-disc{ padding:1.1rem 1.1rem; text-align:center; background:linear-gradient(160deg,rgb(88 101 242 / .22),rgb(10 5 28 / .8)); }
+.x-disc .x-num{ font-size:2rem; }
+.x-pie{ height:2rem; }
+</style>
+
+<section class="x-hero">
+  <div class="brillo"></div><div class="brillo2"></div>
+  <div class="x-pz x-hero-g">
+    <div>
+      <span class="x-pill vivo">Temporada oficial 2026 · fecha 9 en juego</span>
+      <h1 class="x-h1">Juega PES 2021<br>en línea, con <em>liga de verdad</em></h1>
+      <p class="x-bajada">Phoenix Evolution es una <b>comunidad de jugadores</b>: tabla, fechas, retos y transmisiones. Entras, armas tu ficha, retas a alguien y tu resultado cuenta. <b>Gratis</b> y sin instalar nada raro: solo PES 2021 y Parsec.</p>
+      <div class="x-cta">
+        <a class="x-btn x-btn-p" href="#"><i class="fa-solid fa-rocket"></i> Empezar en 4 pasos</a>
+        <a class="x-btn x-btn-s" href="#"><i class="fa-solid fa-tower-broadcast"></i> Ver la liga ahora</a>
+        <a class="x-enlace" href="#">Ya tengo cuenta →</a>
+      </div>
+      <div class="x-confianza">
+        <div><i class="fa-solid fa-users"></i> 12 jugadores en la liga</div>
+        <div><i class="fa-solid fa-gamepad"></i> 31 partidos jugados</div>
+        <div><i class="fa-brands fa-discord"></i> Comunidad en Discord</div>
+      </div>
+    </div>
+    <div class="x-card x-ahora">
+      <div class="x-ahora-cab"><span class="x-eti">Ahora mismo</span><span class="x-pill vivo">En vivo</span></div>
+      <div class="x-partido">
+        <div class="x-eq"><span class="x-esc"></span><span>Roberto<small>Inter</small></span></div>
+        <div class="x-marc">1 - 1</div>
+        <div class="x-eq der"><span>Degox<small>Atlético de Madrid</small></span><span class="x-esc"></span></div>
+      </div>
+      <div class="x-ahora-fila">
+        <div class="x-dato"><div class="x-mini">Hosts listos</div><div class="x-num">3</div></div>
+        <div class="x-dato"><div class="x-mini">Retos abiertos</div><div class="x-num">2</div></div>
+        <div class="x-dato"><div class="x-mini">Conectados</div><div class="x-num">7</div></div>
+      </div>
+      <div class="x-barra"><i></i></div>
+      <div class="x-ahora-pie"><span>Galaxy League · 4 de 6 partidos de la fecha</span><span>39% de la temporada</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="x-pz">
+  <!-- EMPIEZA AQUÍ -->
+  <section class="x-sec">
+    <div class="x-card x-card-acc x-ruta">
+      <div class="x-ruta-cab">
+        <div><span class="x-eti">Para empezar</span><h2 class="x-tit">Tu camino hasta el <em>primer partido</em></h2><p class="x-leyenda">Cuatro pasos. Cada tarjeta te lleva a donde se hace y te dice cuánto tarda. Si ya tienes cuenta, verás aquí tu progreso.</p></div>
+        <a class="x-btn x-btn-g" href="#"><i class="fa-regular fa-circle-question"></i> Preguntas frecuentes</a>
+      </div>
+      <div class="x-pasos">
+        <div class="x-paso act"><div class="x-n">1</div><b>Crea tu cuenta</b><p>Con Discord, Google o correo. Te da perfil, reputación y acceso a los retos.</p><div class="t"><i class="fa-regular fa-clock"></i> 1 minuto</div></div>
+        <div class="x-paso"><div class="x-n">2</div><b>Arma tu ficha</b><p>Tu carta de jugador: posición y estadísticas. Es tu presentación ante los rivales.</p><div class="t"><i class="fa-regular fa-clock"></i> 3 minutos</div></div>
+        <div class="x-paso"><div class="x-n">3</div><b>Prepara tu conexión</b><p>Instala Parsec. Si vas a recibir rivales, Phoenix Link te configura el host.</p><div class="t"><i class="fa-regular fa-clock"></i> 5 minutos</div></div>
+        <div class="x-paso"><div class="x-n">4</div><b>Juega tu primer reto</b><p>Lanza un reto o acepta uno abierto en la Sala de Duelos. El resultado va a tu reputación.</p><div class="t"><i class="fa-regular fa-clock"></i> cuando quieras</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUÉ ES ESTO -->
+  <section class="x-sec">
+    <div class="x-sec-cab"><div><span class="x-eti">En 3 ideas</span><h2 class="x-tit">¿Qué es Phoenix Evolution?</h2></div></div>
+    <div class="x-grid3">
+      <div class="x-card x-que"><i class="fa-solid fa-trophy"></i><div><b>Una liga real</b><p>Galaxy League y Liga Sudario: fechas, tabla, goleadores y palmarés. Como una liga de barrio, pero en PES 2021 y con todo registrado.</p></div></div>
+      <div class="x-card x-que"><i class="fa-solid fa-gamepad"></i><div><b>Retos cuando quieras</b><p>Fuera de la liga puedes retar a cualquiera: 1 vs 1 o equipos de hasta 8. La Sala de Duelos arma la partida y avisa a los dos.</p></div></div>
+      <div class="x-card x-que"><i class="fa-solid fa-plug"></i><div><b>Se juega por Parsec</b><p>Uno pone la PC (el «host») y los demás entran por internet. Phoenix Link lo deja listo con un clic. Hay guía paso a paso.</p></div></div>
+    </div>
+  </section>
+
+  <!-- LIGA + NOTICIAS -->
+  <section class="x-sec">
+    <div class="x-dos">
+      <div>
+        <div class="x-sec-cab"><div><span class="x-eti">Galaxy League · 1.ª edición</span><h2 class="x-tit">Tabla de <em>posiciones</em></h2></div><a class="x-enlace" href="#">Tabla completa →</a></div>
+        <div class="x-card x-tabla">
+          <table>
+            <tr><th>#</th><th>Jugador</th><th>PJ</th><th>DIF</th><th>PTS</th></tr>
+            <tr class="x-l"><td class="x-p">1</td><td class="x-n">Victor<small>Bayern Múnich</small></td><td>9</td><td>+54</td><td class="x-pts">27</td></tr>
+            <tr><td class="x-p">2</td><td class="x-n">Beto<small>Liverpool</small></td><td>9</td><td>+31</td><td class="x-pts">24</td></tr>
+            <tr><td class="x-p">3</td><td class="x-n">Degox<small>Atlético de Madrid</small></td><td>8</td><td>+29</td><td class="x-pts">21</td></tr>
+            <tr><td class="x-p">4</td><td class="x-n">Axel<small>Real Madrid</small></td><td>9</td><td>-6</td><td class="x-pts">13</td></tr>
+            <tr><td class="x-p">5</td><td class="x-n">Arens<small>Manchester City</small></td><td>9</td><td>-7</td><td class="x-pts">12</td></tr>
+          </table>
+          <p class="x-nota" style="padding:.5rem .2rem .3rem"><i class="fa-regular fa-lightbulb" style="color:var(--cian)"></i> PJ = partidos jugados · DIF = goles a favor menos en contra · PTS = puntos (3 por ganar, 1 por empatar).</p>
+        </div>
+      </div>
+      <div>
+        <div class="x-sec-cab"><div><span class="x-eti">Noticias</span><h2 class="x-tit">Lo último</h2></div><a class="x-enlace" href="#">Todas →</a></div>
+        <div class="x-noti">
+          <div class="x-card x-nt dest"><div class="x-img"></div><div class="x-cu"><span class="x-pill">Oficial</span><b style="margin-top:.4rem">Beto golea 6-0 y se acerca al líder</b><small>Fecha 9 · hace 2 horas</small></div></div>
+          <div class="x-card x-nt"><div class="x-img"></div><div><b>Llega Phoenix Link 1.1</b><small>Instalador nuevo · Comunidad</small></div></div>
+          <div class="x-card x-nt"><div class="x-img"></div><div><b>Inscripciones Liga Sudario</b><small>Hasta el 20 de octubre</small></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMUNIDAD -->
+  <section class="x-sec">
+    <div class="x-sec-cab"><div><span class="x-eti">Comunidad</span><h2 class="x-tit">Lo que se habla <em>hoy</em></h2><p class="x-leyenda">El Muro es el espacio social: reacciones, clips y chistes. Discord es donde se avisan los partidos.</p></div><a class="x-enlace" href="#">Ir al muro →</a></div>
+    <div class="x-com">
+      <div style="display:grid;gap:.6rem">
+        <div class="x-card x-post"><span class="x-av"></span><div><b>Degox</b> <span class="x-nota">· hace 20 min</span><p>Ese 6-0 fue una falta de respeto 😂 el domingo nos vemos Beto</p><div class="re"><span>🔥 12</span><span>😂 8</span><span>💬 5</span></div></div></div>
+        <div class="x-card x-post"><span class="x-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></span><div><b>Jack</b> <span class="x-nota">· staff · hace 1 h</span><p>Fecha 10 confirmada para el sábado. Hosts: avisen en Discord si estarán.</p><div class="re"><span>👍 9</span><span>💬 3</span></div></div></div>
+      </div>
+      <div class="x-card x-disc"><i class="fa-brands fa-discord" style="font-size:2rem;color:#8ea1ff"></i><div class="x-num">34</div><div class="x-mini">en línea ahora</div><a class="x-btn x-btn-s" style="margin-top:.9rem" href="#">Entrar al Discord</a></div>
+    </div>
+  </section>
+  <div class="x-pie"></div>
+</div>

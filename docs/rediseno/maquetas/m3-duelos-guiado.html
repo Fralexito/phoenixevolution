@@ -1,0 +1,74 @@
+<!-- plantilla: duelos -->
+<style>
+.x-top{ padding:1.4rem 0 0; }
+.x-cab{ display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1rem; }
+.x-cab h1{ font:800 1.9rem/1.05 var(--font-display); text-transform:uppercase; color:#fff; letter-spacing:.03em; }
+.x-cab h1 em{ font-style:normal; background:linear-gradient(90deg,#00e5ff,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.x-modo{ display:inline-flex; border:1px solid var(--borde); border-radius:999px; padding:.2rem; background:#03010f; }
+.x-modo span{ padding:.45rem .95rem; border-radius:999px; font:700 .68rem var(--font-display); letter-spacing:.14em; text-transform:uppercase; color:var(--txt2); }
+.x-modo span.on{ background:linear-gradient(90deg,#8000ff,#00c3ff); color:#fff; }
+.x-g{ display:grid; grid-template-columns:1.05fr .95fr; gap:1rem; align-items:start; }
+/* asistente */
+.x-asis{ padding:1.2rem 1.3rem 1.3rem; }
+.x-prog{ display:flex; gap:.5rem; margin-bottom:1.1rem; }
+.x-prog i{ flex:1; height:4px; border-radius:2px; background:#1a0b36; }
+.x-prog i.on{ background:linear-gradient(90deg,var(--cian),var(--pur)); box-shadow:0 0 10px var(--cian); }
+.x-preg{ font:800 1.35rem/1.1 var(--font-display); text-transform:uppercase; color:#fff; letter-spacing:.03em; margin:.2rem 0 .3rem; }
+.x-ayu{ font-size:.78rem; color:var(--txt2); line-height:1.4; margin-bottom:1rem; }
+.x-ops{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+.x-op{ padding:1rem 1rem .95rem; border-radius:.9rem; border:1px solid var(--borde); background:rgb(3 1 15 / .55); display:flex; gap:.8rem; align-items:flex-start; }
+.x-op i{ width:2.3rem; height:2.3rem; flex:none; display:grid; place-items:center; border-radius:.7rem; background:rgb(0 229 255 / .1); color:var(--cian); }
+.x-op b{ display:block; font:800 .9rem var(--font-display); text-transform:uppercase; letter-spacing:.05em; color:#fff; }
+.x-op p{ font-size:.73rem; color:var(--txt2); line-height:1.35; margin-top:.15rem; }
+.x-op.sel{ border-color:var(--cian); box-shadow:0 0 22px rgb(0 229 255 / .15); background:linear-gradient(135deg,rgb(0 229 255 / .1),rgb(3 1 15 / .6)); }
+.x-op.sel i{ background:var(--cian); color:#03010f; }
+.x-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:1.1rem; }
+.x-resumen{ margin-top:1rem; padding:.75rem .9rem; border-radius:.8rem; border:1px dashed rgb(0 229 255 / .3); font-size:.78rem; color:#cbd5e1; }
+.x-resumen b{ color:var(--cian); font-family:var(--font-display); letter-spacing:.08em; text-transform:uppercase; font-size:.7rem; margin-right:.4rem; }
+/* radar derecha */
+.x-radar .x-sec-cab{ margin-bottom:.6rem; }
+.x-reto{ padding:.85rem .95rem; display:grid; grid-template-columns:auto 1fr auto; gap:.8rem; align-items:center; margin-bottom:.6rem; }
+.x-av{ width:2.4rem; height:2.4rem; border-radius:50%; background:linear-gradient(135deg,#8000ff,#00c3ff); }
+.x-reto b{ display:block; font:800 .88rem var(--font-display); text-transform:uppercase; color:#fff; letter-spacing:.04em; }
+.x-reto small{ font-size:.7rem; color:var(--txt2); display:block; }
+.x-tags{ display:flex; gap:.35rem; margin-top:.3rem; flex-wrap:wrap; }
+.x-tags span{ font:700 .58rem var(--font-display); letter-spacing:.12em; text-transform:uppercase; padding:.15rem .45rem; border-radius:.35rem; border:1px solid var(--borde); color:var(--txt2); }
+.x-tags span.h{ color:#00ff88; border-color:rgb(0 255 136 / .35); }
+.x-glos{ padding:.9rem 1rem; margin-top:.4rem; }
+.x-glos dl{ display:grid; grid-template-columns:auto 1fr; gap:.35rem .8rem; font-size:.74rem; }
+.x-glos dt{ font:800 .68rem var(--font-display); letter-spacing:.12em; text-transform:uppercase; color:var(--cian); }
+.x-glos dd{ color:var(--txt2); }
+.x-pie{ height:2.5rem; }
+</style>
+<div class="x-pz x-top">
+  <div class="x-cab">
+    <div><span class="x-eti">Jugar · Sala de duelos</span><h1>Arma tu partido en <em>3 preguntas</em></h1><p class="x-leyenda">El modo guiado te hace tres preguntas y lanza el reto por ti. Cuando ya sepas cómo funciona, pásate al modo completo (es el formulario de siempre).</p></div>
+    <div class="x-modo"><span class="on">Guiado</span><span>Completo</span></div>
+  </div>
+
+  <div class="x-g">
+    <div class="x-card x-card-acc x-asis">
+      <div class="x-prog"><i class="on"></i><i class="on"></i><i></i></div>
+      <span class="x-eti">Pregunta 2 de 3</span>
+      <h2 class="x-preg">¿Quién pone la PC?</h2>
+      <p class="x-ayu">En Phoenix se juega por Parsec: <b style="color:#fff">una persona pone su PC</b> (el «host») y la otra entra por internet. Si no sabes si tu PC sirve, elige «Necesito host» y el sistema busca a alguien con PC lista.</p>
+      <div class="x-ops">
+        <div class="x-op"><i class="fa-solid fa-desktop"></i><div><b>Yo tengo host</b><p>Tu PC ya tiene Phoenix Link o Parsec configurado. Tú recibes al rival.</p></div></div>
+        <div class="x-op sel"><i class="fa-solid fa-hand"></i><div><b>Necesito host</b><p>Buscamos a alguien con PC lista. Hoy hay <b style="color:#00ff88">3 hosts</b> disponibles.</p></div></div>
+      </div>
+      <div class="x-resumen"><b>Tu reto</b> 1 vs 1 · a toda la red · <span style="color:#fff">necesito host</span> · <span style="opacity:.5">¿cuándo?</span></div>
+      <div class="x-nav"><a class="x-enlace" href="#">← Volver</a><a class="x-btn x-btn-p" href="#">Siguiente: ¿cuándo? <i class="fa-solid fa-arrow-right"></i></a></div>
+    </div>
+
+    <div class="x-radar">
+      <div class="x-sec-cab"><div><span class="x-eti">O acepta uno abierto</span><h2 class="x-tit">Retos en el <em>radar</em></h2></div><span class="x-pill vivo">2 ahora</span></div>
+      <div class="x-card x-reto"><span class="x-av"></span><div><b>Camilo</b><small>1 vs 1 · ahora · PSG</small><div class="x-tags"><span class="h">Tiene host</span><span>Parsec</span><span>Reputación 4.8</span></div></div><a class="x-btn x-btn-s" href="#">Aceptar</a></div>
+      <div class="x-card x-reto"><span class="x-av" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></span><div><b>Axel</b><small>2 vs 2 · hoy 21:00 · falta 1 cupo</small><div class="x-tags"><span>Necesita host</span><span>Parsec</span></div></div><a class="x-btn x-btn-s" href="#">Unirme</a></div>
+      <div class="x-card x-glos">
+        <span class="x-eti" style="margin-bottom:.5rem">Palabras que verás</span>
+        <dl><dt>Host</dt><dd>Quien pone la PC donde se juega. Los demás entran por Parsec.</dd><dt>Radar</dt><dd>Lista de retos abiertos ahora mismo. Al aceptar, se avisa a los dos.</dd><dt>Cupo</dt><dd>Lugar libre en un equipo (máximo 8 jugadores por reto).</dd><dt>Reputación</dt><dd>Nota de 1 a 5 que dejan tus rivales. Sube si cumples la hora.</dd></dl>
+      </div>
+    </div>
+  </div>
+  <div class="x-pie"></div>
+</div>

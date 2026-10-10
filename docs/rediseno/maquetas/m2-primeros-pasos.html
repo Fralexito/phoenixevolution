@@ -1,0 +1,65 @@
+<style>
+.x-top{ padding:1.6rem 0 0; }
+.x-saludo{ display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; }
+.x-saludo h1{ font:800 2rem/1.05 var(--font-display); text-transform:uppercase; color:#fff; letter-spacing:.03em; }
+.x-saludo h1 em{ font-style:normal; background:linear-gradient(90deg,#00e5ff,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.x-chip{ display:inline-flex; gap:.5rem; align-items:center; padding:.45rem .8rem; border-radius:999px; border:1px solid rgb(0 229 255 / .35); background:rgb(0 229 255 / .07); font:700 .72rem var(--font-display); letter-spacing:.14em; text-transform:uppercase; color:#fff; }
+.x-chip .anillo{ width:1.5rem; height:1.5rem; border-radius:50%; background:conic-gradient(var(--cian) 0 40%, #1a0b36 40% 100%); display:grid; place-items:center; }
+.x-chip .anillo::after{ content:''; width:1rem; height:1rem; border-radius:50%; background:#03010f; }
+/* panel */
+.x-pp{ display:grid; grid-template-columns:260px 1fr; }
+.x-pp-izq{ padding:1.25rem; border-right:1px solid var(--borde); display:flex; flex-direction:column; gap:.9rem; }
+.x-aro{ width:9rem; height:9rem; border-radius:50%; margin:.25rem auto; background:conic-gradient(#00e5ff 0 40%, #8000ff 40% 41%, #1a0b36 41% 100%); display:grid; place-items:center; box-shadow:0 0 30px rgb(0 229 255 / .2); }
+.x-aro div{ width:7.2rem; height:7.2rem; border-radius:50%; background:#07020d; display:grid; place-items:center; text-align:center; }
+.x-aro b{ font:800 2rem/1 var(--font-display); color:#fff; display:block; }
+.x-aro small{ font:700 .62rem var(--font-display); letter-spacing:.2em; text-transform:uppercase; color:var(--txt2); }
+.x-pp-izq p{ font-size:.78rem; color:var(--txt2); text-align:center; line-height:1.4; }
+.x-items{ padding:.6rem .9rem; }
+.x-it{ display:grid; grid-template-columns:1.6rem 1fr auto; gap:.9rem; align-items:center; padding:.8rem .5rem; border-bottom:1px solid rgb(42 22 96 / .4); }
+.x-it:last-child{ border-bottom:0; }
+.x-ck{ width:1.5rem; height:1.5rem; border-radius:50%; border:2px solid #334155; display:grid; place-items:center; font-size:.7rem; color:#03010f; }
+.x-it.ok .x-ck{ background:#00ff88; border-color:#00ff88; box-shadow:0 0 12px rgb(0 255 136 / .5); }
+.x-it.ok b{ color:var(--txt2); text-decoration:line-through; }
+.x-it.sig{ background:linear-gradient(90deg,rgb(0 229 255 / .08),transparent); border-radius:.7rem; }
+.x-it.sig .x-ck{ border-color:var(--cian); box-shadow:0 0 12px rgb(0 229 255 / .4); }
+.x-it b{ display:block; font:800 .88rem var(--font-display); text-transform:uppercase; letter-spacing:.05em; color:#fff; }
+.x-it p{ font-size:.74rem; color:var(--txt2); line-height:1.35; }
+.x-it .x-pq{ font-size:.7rem; color:#6b7280; margin-top:.15rem; }
+.x-it .x-pq i{ color:var(--cian); margin-right:.25rem; }
+.x-it .x-btn{ padding:.6rem 1rem; font-size:.7rem; }
+/* debajo: lo de siempre, compacto */
+.x-fila3{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1.5rem; }
+.x-mod{ padding:1rem 1.1rem; }
+.x-mod .x-mini{ margin-bottom:.4rem; }
+.x-mod h3{ font:800 1.05rem var(--font-display); text-transform:uppercase; color:#fff; letter-spacing:.04em; }
+.x-mod p{ font-size:.76rem; color:var(--txt2); margin:.25rem 0 .7rem; line-height:1.35; }
+.x-pie{ height:2.5rem; }
+</style>
+<div class="x-pz x-top">
+  <div class="x-saludo">
+    <div><span class="x-eti">Central · Hola, Fralex</span><h1>Te faltan <em>3 pasos</em> para tu primer reto</h1></div>
+    <span class="x-chip"><span class="anillo"></span> Primeros pasos · 2 de 5</span>
+  </div>
+
+  <div class="x-card x-card-acc x-pp">
+    <div class="x-pp-izq">
+      <div class="x-aro"><div><div><b>40%</b><small>listo</small></div></div></div>
+      <p>Esta lista desaparece sola cuando termines. Puedes cerrarla cuando quieras desde «Mi cuenta».</p>
+      <a class="x-btn x-btn-g" style="justify-content:center" href="#"><i class="fa-regular fa-eye-slash"></i> Ocultar por ahora</a>
+    </div>
+    <div class="x-items">
+      <div class="x-it ok"><span class="x-ck"><i class="fa-solid fa-check"></i></span><div><b>Cuenta creada</b><p>Entraste con Discord. Tu @usuario es @fralex.</p></div><span class="x-nota">hecho</span></div>
+      <div class="x-it ok"><span class="x-ck"><i class="fa-solid fa-check"></i></span><div><b>Perfil completo</b><p>Apodo, país y foto. Así te reconocen en la tabla y en los retos.</p></div><span class="x-nota">hecho</span></div>
+      <div class="x-it sig"><span class="x-ck"></span><div><b>Arma tu ficha de jugador</b><p>Tu carta: posición, estadísticas y una frase. Es lo primero que mira un rival antes de aceptarte.</p><div class="x-pq"><i class="fa-regular fa-lightbulb"></i>Por qué importa: sin ficha no apareces en «Jugadores» ni en el comparador.</div></div><a class="x-btn x-btn-p" href="#">Crear ficha</a></div>
+      <div class="x-it"><span class="x-ck"></span><div><b>Prepara tu conexión</b><p>Instala Parsec (gratis). Si vas a ser host, Phoenix Link lo configura por ti y te da un código de sala.</p><div class="x-pq"><i class="fa-regular fa-lightbulb"></i>Por qué importa: las partidas se juegan en la PC de un host; sin esto no puedes conectarte.</div></div><a class="x-btn x-btn-s" href="#">Ver guía</a></div>
+      <div class="x-it"><span class="x-ck"></span><div><b>Juega tu primer reto</b><p>Lanza un reto a toda la red o acepta uno abierto. El primero vale el doble de reputación.</p></div><a class="x-btn x-btn-s" href="#">Ir a Duelos</a></div>
+    </div>
+  </div>
+
+  <div class="x-fila3">
+    <div class="x-card x-mod"><div class="x-mini">Tu liga</div><h3>Galaxy League · Fecha 9</h3><p>Te toca jugar contra <b style="color:#fff">Morgado</b>. Aún sin fecha pactada.</p><a class="x-btn x-btn-s" href="#">Pactar partido</a></div>
+    <div class="x-card x-mod"><div class="x-mini">Retos en el radar</div><h3>2 retos abiertos</h3><p>Camilo busca 1 vs 1 ahora · Axel 2 vs 2 a las 21:00.</p><a class="x-btn x-btn-s" href="#">Ver retos</a></div>
+    <div class="x-card x-mod"><div class="x-mini">Phoenix Link</div><h3>PC sin vincular</h3><p>Vincula tu PC para recibir avisos del juego y usar el buzón.</p><a class="x-btn x-btn-s" href="#">Vincular</a></div>
+  </div>
+  <div class="x-pie"></div>
+</div>
