@@ -1,4 +1,4 @@
-// Edge Function «phoenix» (1.9.0) · API /v1 para Smash Soda (módulo 2, fase 2.2). Contrato: claude/contrato-v1.md.
+// Edge Function «phoenix» (1.10.0) · API /v1 para Smash Soda (módulo 2, fase 2.2). Contrato: claude/contrato-v1.md.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/phoenix/v1/<ruta>
 // Desplegar con verify_jwt = false: la app NO usa sesión de Supabase, usa su token de dispositivo (Authorization: Bearer phx_…).
 // Variables: SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase solas). Ninguna otra.
@@ -746,6 +746,18 @@ async function chatGlobal(req: Request) {
   return conEtag(req, { mensajes, borrados: r.borrados ?? [], ultimo_id: mensajes.length ? mensajes[mensajes.length - 1].id : desde, espera_seg: r.espera_seg ?? 3, sondeo_seg });
 }
 
+// ── Última hora (1.10.0 · migración 100): la línea de noticias de la cabecera de Phoenix Link ─────────────────────────────
+/** GET /v1/noticias/ultima-hora — noticias publicadas y vigentes (máx. 5, las más graves primero). ETag/304. 1 llamada cada 30 s por PC. */
+async function noticiasUltimaHora(req: Request) {
+  const d = await autenticar(req);
+  frenar(`uh:${d.id}`, 1, 30_000);
+  const { cfg } = await cfgVigente();
+  const sondeo_seg = cfg.intervalos.sondeo_noticias_seg;
+  if (!cfg.interruptores.noticias) return conEtag(req, { noticias: [], pausado: true, sondeo_seg });
+  const r = await rpcSync("noticias_api_ultima_hora", {});
+  return conEtag(req, { noticias: r.noticias ?? [], sondeo_seg });
+}
+
 /** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */
 async function config(req: Request) {
   const { cfg, builds } = await cfgVigente();
@@ -797,6 +809,7 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/sync/option": { metodo: "GET|POST", fn: syncOption },
   "/v1/sync/option/listo": { metodo: "POST", fn: syncOptionListo },
   "/v1/chat/global": { metodo: "GET|POST", fn: chatGlobal },
+  "/v1/noticias/ultima-hora": { metodo: "GET", fn: noticiasUltimaHora },
 };
 
 Deno.serve(async (req) => {

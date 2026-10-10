@@ -151,7 +151,7 @@ import { modoSeguro, limpiarOperacion, limpiarResultados, limpiarOption } from '
 const G = '11111111-1111-4111-8111-111111111111'; const OP = '22222222-2222-4222-8222-222222222222';
 
 test('sync: versión 1.8.0, interruptor, sondeo mínimo 5 s y errores nuevos', () => {
-  assert.ok(CONFIG.version_api >= '1.8.0');
+  assert.ok(compararVersion(CONFIG.version_api, '1.8.0') >= 0);
   assert.equal(CONFIG.interruptores.sync_compartido, true);
   assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_sync_seg: 1 } }]).intervalos.sondeo_sync_seg, 5);
   for (const c of ['SIN_PERMISO', 'GRUPO_NO_ENCONTRADO', 'OPERACION_INVALIDA', 'OPERACION_NO_ENCONTRADA', 'OPTION_INVALIDA', 'OPTION_NO_ENCONTRADA', 'LIMITE_EXCEDIDO', 'SYNC_PAUSADO']) assert.ok(ERRORES[c], c);
@@ -197,8 +197,8 @@ test('sync: limpiarOption exige sha256, tamaño dentro del tope', () => {
 // ── Chat general (1.9.0) ─────────────────────────────────────────────────────────────────────────────────────────────
 import { limpiarMensajeChat, limpiarConsultaChat } from '../supabase/functions/phoenix/_lib/nucleo.js';
 
-test('chat: versión 1.9.0, interruptor, sondeo mínimo 3 s y errores nuevos', () => {
-  assert.equal(CONFIG.version_api, '1.9.0'); assert.equal(CONFIG.interruptores.chat_global, true);
+test('chat: interruptor, sondeo mínimo 3 s y errores nuevos', () => {
+  assert.match(CONFIG.version_api, /^1\.(9|10)\.\d+$/); assert.equal(CONFIG.interruptores.chat_global, true);
   assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_chat_seg: 1 } }]).intervalos.sondeo_chat_seg, 3);
   assert.equal(ERRORES.MENSAJE_INVALIDO.http, 400); assert.equal(ERRORES.CUENTA_SANCIONADA.http, 403); assert.equal(ERRORES.CHAT_PAUSADO.http, 503);
 });
@@ -214,4 +214,12 @@ test('chat: limpiarConsultaChat (desde y limite)', () => {
   assert.deepEqual(limpiarConsultaChat(q('')), { desde: 0, limite: 50 });
   assert.deepEqual(limpiarConsultaChat(q('desde=12&limite=100')), { desde: 12, limite: 100 });
   for (const s of ['desde=-1', 'desde=abc', 'desde=1.5', 'limite=0', 'limite=101']) assert.throws(() => limpiarConsultaChat(q(s)), (e) => e.codigo === 'CAMPO_INVALIDO');
+});
+
+// ── Última hora (1.10.0) ───────────────────────────────────────────────────────────────────────────────────────────────────
+test('última hora: versión 1.10.0, interruptor, sondeo mínimo 60 s', () => {
+  assert.equal(CONFIG.version_api, '1.10.0'); assert.equal(CONFIG.interruptores.noticias, true); assert.equal(CONFIG.intervalos.sondeo_noticias_seg, 60);
+  assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_noticias_seg: 10 } }]).intervalos.sondeo_noticias_seg, 60);
+  assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_noticias_seg: 120 } }]).intervalos.sondeo_noticias_seg, 120);
+  assert.equal(fusionarConfig(CONFIG, [{ clave: 'interruptores', valor: { noticias: false } }]).interruptores.noticias, false);
 });

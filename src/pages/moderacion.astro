@@ -53,6 +53,25 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" id="bzs-enviar" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Enviar a todos</button>
       </section>
 
+      <section id="uh-card" hidden class="space-y-2" aria-labelledby="h-uh">
+        <div class="flex flex-wrap items-center gap-2 border-b border-galaxy-border pb-2">
+          <h2 id="h-uh" class="text-base font-display font-bold text-white uppercase tracking-wider flex-1"><i class="fa-solid fa-bolt text-galaxy-400 mr-2"></i>Última hora en Phoenix Link</h2>
+          <b id="uh-cuenta" class="text-[12px] text-galaxy-400"></b>
+        </div>
+        <p class="text-xs text-gray-400">Una línea discreta en la cabecera de Phoenix Link. Máximo 5 a la vez; cada una vence sola (hasta 7 días).</p>
+        <form id="uh-form" class="space-y-2" autocomplete="off">
+          <label class="text-xs text-gray-300 block" for="uh-texto">Texto (una sola línea) <span id="uh-contador" class="text-gray-500"></span></label>
+          <input id="uh-texto" class="field w-full" maxlength="260" placeholder="Ej.: Hoy 9 pm final de la Copa Galaxy">
+          <div class="flex flex-wrap gap-2 items-end">
+            <label class="text-xs text-gray-300">Nivel <select id="uh-nivel" class="field"></select></label>
+            <label class="text-xs text-gray-300">Dura <select id="uh-horas" class="field"></select></label>
+            <label class="text-xs text-gray-300 flex-1 min-w-[12rem]">Enlace (opcional, https://) <input id="uh-enlace" class="field w-full" inputmode="url" placeholder="https://…"></label>
+            <button type="submit" id="uh-publicar" class="btn btn-primary !min-h-10"><i class="fa-solid fa-paper-plane"></i> Publicar</button>
+          </div>
+        </form>
+        <div id="uh-lista" class="space-y-1.5"></div>
+      </section>
+
       <section id="tls-card" hidden class="space-y-2" aria-labelledby="h-tls">
         <h2 id="h-tls" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-trophy text-galaxy-400 mr-2"></i>Torneos propios</h2>
         <p class="text-xs text-gray-400">Los usuarios crean torneos libremente. Aquí los vigilas: pausa la creación, aprieta los topes u oculta/cancela uno.</p>
@@ -76,4 +95,5 @@ import Layout from '../layouts/Layout.astro';
   import '../js/pages/moderacionPrivacidad.js';
   import '../js/features/buzon.js';
   import '../js/features/torneos/staff.js';
+  import '../js/features/ultimaHora.js';
 </script>

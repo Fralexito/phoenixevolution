@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.9.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.10.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.10.0 (compatibles, requieren migración 100; función PENDIENTE-DEPLOY como v13; la web oficial sigue `PENDIENTE-WEB`):** «Última hora» para Phoenix Link: `GET /v1/noticias/ultima-hora` (sección 28); interruptor `noticias`; intervalo `sondeo_noticias_seg` (mínimo 60). Solo añade: nada de lo publicado cambia.
 
 **Cambios 1.9.0 (compatibles, requieren migraciones 099 a 099g; función DESPLEGADA como v12 el 09-10-2026; la web oficial sigue `PENDIENTE-WEB`):** Chat general compartido con la web: `GET/POST /v1/chat/global` (sección 27), con `espera_seg` (anti-spam que fija el admin); interruptor `chat_global`; intervalo `sondeo_chat_seg`; errores `MENSAJE_INVALIDO` (400), `CUENTA_SANCIONADA` (403), `CHAT_PAUSADO` (503). Solo añade: nada de lo publicado cambia.
 
@@ -654,3 +656,38 @@ Sanciones (suspensión/baneo), separación por edad, límite de ritmo y borrado 
 ### Coste estimado (plan FREE, 500 000 invocaciones/mes)
 Link pregunta cada 5 s **solo mientras PES2021.exe está abierto**: 720 llamadas/hora por PC. 5 PCs × 2 h/día × 30 días ≈ **216 000**/mes, sumadas a §21, §25 y §26 se **pasaría del tope**. Palancas: subir `sondeo_chat_seg` (10 s lo reduce a la mitad), pedir solo si el panel de chat está abierto, o apagar `chat_global`.
 
+## 28. Última hora — avisos cortos para Phoenix Link (1.10.0 · migración 100, aditivo)
+
+Tabla propia `noticias_ultima_hora`. Las publican moderador/admin en la web (página Moderación → «Última hora en Phoenix Link»). Máximo **5 vigentes** a la vez; cada una dura de 1 h a 7 días (por defecto 24 h) y desaparece sola al expirar.
+
+**`GET /v1/noticias/ultima-hora`** (token + `X-Phoenix-Version`, igual que las demás rutas con token)
+
+Respuesta 200:
+```json
+{
+  "noticias": [
+    {"id": 7, "texto": "Ejemplo: mantenimiento breve del servidor en 10 minutos", "nivel": "urgente", "enlace": "https://phoenixevolution.example/aviso", "creado_en": "2026-10-10T06:53:25.152554+00:00", "expira_en": "2026-10-10T08:53:25.152554+00:00"},
+    {"id": 6, "texto": "Ejemplo: la jornada 5 empieza esta noche a las 21:00", "nivel": "info", "enlace": null, "creado_en": "2026-10-10T06:53:25.152554+00:00", "expira_en": "2026-10-11T06:53:25.152554+00:00"}
+  ],
+  "sondeo_seg": 60
+}
+```
+- `texto`: 1–200 caracteres, una sola línea, sin formato.
+- `nivel`: `info` → etiqueta «ÚLTIMA HORA», `importante` → «IMPORTANTE», `urgente` → «URGENTE».
+- `enlace`: `https://…` o `null`.
+- Orden ya hecho por el servidor: urgente, importante, info; dentro de cada nivel, la más nueva primero. Nunca más de 5. Lista vacía = no hay nada que mostrar.
+- Si el admin apaga el interruptor `noticias`: `{"noticias": [], "pausado": true, "sondeo_seg": 60}` (200, no es error).
+- `sondeo_seg` = `intervalos.sondeo_noticias_seg` de la config (mínimo 60). Es el tiempo mínimo entre consultas.
+- ETag: igual que la sección 21. Mandar `If-None-Match` con el último ETag; si no cambió responde **304** sin cuerpo.
+- Freno: 1 consulta cada 30 s por dispositivo. Si se pasa → **429** `DEMASIADOS_INTENTOS` con `reintentar_en` (segundos).
+- Errores posibles de la autenticación (sección 7): `TOKEN_INVALIDO`, `DISPOSITIVO_SUSPENDIDO`, `APP_DESACTUALIZADA`, etc.
+
+**Qué debe hacer Phoenix Link**
+1. Consultar cada `sondeo_seg` (≥ 60 s) **solo mientras su ventana esté visible**; al ocultarla, parar el temporizador.
+2. Usar ETag / `If-None-Match`; con 304 no cambiar nada.
+3. Con 429, esperar `reintentar_en` s. Con `pausado: true` o lista vacía, no mostrar nada. Con 404 (función antigua) o cualquier error: no mostrar nada y reintentar más tarde sin molestar al usuario.
+4. Mostrar una línea con la etiqueta del nivel + `texto`; si hay varias, rotar cada 9 s. Si hay `enlace`, que se pueda abrir.
+5. Botón «Entendido»: oculta esa noticia (por `id`) solo en esa PC; no se avisa al servidor.
+
+**Coste en llamadas (plan FREE: 500 000 invocaciones/mes)**
+Con 60 s de sondeo y la ventana visible: 60 llamadas por hora y PC (el 304 también cuenta). Ejemplo: 5 PCs × 2 h/día × 30 días × 60 = **18 000 llamadas/mes** (≈ 3,6 % del cupo). 20 PCs con las mismas horas = 72 000 (≈ 14 %). Si la ventana está oculta, 0 llamadas. Se suma a lo que ya gastan el chat, el buzón y Sync.

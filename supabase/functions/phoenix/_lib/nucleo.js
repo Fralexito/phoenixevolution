@@ -3,11 +3,11 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.9.0',
+  version_api: '1.10.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
-  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15, sondeo_sync_seg: 10, sondeo_chat_seg: 5 }),
-  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true, sync_compartido: true, chat_global: true }),
+  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15, sondeo_sync_seg: 10, sondeo_chat_seg: 5, sondeo_noticias_seg: 60 }),
+  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true, sync_compartido: true, chat_global: true, noticias: true }),
   limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096, sync_option_bytes_max: 8388608, sync_resultados_max: 50, chat_texto_max: 300 }),
 });
 
@@ -241,6 +241,7 @@ export function fusionarConfig(base, filas = []) {
   if (out.intervalos.sondeo_buzon_seg < 5) out.intervalos.sondeo_buzon_seg = 5;
   if (out.intervalos.sondeo_sync_seg < 5) out.intervalos.sondeo_sync_seg = 5;
   if (out.intervalos.sondeo_chat_seg < 3) out.intervalos.sondeo_chat_seg = 3;
+  if (out.intervalos.sondeo_noticias_seg < 60) out.intervalos.sondeo_noticias_seg = 60;   // Última hora: nunca más seguido que cada 60 s
   return out;
 }
 
