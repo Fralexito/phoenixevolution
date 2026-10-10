@@ -484,6 +484,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ### Ronda 222 — Rendimiento: refresco de «Ahora» en pausa con la pestaña oculta
 - `src/js/pages/ahora.js`: las cifras (cada 30 s) ya no se piden con la pestaña oculta y se refrescan al volver. Visualmente idéntico. NO se recortó Font Awesome: los íconos de insignias/tienda se guardan en la BD (`fa-…` libre), un subset los haría desaparecer. Aviso: 3 pruebas (`pure.test.mjs`: tabla CopaFácil, ligaStats, crónica) fallan desde la ronda 221 (datos nuevos de resultados); no son de esta ronda.
 
+### Ronda 223 — Arreglo: «Aprobar host» fallaba (migración 101)
+- Error en pantalla: `violates check constraint "auditoria_staff_accion_check"`. `staff_aprobar_host` auditaba con `aprobar_host`/`quitar_host`, acciones que `auditoria_staff` no admite. Ahora audita como `rol` (texto «Host aprobado/retirado · nombre»). Aplicada por MCP y probada con transacción revertida. Siguiente migración libre = 102. (Ojo: la otra cuenta ya usó «ronda 221» y su propia numeración; esta ronda se llama 223 aquí.)
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
