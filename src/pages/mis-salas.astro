@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { href } from '../js/core/config.js';
 ---
 <Layout title="Phoenix Link" active="missalas">
   <div class="max-w-4xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
@@ -21,6 +22,11 @@ import Layout from '../layouts/Layout.astro';
       <section id="ms-bloque-host" class="bg-galaxy-panel rounded-xl border border-galaxy-border p-4 space-y-3" aria-labelledby="h-pcs">
         <h2 id="h-pcs" class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-computer text-galaxy-400 mr-2"></i>Mis PCs (host)</h2>
         <div id="ms-host" class="space-y-3 text-sm text-gray-300">Cargando…</div>
+      </section>
+      <section class="bg-galaxy-panel rounded-xl border border-galaxy-border p-4 space-y-2" aria-labelledby="h-sync">
+        <h2 id="h-sync" class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-arrows-rotate text-galaxy-400 mr-2"></i>Phoenix Sync · fichajes compartidos</h2>
+        <p class="text-xs text-gray-400">Comparte tus fichajes con otras PCs y mira quién ya los aplicó. Usa el mismo código de vinculación de arriba.</p>
+        <a class="btn btn-ghost" href={href('phoenix-sync/')}><i class="fa-solid fa-arrow-right"></i> Abrir Phoenix Sync</a>
       </section>
       <section id="ms-bloque-oferta" hidden class="bg-galaxy-panel rounded-xl border border-galaxy-border p-4 space-y-3" aria-labelledby="h-oferta">
         <h2 id="h-oferta" class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid fa-handshake text-galaxy-400 mr-2"></i>Alquilar mi host</h2>
