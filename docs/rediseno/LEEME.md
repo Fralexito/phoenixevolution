@@ -17,7 +17,7 @@ Se fusiona solo cuando FRALEX apruebe cada sección y diga «Súbelo».
 ## Propuestas (cada una se aprueba por separado)
 | # | Sección | Qué cambia | Estado |
 |---|---|---|---|
-| 1 | Inicio | Título que explica, un solo botón principal («Empezar en 4 pasos»), tarjeta «Ahora mismo», camino de 4 pasos, «¿Qué es?» en 3 ideas, tabla con leyenda, noticias, comunidad | Esperando aprobación |
+| 1 | Inicio | Título que explica, un solo botón principal («Empezar en 4 pasos»), tarjeta «Ahora mismo», camino de 4 pasos, «¿Qué es?» en 3 ideas, tabla con leyenda, noticias, comunidad | **HECHO en esta rama** (`src/pages/index.astro`, `src/styles/inicio.css`; capturas `1b-inicio-real-*`) |
 | 2 | Primeros pasos | Panel con progreso solo para quien tiene cuenta; «por qué importa» en cada paso; se oculta al terminar | Esperando aprobación |
 | 3 | Duelos guiado | 3 preguntas en vez del formulario; el formulario completo sigue disponible; glosario al lado | Esperando aprobación |
 | 4 | Menú | Mismos 4 pilares; cada enlace con una línea de explicación; puerta «Empieza aquí» y columna Ayuda | Esperando aprobación |
@@ -32,3 +32,12 @@ python3 -m http.server 4399 -d dist &
 python3 docs/rediseno/maquetas/build.py      # crea dist/_mock_*.html
 # captura con Playwright: ver MAPA.md («Entorno de la IA»)
 ```
+
+## Inicio: qué se implementó (10 oct 2026)
+- `src/pages/index.astro` reescrito. **La lógica no cambió**: `js/pages/central.js` sigue pintando partidos, destacado, tabla, rachas y cifras; se conservaron todos los ids que busca.
+- `src/styles/inicio.css` nuevo (prefijo `in-`), importado desde `global.css`.
+- Portada en 2 columnas: mensaje + botón principal (invitado: «Empezar en 4 pasos»; con sesión: «Jugar un reto») y tarjeta «Ahora mismo» con la franja de estado real, el partido destacado real y 3 cifras de la base.
+- Cifras que no dependen de la base (jugadores y partidos jugados) salen de `data/ligaResultados.js` al compilar: la portada nunca queda vacía.
+- «Tu camino» y «¿Qué es?» solo se ven sin sesión (`.solo-invitado`). Con sesión queda el hueco `#primeros-pasos` para el panel de la propuesta 2.
+- Se quitó la barra de anclas y los 5 accesos iguales. Clubes/goleadores, Jugadores destacados y Discord se mantienen.
+- Para volver al inicio anterior: `git checkout borrador -- src/pages/index.astro src/styles/global.css` (y borrar `inicio.css`).

@@ -280,7 +280,9 @@ podio.addEventListener('keydown', (e) => { const s = e.target.closest('.podio-sl
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarPodio(); });
 document.addEventListener('click', (e) => { if (!e.target.closest('#featured-players-container, .pcw-replica')) cerrarPodio(); });
 window.addEventListener('resize', () => replicaPodio.reposicionar());
-$('btn-hero-register')?.addEventListener('click', () => openAuthModal('register'));
+$('btn-hero-register')?.addEventListener('click', () => openAuthModal('login'));
+// Inicio nuevo: cualquier botón con data-auth="login|register" abre la ventana de cuenta (paso 1 del camino, «Ya tengo cuenta»).
+document.querySelectorAll('[data-auth]').forEach((b) => b.addEventListener('click', () => openAuthModal(b.dataset.auth === 'register' ? 'register' : 'login')));
 // Si ya hay sesión, el botón de "Crear Cuenta" sobra.
 onSession(({ session }) => { const b = $('btn-hero-register'); if (b) b.hidden = !!session; });
 

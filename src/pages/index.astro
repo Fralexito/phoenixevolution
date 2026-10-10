@@ -1,166 +1,150 @@
 ---
+// INICIO (rama rediseno). Pensado para quien entra por primera vez: qué es esto, qué puedo hacer y por dónde empiezo.
+// Toda la lógica de datos (partidos, destacado, tabla, cifras, rachas) sigue en js/pages/central.js: aquí solo cambia la ESTRUCTURA
+// y se conservan los mismos ids que ese archivo busca. Para volver al inicio anterior: git checkout borrador -- src/pages/index.astro.
 import Layout from '../layouts/Layout.astro';
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
-import { DEMO_CLIPS } from '../data/demo.js';
-import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
+import { LIGAS } from '../data/ligas.js';
+import { NOTICIAS } from '../data/noticias.js';
+import { EDICIONES } from '../data/ligaResultados.js';
 const base = import.meta.env.BASE_URL;
-// «¿Qué quieres hacer?»: las acciones más buscadas, a un clic desde Central. `invitado` = solo sin sesión; `cuenta` = solo con sesión (lo decide html[data-sesion]).
-const ACCIONES = [
-  { href: 'duelos/', icono: 'fa-gamepad', titulo: 'Jugar un reto', txt: 'Reta a alguien y arma la sala', tono: 'primario' },
-  { href: 'ahora/', icono: 'fa-tower-broadcast', titulo: 'Ver en vivo', txt: 'Partidos y retos en este momento' },
-  { href: 'liga/', icono: 'fa-table-list', titulo: 'Tabla de la liga', txt: 'Posiciones, fechas y resultados' },
-  { href: 'noticias/', icono: 'fa-newspaper', titulo: 'Noticias', txt: 'Lo oficial y la Tribuna' },
-  { href: 'mis-salas/', icono: 'fa-desktop', titulo: 'Vincular mi PC', txt: 'Phoenix Soda y Parsec', cuenta: true },
-  { href: 'unirme/', icono: 'fa-door-open', titulo: 'Unirme a la liga', txt: 'Inscríbete para la próxima edición', invitado: true },
+
+// Cifras que NO dependen de la base de datos (salen de data/ligaResultados.js al compilar): así la portada nunca queda vacía.
+const edicion = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;
+const partidosEd = (edicion?.fechas ?? []).flatMap((f) => f.partidos ?? []);
+const nJugadores = new Set([...(edicion?.jugadores ?? []), ...partidosEd.flatMap((m) => [m.l, m.v])].filter(Boolean)).size;
+const nJugados = partidosEd.filter((m) => Number.isInteger(m?.gl) && Number.isInteger(m?.gv)).length;
+const nLigas = LIGAS.filter((l) => l.enCentral !== false).length;
+const noticias = NOTICIAS.slice(0, 3);
+const DISCORD = 'https://discord.gg/jsxZ3mtfwe';
+
+// Los 4 pasos del nuevo (solo sin sesión). Con sesión, este bloque se oculta y lo reemplaza «Primeros pasos» (ver js/features/primerosPasos.js cuando exista).
+const PASOS = [
+  { n: 1, t: 'Crea tu cuenta', p: 'Con Discord, Google o correo. Te da perfil, reputación y acceso a los retos.', tiempo: '1 minuto', accion: 'registro' },
+  { n: 2, t: 'Arma tu ficha', p: 'Tu carta de jugador: posición y estadísticas. Es tu presentación ante los rivales.', tiempo: '3 minutos', href: 'database/' },
+  { n: 3, t: 'Prepara tu conexión', p: 'Instala Parsec. Si vas a recibir rivales, Phoenix Link te configura el host.', tiempo: '5 minutos', href: 'unirme/#conexion' },
+  { n: 4, t: 'Juega tu primer reto', p: 'Lanza un reto o acepta uno abierto en la Sala de Duelos. El resultado va a tu reputación.', tiempo: 'cuando quieras', href: 'duelos/' },
+];
+const IDEAS = [
+  { i: 'fa-trophy', t: 'Una liga real', p: 'Galaxy League y Liga Sudario: fechas, tabla, goleadores y palmarés. Como una liga de barrio, pero en PES 2021 y con todo registrado.' },
+  { i: 'fa-gamepad', t: 'Retos cuando quieras', p: 'Fuera de la liga puedes retar a cualquiera: 1 vs 1 o equipos de hasta 8. La Sala de Duelos arma la partida y avisa a los dos.' },
+  { i: 'fa-plug', t: 'Se juega por Parsec', p: 'Uno pone la PC (el «host») y los demás entran por internet. Phoenix Link lo deja listo con un clic. Hay guía paso a paso.' },
 ];
 ---
 <Layout title="Central" active="central">
-  <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
-  <header class="relative flex flex-col justify-center overflow-hidden pt-4 pb-16 sm:pt-8 sm:pb-16 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40">
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
+
+  <!-- 1. PORTADA · izquierda: qué es y UNA acción principal · derecha: lo que pasa ahora (estado real + partido destacado + cifras) -->
+  <header class="in-hero px-4 sm:px-6 lg:px-8">
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="flex items-center justify-center w-full"><div class="max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-5">
-      <span class="inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
-      <h1 class="text-[1.85rem] leading-[1.15] sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase tracking-wider sm:leading-tight">
-        EL SHOW MÁXIMO DE<br class="hidden sm:inline" /> LA <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 via-galaxy-500 to-galaxy-600 text-shadow-glow">GALAXY LEAGUE</span>
-      </h1>
-      <p class="text-gray-300 text-[13px] leading-snug sm:leading-normal sm:text-base md:text-lg max-w-2xl mx-auto">Comunidad competitiva de simulación futbolística. Matchmaking punto a punto, hosting remoto, transferencias de mercado y disputas de honor sobre el campo virtual.</p>
-      {!FX.limpio && <Fragment>
-      <div class="flex flex-nowrap sm:flex-wrap items-center justify-center gap-2 sm:gap-4 pt-1 sm:pt-4">
-        <a href={`${base}duelos/`} class="bg-gradient-to-r from-galaxy-600 to-galaxy-700 hover:from-galaxy-500 hover:to-galaxy-600 text-white font-display font-bold px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(128,0,255,0.4)] flex items-center gap-2"><i class="fa-solid fa-gamepad"></i> Sala de Duelos</a>
-        <a href={`${base}database/`} class="glass-panel hover:bg-white/10 text-white font-display font-bold px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider hover:border-galaxy-400 transition-all flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Jugadores</a>
+    <div class="max-w-7xl mx-auto in-hero-g">
+      <div>
+        <span class="in-pill vivo">Temporada oficial 2026</span>
+        <h1 class="in-h1">Juega PES 2021<br />en línea, con <em>liga de verdad</em></h1>
+        <p class="in-bajada">Phoenix Evolution es una <b>comunidad de jugadores</b>: tabla, fechas, retos y transmisiones. Entras, armas tu ficha, retas a alguien y tu resultado cuenta. <b>Gratis</b> y sin instalar nada raro: solo PES 2021 y Parsec.</p>
+        <div class="in-cta">
+          <a href="#empezar" class="in-btn in-btn-p solo-invitado"><i class="fa-solid fa-rocket"></i> Empezar en 4 pasos</a>
+          <a href={`${base}duelos/`} class="in-btn in-btn-p solo-cuenta"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
+          <a href={`${base}liga/`} class="in-btn in-btn-s"><i class="fa-solid fa-table-list"></i> Ver la liga</a>
+          <button type="button" id="btn-hero-register" class="in-enlace solo-invitado" data-auth="login">Ya tengo cuenta →</button>
+        </div>
+        <div class="in-confianza" aria-label="Datos de la comunidad">
+          {nJugadores > 0 && <span><i class="fa-solid fa-users"></i> {nJugadores} jugadores en la liga</span>}
+          {nJugados > 0 && <span><i class="fa-solid fa-futbol"></i> {nJugados} partidos jugados</span>}
+          {nLigas > 1 && <span><i class="fa-solid fa-crown"></i> {nLigas} competiciones</span>}
+          <span><i class="fa-brands fa-discord"></i> Comunidad en Discord</span>
+        </div>
       </div>
-      <p class="pt-1"><a href={`${base}unirme/`} class="inline-flex items-center gap-2 text-[12px] sm:text-xs font-display font-bold uppercase tracking-widest text-galaxy-400 hover:text-white border border-galaxy-400/30 bg-galaxy-400/10 hover:bg-galaxy-400/20 px-3.5 py-1.5 rounded-full transition-colors"><i class="fa-solid fa-door-open"></i> ¿Eres nuevo? Únete a la liga en 5 pasos <i class="fa-solid fa-arrow-right"></i></a></p>
-      </Fragment>}
-    </div></div>
-  <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
-  {FX.limpio ? (
-    <div class="relative z-10 w-full max-w-5xl mx-auto pt-6 sm:pt-8 space-y-4">
-      <div class="acciones-grid acciones-hero">
-        {ACCIONES.map((a) => (
-          <a href={`${base}${a.href}`} class:list={['accion', a.tono === 'primario' && 'accion-primaria', a.invitado && 'solo-invitado', a.cuenta && 'solo-cuenta']}>
-            <i class={`fa-solid ${a.icono}`}></i><span><b>{a.titulo}</b><small>{a.txt}</small></span>
-          </a>
-        ))}
-      </div>
-      <p class="pulso-linea" aria-label="Pulso de la comunidad">
-        {[['jugadores', 'fichas', 'database/'], ['comunidad', 'registrados', 'database/'], ['hosts', 'hosts listos', 'duelos/'], ['retos', 'retos abiertos', 'duelos/']].map(([id, txt, href]) => (
-          <a href={`${base}${href}`}><b id={`pulso-${id}`}>—</b> {txt}</a>
-        ))}
-      </p>
+
+      <aside class="in-card in-ahora" aria-label="Ahora mismo en la comunidad">
+        <div class="in-ahora-cab"><span class="in-eti">Ahora mismo</span><span class="in-pill vivo">En vivo</span></div>
+        <!-- Franja de estado de la liga (la pinta central.js; hidden hasta tener datos) -->
+        <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
+        <!-- Partido destacado real (central.js) -->
+        <article id="destacado" class="glass-panel rounded-xl overflow-hidden relative" aria-live="polite">
+          <div class="p-5 space-y-3" role="status" aria-label="Cargando el partido destacado"><div class="esqueleto h-4 w-1/3 mx-auto"></div><div class="esqueleto h-12"></div></div>
+        </article>
+        <!-- Cifras reales de la base (central.js las rellena; «—» mientras tanto) -->
+        <div class="in-cifras">
+          <a href={`${base}duelos/`} class="in-cifra"><span class="in-mini">Hosts listos</span><b id="pulso-hosts">—</b></a>
+          <a href={`${base}duelos/`} class="in-cifra"><span class="in-mini">Retos abiertos</span><b id="pulso-retos">—</b></a>
+          <a href={`${base}database/`} class="in-cifra"><span class="in-mini">Registrados</span><b id="pulso-comunidad">—</b></a>
+          <span hidden id="pulso-jugadores">—</span>
+        </div>
+      </aside>
     </div>
-  ) : (<Fragment>
-  <section aria-label="Pulso de la comunidad" class="relative z-10 w-full grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 pt-5 sm:pt-8 text-left">
-    {[
-      { id: 'jugadores', icon: 'fa-id-card', label: 'Fichas de jugador', href: 'database/' },
-      { id: 'comunidad', icon: 'fa-users', label: 'Jugadores registrados', href: 'duelos/' },
-      { id: 'hosts', icon: 'fa-tower-broadcast', label: 'Hosts disponibles', href: 'duelos/' },
-      { id: 'retos', icon: 'fa-bolt', label: 'Retos abiertos', href: 'duelos/' },
-    ].map((t) => (
-      <a href={`${base}${t.href}`} class="pulse-tile group">
-        <i class={`fa-solid ${t.icon} pulse-ico`}></i>
-        <span class="pulse-num" id={`pulso-${t.id}`}>—</span>
-        <span class="pulse-lbl">{t.label}</span>
-      </a>
-    ))}
-  </section>
-  </Fragment>)}
   </header>
 
-  <div class:list={["max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full", FX.limpio ? "space-y-12 sm:space-y-16" : "space-y-8 sm:space-y-10"]}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 w-full">
 
-    {!FX.limpio && <Fragment>
-    <!-- 00. ¿QUÉ QUIERES HACER? Accesos directos a lo más usado (que nada importante quede escondido en menús). -->
-    <section aria-labelledby="acc-t" class="acciones">
-      <h2 id="acc-t" class="acciones-tit">¿Qué quieres hacer?</h2>
-      <div class="acciones-grid">
-        {ACCIONES.map((a) => (
-          <a href={`${base}${a.href}`} class:list={['accion', a.tono === 'primario' && 'accion-primaria', a.invitado && 'solo-invitado', a.cuenta && 'solo-cuenta']}>
-            <i class={`fa-solid ${a.icono}`}></i><span><b>{a.titulo}</b><small>{a.txt}</small></span><i class="fa-solid fa-arrow-right accion-flecha"></i>
-          </a>
-        ))}
+    <!-- 2. TU CAMINO (solo invitados). Con sesión aquí irá «Primeros pasos» (progreso real). -->
+    <section id="empezar" class="in-sec scroll-mt-28 solo-invitado" aria-labelledby="empezar-t">
+      <div class="in-card in-acc in-ruta">
+        <div class="in-cab">
+          <div><span class="in-eti">Para empezar</span><h2 id="empezar-t" class="in-tit">Tu camino hasta el <em>primer partido</em></h2><p class="in-leyenda">Cuatro pasos. Cada tarjeta te lleva a donde se hace y te dice cuánto tarda. Cuando tengas cuenta, aquí verás tu progreso.</p></div>
+          <a href={`${base}unirme/`} class="in-btn in-btn-g"><i class="fa-regular fa-circle-question"></i> Guía completa y preguntas</a>
+        </div>
+        <div class="in-pasos">
+          {PASOS.map((s) => (
+            s.accion
+              ? <button type="button" class:list={['in-paso text-left', s.n === 1 && 'act']} data-auth="register"><span class="n">{s.n}</span><b>{s.t}</b><p>{s.p}</p><span class="t"><i class="fa-regular fa-clock"></i>{s.tiempo}</span></button>
+              : <a href={`${base}${s.href}`} class="in-paso"><span class="n">{s.n}</span><b>{s.t}</b><p>{s.p}</p><span class="t"><i class="fa-regular fa-clock"></i>{s.tiempo}</span></a>
+          ))}
+        </div>
+      </div>
+    </section>
+    <!-- Con sesión: contenedor del panel «Primeros pasos» (lo monta js/features/primerosPasos.js; vacío hasta entonces) -->
+    <div id="primeros-pasos" class="solo-cuenta in-sec" hidden></div>
+
+    <!-- 3. QUÉ ES ESTO (solo invitados) -->
+    <section class="in-sec solo-invitado" aria-labelledby="ideas-t">
+      <div class="in-cab"><div><span class="in-eti">En 3 ideas</span><h2 id="ideas-t" class="in-tit">¿Qué es Phoenix Evolution?</h2></div></div>
+      <div class="in-ideas">
+        {IDEAS.map((x) => (<div class="in-card in-idea"><i class={`fa-solid ${x.i}`}></i><div><b>{x.t}</b><p>{x.p}</p></div></div>))}
       </div>
     </section>
 
-    </Fragment>}
-    <!-- 0. ESTADO DE LA LIGA: franja compacta («en juego · fecha · avance»). La pinta js/pages/central.js con los datos reales de la edición en curso. -->
-    <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
-
-    <!-- 0b. SALTO RÁPIDO entre secciones (pegajosa bajo la cabecera). Las minisecciones plegadas se abren al saltar a ellas (js/pages/central.js). -->
-{(<nav class="anclas" aria-label="Saltar a una sección">
-      <a href="#central-partidos"><i class="fa-solid fa-futbol"></i>Partidos</a>
-      <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
-      <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Clubes</a>
-      <a href="#destacados-seccion"><i class="fa-solid fa-id-card"></i>Jugadores</a>
-      {FX.highlightsDemo && <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>}
-    </nav>)}
-
-    <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
-    {LIGAS.filter((l) => l.enCentral !== false).length > 1 && (
-      <section aria-label="Competiciones" class="space-y-3">
-        <h2 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Competiciones</h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {LIGAS.filter((l) => l.enCentral !== false).map((l) => (
-            <a href={`${base}liga/#liga-${l.id}`} class="liga-card group min-h-[170px] block">
-              <div class="absolute inset-0 bg-gradient-to-r from-black via-galaxy-900/80 to-transparent z-10"></div>
-              <img src={l.imagen} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
-              <div class="relative z-20 p-5 flex flex-col justify-end h-full min-h-[170px]">
-                <span class:list={['liga-sello self-start mb-2', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
-                <h3 class="text-2xl font-display font-bold text-white uppercase leading-none">{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span></h3>
-                <p class="text-xs font-display tracking-[0.2em] text-gray-300 uppercase mt-1">{l.juego}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
-
-    <!-- 3. CENTRAL DE PARTIDOS (con el partido destacado dentro) + clasificación y XI al costado -->
-    {FX.visita && <div id="novedad" hidden class="novedad" role="status"></div>}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
-      <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
-        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
-          <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
-          <div id="fecha-nav" hidden class="order-3 sm:order-none w-full sm:w-auto sm:flex-1 sm:max-w-[19rem] sm:mx-auto min-w-0"></div>
-          <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
-            <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
-            <button type="button" data-v="resultados" aria-pressed="false">Resultados</button>
-            <button type="button" data-v="porfecha" aria-pressed="false">Por fecha</button>
+    <!-- 4. PARTIDOS + POSICIONES (misma lógica de central.js: ids intactos) -->
+    {FX.visita && <div id="novedad" hidden class="novedad mt-6" role="status"></div>}
+    <section class="in-sec" aria-labelledby="liga-t">
+      <div class="in-liga">
+        <section id="central-partidos" class="space-y-3 scroll-mt-32 min-w-0">
+          <div class="in-cab !mb-2">
+            <div><span class="in-eti">Galaxy League{edicion ? ` · ${edicion.nombre}` : ''}</span><h2 id="liga-t" class="in-tit">Central de <em>partidos</em></h2><p class="in-leyenda">Próximos cruces y resultados de la liga oficial. Toca un partido para ver su detalle.</p></div>
+            <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
+              <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
+              <button type="button" data-v="resultados" aria-pressed="false">Resultados</button>
+              <button type="button" data-v="porfecha" aria-pressed="false">Por fecha</button>
+            </div>
           </div>
-        </div>
-
-        <!-- Partido destacado: lo pinta js/pages/central.js con el próximo cruce entre los mejor ubicados de la tabla real. -->
-        <article id="destacado" class="glass-panel rounded-xl overflow-hidden relative min-h-[9rem]" aria-live="polite">
-          <div class="p-6 space-y-3" role="status" aria-label="Cargando el partido destacado"><div class="esqueleto h-5 w-1/3 mx-auto"></div><div class="esqueleto h-16"></div></div>
-        </article>
-
-        <div class="grid gap-3" id="matches-container" aria-live="polite"></div>
-        <a href={`${base}duelos/`} class="flex items-center justify-center gap-2 text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase tracking-wider border border-dashed border-galaxy-400/30 rounded-xl py-3 hover:border-galaxy-400 transition-colors"><i class="fa-solid fa-gamepad"></i> Ver retos abiertos en la Sala de Duelos <i class="fa-solid fa-arrow-right"></i></a>
-      </section>
-
-      <aside class="space-y-5">
-        <section id="pos-seccion" class="glass-panel rounded-xl overflow-hidden scroll-mt-40">
-          <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
-            <div><h3 id="pos-titulo" class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><p id="pos-sub" hidden class="text-[12px] text-gray-400"></p></div><i class="fa-solid fa-trophy text-galaxy-400"></i>
-          </div>
-          <div class="p-4 overflow-auto max-h-[260px]" role="region" tabindex="0" aria-label="Contenido desplazable">
-            <table class="w-full text-left text-sm">
-              <thead><tr class="text-gray-500 border-b border-galaxy-border/50"><th class="pb-2 font-semibold">Pos</th><th class="pb-2 font-semibold">DT / Club</th><th class="pb-2 text-center font-semibold">PJ</th><th class="pb-2 text-center font-semibold text-galaxy-400">PTS</th></tr></thead>
-              <tbody id="mini-table-container"></tbody>
-            </table>
-          </div>
+          <div id="fecha-nav" hidden class="w-full sm:max-w-[19rem] min-w-0"></div>
+          <div class="grid gap-3" id="matches-container" aria-live="polite"></div>
+          <a href={`${base}duelos/`} class="flex items-center justify-center gap-2 text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase tracking-wider border border-dashed border-galaxy-400/30 rounded-xl py-3 hover:border-galaxy-400 transition-colors"><i class="fa-solid fa-gamepad"></i> Ver retos abiertos en la Sala de Duelos <i class="fa-solid fa-arrow-right"></i></a>
         </section>
-        {FX.rachas && <section id="rachas" hidden class="glass-panel rounded-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center"><h3 class="font-display font-bold text-lg uppercase tracking-wider text-white">En racha</h3><i class="fa-solid fa-fire-flame-curved text-amber-400"></i></div>
-          <div id="rachas-lista" class="px-4 py-2 text-sm"></div>
-        </section>}
-        <div id="inicio-creadores" hidden></div>
-        <div id="inicio-semanal" hidden></div>
-      </aside>
-    </div>
 
-    <!-- 3b. CLUBES Y GOLEADORES (plegado). Los pinta js/pages/central.js. El ELO NO va aquí: solo mide amistosos (página Ranking). -->
+        <aside class="space-y-4 min-w-0">
+          <div class="in-cab !mb-2"><div><span class="in-eti">Tabla</span><h2 id="pos-titulo" class="in-tit">Posiciones</h2><p id="pos-sub" hidden class="in-leyenda"></p></div><a href={`${base}liga/`} class="in-enlace">Tabla completa →</a></div>
+          <section id="pos-seccion" class="in-card in-tabla scroll-mt-40">
+            <div class="overflow-auto max-h-[300px]" role="region" tabindex="0" aria-label="Tabla de posiciones (desplazable)">
+              <table class="w-full text-left text-sm">
+                <thead><tr><th>Pos</th><th>DT / Club</th><th class="text-center">PJ</th><th class="text-center !text-galaxy-400">PTS</th></tr></thead>
+                <tbody id="mini-table-container"></tbody>
+              </table>
+            </div>
+            <p class="in-nota px-1 py-2"><i class="fa-regular fa-lightbulb"></i>PJ = partidos jugados · PTS = puntos (3 por ganar, 1 por empatar). ▲▼ aparecen en «Por fecha».</p>
+          </section>
+          {FX.rachas && <section id="rachas" hidden class="glass-panel rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center"><h3 class="font-display font-bold text-base uppercase tracking-wider text-white">En racha</h3><i class="fa-solid fa-fire-flame-curved text-amber-400"></i></div>
+            <div id="rachas-lista" class="px-4 py-2 text-sm"></div>
+          </section>}
+          <div id="inicio-creadores" hidden></div>
+          <div id="inicio-semanal" hidden></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 4b. CLUBES Y GOLEADORES (plegado, como antes) -->
+    <div class="in-sec">
     <Plegable titulo="Clubes y goleadores" icono="fa-ranking-star" resumen="Clubes más usados y máximos goleadores · toca para ver" id="rank-liga" clase="scroll-mt-40">
       <div class="space-y-6">
         <div>
@@ -174,50 +158,40 @@ const ACCIONES = [
         </div>
       </div>
     </Plegable>
+    </div>
 
-    <!-- 4. JUGADORES DESTACADOS: en celular, carrusel que se desliza de lado -->
-    <section id="destacados-seccion" class="space-y-4 scroll-mt-40">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
-        <a href={`${base}database/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1.5 border border-galaxy-400/30 bg-galaxy-400/10 px-3 py-1.5 rounded hover:bg-galaxy-400/20 transition-colors">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
+    <!-- 5. NOTICIAS (data/noticias.js, las 3 más recientes) -->
+    {noticias.length > 0 && <section class="in-sec" aria-labelledby="noti-t">
+      <div class="in-cab"><div><span class="in-eti">Noticias</span><h2 id="noti-t" class="in-tit">Lo <em>último</em></h2><p class="in-leyenda">Lo oficial (calendario, reglamento) y la Tribuna (la joda de la comunidad).</p></div><a href={`${base}noticias/`} class="in-enlace">Todas las noticias →</a></div>
+      <div class="in-noti">
+        {noticias.map((n, i) => (
+          <a href={`${base}noticias/#noticia-${n.id}`} class:list={['in-card in-nt', i === 0 && 'dest']}>
+            {n.imagen ? <img src={n.imagen} alt="" loading="lazy" /> : <span class="in-img"></span>}
+            <div class={i === 0 ? 'cu' : 'min-w-0'}><span class="in-pill">{n.categoria}</span><b>{n.titulo}</b><small>{n.tag} · {n.fecha}</small></div>
+          </a>
+        ))}
       </div>
+    </section>}
+
+    <!-- 6. JUGADORES DESTACADOS (como antes) -->
+    <section id="destacados-seccion" class="in-sec scroll-mt-40" aria-labelledby="dest-t">
+      <div class="in-cab"><div><span class="in-eti">Jugadores</span><h2 id="dest-t" class="in-tit">Fichas <em>destacadas</em></h2><p class="in-leyenda">Las cartas mejor valoradas. Cada jugador arma la suya; tú tendrás la tuya en el paso 2.</p></div><a href={`${base}database/`} class="in-enlace">Ver todas →</a></div>
       <div class="podio" id="featured-players-container"><div class="grid grid-cols-3 gap-3 w-full" role="status" aria-label="Cargando jugadores"><div class="esqueleto h-56"></div><div class="esqueleto h-64"></div><div class="esqueleto h-56"></div></div></div>
     </section>
 
-    <!-- 5. HIGHLIGHTS (oculto mientras sean clips de ejemplo: FX.highlightsDemo) -->
-    {FX.highlightsDemo && <>    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver" id="highlights" clase="scroll-mt-40">
-      <p class="mb-3 text-right"><a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase inline-flex items-center gap-1.5"><i class="fa-brands fa-youtube"></i> Ver canal</a></p>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-        <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden relative aspect-video w-full flex items-center justify-center group shadow-[0_0_35px_rgba(128,0,255,0.25)]">
-          <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400&auto=format&fit=crop" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" />
-          <div class="absolute inset-0 bg-gradient-to-t from-galaxy-dark via-galaxy-dark/40 to-transparent"></div>
-          <div class="relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-galaxy-600/90 border border-galaxy-400/80 flex items-center justify-center shadow-[0_0_30px_rgba(128,0,255,0.8)] group-hover:scale-110 transition-all duration-300"><i class="fa-solid fa-play text-white text-xl sm:text-2xl pl-1"></i></div>
-          <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 z-10 text-left">
-            <span class="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-[12px] uppercase tracking-wider inline-block mb-1">TOP 5</span>
-            <h3 class="text-xl sm:text-3xl font-display font-bold text-white uppercase tracking-wide text-shadow-glow">Mejores goles: Jornada 3</h3>
-            <p class="text-xs text-gray-300 mt-0.5">Resumen oficial · Galaxy League PES</p>
-          </div>
-        </div>
-        <div class="space-y-2.5">
-          <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Más clips</h3>
-          {DEMO_CLIPS.map((c) => (
-            <a href="https://youtube.com" target="_blank" rel="noopener" class="clip-row group/clip">
-              <span class="clip-thumb"><i class="fa-solid fa-play"></i></span>
-              <span class="min-w-0 flex-1"><b class="clip-tag">{c.tag}</b><span class="block text-sm text-white font-semibold leading-snug truncate">{c.titulo}</span></span>
-              <span class="text-[12px] text-gray-400 font-display tabular-nums shrink-0">{c.dur}</span>
-            </a>
-          ))}
-        </div>
+    <!-- 7. COMUNIDAD -->
+    <section class="in-sec" aria-labelledby="com-t">
+      <div class="in-cab"><div><span class="in-eti">Comunidad</span><h2 id="com-t" class="in-tit">Dónde se <em>habla</em></h2><p class="in-leyenda">El Muro es el espacio social de la web: publicaciones, clips y reacciones. Discord es donde se avisan los partidos y se pide ayuda.</p></div></div>
+      <div class="in-com">
+        <a href={`${base}social/`} class="in-card in-idea" style="align-items:center">
+          <i class="fa-solid fa-earth-americas"></i>
+          <div><b>Entrar al Muro</b><p>Historias, publicaciones y reacciones de la comunidad. Sin cuenta puedes mirar; con cuenta, publicar.</p></div>
+        </a>
+        <a href={DISCORD} target="_blank" rel="noopener" class="in-card in-disc">
+          <i class="fa-brands fa-discord"></i><b>Discord oficial</b><p>Avisos de fechas, canal de soporte y salas de voz para jugar.</p>
+          <span class="in-btn in-btn-s mt-2">Unirme al Discord</span>
+        </a>
       </div>
-    </Plegable></>}
-
-    <!-- 6. INVITACIÓN FINAL -->
-    <section class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-      <div>
-        <h2 class="font-display font-bold text-lg sm:text-xl text-white uppercase tracking-wider">¿Listo para entrar a la Galaxy?</h2>
-        <p class="text-sm text-gray-400 mt-0.5">La comunidad vive en Discord: ahí se pactan partidas, se arman torneos y se avisa cada novedad.</p>
-      </div>
-      <a href="https://discord.gg/jsxZ3mtfwe" target="_blank" rel="noopener" class="shrink-0 bg-[#5865F2] hover:bg-[#4752c4] text-white font-display font-bold px-6 py-3 rounded-xl text-sm uppercase tracking-wider transition-colors flex items-center gap-2"><i class="fa-brands fa-discord text-lg"></i> Unirme al Discord</a>
     </section>
   </div>
 </Layout>
