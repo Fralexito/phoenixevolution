@@ -3,12 +3,12 @@
 
 /** Ajustes que la app lee de GET /v1/config. Cambiarlos aquí y redesplegar = cambiar el comportamiento de la app sin recompilarla. */
 export const CONFIG = Object.freeze({
-  version_api: '1.7.0',
+  version_api: '1.8.0',
   version_app_min: '7.0.4',          // por debajo → APP_DESACTUALIZADA
   version_app_recomendada: '7.0.4',
-  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15 }),
-  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true }),
-  limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096 }),
+  intervalos: Object.freeze({ latido_seg: 30, latido_min_seg: 10, eventos_lote_max: 50, eventos_envio_seg: 15, ping_vivo_seg: 4, reintento_max_seg: 300, presencia_seg: 60, sondeo_salas_seg: 25, sondeo_amigos_seg: 30, sondeo_buzon_seg: 15, sondeo_sync_seg: 10 }),
+  interruptores: Object.freeze({ integracion: true, muestras_calidad: true, ping_en_vivo: false, roles_reto: true, buzon_juego: true, sync_compartido: true }),
+  limites: Object.freeze({ invitados_max: 16, nombre_pc_max: 40, enlace_max: 500, datos_evento_bytes: 4096, sync_option_bytes_max: 8388608, sync_resultados_max: 50 }),
 });
 
 /** Catálogo cerrado de errores: la app reacciona por `codigo`, nunca por `mensaje`. */
@@ -42,6 +42,14 @@ export const ERRORES = Object.freeze({
   NO_SON_AMIGOS:        { http: 403, reintentable: false, mensaje: 'Solo puedes invitar a tus amigos (y sin bloqueos entre ustedes).' },
   RETO_NO_VALIDO:       { http: 422, reintentable: false, mensaje: 'El reto no existe, no está aceptado o no eres su host.' },
   LOTE_DEMASIADO_GRANDE:{ http: 413, reintentable: false, mensaje: 'Demasiados eventos en un lote.' },
+  SIN_PERMISO:          { http: 403, reintentable: false, mensaje: 'Tu rol en el grupo no permite esta acción.' },
+  GRUPO_NO_ENCONTRADO:  { http: 404, reintentable: false, mensaje: 'El grupo de Phoenix Sync no existe o no eres miembro.' },
+  OPERACION_INVALIDA:   { http: 422, reintentable: false, mensaje: 'La operación (fichaje) no es válida.' },
+  OPERACION_NO_ENCONTRADA:{ http: 404, reintentable: false, mensaje: 'Esa operación no existe o no es de tu grupo.' },
+  OPTION_INVALIDA:      { http: 422, reintentable: false, mensaje: 'El archivo no coincide con lo declarado (tamaño o subida incompleta).' },
+  OPTION_NO_ENCONTRADA: { http: 404, reintentable: false, mensaje: 'Aún no hay una versión del archivo para este grupo.' },
+  LIMITE_EXCEDIDO:      { http: 429, reintentable: true,  mensaje: 'Límite por hora alcanzado: espera y reintenta.' },
+  SYNC_PAUSADO:         { http: 503, reintentable: true,  mensaje: 'Phoenix Sync está en pausa por el staff.' },
   ERROR_INTERNO:        { http: 500, reintentable: true,  mensaje: 'Error del servidor: reintenta con espera.' },
 });
 
@@ -228,6 +236,7 @@ export function fusionarConfig(base, filas = []) {
   if (out.intervalos.latido_seg < 10) out.intervalos.latido_seg = 10;      // frenos de seguridad: un error de staff no puede saturar el plan FREE
   if (out.intervalos.latido_min_seg < 5) out.intervalos.latido_min_seg = 5;
   if (out.intervalos.sondeo_buzon_seg < 5) out.intervalos.sondeo_buzon_seg = 5;
+  if (out.intervalos.sondeo_sync_seg < 5) out.intervalos.sondeo_sync_seg = 5;
   return out;
 }
 
@@ -301,4 +310,54 @@ export function coincideEtag(delCliente, actual) {
   if (!delCliente || !actual) return false;
   const limpio = (x) => x.trim().replace(/^W\//, '');
   return delCliente.split(',').some((x) => x.trim() === '*' || limpio(x) === limpio(actual));
+}
+
+// ── Phoenix Sync compartido (1.8.0 · migración 098) ─────────────────────────────────────────────────────────────────
+export const MODOS_SYNC = ['automatico', 'autorizacion'];
+export const ESTADOS_APLICACION = ['aplicada', 'conflicto', 'omitida', 'rechazada', 'incompatible'];
+
+/** Regla del contrato: lo que no sea un modo conocido se trata como `autorizacion` (lo más seguro). */
+export function modoSeguro(m) { return MODOS_SYNC.includes(m) ? m : 'autorizacion'; }
+
+const HEX64 = /^[0-9a-f]{64}$/;
+const ID_MAX = 2147483647;
+
+/** POST /v1/sync/operaciones → { grupo_id, op } con todo validado (enteros razonables, textos con largo máximo). */
+export function limpiarOperacion(b) {
+  const grupo_id = v.uuid(b.grupo_id, 'grupo_id');
+  const tipo = v.enumerado(b.tipo, 'tipo', ['fichaje']) ?? 'fichaje';
+  const sha = v.texto(b.sha256_resultado, 'sha256_resultado', { max: 64 });
+  if (sha && !HEX64.test(sha.toLowerCase())) falla('sha256_resultado', 'sha256_resultado son 64 caracteres hexadecimales.');
+  const base_seq = b.base_seq === undefined || b.base_seq === null ? 0 : b.base_seq;
+  if (!Number.isInteger(base_seq) || base_seq < 0 || base_seq > Number.MAX_SAFE_INTEGER) falla('base_seq', 'base_seq debe ser un entero mayor o igual a 0.');
+  const op = {
+    op_id: v.uuid(b.op_id, 'op_id'), tipo,
+    jugador_id: v.entero(b.jugador_id, 'jugador_id', { min: 0, max: ID_MAX, opcional: false }),
+    equipo_origen: v.entero(b.equipo_origen, 'equipo_origen', { min: 0, max: ID_MAX, opcional: false }),
+    equipo_destino: v.entero(b.equipo_destino, 'equipo_destino', { min: 0, max: ID_MAX, opcional: false }),
+    base_seq, sha256_resultado: sha ? sha.toLowerCase() : null,
+    resumen: v.texto(b.resumen, 'resumen', { max: 200 }), parche: v.texto(b.parche, 'parche', { max: 60 }),
+    huella_bd: v.texto(b.huella_bd, 'huella_bd', { max: 128 }), formato: v.entero(b.formato, 'formato', { min: 0, max: 1000 }),
+  };
+  return { grupo_id, op };
+}
+
+/** POST /v1/sync/operaciones/aplicada: acepta un resultado suelto { op_id, estado, motivo? } o un lote { resultados: [...] }. */
+export function limpiarResultados(b) {
+  const lista = Array.isArray(b.resultados) ? b.resultados : (b.resultados === undefined ? [b] : falla('resultados', 'resultados debe ser una lista.'));
+  if (!lista.length || lista.length > CONFIG.limites.sync_resultados_max) falla('resultados', `Envía de 1 a ${CONFIG.limites.sync_resultados_max} resultados.`);
+  return { unico: !Array.isArray(b.resultados), resultados: lista.map((e, i) => {
+    if (!e || typeof e !== 'object') falla(`resultados[${i}]`, 'Cada resultado debe ser un objeto.');
+    return { op_id: v.uuid(e.op_id, `resultados[${i}].op_id`), estado: v.enumerado(e.estado, `resultados[${i}].estado`, ESTADOS_APLICACION, { opcional: false }),
+             motivo: v.texto(e.motivo, `resultados[${i}].motivo`, { max: 300 }) };
+  }) };
+}
+
+/** POST /v1/sync/option: datos del archivo entero (EDIT00000000) antes de subirlo. */
+export function limpiarOption(b) {
+  const sha = v.texto(b.sha256, 'sha256', { max: 64, opcional: false }).toLowerCase();
+  if (!HEX64.test(sha)) falla('sha256', 'sha256 son 64 caracteres hexadecimales.');
+  return { grupo_id: v.uuid(b.grupo_id, 'grupo_id'), d: { sha256: sha,
+    tamano: v.entero(b.tamano, 'tamano', { min: 1, max: CONFIG.limites.sync_option_bytes_max, opcional: false }),
+    resumen: v.texto(b.resumen, 'resumen', { max: 200 }), parche: v.texto(b.parche, 'parche', { max: 60 }), huella_bd: v.texto(b.huella_bd, 'huella_bd', { max: 128 }) } };
 }

@@ -1,6 +1,7 @@
 -- 097 · «Torneos propios»: cualquier usuario crea su torneo (ficha con formato y opciones libres) y lo juega con inscripciones,
 -- resultados y avance automático de llaves. Casi sin límites: el staff los vigila y puede ocultar/cancelar o apretar los topes
 -- desde torneos_libres_config. No hay borrados duros (retirado / oculto / cancelado) para que el staff conserve la evidencia.
+-- Auditoría: auditoria_staff solo admite crear/editar/borrar/ocultar/rol/sancion/sistema (corregido tras la ronda 215).
 -- Aplicada por partes (A tablas, B permisos, C ayudas, D funciones de jugadores, E funciones de partidos, F staff).
 
 -- ── A) Tablas ─────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -406,7 +407,7 @@ begin
   elsif p_accion = 'mostrar' then update public.torneos_libres set oculto = false, motivo_oculto = null, actualizado_en = now() where id = p_id;
   elsif p_accion = 'cancelar' then update public.torneos_libres set estado = 'cancelado', inscripcion_abierta = false, actualizado_en = now() where id = p_id;
   else raise exception 'ACCION_INVALIDA'; end if;
-  perform private.auditar_moderacion('torneo_' || p_accion, 'torneos_libres', p_id::text, v_t.nombre, '{}'::jsonb, p_motivo);
+  perform private.auditar_moderacion(case when p_accion = 'ocultar' then 'ocultar' else 'editar' end, 'torneos_libres', p_id::text, 'Torneo ' || p_accion || ': ' || v_t.nombre, jsonb_build_object('accion', p_accion), p_motivo);
   perform private.tl_evento(p_id, 'staff_' || p_accion, jsonb_build_object('motivo', p_motivo));
 end $$;
 
@@ -416,7 +417,7 @@ begin
   if (select auth.uid()) is null or not private.es_moderador() then raise exception 'NO_AUTORIZADO'; end if;
   update public.torneos_libres_config set habilitado = coalesce(p_habilitado, habilitado), max_activos_por_usuario = coalesce(p_max_activos, max_activos_por_usuario),
     max_jugadores = coalesce(p_max_jugadores, max_jugadores), actualizado_en = now() where id = 1;
-  perform private.auditar_moderacion('torneos_config', 'torneos_libres_config', '1', 'Topes de torneos propios',
+  perform private.auditar_moderacion('sistema', 'torneos_libres_config', '1', 'Topes de torneos propios',
     jsonb_build_object('habilitado', p_habilitado, 'max_activos', p_max_activos, 'max_jugadores', p_max_jugadores), null);
 end $$;
 

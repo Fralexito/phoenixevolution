@@ -1,7 +1,9 @@
-# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.6.0)
+# Contrato API `/v1` · Smash Soda ↔ Phoenix (versión 1.8.0)
 
 Fuente única para el cliente C++ (`PhoenixLink` en `Fralexito/smash-soda-fork`). Si algo de aquí cambia, sube `version_api` y avisa al chat de Smash Soda.
 Implementación: `supabase/functions/phoenix/` (repo `phoenixevolution`, rama `borrador`). v1.0.0 desplegada el 6 oct 2026; **v1.1.0** (preferencias de aviso, builds oficiales, control remoto) requiere la migración 059.
+
+**Cambios 1.8.0 (compatibles, requieren migración 098; `PENDIENTE-WEB`: la función aún no está desplegada):** Phoenix Sync compartido, sección 26: rutas `/v1/sync/config`, `/v1/sync/operaciones`, `/v1/sync/operaciones/aplicada`, `/v1/sync/option`, `/v1/sync/option/listo`; interruptor `sync_compartido`; intervalo `sondeo_sync_seg`; errores `SIN_PERMISO`, `GRUPO_NO_ENCONTRADO`, `OPERACION_INVALIDA`, `OPERACION_NO_ENCONTRADA`, `OPTION_INVALIDA`, `OPTION_NO_ENCONTRADA`, `LIMITE_EXCEDIDO`, `SYNC_PAUSADO`.
 
 **Cambios 1.6.0 (compatibles, requieren migración 073):** nueva ruta `POST /v1/perfiles` (sección 23): nombre, avatar y carta de jugador por `parsec_id`.
 
@@ -538,3 +540,68 @@ Link pregunta **solo mientras `PES2021.exe` está abierto**, cada 15 s → 240 l
 - 10 PCs × 2 h/día × 30 días ≈ **144 000**/mes · con 3 h/día ≈ **216 000**/mes.
 - Se suma a las ~410 000 ya estimadas en §21: **se pasaría del tope**. Palancas: subir `sondeo_buzon_seg` (30 s lo reduce a la mitad), el 304 no cuesta BD pero sí invocación, o apagar `buzon_juego`.
 - Recomendación: empezar con 2–3 PCs y vigilar el uso en Supabase antes de abrirlo a todos.
+
+
+## 26. Phoenix Sync compartido — fichajes entre PCs (1.8.0 · migración 098, aditivo · `PENDIENTE-WEB` hasta desplegar)
+Mismo token `phx_…` y cabeceras que el resto. **Diferencia:** estas rutas **no exigen** `host_aprobado` ni `X-Phoenix-Version` (Phoenix Sync es otro programa); el permiso real lo da el **rol en el grupo**. Todas: 1 llamada cada **5 s** por ruta y método → `429 DEMASIADOS_INTENTOS` con `reintentar_en`/`retry-after`. Si el staff apaga `interruptores.sync_compartido` → `503 SYNC_PAUSADO`.
+
+**Roles del grupo:** `admin` (todo, incluido el interruptor y los permisos), `publica` (publica fichajes), `miembro` (recibe/aplica). Cada miembro tiene además `puede_aplicar`. El admin del sitio cuenta como `admin` de cualquier grupo.
+
+### El interruptor `modo` (SOLO el admin lo cambia)
+- `autorizacion` (**defecto de todo grupo nuevo**): cada PC debe pedir confirmación a su dueño y avisar `aplicada` solo si pulsó Aplicar.
+- `automatico`: cada PC aplica sola, siempre con respaldo antes.
+- **Regla para clientes:** si no puedes leer el modo (error, red caída, valor desconocido) **asume `autorizacion`**. Nunca apliques sin preguntar con un modo que no leíste.
+- Protegido en el servidor: la tabla solo se escribe por RPC que exige ser admin (RLS sin permisos de escritura) y la ruta `PUT` devuelve `403 SIN_PERMISO` a cualquier otro. Cada cambio queda en un historial (quién, cuándo, de → a). Los miembros **leen** el modo (para obedecerlo) pero no lo cambian.
+
+### `GET /v1/sync/config?grupo_id=<uuid>` (cualquier miembro)
+```json
+{ "ok": true, "grupo_id": "…", "modo": "autorizacion", "actualizado_por": "uuid|null", "actualizado_en": "2026-10-09T…|null",
+  "tu_rol": "miembro", "sondeo_seg": 10, "etag": "W/\"…\"", "solicitud_id": "…" }
+```
+ETag/304 como §21. Si nadie lo cambió nunca: `modo:"autorizacion"` con `actualizado_*` en `null`.
+
+### `PUT /v1/sync/config` (solo admin del grupo)
+Cuerpo `{ "grupo_id": "…", "modo": "automatico" }` → `{ "ok": true, "grupo_id": "…", "modo": "automatico", "anterior": "autorizacion", "actualizado_por": "…", "actualizado_en": "…" }`. Otro rol → `403 SIN_PERMISO`. `modo` distinto de los dos valores → `422 CAMPO_INVALIDO`.
+
+### `POST /v1/sync/operaciones` (rol `admin` o `publica`)
+```json
+{ "grupo_id": "uuid", "op_id": "uuid (lo genera la PC)", "tipo": "fichaje", "jugador_id": 123456, "equipo_origen": 12, "equipo_destino": 34,
+  "base_seq": 7, "sha256_resultado": "64 hex (opcional)", "resumen": "Messi: Inter Miami → Barcelona", "parche": "Conmegol Patch 26",
+  "huella_bd": "hash de la base de datos usada", "formato": 1 }
+```
+Respuesta `{ "ok": true, "op_id": "…", "seq": 8, "repetida": false }`. **Idempotente:** repetir el mismo `op_id` devuelve el mismo `seq` con `repetida: true` y no crea otra fila. Validación: `jugador_id`, `equipo_origen`, `equipo_destino` enteros 0–2 147 483 647; `base_seq` entero ≥ 0; `resumen` ≤ 200, `parche` ≤ 60, `huella_bd` ≤ 128 caracteres; `tipo` solo `fichaje`. `parche` y `huella_bd` se **guardan y se muestran**, la web **no filtra** por ellos (lo decide cada Sync). Límite: 60 operaciones por hora por usuario → `429 LIMITE_EXCEDIDO` con `reintentar_en`. Efecto lateral: se crea un aviso del Buzón (§25) para los miembros que aplican: «Fichaje nuevo de <autor>: <resumen>» (modo `automatico`) o «Fichaje pendiente de aplicar (de <autor>): <resumen>» (`autorizacion`).
+
+### `GET /v1/sync/operaciones?grupo_id=<uuid>&desde=<seq>&limite=100`
+```json
+{ "ok": true, "grupo_id": "…", "modo": "autorizacion", "ultimo_seq": 8, "sondeo_seg": 10,
+  "operaciones": [ { "op_id": "…", "seq": 8, "tipo": "fichaje", "jugador_id": 123456, "equipo_origen": 12, "equipo_destino": 34, "autor": "uuid",
+    "autor_nombre": "FRALEX", "base_seq": 7, "sha256_resultado": null, "resumen": "…", "parche": "Conmegol Patch 26", "huella_bd": "…", "formato": 1,
+    "creado_en": "…", "mi_estado": "pendiente", "mi_motivo": null } ],
+  "etag": "W/\"…\"", "solicitud_id": "…" }
+```
+Solo operaciones con `seq > desde` (orden ascendente; guarda el mayor `seq` recibido). Incluye el `modo` actual para ahorrar llamadas. ETag/304 como §21. `mi_estado` es el de esta cuenta: `pendiente` (otros) o `aplicada` (el autor, motivo `autor`). **Anti-bucle:** una operación aplicada desde aquí no se vuelve a publicar (lo controla Sync).
+
+### `POST /v1/sync/operaciones/aplicada`
+Un resultado `{ "op_id": "…", "estado": "aplicada", "motivo": "opcional ≤ 300" }` o un lote `{ "resultados": [ {…}, … ] }` (1 a 50). `estado` ∈ `aplicada | conflicto | omitida | rechazada | incompatible` (`pendiente` no se informa: es el estado inicial). Respuesta `{ "ok": true, "actualizadas": 1, "descartadas": 0 }`. Idempotente: repetir pisa el estado de esa cuenta en esa operación. En el modo de un solo resultado, si la operación no existe o no es de tu grupo → `404 OPERACION_NO_ENCONTRADA`; en lote, las inválidas cuentan en `descartadas`. **La web no resuelve conflictos: solo registra y muestra lo que cada PC informa.**
+
+### Archivo entero (solo arranque y respaldo)
+1. `POST /v1/sync/option` (rol `admin` o `publica`) cuerpo `{ "grupo_id", "sha256": "64 hex", "tamano": 1048576, "resumen"?, "parche"?, "huella_bd"? }` → `{ "ok": true, "id": "…", "url_subida": "https://…", "metodo_subida": "PUT", "expira_en_seg": 7200, "tamano_max": 8388608, "siguiente": "POST /v1/sync/option/listo" }`. Máximo **8 MB** por archivo y **6 subidas por hora** por usuario (`429 LIMITE_EXCEDIDO`).
+2. Subir los bytes a `url_subida` con `PUT` (URL firmada, caduca en 2 h). *Por confirmar con la primera subida real: si el servidor pide `multipart/form-data`, usar el mismo formato que `uploadToSignedUrl` de supabase-js.*
+3. `POST /v1/sync/option/listo` `{ "id": "…" }` → el servidor comprueba que el archivo existe y mide `tamano`; si no, `422 OPTION_INVALIDA` (y borra el archivo mal subido). Si todo bien: `{ "ok": true, "id": "…", "estado": "lista", "archivadas": 0 }`. Se conservan las **3 últimas** versiones por grupo.
+4. `GET /v1/sync/option?grupo_id=<uuid>` (cualquier miembro) → `{ "ok": true, "id", "sha256", "tamano", "resumen", "parche", "huella_bd", "autor", "creado_en", "url_descarga": "https://…", "expira_en_seg": 900 }`. Sin versiones: `404 OPTION_NO_ENCONTRADA`. Verifica `sha256` tras descargar. Bucket privado `sync-option`: solo miembros, URLs temporales.
+
+### Códigos nuevos
+| Código | HTTP | Cuándo |
+|---|---|---|
+| `SIN_PERMISO` | 403 | Tu rol en el grupo no permite la acción (p. ej. `PUT config` sin ser admin, publicar sin permiso) |
+| `GRUPO_NO_ENCONTRADO` | 404 | El grupo no existe **o** no eres miembro (no se distingue a propósito) |
+| `OPERACION_INVALIDA` | 422 | `op_id` mal formado o repetido en otro grupo |
+| `OPERACION_NO_ENCONTRADA` | 404 | `aplicada` con un `op_id` desconocido (resultado único) |
+| `OPTION_INVALIDA` | 422 | Archivo sin subir o con tamaño distinto al declarado |
+| `OPTION_NO_ENCONTRADA` | 404 | El grupo aún no tiene archivo entero |
+| `LIMITE_EXCEDIDO` | 429 | Tope por hora (60 operaciones / 6 archivos); trae `reintentar_en` |
+| `SYNC_PAUSADO` | 503 | El staff apagó `sync_compartido` |
+Más los de siempre: `TOKEN_*`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (con `campo`), `DEMASIADOS_INTENTOS`, `ERROR_INTERNO`. Política de reintentos: la del §0.
+
+### Coste estimado (plan FREE)
+Con `sondeo_sync_seg` = 10 y solo mientras Sync está abierto: 360 llamadas/hora por PC. 2 PCs × 3 h/día × 30 días ≈ **65 000**/mes. Se suma a lo de §21 y §25: vigilar el uso antes de sumar más PCs.

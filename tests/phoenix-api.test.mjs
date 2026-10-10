@@ -145,3 +145,51 @@ test('coincideEtag: débil/fuerte, listas y comodín', () => {
   assert.equal(coincideEtag('"otro"', e), false);
   assert.equal(coincideEtag(null, e), false);
 });
+
+// ── Phoenix Sync compartido (1.8.0) ──────────────────────────────────────────────────────────────────────────────────
+import { modoSeguro, limpiarOperacion, limpiarResultados, limpiarOption } from '../supabase/functions/phoenix/_lib/nucleo.js';
+const G = '11111111-1111-4111-8111-111111111111'; const OP = '22222222-2222-4222-8222-222222222222';
+
+test('sync: versión 1.8.0, interruptor, sondeo mínimo 5 s y errores nuevos', () => {
+  assert.equal(CONFIG.version_api, '1.8.0');
+  assert.equal(CONFIG.interruptores.sync_compartido, true);
+  assert.equal(fusionarConfig(CONFIG, [{ clave: 'intervalos', valor: { sondeo_sync_seg: 1 } }]).intervalos.sondeo_sync_seg, 5);
+  for (const c of ['SIN_PERMISO', 'GRUPO_NO_ENCONTRADO', 'OPERACION_INVALIDA', 'OPERACION_NO_ENCONTRADA', 'OPTION_INVALIDA', 'OPTION_NO_ENCONTRADA', 'LIMITE_EXCEDIDO', 'SYNC_PAUSADO']) assert.ok(ERRORES[c], c);
+  assert.equal(ERRORES.SIN_PERMISO.http, 403); assert.equal(ERRORES.LIMITE_EXCEDIDO.http, 429);
+});
+
+test('sync: modoSeguro asume «autorizacion» ante cualquier duda', () => {
+  assert.equal(modoSeguro('automatico'), 'automatico'); assert.equal(modoSeguro('autorizacion'), 'autorizacion');
+  for (const x of [undefined, null, '', 'AUTOMATICO', 'auto', 1, {}]) assert.equal(modoSeguro(x), 'autorizacion');
+});
+
+test('sync: limpiarOperacion valida y normaliza', () => {
+  const ok = limpiarOperacion({ grupo_id: G, op_id: OP.toUpperCase(), jugador_id: 1234, equipo_origen: 5, equipo_destino: 6, resumen: ' Messi → Inter ', parche: 'Conmegol', huella_bd: 'abc', formato: 1, sha256_resultado: 'A'.repeat(64) });
+  assert.equal(ok.grupo_id, G); assert.equal(ok.op.op_id, OP); assert.equal(ok.op.tipo, 'fichaje'); assert.equal(ok.op.resumen, 'Messi → Inter');
+  assert.equal(ok.op.base_seq, 0); assert.equal(ok.op.sha256_resultado, 'a'.repeat(64));
+  const base = { grupo_id: G, op_id: OP, jugador_id: 1, equipo_origen: 2, equipo_destino: 3 };
+  const mal = (cambio, campo) => assert.throws(() => limpiarOperacion({ ...base, ...cambio }), (e) => e.codigo === 'CAMPO_INVALIDO' && e.campo === campo);
+  mal({ op_id: 'x' }, 'op_id'); mal({ grupo_id: undefined }, 'grupo_id'); mal({ jugador_id: -1 }, 'jugador_id'); mal({ jugador_id: 1.5 }, 'jugador_id');
+  mal({ equipo_destino: '3' }, 'equipo_destino'); mal({ equipo_origen: undefined }, 'equipo_origen'); mal({ tipo: 'venta' }, 'tipo');
+  mal({ resumen: 'x'.repeat(201) }, 'resumen'); mal({ parche: 'x'.repeat(61) }, 'parche'); mal({ huella_bd: 'x'.repeat(129) }, 'huella_bd');
+  mal({ sha256_resultado: 'zz' }, 'sha256_resultado'); mal({ base_seq: -2 }, 'base_seq'); mal({ jugador_id: 2147483648 }, 'jugador_id');
+});
+
+test('sync: limpiarResultados acepta uno o un lote, con estados cerrados', () => {
+  const uno = limpiarResultados({ op_id: OP, estado: 'conflicto', motivo: ' ya existía ' });
+  assert.equal(uno.unico, true); assert.deepEqual(uno.resultados, [{ op_id: OP, estado: 'conflicto', motivo: 'ya existía' }]);
+  const lote = limpiarResultados({ resultados: [{ op_id: OP, estado: 'aplicada' }, { op_id: OP, estado: 'omitida' }] });
+  assert.equal(lote.unico, false); assert.equal(lote.resultados.length, 2);
+  for (const est of ['pendiente', 'otra', undefined]) assert.throws(() => limpiarResultados({ op_id: OP, estado: est }), (e) => e.codigo === 'CAMPO_INVALIDO');
+  assert.throws(() => limpiarResultados({ resultados: [] }), (e) => e.codigo === 'CAMPO_INVALIDO');
+  assert.throws(() => limpiarResultados({ resultados: Array(51).fill({ op_id: OP, estado: 'aplicada' }) }), (e) => e.codigo === 'CAMPO_INVALIDO');
+  assert.throws(() => limpiarResultados({ resultados: 'x' }), (e) => e.codigo === 'CAMPO_INVALIDO');
+});
+
+test('sync: limpiarOption exige sha256, tamaño dentro del tope', () => {
+  const ok = limpiarOption({ grupo_id: G, sha256: 'B'.repeat(64), tamano: 1048576, parche: 'Conmegol' });
+  assert.equal(ok.d.sha256, 'b'.repeat(64)); assert.equal(ok.d.tamano, 1048576);
+  assert.throws(() => limpiarOption({ grupo_id: G, sha256: 'b'.repeat(64), tamano: 0 }), (e) => e.campo === 'tamano');
+  assert.throws(() => limpiarOption({ grupo_id: G, sha256: 'b'.repeat(64), tamano: CONFIG.limites.sync_option_bytes_max + 1 }), (e) => e.campo === 'tamano');
+  assert.throws(() => limpiarOption({ grupo_id: G, sha256: 'nope', tamano: 5 }), (e) => e.campo === 'sha256');
+});

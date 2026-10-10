@@ -1,0 +1,63 @@
+---
+// PHOENIX SYNC · panel web (migración 098): interruptor de aplicación de cambios (solo admin del grupo), fichajes compartidos y permisos.
+// API del programa: docs/contrato-v1.md §26 · Guía: docs/SYNC-COMPARTIDO.md
+import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
+---
+<Layout title="Phoenix Sync" active="mercado" description="Fichajes compartidos entre PCs y reglas de aplicación.">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-20 space-y-5">
+    <header class="glass-panel rounded-2xl px-5 py-4 space-y-1">
+      <span class="sy-sello">Beta</span>
+      <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-arrows-rotate text-galaxy-400 mr-2"></i>Phoenix <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">Sync</span></h1>
+      <p class="text-sm text-gray-300 max-w-3xl">Los fichajes que haces en tu PC llegan al option file de tus amigos. Aquí ves quién publicó qué, qué PC ya lo aplicó y quién decide las reglas.</p>
+    </header>
+
+    <Plegable titulo="¿Cómo funciona?" icono="fa-circle-question" resumen="Léelo una vez">
+      <ol class="sy-guia">
+        <li><b>Publicar:</b> Phoenix Sync de la PC que ficha manda el fichaje a esta página (que hace de buzón compartido).</li>
+        <li><b>Recibir:</b> las otras PCs lo bajan. Si el modo es <b>Automático</b> lo aplican solas (con respaldo antes). Si es <b>Con autorización</b>, la persona debe pulsar Aplicar.</li>
+        <li><b>Informar:</b> cada PC avisa aquí qué hizo. Esta página no resuelve conflictos: solo los muestra.</li>
+      </ol>
+      <div id="sy-leyenda-estados"></div>
+    </Plegable>
+
+    <p id="sy-sin-sesion" class="sy-aviso" hidden>Inicia sesión para ver tus grupos de Phoenix Sync.</p>
+    <div id="sy-grupos" class="sy-tabs" role="group" aria-label="Grupo"></div>
+    <div id="sy-vacio" class="glass-panel rounded-2xl p-5 text-sm text-gray-300" hidden></div>
+
+    <div id="sy-panel" class="space-y-5" hidden>
+      <section id="sy-modo" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" aria-labelledby="sy-h-modo" hidden>
+        <h2 id="sy-h-modo" class="sy-titulo"><i class="fa-solid fa-sliders"></i> Phoenix Sync · Aplicación de cambios</h2>
+        <div class="sy-interruptor" id="sy-interruptor" role="group" aria-label="Modo de aplicación"></div>
+        <p class="sy-ayuda" id="sy-modo-quien"></p>
+        <p class="sy-ayuda" id="sy-modo-leyenda"></p>
+        <p class="sy-aviso" id="sy-aviso-auto" hidden></p>
+        <div id="sy-historial"></div>
+      </section>
+
+      <section class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" aria-labelledby="sy-h-ops">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="sy-h-ops" class="sy-titulo"><i class="fa-solid fa-right-left"></i> Fichajes recientes</h2>
+          <button type="button" id="sy-recargar" class="btn btn-ghost"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+        </div>
+        <div id="sy-ops" aria-live="polite"><div class="esqueleto h-20"></div></div>
+      </section>
+
+      <section id="sy-permisos" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" aria-labelledby="sy-h-perm" hidden>
+        <h2 id="sy-h-perm" class="sy-titulo"><i class="fa-solid fa-user-shield"></i> Quién publica y quién aplica</h2>
+        <p class="sy-ayuda">Publicar = puede mandar fichajes. Aplicar = su PC recibe los fichajes de los demás. El admin siempre puede todo.</p>
+        <div id="sy-miembros"></div>
+        <form id="sy-form-miembro" class="sy-fila" autocomplete="off">
+          <input id="sy-usuario" class="field" placeholder="Usuario de la web (ej.: juanperez)" maxlength="33" aria-label="Usuario a añadir">
+          <button class="btn btn-primary" type="submit"><i class="fa-solid fa-user-plus"></i> Añadir</button>
+        </form>
+      </section>
+    </div>
+
+    <section id="sy-crear" class="glass-panel rounded-2xl p-4 space-y-2" hidden>
+      <p class="sy-ayuda">Eres admin del sitio: puedes crear un grupo nuevo. Quedas como admin y empieza en «Con autorización».</p>
+      <button type="button" id="sy-nuevo" class="btn btn-ghost"><i class="fa-solid fa-plus"></i> Crear grupo</button>
+    </section>
+  </div>
+  <script>import '../js/pages/phoenix-sync.js';</script>
+</Layout>

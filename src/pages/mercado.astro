@@ -5,6 +5,7 @@
 import Layout from '../layouts/Layout.astro';
 import MercadoProximamente from '../components/MercadoProximamente.astro';
 import { FX } from '../data/experimento.js';
+import { href } from '../js/core/config.js';
 ---
 <Layout title="Mercado" active="mercado">
   {!FX.mercadoLink ? <MercadoProximamente /> : (
@@ -13,6 +14,7 @@ import { FX } from '../data/experimento.js';
       <span class="text-[11px] font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta</span>
       <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-handshake text-galaxy-400 mr-2"></i>Mercado</h1>
       <p class="text-gray-300 text-sm mt-1 max-w-3xl">Los fichajes de la liga llegan a tu juego. El programa <b class="text-white">Phoenix Sync</b> descarga el option file oficial, lo verifica y, después de jugar, envía los cambios para que el staff los apruebe.</p>
+      <p class="mt-3"><a class="btn btn-ghost" href={href('phoenix-sync/')}><i class="fa-solid fa-arrows-rotate"></i> Fichajes compartidos (Phoenix Sync)</a></p>
       <ol class="mt-4 grid sm:grid-cols-3 gap-2 text-xs">
         <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">1 · Vincula</b><br>Genera un código aquí y pégalo en el programa.</li>
         <li class="rounded-xl border border-galaxy-border bg-black/20 p-3"><b class="text-galaxy-400 font-display">2 · Descarga</b><br>El programa baja el option file oficial y comprueba que esté intacto.</li>

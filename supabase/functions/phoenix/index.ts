@@ -1,4 +1,4 @@
-// Edge Function «phoenix» · API /v1 para Smash Soda (módulo 2, fase 2.2). Contrato: claude/contrato-v1.md.
+// Edge Function «phoenix» (1.8.0) · API /v1 para Smash Soda (módulo 2, fase 2.2). Contrato: claude/contrato-v1.md.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/phoenix/v1/<ruta>
 // Desplegar con verify_jwt = false: la app NO usa sesión de Supabase, usa su token de dispositivo (Authorization: Bearer phx_…).
 // Variables: SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase solas). Ninguna otra.
@@ -6,13 +6,14 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   CONFIG, ErrorApi, cuerpoError, compararVersion, v, ESTADOS_LATIDO, VISIBILIDADES_APP,
-  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido, ESTADOS_PRESENCIA_APP, huellaContenido, coincideEtag,
+  limpiarInvitados, limpiarEventos, construirRoles, fusionarConfig, evaluarBuild, MODOS_SALA, marcaDe, sugerenciasHost, retrasoSugerido, ESTADOS_PRESENCIA_APP, huellaContenido, coincideEtag, MODOS_SYNC, limpiarOperacion, limpiarResultados, limpiarOption,
 } from "./_lib/nucleo.js";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 const ROLES_STAFF = ["ayudante", "moderador", "admin"];
 const VIVAS = ["preparando", "abierta", "en_partida"];
 const BUCKET_FUENTE = "fuente-phoenix";
+const BUCKET_SYNC = "sync-option";
 const URL_FIRMADA_SEG = 900;     // 15 min para empezar la descarga
 
 // ── Utilidades ───────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -603,6 +604,124 @@ async function juegoBuzonEntregado(req: Request) {
   return { marcados: Number(data ?? 0) };
 }
 
+// ── Phoenix Sync compartido (1.8.0 · migración 098) ──────────────────────────────────────────────────────────────────
+/** Como autenticar() pero SIN exigir host aprobado ni versión de Smash Soda: Phoenix Sync es otro programa. El permiso real lo da el grupo (RPC). */
+async function autenticarSync(req: Request): Promise<Dispositivo> {
+  const m = /^Bearer\s+(phx_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "");
+  if (!m) throw new ErrorApi(req.headers.get("authorization") ? "TOKEN_INVALIDO" : "TOKEN_FALTANTE");
+  const { data, error } = await sb.from("dispositivos_host").select("id, usuario, nombre, revocado, suspendido").eq("huella_token", await sha256(m[1])).maybeSingle();
+  db(error, "autenticarSync");
+  if (!data) throw new ErrorApi("TOKEN_INVALIDO");
+  if (data.revocado) throw new ErrorApi("TOKEN_REVOCADO");
+  if (data.suspendido) throw new ErrorApi("DISPOSITIVO_SUSPENDIDO");
+  frenar(`d:${data.id}`, 120, 60_000);
+  const { cfg } = await cfgVigente();
+  if (!cfg.interruptores.sync_compartido) throw new ErrorApi("SYNC_PAUSADO", { reintentar_en: 300 });
+  sb.from("dispositivos_host").update({ ultimo_uso: new Date().toISOString() }).eq("id", data.id).then(({ error }) => error && log("warn", "ultimo_uso", { mensaje: error.message }));
+  return { id: data.id, usuario: data.usuario, nombre: data.nombre };
+}
+
+/** Llama a una RPC sync_api_* (solo service_role). Si devuelve {error:CODIGO} lo convierte en ErrorApi con ese código. */
+async function rpcSync(nombre: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const { data, error } = await sb.rpc(nombre, args);
+  db(error, nombre);
+  const r = (data ?? {}) as Record<string, unknown>;
+  if (r.error) throw new ErrorApi(String(r.error), typeof r.reintentar_en === "number" ? { reintentar_en: r.reintentar_en } : {});
+  return r;
+}
+const grupoDeQuery = (req: Request) => v.uuid(new URL(req.url).searchParams.get("grupo_id"), "grupo_id");
+
+/** GET /v1/sync/config?grupo_id= (cualquier miembro) · PUT /v1/sync/config {grupo_id, modo} (SOLO admin del grupo). */
+async function syncConfig(req: Request) {
+  const d = await autenticarSync(req);
+  frenar(`sync:config:${req.method}:${d.id}`, 1, 5_000);
+  if (req.method === "PUT") {
+    const b = await leerJson(req);
+    const grupo = v.uuid(b.grupo_id, "grupo_id"); const modo = v.enumerado(b.modo, "modo", MODOS_SYNC, { opcional: false });
+    const r = await rpcSync("sync_api_config_poner", { p_usuario: d.usuario, p_grupo: grupo, p_modo: modo });
+    log("info", "sync_modo", { grupo, modo, por: d.usuario });
+    return { grupo_id: grupo, modo: r.modo, anterior: r.anterior ?? null, actualizado_por: r.actualizado_por, actualizado_en: r.actualizado_en };
+  }
+  const grupo = grupoDeQuery(req);
+  const r = await rpcSync("sync_api_config_leer", { p_usuario: d.usuario, p_grupo: grupo });
+  const { cfg } = await cfgVigente();
+  return conEtag(req, { grupo_id: grupo, modo: r.modo, actualizado_por: r.actualizado_por, actualizado_en: r.actualizado_en, tu_rol: r.tu_rol, sondeo_seg: cfg.intervalos.sondeo_sync_seg });
+}
+
+/** GET /v1/sync/operaciones?grupo_id=&desde=<seq> (operaciones nuevas + modo, ETag/304) · POST publica un fichaje (idempotente por op_id). */
+async function syncOperaciones(req: Request) {
+  const d = await autenticarSync(req);
+  frenar(`sync:ops:${req.method}:${d.id}`, 1, 5_000);
+  if (req.method === "POST") {
+    const { grupo_id, op } = limpiarOperacion(await leerJson(req));
+    const r = await rpcSync("sync_api_publicar", { p_usuario: d.usuario, p_grupo: grupo_id, p_op: op });
+    log("info", "sync_publicada", { grupo: grupo_id, op: r.op_id, seq: r.seq, repetida: r.repetida });
+    return { op_id: r.op_id, seq: r.seq, repetida: r.repetida };
+  }
+  const q = new URL(req.url).searchParams; const grupo = grupoDeQuery(req);
+  const desde = q.get("desde") === null ? 0 : Number(q.get("desde"));
+  if (!Number.isInteger(desde) || desde < 0) throw new ErrorApi("CAMPO_INVALIDO", { campo: "desde", mensaje: "desde debe ser un entero mayor o igual a 0." });
+  const limite = q.get("limite") === null ? 100 : Number(q.get("limite"));
+  if (!Number.isInteger(limite) || limite < 1 || limite > 100) throw new ErrorApi("CAMPO_INVALIDO", { campo: "limite", mensaje: "limite debe ser un entero entre 1 y 100." });
+  const r = await rpcSync("sync_api_listar", { p_usuario: d.usuario, p_grupo: grupo, p_desde: desde, p_limite: limite });
+  const { cfg } = await cfgVigente();
+  return conEtag(req, { grupo_id: grupo, modo: r.modo, ultimo_seq: r.ultimo_seq, operaciones: r.operaciones, sondeo_seg: cfg.intervalos.sondeo_sync_seg });
+}
+
+/** POST /v1/sync/operaciones/aplicada { op_id, estado, motivo? } o { resultados:[…] } — cada PC informa qué hizo. Idempotente. */
+async function syncAplicada(req: Request) {
+  const d = await autenticarSync(req);
+  frenar(`sync:apl:${d.id}`, 1, 5_000);
+  const { unico, resultados } = limpiarResultados(await leerJson(req));
+  const r = await rpcSync("sync_api_aplicada", { p_usuario: d.usuario, p_dispositivo: d.id, p_resultados: resultados });
+  if (unico && Number(r.actualizadas) === 0) throw new ErrorApi("OPERACION_NO_ENCONTRADA");
+  return { actualizadas: r.actualizadas, descartadas: r.descartadas };
+}
+
+/** POST /v1/sync/option {grupo_id, sha256, tamano, …} → URL temporal de SUBIDA · GET ?grupo_id= → última versión + URL temporal de DESCARGA. */
+async function syncOption(req: Request) {
+  const d = await autenticarSync(req);
+  frenar(`sync:opt:${req.method}:${d.id}`, 1, 5_000);
+  if (req.method === "POST") {
+    const { grupo_id, d: datos } = limpiarOption(await leerJson(req));
+    const r = await rpcSync("sync_api_option_crear", { p_usuario: d.usuario, p_grupo: grupo_id, p_d: datos });
+    const { data, error } = await sb.storage.from(BUCKET_SYNC).createSignedUploadUrl(String(r.ruta));
+    if (error || !data?.signedUrl) { log("error", "sync_option_firma", { mensaje: error?.message }); throw new ErrorApi("ERROR_INTERNO"); }
+    return { id: r.id, url_subida: data.signedUrl, metodo_subida: "PUT", expira_en_seg: 7200, tamano_max: CONFIG.limites.sync_option_bytes_max, siguiente: "POST /v1/sync/option/listo" };
+  }
+  const grupo = grupoDeQuery(req);
+  const r = await rpcSync("sync_api_option_ultima", { p_usuario: d.usuario, p_grupo: grupo });
+  const { data, error } = await sb.storage.from(BUCKET_SYNC).createSignedUrl(String(r.ruta), URL_FIRMADA_SEG);
+  if (error || !data?.signedUrl) { log("error", "sync_option_descarga", { mensaje: error?.message }); throw new ErrorApi("ERROR_INTERNO"); }
+  return { id: r.id, sha256: r.sha256, tamano: r.tamano, resumen: r.resumen, parche: r.parche, huella_bd: r.huella_bd, autor: r.autor, creado_en: r.creado_en,
+           url_descarga: data.signedUrl, expira_en_seg: URL_FIRMADA_SEG };
+}
+
+/** POST /v1/sync/option/listo {id} — confirma la subida: comprueba que el archivo existe y mide lo declarado; recién entonces queda «lista». */
+async function syncOptionListo(req: Request) {
+  const d = await autenticarSync(req); const b = await leerJson(req);
+  frenar(`sync:optlisto:${d.id}`, 1, 5_000);
+  const id = v.uuid(b.id, "id");
+  const { data: fila, error } = await sb.from("sync_option_versiones").select("tamano, ruta_storage, autor, estado").eq("id", id).maybeSingle();
+  db(error, "sync_option_listo.fila");
+  if (!fila || fila.autor !== d.usuario) throw new ErrorApi("OPTION_NO_ENCONTRADA");
+  if (fila.estado === "subiendo") {
+    const [carpeta, archivo] = String(fila.ruta_storage).split("/");
+    const { data: lista, error: e2 } = await sb.storage.from(BUCKET_SYNC).list(carpeta, { search: archivo });
+    db(e2, "sync_option_listo.lista");
+    const obj = (lista ?? []).find((o) => o.name === archivo);
+    const tam = Number((obj?.metadata as { size?: number } | null)?.size ?? -1);
+    if (!obj || tam !== fila.tamano) {
+      if (obj) await sb.storage.from(BUCKET_SYNC).remove([fila.ruta_storage]);
+      throw new ErrorApi("OPTION_INVALIDA", { mensaje: obj ? "El archivo subido no mide lo declarado: vuelve a empezar con POST /v1/sync/option." : "Aún no se subió el archivo a url_subida." });
+    }
+  }
+  const r = await rpcSync("sync_api_option_listo", { p_usuario: d.usuario, p_id: id });
+  const viejas = (r.archivadas as string[] | undefined) ?? [];
+  if (viejas.length) { const { error: e3 } = await sb.storage.from(BUCKET_SYNC).remove(viejas); if (e3) log("warn", "sync_option_limpieza", { mensaje: e3.message }); }
+  return { id, estado: "lista", archivadas: viejas.length };
+}
+
 /** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */
 async function config(req: Request) {
   const { cfg, builds } = await cfgVigente();
@@ -648,6 +767,11 @@ const RUTAS: Record<string, { metodo: string; fn: (req: Request) => unknown }> =
   "/v1/perfiles": { metodo: "POST", fn: perfiles },
   "/v1/juego/buzon": { metodo: "GET", fn: juegoBuzon },
   "/v1/juego/buzon/entregado": { metodo: "POST", fn: juegoBuzonEntregado },
+  "/v1/sync/config": { metodo: "GET|PUT", fn: syncConfig },
+  "/v1/sync/operaciones": { metodo: "GET|POST", fn: syncOperaciones },
+  "/v1/sync/operaciones/aplicada": { metodo: "POST", fn: syncAplicada },
+  "/v1/sync/option": { metodo: "GET|POST", fn: syncOption },
+  "/v1/sync/option/listo": { metodo: "POST", fn: syncOptionListo },
 };
 
 Deno.serve(async (req) => {
@@ -662,7 +786,7 @@ Deno.serve(async (req) => {
   try {
     const r = RUTAS[ruta];
     if (!r) throw new ErrorApi("RUTA_NO_EXISTE");
-    if (req.method !== r.metodo) throw new ErrorApi("METODO_NO_PERMITIDO");
+    if (!r.metodo.split("|").includes(req.method)) throw new ErrorApi("METODO_NO_PERMITIDO");
     const datos = await r.fn(req) as Record<string, unknown>;
     if (datos && (datos as NoModificado).__noModificado) {
       return new Response(null, { status: 304, headers: { ...cab, etag: (datos as NoModificado).etag } });
