@@ -471,6 +471,9 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ### Ronda 219 — Anti-spam configurable por el admin
 - Tabla `chat_ajustes` (espera_seg 0–60, defecto 3), RPC `chat_global_ajustar` (solo admin, auditada), migración 099f/099g aplicadas por MCP. Web: panel «Ajustes del chat» en /chat-general/ (solo admin) y botón con cuenta atrás según `espera_seg`. API: GET /v1/chat/global añade `espera_seg`. Edge **v12 desplegada** por MCP (freno 1/1 s de cortesía; comprobada contra el repo). Tests 405, 45 páginas. Siguiente migración libre: 100.
 
+### Ronda 223 — Pruebas arregladas tras la ronda 221
+- `tests/pure.test.mjs`: se actualizaron los valores esperados de 3 pruebas que todavía tenían los datos de antes de jugarse fecha 8 y fecha 9. Tabla: Beto 24 pts, Degox 21 (8 pj), Jeremi 11. Estado de fecha: fecha 8 «jugada», fecha 9 «en_juego». Fecha actual: 9. Mejor defensa: Victor 6 goles, Degox 7. Crónica fecha 8: 6 partidos y 28 goles. Código de la lógica sin cambios. `npm test`: 410 de 410. `npm run build`: 45 páginas. Pendiente: confirmar con CopaFácil.
+
 ### Ronda 221 — Resultados Galaxy League: fechas 8 y 9
 - Marcadores cargados en `src/data/ligaResultados.js` (solo datos, sin migración ni cambios de BD): fecha 8 Degox 0–1 Jeremi y Beto 2–0 Morgado; fecha 9 Jeremi 0–6 Beto. Hugo 2–3 Víctor, Camilo 4–1 Jack y Axel 0–3 Arens ya estaban. Quedan sin jugar en fecha 9: Roberto–Degox y Fralex–Morgado. Pruebas: el archivo se carga bien (fecha 8: 6 jugados; fecha 9: 4 jugados). Se subió a `borrador` (FASE BETA).
 
