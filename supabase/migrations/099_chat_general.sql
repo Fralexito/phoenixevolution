@@ -33,7 +33,7 @@ grant select on public.mensajes_chat to authenticated;
 -- ── B) Lógica común (la usan la web y la API) ──────────────────────────────────────────────────────────────────────────
 create or replace function private.chat_poner(p_uid uuid, p_texto text) returns jsonb
 language plpgsql security definer set search_path = '' as $$
-declare t text; s public.sanciones; p public.perfiles; v_id int; v_ult timestamptz; v_n int; v_staff boolean; v_cat text;
+declare t text; s public.sanciones; p public.perfiles; v_id int; v_ult timestamptz; v_n int; v_staff boolean; v_cat text; v_esp int := private.chat_espera();
 begin
   select * into p from public.perfiles where id = p_uid;
   if p_uid is null or not found then return jsonb_build_object('error', 'SIN_PERMISO'); end if;
@@ -45,8 +45,12 @@ begin
   v_cat := private.categoria_edad(p_uid);
   if v_cat = 'bloqueado' then return jsonb_build_object('error', 'SIN_PERMISO'); end if;
   v_staff := p.rol in ('moderador', 'admin');
-  select max(created_at) into v_ult from public.mensajes_chat where autor_id = p_uid;
-  if v_ult is not null and now() - v_ult < interval '3 seconds' then return jsonb_build_object('error', 'LIMITE_EXCEDIDO', 'reintentar_en', greatest(1, ceil(3 - extract(epoch from (now() - v_ult)))::int), 'mensaje', 'Anti-spam: un mensaje cada 3 segundos.'); end if;
+  if v_esp > 0 then
+    select max(created_at) into v_ult from public.mensajes_chat where autor_id = p_uid;
+    if v_ult is not null and now() - v_ult < make_interval(secs => v_esp) then
+      return jsonb_build_object('error', 'LIMITE_EXCEDIDO', 'reintentar_en', greatest(1, ceil(v_esp - extract(epoch from (now() - v_ult)))::int), 'mensaje', 'Anti-spam: un mensaje cada ' || v_esp || ' segundos.');
+    end if;
+  end if;
   if not v_staff then
     select count(*) into v_n from public.mensajes_chat where autor_id = p_uid and created_at > now() - interval '1 hour';
     if v_n >= 200 then return jsonb_build_object('error', 'LIMITE_EXCEDIDO', 'reintentar_en', 60); end if;
@@ -70,7 +74,7 @@ begin
     left join public.perfiles pf on pf.id = m.autor_id) t;
   select coalesce(jsonb_agg(c.id order by c.id), '[]'::jsonb) into v_borr from public.mensajes_chat c
     where c.borrado and c.id > (select greatest(coalesce(max(id), 0) - 200, 0) from public.mensajes_chat) and (v_staff or c.autor_staff or c.grupo_edad = v_grupo);
-  return jsonb_build_object('ok', true, 'mensajes', v_msgs, 'borrados', v_borr);
+  return jsonb_build_object('ok', true, 'mensajes', v_msgs, 'borrados', v_borr, 'espera_seg', private.chat_espera());
 end $$;
 revoke all on function private.chat_poner(uuid, text), private.chat_listar(uuid, bigint, int) from public, anon, authenticated;
 
@@ -116,3 +120,36 @@ language sql security definer set search_path = '' as $$ select private.chat_pon
 
 revoke execute on function public.chat_api_listar(uuid, bigint, int), public.chat_api_enviar(uuid, text) from public, anon, authenticated;
 grant execute on function public.chat_api_listar(uuid, bigint, int), public.chat_api_enviar(uuid, text) to service_role;
+
+-- ── E) Anti-spam configurable (partes 099f y 099g aplicadas por MCP) ───────────────────────────────────────────────────
+-- Tabla de una sola fila: espera_seg (0 = sin espera, máx. 60). Solo el admin la cambia, con chat_global_ajustar (queda en auditoría).
+-- private.chat_poner lee private.chat_espera() y devuelve LIMITE_EXCEDIDO con reintentar_en = segundos que faltan.
+-- private.chat_listar añade 'espera_seg' a la respuesta (web y API) para que los clientes muestren la cuenta atrás.
+create table if not exists public.chat_ajustes (
+  id int primary key default 1 check (id = 1),
+  espera_seg int not null default 3 check (espera_seg between 0 and 60),
+  actualizado_por uuid references public.perfiles(id) on delete set null,
+  actualizado_en timestamptz not null default now()
+);
+insert into public.chat_ajustes (id) values (1) on conflict (id) do nothing;
+alter table public.chat_ajustes enable row level security;
+create policy chat_ajustes_lectura on public.chat_ajustes for select to authenticated using (true);
+grant select on public.chat_ajustes to authenticated;
+revoke insert, update, delete on public.chat_ajustes from anon, authenticated;
+create or replace function private.chat_espera() returns int
+language sql stable security definer set search_path = '' as $$ select coalesce((select espera_seg from public.chat_ajustes where id = 1), 3) $$;
+revoke all on function private.chat_espera() from public, anon, authenticated;
+create or replace function public.chat_global_ajustar(p_espera_seg int) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare v_antes int;
+begin
+  if (select auth.uid()) is null or not private.es_admin() then raise exception 'NO_AUTORIZADO' using errcode = 'P0001'; end if;
+  if p_espera_seg is null or p_espera_seg < 0 or p_espera_seg > 60 then raise exception 'CAMPO_INVALIDO: la espera va de 0 a 60 segundos' using errcode = 'P0001'; end if;
+  select espera_seg into v_antes from public.chat_ajustes where id = 1;
+  update public.chat_ajustes set espera_seg = p_espera_seg, actualizado_por = (select auth.uid()), actualizado_en = now() where id = 1;
+  perform private.auditar_moderacion('sistema', 'chat_ajustes', '1', 'Chat general · espera anti-spam', jsonb_build_object('de', v_antes, 'a', p_espera_seg), null);
+  return jsonb_build_object('ok', true, 'espera_seg', p_espera_seg);
+end $$;
+revoke execute on function public.chat_global_ajustar(int) from public, anon;
+grant execute on function public.chat_global_ajustar(int) to authenticated;
+-- (Las nuevas versiones de private.chat_poner y private.chat_listar de 099g están arriba en las secciones B; ver MAPA ronda 219.)

@@ -732,7 +732,7 @@ async function chatGlobal(req: Request) {
   const { cfg } = await cfgVigente();
   if (req.method === "POST") {
     if (!cfg.interruptores.chat_global) throw new ErrorApi("CHAT_PAUSADO", { reintentar_en: 300 });
-    frenar(`chat:post:${d.id}`, 1, 3_000);
+    frenar(`chat:post:${d.id}`, 1, 1_000);   // solo cortesía: la espera anti-spam real la decide la BD (chat_ajustes.espera_seg)
     const texto = limpiarMensajeChat(await leerJson(req));
     const r = await rpcSync("chat_api_enviar", { p_usuario: d.usuario, p_texto: texto });
     return { id: r.id, creado_en: r.creado_en };
@@ -743,7 +743,7 @@ async function chatGlobal(req: Request) {
   if (!cfg.interruptores.chat_global) return conEtag(req, { mensajes: [], borrados: [], ultimo_id: desde, pausado: true, sondeo_seg });
   const r = await rpcSync("chat_api_listar", { p_usuario: d.usuario, p_desde: desde, p_limite: limite });
   const mensajes = (r.mensajes as { id: number }[]) ?? [];
-  return conEtag(req, { mensajes, borrados: r.borrados ?? [], ultimo_id: mensajes.length ? mensajes[mensajes.length - 1].id : desde, sondeo_seg });
+  return conEtag(req, { mensajes, borrados: r.borrados ?? [], ultimo_id: mensajes.length ? mensajes[mensajes.length - 1].id : desde, espera_seg: r.espera_seg ?? 3, sondeo_seg });
 }
 
 /** Config pública + (si viene token) estado de ESTA PC y de ESTE build. Nunca falla por el token: lo informa. */

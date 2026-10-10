@@ -10,3 +10,4 @@ async function rpc(nombre, args) {
 export const listar = (desde = 0, limite = 50) => rpc('chat_global_listar', { p_desde: desde, p_limite: limite });
 export const enviar = (texto) => rpc('chat_global_enviar', { p_texto: texto });
 export const borrar = (id, motivo = null) => rpc('chat_global_borrar', { p_id: id, p_motivo: motivo });
+export const ajustarEspera = (segundos) => rpc('chat_global_ajustar', { p_espera_seg: segundos });

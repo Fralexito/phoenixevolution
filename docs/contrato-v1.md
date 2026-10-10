@@ -638,8 +638,8 @@ Cuerpo `{ "texto": "hola a todos" }` → `{ "ok": true, "id": 12, "creado_en": "
 | `MENSAJE_INVALIDO` | 400 | Texto vacío o de más de 300 caracteres (`campo: "texto"`) | Corregir; no reintentar igual |
 | `CUENTA_SANCIONADA` | 403 | La cuenta está suspendida o baneada. `mensaje` trae el texto exacto con motivo y fecha | Mostrar el `mensaje` al usuario; no reintentar |
 | `SIN_PERMISO` | 403 | Cuenta sin permiso para escribir (menor de 13 años) | Avisar al usuario |
-| `DEMASIADOS_INTENTOS` | 429 | Más de 1 mensaje cada 3 s (o 1 consulta cada 3 s) por PC; trae `reintentar_en` | Esperar `reintentar_en` |
-| `LIMITE_EXCEDIDO` | 429 | Más de 200 mensajes por hora (el staff no tiene tope); trae `reintentar_en` | Esperar |
+| `DEMASIADOS_INTENTOS` | 429 | Escribir antes de la espera anti-spam (`espera_seg`, la fija el admin; defecto 3 s) o 1 consulta cada 3 s por PC; trae `reintentar_en` | Esperar `reintentar_en` |
+| `LIMITE_EXCEDIDO` | 429 | Más de 200 mensajes por hora (el staff no tiene tope) o escribir antes de la espera anti-spam; trae `reintentar_en` (segundos que faltan) | Esperar |
 | `CHAT_PAUSADO` | 503 | El staff apagó `chat_global` | Reintentar más tarde |
 Más los de siempre: `TOKEN_*`, `HOST_NO_AUTORIZADO`, `APP_DESACTUALIZADA`, `DISPOSITIVO_SUSPENDIDO`, `CAMPO_INVALIDO` (`desde`/`limite` mal), `ERROR_INTERNO`. Política de reintentos: la del §0.
 
@@ -648,3 +648,6 @@ Sanciones (suspensión/baneo), separación por edad, límite de ritmo y borrado 
 
 ### Coste estimado (plan FREE, 500 000 invocaciones/mes)
 Link pregunta cada 5 s **solo mientras PES2021.exe está abierto**: 720 llamadas/hora por PC. 5 PCs × 2 h/día × 30 días ≈ **216 000**/mes, sumadas a §21, §25 y §26 se **pasaría del tope**. Palancas: subir `sondeo_chat_seg` (10 s lo reduce a la mitad), pedir solo si el panel de chat está abierto, o apagar `chat_global`.
+
+
+> **§27 · añadido 1.9.0 (anti-spam configurable):** `GET /v1/chat/global` devuelve además `espera_seg` (entero 0–60): segundos mínimos entre dos mensajes de la misma persona. El admin lo cambia desde la web. Si `POST` llega antes → `429 LIMITE_EXCEDIDO` con `reintentar_en`. La app debe mostrar cuenta atrás con `espera_seg` y no inventar su propio valor.

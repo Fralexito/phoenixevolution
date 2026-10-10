@@ -12,12 +12,21 @@ import Plegable from '../components/Plegable.astro';
     <Plegable titulo="Cómo funciona y reglas" icono="fa-circle-question" resumen="Léelo una vez">
       <ul class="cg-guia">
         <li><b>Un solo chat:</b> web y Phoenix Link muestran los mismos mensajes (se actualiza cada pocos segundos).</li>
-        <li><b>Hasta 300 letras</b> por mensaje y <b>un mensaje cada 3 segundos</b> (anti-spam).</li>
+        <li><b>Hasta 300 letras</b> por mensaje y <b>una espera entre mensajes</b> (anti-spam; la fija el admin, normalmente 3 segundos).</li>
         <li><b>Menores y mayores de 18</b> se ven solo entre sí, igual que en los mensajes privados. El staff ve a todos.</li>
         <li><b>Si el staff borra un mensaje</b>, desaparece también en Phoenix Link.</li>
         <li>Una cuenta sancionada no puede escribir mientras dure la sanción.</li>
       </ul>
     </Plegable>
+    <section id="cg-ajustes" class="glass-panel rounded-2xl px-4 py-3" hidden>
+      <Plegable titulo="Ajustes del chat (solo admin)" icono="fa-sliders" resumen="Tiempo anti-spam">
+        <form id="cg-ajustes-form" class="cg-ajustes" autocomplete="off">
+          <label class="label" for="cg-espera">Segundos de espera entre mensajes (0 a 60)</label>
+          <div class="cg-ajustes-fila"><input id="cg-espera" class="field" type="number" inputmode="numeric" min="0" max="60" step="1" value="3"><button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Guardar</button></div>
+          <p class="cg-ayuda">Ahora: <b id="cg-espera-txt">un mensaje cada 3 segundos</b>. Vale para la web y para Phoenix Link. 0 = sin espera.</p>
+        </form>
+      </Plegable>
+    </section>
     <p id="cg-sin-sesion" class="cg-aviso" hidden>Inicia sesión para leer y escribir en el chat.</p>
     <section id="cg-caja" class="glass-panel rounded-2xl p-3 sm:p-4 space-y-3" hidden aria-label="Chat general">
       <ol id="cg-lista" class="cg-lista" aria-live="polite" tabindex="0"><li class="cg-vacio">Cargando…</li></ol>

@@ -1,5 +1,6 @@
 // Lógica pura del CHAT GENERAL (sin red ni DOM: se prueba con npm test). Datos: migración 099. Contrato: docs/contrato-v1.md §27.
 export const MAX_TEXTO = 300;
+export const ESPERA_DEFECTO = 3;   // segundos entre mensajes si el servidor aún no dijo otra cosa
 export const VENTANA = 200;   // cuántos mensajes se guardan en pantalla (los más viejos se sueltan)
 
 /** Igual que el servidor: espacios y saltos juntos en uno. */
@@ -36,7 +37,7 @@ export function horaCorta(iso, tz = 'America/Lima') {
 
 const FRASES = {
   CUENTA_SANCIONADA: null, // el servidor manda el texto exacto de la sanción
-  LIMITE_EXCEDIDO: 'Anti-spam: solo se puede enviar un mensaje cada 3 segundos.',
+  LIMITE_EXCEDIDO: 'Anti-spam: espera unos segundos antes de enviar otro mensaje.',
   MENSAJE_INVALIDO: null,
   NO_AUTORIZADO: 'Inicia sesión para escribir en el chat.',
   MENSAJE_NO_ENCONTRADO: 'Ese mensaje ya no existe.',
@@ -50,4 +51,10 @@ export function mensajeError(e) {
   if (codigo && FRASES[codigo]) return FRASES[codigo];
   if (codigo && (codigo in FRASES) && extra) return extra;
   return t || 'Algo salió mal. Inténtalo otra vez.';
+}
+
+/** Espera anti-spam válida (0 a 60 s, entero) o null si lo escrito no sirve. */
+export function esperaValida(x) {
+  const t = String(x ?? '').trim(); if (!/^\d{1,2}$/.test(t)) return null;
+  const n = Number(t); return n >= 0 && n <= 60 ? n : null;
 }

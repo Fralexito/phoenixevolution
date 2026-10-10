@@ -3,13 +3,12 @@ import { onSession, can } from '../core/session.js';
 import { toast } from '../core/toast.js';
 import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc } from '../core/dom.js';
-import { estadoEscritura, fusionar, insignia, horaCorta, MAX_TEXTO } from '../core/chatGeneral.js';
+import { estadoEscritura, fusionar, insignia, horaCorta, esperaValida, ESPERA_DEFECTO, MAX_TEXTO } from '../core/chatGeneral.js';
 import * as api from '../features/chatGeneral/api.js';
 
 const $ = (id) => document.getElementById(id);
 const SONDEO_MS = 6000;
-const ESPERA_MS = 3000;
-const st = { yo: null, lista: [], ultimoId: 0, timer: null, cargando: false, primera: true, hasta: 0, enf: null };
+const st = { yo: null, lista: [], ultimoId: 0, timer: null, cargando: false, primera: true, hasta: 0, enf: null, espera: ESPERA_DEFECTO };
 const esMod = () => can('moderarChat');
 
 function filaHTML(m) {
@@ -27,6 +26,7 @@ async function refrescar(forzarBajar = false) {
   st.cargando = true;
   try {
     const r = await api.listar(st.ultimoId, 50);
+    if (Number.isInteger(r?.espera_seg)) { st.espera = r.espera_seg; mostrarEspera(); }
     const f = fusionar(st.lista, r);
     const cambio = f.hayNuevos || f.lista.length !== st.lista.length;
     st.lista = f.lista; st.ultimoId = f.ultimoId;
@@ -34,6 +34,17 @@ async function refrescar(forzarBajar = false) {
     st.primera = false;
   } catch (e) { if (st.primera) $('cg-lista').innerHTML = `<li class="cg-vacio">${esc(e.message)}</li>`; }
   finally { st.cargando = false; }
+}
+function mostrarEspera() {
+  const i = $('cg-espera'); if (i && document.activeElement !== i) i.value = String(st.espera);
+  const t = $('cg-espera-txt'); if (t) t.textContent = st.espera > 0 ? `un mensaje cada ${st.espera} segundos` : 'sin espera entre mensajes';
+}
+async function guardarEspera(ev) {
+  ev.preventDefault();
+  const n = esperaValida($('cg-espera').value);
+  if (n === null) { toast('Escribe un número entero de 0 a 60.', 'error', { key: 'cg-espera' }); return; }
+  try { await api.ajustarEspera(n); st.espera = n; mostrarEspera(); toast(n > 0 ? `Listo: un mensaje cada ${n} segundos.` : 'Listo: sin espera entre mensajes.', 'ok'); }
+  catch (err) { toast(err.message, 'error', { key: 'cg-espera' }); }
 }
 function arrancar() { clearInterval(st.timer); st.timer = setInterval(refrescar, SONDEO_MS); refrescar(true); }
 
@@ -43,7 +54,8 @@ function actualizarCuenta() {
   $('cg-enviar').disabled = !e.puede || Date.now() < st.hasta;
 }
 function enfriar() {
-  st.hasta = Date.now() + ESPERA_MS;
+  if (st.espera <= 0) return;
+  st.hasta = Date.now() + st.espera * 1000;
   const btn = $('cg-enviar'); const base = st.base || btn.innerHTML; st.base = base;
   clearInterval(st.enf);
   const paso = () => {
@@ -68,6 +80,7 @@ async function borrar(id) {
 }
 
 $('cg-form').addEventListener('submit', enviar);
+$('cg-ajustes-form')?.addEventListener('submit', guardarEspera);
 $('cg-texto').addEventListener('input', actualizarCuenta);
 $('cg-texto').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('cg-form').requestSubmit(); } });
 $('cg-lista').addEventListener('click', (e) => { const b = e.target.closest('[data-borrar]'); if (b) borrar(Number(b.dataset.borrar)); });
@@ -79,5 +92,6 @@ actualizarCuenta();
 onSession((s) => {
   const yo = s.session?.user?.id ?? null;
   $('cg-sin-sesion').hidden = !!yo; $('cg-caja').hidden = !yo;
+  if ($('cg-ajustes')) $('cg-ajustes').hidden = !(yo && can('ajustarChat'));
   if (yo !== st.yo) { st.yo = yo; st.lista = []; st.ultimoId = 0; st.primera = true; if (yo) arrancar(); else clearInterval(st.timer); }
 });

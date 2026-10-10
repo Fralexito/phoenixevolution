@@ -1,7 +1,7 @@
 // Pruebas de la lógica pura del chat general (src/js/core/chatGeneral.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MAX_TEXTO, limpiarTexto, estadoEscritura, insignia, fusionar, horaCorta, mensajeError } from '../src/js/core/chatGeneral.js';
+import { MAX_TEXTO, limpiarTexto, estadoEscritura, insignia, fusionar, horaCorta, mensajeError, esperaValida } from '../src/js/core/chatGeneral.js';
 
 test('limpiarTexto y estadoEscritura: juntan espacios y cuentan el máximo', () => {
   assert.equal(limpiarTexto('  hola \n  mundo\t '), 'hola mundo');
@@ -30,9 +30,14 @@ test('horaCorta: hora de Lima', () => {
   assert.equal(horaCorta('2026-10-10T03:05:00Z'), '22:05'); assert.equal(horaCorta('basura'), '');
 });
 test('mensajeError: frases amables y texto del servidor', () => {
-  assert.match(mensajeError(new Error('LIMITE_EXCEDIDO: LIMITE_EXCEDIDO')), /cada 3 segundos/);
+  assert.match(mensajeError(new Error('LIMITE_EXCEDIDO: LIMITE_EXCEDIDO')), /Anti-spam/);
   assert.equal(mensajeError(new Error('CUENTA_SANCIONADA: Tu cuenta está suspendida hasta mañana.')), 'Tu cuenta está suspendida hasta mañana.');
   assert.equal(mensajeError(new Error('MENSAJE_INVALIDO: Escribe algo antes de enviar.')), 'Escribe algo antes de enviar.');
   assert.match(mensajeError(new Error('NO_AUTORIZADO')), /Inicia sesión/);
   assert.equal(mensajeError(new Error('algo raro')), 'algo raro');
+});
+
+test('esperaValida: entero de 0 a 60 o null', () => {
+  assert.equal(esperaValida('3'), 3); assert.equal(esperaValida(' 0 '), 0); assert.equal(esperaValida('60'), 60);
+  for (const mal of ['61', '-1', '2.5', 'abc', '', null, '100']) assert.equal(esperaValida(mal), null);
 });

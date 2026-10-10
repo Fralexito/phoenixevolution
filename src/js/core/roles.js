@@ -30,6 +30,7 @@ export const PERMISOS = Object.freeze({
   verAuditoria:         ['moderador', 'admin'],
   verAuditoriaCompleta: ['admin'],                // el moderador solo ve sus propias acciones
   darRoles:             ['admin'],
+  ajustarChat:          ['admin'],                // tiempo anti-spam del chat general
   sancionar:            ['moderador', 'admin'],   // suspender o banear (siempre a alguien de menor rango, ver puedeSancionar)
   verReportes:          ['ayudante', 'moderador', 'admin'],
   resolverReportes:     ['moderador', 'admin'],

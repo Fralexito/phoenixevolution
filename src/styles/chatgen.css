@@ -18,3 +18,5 @@ html[data-tema='sudario'] .cg-msg.cg-mio { border-left-color: #f5c542; backgroun
 .cg-pie { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
 .cg-ayuda { font-size: 12px; color: #9ca3af; } .cg-ayuda[data-mal='1'] { color: #f87171; }
 .cg-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cg-ajustes { display: grid; gap: .5rem; }
+.cg-ajustes-fila { display: flex; gap: .5rem; align-items: center; } .cg-ajustes-fila .field { max-width: 7rem; }
