@@ -42,7 +42,10 @@ URL base: `https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/liga/�
 3. Al final (con `completo:true` del juego), Link envía el **resultado**. Si no hay internet, lo guarda en `phoenix-liga-resultados.json` y lo reintenta.
 4. El staff o el árbitro designado lo **valida** y la tabla se actualiza sola (vista `liga_tabla`).
 
-## Pendiente (web)
+## Hecho en la web (ronda 224, rama borrador)
+- Marcador en vivo (Central y Salas en vivo), panel del staff en Moderación, «Partidos que arbitras» y «Mis partidos oficiales» con «Reclamar» en Mis partidos, y la Liga actualizada con los resultados confirmados. Detalle en `MAPA.md`, ronda 224.
+
+## Pendiente (web) — versión original, ya hecha en la ronda 224
 - **Páginas:**
   - marcador en vivo (suscripción Realtime a `liga_vivo`) en Inicio y En vivo;
   - panel del staff para validar, designar árbitro y ver disputas;

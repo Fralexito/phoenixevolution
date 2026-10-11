@@ -1,0 +1,17 @@
+---
+// Marcador EN VIVO de la liga (ronda 224): partidos que se juegan ahora en salas de Phoenix Link, con goles,
+// minuto y goleador (Sider 7.3.4+). Oculto si no hay ninguno. Datos: tabla liga_vivo por Realtime
+// (js/features/liga/vivo.js). Oficiales primero; los amistosos solo llegan si la sala no es privada.
+interface Props { titulo?: string; id?: string }
+const { titulo = 'En vivo ahora', id = 'liga-vivo' } = Astro.props;
+---
+<section id={id} data-liga-vivo hidden class="space-y-3 scroll-mt-32" aria-live="polite" aria-labelledby={`${id}-h`}>
+  <h2 id={`${id}-h`} class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2 flex items-center gap-2">
+    <span class="live-dot" aria-hidden="true"></span>{titulo} <b data-cuenta class="text-galaxy-400"></b>
+  </h2>
+  <div data-lista class="grid gap-3 sm:grid-cols-2"></div>
+</section>
+<script>
+  import { montarMarcadorVivo } from '../js/features/liga/vivo.js';
+  montarMarcadorVivo();
+</script>

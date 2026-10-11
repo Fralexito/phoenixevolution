@@ -487,6 +487,23 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 ### Ronda 223 — Arreglo: «Aprobar host» fallaba (migración 101)
 - Error en pantalla: `violates check constraint "auditoria_staff_accion_check"`. `staff_aprobar_host` auditaba con `aprobar_host`/`quitar_host`, acciones que `auditoria_staff` no admite. Ahora audita como `rol` (texto «Host aprobado/retirado · nombre»). Aplicada por MCP y probada con transacción revertida. Siguiente migración libre = 102. (Ojo: la otra cuenta ya usó «ronda 221» y su propia numeración; esta ronda se llama 223 aquí.)
 
+### Ronda 224 — Liga automática en la web (marcador en vivo, validación por staff/árbitro, reclamos)
+- Junta en `borrador` la rama `liga-automatica`: migraciones 102/102b, ya aplicadas, y Edge Function `liga` v2 (goleador `j` y en propia `pp` en los goles). Documento: `docs/LIGA-AUTOMATICA.md`.
+- **Marcador EN VIVO** (`components/MarcadorVivo.astro` + `js/features/liga/vivo.js`) en Central (encima de la Central de Partidos) y en Salas en vivo:
+  - Realtime sobre `liga_vivo`;
+  - oficial (con fecha) o amistoso, minuto y tiempo, goles con goleador («34′ MESSI», «80′ ARAUJO (p.p.)»);
+  - efecto de gol con la capa dopamina;
+  - «Final» 30 s al terminar;
+  - oculto si no hay partidos.
+- **Moderación › Liga · resultados por validar** (`js/pages/moderacionLiga.js`, permiso `verReportes` = `private.es_staff`): disputas y propuestos con Confirmar / Corregir y confirmar / En disputa, goles con minuto y goleador, reclamo, resumen del Phoenix Doctor (solo informativo) y designar árbitro (también en «Próximos partidos»).
+- **Mis partidos** (`js/pages/misPartidosLiga.js`): «Partidos que arbitras» (árbitro designado: valida aunque el host sea otro) y «Mis partidos oficiales» (los que llegaron por Link, con «Reclamar»). Ambos ocultos si no hay nada.
+- **Liga:** al abrir, pide los resultados CONFIRMADOS de la base (`js/features/liga/tablaViva.js`). Si hay alguno que `ligaResultados.js` aún no tiene, recalcula con `calcularTabla`, la misma fórmula con enfrentamiento directo (por eso no se usa la vista `liga_tabla`, que no lo tiene), y actualiza puntos, orden, zonas y el marcador. Hoy la base y la web coinciden: no cambia nada.
+- Lógica pura en `core/ligaVivo.js`; pruebas en `tests/ligaVivo.test.mjs` (6 nuevas, 416 en total). Estilos en `styles/ligaVivo.css`.
+- **Probado contra la base real:**
+  - fila de prueba en `liga_vivo` (insertar, gol, borrar), luego quitada;
+  - funciones 102 en una transacción deshecha: jugador no valida ni designa (42501); el staff designa; el árbitro corrige 3-1 → confirmado/origen staff; el DT reclama → disputa; un no DT no reclama (42501).
+- Partidos contra la CPU: la web no guarda `partida_fin` en ninguna tabla y el ranking sale de los duelos, así que nunca cuentan. Si algún día se guarda el historial de Link, filtrar `datos.contra_ia`.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

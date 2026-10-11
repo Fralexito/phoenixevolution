@@ -4,6 +4,7 @@ import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
+import MarcadorVivo from '../components/MarcadorVivo.astro';
 const base = import.meta.env.BASE_URL;
 // «¿Qué quieres hacer?»: las acciones más buscadas, a un clic desde Central. `invitado` = solo sin sesión; `cuenta` = solo con sesión (lo decide html[data-sesion]).
 const ACCIONES = [
@@ -115,6 +116,9 @@ const ACCIONES = [
         </div>
       </section>
     )}
+
+    <!-- 2b. EN VIVO (ronda 224): partidos de salas de Phoenix Link con marcador, minuto y goleador. Oculto si no hay ninguno. -->
+    <MarcadorVivo />
 
     <!-- 3. CENTRAL DE PARTIDOS (con el partido destacado dentro) + clasificación y XI al costado -->
     {FX.visita && <div id="novedad" hidden class="novedad" role="status"></div>}

@@ -27,6 +27,16 @@ import Layout from '../layouts/Layout.astro';
         <div data-lista class="grid md:grid-cols-2 gap-2"></div>
       </section>
 
+      <section id="mod-liga" hidden class="space-y-2" aria-labelledby="h-mod-liga">
+        <h2 id="h-mod-liga" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-trophy text-galaxy-400 mr-2"></i>Liga · resultados por validar <b data-cuenta class="text-galaxy-400"></b></h2>
+        <p class="text-[12px] text-gray-400">Llegan de Phoenix Link al terminar un partido oficial. Solo el staff o el árbitro designado los valida, nunca el host. El Phoenix Doctor es solo informativo hasta que exista el parche oficial.</p>
+        <div data-lista class="grid md:grid-cols-2 gap-2"></div>
+        <details class="plegable" data-proximos>
+          <summary class="cursor-pointer text-[12px] font-display font-bold uppercase tracking-widest text-gray-300">Próximos partidos · designar árbitro <b data-cuenta class="text-galaxy-400"></b></summary>
+          <div data-lista class="grid md:grid-cols-2 gap-2 mt-2"></div>
+        </details>
+      </section>
+
       <section id="mod-hosts" hidden class="space-y-2" aria-labelledby="h-mod-hosts">
         <div class="flex flex-wrap items-center gap-2 border-b border-galaxy-border pb-2">
           <h2 id="h-mod-hosts" class="text-base font-display font-bold text-white uppercase tracking-wider flex-1"><i class="fa-solid fa-desktop text-galaxy-400 mr-2"></i>Hosts Phoenix Soda <b data-hp-cuenta class="text-galaxy-400"></b></h2>
@@ -96,4 +106,5 @@ import Layout from '../layouts/Layout.astro';
   import '../js/features/buzon.js';
   import '../js/features/torneos/staff.js';
   import '../js/features/ultimaHora.js';
+  import '../js/pages/moderacionLiga.js';
 </script>

@@ -1,0 +1,22 @@
+/* Liga automática (ronda 224): marcador EN VIVO y panel de validación. Colores con las variables del tema
+   (Galaxy cian/púrpura, Sudario azul/dorado); texto mínimo 12 px; movimiento solo transform/opacity. */
+.vivo-card { border-left: 3px solid var(--color-galaxy-400); }
+.vivo-card.vivo-fin { border-left-color: #6b7280; opacity: .85; }
+.vivo-chip { display: inline-flex; align-items: center; gap: .35rem; font: 700 12px/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase;
+  color: #cbd5e1; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .14); padding: .3rem .55rem; border-radius: .4rem; }
+.vivo-chip-oficial { color: var(--color-galaxy-400); background: color-mix(in srgb, var(--color-galaxy-600) 22%, transparent); border-color: color-mix(in srgb, var(--color-galaxy-400) 40%, transparent); }
+.vivo-reloj { display: inline-flex; align-items: center; gap: .4rem; font: 700 12px/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: #e5e7eb; }
+.vivo-nombre { font: 700 1rem/1.15 var(--font-display); color: #fff; text-transform: uppercase; letter-spacing: .04em; overflow-wrap: anywhere; }
+.vivo-marcador { display: flex; align-items: center; gap: .45rem; font: 800 2rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums;
+  padding: .35rem .7rem; border-radius: .6rem; background: var(--color-galaxy-900); border: 1px solid color-mix(in srgb, var(--color-galaxy-600) 55%, transparent); }
+.vivo-goles { font-size: 12px; line-height: 1.5; color: #d1d5db; }
+.vivo-goles li { overflow-wrap: anywhere; }
+
+/* Panel del staff y del árbitro */
+.lv-estado { display: inline-block; font: 700 12px/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; padding: .3rem .5rem; border-radius: .35rem; border: 1px solid; }
+.lv-estado-aviso { color: #fbbf24; border-color: rgb(251 191 36 / .45); background: rgb(251 191 36 / .1); }
+.lv-estado-error { color: #f87171; border-color: rgb(248 113 113 / .45); background: rgb(248 113 113 / .1); }
+.lv-estado-ok { color: #34d399; border-color: rgb(52 211 153 / .45); background: rgb(52 211 153 / .1); }
+.lv-estado-neutro { color: #cbd5e1; border-color: rgb(203 213 225 / .3); background: rgb(255 255 255 / .05); }
+.lv-dato { font-size: 12px; color: #9ca3af; }
+.lv-dato b { color: #e5e7eb; font-weight: 600; }
