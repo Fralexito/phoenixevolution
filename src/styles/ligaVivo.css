@@ -9,6 +9,7 @@
 .vivo-nombre { font: 700 1rem/1.15 var(--font-display); color: #fff; text-transform: uppercase; letter-spacing: .04em; overflow-wrap: anywhere; }
 .vivo-marcador { display: flex; align-items: center; gap: .45rem; font: 800 2rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums;
   padding: .35rem .7rem; border-radius: .6rem; background: var(--color-galaxy-900); border: 1px solid color-mix(in srgb, var(--color-galaxy-600) 55%, transparent); }
+.vivo-vs { font-size: 1.25rem; color: #9ca3af; letter-spacing: .12em; }
 .vivo-goles { font-size: 12px; line-height: 1.5; color: #d1d5db; }
 .vivo-goles li { overflow-wrap: anywhere; }
 

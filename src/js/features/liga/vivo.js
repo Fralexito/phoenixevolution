@@ -4,10 +4,8 @@
 // Lógica pura y pruebas: core/ligaVivo.js · tests/ligaVivo.test.mjs.
 import { supabase } from '../../core/supabase.js';
 import { escapeHTML } from '../../core/dom.js';
-import { aplicarCambioVivo, limpiarVivos, normalizarVivo, ordenarVivos, huboGol, textoGol, FASES_VIVO } from '../../core/ligaVivo.js';
+import { aplicarCambioVivo, limpiarVivos, normalizarVivo, ordenarVivos, huboGol, textoGol, textoEstado } from '../../core/ligaVivo.js';
 import { rafaga, salto } from '../dopamina.js';
-
-const PERIODOS = { 1: '1.er tiempo', 2: '2.º tiempo', 3: 'Prórroga 1', 4: 'Prórroga 2', 5: 'Penales' };
 
 let lista = [];
 let iniciado = false;
@@ -27,19 +25,17 @@ function listaGoles(x, lado) {
 }
 
 function tarjeta(x) {
-  const fase = FASES_VIVO[x.fase] ?? 'En juego';
   const enJuego = x.fase === 'en_juego' && !x.terminado;
-  const reloj = x.terminado || x.fase === 'final' ? 'Final'
-    : x.fase === 'previa' ? 'Previa'
-    : `${x.minuto}′ · ${x.fase === 'en_juego' ? (PERIODOS[x.periodo] ?? fase) : fase}`;
+  const previa = x.fase === 'previa' && !x.terminado;   // antes del pitazo: eligiendo equipos, saliendo al campo…
+  const reloj = textoEstado(x);
   return `<article class="glass-panel rounded-xl p-4 vivo-card${x.terminado ? ' vivo-fin' : ''}" data-sala="${escapeHTML(x.sala_id)}">
     <div class="flex items-center justify-between gap-2 mb-3">
       ${chipTipo(x)}
-      <span class="vivo-reloj">${enJuego ? '<span class="live-dot" aria-hidden="true"></span>' : ''}${escapeHTML(reloj)}</span>
+      <span class="vivo-reloj">${enJuego || previa ? '<span class="live-dot" aria-hidden="true"></span>' : ''}${escapeHTML(reloj)}</span>
     </div>
     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
       <p class="vivo-nombre text-left">${escapeHTML(x.local)}</p>
-      <p class="vivo-marcador" aria-label="${escapeHTML(`${x.local} ${x.goles_local}, ${x.visitante} ${x.goles_visita}`)}"><span data-gl>${x.goles_local}</span><span class="text-gray-500">-</span><span data-gv>${x.goles_visita}</span></p>
+      ${previa ? '<p class="vivo-marcador vivo-vs">VS</p>' : `<p class="vivo-marcador" aria-label="${escapeHTML(`${x.local} ${x.goles_local}, ${x.visitante} ${x.goles_visita}`)}"><span data-gl>${x.goles_local}</span><span class="text-gray-500">-</span><span data-gv>${x.goles_visita}</span></p>`}
       <p class="vivo-nombre text-right">${escapeHTML(x.visitante)}</p>
     </div>
     ${x.goles.length ? `<div class="grid grid-cols-2 gap-3 mt-3">${listaGoles(x, 'l') || '<span></span>'}${listaGoles(x, 'v')}</div>` : ''}

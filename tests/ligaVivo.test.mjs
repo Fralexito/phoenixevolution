@@ -123,3 +123,19 @@ test('ligaVivo: resultados confirmados de la base sobre las fechas de la web', a
   const espejo = ed.fechas.flatMap((f) => f.partidos.filter((m) => Number.isInteger(m.gl)).map((m) => ({ fecha: f.n, local: m.l, visitante: m.v, goles_local: m.gl, goles_visita: m.gv, estado: 'confirmado' })));
   assert.equal(fusionarConfirmados(ed.fechas, espejo).cambios, 0);
 });
+
+test('ligaVivo: pantalla del juego y texto del estado (Phoenix Referee v1.2)', async () => {
+  const { textoEstado, normalizarVivo, PANTALLAS } = await import('../src/js/core/ligaVivo.js');
+  const base = { sala_id: 's', local: 'A', visitante: 'B', goles_local: 0, goles_visita: 0, minuto: 0, periodo: 0 };
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'previa', pantalla: 'equipos' })), 'Eligiendo equipos');
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'previa', pantalla: 'saliendo' })), 'Saliendo al campo');
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'previa', pantalla: 'cargando' })), 'Cargando el partido');
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'previa' })), 'Previa');                       // Link viejo: sin pantalla
+  assert.equal(normalizarVivo({ ...base, fase: 'previa', pantalla: 'raro' }).pantalla, null);
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'en_juego', minuto: 34, periodo: 2 })), '34′ · 2.º tiempo');
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'pausado', minuto: 67, periodo: 2, pantalla: 'pausa' })), '67′ · En pausa');
+  assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'descanso', minuto: 45, periodo: 1 })), 'Descanso');
+  assert.equal(textoEstado({ ...normalizarVivo({ ...base, fase: 'en_juego' }), terminado: true }), 'Final');
+  assert.equal(textoEstado(null), '');
+  for (const p of ['menu', 'equipos', 'ajustes', 'cargando', 'saliendo', 'en_juego', 'descanso', 'pausa', 'final']) assert.ok(PANTALLAS[p]);
+});

@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.1.0: goleador en los goles) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -15,6 +15,8 @@ const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 const ROLES_STAFF = ["ayudante", "moderador", "admin"];
 const SALAS_VIVAS = ["preparando", "abierta", "en_partida"];
 const FASES_VIVO = ["previa", "en_juego", "descanso", "pausado", "final"];
+/** En qué parte del juego están (Phoenix Referee v1.2+, migración 103). Opcional: un Link viejo no la manda. */
+const PANTALLAS = ["menu", "equipos", "ajustes", "cargando", "saliendo", "en_juego", "descanso", "pausa", "final"];
 
 const ERRORES: Record<string, { http: number; mensaje: string; reintentable: boolean }> = {
   TOKEN_FALTANTE: { http: 401, mensaje: "Falta el token de la PC (vincula Phoenix Link).", reintentable: false },
@@ -181,6 +183,7 @@ async function vivo(req: Request) {
     goles_local: entero(j.goles_local, "goles_local", 0, 99), goles_visita: entero(j.goles_visita, "goles_visita", 0, 99),
     minuto: entero(j.minuto ?? 0, "minuto", 0, 200), periodo: entero(j.periodo ?? 0, "periodo", 0, 5),
     fase, goles: golesJuego(j.goles), actualizado: new Date().toISOString(),
+    pantalla: typeof j.pantalla === "string" && PANTALLAS.includes(j.pantalla) ? j.pantalla : null,
   };
   const { error } = await sb.from("liga_vivo").upsert(fila, { onConflict: "sala_id" });
   db(error, "vivo.guardar");

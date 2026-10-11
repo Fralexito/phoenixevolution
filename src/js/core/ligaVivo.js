@@ -13,6 +13,31 @@ export const FASES_VIVO = {
   final: 'Final',
 };
 
+/** En qué parte del juego están (Phoenix Referee v1.2+, liga_vivo.pantalla, migración 103). */
+export const PANTALLAS = {
+  menu: 'En el menú',
+  equipos: 'Eligiendo equipos',
+  ajustes: 'Ajustes del partido',
+  cargando: 'Cargando el partido',
+  saliendo: 'Saliendo al campo',
+  en_juego: 'En juego',
+  descanso: 'Descanso',
+  pausa: 'En pausa',
+  final: 'Final',
+};
+
+const PERIODOS = { 1: '1.er tiempo', 2: '2.º tiempo', 3: 'Prórroga 1', 4: 'Prórroga 2', 5: 'Penales' };
+
+/** Texto del estado para la tarjeta: «Eligiendo equipos», «Saliendo al campo», «34′ · 2.º tiempo», «67′ · En pausa», «Final». */
+export function textoEstado(x) {
+  if (!x) return '';
+  if (x.terminado || x.fase === 'final') return 'Final';
+  if (x.fase === 'previa') return PANTALLAS[x.pantalla] ?? 'Previa';
+  if (x.fase === 'descanso') return 'Descanso';
+  if (x.fase === 'pausado') return `${x.minuto}′ · En pausa`;
+  return `${x.minuto}′ · ${PERIODOS[x.periodo] ?? 'En juego'}`;
+}
+
 export const ESTADOS_LIGA = {
   pendiente: { texto: 'Por jugar', tono: 'neutro' },
   propuesto: { texto: 'Pendiente de validar', tono: 'aviso' },
@@ -60,6 +85,7 @@ export function normalizarVivo(f) {
     fase: Object.hasOwn(FASES_VIVO, f.fase) ? f.fase : 'en_juego',
     goles: golesVivo(f.goles),
     actualizado: f.actualizado ?? null,
+    pantalla: Object.hasOwn(PANTALLAS, f.pantalla) ? f.pantalla : null,
     terminado: f.terminado === true,
     quitarEn: Number.isFinite(f.quitarEn) ? f.quitarEn : null,
   };

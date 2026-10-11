@@ -504,6 +504,15 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
   - funciones 102 en una transacción deshecha: jugador no valida ni designa (42501); el staff designa; el árbitro corrige 3-1 → confirmado/origen staff; el DT reclama → disputa; un no DT no reclama (42501).
 - Partidos contra la CPU: la web no guarda `partida_fin` en ninguna tabla y el ranking sale de los duelos, así que nunca cuentan. Si algún día se guarda el historial de Link, filtrar `datos.contra_ia`.
 
+### Ronda 225 — En qué parte del juego están (pantalla) en el marcador en vivo
+- Migración **103** (aplicada por MCP): `liga_vivo.pantalla` (`menu | equipos | ajustes | cargando | saliendo | en_juego | descanso | pausa | final`, opcional). Edge Function `liga` **v3** (1.2.0) la acepta.
+- Viene de **Phoenix Referee** (el Lua de Sider, antes «phoenix_estadio»), que escribe `pantalla.json` también fuera del partido. Phoenix Link la manda, y con los lados ya elegidos en Link manda el «en vivo» ANTES del pitazo (`fase: previa`).
+- Tarjeta en vivo:
+  - el estado dice «Eligiendo equipos», «Ajustes del partido», «Cargando el partido», «Saliendo al campo», «34′ · 2.º tiempo», «67′ · En pausa», «Descanso» o «Final» (`core/ligaVivo.js` `textoEstado`);
+  - antes del pitazo muestra «VS» en vez de 0-0.
+- Pruebas: 417 (1 nueva). Build OK.
+- Pendiente, en investigación con una sesión de prueba en el juego: distinguir «viendo estrategia» y «pausa haciendo formación».
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
