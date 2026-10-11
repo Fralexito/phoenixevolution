@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.0.0) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.1.0: goleador en los goles) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -68,10 +68,19 @@ const entero = (v: unknown, campo: string, min: number, max: number): number => 
 };
 const texto = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, max) : "");
 const uuid = (v: unknown) => (typeof v === "string" && /^[0-9a-f-]{36}$/i.test(v) ? v : null);
-/** Goles del juego [{m, l:"l"|"v"}] (máx. 60). */
+/** Nombre del goleador: sin controles y cortado por letras (nunca medio emoji: jsonb lo rechazaría). */
+const nombreGol = (v: unknown) => (typeof v === "string" ? Array.from(v.replace(/[\u0000-\u001f\u007f]/g, "")).slice(0, 32).join("").trim() : "");
+/** Goles del juego [{m, l:"l"|"v", j?: goleador, pp?: en propia}] (máx. 60). «j» y «pp» llegan con Sider 7.3.4+. */
+type GolEntrada = { m: unknown; l?: unknown; j?: unknown; pp?: unknown };
 const golesJuego = (v: unknown) => (Array.isArray(v) ? v : []).slice(0, 60)
-  .filter((g) => g && typeof g === "object" && Number.isInteger((g as { m: unknown }).m))
-  .map((g) => ({ m: Math.max(0, Math.min(200, (g as { m: number }).m)), l: (g as { l: unknown }).l === "v" ? "v" : "l" }));
+  .filter((g): g is GolEntrada => !!g && typeof g === "object" && Number.isInteger((g as GolEntrada).m))
+  .map((g) => {
+    const r: { m: number; l: "l" | "v"; j?: string; pp?: true } = { m: Math.max(0, Math.min(200, g.m as number)), l: g.l === "v" ? "v" : "l" };
+    const j = nombreGol(g.j);
+    if (j) r.j = j;
+    if (g.pp === true) r.pp = true;
+    return r;
+  });
 
 type Dispositivo = { id: string; usuario: string };
 
