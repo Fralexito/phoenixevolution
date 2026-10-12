@@ -814,6 +814,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `duelosPro.js`: mueve `#racha-diaria` dentro de la cabecera (píldora bajo la descripción), `#btn-abrir-form` bajo «Tu estado» (PC, solo con el formulario plegado) y `#seg-vista` (celular) también a la cabecera. `duelosPro.css` §8: estilos de la píldora y de los botones. Se ahorran dos filas completas.
 - Pruebas 444. Build 45.
 
+### Ronda 263 — Jugadores con una sola barra de herramientas (FX.jugadoresBarra)
+- Fralex: «hazlo, lo revertiré si no me gusta». Antes de la primera carta había 5 bloques de controles.
+- `js/features/jugadoresBarra.js` (lo llama `pages/database.js`) mueve los MISMOS controles (mismos ids, misma lógica): cabecera = título · Comparar · buscador; barra cápsula = vista (Todos/Estilo/Nivel/Carrusel) · Ordenar · Equipo · **Filtros** (Liga/Torneo/Temporada, panel que se abre bajo la barra y se cierra al tocar fuera) · Avanzada · Leyenda · Tamaño. En PC cabe en una línea («Ordenar por», «Predeterminado» y «Leyenda» como ícono/selector). Reconocimientos se queda debajo.
+- `styles/jugadoresBarra.css`. Revertir: `FX.jugadoresBarra = false`.
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

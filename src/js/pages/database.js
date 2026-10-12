@@ -19,6 +19,7 @@ import { agruparPorEstilo, agruparPorNivel, ordenar, statsLiga, CRITERIOS } from
 import { montarReconocimientos } from '../features/reconocimientos.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { LIGAS } from '../../data/ligas.js';
+import { montarJugadoresBarra } from '../features/jugadoresBarra.js';
 import { mountAdvanced } from '../features/advancedSearch.js';
 import { openStatLegend } from '../features/statLegend.js';
 import { crearReplica } from '../features/replicaCarta.js';
@@ -224,3 +225,4 @@ $('players-container').addEventListener('click', async (e) => {
 // El botón "Añadir" y los controles de edición existen para admin y moderador (borrar: solo admin).
 onSession(() => { $('btn-add-player').hidden = !can('editarLiga'); if (all.length) paint(); });
 load();
+montarJugadoresBarra();   // ronda 263: una sola barra de herramientas (FX.jugadoresBarra)
