@@ -781,6 +781,10 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Resultado (pantallas de alto): Quiénes somos en celular 3,7 → 2,2; Ligas en PC 1,2 → 0,9; Historial en PC ≈ mitad de alto de lista. Las páginas con sesión (Tienda, Clanes, Amigos…) no se pudieron medir con datos reales desde aquí.
 - Pruebas 444. Build 45.
 
+### Ronda 257 — «Ligas» y «Ligas activas» por separado
+- Fralex: no quería que «Ligas» y «Ligas activas» fueran lo mismo. Ahora son dos entradas en Competiciones › Compite: **Ligas** (`liga/`, tabla, fechas y resultados) y **Ligas activas** (`competiciones/`, todas las ligas en tarjetas). Cada una se ilumina sola en las pestañas. El bloque queda con 6 entradas (cuadrícula pareja, sin huecos).
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
