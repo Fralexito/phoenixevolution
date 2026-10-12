@@ -773,6 +773,14 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Fralex preguntó dónde quedó «Ligas activas en cuadrados» (página /competiciones/): en el menú, «Ligas» ahora abre esa vista en tarjetas (`competiciones>liga`).
 - Pruebas 444. Build 45.
 
+### Ronda 256 — Menos scroll y más orden en las páginas que faltaban (FX.ordenado)
+- Fralex (/taste): reorganizar las secciones que faltan, priorizando el menor scroll posible, orden visual y dinamismo.
+- Se midió el alto de 29 páginas (en pantallas). Las largas eran Quiénes somos, Temporada, Divisiones Sudario, Formatos, Ligas, Historial, Palmarés y Noticias.
+- `styles/ordenado.css`: cabeceras grandes centradas (Ligas, Formatos, Historial, Torneos, Quiénes somos) más bajas y alineadas a la izquierda; `.desliza-movil` = en celular las filas de tarjetas se deslizan de lado (Quiénes somos: pilares y personas; Temporada y Divisiones: «Cómo funciona»; Formatos: retos de hoy); «Más competiciones» pasa de bloque de 300 px a franja; Historial en 2 columnas en PC.
+- /competiciones/ se titula **Ligas activas** (igual que en el menú).
+- Resultado (pantallas de alto): Quiénes somos en celular 3,7 → 2,2; Ligas en PC 1,2 → 0,9; Historial en PC ≈ mitad de alto de lista. Las páginas con sesión (Tienda, Clanes, Amigos…) no se pudieron medir con datos reales desde aquí.
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
