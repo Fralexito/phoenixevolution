@@ -754,6 +754,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - ARREGLO IMPORTANTE (afecta a toda la web): lightningcss fundía `animation` + `animation-timeline: view()` en un shorthand inválido y TODAS las animaciones ligadas al scroll se perdían en producción (salida 3D de prof3d, alejarse de las ventanas, etc.). `tools/movimiento-postcss.mjs` ahora envuelve el valor en `var(--pes-tl, …)` (`protegerTimeline`, con prueba).
 - Pruebas 444. Build 45.
 
+### Ronda 253 — La portada vuelve al podio de 3; el carrusel pasa a Jugadores
+- Fralex: le gustaba más la portada de antes (solo los 3 mejores/destacados). El carrusel le sirve como otra forma de ver las cartas dentro de Jugadores.
+- Portada: vuelve «Jugadores destacados» (podio de 3). «Cartas de la Galaxy» queda tras `FX.cartasPortada` = false.
+- Jugadores (`database.astro`/`database.js`): 4.ª vista **Carrusel** junto a Todos · Por estilo · Por nivel; usa el «Ordenar por» elegido y los filtros; toca una carta → su perfil. En modo Avanzada se ve la cuadrícula de siempre.
+- Se mantiene: botón «Jugadores» en el menú, carruseles de Creadores y del perfil, arreglo de animaciones de scroll. Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { FX } from '../data/experimento.js';
 ---
 <Layout title="Jugadores" active="database">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
@@ -46,6 +47,7 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" data-vista="plano" aria-pressed="true" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Todos</button>
         <button type="button" data-vista="estilo" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por estilo</button>
         <button type="button" data-vista="nivel" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por nivel</button>
+        {FX.carruseles && <button type="button" data-vista="carrusel" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-layer-group mr-1"></i>Carrusel</button>}
       </div>
       <label id="orden-wrap" class="flex items-center gap-2 text-xs text-gray-400">Ordenar por
         <select id="orden-select" class="field !w-auto !min-h-9"></select></label>
@@ -59,6 +61,7 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
     <!-- Herramientas sutiles: leyenda de stats y zoom (tamaño de tarjeta; la cuadrícula acomoda cuántas caben, como el explorador de archivos) -->
+    {FX.carruseles && <div id="carrusel-zona" hidden><div id="players-carrusel" data-carrusel="3d" aria-label="Cartas en carrusel: usa las flechas para moverte"></div></div>}
     <div id="players-container" class="grid pt-3">
       <div class="col-span-full text-center py-10 text-gray-400 text-sm flex flex-col items-center"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-galaxy-400 mb-3"></i> Descargando registros de la liga...</div>
     </div>

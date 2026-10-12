@@ -73,6 +73,13 @@ function paint() {
     box.innerHTML = r.length ? r.map((f, i) => tarjeta(f.p, i, `<span class="rank-badge" title="Puesto ${f.rank}">#${f.rank}</span>`)
       .replace(/<\/div>$/, `<div class="adv-strip">${adv.keys.map((k) => `<span>${k === 'ovr' ? 'MEDIA' : k.toUpperCase()} <b>${f.vals[k]}</b></span>`).join('')}${adv.keys.length > 1 ? `<span class="adv-prom">prom <b>${Math.round(f.score * 10) / 10}</b></span>` : ''}</div></div>`)).join('')
       : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">Ningún jugador cumple ese mínimo en todas las stats elegidas.</div>`;
+  } else if (vista === 'carrusel' && $('players-carrusel')) {
+    // Vista «Carrusel» (FX.carruseles, ronda 253): las cartas en fila 3D, con el orden elegido. Toca una → su perfil.
+    const lista = ordenar(list, orden, { liga: ligaStats, semilla });
+    $('players-carrusel').innerHTML = lista.length
+      ? lista.map((p, i) => `<a class="carta-slot" href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" aria-label="${escapeHTML(p.nombre)}: ver perfil">${playerCardHTML(p, i, { sizeClass: 'w-full' })}</a>`).join('')
+      : '<p class="text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</p>';
+    $('players-carrusel').scrollLeft = 0;
   } else {
     let n = 0;
     const grupos = vista === 'estilo' ? agruparPorEstilo(list) : vista === 'nivel' ? agruparPorNivel(list) : null;
@@ -80,6 +87,9 @@ function paint() {
       : grupos ? grupos.map((g) => encabezado(g) + g.jugadores.map((p) => tarjeta(p, n++)).join('')).join('')
         : ordenar(list, orden, { liga: ligaStats, semilla }).map((p, i) => tarjeta(p, i)).join('');
   }
+  const enCarrusel = vista === 'carrusel' && !adv && !!$('carrusel-zona');
+  if ($('carrusel-zona')) $('carrusel-zona').hidden = !enCarrusel;
+  box.hidden = enCarrusel;
   paintBar();
 }
 
@@ -137,7 +147,7 @@ $('orden-select').addEventListener('change', (e) => { orden = e.target.value; pa
 $('vista-seg').addEventListener('click', (e) => {
   const b = e.target.closest('[data-vista]'); if (!b) return; vista = b.dataset.vista;
   $('vista-seg').querySelectorAll('[data-vista]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-  $('orden-wrap').hidden = vista !== 'plano'; paint();
+  $('orden-wrap').hidden = !['plano', 'carrusel'].includes(vista); paint();
 });
 
 // ---- Zoom: el usuario elige el TAMAÑO de tarjeta; la cuadrícula (auto-fill) decide cuántas caben y las reparte parejas. ----

@@ -258,7 +258,7 @@ renderFeatured();
 renderCartas();
 // ---- Cartas de la Galaxy (FX.carruseles, ronda 252): carrusel 3D de la portada, de mayor a menor media (OVR). Toca una carta → su perfil. ----
 async function renderCartas() {
-  const box = $('cartas-carrusel'); if (!box || !FX.carruseles) return;
+  const box = $('cartas-carrusel'); if (!box || !FX.cartasPortada) return;
   try {
     const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false }).limit(16);
     if (error) throw error;
