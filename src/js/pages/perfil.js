@@ -310,8 +310,12 @@ function seccionClips(p) {
 function pintar() {
   const p = S.p;
   const conExtras = !!S.hist;   // sin la migración 025 no hay pestañas ni historias: el muro sigue funcionando igual que antes
-  root.innerHTML = `<div class="space-y-4">${cabecera(p)}${franjaEstadisticas()}<div id="pf-historia" hidden></div>${franjaLogros(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}${barraHistorias(p)}
-    <div class="space-y-3 max-w-2xl mx-auto w-full">${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
+  // Ronda 226: tres grupos con espacio grande entre ellos → 1) quién es (cabecera + sus paneles de ajuste),
+  // 2) «Resumen» (estadísticas, logros e historia juntos; en PC a dos columnas si hay historia), 3) «Muro» (historias + publicaciones/clips).
+  root.innerHTML = `<div class="space-y-8">
+    <div class="space-y-3">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}</div>
+    <div class="pf-resumen" aria-label="Resumen del jugador"><div class="space-y-3 empty:hidden">${franjaEstadisticas()}${franjaLogros(p)}</div><div id="pf-historia" hidden></div></div>
+    <div class="space-y-3 max-w-2xl mx-auto w-full">${barraHistorias(p)}${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
 }

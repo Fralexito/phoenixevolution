@@ -330,3 +330,14 @@
 .mg-acciones { position: absolute; top: .55rem; right: .55rem; display: flex; gap: .3rem; }
 .mg-acciones .mg-mini { position: static; }
 .mg-carta:hover .mg-acciones .mg-mini { opacity: 1; }
+
+/* ---------- Perfil · sección «Resumen» (ronda 226) ----------
+   Estadísticas + logros a la izquierda e «Historia» a la derecha; si no hay historia, todo ocupa el ancho completo. */
+.pf-resumen { display: grid; gap: .75rem; }
+.pf-resumen:not(:has(> :not([hidden]):not(:empty))) { display: none; }
+@media (min-width: 1024px) {
+  .pf-resumen:has(> #pf-historia:not([hidden])):has(> div:first-child:not(:empty)) { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+
+/* ---------- Mis partidos · grupo «Pendientes de ti» (ronda 226): no ocupa espacio si los tres bloques están ocultos ---------- */
+.mp-pendientes:not(:has(> section:not([hidden]))) { display: none; }

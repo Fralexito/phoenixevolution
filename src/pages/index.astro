@@ -18,7 +18,7 @@ const ACCIONES = [
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
-  <header class="relative flex flex-col justify-center overflow-hidden pt-4 pb-16 sm:pt-8 sm:pb-16 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40">
+  <header class="relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40">
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="flex items-center justify-center w-full"><div class="max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-5">
@@ -37,7 +37,7 @@ const ACCIONES = [
     </div></div>
   <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
   {FX.limpio ? (
-    <div class="relative z-10 w-full max-w-5xl mx-auto pt-6 sm:pt-8 space-y-4">
+    <div class="relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
       <div class="acciones-grid acciones-hero">
         {ACCIONES.map((a) => (
           <a href={`${base}${a.href}`} class:list={['accion', a.tono === 'primario' && 'accion-primaria', a.invitado && 'solo-invitado', a.cuenta && 'solo-cuenta']}>
@@ -85,17 +85,21 @@ const ACCIONES = [
     </section>
 
     </Fragment>}
-    <!-- 0. ESTADO DE LA LIGA: franja compacta («en juego · fecha · avance»). La pinta js/pages/central.js con los datos reales de la edición en curso. -->
-    <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
-
-    <!-- 0b. SALTO RÁPIDO entre secciones (pegajosa bajo la cabecera). Las minisecciones plegadas se abren al saltar a ellas (js/pages/central.js). -->
-{(<nav class="anclas" aria-label="Saltar a una sección">
+    <!-- 0b. SALTO RÁPIDO entre secciones (pegajosa bajo la cabecera). Va primero y fuera de los grupos para que siga pegada en toda la página.
+         Las minisecciones plegadas se abren al saltar a ellas (js/pages/central.js). -->
+{(<nav class="anclas !mb-6 sm:!mb-8" aria-label="Saltar a una sección">
       <a href="#central-partidos"><i class="fa-solid fa-futbol"></i>Partidos</a>
       <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
-      <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Clubes</a>
+      <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Estadísticas</a>
       <a href="#destacados-seccion"><i class="fa-solid fa-id-card"></i>Jugadores</a>
       {FX.highlightsDemo && <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>}
     </nav>)}
+
+    <!-- GRUPO «AHORA EN LA LIGA» (ronda 226): todo lo de la liga en curso junto y con poco espacio entre sí;
+         lo separa del resto el espacio grande del contenedor. Orden: estado → en vivo → Central + Posiciones → estadísticas plegadas. -->
+    <div class="space-y-5 sm:space-y-6">
+    <!-- 0. ESTADO DE LA LIGA: franja compacta («en juego · fecha · avance»). La pinta js/pages/central.js con los datos reales de la edición en curso. -->
+    <a id="estado-liga" hidden href={`${base}liga/#liga-galaxy`} class="estado-liga" aria-live="polite"></a>
 
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
     {LIGAS.filter((l) => l.enCentral !== false).length > 1 && (
@@ -125,7 +129,7 @@ const ACCIONES = [
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
       <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
         <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
-          <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
+          <h2 class="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
           <div id="fecha-nav" hidden class="order-3 sm:order-none w-full sm:w-auto sm:flex-1 sm:max-w-[19rem] sm:mx-auto min-w-0"></div>
           <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
             <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
@@ -148,25 +152,27 @@ const ACCIONES = [
           <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
             <div><h3 id="pos-titulo" class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><p id="pos-sub" hidden class="text-[12px] text-gray-400"></p></div><i class="fa-solid fa-trophy text-galaxy-400"></i>
           </div>
-          <div class="p-4 overflow-auto max-h-[260px]" role="region" tabindex="0" aria-label="Contenido desplazable">
+          <div class="p-4 overflow-auto" role="region" tabindex="0" aria-label="Tabla de posiciones">
             <table class="w-full text-left text-sm">
               <thead><tr class="text-gray-500 border-b border-galaxy-border/50"><th class="pb-2 font-semibold">Pos</th><th class="pb-2 font-semibold">DT / Club</th><th class="pb-2 text-center font-semibold">PJ</th><th class="pb-2 text-center font-semibold text-galaxy-400">PTS</th></tr></thead>
               <tbody id="mini-table-container"></tbody>
             </table>
           </div>
         </section>
-        {FX.rachas && <section id="rachas" hidden class="glass-panel rounded-xl overflow-hidden">
-          <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center"><h3 class="font-display font-bold text-lg uppercase tracking-wider text-white">En racha</h3><i class="fa-solid fa-fire-flame-curved text-amber-400"></i></div>
-          <div id="rachas-lista" class="px-4 py-2 text-sm"></div>
-        </section>}
         <div id="inicio-creadores" hidden></div>
         <div id="inicio-semanal" hidden></div>
       </aside>
     </div>
 
-    <!-- 3b. CLUBES Y GOLEADORES (plegado). Los pinta js/pages/central.js. El ELO NO va aquí: solo mide amistosos (página Ranking). -->
-    <Plegable titulo="Clubes y goleadores" icono="fa-ranking-star" resumen="Clubes más usados y máximos goleadores · toca para ver" id="rank-liga" clase="scroll-mt-40">
+    <!-- 3b. ESTADÍSTICAS DE LA LIGA (plegado): En racha + clubes + goleadores juntos (ronda 226). Los pinta js/pages/central.js.
+         El ELO NO va aquí: solo mide amistosos (página Ranking). -->
+    <Plegable titulo="Estadísticas de la liga" icono="fa-ranking-star" resumen="En racha, clubes más usados y goleadores · toca para ver" id="rank-liga" clase="scroll-mt-40">
       <div class="space-y-6">
+        {FX.rachas && <div id="rachas" hidden class="border-b border-galaxy-border/40 pb-5">
+          <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-fire-flame-curved text-amber-400 mr-1.5"></i>En racha</h3>
+          <p class="text-[12px] text-gray-500 mb-2">Victorias o derrotas seguidas en la edición en curso.</p>
+          <div id="rachas-lista" class="text-sm max-w-xl"></div>
+        </div>}
         <div>
           <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest mb-1">Clubes más usados</h3>
           <p class="text-[12px] text-gray-500 mb-2">Partidos jugados por club en la edición en curso.</p>
@@ -178,11 +184,13 @@ const ACCIONES = [
         </div>
       </div>
     </Plegable>
+    </div>
+    <!-- fin del grupo «Ahora en la liga» -->
 
     <!-- 4. JUGADORES DESTACADOS: en celular, carrusel que se desliza de lado -->
     <section id="destacados-seccion" class="space-y-4 scroll-mt-40">
       <div class="flex items-center justify-between">
-        <h2 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
+        <h2 class="text-lg sm:text-xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
         <a href={`${base}database/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1.5 border border-galaxy-400/30 bg-galaxy-400/10 px-3 py-1.5 rounded hover:bg-galaxy-400/20 transition-colors">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
       </div>
       <div class="podio" id="featured-players-container"><div class="grid grid-cols-3 gap-3 w-full" role="status" aria-label="Cargando jugadores"><div class="esqueleto h-56"></div><div class="esqueleto h-64"></div><div class="esqueleto h-56"></div></div></div>
