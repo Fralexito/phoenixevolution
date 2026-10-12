@@ -1,0 +1,9 @@
+/* REPASO CON LA SKILL TASTE (FX.pulido, ronda 246). Solo la portada. Con la bandera en false nada de esto se aplica (las clases no existen).
+   1. Cifras del pulso: mientras cargan, una barrita quieta en vez de «—» (nada se mueve solo). Si una no se puede leer, js/pages/central.js la oculta.
+   2. La línea de cifras flotaba sola entre dos huecos de 64 px: ahora queda pegada a «Campeones vigentes», como su pie.
+   3. Celular: el texto chico de cada ventana usa hasta 2 líneas en vez de cortarse con «…». */
+.esc-pulso.pulido { margin-top: -2.5rem; }
+.esc-pulso.pulido b:empty { display: inline-block; width: 1.6em; height: .75em; border-radius: .3em; vertical-align: -.05em; background: rgb(255 255 255 / .1); }
+@media (max-width: 640px) {
+  .vt-pulido .vt-txt small { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+}

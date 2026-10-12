@@ -320,10 +320,17 @@ cargarManuales();
 if ($('xi-det')) $('xi-det').open = window.matchMedia('(min-width: 1024px)').matches;
 
 // ---- Pulso de la comunidad: cuatro conteos reales (head:true no descarga filas, solo el número). Si uno falla se queda en «—». ----
+// Con FX.pulido (ronda 246) la cifra que no se pudo leer se oculta en vez de mostrar «—»; si fallan todas, se oculta la línea.
+function ocultarCifra(id) {
+  const fila = $(`pulso-${id}`)?.closest('.pulido'); if (!fila) return false;
+  $(`pulso-${id}`).closest('a').hidden = true;
+  if (![...fila.querySelectorAll('a')].some((a) => !a.hidden)) fila.hidden = true;
+  return true;
+}
 async function contar(consulta, id) {
   const t0 = performance.now();
-  try { const { count, error } = await consulta; if (error) throw error; { const t = cifra(count); if (t === '—') $(`pulso-${id}`).textContent = t; else contarHasta($(`pulso-${id}`), Number(t)); } if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
-  catch (e) { console.error(`[central] pulso ${id}:`, e?.message ?? e); }
+  try { const { count, error } = await consulta; if (error) throw error; { const t = cifra(count); if (t === '—') { if (!ocultarCifra(id)) $(`pulso-${id}`).textContent = t; } else contarHasta($(`pulso-${id}`), Number(t)); } if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
+  catch (e) { console.error(`[central] pulso ${id}:`, e?.message ?? e); ocultarCifra(id); }
 }
 const head = { count: 'exact', head: true };
 contar(supabase.from('jugadores').select('id', head), 'jugadores');

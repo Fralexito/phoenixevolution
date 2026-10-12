@@ -101,7 +101,7 @@ const VENTANAS = [
     {INTER && <canvas class="vt-estrellas" data-vt-estrellas aria-hidden="true"></canvas>}
     {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {!PORTADA.clip && PORTADA.imagen && <img class="tx-imagen" src={urlPortada(PORTADA.imagen)} alt="" aria-hidden="true" loading="eager" decoding="async" />}
-    <div class:list={['vt', FX.ventanas3d && 'vt-3d', INTER && 'vt-plus', INTER && FX.sinIconos && 'vt-limpio']} data-vt>
+    <div class:list={['vt', FX.ventanas3d && 'vt-3d', INTER && 'vt-plus', INTER && FX.sinIconos && 'vt-limpio', FX.pulido && 'vt-pulido']} data-vt>
       <h1 class="vt-tit" data-vt-tit>
         <span class="esc-l1">{palabras('Bienvenido a la').map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
         <span class="esc-l2 esc-marca" data-vt-galaxy><span class="esc-w" style="--i:3">Galaxy</span></span>
@@ -383,9 +383,9 @@ const VENTANAS = [
     </section>
     </Fragment>)}
     {ESC && (
-      <p class="pulso-linea esc-pulso" aria-label="Pulso de la comunidad">
+      <p class:list={['pulso-linea esc-pulso', FX.pulido && 'pulido']} aria-label="Pulso de la comunidad">
         {[['jugadores', 'fichas', 'database/'], ['comunidad', 'registrados', 'database/'], ['hosts', 'hosts listos', 'duelos/'], ['retos', 'retos abiertos', 'duelos/']].map(([id, txt, href]) => (
-          <a href={`${base}${href}`}><b id={`pulso-${id}`}>—</b> {txt}</a>
+          <a href={`${base}${href}`}><b id={`pulso-${id}`}>{FX.pulido ? '' : '—'}</b> {txt}</a>
         ))}
       </p>
     )}

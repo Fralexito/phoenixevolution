@@ -708,6 +708,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Arreglo (`styles/prof3d.css`): el «hundirse» solo en tarjetas que son ellas mismas un botón o enlace (`:is(a, button, [role="button"])[data-p3]:active`). Se quitó la regla de presión del modo suave.
 - Medido en Liga: la flecha se mueve 0 px mientras se presiona; el clic avanza la racha (5–9 → 3–7). Probado también en el navegador de la PC de Fralex. Pruebas 443. Build 45.
 
+### Ronda 246 — Repaso de la portada con la skill taste (FX.pulido)
+- Fralex invocó /taste sin más indicación: se revisó la portada actual (4 ventanas) contra la lista de «señales de IA» de taste.
+- Bien de partida: sin íconos de relleno, sin rayas largas en textos, un solo punto «·» por línea, identidad cian/púrpura intacta (protegida en CLAUDE.md).
+- Arreglado tras `FX.pulido`: (1) las cifras del pulso ya no muestran «—» mientras cargan (barrita quieta) y la que no se puede leer se oculta; si fallan todas, la línea desaparece (`js/pages/central.js`, `ocultarCifra`); (2) esa línea flotaba sola entre dos huecos de 64 px: ahora queda a 24 px de «Campeones vigentes», como su pie; (3) en celular el texto chico de cada ventana usa 2 líneas en vez de cortarse con «…» (`styles/pulido.css`).
+- Pendiente de Fralex: rayitas de color junto al nombre de cada ventana (quitar / línea arriba / solo al interactuar). Pruebas 443. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
