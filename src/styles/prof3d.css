@@ -1,0 +1,70 @@
+/* CAPA 3D DE TODA LA WEB (FX.prof3d, ronda 242). Se activa con html[data-fx-3d]; con la bandera en false este archivo no hace nada.
+   Pedido de Fralex: «movimiento 3D en todos lados», FUERTE PERO ORDENADO.
+   Regla: nada de esto se mueve solo; todo responde a lo que haces (bajar, mover el mouse, presionar, cambiar de página).
+   Solo transform / opacity / filter. Respeta «menos movimiento» (del sistema y de los ajustes de la web).
+   No toca lo protegido: cabecera, ticker, barras laterales, botones flotantes (todo eso está fuera de <main>) ni las pestañas cápsula.
+   Piezas:
+   1. AL BAJAR   cada sección aparece levantándose en 3D (desde abajo, inclinada y desenfocada) y sus tarjetas, una tras otra.
+   2. AL SALIR   la sección que sale por arriba se inclina hacia atrás y se aleja (navegadores compatibles).
+   3. MOUSE      tarjetas y paneles se inclinan hacia el mouse (lo grande, menos). Lo calcula js/features/prof3d.js.
+   4. PRESIONAR  la tarjeta se hunde un poco.
+   5. PÁGINA     al cambiar de página, la vieja se aleja y la nueva llega desde cerca (como moverse por el espacio). */
+
+:root { --p3-ease: cubic-bezier(.22, 1, .36, 1); }
+
+/* 1 · Aparición 3D al bajar (usa el sistema [data-reveal]/.visto de features/reveal.js) */
+html[data-fx-3d][data-fx-reveal].js main [data-reveal] { transform-origin: 50% 0%;
+  transition: opacity .7s ease, transform .95s var(--p3-ease), filter .7s ease; }
+html[data-fx-3d][data-fx-reveal].js main [data-reveal]:not(.visto) { opacity: 0; filter: blur(5px); transform: perspective(1200px) translate3d(0, 56px, -90px) rotateX(13deg); }
+html[data-fx-3d][data-fx-reveal].js main [data-reveal].visto { opacity: 1; filter: none; transform: none; }
+
+/* …y las tarjetas de adentro se levantan una tras otra (las demoras por posición vienen de dopamina.css) */
+@keyframes p3-tarjeta { from { opacity: 0; transform: perspective(900px) translate3d(0, 34px, -40px) rotateX(-22deg); } }
+html[data-fx-3d] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org, .player-card, .accion, .liga-card) {
+  transform-origin: 50% 100%; animation: p3-tarjeta .75s var(--p3-ease) backwards; }
+
+/* «Unirme»: los pasos del camino también se levantan uno tras otro */
+html[data-fx-3d] .camino-paso { transform-origin: 50% 100%; animation: p3-tarjeta .8s var(--p3-ease) backwards; }
+html[data-fx-3d] .camino-paso:nth-child(1) { animation-delay: .15s; }
+html[data-fx-3d] .camino-paso:nth-child(2) { animation-delay: .25s; }
+html[data-fx-3d] .camino-paso:nth-child(3) { animation-delay: .35s; }
+html[data-fx-3d] .camino-paso:nth-child(4) { animation-delay: .45s; }
+html[data-fx-3d] .camino-paso:nth-child(n+5) { animation-delay: .55s; }
+
+/* 2 · Al salir por arriba: la cabecera de cada página y las secciones se inclinan hacia atrás y se alejan.
+   Solo navegadores con animaciones ligadas al scroll. Se excluyen las secciones con elementos «pegajosos» (sticky),
+   porque un giro en el contenedor los despegaría. La portada tiene su propio efecto ([data-portada]). */
+@supports (animation-timeline: view()) {
+  html[data-fx-3d] main > header:not([data-portada]) { transform-origin: 50% 100%; animation: p3-aleja linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+  html[data-fx-3d] main [data-reveal].visto:not(:has(.sticky, [class*="sticky"], .anclas)) { animation: p3-sale linear none; animation-timeline: view(); animation-range: exit 15% exit 100%; transform-origin: 50% 100%; }
+}
+@keyframes p3-aleja { to { opacity: .25; transform: perspective(1200px) translate3d(0, -1.5rem, -80px) rotateX(10deg); } }
+@keyframes p3-sale { to { opacity: .5; transform: perspective(1400px) translate3d(0, -.75rem, -50px) rotateX(6deg); } }
+
+/* 3 · Inclinación hacia el mouse (--p3x/--p3y y [data-p3] los pone js/features/prof3d.js; solo con mouse) */
+@media (hover: hover) and (pointer: fine) {
+  html[data-fx-3d] main :is(.glass-panel, .liga-card, .player-card, .match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido, .accion, .campeones, .cierre, [data-pub], .cat-item, .lanza) {
+    transition: transform .5s var(--p3-ease), box-shadow .5s var(--p3-ease), border-color .25s; }
+  html[data-fx-3d] main [data-p3] { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, -3px, 0); transition-duration: .14s, .4s, .25s;
+    box-shadow: 0 22px 44px -22px rgb(0 0 0 / .75), 0 0 0 1px color-mix(in srgb, var(--color-galaxy-400) 16%, transparent); }
+  /* 4 · Presionar: se hunde un poco (mantiene la inclinación) */
+  html[data-fx-3d] main [data-p3]:active { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, 0, 0) scale(.985); transition-duration: .1s; }
+}
+/* Tema Sudario: el borde que se enciende es dorado */
+html[data-tema='sudario'][data-fx-3d] main [data-p3] { box-shadow: 0 22px 44px -22px rgb(0 0 0 / .75), 0 0 0 1px rgb(245 197 66 / .22); }
+
+/* 5 · Cambio de página en 3D (View Transitions; si el navegador no las tiene, la página cambia normal) */
+@keyframes p3-pag-sale { to { opacity: 0; transform: perspective(1400px) translate3d(0, 0, -140px) rotateX(3deg); } }
+@keyframes p3-pag-entra { from { opacity: 0; transform: perspective(1400px) translate3d(0, 22px, 90px) rotateX(-3deg); } }
+:root[data-fx-3d]::view-transition-old(root) { animation: p3-pag-sale .26s cubic-bezier(.4, 0, 1, 1) both; }
+:root[data-fx-3d]::view-transition-new(root) { animation: p3-pag-entra .42s var(--p3-ease) both; }
+
+/* «Menos movimiento»: todo queda quieto y visible */
+@media (prefers-reduced-motion: reduce) {
+  html[data-fx-3d] main [data-reveal], html[data-fx-3d] main [data-reveal]:not(.visto) { opacity: 1; filter: none; transform: none; transition: none; }
+  html[data-fx-3d] :is(.camino-paso, [data-reveal].visto *, main > header) { animation: none !important; }
+  html[data-fx-3d] main [data-p3], html[data-fx-3d] main [data-p3]:active { transform: none; }
+  :root[data-fx-3d]::view-transition-old(root), :root[data-fx-3d]::view-transition-new(root) { animation: none; }
+}
+html[data-fx-3d][data-aj-mov-efectivo='reducido'] main [data-reveal] { opacity: 1 !important; filter: none !important; transform: none !important; transition: none !important; }
+html[data-fx-3d][data-aj-mov-efectivo='reducido'] :is(.camino-paso, [data-reveal].visto *, main > header) { animation: none !important; }

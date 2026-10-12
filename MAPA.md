@@ -670,6 +670,20 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Medido cada 25 ms: el borde de arriba del nuevo coincide con el de abajo del viejo en todo momento (diferencia ≤ 1 px por redondeo).
 - Archivos: `styles/ventanas.css`, `styles/ventanas3d.css` (sin las reglas de giro), `js/features/ventanas.js`. Pruebas 437. Build 45.
 
+### Ronda 242 — CAPA 3D EN TODA LA WEB (FX.prof3d)
+- Fralex: «quiero algo súper completo y dinámico, movimiento 3D en todos lados». Eligió: **todas las páginas** y **fuerte pero ordenado** (nada se mueve solo; todo responde a la persona).
+- Bandera nueva **`FX.prof3d`** → `html[data-fx-3d]` (Layout). `false` = la web como antes. Comprobado en el build.
+- Piezas:
+  1. **Al bajar**: las secciones (`[data-reveal]` de `features/reveal.js`) aparecen levantándose en 3D (desde abajo, inclinadas, desenfocadas); sus tarjetas se levantan una tras otra (demoras de `dopamina.css`). En «Unirme», los pasos del camino también.
+  2. **Al salir por arriba**: la cabecera de cada página (`main > header`, menos la portada) y las secciones se inclinan hacia atrás y se alejan (animación ligada al scroll). Se excluyen secciones con elementos sticky (`:has(.sticky, [class*=sticky], .anclas)`).
+  3. **Mouse** (`js/features/prof3d.js`, lógica en `js/core/inclinacion.js` con pruebas): tarjetas y paneles (`.glass-panel`, `.liga-partido`, `.player-card`, `.match-card`, `.liga-card`, `.accion`, `.campeones`, …) se inclinan hacia el mouse; ±8° lo chico, ±1–2° lo ancho. Un listener, un cálculo por cuadro. Solo dentro de `<main>`; fuera las 4 ventanas de la portada, las pestañas cápsula, ventanas emergentes y `[data-no3d]`; no se inclina el panel donde estás escribiendo.
+  4. **Presionar**: se hunde un poco.
+  5. **Cambio de página**: View Transition en 3D (la vieja se aleja, la nueva llega desde cerca).
+- Protegido sin tocar: cabecera, ticker, barras laterales, Red de enlaces, botones de historial/En vivo (todo fuera de `<main>`) y el estilo de las pestañas cápsula.
+- «Menos movimiento» (sistema o ajustes): todo quieto y visible.
+- Revisado en 9 páginas (portada, liga, duelos, database, noticias, tienda, unirme, torneos, palmarés): 0 errores; la mancha borrosa junto al logo al bajar es el ticker escondiéndose (igual sin la capa).
+- Archivos: `styles/prof3d.css`, `js/features/prof3d.js`, `js/core/inclinacion.js`, `tests/inclinacion.test.mjs`, `js/boot.js`, `layouts/Layout.astro`, `styles/global.css`, `data/experimento.js`, `CLAUDE.md`. Pruebas 439. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

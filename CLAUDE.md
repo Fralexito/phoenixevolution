@@ -29,6 +29,7 @@ Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sud
 - Lo raro o celebratorio (reaccionar, publicar, ganar) puede ser más juguetón (`--ease-pop`, ráfagas). El usuario quiere la web lo más «dopamínica» posible, mientras no pierda la identidad.
 - Los efectos de hover con movimiento solo con mouse (`@media (hover: hover)`); `prefers-reduced-motion` siempre respetado.
 - La capa vive tras la bandera `FX.dopamina` (`styles/dopamina.css`, `js/features/dopamina.js`); si algo no gusta, se apaga ahí.
+- Capa 3D de toda la web tras `FX.prof3d` (`styles/prof3d.css`, `js/features/prof3d.js`, ronda 242): aparición 3D al bajar, inclinación al salir, tarjetas que se inclinan hacia el mouse (lo grande, menos), presión y cambio de página en 3D. Regla de Fralex: **fuerte pero ordenado — nada se mueve solo, todo responde a la persona**. Solo actúa dentro de `<main>`; para excluir algo, `data-no3d`. Prioridades permanentes: dinamismo, suavidad, animaciones visuales y cero desorden.
 
 ## Diferido por el usuario
 Webhook/bot de Discord, pasarela de pago, pruebas de clanes. El cumplimiento legal de monetización y escudos es responsabilidad del usuario.
