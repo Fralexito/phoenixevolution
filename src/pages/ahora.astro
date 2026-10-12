@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import MarcadorVivo from '../components/MarcadorVivo.astro';
 const base = import.meta.env.BASE_URL;
 ---
 <Layout title="Ahora mismo" active="ahora">
@@ -9,6 +10,7 @@ const base = import.meta.env.BASE_URL;
         <p class="text-gray-300 text-xs mt-0.5">Todo lo que está pasando en la comunidad, en una sola pantalla. Se actualiza solo.</p></div>
       <div id="ah-cifras" class="flex flex-wrap gap-2 text-xs"></div>
     </header>
+    <MarcadorVivo titulo="Partidos en juego" id="liga-vivo-ahora" tablero="auto" />
     <div id="ah-racha" hidden></div>
     <div class="grid lg:grid-cols-3 gap-4 items-start">
       <div class="lg:col-span-2 space-y-4">
