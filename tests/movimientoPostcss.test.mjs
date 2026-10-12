@@ -29,3 +29,11 @@ test('movimiento: el plugin desarma el @media y deja las keyframes igual', async
   assert.match(r, /@media \(max-width: 1px\)/);
   assert.doesNotMatch(r, /prefers-reduced-motion/);
 });
+
+test('movimiento: protege animation-timeline para que el minificador no lo funda en un shorthand inválido', async () => {
+  const { protegerTimeline } = await import('../tools/movimiento-postcss.mjs');
+  assert.equal(protegerTimeline('view(inline)'), 'var(--pes-tl, view(inline))');
+  assert.equal(protegerTimeline('view()'), 'var(--pes-tl, view())');
+  assert.equal(protegerTimeline('auto'), 'auto');
+  assert.equal(protegerTimeline('var(--x)'), 'var(--x)');
+});

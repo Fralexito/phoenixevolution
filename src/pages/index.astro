@@ -365,6 +365,20 @@ const VENTANAS = [
 
   <div class:list={["max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full", FX.limpio ? "space-y-12 sm:space-y-16" : "space-y-8 sm:space-y-10"]}>
 
+    {FX.carruseles && (<Fragment>
+    <!-- CARTAS DE LA GALAXY (FX.carruseles, ronda 252): carrusel 3D con las cartas de los jugadores, justo bajo las 4 ventanas.
+         Reemplaza a «Jugadores destacados». Lo llena js/pages/central.js (renderCartas); se mueve con flechas, dedo o arrastre. -->
+    <section id="cartas-seccion" class="space-y-2 scroll-mt-40" aria-labelledby="cartas-t">
+      <div class="cartas-cab">
+        <div><h2 id="cartas-t">Cartas de la Galaxy</h2><p>Todos los jugadores con su carta y sus estadísticas. Toca una para ver su perfil.</p></div>
+        <a href={`${base}database/`} class="cartas-ver">Ver todas las cartas <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div id="cartas-carrusel" data-carrusel="3d" aria-label="Cartas de jugadores: usa las flechas para moverte">
+        {[0, 1, 2, 3, 4].map(() => <div class="esqueleto carta-esq" aria-hidden="true"></div>)}
+      </div>
+    </section>
+    </Fragment>)}
+
     {ELITE && (<Fragment>
     <!-- CAMPEONES VIGENTES (FX.elite): la pared de trofeos de la entrada. Datos: data/palmares.js (PODIO). -->
     <section class:list={['campeones', FC && 'campeones-fc']} aria-labelledby="campeones-t">
@@ -410,7 +424,7 @@ const VENTANAS = [
       <a href="#central-partidos"><i class="fa-solid fa-futbol"></i>Partidos</a>
       <a href="#pos-seccion"><i class="fa-solid fa-trophy"></i>Posiciones</a>
       <a href="#rank-liga"><i class="fa-solid fa-ranking-star"></i>Estadísticas</a>
-      <a href="#destacados-seccion"><i class="fa-solid fa-id-card"></i>Jugadores</a>
+      <a href={FX.carruseles ? "#cartas-seccion" : "#destacados-seccion"}><i class="fa-solid fa-id-card"></i>Jugadores</a>
       {FX.highlightsDemo && <a href="#highlights"><i class="fa-solid fa-video"></i>Highlights</a>}
     </nav>)}
 
@@ -507,7 +521,7 @@ const VENTANAS = [
     <!-- fin del grupo «Ahora en la liga» -->
 
     <!-- 4. JUGADORES DESTACADOS: en celular, carrusel que se desliza de lado -->
-    <section id="destacados-seccion" class="space-y-4 scroll-mt-40">
+    <section id="destacados-seccion" class="space-y-4 scroll-mt-40" hidden={FX.carruseles}>
       <div class="flex items-center justify-between">
         <h2 class="text-lg sm:text-xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
         <a href={`${base}database/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1.5 border border-galaxy-400/30 bg-galaxy-400/10 px-3 py-1.5 rounded hover:bg-galaxy-400/20 transition-colors">Ver todos <i class="fa-solid fa-arrow-right"></i></a>

@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { FX } from '../data/experimento.js';
 ---
 <Layout title="Creadores" active="creadores">
   <div class="max-w-6xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
@@ -9,7 +10,7 @@ import Layout from '../layouts/Layout.astro';
       <button type="button" id="cr-yo" hidden class="btn btn-primary !min-h-10"><i class="fa-solid fa-circle-check"></i> <span>Quiero ser creador</span></button>
     </header>
     <section id="cr-panel" hidden class="glass-panel rounded-2xl p-4"></section>
-    <div id="cr-lista" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"><p class="text-xs text-gray-400">Cargando…</p></div>
+    <div id="cr-lista" class:list={[FX.carruseles ? "cr-carru" : "grid sm:grid-cols-2 lg:grid-cols-3 gap-3"]} data-carrusel={FX.carruseles ? "" : undefined} aria-label="Creadores"><p class="text-xs text-gray-400">Cargando…</p></div>
   </div>
 </Layout>
 <script>

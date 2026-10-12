@@ -33,10 +33,22 @@ function convertir(nodo, tipo) {
   if (nodo.nodes) nodo.nodes.forEach((n) => convertir(n, tipo));                        // @supports, @media anidados…
 }
 
+// Ronda 252: el optimizador final (lightningcss, dentro de Tailwind) junta «animation: …» + «animation-timeline: view()» en UN
+// solo «animation: … view()», que los navegadores NO aceptan: se perdían en silencio todas las animaciones ligadas al scroll.
+// Envolver el valor en var() con respaldo impide esa fusión y el navegador usa el respaldo igual:
+//   animation-timeline: view(inline)  →  animation-timeline: var(--pes-tl, view(inline))
+export function protegerTimeline(valor) {
+  const v = String(valor).trim();
+  return /^var\(/.test(v) || /^(auto|none)$/i.test(v) ? v : `var(--pes-tl, ${v})`;
+}
+
 /** Plugin de PostCSS (Vite lo ejecuta sobre todo el CSS del sitio). */
 export default function movimientoSegunAjustes() {
   return {
     postcssPlugin: 'pes-movimiento-segun-ajustes',
+    Declaration: {
+      'animation-timeline'(decl) { decl.value = protegerTimeline(decl.value); },
+    },
     AtRule: {
       media(at) {
         const tipo = tipoMedia(at.params);

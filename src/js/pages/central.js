@@ -1,6 +1,7 @@
 // Página Central: partidos, posiciones y partido destacado REALES (edición en curso de data/ligaResultados.js), XI ideal (demo) y Top 3 REAL desde `jugadores`.
 import { supabase } from '../core/supabase.js';
 import { escapeHTML } from '../core/dom.js';
+import { href } from '../core/config.js';
 import { escudoDe, escudoHTML } from '../core/escudos.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { crearReplica } from '../features/replicaCarta.js';
@@ -254,6 +255,22 @@ renderDemo();
 pintarRachas(); avisoVisita();
 pintarEstado(); pintarRankings(); pintarGoleadores();
 renderFeatured();
+renderCartas();
+// ---- Cartas de la Galaxy (FX.carruseles, ronda 252): carrusel 3D de la portada, de mayor a menor media (OVR). Toca una carta → su perfil. ----
+async function renderCartas() {
+  const box = $('cartas-carrusel'); if (!box || !FX.carruseles) return;
+  try {
+    const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false }).limit(16);
+    if (error) throw error;
+    if (!data?.length) throw new Error('vacío');
+    box.innerHTML = data.map((j, i) => `<a class="carta-slot" href="${href(`jugador/?id=${encodeURIComponent(j.id)}`)}" aria-label="${escapeHTML(j.nombre)}: ver perfil">${playerCardHTML(j, i, { sizeClass: 'w-full' })}</a>`).join('');
+    // Empieza con la mejor carta al centro
+    requestAnimationFrame(() => { const c = box.firstElementChild; if (c) box.scrollLeft = 0; });
+  } catch (e) {
+    console.error('[central] cartas:', e);
+    box.closest('section').querySelector('.carru, [data-carrusel]')?.replaceWith(Object.assign(document.createElement('p'), { className: 'text-sm text-gray-500 py-6', textContent: 'No se pudieron cargar las cartas ahora. Míralas todas en «Jugadores».' }));
+  }
+}
 // Podio: el pase del mouse agranda por CSS; en celular (sin mouse) el toque agranda/encoge la carta. Un solo jugador agrandado a la vez.
 // En celular las tres cartas miden ≈ 105 px y el CSS oculta sus estadísticas (< 135 px): ahí el toque abre la RÉPLICA completa (features/replicaCarta.js),
 // con el ancho de una carta «normal», igual que en «Jugadores». Si las cartas son anchas (PC), se conserva el zoom por CSS de siempre.

@@ -745,6 +745,15 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Fuera de Identidad, la tarjeta de foto se achica a una línea. Movimiento: pestaña nueva y lo que se despliega llegan con un giro 3D corto; tarjetas se levantan un poco al pasar el mouse. Arreglo: en celular nada se sale por el costado.
 - Probado con sesión y perfil de host simulados (PC y celular). Pruebas 443. Build 45.
 
+### Ronda 252 — «Jugadores» casi principal + carruseles (FX.carruseles)
+- Fralex: la zona de jugadores (cartas y estadísticas) es de lo más relevante; pidió hacerla fácil de encontrar y más carruseles. «Hazlo todo».
+- Menú: «Jugadores» con botón propio (Competiciones · Jugadores · Jugar · Comunidad); sale de «Estadísticas». Barra lateral: Jugadores en el bloque Competiciones.
+- Portada: sección **Cartas de la Galaxy** justo bajo las 4 ventanas: carrusel 3D (la carta del centro de frente, las de los costados giran; ligado al desplazamiento de la fila, nada se mueve solo), las 16 de mayor media, toque → perfil del jugador, botón «Ver todas las cartas». Reemplaza «Jugadores destacados» (oculto con la bandera; el ancla «Jugadores» apunta a la nueva sección). `js/pages/central.js` → `renderCartas`.
+- Componente nuevo `js/features/carruseles.js` + `styles/carruseles.css` (`[data-carrusel]`, `="3d"` para la versión con giro): flechas, dedo, arrastre con mouse, teclas ← →, bordes que se desvanecen; se monta solo también en listas que se pintan después. OJO: `features/carrusel.js` (con avance automático) es OTRO componente y sigue igual.
+- Carruseles también en **Creadores** (`#cr-lista`) y en **Resultados** del perfil de jugador. No se puso en Palmarés (solo 3 trofeos) ni en Noticias (choca con «Acomodar»).
+- ARREGLO IMPORTANTE (afecta a toda la web): lightningcss fundía `animation` + `animation-timeline: view()` en un shorthand inválido y TODAS las animaciones ligadas al scroll se perdían en producción (salida 3D de prof3d, alejarse de las ventanas, etc.). `tools/movimiento-postcss.mjs` ahora envuelve el valor en `var(--pes-tl, …)` (`protegerTimeline`, con prueba).
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

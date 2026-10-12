@@ -18,7 +18,7 @@ const SECCIONES = FX.reparto ? [
   { tit: 'Jugar ahora', items: busca(['duelos', 'ahora', 'missalas']).map((n) => n.id === 'ahora' ? { ...n, label: 'En vivo' } : n) },
   { tit: 'Comunidad', items: busca(['chatgeneral', 'creadores', 'eventos']) },
 ] : [{ tit: 'En vivo y comunidad', items: atajos }];
-const extraLigas = FX.reparto ? busca(['ranking']) : [];
+const extraLigas = FX.reparto ? busca(FX.carruseles ? ['database', 'ranking'] : ['ranking']) : [];
 ---
 <aside id="barra-lat" class="barra-lat" aria-label="Barra lateral" hidden>
   {SECCIONES.slice(0, 1).map((sec) => (

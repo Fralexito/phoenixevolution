@@ -77,7 +77,7 @@ function seccionEdicion(liga, ed, nombre) {
       <div class="grid sm:grid-cols-2 gap-4">${barra}${goles}</div>` : '<p class="text-sm text-gray-400">Aún no tiene partidos jugados en esta edición.</p>'}
     <div class="grid md:grid-cols-2 gap-5">
       <div>${tit('fa-clock-rotate-left', 'Resultados', ' <span class="text-gray-500 normal-case font-normal tracking-normal">· del más reciente</span>')}
-        ${c.jugados.length ? `<ul class="space-y-2">${[...c.jugados].reverse().map(fila).join('')}</ul>` : '<p class="text-sm text-gray-500">Sin resultados todavía.</p>'}</div>
+        ${c.jugados.length ? `<ul class="${FX.carruseles ? 'res-carru' : 'space-y-2'}" ${FX.carruseles ? 'data-carrusel aria-label="Resultados, del más reciente"' : ''}>${[...c.jugados].reverse().map(fila).join('')}</ul>` : '<p class="text-sm text-gray-500">Sin resultados todavía.</p>'}</div>
       <div>${tit('fa-calendar-days', 'Próximos partidos')}
         ${c.proximos.length ? `<ul class="space-y-2">${c.proximos.slice(0, 5).map((p) => `<li class="flex items-center gap-3 text-sm rounded-xl bg-black/25 border border-dashed border-amber-400/30 px-3 py-2"><span class="w-12 shrink-0 text-center"><span class="block text-[12px] uppercase text-gray-500 leading-none">Fecha</span><b class="font-display text-white">${p.n}</b></span><span class="flex-1 min-w-0">${rival(ed, p.rival)}</span><span class="shrink-0 text-[12px] uppercase text-amber-300 font-bold">${p.local ? 'Local' : 'Visita'}</span></li>`).join('')}</ul>` : '<p class="text-sm text-gray-500">No quedan partidos pendientes o el calendario aún no está confirmado.</p>'}</div>
     </div>

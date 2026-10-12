@@ -1,0 +1,58 @@
+/* CARRUSELES (FX.carruseles, ronda 252). Lógica en js/features/carruseles.js. Nada se mueve solo:
+   flechas, dedo, arrastre con mouse o teclas ← →. Las tarjetas se «imantan» al centro (scroll-snap). */
+.carru { position: relative; }
+.carru-pista { display: flex; gap: .9rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 1rem;
+  padding: .75rem .25rem 1rem; scrollbar-width: none; cursor: grab; outline: none; }
+.carru-pista::-webkit-scrollbar { display: none; }
+.carru-pista:focus-visible { box-shadow: inset 0 0 0 2px var(--color-galaxy-400); border-radius: 1rem; }
+.carru[data-arrastrando] .carru-pista { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+.carru-pista > * { flex: 0 0 var(--carru-ancho, min(80%, 18rem)); scroll-snap-align: center; min-width: 0; }
+
+/* Bordes que se desvanecen: se intuye que hay más a los costados */
+.carru:not([data-sin-scroll]) .carru-pista { mask-image: linear-gradient(90deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent); }
+
+/* Flechas: círculos de vidrio a los costados (solo con mouse; en celular se desliza con el dedo) */
+.carru-flecha { position: absolute; top: 50%; z-index: 3; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 999px;
+  border: 1px solid rgb(34 211 238 / .35); background: rgb(8 6 24 / .85); backdrop-filter: blur(8px); color: var(--color-galaxy-400);
+  transform: translateY(-50%); transition: opacity .2s, transform .18s cubic-bezier(.22, 1, .36, 1), background .2s; }
+.carru-ant { left: -.4rem; } .carru-sig { right: -.4rem; }
+.carru-flecha:hover { background: rgb(34 211 238 / .15); }
+.carru-flecha:active { transform: translateY(-50%) scale(.92); }
+.carru-flecha:disabled { opacity: 0; pointer-events: none; }
+.carru[data-sin-scroll] .carru-flecha { display: none; }
+@media (hover: none) { .carru-flecha { display: none; } }
+
+/* Variante 3D (cartas): la del centro de frente; las de los costados giran hacia adentro y se achican un poco.
+   Va ligada al desplazamiento de la propia fila (animation-timeline: view(inline)): solo se mueve cuando TÚ la mueves. */
+.carru-3d .carru-pista { --carru-ancho: clamp(11.5rem, 42vw, 14.5rem); gap: .4rem; padding-block: 1.5rem 2rem; perspective: 1100px; }
+.carru-3d .carru-pista > * { transform-style: preserve-3d; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes carru-cov {
+      0%   { transform: perspective(1100px) translate3d(0, 10px, -140px) rotateY(38deg); opacity: .45; filter: saturate(.6) brightness(.75); }
+      42%, 58% { transform: none; opacity: 1; filter: none; }
+      100% { transform: perspective(1100px) translate3d(0, 10px, -140px) rotateY(-38deg); opacity: .45; filter: saturate(.6) brightness(.75); }
+    }
+    .carru-3d .carru-pista > * { animation: carru-cov linear both; animation-timeline: view(inline); }
+  }
+}
+
+/* Encabezado de la sección de cartas de la portada */
+.cartas-cab { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .75rem 1.5rem; }
+.cartas-cab h2 { font: 800 clamp(1.4rem, 3vw, 2rem)/1.05 var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: #fff; }
+.cartas-cab p { margin-top: .35rem; font-size: .85rem; color: #9ca3af; }
+.cartas-ver { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.1rem; border-radius: 999px; border: 1px solid rgb(34 211 238 / .4);
+  background: rgb(34 211 238 / .08); font: 700 .78rem var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--color-galaxy-400);
+  transition: background .2s, transform .18s cubic-bezier(.22, 1, .36, 1); }
+.cartas-ver:hover { background: rgb(34 211 238 / .16); }
+.cartas-ver:active { transform: scale(.97); }
+.carta-slot { display: block; border-radius: 1rem; outline: none; }
+.carta-slot:focus-visible { box-shadow: 0 0 0 2px var(--color-galaxy-400); }
+.carta-esq { height: 19rem; border-radius: 1rem; }
+
+/* Listas que pasan a carrusel: tarjetas de ancho fijo */
+.carru-pista.cr-carru > * { --carru-ancho: min(85%, 20rem); }
+.carru-pista.res-carru { list-style: none; margin: 0; }
+.carru-pista.res-carru > * { --carru-ancho: min(85%, 17rem); }
+.carru-pista > p { flex-basis: 100%; }
+.carru-3d .carru-pista { padding-inline: calc(50% - var(--carru-ancho) / 2); }

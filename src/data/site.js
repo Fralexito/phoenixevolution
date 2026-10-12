@@ -133,8 +133,10 @@ const PILARES_REPARTO = [
   conBloques('competir', 'Competiciones', 'fa-trophy', [
     ['Compite', ['liga>competiciones', 'torneos', 'palmares', 'formatos',
       { id: 'crear', label: 'Crear liga o torneo', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos' }]],
-    ['Estadísticas', ['historial', 'ranking', 'database']],
+    ['Estadísticas', ['historial', 'ranking', ...(FX.carruseles ? [] : ['database'])]],
   ], { lema: 'Ligas, torneos y campeones' }),
+  // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
+  ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
     ['Tu club', ['manager>mercado', 'miclub']],
