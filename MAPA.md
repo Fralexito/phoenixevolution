@@ -546,6 +546,17 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Archivos: `styles/elite.css`, `js/features/elite.js`, `js/core/pase.js`, `tests/pase.test.mjs`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
 - Pruebas: 423 (4 nuevas). Build 45 páginas. Revisado a 1440 (con y sin columna de contactos) y 390 px, como visitante y con una sesión simulada.
 
+### Ronda 229 — PRUEBA: portada «transmisión» (FX.transmision)
+- Bandera nueva **`FX.transmision`** (`data/experimento.js`), ENCIMA de `FX.elite`. `false` = vuelve la portada de la ronda 228 (pase del líder / de miembro). Comprobado en el build. Fralex: «que no parezca IA, que transmita emoción, minimalista y muy dinámica».
+- **Titulares reales que rotan** (`js/core/titulares.js`, con pruebas): salen de `ligaResultados.js` al construir la web. Hoy: «Bienvenido a la Galaxy», «Victor sigue invicto. ¿Quién lo baja?», «Victor le metió 9 a Roberto. Goleada en la fecha 8.», «Beto ganó sus últimos 8. Viene encendido.», «Solo 3 puntos separan al primero del segundo.». Se actualizan solos al cargar resultados.
+- Cada titular trae **el marcador que lo respalda** (escudos, resultado o VS, «Fecha N · Final/Próximo») con el escudo del protagonista grande y tenue detrás. «La cima» muestra 1.º y 2.º con sus puntos.
+- **Movimiento con sentido**: las palabras entran de abajo y salen hacia arriba; el marcador entra después; los goles suben uno tras otro. **Barritas de progreso** (como historias): marcan cuándo cambia, se pueden tocar, y las ya vistas quedan marcadas. Botón de pausa. Se pausa con el mouse encima, con el foco del teclado y con la pestaña oculta. Con «menos movimiento» (sistema o ajuste de la web) no rota sola.
+- **Línea de estado** arriba: «Galaxy League · fecha 9 en juego» con punto verde que late (solo si la fecha está en juego). Con sesión: «Hola, Fralex · 10.º · próximo: Morgado».
+- **Accesos en texto** (sin tarjetas): título, flecha y línea fina que se dibuja al pasar el mouse. «¿Qué quieres hacer?» en tipografía normal (sin etiqueta en mayúsculas).
+- **Video de fondo opcional**: `data/portada.js` (`clip`, `poster`, `segundos`). Archivo en `public/portada/`. Solo en pantallas ≥ 768 px y sin «menos movimiento».
+- Archivos: `js/core/titulares.js`, `tests/titulares.test.mjs`, `js/features/transmision.js`, `styles/transmision.css`, `data/portada.js`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
+- Pruebas: 426 (3 nuevas). Build 45 páginas. Revisado a 1440 y 390 px, como visitante y con sesión simulada; avance automático y pausa probados.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

@@ -1,0 +1,119 @@
+/* PRUEBA · Portada «transmisión» (FX.transmision, ronda 229). Va encima de elite.css; si FX.transmision = false, nada de esto se pinta.
+   Idea: minimalista y con movimiento que CUENTA algo (titulares reales que entran palabra por palabra, el marcador que los respalda,
+   la barrita que marca cuándo cambia). Casi sin cajas: letra grande, líneas finas y aire. Solo colores de tokens.css. */
+
+/* ── Fondo: video opcional (data/portada.js) muy tenue, que se funde con la página ── */
+.tx-video { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; opacity: .2; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 92%); mask-image: linear-gradient(to bottom, #000 30%, transparent 92%); }
+@media (max-width: 767px) { .tx-video { display: none; } }
+
+.tx { position: relative; z-index: 1; display: grid; gap: 1.1rem; width: 100%; max-width: 72rem; margin-inline: auto; padding-top: .5rem; text-align: left; }
+
+/* Línea de estado: «Galaxy League · fecha 9 en juego» (o el saludo con sesión). El punto late solo si la fecha está en juego. */
+.tx-estado { display: inline-flex; align-items: center; gap: .6rem; min-width: 0; font: 600 .8rem var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: #c3c7d0; }
+.tx-estado span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-punto { flex-shrink: 0; width: .5rem; height: .5rem; border-radius: 999px; background: var(--color-galaxy-400); }
+.tx-punto-vivo { position: relative; background: var(--color-ok); }
+
+/* ── Titulares: todos apilados en la misma celda (la altura es la del más alto: nunca salta) ── */
+.tx-fila { display: grid; gap: 1.5rem; align-items: end; }
+@media (min-width: 1024px) { .tx-fila { grid-template-columns: minmax(0, 1fr) minmax(18rem, 23rem); gap: clamp(2rem, 4vw, 4rem); } }
+.tx-titulares { display: grid; container-type: inline-size; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .005em; line-height: .98; color: #fff; }
+.tx-slide { grid-area: 1 / 1; align-self: end; display: block; font-size: clamp(2.35rem, 9.2cqi, 6.25rem); text-wrap: balance; }
+.tx-slide:not([data-on]):not([data-sale]) { visibility: hidden; }
+.tx-l1, .tx-l2 { display: block; }
+.tx-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+.tx-w > span { display: inline-block; }
+.tx-l2 .tx-w > span { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; }
+
+/* ── Marcador que respalda el titular ── */
+.tx-marcadores { display: grid; }
+.tx-marcador { grid-area: 1 / 1; position: relative; overflow: hidden; isolation: isolate; padding: 1.1rem 1.2rem 1.2rem; border-radius: 1rem; border: 1px solid var(--color-galaxy-border);
+  background: rgb(7 2 13 / .6); backdrop-filter: blur(10px); }
+.tx-marcador::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-600)); }
+.tx-marcador:not([data-on]) { visibility: hidden; opacity: 0; }
+.tx-fondo { position: absolute; z-index: -1; right: -3.5rem; top: 50%; transform: translateY(-50%); opacity: .07; pointer-events: none; }
+.tx-fondo img { width: 15rem; height: 15rem; object-fit: contain; filter: saturate(.6); }
+.tx-m-etq { display: flex; justify-content: space-between; font: 700 .75rem var(--font-display); letter-spacing: .2em; text-transform: uppercase; color: #9ca3af; }
+.tx-m-etq span { color: var(--color-galaxy-400); }
+.tx-m-fila { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: 'a r b'; align-items: center; gap: .75rem; margin-top: .9rem; }
+.tx-m-eq { grid-area: a; min-width: 0; display: grid; justify-items: start; gap: .3rem; }
+.tx-m-der { grid-area: b; justify-items: end; text-align: right; }
+.tx-m-esc { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 999px; background: rgb(0 0 0 / .4); border: 1px solid rgb(255 255 255 / .08); }
+.tx-m-eq b { max-width: 100%; font: 700 1.15rem/1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-m-eq small { max-width: 100%; font-size: .75rem; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-pierde b { color: #9ca3af; }
+.tx-m-res { grid-area: r; display: flex; align-items: center; gap: .55rem; font: 700 2.75rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.tx-m-res i { width: .6rem; height: 2px; background: #4b5563; }
+.tx-m-res > span { display: inline-block; }
+.tx-vs { font-size: 1.35rem; letter-spacing: .25em; color: #9ca3af; }
+.tx-m-cima { display: grid; gap: .55rem; margin-top: .9rem; }
+.tx-m-cima-fila { display: grid; grid-template-columns: 1.25rem auto minmax(0, 1fr) auto; align-items: center; gap: .7rem; }
+.tx-m-cima-fila .tx-m-esc { width: 2.2rem; height: 2.2rem; }
+.tx-m-pos { font: 700 .9rem var(--font-display); color: #6b7280; }
+.tx-m-cima-fila b { font: 700 1.15rem var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-m-pts { font: 700 1.6rem var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+
+/* ── Barritas de progreso (como historias) + pausa ── */
+.tx-control { display: flex; align-items: center; gap: .6rem; }
+.tx-segs { display: flex; gap: .15rem; }
+.tx-seg { display: grid; align-items: center; width: 2.75rem; height: 1.5rem; padding: 0; border: 0; background: none; cursor: pointer; }
+.tx-seg i { position: relative; display: block; height: 3px; border-radius: 3px; overflow: hidden; background: rgb(255 255 255 / .14); }
+.tx-seg i::after { content: ''; position: absolute; inset: 0; background: var(--color-galaxy-400); transform: scaleX(0); transform-origin: left; }
+.tx-seg[aria-current] i::after { transform: scaleX(1); }
+.tx-seg[data-hecho] i::after { transform: scaleX(1); opacity: .45; }
+.tx-seg:hover i { background: rgb(255 255 255 / .28); }
+.tx-seg:focus-visible, .tx-pausa:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; border-radius: 4px; }
+.tx-pausa { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .12); background: none; color: #9ca3af; font-size: .75rem; cursor: pointer; transition: color .15s, border-color .15s; }
+.tx-pausa:hover { color: #fff; border-color: rgb(255 255 255 / .3); }
+
+/* ── Accesos en texto (sin tarjetas): solo líneas finas ── */
+.portada-tx .mundos-tit { font: 600 1.05rem var(--font-display); letter-spacing: .04em; text-transform: none; color: #e5e7eb; }
+.portada-tx .mundo-lema { margin-bottom: .4rem; }
+.tx-links { display: grid; grid-template-columns: minmax(0, 1fr); text-align: left; }
+@media (min-width: 640px) { .tx-links { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 1.5rem; } }
+.tx-link { position: relative; display: grid; gap: .2rem; padding: .85rem .1rem .9rem; border-top: 1px solid var(--color-galaxy-border); }
+.tx-link::after { content: ''; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--color-galaxy-400); transform: scaleX(0); transform-origin: left; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+.tx-link b { display: flex; align-items: center; gap: .55rem; font: 700 1.05rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; transition: color .15s; }
+.tx-link b i { font-size: .75rem; color: #6b7280; transition: transform .2s cubic-bezier(.22,1,.36,1), color .15s; }
+.tx-link small { font-size: .8rem; color: #9ca3af; }
+.tx-link-prim b { color: var(--color-galaxy-400); }
+.tx-link:hover::after, .tx-link:focus-visible::after { transform: scaleX(1); }
+.tx-link:hover b, .tx-link:focus-visible b { color: var(--color-galaxy-400); }
+.tx-link:hover b i { transform: translateX(4px); color: var(--color-galaxy-400); }
+
+/* ── Movimiento (solo si nadie pidió menos movimiento: ni el sistema ni el ajuste de la web) ── */
+@media (prefers-reduced-motion: no-preference) {
+  .portada-tx .tx:not([data-quieto]) .tx-w > span { transform: translateY(108%); transition: transform .75s cubic-bezier(.22,1,.36,1); transition-delay: calc(var(--i) * 55ms); }
+  .portada-tx .tx:not([data-quieto]) .tx-slide[data-on] .tx-w > span { transform: none; }
+  .portada-tx .tx:not([data-quieto]) .tx-slide[data-sale] .tx-w > span { transform: translateY(-108%); transition-duration: .5s; transition-delay: calc(var(--i) * 25ms); }
+  .portada-tx .tx:not([data-quieto]) .tx-slide:not([data-on]):not([data-sale]) .tx-w > span { transition: none; }
+  /* Al cargar, la primera frase también entra palabra por palabra */
+  .portada-tx .tx:not([data-quieto]) .tx-slide[data-on] .tx-w > span { animation: tx-sube .8s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--i) * 60ms + .1s); }
+  .portada-tx .tx:not([data-quieto]) .tx-marcador { transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.22,1,.36,1), visibility .45s; }
+  .portada-tx .tx:not([data-quieto]) .tx-marcador:not([data-on]) { transform: translateY(12px); }
+  .portada-tx .tx:not([data-quieto]) .tx-marcador[data-on] { transition-delay: .2s; }
+  .portada-tx .tx:not([data-quieto]) .tx-marcador[data-on] .tx-m-res > span { animation: tx-sube .55s cubic-bezier(.22,1,.36,1) .35s both; }
+  .portada-tx .tx:not([data-quieto]) .tx-marcador[data-on] .tx-m-res > span:last-child { animation-delay: .45s; }
+  .portada-tx .tx:not([data-quieto]) .tx-marcador[data-on] .tx-fondo { animation: tx-fondo 9s ease-out both; }
+  .tx-punto-vivo::after { content: ''; position: absolute; inset: -4px; border-radius: inherit; border: 2px solid var(--color-ok); animation: tx-late 1.8s ease-out infinite; }
+  /* La barrita se llena en el tiempo de cada titular; al terminar, js/features/transmision.js pasa al siguiente */
+  .tx:not([data-quieto]) .tx-seg[aria-current] i::after { animation: tx-llena var(--tx-seg, 6s) linear both; }
+  .tx[data-pausa] .tx-seg[aria-current] i::after { animation-play-state: paused; }
+  .mundo-panel:not([hidden]) .tx-link { animation: portada-entra .3s cubic-bezier(.22,1,.36,1) both; }
+  .mundo-panel:not([hidden]) .tx-link:nth-child(2) { animation-delay: 45ms; }
+  .mundo-panel:not([hidden]) .tx-link:nth-child(3) { animation-delay: 90ms; }
+}
+.tx[data-quieto] .tx-pausa { display: none; }
+@keyframes tx-sube { from { transform: translateY(108%); } to { transform: none; } }
+@keyframes tx-llena { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes tx-late { from { opacity: .8; transform: scale(.6); } to { opacity: 0; transform: scale(1.6); } }
+@keyframes tx-fondo { from { transform: translateY(-50%) scale(1.15) rotate(-4deg); } to { transform: translateY(-50%) scale(1) rotate(0); } }
+
+/* ── Celular ── */
+@media (max-width: 1023px) {
+  .tx { gap: .9rem; }
+  .tx-estado { font-size: .75rem; letter-spacing: .14em; }
+  .tx-marcador { padding: .9rem 1rem 1rem; }
+  .tx-m-res { font-size: 2.25rem; }
+}

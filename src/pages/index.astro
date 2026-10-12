@@ -10,12 +10,26 @@ import { PODIO } from '../data/palmares.js';
 import { calcularTabla } from '../js/core/tabla.js';
 import { liderDe } from '../js/core/pase.js';
 import { escudoHTML } from '../js/core/escudos.js';
+import { titularesPortada, lineaEstado } from '../js/core/titulares.js';
+import { estadoLiga } from '../js/core/pulso.js';
+import { PORTADA } from '../data/portada.js';
 const base = import.meta.env.BASE_URL;
 // PRUEBA (FX.elite, ronda 228): portada «palco VIP». Va encima de FX.portada; si se apaga, vuelve la portada de la ronda 227.
 const ELITE = FX.limpio && FX.portada && FX.elite;
 const edGalaxy = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;
 const lider = liderDe(calcularTabla((edGalaxy?.fechas ?? []).flatMap((f) => f.partidos)).tabla);
 const liderClub = lider ? (edGalaxy?.clubes?.[lider.nombre] ?? '') : '';
+// PRUEBA (FX.transmision, ronda 229): portada tipo transmisión. Titulares REALES que rotan (core/titulares.js) + el marcador que los respalda.
+// Encima de FX.elite: si se apaga, vuelve la portada de la ronda 228.
+const TRANS = ELITE && FX.transmision;
+const clubesG = edGalaxy?.clubes ?? {};
+const tablaG = calcularTabla((edGalaxy?.fechas ?? []).flatMap((f) => f.partidos)).tabla.filter((t) => t.pj > 0);
+const TITULARES = TRANS ? titularesPortada(edGalaxy?.fechas ?? []) : [];
+const ESTADO = lineaEstado(estadoLiga(edGalaxy?.fechas ?? []));
+const palabras = (txt) => String(txt).split(' ').filter(Boolean);
+// Protagonista del marcador = el jugador que nombra el titular (su escudo va grande y tenue detrás).
+const prota = (t) => (t.partido ? [t.partido.l, t.partido.v].find((n) => t.lineas[0].includes(n)) ?? t.partido.l : tablaG[0]?.nombre ?? '');
+const urlPortada = (f) => (f ? `${base}portada/${f}` : '');
 // Campeones vigentes = el podio del Palmarés (edición terminada). El de liga (gold) va al centro.
 const CAMPEONES = PODIO.map((c) => ({ copa: c.copa, dt: c.dt, club: c.club, oro: Boolean(c.gold) }));
 // «¿Qué quieres hacer?»: las acciones más buscadas, a un clic desde Central. `invitado` = solo sin sesión; `cuenta` = solo con sesión (lo decide html[data-sesion]).
@@ -55,9 +69,61 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
-  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite']} data-portada>
+  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx']} data-portada>
     <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    {TRANS ? (<Fragment>
+    <!-- TRANSMISIÓN (FX.transmision): titulares reales que rotan + el marcador que los respalda. Lo mueve js/features/transmision.js.
+         Todos los titulares vienen en el HTML (uno visible); así la portada nunca salta de tamaño. -->
+    {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
+    <div class="tx" data-tx style={`--tx-seg:${PORTADA.segundos}s`}>
+      <p class="tx-estado"><span class:list={['tx-punto', ESTADO.vivo && 'tx-punto-vivo']} aria-hidden="true"></span><span data-tx-estado>{ESTADO.texto}</span></p>
+      <div class="tx-fila">
+        <h1 class="tx-titulares">
+          {TITULARES.map((t, i) => (
+            <span class="tx-slide" data-tx-slide data-on={i === 0 ? '' : undefined} aria-hidden={i === 0 ? undefined : 'true'}>
+              <span class="tx-l1">{palabras(t.lineas[0]).map((w, k) => (<Fragment><span class="tx-w"><span style={`--i:${k}`}>{w}</span></span>{' '}</Fragment>))}</span>
+              <span class="tx-l2">{palabras(t.lineas[1]).map((w, k) => (<Fragment><span class="tx-w"><span style={`--i:${k + palabras(t.lineas[0]).length}`}>{w}</span></span>{' '}</Fragment>))}</span>
+            </span>
+          ))}
+        </h1>
+        <div class="tx-marcadores">
+          {TITULARES.map((t, i) => (
+            <div class="tx-marcador" data-tx-marcador data-on={i === 0 ? '' : undefined} aria-hidden={i === 0 ? undefined : 'true'}>
+              <span class="tx-fondo" aria-hidden="true"><Fragment set:html={escudoHTML(clubesG[prota(t)] ?? '', 240)} /></span>
+              {t.partido ? (<Fragment>
+                <p class="tx-m-etq">Fecha {t.partido.fecha} <span>{t.partido.etiqueta}</span></p>
+                <div class="tx-m-fila">
+                  {[t.partido.l, t.partido.v].map((n, k) => (
+                    <span class:list={['tx-m-eq', k === 1 && 'tx-m-der', t.partido.gl !== null && ((k === 0 ? t.partido.gl > t.partido.gv : t.partido.gv > t.partido.gl) ? 'tx-gana' : 'tx-pierde')]}>
+                      <span class="tx-m-esc"><Fragment set:html={escudoHTML(clubesG[n] ?? '', 40)} /></span>
+                      <b>{n}</b><small>{clubesG[n] ?? ''}</small>
+                    </span>
+                  ))}
+                  <span class="tx-m-res">{t.partido.gl === null ? <span class="tx-vs">VS</span> : <Fragment><span>{t.partido.gl}</span><i></i><span>{t.partido.gv}</span></Fragment>}</span>
+                </div>
+              </Fragment>) : (<Fragment>
+                <p class="tx-m-etq">La cima <span>Puntos</span></p>
+                <div class="tx-m-cima">
+                  {tablaG.slice(0, 2).map((x, k) => (
+                    <span class="tx-m-cima-fila"><span class="tx-m-pos">{k + 1}</span><span class="tx-m-esc"><Fragment set:html={escudoHTML(clubesG[x.nombre] ?? '', 32)} /></span><b>{x.nombre}</b><span class="tx-m-pts">{x.pts}</span></span>
+                  ))}
+                </div>
+              </Fragment>)}
+            </div>
+          ))}
+        </div>
+      </div>
+      {TITULARES.length > 1 && (
+      <div class="tx-control">
+        <div class="tx-segs" role="group" aria-label="Elegir titular">
+          {TITULARES.map((t, i) => (<button type="button" class="tx-seg" data-tx-seg aria-label={`Titular ${i + 1} de ${TITULARES.length}`} aria-current={i === 0 ? 'true' : undefined}><i></i></button>))}
+        </div>
+        <button type="button" class="tx-pausa" data-tx-pausa aria-pressed="false" aria-label="Pausar titulares"><i class="fa-solid fa-pause"></i></button>
+      </div>
+      )}
+    </div>
+    </Fragment>) : (<Fragment>
     <div class:list={['flex items-center justify-center w-full', ELITE && 'elite-fila']}><div class:list={['max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-5', ELITE && 'elite-texto']}>
       <span data-saludo class="portada-sello inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
       {FX.portada ? (<Fragment>
@@ -104,6 +170,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
     </aside>
     </Fragment>)}
     </div>
+    </Fragment>)}
   <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
   {FX.limpio ? (
     <div class="relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
@@ -120,6 +187,13 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
         {MUNDOS.map((m) => (
           <div class="mundo-panel" role="tabpanel" id={`mundo-${m.id}`} aria-labelledby={`mundo-tab-${m.id}`} hidden={!m.abierto}>
             <p class="mundo-lema">{m.lema}</p>
+            {TRANS ? (
+            <div class="tx-links">
+              {m.acciones.map((a) => (
+                <a href={`${base}${a.href}`} class:list={['tx-link', a.primario && 'tx-link-prim']}><b>{a.titulo} <i class="fa-solid fa-arrow-right"></i></b><small>{a.txt}</small></a>
+              ))}
+            </div>
+            ) : (
             <div class="mundo-grid">
               {m.acciones.map((a) => (
                 <a href={`${base}${a.href}`} class:list={['accion', a.primario && 'accion-primaria']}>
@@ -127,6 +201,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
                 </a>
               ))}
             </div>
+            )}
           </div>
         ))}
       </section>
@@ -367,5 +442,6 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();
   import('../js/features/elite.js').then((m) => m.montarElite()).catch((e) => console.warn('[central] elite:', e));
+  import('../js/features/transmision.js').then((m) => m.montarTransmision()).catch((e) => console.warn('[central] transmisión:', e));
   document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));
 </script>
