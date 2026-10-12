@@ -869,6 +869,10 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Retiradas las banderas premiosVariedad, premiosGaleria, premiosSinIA y premiosGraficos y el archivo `features/premiosGraficos.js` (siguen en el historial de git: commits de las rondas 267–270). En `core/premios.js` quedan las funciones `tamanosMuro`, `historialJugador`, `puestosPorFecha` (con test) por si se reutilizan.
 - NUEVA REGLA de Fralex: usar JavaScript u otros lenguajes/recursos que aporten mucho a la web, siempre que no la sobrecarguen ni afecten el rendimiento. Lección: lo visual debe seguir el estilo vivo de la web (colores, brillo), no verse «técnico».
 
+## Ronda 272 — Premios: el voto MVP sale de la sala de trofeos
+- Fralex: el voto «rompe con el orden de sala». Sale del costado de «De toda la edición» y va en su propia franja al final («Vota tú · MVP de la afición»); en PC queda en una sola fila (título | ranking | elegir y votar).
+- Así los trofeos de la edición quedan en una malla limpia de 4 por fila en PC.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

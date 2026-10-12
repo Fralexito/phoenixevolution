@@ -127,3 +127,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 269 (cuenta Opus, borrador): Premios sin rastro de IA (un acento, sin íconos en cuadrito ni brillos, escudos reales). Bandera FX.premiosSinIA.
 - Ronda 270 (cuenta Opus, borrador): gráficos SVG con JS en cada premio (barras, tira de resultados, línea de puestos) con globito al pasar el mouse. Bandera FX.premiosGraficos.
 - Ronda 271 (cuenta Opus, borrador): Premios vuelve al look de la ronda 265; retiradas las banderas de las rondas 267–270. Regla nueva: JS y recursos que aporten, sin hacer pesada la web.
+- Ronda 272 (cuenta Opus, borrador): Premios — voto MVP en franja propia al final; trofeos de la edición en malla limpia.

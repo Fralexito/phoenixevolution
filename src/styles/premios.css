@@ -8,8 +8,12 @@
 
 .pr-grid { display: grid; gap: .875rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); align-content: start; }
 @media (min-width: 768px) { .pr-grid-fecha { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); } .pr-grid-fecha .pr-destacado { grid-column: span 2; } }
-.pr-ed-grid { display: grid; gap: .875rem; }
-@media (min-width: 1024px) { .pr-ed-grid { grid-template-columns: minmax(0, 1fr) 22rem; align-items: start; } #pr-voto { position: sticky; top: 7rem; } }
+/* Voto de la afición en su propia franja (ronda 272): en PC, título | ranking | elegir y votar en una sola fila */
+@media (min-width: 768px) {
+  .pr-voto-franja > article { display: grid !important; grid-template-columns: minmax(12rem, auto) minmax(0, 1fr) minmax(16rem, 22rem); align-items: center; gap: 1.25rem !important; padding: 1rem 1.25rem !important; }
+  .pr-voto-franja > article > ol { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; }
+  .pr-voto-franja > article > ol > li { margin: 0 !important; }
+}
 
 .pr-trofeo {
   --c: #00e5ff; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .55rem;

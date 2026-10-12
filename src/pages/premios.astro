@@ -27,10 +27,13 @@ const ligas = LIGAS.filter((l) => (EDICIONES[l.id] ?? []).some((e) => (e.fechas 
 
     <section aria-labelledby="pr-ed-t" class="space-y-3">
       <h2 id="pr-ed-t" class="pr-sec"><span>De toda la edición</span><b id="pr-ed-n"></b></h2>
-      <div class="pr-ed-grid">
-        <div id="pr-edicion" class="pr-grid"></div>
-        <aside id="pr-voto" aria-label="MVP de la afición"></aside>
-      </div>
+      <div id="pr-edicion" class="pr-grid"></div>
+    </section>
+
+    <!-- Ronda 272: el voto de la afición sale de la sala de trofeos (rompía su orden) y va en su propia franja al final -->
+    <section aria-labelledby="pr-voto-t" class="space-y-3">
+      <h2 id="pr-voto-t" class="pr-sec"><span>Vota tú</span><b>MVP de la afición</b></h2>
+      <div id="pr-voto" class="pr-voto-franja"></div>
     </section>
   </div>
 </Layout>
