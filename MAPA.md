@@ -527,7 +527,7 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 ### Ronda 227 — PRUEBA: portada con los 4 mundos y «Unirme» como camino (FX.portada)
 - Todo detrás de la bandera nueva **`FX.portada`** (`data/experimento.js`). `false` = portada y «Unirme» exactamente como antes. Fralex lo pidió «solo como prueba».
 - Portada (`pages/index.astro`, solo dentro de `FX.limpio`):
-  - Título nuevo «SOCIALIZA. COMPITE. / JUEGA. DIRIGE.» (2.ª línea con el degradado cian→púrpura); las palabras entran una tras otra (respeta `prefers-reduced-motion`). Frase nueva sin tecnicismos.
+  - Título nuevo «BIENVENIDO A LA / GALAXY» (Fralex descartó «Socializa. Compite. Juega. Dirige.») (2.ª línea con el degradado cian→púrpura); las palabras entran una tras otra (respeta `prefers-reduced-motion`). Frase nueva sin tecnicismos.
   - «¿Qué quieres hacer?» visible otra vez, con 4 pestañas cápsula (mismo estilo que `.pilar-tabs-lista`; nombres elegidos por Fralex): **Zona Social · Competencia · Duelos · Mi Club**. Cada una muestra 3 accesos (lista `MUNDOS`). Abre en «Duelos». Teclado: flechas, Inicio, Fin. En celular ≤430 px se ocultan los íconos de las pestañas para que entren las 4 (texto sigue en 12 px).
   - Cierre «¿Listo para entrar a la Galaxy?» grande con aurora: «Crear mi cuenta» (abre el registro; con sesión pasa a «Ir a mi perfil»), «Entrar al Discord» y enlace a la guía.
 - «Unirme» (`pages/unirme.astro`): chips «5 pasos · Gratis», los pasos unidos por una línea, pasos 1 y 2 destacados (borde cian y número relleno), «Crear mi cuenta» relleno púrpura. Textos sin cambios.

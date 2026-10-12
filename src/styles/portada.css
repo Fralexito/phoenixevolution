@@ -5,8 +5,7 @@
 .portada-tit { display: flex; flex-direction: column; align-items: center; gap: .05em; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .02em; line-height: 1; font-size: clamp(2.4rem, 8.5vw, 5.25rem); color: #fff; }
 .portada-linea { display: block; }
 .portada-linea > span { display: inline-block; }
-.portada-linea-acento > span { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-500) 45%, var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; padding-bottom: .06em; }
-.portada-linea-acento > span:last-child { background: linear-gradient(90deg, var(--color-galaxy-500), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; }
+.portada-linea-acento > span { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-500) 45%, var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; padding-bottom: .06em; font-size: 1.12em; }
 .portada-sub { max-width: 36rem; margin: 0 auto; font-size: .95rem; line-height: 1.55; color: #d1d5db; text-wrap: balance; }
 @media (min-width: 640px) { .portada-sub { font-size: 1.1rem; } }
 /* Las palabras entran una tras otra, rápido (solo si la persona no pidió menos movimiento). */
