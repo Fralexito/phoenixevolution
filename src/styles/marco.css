@@ -1,0 +1,55 @@
+/* EL «MARCO» DE TODAS LAS PÁGINAS (FX.marco, ronda 258). Pedido de Fralex: mejorar la distribución general SIN quitar ni cambiar
+   la barra izquierda, la «Red de enlaces» ni los botones «Historial / En vivo»: solo mejorarlos y redistribuirlos.
+   A. Mismo ancho en todas las páginas (el de Inicio): al cambiar de página el contenido no «salta».
+   B. Barra izquierda: sin huecos raros entre grupos cuando está cerrada; cada ícono reacciona al pasar el mouse.
+   C. Ticker «Última hora»: un poco más delgado; ya se escondía al bajar, ahora también vuelve en cuanto subes.
+   D. «Historial» y «En vivo» juntos en una sola cápsula de vidrio.
+   E. Pie de página: el aviso legal largo va plegado; nada menor a 12 px.
+   F. «Red de enlaces»: cuadros más bajos y, en los grupos de 2 columnas, ícono al lado del texto (menos scroll, más orden). */
+
+/* A · un solo ancho */
+@media (min-width: 1024px) {
+  html[data-fx-marco] main > :is(div, section)[class*='max-w-'].mx-auto,
+  html[data-fx-marco] main > header > .relative.z-10[class*='max-w-'] { max-width: 80rem; }
+}
+
+/* B · barra izquierda */
+@media (min-width: 1280px) {
+  html[data-fx-marco]:not([data-barra-fijada]) .barra-lat:not(:hover):not(:focus-within) .barra-tit { height: 0; margin: 0; }
+  html[data-fx-marco] .barra-tit { transition: opacity .15s, height .2s cubic-bezier(.22, 1, .36, 1), margin .2s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-marco] .barra-sec { padding-block: .3rem; }
+  html[data-fx-marco] .barra-amigos:not(:has(#barra-amigos > *)) { display: none; }
+  html[data-fx-marco] .barra-item > i { transition: transform .18s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-marco] .barra-item:hover > i { transform: scale(1.12); }
+  html[data-fx-marco] .barra-item:active > i { transform: scale(.94); }
+  html[data-fx-marco][data-fx-barra] .barra-lat:not([hidden]) { top: 6.9rem; transition: width .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease, top .3s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-marco][data-fx-barra][data-cab-compacta]:has(#ticker[data-oculto="true"]) .barra-lat:not([hidden]) { top: 4.6rem; }
+}
+
+/* C · ticker más delgado que se esconde al bajar */
+@media (min-width: 640px) { html[data-fx-marco] #ticker { height: 2.25rem; } html[data-fx-marco] #ticker > div:first-child { font-size: .8rem; } }
+/* Ya existía: el ticker se esconde al bajar (ticker.js → data-oculto). Ahora además VUELVE en cuanto subes un poco (marco.js → data-cab-compacta). */
+@media (min-width: 640px) {
+  html[data-fx-marco]:not([data-cab-compacta]) .ticker-wrap[data-oculto='true'] { transform: none; visibility: visible; transition: transform .35s cubic-bezier(.22, 1, .36, 1), visibility 0s; }
+}
+
+/* D · cápsula única para «Historial» y «En vivo» */
+html[data-fx-marco] #live-row { gap: .25rem; padding: .25rem; border-radius: 999px; background: rgb(8 6 24 / .78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 22%, var(--color-galaxy-border)); box-shadow: 0 10px 28px rgb(0 0 0 / .45); }
+html[data-fx-marco] #live-row .live-toggle { border-color: transparent; background: transparent; box-shadow: none; }
+html[data-fx-marco] #live-row .live-toggle:hover { background: rgb(255 255 255 / .06); }
+
+/* E · pie de página */
+html[data-fx-marco] footer .text-\[11px\] { font-size: 12px; }
+html[data-fx-marco] .pie-legal > summary { cursor: pointer; list-style: none; }
+html[data-fx-marco] .pie-legal > summary::-webkit-details-marker { display: none; }
+
+/* F · Red de enlaces */
+html[data-fx-marco] .cuenta-tile { font-size: .75rem; }
+html[data-fx-marco] #sidebar-menu .cuenta-tile { min-height: 4rem; }
+html[data-fx-marco] #sidebar-menu .cuenta-mosaico:has(> :nth-child(4):last-child) > .cuenta-tile,
+html[data-fx-marco] #sidebar-menu .cuenta-mosaico:has(> :nth-child(2):last-child) > .cuenta-tile {
+  min-height: 3rem; flex-direction: row !important; justify-content: flex-start !important; gap: .55rem; padding: .55rem .7rem; text-align: left; white-space: nowrap; letter-spacing: .03em; }
+html[data-fx-marco] #sidebar-menu .cuenta-tile > i { transition: transform .18s cubic-bezier(.22, 1, .36, 1); }
+html[data-fx-marco] #sidebar-menu .cuenta-tile:hover > i { transform: translateY(-1px) scale(1.1); }
+@media (prefers-reduced-motion: reduce) { html[data-fx-marco] #ticker, html[data-fx-marco] .barra-lat { transition: none; } }

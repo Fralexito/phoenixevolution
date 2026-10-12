@@ -785,6 +785,11 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Fralex: no quería que «Ligas» y «Ligas activas» fueran lo mismo. Ahora son dos entradas en Competiciones › Compite: **Ligas** (`liga/`, tabla, fechas y resultados) y **Ligas activas** (`competiciones/`, todas las ligas en tarjetas). Cada una se ilumina sola en las pestañas. El bloque queda con 6 entradas (cuadrícula pareja, sin huecos).
 - Pruebas 444. Build 45.
 
+### Ronda 258 — El «marco» de todas las páginas (FX.marco)
+- Fralex: mejorar la distribución general; la barra izquierda, la Red de enlaces y los botones Historial/En vivo NO se quitan ni cambian: solo se mejoran y redistribuyen.
+- `styles/marco.css` + `js/features/marco.js`: (A) mismo ancho en todas las páginas (80rem, como Inicio); (B) barra izquierda sin huecos entre grupos cuando está cerrada, ícono que reacciona, se oculta el bloque Amigos si está vacío, sube cuando el ticker se esconde; (C) ticker 2,25rem y, además de esconderse al bajar (ya existía, ticker.js), vuelve en cuanto subes un poco (`data-cab-compacta`); (D) Historial + En vivo en una cápsula de vidrio; (E) pie: aviso legal plegado («Aviso legal y marcas»), 11 px → 12 px; (F) Red de enlaces: cuadros más bajos, en grupos de 2 columnas ícono al lado del texto, texto mínimo 12 px.
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
