@@ -4,7 +4,8 @@ import { posInfo } from '../../data/posiciones.js';
 import { ratioDe } from '../core/crop.js';
 import { fisicoPartes } from '../core/fisico.js';
 import { nivelDe } from '../core/destacados.js';
-import { escudoHTML } from '../core/escudos.js';
+import { escudoHTML, escudoDe } from '../core/escudos.js';
+import { FX } from '../../data/experimento.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];
 const GLOWS = [
@@ -29,11 +30,26 @@ export function efectoDe(p) {
   return EFECTOS[h % EFECTOS.length];
 }
 
+// Carta SIN foto (FX.jugadoresPro, ronda 264): en vez del astronauta repetido, las iniciales del jugador con el color de su
+// posición y el escudo de su club de fondo, en grande y tenue. Así cada carta se distingue aunque no tenga foto.
+function iniciales(nombre) {
+  const partes = String(nombre ?? '').trim().split(/\s+/).filter(Boolean);
+  const ini = partes.length > 1 ? partes[0][0] + partes[1][0] : (partes[0] ?? '?').slice(0, 2);
+  return ini.toUpperCase();
+}
+function sinFotoHTML(p) {
+  const color = posInfo(p.posicion).color; const esc = escudoDe(p.club);
+  return `<div class="pc-sinfoto" style="--pc-c:${color}">
+    ${esc ? `<img src="${esc}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" class="pc-sinfoto-escudo" onerror="this.remove()">` : ''}
+    <span class="pc-sinfoto-ini" aria-hidden="true">${escapeHTML(iniciales(p.nombre))}</span></div>`;
+}
+
 export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '', largo = false } = {}) {
   const img = safeImg(p.foto_url) || safeImg(p.foto);
   // La foto ocupa la parte alta de la tarjeta (formato 5:4, enfocada arriba para que se vea la cara).
   const foto = img
     ? `<img src="${escapeHTML(img)}" alt="${escapeHTML(p.nombre)}" loading="lazy" class="w-full h-full object-cover object-top">`
+    : FX.jugadoresPro ? sinFotoHTML(p)
     : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-galaxy-600/30 via-galaxy-900 to-galaxy-deep"><i class="fa-solid fa-user-astronaut text-6xl text-galaxy-400/40"></i></div>`;
   const pos = posInfo(p.posicion);
   const stats = STAT_KEYS.map((k) => {

@@ -39,6 +39,22 @@ export function montarJugadoresBarra() {
     if ($('btn-leyenda')) der.append($('btn-leyenda'));
     const dens = document.querySelector('.dens-grupo'); if (dens) der.append(dens);
 
+    // Ronda 264 (FX.jugadoresPro): cabecera en una línea con el número de jugadores que se ven ahora
+    if (FX.jugadoresPro) {
+      document.documentElement.setAttribute('data-fx-jpro', '');
+      const h1 = cab.querySelector('h1');
+      if (h1 && !h1.querySelector('.jb-cuenta')) {
+        h1.insertAdjacentHTML('beforeend', '<span class="jb-cuenta" aria-live="polite"></span>');
+        const cuenta = h1.querySelector('.jb-cuenta');
+        const contar = () => {
+          const enCarrusel = $('carrusel-zona') && !$('carrusel-zona').hidden;
+          const n = enCarrusel ? document.querySelectorAll('#players-carrusel .carta-slot').length : document.querySelectorAll('#players-container .pcw').length;
+          cuenta.textContent = n ? `${n} jugador${n === 1 ? '' : 'es'}` : '';
+        };
+        ['players-container', 'players-carrusel'].forEach((id) => { const el = $(id); if (el) new MutationObserver(contar).observe(el, { childList: true }); });
+        contar();
+      }
+    }
     // El panel de «Avanzada» va justo debajo de la barra; la fila vieja de vistas ya está vacía
     const adv = $('adv-panel'); if (adv) barra.after(adv);
     vistaBar.remove();

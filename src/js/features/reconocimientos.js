@@ -6,11 +6,12 @@ import { escapeHTML, safeImg } from '../core/dom.js';
 import { toast } from '../core/toast.js';
 import { href } from '../core/config.js';
 import { reconocimientos, semanaActual } from '../core/destacados.js';
+import { FX } from '../../data/experimento.js';
 
 const TARJETAS = [
-  { k: 'fecha', titulo: 'Jugador de la fecha', icono: 'fa-medal', color: '#fbbf24' },
-  { k: 'forma', titulo: 'Más en forma', icono: 'fa-fire', color: '#fb7185' },
-  { k: 'revelacion', titulo: 'Revelación', icono: 'fa-seedling', color: '#34d399' },
+  { k: 'fecha', titulo: 'Jugador de la fecha', corto: 'De la fecha', icono: 'fa-medal', color: '#fbbf24' },
+  { k: 'forma', titulo: 'Más en forma', corto: 'En forma', icono: 'fa-fire', color: '#fb7185' },
+  { k: 'revelacion', titulo: 'Revelación', corto: 'Revelación', icono: 'fa-seedling', color: '#34d399' },
 ];
 const avatar = (p) => (safeImg(p.foto_url) ? `<img src="${escapeHTML(safeImg(p.foto_url))}" alt="" loading="lazy" class="w-12 h-12 rounded-full object-cover object-top border border-galaxy-400/50 shrink-0">` : '<span class="w-12 h-12 rounded-full bg-galaxy-600/30 border border-galaxy-400/40 grid place-items-center text-galaxy-400/70 shrink-0"><i class="fa-solid fa-user-astronaut"></i></span>');
 const nombreHTML = (p) => `<a href="${href(`jugador/?id=${encodeURIComponent(p.id)}`)}" class="font-display font-bold text-white uppercase tracking-wide hover:text-galaxy-400 truncate">${escapeHTML(p.nombre)}</a>${p.apodo ? `<span class="block text-[12px] text-galaxy-400 font-bold truncate">«${escapeHTML(p.apodo)}»</span>` : ''}`;
@@ -57,10 +58,10 @@ export function montarReconocimientos(el, jugadores, edicion) {
   const r = reconocimientos(jugadores, edicion); const semana = semanaActual();
   let sesion = false; let votos = { conteo: [], mio: null };
   let abierto = false;                     // plegado por defecto: una franja sutil; el botón la expande
-  const pastilla = (t, rec) => `<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] leading-none whitespace-nowrap" style="border-color:${t.color}55;color:${t.color}"><i class="fa-solid ${t.icono}"></i><span class="text-gray-100 max-w-[7rem] truncate">${rec ? escapeHTML(rec.p.nombre) : '—'}</span></span>`;
+  const pastilla = (t, rec) => `<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] leading-none whitespace-nowrap" style="border-color:${t.color}55;color:${t.color}"><i class="fa-solid ${t.icono}"></i>${FX.jugadoresPro ? `<span class="opacity-80">${t.corto}:</span>` : ''}<span class="text-gray-100 max-w-[7rem] truncate">${rec ? escapeHTML(rec.p.nombre) : '—'}</span></span>`;
   const pintar = () => {
     const por = new Map(jugadores.map((p) => [p.id, p])); const lider = votos.conteo.find((x) => por.has(x.jugador_id));
-    const pVoto = `<span class="inline-flex items-center gap-1.5 rounded-full border border-galaxy-400/50 px-2.5 py-1 text-[12px] leading-none whitespace-nowrap text-galaxy-400"><i class="fa-solid fa-ranking-star"></i><span class="text-gray-100 max-w-[7rem] truncate">${lider ? escapeHTML(por.get(lider.jugador_id).nombre) : 'Vota'}</span></span>`;
+    const pVoto = `<span class="inline-flex items-center gap-1.5 rounded-full border border-galaxy-400/50 px-2.5 py-1 text-[12px] leading-none whitespace-nowrap text-galaxy-400"><i class="fa-solid fa-ranking-star"></i>${FX.jugadoresPro ? `<span class="opacity-80">De la semana:</span>` : ''}<span class="text-gray-100 max-w-[7rem] truncate">${lider ? escapeHTML(por.get(lider.jugador_id).nombre) : FX.jugadoresPro ? 'vota tú' : 'Vota'}</span></span>`;
     el.innerHTML = `<div class="rounded-xl border border-galaxy-border/60 bg-black/20">
       <button type="button" data-recon-toggle aria-expanded="${abierto}" class="w-full flex items-center gap-3 px-3 py-2 text-left">
         <span class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-300 shrink-0"><i class="fa-solid fa-award text-galaxy-400 mr-1.5"></i>Reconocimientos</span>

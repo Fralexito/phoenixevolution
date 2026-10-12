@@ -820,6 +820,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `styles/jugadoresBarra.css`. Revertir: `FX.jugadoresBarra = false`.
 - Pruebas 444. Build 45.
 
+### Ronda 264 — Jugadores «pro» (FX.jugadoresPro, encima de jugadoresBarra)
+- Fralex: «corrige todito eso, el mejor trabajo profesional y premium».
+- (1) La barra de herramientas se queda pegada arriba al bajar en PC (sube cuando el ticker se esconde; en celular no, taparía las cartas). (2) Cartas sin foto: iniciales con el color de la posición + escudo del club grande y tenue (`playerCard.js` → `sinFotoHTML`, vale en toda la web). (3) Reconocimientos con el nombre del premio («De la fecha: Beto», «En forma», «Revelación», «De la semana: vota tú»). (4) Cabecera en una línea con «N jugadores» (cuenta lo que se ve). (5) Botones comparar/perfil de la carta aparecen al pasar el mouse (si está marcada, se quedan). (6) Celular: Comparar como ícono junto al buscador, barra deslizable, título de Reconocimientos como ícono.
+- `styles/jugadoresBarra.css` (sección ronda 264), `features/jugadoresBarra.js`, `features/reconocimientos.js`. Revertir: `FX.jugadoresPro = false` (o también `jugadoresBarra`).
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
