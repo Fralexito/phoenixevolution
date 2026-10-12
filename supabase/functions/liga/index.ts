@@ -1,10 +1,11 @@
-// Edge Function «liga» (1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
 //   GET  /v1/liga/partidos   → partidos oficiales por jugar (fecha en curso + atrasados), con los parsec_id de cada DT si los hay.
 //   POST /v1/liga/vivo       → marcador en vivo de la sala (upsert en liga_vivo; la web lo recibe por Realtime).
 //   POST /v1/liga/campo      → campo 2D en vivo (posiciones): no escribe en la base, se reenvía por Realtime Broadcast a «campo:<sala_id>».
+//   GET  /v1/liga/mirando    → quién ve el partido de la sala desde la web (nombres de perfil; liga_mirando, migración 104).
 //   POST /v1/liga/resultado  → resultado del juego para un partido oficial: queda «propuesto» hasta que lo valide
 //                              el staff o el árbitro designado (nunca el host). Borra el «en vivo» de la sala.
 // Interruptor del staff: phoenix_config clave «liga_resultados» = false → todo responde LIGA_PAUSADA (503).
@@ -234,6 +235,19 @@ async function campo(req: Request) {
   return {};
 }
 
+// ── GET /v1/liga/mirando?sala_id=… ──────────────────────────────────────────────────────────────────
+// Quién está viendo el partido de esta sala DESDE LA WEB (usuarios con sesión; tabla liga_mirando, migración 104; la web avisa cada ~30 s).
+// Solo nombres de perfil (nombre_display), sin ids. Phoenix Link lo pide cada ~10 s para ponerlo en la sala.
+async function mirando(req: Request) {
+  const d = await autenticar(req);
+  const sala = await salaDe(d, uuid(new URL(req.url).searchParams.get("sala_id")));
+  if (!sala) throw new ErrorApi("CAMPO_INVALIDO", { campo: "sala_id" });
+  const desde = new Date(Date.now() - 90_000).toISOString();
+  const { data, error } = await sb.from("liga_mirando").select("nombre").eq("sala_id", sala).gt("visto", desde).order("visto", { ascending: true }).limit(30);
+  db(error, "mirando");
+  return { mirando: (data ?? []).map((x) => texto(x.nombre, 40)).filter(Boolean) };
+}
+
 // ── POST /v1/liga/resultado ─────────────────────────────────────────────────────────────────────────
 async function resultado(req: Request) {
   const d = await autenticar(req);
@@ -289,6 +303,7 @@ const RUTAS: Record<string, { metodo: string; fn: (r: Request) => Promise<Record
   "/v1/liga/partidos": { metodo: "GET", fn: partidos },
   "/v1/liga/vivo": { metodo: "POST", fn: vivo },
   "/v1/liga/campo": { metodo: "POST", fn: campo },
+  "/v1/liga/mirando": { metodo: "GET", fn: mirando },
   "/v1/liga/resultado": { metodo: "POST", fn: resultado },
 };
 

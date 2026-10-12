@@ -33,6 +33,7 @@ URL base: `https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/liga/�
 | `GET /partidos` | Partidos por jugar: la fecha en curso, los atrasados, en disputa o ya enviados. Trae `mio` y los `parsec` de cada DT. |
 | `POST /vivo` | `{sala_id, partido_id?, local, visitante, goles_local, goles_visita, minuto, periodo, fase, goles[]}` → upsert en `liga_vivo`. Con `{terminado:true}` borra la fila. Máximo 30 por minuto. |
 | `POST /campo` | `{sala_id, v:1, j:[[x,z,eq],…≤30], b:[x,z,y]|null, equipos, posesion?:[A,B], fase?:"vivo"|"repeticion"|"otro"|"pausa", c?:["#rrggbb","#rrggbb"] (colores de camiseta de A y B), t?:{l:[[eq,gol],…],e,listo,vuelo}}` → **no escribe en la base**: Realtime Broadcast al canal `campo:<sala_id>` (evento `campo`, público de solo lectura). Máximo 2 por segundo por sala; Link manda ≤ 1/s. Metros, centro = (0,0), x ±52,5, z ±34; `eq` 0 = A (izquierda en el primer saque), 1 = B, 2 = árbitros, -1 = sin equipo. |
+| `GET /mirando?sala_id=` | → `{mirando:[nombres]}`: quién ve el partido de esa sala desde la web (últimos 90 s; tabla `liga_mirando`, migración 104). Solo para el host dueño de la sala. |
 | `POST /resultado` | `{partido_id, goles_local, goles_visita, completo:true, juego{goles, pk_*, nombre_*}, sala_id?, doctor?}` → `propuesto`. Repetir lo mismo no cambia nada; si llega uno distinto, pasa a `disputa`. Ya confirmado → 409. |
 
 **Interruptor del staff:** `phoenix_config` → `liga_resultados = false` (o `integracion = false`) responde `LIGA_PAUSADA`.

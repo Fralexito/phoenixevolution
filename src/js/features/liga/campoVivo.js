@@ -4,7 +4,9 @@
 // desplegado. Un único requestAnimationFrame interpola ~1 mensaje/s para que las fichitas se muevan suaves.
 // Lógica pura y pruebas: core/campoVivo.js · tests/campoVivo.test.mjs.
 import { supabase } from '../../core/supabase.js';
-import { escapeHTML } from '../../core/dom.js';
+import { escapeHTML, safeUrl } from '../../core/dom.js';
+import { getState } from '../../core/session.js';
+import { toast } from '../../core/toast.js';
 import { LARGO, ANCHO, COLORES, colorEquipo, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
 
 const MX = 3, MZ = 3;
@@ -36,11 +38,18 @@ const HTML = `
       </svg>
       <div class="campo-etq" data-etq hidden></div>
     </div>
+    <div class="campo-stats">
+    <p class="campo-tit">Estadísticas del partido</p>
     <div class="campo-pos" data-posbox hidden>
       <div class="campo-pos-barra"><span data-pa style="background:${COLORES[0]}"></span><span data-pb style="background:${COLORES[1]}"></span></div>
       <p class="vivo-goles" style="text-align:center">Posesión: <b data-postxt>calculando…</b></p>
     </div>
+    <p class="vivo-goles campo-nota" data-sinpos>Posesión: calculando…</p>
+    <p class="vivo-goles campo-nota">Disparos, córners, faltas y tarjetas llegarán cuando Link pueda leerlos del juego.</p>
+    </div>
     <div class="campo-tanda" data-tanda hidden></div>
+    <div class="campo-acciones"><button type="button" class="btn btn-primary !min-h-9 !px-4 !text-[12px]" data-entrar><i class="fa-solid fa-door-open" aria-hidden="true"></i> Entrar a la sala</button>
+      <span class="vivo-goles">Para mirar no hace falta entrar: esto ya es el partido en vivo. Si entras, el host te acepta como espectador. En la sala se verá que miras desde la web.</span></div>
     <p class="vivo-goles campo-aviso" data-aviso hidden></p>
     <p class="vivo-goles campo-nota">Equipo A = local y B = visita (colores aproximados: se asignan en el primer saque de centro).</p>
   </div>`;
@@ -81,6 +90,7 @@ export function crearTablero(salaId) {
     const etq = etiquetaFase(n.fase), e = q('[data-etq]');
     e.hidden = !etq; e.textContent = etq;
     q('[data-posbox]').hidden = false;
+    q('[data-sinpos]').hidden = true;
     q('[data-postxt]').textContent = textoPosesion(n.posesion);
     q('[data-pa]').style.width = `${n.posesion ? n.posesion[0] : 50}%`;
     q('[data-pb]').style.width = `${n.posesion ? n.posesion[1] : 50}%`;
@@ -140,6 +150,27 @@ export function crearTablero(salaId) {
     else if (estado.ultimo && ahora - estado.ultimo > SIN_DATOS_MS) aviso('Sin datos del campo desde hace unos segundos…');
   }, 1000);
 
+  // «Mirando desde la web»: con sesión, se avisa cada 30 s (liga_mirando, migración 104) para que Link lo ponga en la sala
+  const usuario = () => getState().session?.user ?? null;
+  async function latir() {
+    const u = usuario();
+    if (!u || document.hidden) return;
+    try { await supabase.from('liga_mirando').upsert({ sala_id: salaId, usuario: u.id }, { onConflict: 'sala_id,usuario' }); }
+    catch (e) { console.warn('[campo vivo] mirando:', e); }
+  }
+  latir();
+  const latido = setInterval(latir, 30_000);
+
+  q('[data-entrar]').addEventListener('click', async () => {
+    if (!usuario()) { toast('Inicia sesión para entrar a la sala.', 'info', { key: 'entrar-sala' }); return; }
+    try {
+      const { data, error } = await supabase.from('salas_enlace').select('enlace').eq('sala_id', salaId).maybeSingle();
+      const url = error ? '' : safeUrl(data?.enlace, { allowParsec: true });
+      if (!url) { toast('No puedes entrar a esta sala (es privada o ya cerró).', 'error', { key: 'entrar-sala' }); return; }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) { console.warn('[campo vivo] entrar:', e); toast('No se pudo abrir la sala.', 'error', { key: 'entrar-sala' }); }
+  });
+
   let canal = null;
   try {
     canal = supabase.channel(`campo:${salaId}`).on('broadcast', { event: 'campo' }, (m) => alMensaje(m?.payload)).subscribe();
@@ -153,7 +184,9 @@ export function crearTablero(salaId) {
       q('[data-nb]').textContent = visitante || 'Equipo B';
     },
     cerrar() {
-      cancelAnimationFrame(raf); clearInterval(reloj);
+      cancelAnimationFrame(raf); clearInterval(reloj); clearInterval(latido);
+      const u = usuario();
+      if (u) supabase.from('liga_mirando').delete().eq('sala_id', salaId).eq('usuario', u.id).then(() => {}, () => {});
       try { if (canal) supabase.removeChannel(canal); } catch { /* ya cerrado */ }
       canal = null; el.remove();
     },
