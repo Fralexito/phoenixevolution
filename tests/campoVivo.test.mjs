@@ -65,3 +65,18 @@ test('campoVivo: colores de camiseta', async () => {
   assert.equal(colorEquipo(0, null), '#00e5ff');
   assert.equal(colorEquipo(-1, n.colores), '#cfd8ee');
 });
+
+test('campoVivo: poseedor del balón, hora de lectura y suavizado', async () => {
+  const { tauSegunIntervalo } = await import('../src/js/core/campoVivo.js');
+  const n = normalizarCampo({ j: [[0, 0, 0], [1, 1, 1]], p: 1, ts: 1_790_000_000_000 });
+  assert.equal(n.poseedor, 1);
+  assert.equal(n.ts, 1_790_000_000_000);
+  assert.equal(normalizarCampo({ j: [[0, 0, 0]], p: 5 }).poseedor, -1);     // fuera de rango
+  assert.equal(normalizarCampo({ j: [[0, 0, 0]], p: -1 }).poseedor, -1);
+  assert.equal(normalizarCampo({ j: [[0, 0, 0]] }).poseedor, -1);           // Link viejo: sin poseedor
+  assert.equal(normalizarCampo({ j: [], ts: 5 }).ts, null);                 // hora absurda
+  assert.equal(tauSegunIntervalo(1000), 0.5);
+  assert.equal(tauSegunIntervalo(250), 0.125);
+  assert.equal(tauSegunIntervalo(30), 0.06);
+  assert.equal(tauSegunIntervalo(NaN), 0.3);
+});

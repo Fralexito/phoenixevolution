@@ -647,6 +647,11 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Edge **liga 1.4.0**: `GET /v1/liga/mirando?sala_id=` (token de Link; solo de su sala) → `{mirando:[nombres]}` de los últimos 90 s. Link lo pide cada ~10 s y lo enseña en Gente («Viendo desde la web: …») y lo anuncia una vez por persona en el chat de la sala («X está viendo el partido desde la web.»).
 - Tablero: botón **Entrar a la sala** (lee `salas_enlace` por RLS: solo si la sala es visible para ti; abre el enlace de Parsec; el host te acepta como espectador) y panel «Estadísticas del partido» (posesión; disparos, córners y tarjetas cuando Link los pueda leer).
 
+### Ronda 238 — Campo en vivo más rápido y con poseedor del balón (chat LINK, con permiso de Fralex)
+- Edge **liga 1.5.0**: `POST /v1/liga/campo` acepta `p` (índice en `j` de quien lleva el balón, -1 = libre) y `ts` (hora de la lectura en la PC del host, ms); hasta 6 mensajes/s por sala; la autenticación se guarda en caché (60 s la PC, 30 s la sala) para no hacer 3 consultas por mensaje (una PC revocada puede seguir mandando posiciones hasta 60 s).
+- Link (0.2.37) manda 1 mensaje/s y **4/s si alguien mira con sesión** (liga_mirando). El tablero ajusta el suavizado al ritmo de llegada (≈ medio intervalo, 60–500 ms) y marca con un **halo** a quien lleva el balón. Con `?diag` en la URL, el tablero enseña mensajes/s y retraso desde la lectura.
+- Pruebas: 436. Build OK.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

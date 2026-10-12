@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -196,13 +196,33 @@ async function vivo(req: Request) {
 // Campo 2D en vivo (Phoenix Link ≥ 0.2.21): posiciones de las fichitas y el balón. NO escribe en la base: se reenvía por Realtime
 // Broadcast al canal público de solo lectura «campo:<sala_id>» (evento «campo»). Sin nombres de cuentas ni ids de Parsec.
 const FASES_CAMPO = ["vivo", "repeticion", "otro", "pausa"];
+// «campo» llega hasta 4 veces por segundo: se recuerda 60 s quién es la PC (token) y 30 s que la sala es suya, para no hacer 3 consultas por mensaje.
+// Coste: una PC revocada o una sala cerrada puede seguir mandando posiciones hasta 60 s (solo posiciones; el resto de rutas siguen sin caché).
+const cacheCampo = new Map<string, { d: Dispositivo; hasta: number; salas: Map<string, number> }>();
+async function autenticarCampo(req: Request, salaId: string | null): Promise<{ d: Dispositivo; sala: string }> {
+  const token = /^Bearer\s+(phx_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "")?.[1] ?? "";
+  const clave = token ? await sha256(token) : "";
+  const ahora = Date.now();
+  let c = clave ? cacheCampo.get(clave) : undefined;
+  if (!c || c.hasta < ahora) {
+    const d = await autenticar(req, false);
+    c = { d, hasta: ahora + 60_000, salas: new Map() };
+    cacheCampo.set(clave, c);
+    if (cacheCampo.size > 200) cacheCampo.clear();
+  }
+  const id = salaId ?? "";
+  if (!id || (c.salas.get(id) ?? 0) < ahora) {
+    const sala = await salaDe(c.d, salaId);
+    if (!sala) throw new ErrorApi("CAMPO_INVALIDO", { campo: "sala_id" });
+    c.salas.set(id, ahora + 30_000);
+  }
+  return { d: c.d, sala: id };
+}
 const num = (v: unknown, min: number, max: number) => typeof v === "number" && Number.isFinite(v) && v >= min && v <= max;
 async function campo(req: Request) {
-  const d = await autenticar(req, false);
   const j = await leerJson(req);
-  const sala = await salaDe(d, uuid(j.sala_id));
-  if (!sala) throw new ErrorApi("CAMPO_INVALIDO", { campo: "sala_id" });
-  frenar(`campo:${sala}`, 2, 1_000);   // 2 por segundo por sala
+  const { sala } = await autenticarCampo(req, uuid(j.sala_id));
+  frenar(`campo:${sala}`, 6, 1_000);   // hasta 6 por segundo por sala (Link manda 1/s, o 4/s si alguien mira)
   if (!Array.isArray(j.j) || j.j.length > 30) throw new ErrorApi("CAMPO_INVALIDO", { campo: "j" });
   const fichas: number[][] = [];
   for (const p of j.j) {
@@ -220,6 +240,8 @@ async function campo(req: Request) {
     if (!Array.isArray(j.posesion) || j.posesion.length !== 2 || !num(j.posesion[0], 0, 100) || !num(j.posesion[1], 0, 100)) throw new ErrorApi("CAMPO_INVALIDO", { campo: "posesion" });
     carga.posesion = [j.posesion[0], j.posesion[1]];
   }
+  if (Number.isInteger(j.p) && (j.p as number) >= -1 && (j.p as number) < 30) carga.p = j.p;   // índice en j de quien lleva el balón (-1 = libre)
+  if (typeof j.ts === "number" && Number.isFinite(j.ts) && j.ts > 1_600_000_000_000 && j.ts < 4_000_000_000_000) carga.ts = j.ts;   // hora de la lectura en la PC del host (ms): para medir el retraso
   if (Array.isArray(j.c) && j.c.length === 2 && j.c.every((x) => typeof x === "string" && /^#[0-9a-fA-F]{6}$/.test(x))) carga.c = [j.c[0], j.c[1]];   // colores de camiseta de A y B (Link ≥ 0.2.30)
   const t = j.t as { l?: unknown; e?: unknown; listo?: unknown; vuelo?: unknown } | undefined;
   if (t && typeof t === "object") {

@@ -7,7 +7,7 @@ import { supabase } from '../../core/supabase.js';
 import { escapeHTML, safeUrl } from '../../core/dom.js';
 import { getState } from '../../core/session.js';
 import { toast } from '../../core/toast.js';
-import { LARGO, ANCHO, COLORES, colorEquipo, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
+import { LARGO, ANCHO, COLORES, colorEquipo, tauSegunIntervalo, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
 
 const MX = 3, MZ = 3;
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -34,6 +34,7 @@ const HTML = `
       <svg viewBox="${-LARGO / 2 - MX} ${-ANCHO / 2 - MZ} ${LARGO + MX * 2} ${ANCHO + MZ * 2}" role="img" aria-label="Campo con los jugadores en vivo">
         <rect x="${-LARGO / 2}" y="${-ANCHO / 2}" width="${LARGO}" height="${ANCHO}" fill="#0d3b24"/>${lineas()}
         <g data-fichas></g>
+        <circle data-halo r="2.5" fill="none" stroke="#fff" stroke-width="0.55" opacity="0" style="filter:drop-shadow(0 0 1.2px #fff)"></circle>
         <g data-bola opacity="0"><circle r="1.5" fill="rgba(0,0,0,.35)" cx="0.3" cy="0.4"/><circle r="0.95" fill="#fff" stroke="#111" stroke-width="0.25"/></g>
       </svg>
       <div class="campo-etq" data-etq hidden></div>
@@ -51,6 +52,7 @@ const HTML = `
     <div class="campo-acciones"><button type="button" class="btn btn-primary !min-h-9 !px-4 !text-[12px]" data-entrar><i class="fa-solid fa-door-open" aria-hidden="true"></i> Entrar a la sala</button>
       <span class="vivo-goles">Para mirar no hace falta entrar: esto ya es el partido en vivo. Si entras, el host te acepta como espectador. En la sala se verá que miras desde la web.</span></div>
     <p class="vivo-goles campo-aviso" data-aviso hidden></p>
+    <p class="vivo-goles campo-nota" data-diag hidden></p>
     <p class="vivo-goles campo-nota">Equipo A = local y B = visita (colores aproximados: se asignan en el primer saque de centro).</p>
   </div>`;
 
@@ -62,8 +64,9 @@ export function crearTablero(salaId) {
   const el = document.createElement('div');
   el.innerHTML = HTML;
   const q = (s) => el.querySelector(s);
-  const gFichas = q('[data-fichas]'), gBola = q('[data-bola]');
-  const estado = { obj: null, cur: [], curB: null, ultimo: 0, abiertoEn: Date.now(), terminado: false, na: '', nb: '' };
+  const gFichas = q('[data-fichas]'), gBola = q('[data-bola]'), gHalo = q('[data-halo]');
+  const diag = typeof location !== 'undefined' && /[?&]diag(=|&|$)/.test(location.search);
+  const estado = { llegada: 0, intervalo: 1000, lat: null, obj: null, cur: [], curB: null, ultimo: 0, abiertoEn: Date.now(), terminado: false, na: '', nb: '' };
   const circulos = [];
 
   function circulo(i) {
@@ -84,7 +87,10 @@ export function crearTablero(salaId) {
   function alMensaje(payload) {
     const n = normalizarCampo(payload);
     if (!n) return;
-    estado.obj = n; estado.ultimo = Date.now();
+    const ahoraMs = Date.now();
+    if (estado.ultimo) estado.intervalo = estado.intervalo * 0.7 + Math.min(3000, ahoraMs - estado.ultimo) * 0.3;   // ritmo de llegada (media móvil)
+    if (n.ts) estado.lat = estado.lat == null ? ahoraMs - n.ts : estado.lat * 0.8 + (ahoraMs - n.ts) * 0.2;   // retraso desde la lectura (reloj de la PC del host vs. el tuyo)
+    estado.obj = n; estado.ultimo = ahoraMs;
     pintarColores(n.colores);
     aviso(estado.terminado ? 'Partido terminado.' : '');
     const etq = etiquetaFase(n.fase), e = q('[data-etq]');
@@ -125,14 +131,18 @@ export function crearTablero(salaId) {
     const dt = (ahora - t0) / 1000; t0 = ahora;
     const o = estado.obj;
     if (!o) return;
+    const tau = tauSegunIntervalo(estado.intervalo);
     for (let i = 0; i < o.j.length; i++) {
       const c = circulo(i);
-      estado.cur[i] = pasoInterpolado(estado.cur[i], o.j[i], dt);
+      estado.cur[i] = pasoInterpolado(estado.cur[i], o.j[i], dt, tau);
       c.setAttribute('cx', estado.cur[i][0].toFixed(2)); c.setAttribute('cy', estado.cur[i][1].toFixed(2));
       c.setAttribute('fill', colorEquipo(o.j[i][2], o.colores));
       c.setAttribute('r', o.j[i][2] === 2 ? '0.9' : '1.35');
     }
     while (circulos.length > o.j.length) { circulos.pop().remove(); estado.cur.pop(); }
+    const cp = o.poseedor >= 0 ? estado.cur[o.poseedor] : null;   // halo de quien lleva el balón
+    if (cp) { gHalo.setAttribute('cx', cp[0].toFixed(2)); gHalo.setAttribute('cy', cp[1].toFixed(2)); gHalo.setAttribute('opacity', '1'); } else gHalo.setAttribute('opacity', '0');
+    if (diag) { const d = q('[data-diag]'); d.hidden = false; d.textContent = `Diagnóstico: llegan ${(1000 / estado.intervalo).toFixed(1)} mensajes/s · retraso desde la lectura ≈ ${estado.lat == null ? '—' : Math.round(estado.lat)} ms (suavizado ${Math.round(tau * 1000)} ms)`; }
     if (!o.b) gBola.setAttribute('opacity', '0');
     else {
       estado.curB = pasoInterpolado(estado.curB, o.b, dt, 0.2, 20);

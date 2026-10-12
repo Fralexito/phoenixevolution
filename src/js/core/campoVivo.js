@@ -30,13 +30,21 @@ export function normalizarCampo(p) {
     t = { l, e: p.t.e === 1 ? 1 : 0, listo: p.t.listo === true, vuelo: p.t.vuelo === true };
   }
   const colores = Array.isArray(p.c) && p.c.length === 2 && p.c.every((x) => typeof x === 'string' && /^#[0-9a-fA-F]{6}$/.test(x)) ? [p.c[0], p.c[1]] : null;
-  return { j, b, posesion, t, colores, equipos: p.equipos === true, fase: FASES.includes(p.fase) ? p.fase : 'vivo' };
+  const poseedor = Number.isInteger(p.p) && p.p >= 0 && p.p < j.length ? p.p : -1;
+  const ts = finito(p.ts, 1.6e12, 4e12) ? p.ts : null;
+  return { j, b, posesion, t, colores, poseedor, ts, equipos: p.equipos === true, fase: FASES.includes(p.fase) ? p.fase : 'vivo' };
 }
 
 /** Color de cada equipo (0 = A, 1 = B, 2 = árbitros, -1 = sin equipo): el de su camiseta si Link lo mandó, si no el de siempre. */
 export function colorEquipo(eq, colores) {
   if ((eq === 0 || eq === 1) && colores) return colores[eq];
   return COLORES[eq] ?? COLORES['-1'];
+}
+
+/** Constante de suavizado (s) según el ritmo de llegada: ~medio intervalo, entre 60 ms y 500 ms. */
+export function tauSegunIntervalo(intervaloMs) {
+  if (!Number.isFinite(intervaloMs) || intervaloMs <= 0) return 0.3;
+  return Math.min(0.5, Math.max(0.06, intervaloMs / 2000));
 }
 
 /** Etiqueta que se pone sobre el campo según la fase («» si es juego en vivo). */
