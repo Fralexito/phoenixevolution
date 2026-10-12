@@ -85,8 +85,12 @@ export function montarVentanas() {
   root.addEventListener('focusout', (e) => { if (!root.contains(e.relatedTarget)) poner('foco', false); });
   document.addEventListener('visibilitychange', () => poner('oculta', document.hidden));
 
+  if (root.classList.contains('vt-3d')) profundidad(root);
   let turno = 0;
-  setInterval(() => {
+  // Con 3D, la primera rotación espera a que termine la entrada por etapas (así nada se pisa).
+  const arranque = root.classList.contains('vt-3d') ? 3400 - TURNO_MS : 0;
+  setTimeout(() => setInterval(rotar, TURNO_MS), Math.max(0, arranque));
+  function rotar() {
     if (motivos.size) return;
     // Busca la siguiente ventana que tenga más de un elemento (si ninguna tiene, no hace nada).
     for (let k = 0; k < ventanas.length; k += 1) {
@@ -101,5 +105,39 @@ export function montarVentanas() {
       turno = (turno + k + 1) % ventanas.length;
       return;
     }
-  }, TURNO_MS);
+  }
+}
+
+// 3D (FX.ventanas3d): la escena se inclina un poco hacia el mouse; la ventana bajo el mouse se inclina más, su brillo sigue al mouse
+// y sus capas se separan. Solo con mouse de verdad. Un solo requestAnimationFrame por cuadro (no se recalcula de más).
+function profundidad(root) {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const header = root.closest('[data-portada]') ?? root;
+  const grid = root.querySelector('[data-vt-grid]');
+  let pend = null; let activa = null;
+  const aplicar = () => {
+    const e = pend; pend = null; if (!e || !grid) return;
+    const r = header.getBoundingClientRect();
+    const gx = ((e.clientY - r.top) / r.height - 0.5) * -4;   // escena: máx. ±2°
+    const gy = ((e.clientX - r.left) / r.width - 0.5) * 6;    // escena: máx. ±3°
+    grid.style.setProperty('--gx', `${gx.toFixed(2)}deg`); grid.style.setProperty('--gy', `${gy.toFixed(2)}deg`);
+    const v = e.target.closest?.('[data-vt-ventana]');
+    if (activa && activa !== v) soltar(activa);
+    if (!v) { activa = null; return; }
+    activa = v;
+    const b = v.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (e.clientX - b.left) / b.width)); const y = Math.min(1, Math.max(0, (e.clientY - b.top) / b.height));
+    v.setAttribute('data-hover', '');
+    v.style.setProperty('--rx', `${((0.5 - y) * 12).toFixed(2)}deg`);
+    v.style.setProperty('--ry', `${((x - 0.5) * 14).toFixed(2)}deg`);
+    v.style.setProperty('--mx', `${(x * 100).toFixed(1)}%`); v.style.setProperty('--my', `${(y * 100).toFixed(1)}%`);
+    v.style.setProperty('--px', `${((x - 0.5) * 8).toFixed(2)}px`); v.style.setProperty('--py', `${((y - 0.5) * 8).toFixed(2)}px`);
+  };
+  const soltar = (v) => { v.removeAttribute('data-hover'); ['--rx', '--ry', '--mx', '--my', '--px', '--py'].forEach((k) => v.style.removeProperty(k)); };
+  header.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; root.setAttribute('data-mouse', ''); if (!pend) requestAnimationFrame(aplicar); pend = e; });
+  header.addEventListener('pointerleave', () => {
+    root.removeAttribute('data-mouse'); pend = null;
+    grid?.style.removeProperty('--gx'); grid?.style.removeProperty('--gy');
+    if (activa) { soltar(activa); activa = null; }
+  });
 }

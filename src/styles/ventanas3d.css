@@ -1,0 +1,72 @@
+/* PRUEBA · 4 ventanas con sensación 3D y movimiento POR ETAPAS (FX.ventanas3d, ronda 233). Va encima de ventanas.css.
+   Fralex: «más movimiento, sensación 3D, que cada sensación se sienta progresiva».
+   Todo en capas que se suman, nunca de golpe:
+   ENTRADA  fondo → título enfoca → ventanas se levantan en 3D una tras otra → encabezado → contenido → luz del mundo → recién ahí rota.
+   CAMBIO   el contenido gira como un tablero de aeropuerto (sale hacia arriba, entra desde abajo) → una luz recorre el borde → la luz del mundo late.
+   MOUSE    la escena entera se inclina poco → la ventana bajo el mouse sube → se inclina más → su brillo sigue al mouse → sus capas se separan.
+   SCROLL   la portada se inclina hacia atrás y se aleja de a poco.
+   Solo transform / opacity / filter. Nada se mueve con «menos movimiento». Inclinaciones solo con mouse. */
+
+@property --vt-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+/* ── Escena: la profundidad la da la perspectiva del contenedor ── */
+.vt-3d .vt-escena { width: 100%; margin-top: 1.25rem; perspective: 1400px; perspective-origin: 50% 0%; }
+.vt-3d .vt-grid { margin-top: 0; transform-style: preserve-3d; transform: rotateX(var(--gx, 0deg)) rotateY(var(--gy, 0deg)); transition: transform 1s cubic-bezier(.22, 1, .36, 1); }
+@media (max-width: 639px) { .vt-3d .vt-escena { margin-top: .75rem; } }
+
+/* ── Ventana con volumen: sombra de abajo + brillo que sigue al mouse ── */
+.vt-3d .vt-v { box-shadow: 0 1px 0 rgb(255 255 255 / .05) inset, 0 28px 50px -30px rgb(0 0 0 / .9);
+  transform: translate3d(0, var(--ty, 0px), 0) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
+  transition: transform .6s cubic-bezier(.22, 1, .36, 1), box-shadow .6s cubic-bezier(.22, 1, .36, 1), border-color .35s; }
+.vt-3d .vt-v[data-hover] { --ty: -8px; transition-duration: .18s, .5s, .35s; border-color: color-mix(in srgb, var(--vt-c) 45%, transparent);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .08) inset, 0 40px 70px -28px rgb(0 0 0 / .95), 0 22px 50px -30px color-mix(in srgb, var(--vt-c) 70%, transparent);
+  background-image: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgb(255 255 255 / .08), transparent 42%), linear-gradient(180deg, rgb(255 255 255 / .05), rgb(255 255 255 / .015)); }
+.vt-3d .vt-v[data-hover]::before { opacity: .95; transform: scale(1.1); }
+.vt-3d .vt-v[data-hover] .vt-flecha { transform: translateX(4px); color: var(--vt-c); }
+/* Las capas de adentro se separan (paralaje): el ícono y la foto «flotan» más que el texto */
+.vt-3d .vt-ico, .vt-3d .vt-media { transform: translate3d(calc(var(--px, 0px) * 1.7), calc(var(--py, 0px) * 1.7), 0); transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+.vt-3d .vt-txt { transform: translate3d(calc(var(--px, 0px) * .8), calc(var(--py, 0px) * .8), 0); transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+.vt-3d .vt-v[data-hover] .vt-ico, .vt-3d .vt-v[data-hover] .vt-media, .vt-3d .vt-v[data-hover] .vt-txt { transition-duration: .2s; }
+/* Anula el «hover» plano de ventanas.css (aquí manda el de [data-hover], que pone el JS) */
+@media (hover: hover) { .vt-3d .vt-v:hover { transform: translate3d(0, var(--ty, 0px), 0) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); } }
+
+/* ── Luz que recorre el borde de la ventana que acaba de cambiar ── */
+.vt-3d .vt-v::after { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; opacity: 0;
+  background: conic-gradient(from var(--vt-ang), transparent 0 62%, color-mix(in srgb, var(--vt-c) 90%, white) 80%, transparent 96%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+
+/* ── El contenido gira como un tablero: cada ventana es su propio escenario 3D ── */
+.vt-3d .vt-items { perspective: 520px; }
+.vt-3d .vt-item { transform-origin: 50% 50% -1.2rem; backface-visibility: hidden; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ENTRADA, etapa 3: las ventanas se levantan en 3D, una tras otra (backwards: al terminar vuelve a mandar el transform normal) */
+  .vt-3d .vt-v { animation: vt3-levanta 1.15s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--n) * 120ms + .5s); }
+  /* etapa 4 y 5: primero el encabezado, luego el contenido */
+  .vt-3d .vt-cab { animation: vt3-capa .7s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--n) * 120ms + 1s); }
+  .vt-3d .vt-items { animation: vt3-capa .8s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--n) * 120ms + 1.2s); }
+  /* etapa 6: se enciende la luz del mundo */
+  .vt-3d .vt-v::before { animation: vt3-luz 1.6s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--n) * 120ms + 1.35s); }
+
+  /* CAMBIO: sale girando hacia arriba, entra girando desde abajo */
+  .vt-3d:not([data-quieto]) .vt-item { transition: transform .85s cubic-bezier(.22, 1, .36, 1), opacity .55s cubic-bezier(.22, 1, .36, 1), filter .55s, visibility .85s; }
+  .vt-3d:not([data-quieto]) .vt-item:not([data-on]) { opacity: 0; filter: blur(3px); transform: rotateX(-88deg); }
+  .vt-3d:not([data-quieto]) .vt-item[data-sale] { transform: rotateX(88deg); }
+  .vt-3d .vt-v[data-latido]::after { animation: vt3-borde 1.4s cubic-bezier(.4, 0, .2, 1); }
+
+  /* Vida en reposo: la escena se balancea apenas (no con el mouse encima: ahí manda el mouse) */
+  .vt-3d .vt-escena { animation: vt3-respira 16s ease-in-out 3s infinite alternate; }
+  .vt-3d[data-mouse] .vt-escena { animation-play-state: paused; }
+
+  /* SCROLL: la portada se inclina hacia atrás y se aleja de a poco (navegadores compatibles) */
+  @supports (animation-timeline: view()) {
+    .portada-esc .vt-3d { animation: vt3-aleja linear both; animation-timeline: view(); animation-range: exit 0% exit 90%; }
+  }
+}
+@keyframes vt3-levanta { from { opacity: 0; filter: blur(8px); transform: perspective(900px) translate3d(0, 60px, -40px) rotateX(38deg) scale(.92); } 60% { filter: blur(0); } to { opacity: 1; transform: perspective(900px) translate3d(0, 0, 0) rotateX(0) scale(1); } }
+@keyframes vt3-capa { from { opacity: 0; transform: translate3d(0, 10px, 0); } to { opacity: 1; transform: none; } }
+@keyframes vt3-luz { from { opacity: 0; transform: scale(.5); } to { opacity: .55; transform: none; } }
+@keyframes vt3-borde { 0% { opacity: 0; --vt-ang: 0deg; } 15% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; --vt-ang: 360deg; } }
+@keyframes vt3-respira { from { transform: rotateX(1.2deg) rotateY(-1.6deg); } to { transform: rotateX(-.6deg) rotateY(1.6deg); } }
+@keyframes vt3-aleja { to { opacity: 0; filter: blur(5px); transform: perspective(1200px) translate3d(0, -2.5rem, -120px) rotateX(16deg); } }

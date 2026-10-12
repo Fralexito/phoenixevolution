@@ -600,6 +600,18 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Datos reales hoy (12 oct): Zona Social = publicaciones de prueba de Fralex; Duelos = ninguno abierto; Mi Club = movimientos «Demo …».
 - Pruebas 429 (3 nuevas). Build 45. Revisado a 1440 y 390 px con esos datos; video de 20 s.
 
+### Ronda 233 — PRUEBA: las 4 ventanas con 3D y movimiento por etapas (FX.ventanas3d)
+- Fralex eligió «las 4 ventanas» (ronda 232) como portada y pidió «más movimiento, sensación 3D, que cada sensación se sienta progresiva».
+- Bandera nueva **`FX.ventanas3d`** (encima de `FX.ventanas`). `false` = las 4 ventanas planas de la 232. Comprobado en el build.
+- Todo por capas (`styles/ventanas3d.css`):
+  - **Entrada**: título enfoca → las ventanas se levantan en 3D una tras otra (inclinadas, desde abajo y desenfocadas) → encabezado → contenido → se enciende la luz del mundo → recién a los ~3,4 s empieza la rotación.
+  - **Cambio**: el contenido gira como un tablero de aeropuerto (sale hacia arriba, entra desde abajo) y una luz del color del mundo recorre el borde de esa ventana (`@property --vt-ang`).
+  - **Mouse** (solo con mouse): toda la escena se inclina un poco hacia el mouse (±2°/±3°); la ventana bajo el mouse sube, se inclina más (±6°/±7°), su brillo sigue al mouse y sus capas se separan (paralaje: ícono y foto flotan más que el texto). Un solo `requestAnimationFrame` por cuadro (`profundidad()` en `js/features/ventanas.js`).
+  - **Reposo**: la escena se balancea apenas (16 s); se detiene con el mouse encima.
+  - **Scroll**: la portada se inclina hacia atrás y se aleja (animación ligada al scroll, navegadores compatibles).
+- HTML: `.vt-escena` envuelve la cuadrícula (da la perspectiva); clase `vt-3d` en `.vt`.
+- Nada se mueve con «menos movimiento». Pruebas 429. Build 45. Revisado a 1440 y 390 px; video de 39 s.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

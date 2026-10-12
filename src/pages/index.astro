@@ -96,13 +96,13 @@ const VENTANAS = [
     <div class="esc-luz" aria-hidden="true"><i></i><i></i></div>
     {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {!PORTADA.clip && PORTADA.imagen && <img class="tx-imagen" src={urlPortada(PORTADA.imagen)} alt="" aria-hidden="true" loading="eager" decoding="async" />}
-    <div class="vt" data-vt>
+    <div class:list={['vt', FX.ventanas3d && 'vt-3d']} data-vt>
       <h1 class="vt-tit" data-vt-tit>
         <span class="esc-l1">{palabras('Bienvenido a la').map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
         <span class="esc-l2 esc-marca"><span class="esc-w" style="--i:3">Galaxy</span></span>
       </h1>
       <p class="vt-sub">Esto está pasando ahora en la comunidad.</p>
-      <div class="vt-grid" data-vt-grid>
+      <div class="vt-escena"><div class="vt-grid" data-vt-grid>
         {VENTANAS.map((v, n) => (
           <a href={`${base}${v.href}`} class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id}>
             <span class="vt-cab"><span class="vt-ico"><i class={`fa-solid ${v.icono}`}></i></span><b>{v.nombre}</b><i class="fa-solid fa-arrow-right vt-flecha"></i></span>
@@ -116,7 +116,7 @@ const VENTANAS = [
             </span>
           </a>
         ))}
-      </div>
+      </div></div>
     </div>
     </Fragment>) : ESC ? (<Fragment>
     <!-- ESCENARIO (FX.escenario): titular + marcador + los 4 mundos. Lo mueve js/features/escenario.js. Todos los titulares vienen en el HTML. -->
