@@ -1,0 +1,106 @@
+/* PRUEBA · Portada «palco VIP» (FX.elite, ronda 228). Va ENCIMA de portada.css; si FX.elite = false, nada de esto se pinta.
+   Solo colores y fuentes de tokens.css. Idea: menos brillo repartido, brillo solo en lo importante (título, pase, botón principal). */
+
+/* ── Toque fino: menos neón, luz de estadio arriba ── */
+.portada-elite::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 55% 42% at 50% -8%, rgb(255 255 255 / .07), transparent 70%); }
+.portada-elite .hero-brillo { display: none; }
+.portada-elite .hero-aurora i { opacity: .13; }
+.portada-elite .portada-sello { background: transparent; box-shadow: none; border-color: rgb(0 229 255 / .28); letter-spacing: .28em; padding-inline: .9rem; }
+.portada-elite .portada-sub { color: #c3c7d0; }
+
+/* ── Fila del hero: texto a la izquierda, pase a la derecha (PC). En celular: uno debajo del otro. ── */
+.elite-fila { flex-direction: column; gap: 1.25rem; }
+@media (min-width: 1024px) {
+  .elite-fila { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, 17rem); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); max-width: 72rem; margin-inline: auto; }
+  .elite-texto { text-align: left; margin: 0; max-width: none; container-type: inline-size; }
+  /* El tamaño sigue al ancho real de la columna (no de la pantalla): así no se parte en 3 líneas cuando la columna de contactos está abierta */
+  .elite-texto .portada-tit { align-items: flex-start; font-size: clamp(2.75rem, 10.5cqi, 5.75rem); }
+  .elite-texto .portada-sub { margin: 0; max-width: 32rem; }
+}
+
+/* ── El pase (líder o miembro) ── */
+.vitrina { position: relative; z-index: 1; display: grid; justify-items: center; gap: .8rem; width: 100%; perspective: 1100px; }
+.pase {
+  --rx: 2deg; --ry: -7deg;
+  position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); gap: .7rem; width: min(17rem, 100%); padding: 1rem 1rem .85rem; border-radius: 1.25rem;
+  background: linear-gradient(160deg, rgb(18 0 43 / .95), var(--color-galaxy-card) 55%, var(--color-galaxy-deep));
+  border: 1px solid rgb(0 229 255 / .22);
+  box-shadow: 0 34px 70px -24px rgb(0 0 0 / .85), 0 0 0 1px rgb(128 0 255 / .12), inset 0 1px 0 rgb(255 255 255 / .07);
+  transform: rotateX(var(--rx)) rotateY(var(--ry)); transform-style: preserve-3d;
+  transition: transform .22s cubic-bezier(.22,1,.36,1);
+}
+.pase::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-600)); }
+.pase-holo { position: absolute; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: screen; opacity: .5;
+  background: linear-gradient(115deg, transparent 22%, rgb(0 229 255 / .16) 38%, rgb(128 0 255 / .22) 50%, rgb(255 255 255 / .1) 56%, transparent 72%);
+  background-size: 250% 250%; background-position: var(--mx, 25%) var(--my, 25%); transition: background-position .2s; }
+.pase-top { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.pase-tipo { min-width: 0; overflow: hidden; display: inline-flex; align-items: center; gap: .45rem; font: 700 .75rem var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--color-galaxy-400); white-space: nowrap; }
+.pase-tipo i { color: var(--color-gold-400); }
+.pase-temp { font: 700 .8rem var(--font-display); letter-spacing: .12em; color: #9ca3af; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pase-foto { position: relative; overflow: hidden; display: grid; place-items: center; aspect-ratio: 1 / .8; border-radius: .95rem; border: 1px solid rgb(255 255 255 / .06);
+  background: radial-gradient(circle at 50% 40%, rgb(128 0 255 / .32), transparent 68%), rgb(0 0 0 / .35); }
+.pase-foto > img:not(.pase-img) { width: 40%; height: auto; filter: drop-shadow(0 10px 24px rgb(0 0 0 / .6)); }
+.pase-foto > i { font-size: 3.5rem; color: var(--color-gold-400); }
+.pase-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.pase-foto.con-foto::after { content: ''; position: absolute; inset: 55% 0 0; background: linear-gradient(transparent, rgb(7 2 13 / .85)); }
+.pase-mini-escudo { position: absolute; z-index: 1; right: .55rem; bottom: .55rem; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 999px; background: rgb(0 0 0 / .55); border: 1px solid rgb(255 255 255 / .12); }
+.pase-ovr { position: absolute; z-index: 1; left: .6rem; top: .45rem; font: 700 1.9rem/1 var(--font-display); color: #fff; text-shadow: 0 2px 12px rgb(0 0 0 / .7); }
+.pase-inicial { font: 700 4rem/1 var(--font-display); color: transparent; background: linear-gradient(135deg, var(--color-galaxy-400), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; }
+.pase-id { min-width: 0; }
+.pase-nombre { font: 700 1.65rem/1.05 var(--font-display); letter-spacing: .03em; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pase-club { margin-top: .2rem; font: 600 .8rem var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pase-datos { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: .5rem; padding-top: .75rem; border-top: 1px solid var(--color-galaxy-border); }
+.pase-datos:empty { display: none; }
+.pase-datos dt { font: 700 .75rem var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: #6b7280; }
+.pase-datos dd { margin-top: .1rem; font: 700 1.15rem/1.15 var(--font-display); color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pase-pie { display: flex; justify-content: space-between; gap: .5rem; padding-top: .55rem; border-top: 1px dashed rgb(255 255 255 / .08); font: 600 .75rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #6b7280; }
+.pase-pie span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pase[data-pase='miembro'] .pase-pie { justify-content: center; }
+.pase[data-pase='miembro'] .pase-pie span:first-child { display: none; }
+.vitrina-nota { max-width: 17rem; text-align: center; font-size: .8rem; line-height: 1.4; color: #9ca3af; }
+
+/* Celular y tablet: pase horizontal y compacto (para no alargar la portada) */
+@media (max-width: 1023px) {
+  .pase { --rx: 0deg; --ry: 0deg; width: 100%; max-width: 26rem; grid-template-columns: 5.5rem minmax(0, 1fr); grid-template-areas: 'top top' 'foto id' 'datos datos'; align-items: center; gap: .7rem .9rem; padding: .9rem; text-align: left; }
+  .pase-top { grid-area: top; } .pase-foto { grid-area: foto; aspect-ratio: 1; } .pase-id { grid-area: id; } .pase-datos { grid-area: datos; padding-top: .6rem; }
+  .pase-pie, .vitrina-nota { display: none; }
+  .pase-nombre { font-size: 1.35rem; }
+  .pase-ovr { font-size: 1.25rem; left: .4rem; top: .3rem; }
+  .pase-mini-escudo { width: 1.9rem; height: 1.9rem; right: .3rem; bottom: .3rem; }
+  .pase-mini-escudo img { width: 18px; height: 18px; }
+  .pase-inicial { font-size: 3rem; }
+  .pase-foto > i { font-size: 2rem; }
+}
+
+/* ── Movimiento (solo si la persona no pidió menos movimiento) ── */
+@media (prefers-reduced-motion: no-preference) {
+  .vitrina { animation: elite-entra .7s cubic-bezier(.22,1,.36,1) .25s both; }
+  .pase:not([data-activo]) .pase-holo { animation: elite-holo 7s ease-in-out infinite alternate; }
+  /* Entrada tipo transmisión (1 vez al día, la activa js/features/elite.js): un haz de luz cruza la portada */
+  .portada-elite[data-intro]::after { content: ''; position: absolute; z-index: 2; top: -10%; bottom: -10%; left: -35%; width: 30%; pointer-events: none; transform: skewX(-18deg);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / .16), rgb(0 229 255 / .24), transparent); animation: elite-barrido 1.4s cubic-bezier(.45,0,.25,1) forwards; }
+}
+@keyframes elite-entra { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes elite-holo { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
+@keyframes elite-barrido { from { transform: translateX(0) skewX(-18deg); } to { transform: translateX(560%) skewX(-18deg); } }
+
+/* ── Campeones vigentes: la pared de trofeos ── */
+.campeones { display: grid; gap: .8rem; padding: 1rem 1.1rem; border-radius: 1.25rem; border: 1px solid var(--color-galaxy-border);
+  background: linear-gradient(90deg, rgb(251 191 36 / .05), transparent 28%, transparent 72%, rgb(251 191 36 / .05)), var(--color-galaxy-panel); }
+.campeones-tit { display: flex; align-items: center; justify-content: center; gap: .5rem; font: 700 .8rem var(--font-display); letter-spacing: .25em; text-transform: uppercase; color: var(--color-gold-300); white-space: nowrap; }
+.campeones-tit i { color: var(--color-gold-400); }
+.campeones-lista { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
+.campeon a { display: flex; flex-direction: column; align-items: center; gap: .45rem; padding: .5rem .35rem; border-radius: .9rem; border: 1px solid transparent; text-align: center; transition: background-color .15s, border-color .15s; }
+.campeon a:hover { background: rgb(255 255 255 / .03); border-color: rgb(251 191 36 / .25); }
+.campeon small { display: block; font: 700 .75rem var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.campeon b { display: block; font: 700 1rem/1.1 var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.campeon em { display: block; font-style: normal; font-size: .75rem; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.campeon-escudo { flex-shrink: 0; display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 999px; background: rgb(0 0 0 / .4); border: 1px solid var(--color-galaxy-border); }
+.campeon-oro small { color: var(--color-gold-300); }
+.campeon-oro .campeon-escudo { border-color: rgb(251 191 36 / .6); box-shadow: 0 0 18px rgb(251 191 36 / .22); }
+.campeones-ver { justify-self: center; display: inline-flex; align-items: center; gap: .4rem; font: 700 .75rem var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #9ca3af; }
+.campeones-ver:hover { color: var(--color-gold-300); }
+@media (min-width: 768px) {
+  .campeones { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1.5rem; padding: .9rem 1.5rem; }
+  .campeon a { flex-direction: row; text-align: left; gap: .75rem; padding: .55rem .75rem; }
+}

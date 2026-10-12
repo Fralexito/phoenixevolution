@@ -534,6 +534,18 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Archivos nuevos: `styles/portada.css`, `js/features/mundos.js`, `js/core/pestanas.js`, `tests/pestanas.test.mjs`. Sin cambios en colores, barras, ticker ni otras páginas.
 - Pruebas: 419 (2 nuevas). Build 45 páginas. Revisado en capturas a 1440, 390 y 360 px.
 
+### Ronda 228 — PRUEBA: portada «palco VIP» (FX.elite)
+- Bandera nueva **`FX.elite`** (`data/experimento.js`), ENCIMA de `FX.portada`. `false` = vuelve la portada de la ronda 227 tal cual (comprobado en el build). Fralex: «haz toda tu propuesta, si no me gusta volvemos a la anterior».
+- **Pase en la portada** (`aside.vitrina`): en PC va a la derecha del título (inclinado en 3D, brillo holográfico que sigue al mouse); en celular, horizontal y compacto bajo la frase.
+  - Sin sesión: «Líder de la Galaxy» (se calcula al construir desde `ligaResultados.js`, así sale al instante). Si su ficha en `jugadores` tiene foto (nombre o apodo igual), se pone la foto y su media.
+  - Con sesión: «Pase de miembro»: número de miembro (= cuentas creadas hasta la suya, `perfiles.created_at`), puesto, puntos y próximo rival si juega la Galaxy; foto de su ficha (`jugadores.perfil_id`) o avatar o inicial; «Miembro desde mes año». La etiqueta de arriba dice «Bienvenido de vuelta, <nombre>». Al cerrar sesión vuelve el pase del líder.
+- **Campeones vigentes**: franja dorada al inicio del contenido con el podio de `data/palmares.js` (`PODIO`); el de liga va en oro. Enlace a Palmarés.
+- **Menos brillo**: sin la mancha de luz central, aurora más tenue, etiqueta sin resplandor, luz de estadio arriba.
+- **Entrada tipo transmisión**: un haz de luz cruza la portada 1 vez al día (`localStorage` `pes-intro-dia`); nunca con «menos movimiento».
+- El título ajusta su tamaño al ancho de su columna (container query), para no partirse en 3 líneas con la columna de contactos abierta.
+- Archivos: `styles/elite.css`, `js/features/elite.js`, `js/core/pase.js`, `tests/pase.test.mjs`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
+- Pruebas: 423 (4 nuevas). Build 45 páginas. Revisado a 1440 (con y sin columna de contactos) y 390 px, como visitante y con una sesión simulada.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

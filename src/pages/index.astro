@@ -5,7 +5,19 @@ import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import MarcadorVivo from '../components/MarcadorVivo.astro';
+import { EDICIONES } from '../data/ligaResultados.js';
+import { PODIO } from '../data/palmares.js';
+import { calcularTabla } from '../js/core/tabla.js';
+import { liderDe } from '../js/core/pase.js';
+import { escudoHTML } from '../js/core/escudos.js';
 const base = import.meta.env.BASE_URL;
+// PRUEBA (FX.elite, ronda 228): portada «palco VIP». Va encima de FX.portada; si se apaga, vuelve la portada de la ronda 227.
+const ELITE = FX.limpio && FX.portada && FX.elite;
+const edGalaxy = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;
+const lider = liderDe(calcularTabla((edGalaxy?.fechas ?? []).flatMap((f) => f.partidos)).tabla);
+const liderClub = lider ? (edGalaxy?.clubes?.[lider.nombre] ?? '') : '';
+// Campeones vigentes = el podio del Palmarés (edición terminada). El de liga (gold) va al centro.
+const CAMPEONES = PODIO.map((c) => ({ copa: c.copa, dt: c.dt, club: c.club, oro: Boolean(c.gold) }));
 // «¿Qué quieres hacer?»: las acciones más buscadas, a un clic desde Central. `invitado` = solo sin sesión; `cuenta` = solo con sesión (lo decide html[data-sesion]).
 const ACCIONES = [
   { href: 'duelos/', icono: 'fa-gamepad', titulo: 'Jugar un reto', txt: 'Reta a alguien y arma la sala', tono: 'primario' },
@@ -43,11 +55,11 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
-  <header class="relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40">
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
+  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite']} data-portada>
+    <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="flex items-center justify-center w-full"><div class="max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-5">
-      <span class="inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
+    <div class:list={['flex items-center justify-center w-full', ELITE && 'elite-fila']}><div class:list={['max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-5', ELITE && 'elite-texto']}>
+      <span data-saludo class="portada-sello inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
       {FX.portada ? (<Fragment>
       <h1 class="portada-tit">
         <span class="portada-linea"><span style="--i:0">Bienvenido</span> <span style="--i:1">a la</span></span>
@@ -67,7 +79,31 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
       </div>
       <p class="pt-1"><a href={`${base}unirme/`} class="inline-flex items-center gap-2 text-[12px] sm:text-xs font-display font-bold uppercase tracking-widest text-galaxy-400 hover:text-white border border-galaxy-400/30 bg-galaxy-400/10 hover:bg-galaxy-400/20 px-3.5 py-1.5 rounded-full transition-colors"><i class="fa-solid fa-door-open"></i> ¿Eres nuevo? Únete a la liga en 5 pasos <i class="fa-solid fa-arrow-right"></i></a></p>
       </Fragment>}
-    </div></div>
+    </div>
+    {ELITE && (<Fragment>
+    <!-- VITRINA (FX.elite): sin sesión = pase del líder de la Galaxy; con sesión = «pase de miembro» de quien entra (lo pinta js/features/elite.js). -->
+    <aside class="vitrina" id="vitrina" aria-label="Pase destacado">
+      <div class="pase" data-pase="lider">
+        <span class="pase-holo" aria-hidden="true"></span>
+        <div class="pase-top"><span class="pase-tipo" data-pase-tipo><i class="fa-solid fa-crown"></i> {lider ? 'Líder de la Galaxy' : 'Galaxy League'}</span><span class="pase-temp" data-pase-num>2026</span></div>
+        <div class="pase-foto" data-pase-foto><Fragment set:html={lider ? escudoHTML(liderClub, 88) : '<i class="fa-solid fa-trophy"></i>'} /></div>
+        <div class="pase-id">
+          <p class="pase-nombre" data-pase-nombre>{lider ? lider.nombre : 'Temporada 2026'}</p>
+          <p class="pase-club" data-pase-club>{lider ? liderClub : 'La liga empieza pronto'}</p>
+        </div>
+        <dl class="pase-datos" data-pase-datos>
+          {lider && <Fragment>
+          <div><dt>Puesto</dt><dd>1.º</dd></div>
+          <div><dt>Puntos</dt><dd>{lider.pts}</dd></div>
+          <div><dt>Partidos</dt><dd>{lider.pj}</dd></div>
+          </Fragment>}
+        </dl>
+        <div class="pase-pie"><span>Phoenix Evolution</span><span data-pase-pie>Galaxy League</span></div>
+      </div>
+      <p class="vitrina-nota" data-vitrina-nota>Juega, sube en la tabla y tu nombre puede estar aquí.</p>
+    </aside>
+    </Fragment>)}
+    </div>
   <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
   {FX.limpio ? (
     <div class="relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
@@ -128,6 +164,24 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
   </header>
 
   <div class:list={["max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full", FX.limpio ? "space-y-12 sm:space-y-16" : "space-y-8 sm:space-y-10"]}>
+
+    {ELITE && (<Fragment>
+    <!-- CAMPEONES VIGENTES (FX.elite): la pared de trofeos de la entrada. Datos: data/palmares.js (PODIO). -->
+    <section class="campeones" aria-labelledby="campeones-t">
+      <h2 id="campeones-t" class="campeones-tit"><i class="fa-solid fa-trophy"></i> Campeones vigentes</h2>
+      <ul class="campeones-lista">
+        {CAMPEONES.map((c) => (
+          <li class:list={['campeon', c.oro && 'campeon-oro']}>
+            <a href={`${base}palmares/`}>
+              <span class="campeon-escudo"><Fragment set:html={escudoHTML(c.club, 36)} /></span>
+              <span class="min-w-0"><small>{c.copa}</small><b>{c.dt}</b><em>{c.club}</em></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="campeones-ver" href={`${base}palmares/`}>Palmarés <i class="fa-solid fa-arrow-right"></i></a>
+    </section>
+    </Fragment>)}
 
     {!FX.limpio && <Fragment>
     <!-- 00. ¿QUÉ QUIERES HACER? Accesos directos a lo más usado (que nada importante quede escondido en menús). -->
@@ -312,5 +366,6 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
   import { montarMundos } from '../js/features/mundos.js';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();
+  import('../js/features/elite.js').then((m) => m.montarElite()).catch((e) => console.warn('[central] elite:', e));
   document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));
 </script>
