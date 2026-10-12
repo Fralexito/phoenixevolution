@@ -11,6 +11,10 @@
 
 /* ── Escena: la profundidad la da la perspectiva del contenedor ── */
 .vt-3d .vt-escena { width: 100%; margin-top: 1.25rem; perspective: 1400px; perspective-origin: 50% 0%; }
+/* La cuadrícula NO recibe clics: al inclinarse una ventana, parte de ella queda «detrás» del plano de la cuadrícula
+   y el clic le llegaba a la cuadrícula en vez de a la ventana. Así el clic siempre llega a la ventana. */
+.vt-3d .vt-grid { pointer-events: none; }
+.vt-3d .vt-v { pointer-events: auto; }
 .vt-3d .vt-grid { margin-top: 0; transform-style: preserve-3d; transform: rotateX(var(--gx, 0deg)) rotateY(var(--gy, 0deg)); transition: transform 1s cubic-bezier(.22, 1, .36, 1); }
 @media (max-width: 639px) { .vt-3d .vt-escena { margin-top: .75rem; } }
 

@@ -75,6 +75,7 @@ export function montarVentanas() {
   const cargas = [['social', social], ['duelos', duelos], ['club', mercado]];
   cargas.forEach(([id, fn]) => fn().then((items) => pintar(caja(id), items)).catch((e) => console.warn(`[ventanas] ${id}:`, e?.message ?? e)));
 
+  if (root.classList.contains('vt-plus')) caras(root);   // las caras funcionan siempre (también con «menos movimiento»)
   if (hayMovimientoReducido()) { root.setAttribute('data-quieto', ''); return; }
   const ventanas = [...root.querySelectorAll('[data-vt-ventana]')];
   const grid = root.querySelector('[data-vt-grid]');
@@ -95,6 +96,7 @@ export function montarVentanas() {
     // Busca la siguiente ventana que tenga más de un elemento (si ninguna tiene, no hace nada).
     for (let k = 0; k < ventanas.length; k += 1) {
       const v = ventanas[(turno + k) % ventanas.length];
+      if (v.hasAttribute('data-girada')) continue;   // la que está dada vuelta no cambia
       const items = [...v.querySelectorAll('.vt-item')];
       if (items.length < 2) continue;
       const i = items.findIndex((x) => x.hasAttribute('data-on'));
@@ -114,6 +116,7 @@ function profundidad(root) {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const header = root.closest('[data-portada]') ?? root;
   const grid = root.querySelector('[data-vt-grid]');
+  const galaxy = root.querySelector('[data-vt-galaxy]');
   let pend = null; let activa = null;
   const aplicar = () => {
     const e = pend; pend = null; if (!e || !grid) return;
@@ -121,6 +124,7 @@ function profundidad(root) {
     const gx = ((e.clientY - r.top) / r.height - 0.5) * -4;   // escena: máx. ±2°
     const gy = ((e.clientX - r.left) / r.width - 0.5) * 6;    // escena: máx. ±3°
     grid.style.setProperty('--gx', `${gx.toFixed(2)}deg`); grid.style.setProperty('--gy', `${gy.toFixed(2)}deg`);
+    galaxy?.style.setProperty('--gtx', `${(gx * 3).toFixed(2)}deg`); galaxy?.style.setProperty('--gty', `${(gy * 3).toFixed(2)}deg`);
     const v = e.target.closest?.('[data-vt-ventana]');
     if (activa && activa !== v) soltar(activa);
     if (!v) { activa = null; return; }
@@ -138,6 +142,43 @@ function profundidad(root) {
   header.addEventListener('pointerleave', () => {
     root.removeAttribute('data-mouse'); pend = null;
     grid?.style.removeProperty('--gx'); grid?.style.removeProperty('--gy');
+    galaxy?.style.removeProperty('--gtx'); galaxy?.style.removeProperty('--gty');
     if (activa) { soltar(activa); activa = null; }
   });
+}
+
+// Caras (FX.interactivo): tocar una ventana la da vuelta y muestra qué puedes hacer en ese mundo. Solo una dada vuelta a la vez.
+// Escape, «×» o tocar fuera la vuelven. Con teclado, el foco va al primer enlace del dorso y regresa al volver.
+function caras(root) {
+  const vs = [...root.querySelectorAll('[data-vt-ventana]')];
+  let abierta = null;
+  const poner = (v, si, foco) => {
+    const btn = v.querySelector('[data-vt-girar]'); const dorso = v.querySelector('.vt-dorso'); const frente = v.querySelector('.vt-frente');
+    v.toggleAttribute('data-girada', si);
+    btn?.setAttribute('aria-expanded', String(si));
+    if (dorso) dorso.inert = !si;
+    if (frente) frente.inert = si;
+    if (foco) (si ? dorso?.querySelector('a') : btn)?.focus({ preventScroll: true });
+  };
+  const cerrar = (foco = false) => { if (!abierta) return; const v = abierta; abierta = null; poner(v, false, foco); };
+  vs.forEach((v) => {
+    v.querySelector('[data-vt-girar]')?.addEventListener('click', (e) => {
+      destello(v, e);
+      if (abierta && abierta !== v) cerrar();
+      abierta = v; poner(v, true, e.detail === 0);
+    });
+    v.querySelector('[data-vt-volver]')?.addEventListener('click', () => cerrar(true));
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrar(true); });
+  document.addEventListener('pointerdown', (e) => { if (abierta && !abierta.contains(e.target)) cerrar(); });
+}
+
+// Destello de luz desde el punto donde se tocó (del color del mundo).
+function destello(v, e) {
+  if (hayMovimientoReducido()) return;
+  const cara = v.querySelector('.vt-frente'); if (!cara) return;
+  const r = cara.getBoundingClientRect();
+  const x = e.clientX ? e.clientX - r.left : r.width / 2; const y = e.clientY ? e.clientY - r.top : r.height / 2;
+  const s = document.createElement('span'); s.className = 'vt-destello'; s.style.left = `${x}px`; s.style.top = `${y}px`;
+  cara.append(s); s.addEventListener('animationend', () => s.remove());
 }

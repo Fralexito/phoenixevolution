@@ -1,0 +1,112 @@
+/* PRUEBA · 4 ventanas interactivas (FX.interactivo, ronda 234). Va encima de ventanas.css y ventanas3d.css.
+   Fralex: «más animación, más diseño 3D, más cosas interactivas, pero sin llegar a ser aturdidor».
+   REGLA ANTI-MAREO: solo UNA cosa se mueve sola a la vez (el turno de las ventanas); el cielo es lentísimo; todo lo demás
+   (girar una ventana, el destello, la inclinación, «Galaxy») responde a lo que hace la persona.
+   · Cada ventana tiene 2 caras: al tocarla gira en 3D y el dorso muestra qué puedes hacer en ese mundo (los accesos de MUNDOS).
+   · «Galaxy» con volumen (capas de sombra de la paleta) que se inclina con el mouse.
+   · Cielo de estrellas en 3D (canvas, js/features/estrellas.js) detrás de todo. Solo colores de tokens.css. */
+
+/* ── Cielo ── */
+.vt-estrellas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%); mask-image: linear-gradient(to bottom, #000 55%, transparent 100%); }
+
+/* ── «Galaxy» con volumen ── */
+.vt-plus [data-vt-galaxy] { justify-self: center; display: inline-block; transform: perspective(700px) rotateX(var(--gtx, 0deg)) rotateY(var(--gty, 0deg)); transition: transform .9s cubic-bezier(.22, 1, .36, 1);
+  filter: drop-shadow(0 2px 0 color-mix(in srgb, var(--color-galaxy-600) 70%, var(--color-galaxy-900)))
+          drop-shadow(0 2px 0 color-mix(in srgb, var(--color-galaxy-600) 45%, var(--color-galaxy-900)))
+          drop-shadow(0 2px 0 color-mix(in srgb, var(--color-galaxy-600) 25%, var(--color-galaxy-900)))
+          drop-shadow(0 16px 22px rgb(0 0 0 / .55)); }
+
+/* ── La ventana deja de ser una caja: ahora es un soporte 3D que lleva 2 caras ── */
+.vt-plus .vt-v, .vt-plus.vt-3d .vt-v[data-hover] { display: block; padding: 0; border: 0; border-radius: 1.25rem; background: none; box-shadow: none; overflow: visible; isolation: auto; }
+.vt-plus .vt-v::before, .vt-plus .vt-v::after { content: none; }
+.vt-plus .vt-giro { position: relative; display: grid; height: 100%; transform-style: preserve-3d; transition: transform .95s cubic-bezier(.22, 1, .36, 1), scale .18s cubic-bezier(.22, 1, .36, 1); }
+.vt-plus .vt-v[data-girada] .vt-giro { transform: rotateY(180deg); }
+.vt-plus .vt-v:has(.vt-girar:active) .vt-giro { scale: .97; }
+
+.vt-plus .vt-cara { grid-area: 1 / 1; position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-rows: auto 1fr; gap: 1.1rem; padding: 1.15rem;
+  border-radius: 1.25rem; border: 1px solid rgb(255 255 255 / .07); background: linear-gradient(180deg, rgb(255 255 255 / .045), rgb(255 255 255 / .014)), rgb(7 2 13 / .55);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .05) inset, 0 28px 50px -30px rgb(0 0 0 / .9);
+  -webkit-backface-visibility: hidden; backface-visibility: hidden; transition: border-color .35s, box-shadow .5s cubic-bezier(.22, 1, .36, 1); }
+.vt-plus .vt-dorso { transform: rotateY(180deg); background: linear-gradient(160deg, color-mix(in srgb, var(--vt-c) 14%, transparent), rgb(255 255 255 / .02) 60%), rgb(7 2 13 / .75); border-color: color-mix(in srgb, var(--vt-c) 35%, transparent); }
+/* Luz del mundo (antes estaba en la ventana; ahora en cada cara) */
+.vt-plus .vt-cara::before { content: ''; position: absolute; z-index: -1; inset: -40% 30% 45% -40%; border-radius: 999px; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--vt-c) 30%, transparent), transparent 65%); opacity: .55; transition: opacity .9s cubic-bezier(.22, 1, .36, 1), transform .9s cubic-bezier(.22, 1, .36, 1); }
+.vt-plus .vt-v[data-latido] .vt-frente::before { opacity: 1; transform: scale(1.12); }
+/* Luz que recorre el borde (en la cara de adelante) */
+.vt-plus .vt-frente::after { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; opacity: 0;
+  background: conic-gradient(from var(--vt-ang), transparent 0 62%, color-mix(in srgb, var(--vt-c) 90%, white) 80%, transparent 96%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+/* Mouse encima: la cara se ilumina y su brillo sigue al mouse */
+.vt-plus .vt-v[data-hover] .vt-frente { border-color: color-mix(in srgb, var(--vt-c) 45%, transparent);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .08) inset, 0 40px 70px -28px rgb(0 0 0 / .95), 0 22px 50px -30px color-mix(in srgb, var(--vt-c) 70%, transparent);
+  background-image: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgb(255 255 255 / .08), transparent 42%), linear-gradient(180deg, rgb(255 255 255 / .05), rgb(255 255 255 / .015)); }
+.vt-plus .vt-v[data-hover] .vt-frente::before { opacity: .95; transform: scale(1.1); }
+
+/* Botón que cubre la cara (toda la ventana se puede tocar). La flecha del encabezado va directo a la sección. */
+.vt-girar { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; border-radius: inherit; background: none; cursor: pointer; }
+.vt-girar:focus-visible { outline: 2px solid var(--vt-c); outline-offset: -3px; }
+.vt-plus .vt-cab { position: relative; z-index: 2; pointer-events: none; }
+.vt-plus .vt-cab a, .vt-plus .vt-cab button { pointer-events: auto; }
+.vt-ir, .vt-volver { display: grid; place-items: center; width: 2rem; height: 2rem; margin: -.4rem -.4rem -.4rem 0; border: 0; border-radius: 999px; background: none; color: inherit; cursor: pointer; transition: background-color .2s; }
+.vt-ir:hover, .vt-volver:hover { background: rgb(255 255 255 / .08); }
+.vt-ir:focus-visible, .vt-volver:focus-visible { outline: 2px solid var(--vt-c); outline-offset: 1px; }
+.vt-volver { color: #d1d5db; font-size: .85rem; }
+/* Pista: un iconito que invita a dar vuelta (sin más texto) */
+.vt-pista { position: absolute; right: 1rem; bottom: .95rem; font-size: 0; color: color-mix(in srgb, var(--vt-c) 70%, white); opacity: .35; transition: opacity .3s, transform .6s cubic-bezier(.22, 1, .36, 1); pointer-events: none; }
+.vt-pista i { font-size: .8rem; }
+.vt-plus .vt-frente .vt-txt small { padding-right: 1.5rem; }
+.vt-plus .vt-v[data-hover] .vt-pista { opacity: .9; transform: rotate(180deg); }
+
+/* Dorso: los accesos de ese mundo */
+.vt-acciones { display: grid; align-content: start; gap: .4rem; }
+.vt-accion { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-width: 0; padding: .55rem .75rem; border-radius: .75rem; background: rgb(255 255 255 / .045);
+  font: 600 1rem var(--font-display); color: #fff; transition: background-color .2s, color .2s, transform .2s cubic-bezier(.22, 1, .36, 1); }
+.vt-accion span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vt-accion i { flex-shrink: 0; font-size: .75rem; color: #9ca3af; transition: transform .25s cubic-bezier(.22, 1, .36, 1), color .2s; }
+.vt-accion-prim { color: var(--vt-c); }
+.vt-accion:hover { background: color-mix(in srgb, var(--vt-c) 16%, transparent); }
+.vt-accion:hover i { transform: translateX(3px); color: var(--vt-c); }
+.vt-accion:focus-visible { outline: 2px solid var(--vt-c); outline-offset: 1px; }
+
+/* Destello donde se tocó */
+.vt-destello { position: absolute; z-index: 3; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 999px; pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--vt-c) 85%, white), transparent 70%); animation: vt4-destello .75s cubic-bezier(.22, 1, .36, 1) forwards; }
+@keyframes vt4-destello { from { opacity: .7; transform: scale(1); } to { opacity: 0; transform: scale(16); } }
+
+@media (max-width: 639px) {
+  .vt-plus .vt-cara { padding: .85rem; gap: .8rem; border-radius: 1rem; }
+  .vt-plus .vt-v { border-radius: 1rem; }
+  .vt-accion { padding: .45rem .55rem; font-size: .9rem; }
+  .vt-acciones { gap: .3rem; }
+  .vt-pista { right: .75rem; bottom: .75rem; opacity: .55; }
+  .vt-plus .vt-frente .vt-txt small { padding-right: 1.1rem; }
+  /* En celular la flecha del encabezado sobra (el dorso ya lleva a cada sección): así entra el nombre completo */
+  .vt-plus .vt-ir { display: none; }
+  .vt-plus .vt-cab b { letter-spacing: .04em; }
+  .vt-plus .vt-volver { width: 1.75rem; height: 1.75rem; }
+}
+@media (hover: none) { .vt-pista { opacity: .55; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Al darse vuelta, los accesos del dorso aparecen uno tras otro */
+  .vt-plus .vt-v[data-girada] .vt-accion { animation: vt3-capa .5s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: .35s; }
+  .vt-plus .vt-v[data-girada] .vt-accion:nth-child(2) { animation-delay: .42s; }
+  .vt-plus .vt-v[data-girada] .vt-accion:nth-child(3) { animation-delay: .49s; }
+  .vt-plus .vt-v[data-latido] .vt-frente::after { animation: vt3-borde 1.4s cubic-bezier(.4, 0, .2, 1); }
+  .vt-plus .vt-cara::before { animation: vt3-luz 1.6s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--n) * 120ms + 1.35s); }
+}
+/* Con «menos movimiento» (del sistema o de los ajustes de la web): las caras se cambian sin girar, con un fundido */
+@media (prefers-reduced-motion: reduce) {
+  .vt-plus .vt-giro { transition: none; }
+  .vt-plus .vt-v[data-girada] .vt-giro, .vt-plus .vt-dorso { transform: none; }
+  .vt-plus .vt-dorso { opacity: 0; }
+  .vt-plus .vt-v[data-girada] .vt-dorso { opacity: 1; }
+  .vt-plus .vt-v[data-girada] .vt-frente { opacity: 0; }
+}
+html[data-aj-mov-efectivo='reducido'] .vt-plus .vt-giro { transition: none; }
+html[data-aj-mov-efectivo='reducido'] .vt-plus .vt-v[data-girada] .vt-giro, html[data-aj-mov-efectivo='reducido'] .vt-plus .vt-dorso { transform: none; }
+html[data-aj-mov-efectivo='reducido'] .vt-plus .vt-dorso { opacity: 0; }
+html[data-aj-mov-efectivo='reducido'] .vt-plus .vt-v[data-girada] .vt-dorso { opacity: 1; }
+html[data-aj-mov-efectivo='reducido'] .vt-plus .vt-v[data-girada] .vt-frente { opacity: 0; }

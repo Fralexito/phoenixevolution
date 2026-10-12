@@ -612,6 +612,18 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - HTML: `.vt-escena` envuelve la cuadrícula (da la perspectiva); clase `vt-3d` en `.vt`.
 - Nada se mueve con «menos movimiento». Pruebas 429. Build 45. Revisado a 1440 y 390 px; video de 39 s.
 
+### Ronda 234 — PRUEBA: ventanas interactivas, cielo 3D y «Galaxy» con volumen (FX.interactivo)
+- Fralex: «más animación, más diseño 3D, más cosas interactivas, pero sin llegar a ser aturdidor». Dijo que piensa aplicar esta estética a toda la página (pendiente: se hará página por página, con su OK).
+- Bandera nueva **`FX.interactivo`** (encima de `FX.ventanas3d`). `false` = vuelve la ronda 233. Comprobado en el build.
+- **Regla anti-mareo**: solo UNA cosa se mueve sola a la vez (el turno de las ventanas); el cielo es lentísimo; todo lo demás responde a la persona.
+- **Ventanas con 2 caras**: tocar (clic, Enter o dedo) la da vuelta en 3D; el dorso muestra los 3 accesos de ese mundo (lista `MUNDOS`). Solo una dada vuelta a la vez; Escape, «×» o tocar fuera la vuelven. Con teclado el foco va al primer enlace del dorso y regresa al volver (caras con `inert`). La dada vuelta no rota. La flecha del encabezado sigue llevando directo a la sección (en celular se oculta). Con «menos movimiento» las caras cambian con fundido, sin girar.
+- **Destello** del color del mundo desde el punto tocado; la ventana se «hunde» un poco al presionar (`scale` con `:has(.vt-girar:active)`).
+- **Cielo de estrellas en 3D** (`js/features/estrellas.js`, canvas): 90 estrellas en PC / 45 en celular en 3 capas, paralaje con el mouse y con el scroll, una estrella fugaz cada ~14 s. Se detiene si no se ve o la pestaña está oculta; quieto con «menos movimiento».
+- **«Galaxy» con volumen**: capas de sombra de la paleta (`drop-shadow` con `color-mix` de tokens) y se inclina con el mouse.
+- **Arreglo** (también afectaba a la 233): al inclinarse una ventana, parte quedaba «detrás» del plano de la cuadrícula y el clic lo recibía la cuadrícula. Ahora `.vt-grid` no recibe clics y `.vt-v` sí.
+- Archivos: `styles/ventanasplus.css`, `js/features/estrellas.js`, `js/features/ventanas.js` (caras, destello, «Galaxy»), `styles/ventanas3d.css`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
+- Pruebas 429. Build 45. Probado: clic, teclado, Escape, toque en celular; revisado a 1440 y 390 px; video de 34 s.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
