@@ -6,3 +6,6 @@
 .cuenta-bloque { padding: .35rem .25rem .25rem; font-size: .75rem; letter-spacing: .12em; color: #4b5563; text-transform: none; }
 /* Sin huecos: si un bloque tiene un número impar de secciones, la última ocupa todo el ancho (orden visual, nada «cojo»). */
 .pilar-bloque + .pilar-grid > .pilar-item:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* Red de enlaces (ronda 248): sin huecos en la cuadrícula. 4 cuadros → 2×2; 2 cuadros → 2 columnas; 1 → ancho completo. */
+.cuenta-mosaico:has(> :nth-child(4):last-child), .cuenta-mosaico:has(> :nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cuenta-mosaico:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }

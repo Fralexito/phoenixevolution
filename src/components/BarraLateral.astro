@@ -3,6 +3,7 @@
 // y se puede «fijar» abierta. Atajos + tus ligas + (con sesión) tus amigos. El menú de la derecha sigue existiendo. La parte dinámica (amigos) la pinta features/barraLateral.js.
 import { NAV, NAV_EXTRA, ACCOUNT_NAV } from '../data/site.js';
 import { LIGAS } from '../data/ligas.js';
+import { FX } from '../data/experimento.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
 const todos = [...NAV, ...NAV_EXTRA];
@@ -11,16 +12,30 @@ const todosMas = [...todos, ...ACCOUNT_NAV];
 const atajos = ['ahora', 'missalas', 'duelos', 'creadores', 'ranking', 'eventos'].map((id) => todosMas.find((n) => n.id === id && n.path)).filter(Boolean);
 const cuenta = ['muro', 'partidos', 'mensajes'].map((id) => ACCOUNT_NAV.find((n) => n.id === id)).filter((n) => n?.path);
 const item = (n, id = n.id) => ({ ...n, actual: active === id });
+// REPARTO (FX.reparto, ronda 248): los atajos siguen los 3 grupos del menú (antes: «En vivo y comunidad» mezclaba de todo).
+const busca = (ids) => ids.map((id) => todosMas.find((n) => n.id === id && n.path)).filter(Boolean);
+const SECCIONES = FX.reparto ? [
+  { tit: 'Jugar ahora', items: busca(['duelos', 'ahora', 'missalas']).map((n) => n.id === 'ahora' ? { ...n, label: 'En vivo' } : n) },
+  { tit: 'Comunidad', items: busca(['chatgeneral', 'creadores', 'eventos']) },
+] : [{ tit: 'En vivo y comunidad', items: atajos }];
+const extraLigas = FX.reparto ? busca(['ranking']) : [];
 ---
 <aside id="barra-lat" class="barra-lat" aria-label="Barra lateral" hidden>
-  <nav class="barra-sec" aria-label="Atajos">
-    <p class="barra-tit">En vivo y comunidad</p>
-    {atajos.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
-  </nav>
+  {SECCIONES.slice(0, 1).map((sec) => (
+  <nav class="barra-sec" aria-label={sec.tit}>
+    <p class="barra-tit">{sec.tit}</p>
+    {sec.items.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
+  </nav>))}
   <nav class="barra-sec" aria-label="Ligas">
-    <p class="barra-tit">Ligas</p>
+    <p class="barra-tit">{FX.reparto ? 'Competir' : 'Ligas'}</p>
     {LIGAS.map((l) => (<a href={`${base}liga/#liga-${l.id}`} class="barra-item" title={l.titulo.join(' ')} data-liga-tema={l.id}><i class={`fa-solid ${l.icono}`}></i><span class="barra-txt">{l.titulo.join(' ')}</span></a>))}
+    {extraLigas.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
   </nav>
+  {SECCIONES.slice(1).map((sec) => (
+  <nav class="barra-sec" aria-label={sec.tit}>
+    <p class="barra-tit">{sec.tit}</p>
+    {sec.items.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
+  </nav>))}
   <nav id="barra-cuenta" class="barra-sec" aria-label="Mi cuenta" hidden>
     <p class="barra-tit">Mi cuenta</p>
     {cuenta.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}

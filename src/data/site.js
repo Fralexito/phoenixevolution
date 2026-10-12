@@ -31,7 +31,7 @@ export const APOYO = { href: '', texto: 'Apoya la comunidad' };
 
 // Menú lateral, grupo "Mi cuenta": solo se muestra con sesión iniciada.
 // Para añadir una sección futura, agrega UNA línea aquí (con `path` para una página o `action` para algo del sistema).
-export const ACCOUNT_NAV = [
+const ACCOUNT_NAV_BASE = [
   { id: 'perfil',   label: 'Mi perfil',   action: 'profile',              icon: 'fa-user', grupo: 'tu' },
   { id: 'muro',     label: 'Mi muro',      path: 'perfil/',        icon: 'fa-newspaper', grupo: 'tu' },
   { id: 'partidos', label: 'Mis partidos', path: 'mis-partidos/',  icon: 'fa-gamepad', grupo: 'tu' },
@@ -61,8 +61,21 @@ export const ACCOUNT_NAV = [
   { id: 'salir',    label: 'Salir',        action: 'logout',               icon: 'fa-right-from-bracket', abajo: true },
 ];
 
+// REPARTO (FX.reparto, ronda 248): el panel «Red de enlaces» queda SOLO con lo tuyo, en 2 grupos (+ Staff).
+// Lo público (En vivo, Salas, Chat, Clanes, Eventos, Ranking, Tienda, Torneos, Formatos) ya vive en los 3 grupos del menú
+// (arriba en PC, al inicio del panel en celular): aquí se ocultaba duplicado. Siguen en el buscador (`menu: false`).
+const ORDEN_CUENTA = { perfil: ['tu', 1], muro: ['tu', 2], logros: ['tu', 3], guardados: ['tu', 4], mensajes: ['tu', 5], amigos: ['tu', 6],
+  partidos: ['juego', 1], missalas: ['juego', 2], manager: ['juego', 3], miclub: ['juego', 4], moderacion: ['staff', 1], auditoria: ['staff', 2] };
+const repartirCuenta = (lista) => {
+  const pos = (n) => (ORDEN_CUENTA[n.id]?.[1] ?? 99);
+  return lista.map((n) => n.abajo ? n : ORDEN_CUENTA[n.id] ? { ...n, grupo: ORDEN_CUENTA[n.id][0] } : { ...n, menu: false })
+    .sort((a, b) => (a.abajo ? 1 : 0) - (b.abajo ? 1 : 0) || pos(a) - pos(b));
+};
+export const ACCOUNT_NAV = FX.reparto ? repartirCuenta(ACCOUNT_NAV_BASE) : ACCOUNT_NAV_BASE;
+
 // Bloques del panel «Mi cuenta», en este orden.
-export const GRUPOS_CUENTA = [
+const GRUPOS_CUENTA_REPARTO = [{ id: 'tu', label: 'Tú' }, { id: 'juego', label: 'Tu juego' }, { id: 'staff', label: 'Staff' }];
+export const GRUPOS_CUENTA = FX.reparto ? GRUPOS_CUENTA_REPARTO : [
   { id: 'tu', label: 'Tú' }, { id: 'jugar', label: 'Jugar' }, { id: 'social', label: 'Social' },
   { id: 'comunidad', label: 'Comunidad' }, { id: 'staff', label: 'Staff' },
 ];
