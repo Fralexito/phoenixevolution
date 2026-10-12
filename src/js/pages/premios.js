@@ -14,6 +14,8 @@ import { FX } from '../../data/experimento.js';
 const $ = (id) => document.getElementById(id);
 const edicionDe = (lid) => { const eds = EDICIONES[lid] ?? []; return eds.find((e) => e.estado === 'en_curso') ?? eds.at(-1) ?? null; };
 let jugadores = [];
+// SIN RASTRO DE IA (ronda 269, FX.premiosSinIA): sin cuadraditos con ícono, sin íconos gigantes de fondo, sin brillos; solo fotos, escudos reales y tipografía.
+const SIN_IA = !!FX.premiosSinIA;
 let ligaActual = LIGAS.find((l) => (EDICIONES[l.id] ?? []).some((e) => (e.fechas ?? []).length))?.id ?? 'galaxy';
 
 const ini = (n) => { const p = String(n).trim().split(/\s+/); return (p.length > 1 ? p[0][0] + p[1][0] : p[0].slice(0, 2)).toUpperCase(); };
@@ -26,9 +28,11 @@ function quien(pr, ed) {
   const j = jugadores.find((p) => nombreEnEdicion(p, ed) === pr.nombre);
   const foto = j && safeImg(j.foto_url);
   const club = ed?.clubes?.[pr.nombre];
-  const av = foto ? `<img src="${escapeHTML(foto)}" alt="" loading="lazy" class="pr-av">` : `<span class="pr-av pr-av-ini">${escapeHTML(ini(pr.nombre))}</span>`;
+  const av = foto ? `<img src="${escapeHTML(foto)}" alt="" loading="lazy" class="pr-av">`
+    : SIN_IA && club ? `<span class="pr-av pr-av-esc">${escudoHTML(club, 30)}</span>`   // sin foto: el escudo real del club, no iniciales de colores
+    : `<span class="pr-av pr-av-ini">${escapeHTML(ini(pr.nombre))}</span>`;
   const nom = j ? `<a href="${href(`jugador/?id=${encodeURIComponent(j.id)}`)}">${escapeHTML(pr.nombre)}</a>` : escapeHTML(pr.nombre);
-  return `<div class="pr-quien">${av}<span class="min-w-0"><b>${nom}</b>${club ? `<small>${escudoHTML(club, 14)} ${escapeHTML(club)}</small>` : ''}</span></div>`;
+  return `<div class="pr-quien">${av}<span class="min-w-0"><b>${nom}</b>${club ? `<small>${SIN_IA && !foto ? '' : escudoHTML(club, 14) + ' '}${escapeHTML(club)}</small>` : ''}</span></div>`;
 }
 
 // VARIEDAD (ronda 267, FX.premiosVariedad): misma malla y mismo orden, pero cada familia muestra su cifra a su manera.
@@ -56,8 +60,8 @@ function valorHTML(pr) {
 }
 
 const trofeo = (pr, ed, i, destacado = false, t = '') => `<article ${t ? `data-t="${t}"` : ''} class="pr-trofeo${destacado ? ' pr-destacado' : ''}${FX.premiosVariedad && pr.id === 'lider' ? ' pr-corona' : ''}" data-premio="${escapeHTML(pr.id)}" style="--c:${pr.color};--i:${i}">
-    ${t ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>${familiaDe(pr.id) ? `<span class="pr-chip">${familiaDe(pr.id)}</span>` : ''}` : FX.premiosVariedad && AGUA.includes(pr.id) ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>` : ''}
-    <header class="pr-t-cab"><span class="pr-ico"><i class="fa-solid ${pr.icono}"></i></span><h3>${escapeHTML(pr.titulo)}</h3></header>
+    ${t ? `${SIN_IA ? '' : `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>`}${familiaDe(pr.id) ? `<span class="pr-chip">${familiaDe(pr.id)}</span>` : ''}` : !SIN_IA && FX.premiosVariedad && AGUA.includes(pr.id) ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>` : ''}
+    <header class="pr-t-cab">${SIN_IA ? '' : `<span class="pr-ico"><i class="fa-solid ${pr.icono}"></i></span>`}<h3>${escapeHTML(pr.titulo)}</h3></header>
     ${quien(pr, ed)}
     ${valorHTML(pr)}
     <p class="pr-det">${escapeHTML(pr.detalle)}</p>

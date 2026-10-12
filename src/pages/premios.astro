@@ -4,14 +4,18 @@
 import Layout from '../layouts/Layout.astro';
 import { LIGAS } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
+import { FX } from '../data/experimento.js';
 const ligas = LIGAS.filter((l) => (EDICIONES[l.id] ?? []).some((e) => (e.fechas ?? []).length));
 ---
 <Layout title="Premios" active="premios" description="Los premios de la Galaxy League: La Paliza, Matagigantes, La Muralla, El Cañonero y más, calculados con cada resultado.">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+  <div class={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6${FX.premiosSinIA ? ' pr-sinia' : ''}`}>
     <header class="glass-panel px-4 py-3 rounded-2xl pr-cab">
       <div class="min-w-0">
-        <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow"><i class="fa-solid fa-award text-galaxy-400 mr-2"></i>Premios</h1>
-        <p class="text-gray-300 text-xs mt-0.5">Se entregan solos con cada resultado: quién goleó, quién sorprendió, quién no deja pasar ni una.</p>
+        {FX.premiosSinIA
+          ? <Fragment><h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider">Premios</h1>
+            <p class="text-gray-400 text-xs mt-0.5">Salen de los resultados de la liga y cambian cada fecha.</p></Fragment>
+          : <Fragment><h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow"><i class="fa-solid fa-award text-galaxy-400 mr-2"></i>Premios</h1>
+            <p class="text-gray-300 text-xs mt-0.5">Se entregan solos con cada resultado: quién goleó, quién sorprendió, quién no deja pasar ni una.</p></Fragment>}
       </div>
       {ligas.length > 1 && (
         <div class="pilar-tabs-lista pr-ligas" role="tablist" aria-label="Liga">

@@ -240,3 +240,37 @@ html[data-tema='sudario'] .pr-sec::before { background: #f5c542; box-shadow: 0 0
 .pr-muro :is([data-t='g'], [data-t='c']) .pr-salto { justify-content: flex-start; }
 .pr-muro :is([data-t='g'], [data-t='c']) .pr-salto span { text-align: left; }
 .pr-muro [data-t='c'] .pr-valor { flex-wrap: wrap; } .pr-muro [data-t='c'] .pr-valor span { white-space: normal; line-height: 1.2; }
+
+/* ══ SIN RASTRO DE IA (ronda 269, FX.premiosSinIA) ══════════════════════════════════════════════════════════
+   Mismo criterio que sinIconos.css (ronda 235): lo que delata «hecho por IA» fuera — cuadraditos con ícono, íconos gigantes
+   de fondo, halos y brillos de colores, un color distinto por tarjeta, etiquetas en píldora, todo apareciendo en cascada.
+   Queda lo real (fotos, escudos), la tipografía, los números y el borde lateral de acento de la identidad. */
+.pr-sinia { --pr-acento: var(--color-galaxy-400, #00e5ff); }
+html[data-tema='sudario'] .pr-sinia { --pr-acento: #f5c542; }
+.pr-sinia .pr-sec::before { box-shadow: none; width: 1.25rem; height: 2px; }
+.pr-sinia .pr-trofeo { --c: var(--pr-acento) !important; animation: none !important;
+  background: rgba(255, 255, 255, .025) !important; border: 1px solid rgba(148, 163, 184, .14); border-left: 2px solid var(--c); box-shadow: none !important; }
+.pr-sinia .pr-trofeo::after, .pr-sinia .pr-trofeo::before { content: none !important; }
+.pr-sinia .pr-agua, .pr-sinia .pr-ico { display: none !important; }
+.pr-sinia .pr-t-cab h3 { color: #9ca3af; font-size: 12px; font-weight: 700; letter-spacing: .14em; }
+.pr-sinia .pr-muro [data-t='g'] .pr-t-cab h3 { font-size: 13px; color: #cbd5e1; }
+.pr-sinia .pr-valor b { color: #fff; text-shadow: none; }
+.pr-sinia .pr-chip { position: absolute; background: none; border: 0; padding: 0; color: #6b7280; font-weight: 600; letter-spacing: .12em; }
+.pr-sinia .pr-av { border: 1px solid rgba(255, 255, 255, .12); box-shadow: none !important; }
+.pr-sinia .pr-av-ini { background: #1f2937; color: #d1d5db; }
+.pr-sinia .pr-av-esc { display: grid; place-items: center; background: rgba(255, 255, 255, .04); }
+.pr-sinia .pr-muro [data-t='g'] .pr-av-esc img, .pr-sinia .pr-muro [data-t='t'] .pr-av-esc img { width: 2.75rem !important; height: 2.75rem !important; }
+.pr-sinia .pr-quien b a:hover { color: var(--pr-acento); }
+.pr-sinia .pr-duelo i { color: #6b7280; }
+/* Marcador: el resultado en números, sin cajitas brillantes */
+.pr-sinia .pr-marcador b { gap: 0; }
+.pr-sinia .pr-marcador em { background: none; border: 0; box-shadow: none; padding: 0; min-width: 0; font-size: 1em; }
+.pr-sinia .pr-marcador em + em::before { content: '–'; margin: 0 .12em; color: #6b7280; }
+.pr-sinia .pr-puntos i { box-shadow: none; animation: none !important; }
+.pr-sinia .pr-barra i { background: var(--c); }
+.pr-sinia .pr-salto > i { color: #6b7280; }
+.pr-sinia .pr-salto .pr-gigante { text-decoration-color: #6b7280; }
+.pr-sinia .pr-vacio { border-style: solid; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pr-sinia .pr-trofeo:hover { transform: translateY(-2px); border-color: rgba(148, 163, 184, .28); border-left-color: var(--c); box-shadow: none; }
+}

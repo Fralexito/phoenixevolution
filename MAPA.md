@@ -852,6 +852,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - «Esta semana»: La Paliza grande + Matagigantes y voto MVP como cuadros anchos. En celular/tablet, 2 columnas.
 - false = malla por familias (ronda 267). Siguen activas las cifras con forma propia (marcador, bolitas, salto de puesto).
 
+## Ronda 269 — Premios sin rastro de IA (FX.premiosSinIA)
+- Pedido de Fralex: «quita cualquier rastro de factor IA». Mismo criterio que sinIconos (ronda 235).
+- Fuera: cuadraditos de color con ícono, íconos gigantes de fondo, halos/brillos, un color distinto por tarjeta (ahora un solo acento: cian Galaxy / dorado Sudario), etiquetas en píldora, cajitas brillantes del marcador, animación en cascada, ícono del título y la frase de tres partes de la cabecera.
+- Queda: fotos, escudos reales (sin foto, el escudo del club en vez de iniciales de colores), números, tipografía y el borde lateral de acento de la identidad. Se mantiene el muro de galería.
+- false = como la ronda 268.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
