@@ -121,3 +121,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 2026-10-12 14:20 (Lima) | Cuenta (sesión portada) | Ronda 264 | PRUEBA tras FX.jugadoresPro: barra pegada, cartas sin foto con iniciales + escudo, reconocimientos con nombre del premio, cabecera con contador, botones al pasar el mouse, ajustes de celular. Sin BD | src/js/features/{playerCard,reconocimientos,jugadoresBarra}.js, src/styles/jugadoresBarra.css, src/data/experimento.js, MAPA.md | HECHO en borrador (npm test 444/444, build 45) · PENDIENTE-WEB | La carta sin foto cambia en toda la web (podio, carrusel)
 
 - Ronda 265 (cuenta Opus, borrador): sección propia «Premios» con 15 reconocimientos automáticos + voto MVP de la afición; pestaña dentro de Jugadores. Bandera FX.premios.
+- Ronda 266 (cuenta Opus, borrador): Premios con orden visual (malla de 4, familias La tabla/Ataque/Defensa/Rachas, fila «Esta semana» con el voto, tarjetas en fila en celular).

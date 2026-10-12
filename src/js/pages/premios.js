@@ -37,6 +37,15 @@ const trofeo = (pr, ed, i, destacado = false) => `<article class="pr-trofeo${des
     <p class="pr-det">${escapeHTML(pr.detalle)}</p>
   </article>`;
 
+// Orden visual (ronda 266): los premios de la edición van en 4 familias, cada una con su rótulo.
+const FAMILIAS = [
+  { t: 'La tabla', i: 'fa-list-ol', ids: ['lider', 'dominante', 'revelacion', 'empates'] },
+  { t: 'Ataque', i: 'fa-futbol', ids: ['canonero', 'record-goleada', 'record-partido'] },
+  { t: 'Defensa', i: 'fa-shield-halved', ids: ['muralla', 'cerrojo'] },
+  { t: 'Rachas', i: 'fa-fire', ids: ['enllamas', 'imparable'] },
+];
+let votoListo = false;
+
 function pintar() {
   const ed = edicionDe(ligaActual);
   const ovrDe = (nombre) => { const j = jugadores.find((p) => nombreEnEdicion(p, ed) === nombre); return j ? Number(j.ovr) : NaN; };
@@ -45,8 +54,22 @@ function pintar() {
   $('pr-fecha-n').textContent = r.fecha ? `Fecha ${r.fecha}` : '';
   $('pr-ed-n').textContent = ed?.nombre ?? '';
   const vacio = (t) => `<p class="pr-vacio"><i class="fa-solid fa-hourglass-half"></i>${t}</p>`;
-  $('pr-fecha').innerHTML = fecha.length ? fecha.map((p, i) => trofeo(p, ed, i, i === 0)).join('') : vacio('Los premios de la fecha aparecen cuando se juega una fecha.');
-  $('pr-edicion').innerHTML = edic.length ? edic.map((p, i) => trofeo(p, ed, i)).join('') : vacio('Los premios de la edición aparecen cuando cada jugador lleva al menos 3 partidos.');
+  // «Esta semana»: premios de la fecha + el voto de la afición, siempre llenando filas de 4 en PC.
+  const voto = $('pr-voto') ?? Object.assign(document.createElement('div'), { id: 'pr-voto', className: 'pr-voto' });
+  const huecos = fecha.length + 1;
+  const ancho = huecos < 4 ? 4 - huecos + 1 : 1;          // el primero crece para no dejar huecos
+  $('pr-fecha').innerHTML = fecha.length
+    ? fecha.map((p, i) => trofeo(p, ed, i, i === 0 && ancho > 1).replace('<article ', `<article data-ancho="${i === 0 ? ancho : 1}" `)).join('')
+    : vacio('Los premios de la fecha aparecen cuando se juega una fecha.');
+  voto.dataset.ancho = huecos > 4 ? '4' : '1';
+  $('pr-fecha').append(voto);
+  if (!votoListo) { votoListo = true; montarVotoSemana(voto, jugadores); }
+  // «De toda la edición»: una caja por familia; cada caja ocupa tantas columnas como premios tiene.
+  const cajas = FAMILIAS.map((f) => ({ ...f, ps: f.ids.map((id) => edic.find((p) => p.id === id)).filter(Boolean) })).filter((f) => f.ps.length);
+  let k = 0;
+  $('pr-edicion').innerHTML = cajas.length
+    ? cajas.map((f) => `<div class="pr-familia" style="--n:${f.ps.length}"><h3 class="pr-fam-t"><i class="fa-solid ${f.i}"></i>${f.t}</h3>${f.ps.map((p) => trofeo(p, ed, k++)).join('')}</div>`).join('')
+    : vacio('Los premios de la edición aparecen cuando cada jugador lleva al menos 3 partidos.');
 }
 
 document.querySelector('.pr-ligas')?.addEventListener('click', (e) => {
@@ -61,7 +84,6 @@ pintar();   // primero con los resultados (no esperan a la base); las fotos lleg
   try {
     const { data, error } = await supabase.from('jugadores').select('*');
     if (error) throw error;
-    jugadores = data ?? []; pintar();
-    montarVotoSemana($('pr-voto'), jugadores);
-  } catch (e) { console.warn('[premios] jugadores:', e?.message ?? e); montarVotoSemana($('pr-voto'), []); }
+    jugadores = data ?? []; votoListo = false; $('pr-voto')?.replaceWith(Object.assign(document.createElement('div'), { id: 'pr-voto', className: 'pr-voto' })); pintar();
+  } catch (e) { console.warn('[premios] jugadores:', e?.message ?? e); }
 })();

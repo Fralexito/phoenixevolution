@@ -21,16 +21,13 @@ const ligas = LIGAS.filter((l) => (EDICIONES[l.id] ?? []).some((e) => (e.fechas 
     </header>
 
     <section aria-labelledby="pr-fecha-t" class="space-y-3">
-      <h2 id="pr-fecha-t" class="pr-sec"><span>De la fecha</span><b id="pr-fecha-n"></b></h2>
-      <div id="pr-fecha" class="pr-grid pr-grid-fecha"><div class="esqueleto h-48"></div><div class="esqueleto h-48"></div><div class="esqueleto h-48"></div></div>
+      <h2 id="pr-fecha-t" class="pr-sec"><span>Esta semana</span><b id="pr-fecha-n"></b></h2>
+      <div id="pr-fecha" class="pr-malla pr-semana"><div class="esqueleto h-44"></div><div class="esqueleto h-44"></div><div class="esqueleto h-44"></div></div>
     </section>
 
     <section aria-labelledby="pr-ed-t" class="space-y-3">
       <h2 id="pr-ed-t" class="pr-sec"><span>De toda la edición</span><b id="pr-ed-n"></b></h2>
-      <div class="pr-ed-grid">
-        <div id="pr-edicion" class="pr-grid"></div>
-        <aside id="pr-voto" aria-label="MVP de la afición"></aside>
-      </div>
+      <div id="pr-edicion" class="pr-malla pr-cats"></div>
     </section>
   </div>
 </Layout>

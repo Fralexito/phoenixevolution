@@ -833,6 +833,13 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Menú: «Jugadores» ahora tiene pestañas Jugadores · Premios. En la franja de reconocimientos de Jugadores, enlace «Ver todos los premios».
 - false = sin enlace ni pestaña (la página queda sin enlazar).
 
+## Ronda 266 — Premios con orden visual
+- Pedido de Fralex: «orden y organización visual» en /premios/.
+- Malla fija de 4 columnas en PC (3 tablet, 2 chica): todas las tarjetas del mismo alto, cifra y texto alineados (detalle fijo a 2 líneas, unidades cortas: «recibe por partido», «vallas invictas»).
+- «Esta semana» = premios de la fecha + voto «MVP de la afición» en la misma fila (el primero crece para no dejar huecos).
+- «De toda la edición» agrupada en 4 familias con rótulo: La tabla · Ataque · Defensa · Rachas; cada caja ocupa tantas columnas como premios y se acomodan sin huecos.
+- Celular: una columna con tarjetas en fila (ícono + premio + persona a la izquierda, cifra grande a la derecha).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

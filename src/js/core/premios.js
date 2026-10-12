@@ -77,13 +77,13 @@ export function premiosEdicion(edicion, { ovrDe } = {}) {
     const can = mejor(aptos, (x) => x.gf);
     if (can) add({ id: 'canonero', grupo: 'edicion', titulo: 'El Cañonero', icono: 'fa-bullseye', color: '#f43f5e', nombre: can.x.nombre, valor: String(can.v), unidad: 'goles', detalle: `El que más goles lleva en la edición (${redondeo(can.v / can.x.pj)} por partido).`, peso: 44 });
     const mur = mejor(aptos, (x) => -x.gc / x.pj);
-    if (mur) add({ id: 'muralla', grupo: 'edicion', titulo: 'La Muralla', icono: 'fa-shield-halved', color: '#38bdf8', nombre: mur.x.nombre, valor: String(redondeo(-mur.v)), unidad: 'goles en contra por partido', detalle: `La defensa más difícil de romper: ${plural(mur.x.gc, 'gol recibido', 'goles recibidos')} en ${plural(mur.x.pj, 'partido', 'partidos')}.`, peso: 43 });
+    if (mur) add({ id: 'muralla', grupo: 'edicion', titulo: 'La Muralla', icono: 'fa-shield-halved', color: '#38bdf8', nombre: mur.x.nombre, valor: String(redondeo(-mur.v)), unidad: 'recibe por partido', detalle: `La defensa más difícil de romper: ${plural(mur.x.gc, 'gol recibido', 'goles recibidos')} en ${plural(mur.x.pj, 'partido', 'partidos')}.`, peso: 43 });
     const llam = mejor(aptos, (x) => rachaActual(x.res, (r) => r === 'G'));
     if (llam && llam.v >= 3) add({ id: 'enllamas', grupo: 'edicion', titulo: 'En Llamas', icono: 'fa-fire', color: '#fb923c', nombre: llam.x.nombre, valor: String(llam.v), unidad: 'victorias seguidas', detalle: 'La racha de victorias más larga en este momento.', peso: 50 + llam.v * 3 });
     const imp = mejor(aptos, (x) => rachaActual(x.res, (r) => r !== 'P'));
     if (imp && imp.v >= 4 && !(llam && llam.x.nombre === imp.x.nombre && llam.v === imp.v)) add({ id: 'imparable', grupo: 'edicion', titulo: 'Imparable', icono: 'fa-person-running', color: '#34d399', nombre: imp.x.nombre, valor: String(imp.v), unidad: 'partidos sin perder', detalle: 'Nadie lo ha podido vencer últimamente.', peso: 42 + imp.v * 2 });
     const cer = mejor(aptos, (x) => x.ceros);
-    if (cer && cer.v >= 2) add({ id: 'cerrojo', grupo: 'edicion', titulo: 'El Cerrojo', icono: 'fa-lock', color: '#22d3ee', nombre: cer.x.nombre, valor: String(cer.v), unidad: 'partidos sin recibir goles', detalle: 'El que más veces dejó su arco en cero.', peso: 38 + cer.v * 2 });
+    if (cer && cer.v >= 2) add({ id: 'cerrojo', grupo: 'edicion', titulo: 'El Cerrojo', icono: 'fa-lock', color: '#22d3ee', nombre: cer.x.nombre, valor: String(cer.v), unidad: 'vallas invictas', detalle: 'El que más veces dejó su arco en cero.', peso: 38 + cer.v * 2 });
     const dom = mejor(aptos, (x) => x.gf - x.gc);
     if (dom && dom.v > 0 && dom.x.nombre !== lider?.nombre) add({ id: 'dominante', grupo: 'edicion', titulo: 'El Dominante', icono: 'fa-chart-line', color: '#818cf8', nombre: dom.x.nombre, valor: `+${dom.v}`, unidad: 'diferencia de gol', detalle: 'La mejor diferencia entre goles hechos y recibidos.', peso: 34 });
     const emp = mejor(aptos, (x) => x.e);

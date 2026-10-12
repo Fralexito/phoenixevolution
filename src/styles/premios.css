@@ -6,10 +6,24 @@
 .pr-sec::before { content: ''; width: .25rem; height: 1em; align-self: center; border-radius: 99px; background: var(--color-galaxy-400, #00e5ff); box-shadow: 0 0 12px var(--color-galaxy-400, #00e5ff); }
 .pr-sec b { font-size: 12px; font-weight: 600; letter-spacing: .08em; color: #9ca3af; }
 
-.pr-grid { display: grid; gap: .875rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); align-content: start; }
-@media (min-width: 768px) { .pr-grid-fecha { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); } .pr-grid-fecha .pr-destacado { grid-column: span 2; } }
-.pr-ed-grid { display: grid; gap: .875rem; }
-@media (min-width: 1024px) { .pr-ed-grid { grid-template-columns: minmax(0, 1fr) 22rem; align-items: start; } #pr-voto { position: sticky; top: 7rem; } }
+/* Malla de 4 columnas (ronda 266, orden visual): todas las tarjetas miden lo mismo y se alinean en filas. */
+.pr-malla { display: grid; gap: .875rem; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); }
+@media (min-width: 640px) { .pr-malla { --cols: 2; } }
+@media (min-width: 1024px) { .pr-malla { --cols: 3; } }
+@media (min-width: 1200px) { .pr-malla { --cols: 4; } }
+.pr-semana > [data-ancho] { grid-column: span min(var(--cols, 1), var(--a, 1)); }
+.pr-semana > [data-ancho='2'] { --a: 2; } .pr-semana > [data-ancho='3'] { --a: 3; } .pr-semana > [data-ancho='4'] { --a: 4; }
+
+/* Familias: cada caja ocupa tantas columnas como premios tiene; las cajas se acomodan sin dejar huecos. */
+.pr-cats { grid-auto-flow: row dense; }
+.pr-familia { grid-column: span min(var(--n), var(--cols, 1)); display: grid; grid-template-columns: subgrid; grid-template-rows: auto; grid-auto-rows: 1fr; gap: .5rem .875rem; align-content: stretch; }
+.pr-fam-t { grid-column: 1 / -1; display: flex; align-items: center; gap: .5rem; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: #9ca3af; padding-bottom: .35rem; border-bottom: 1px solid rgba(148, 163, 184, .14); }
+.pr-fam-t i { color: var(--color-galaxy-400, #00e5ff); font-size: 12px; }
+html[data-tema='sudario'] .pr-fam-t i { color: #f5c542; }
+
+/* Voto de la afición como una tarjeta más de la fila */
+.pr-voto > * { height: 100%; }
+.pr-voto[data-ancho='4'] > * { height: auto; }
 
 .pr-trofeo {
   --c: #00e5ff; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .55rem;
@@ -37,10 +51,11 @@
 
 .pr-valor { display: flex; align-items: baseline; gap: .4rem; margin-top: auto; }
 .pr-valor b { font-family: var(--font-display, inherit); font-size: 2rem; line-height: 1; font-weight: 900; color: var(--c); text-shadow: 0 0 18px color-mix(in srgb, var(--c) 55%, transparent); font-variant-numeric: tabular-nums; }
-.pr-valor span { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: .1em; }
-.pr-det { font-size: 12px; color: #cbd5e1; line-height: 1.45; }
+.pr-valor span { min-width: 0; font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-det { font-size: 12px; color: #cbd5e1; line-height: 1.45; min-height: 2.9em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pr-quien { min-height: 3rem; }
 
-.pr-destacado { padding: 1.25rem; }
+.pr-destacado { padding: 1rem 1.25rem; }
 .pr-destacado .pr-valor b { font-size: 2.75rem; }
 .pr-destacado .pr-av { width: 3rem; height: 3rem; }
 .pr-destacado .pr-quien b { font-size: 17px; }
@@ -59,11 +74,20 @@ html[data-tema='sudario'] .pr-sec::before { background: #f5c542; box-shadow: 0 0
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .pr-trofeo:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c) 60%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 16px 36px -16px var(--c); }
 }
+/* Celular: una columna con tarjetas en fila (título y persona a la izquierda, cifra a la derecha): menos alto, nada apretado. */
 @media (max-width: 639px) {
-  .pr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
-  .pr-grid-fecha .pr-destacado, .pr-grid > .pr-trofeo:last-child:nth-child(even) { grid-column: 1 / -1; }
-  .pr-trofeo { padding: .8rem; }
-  .pr-valor b { font-size: 1.6rem; }
-  .pr-ico { width: 2rem; height: 2rem; }
-  .pr-t-cab h3 { font-size: 12px; letter-spacing: .06em; }
+  .pr-malla { gap: .55rem; }
+  .pr-trofeo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'ico tit val' 'ico qui val' 'det det det'; gap: .2rem .7rem; padding: .75rem .85rem; align-items: center; }
+  .pr-t-cab { display: contents; }
+  .pr-ico { grid-area: ico; align-self: start; width: 2.25rem; height: 2.25rem; }
+  .pr-t-cab h3 { grid-area: tit; font-size: 12px; }
+  .pr-quien { grid-area: qui; min-height: 0; gap: .45rem; }
+  .pr-quien .pr-av { width: 1.6rem; height: 1.6rem; border-width: 1.5px; }
+  .pr-quien .pr-av-ini { font-size: 12px; }
+  .pr-quien b { font-size: 14px; }
+  .pr-valor { grid-area: val; flex-direction: column; align-items: flex-end; gap: .1rem; margin: 0; max-width: 7.5rem; }
+  .pr-valor b, .pr-destacado .pr-valor b { font-size: 1.75rem; }
+  .pr-valor span { max-width: 7.5rem; text-align: right; letter-spacing: .06em; white-space: normal; line-height: 1.2; }
+  .pr-det { grid-area: det; min-height: 0; margin-top: .25rem; }
+  .pr-fam-t { margin-top: .35rem; }
 }
