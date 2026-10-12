@@ -57,6 +57,10 @@
   .vt-3d:not([data-quieto]) .vt-item { transition: transform .85s cubic-bezier(.22, 1, .36, 1), opacity .55s cubic-bezier(.22, 1, .36, 1), filter .55s, visibility .85s; }
   .vt-3d:not([data-quieto]) .vt-item:not([data-on]) { opacity: 0; filter: blur(3px); transform: rotateX(-88deg); }
   .vt-3d:not([data-quieto]) .vt-item[data-sale] { transform: rotateX(88deg); }
+  /* EN TURNOS (no a la vez): el que sale se va rápido (se apaga en 0,18 s) y el que entra espera 0,2 s a que el otro ya no se vea.
+     Antes los dos se animaban juntos ~0,5 s y por un instante se veían encimados. */
+  .vt-3d:not([data-quieto]) .vt-item[data-sale] { transition: transform .38s cubic-bezier(.55, 0, 1, .45), opacity .18s linear, filter .18s linear, visibility 0s linear .38s; }
+  .vt-3d:not([data-quieto]) .vt-item[data-on] { transition: transform .8s cubic-bezier(.22, 1, .36, 1) .2s, opacity .4s cubic-bezier(.22, 1, .36, 1) .2s, filter .4s linear .2s, visibility 0s linear .2s; }
   .vt-3d .vt-v[data-latido]::after { animation: vt3-borde 1.4s cubic-bezier(.4, 0, .2, 1); }
 
   /* Vida en reposo: la escena se balancea apenas (no con el mouse encima: ahí manda el mouse) */

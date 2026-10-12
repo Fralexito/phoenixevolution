@@ -657,6 +657,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Link (0.2.38) las calcula con las posiciones y el poseedor del balón (aproximadas: el juego no las da). El tablero las enseña en una tabla bajo el campo. Faltas, tarjetas, cambios y asistencias NO están (no se pueden leer del juego todavía).
 - Pruebas: 437. Build OK.
 
+### Ronda 240 — Arreglo: el texto de las ventanas ya no se encima al cambiar
+- Fralex: al cambiar el contenido de una ventana de la portada, el texto nuevo aparecía antes de que el viejo se fuera y se veían encimados unos milisegundos.
+- Causa: el que salía y el que entraba se animaban a la vez (~0,5 s cada uno).
+- Arreglo (solo CSS, `styles/ventanas3d.css` y `styles/ventanas.css`): ahora van EN TURNOS. El que sale se apaga en ~0,18 s; el que entra espera ~0,2 s y recién ahí aparece.
+- Medido en el navegador cada 30 ms: 0 momentos con los dos visibles. Pruebas 437. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

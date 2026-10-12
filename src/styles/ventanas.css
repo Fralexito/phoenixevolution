@@ -69,6 +69,8 @@
   /* Cambio de elemento: el que sale se desenfoca hacia arriba y el que entra enfoca desde abajo */
   .vt:not([data-quieto]) .vt-item { transition: opacity .7s cubic-bezier(.22,1,.36,1), filter .7s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1), visibility .7s; }
   .vt:not([data-quieto]) .vt-item:not([data-on]) { opacity: 0; filter: blur(8px); transform: translateY(14px); }
-  .vt:not([data-quieto]) .vt-item[data-sale] { transform: translateY(-14px); }
+  .vt:not([data-quieto]) .vt-item[data-sale] { transform: translateY(-14px); transition: transform .35s cubic-bezier(.55, 0, 1, .45), opacity .2s linear, filter .2s linear, visibility 0s linear .35s; }
+  /* En turnos: el que entra espera a que el que sale ya no se vea (si no, se ven encimados un instante) */
+  .vt:not([data-quieto]) .vt-item[data-on] { transition: transform .8s cubic-bezier(.22,1,.36,1) .22s, opacity .5s cubic-bezier(.22,1,.36,1) .22s, filter .5s linear .22s, visibility 0s linear .22s; }
 }
 @keyframes vt-entra { from { opacity: 0; transform: translateY(18px) scale(.98); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
