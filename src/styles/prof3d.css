@@ -54,9 +54,10 @@ html[data-fx-3d] .camino-paso:nth-child(n+5) { animation-delay: .55s; }
   /* Con tabla (posiciones, estadísticas): casi quieto. Se levanta solo 1 px, más lento y sin borde encendido (ronda 244) */
   html[data-fx-3d] main [data-p3][data-p3-suave] { transform: perspective(1600px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, -1px, 0); transition-duration: .5s, .5s, .25s;
     box-shadow: 0 16px 36px -24px rgb(0 0 0 / .6); }
-  html[data-fx-3d] main [data-p3][data-p3-suave]:active { transform: perspective(1600px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)); }
-  /* 4 · Presionar: se hunde un poco (mantiene la inclinación) */
-  html[data-fx-3d] main [data-p3]:active { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, 0, 0) scale(.985); transition-duration: .1s; }
+  /* 4 · Presionar: se hunde un poco (mantiene la inclinación).
+     SOLO en tarjetas que son ellas mismas un botón o enlace (ronda 245). Antes se hundía cualquier panel, y al achicarse corría
+     sus botones chicos (p. ej. las flechas de «Últimos» en la tabla) entre que se baja y se suelta el mouse: el clic se perdía. */
+  html[data-fx-3d] main :is(a, button, [role="button"])[data-p3]:active { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, 0, 0) scale(.985); transition-duration: .1s; }
 }
 /* Tema Sudario: el borde que se enciende es dorado */
 html[data-tema='sudario'][data-fx-3d] main [data-p3] { box-shadow: 0 22px 44px -22px rgb(0 0 0 / .75), 0 0 0 1px rgb(245 197 66 / .22); }

@@ -702,6 +702,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Las tarjetas chicas (partidos, jugadores) siguen igual.
 - Archivos: `js/core/inclinacion.js` (opción `suave`, `MAX_SUAVE`), `tests/inclinacion.test.mjs`, `js/features/prof3d.js`, `styles/prof3d.css`. Medido en Liga: esquina de la tabla = 0,71°. Pruebas 443. Build 45.
 
+### Ronda 245 — Arreglo: las flechas de «Últimos» (y otros botones chicos) ya no pierden el clic
+- Fralex: no podía mover la racha «Últimos» de la tabla con las flechas.
+- Causa (capa 3D, ronda 242): al presionar, CUALQUIER panel con `[data-p3]` se «hundía» (`scale(.985)`); en un panel grande eso corría varios píxeles los botones chicos cerca del borde entre `mousedown` y `mouseup`, y el clic se perdía. En la ronda 244 ya no pasaba en paneles con tabla, pero el mismo fallo podía darse en otros paneles con botones.
+- Arreglo (`styles/prof3d.css`): el «hundirse» solo en tarjetas que son ellas mismas un botón o enlace (`:is(a, button, [role="button"])[data-p3]:active`). Se quitó la regla de presión del modo suave.
+- Medido en Liga: la flecha se mueve 0 px mientras se presiona; el clic avanza la racha (5–9 → 3–7). Probado también en el navegador de la PC de Fralex. Pruebas 443. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
