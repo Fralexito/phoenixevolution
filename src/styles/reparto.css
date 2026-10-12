@@ -9,3 +9,7 @@
 /* Red de enlaces (ronda 248): sin huecos en la cuadrícula. 4 cuadros → 2×2; 2 cuadros → 2 columnas; 1 → ancho completo. */
 .cuenta-mosaico:has(> :nth-child(4):last-child), .cuenta-mosaico:has(> :nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cuenta-mosaico:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
+/* «Crear liga o torneo» (ronda 250): es una acción, no una sección; se marca con borde punteado de acento para que se lea como botón */
+.pilar-item[href$='#crear'] { border: 1px dashed rgb(34 211 238 / .35); }
+.pilar-item[href$='#crear'] > i { background: var(--color-galaxy-400); color: #000; }
+.cuenta-tile[href$='#crear'] { border-style: dashed; }

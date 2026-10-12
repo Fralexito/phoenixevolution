@@ -27,7 +27,7 @@ const extraLigas = FX.reparto ? busca(['ranking']) : [];
     {sec.items.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
   </nav>))}
   <nav class="barra-sec" aria-label="Ligas">
-    <p class="barra-tit">{FX.reparto ? 'Competir' : 'Ligas'}</p>
+    <p class="barra-tit">{FX.reparto ? 'Competiciones' : 'Ligas'}</p>
     {LIGAS.map((l) => (<a href={`${base}liga/#liga-${l.id}`} class="barra-item" title={l.titulo.join(' ')} data-liga-tema={l.id}><i class={`fa-solid ${l.icono}`}></i><span class="barra-txt">{l.titulo.join(' ')}</span></a>))}
     {extraLigas.map((n) => (<a href={`${base}${n.path}`} class="barra-item" aria-current={active === n.id ? 'page' : undefined} title={n.label}><i class={`fa-solid ${n.icon}`}></i><span class="barra-txt">{n.label}</span></a>))}
   </nav>

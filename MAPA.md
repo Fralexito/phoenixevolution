@@ -731,6 +731,11 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `features/profile.js`: título + pestañas cápsula fijos arriba; tarjeta con foto + apodo/@usuario que se actualizan al escribir (`avatarPickerHTML` acepta `cabecera`); bloques con título (Cómo te ven / De dónde eres · Sobre ti / Dónde encontrarte · Tu conexión / Qué hosteas); campos en pares desde 560 px; íconos en Discord y stream; contador 0/280 en la biografía; Phoenix Soda con aviso en recuadro; «Guardar cambios» fijo abajo; ventana más ancha. `styles/perfil2.css`.
 - Probado con sesión simulada en PC y celular. Pruebas 443. Build 45.
 
+### Ronda 250 — Una sola sección «Competiciones» (FX.reparto)
+- Pedido de Fralex: «una sola sección llamada competiciones donde estén ligas, torneos, palmarés, formatos y crear ligas».
+- `data/site.js`: el grupo «Competir» pasa a llamarse **Competiciones**: bloque *Compite* = Ligas (Liga + página de copas oficiales, que se ilumina como «Ligas») · Torneos · Palmarés · Formatos · **Crear liga o torneo** (`torneos/#crear`, abre la ficha directo; `js/pages/torneos.js`) · bloque *Estadísticas* = Historial · Ranking · Jugadores. `pilar()` admite entradas sueltas (objeto) para acciones como «Crear».
+- Barra lateral: título «Competiciones». «Crear» con borde punteado (`reparto.css`). Pruebas 443. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

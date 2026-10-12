@@ -106,7 +106,7 @@ export const NOMBRE_APP = 'Phoenix Soda';
 // muestra las pestañas de su pilar para saltar entre hermanas. Para mover una sección de pilar, cambia su id de lista aquí.
 const TODAS = () => [...NAV, ...NAV_EXTRA, ...ACCOUNT_NAV];
 const DESC = {
-  liga: 'Tabla, fechas y resultados de cada división', competiciones: 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
+  liga: FX.reparto ? 'Galaxy, Sudario y las copas oficiales' : 'Tabla, fechas y resultados de cada división', competiciones: 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
   palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
   duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
   missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
@@ -115,9 +115,9 @@ const DESC = {
   tienda: 'Estética y mejoras para tu perfil',
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
-const RENOMBRE = { ahora: 'En vivo' };
+const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas' } : {}) };
 const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra,
-  items: ids.map((spec) => { const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
+  items: ids.map((spec) => { if (typeof spec === 'object') return { tambien: [], ...spec }; const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
     return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
 // REPARTO EN 3 GRUPOS (FX.reparto, ronda 247). Pedido de Fralex: cada sección en el grupo de su TIPO, y orden visual primero.
 //   Competir = la liga organizada y sus récords · Jugar = lo que haces tú ahora (partidos y tu club) · Comunidad = la gente y lo que se dice.
@@ -128,10 +128,13 @@ const conBloques = (id, label, icon, bloques, extra = {}) => {
   return { id, label, icon, ...extra, bloques: bs, items: bs.flatMap((b) => b.items) };
 };
 const PILARES_REPARTO = [
-  conBloques('competir', 'Competir', 'fa-trophy', [
-    ['La liga', ['liga', 'competiciones', 'torneos', 'formatos']],
-    ['Récords', ['historial', 'palmares', 'ranking', 'database']],
-  ], { lema: 'La liga organizada y sus récords' }),
+  // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
+  // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
+  conBloques('competir', 'Competiciones', 'fa-trophy', [
+    ['Compite', ['liga>competiciones', 'torneos', 'palmares', 'formatos',
+      { id: 'crear', label: 'Crear liga o torneo', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos' }]],
+    ['Estadísticas', ['historial', 'ranking', 'database']],
+  ], { lema: 'Ligas, torneos y campeones' }),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
     ['Tu club', ['manager>mercado', 'miclub']],

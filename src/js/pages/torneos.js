@@ -101,6 +101,8 @@ async function cargar() {
 $('tn-leyenda').innerHTML = leyendaHTML();
 pintarChips(); pintarFormato(); $('tn-dinamicas').innerHTML = selectorDinamicasHTML(); pintarTabs();
 $('tn-nuevo').addEventListener('click', () => abrirFicha(true));
+// «Crear liga o torneo» del menú Competiciones (ronda 250) llega con #crear: abre la ficha directamente.
+if (location.hash === '#crear') abrirFicha(true);
 $('tn-cerrar-ficha').addEventListener('click', () => abrirFicha(false));
 $('tn-form').addEventListener('submit', crear);
 $('tn-azar').addEventListener('click', () => {
