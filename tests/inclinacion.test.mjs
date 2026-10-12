@@ -15,3 +15,9 @@ test('inclinación: centro = plano; esquinas = ±máximo', () => {
   assert.deepEqual(inclinacion(0, 200, 300, 200), { rx: -8, ry: -8 });
   assert.deepEqual(inclinacion(-50, 999, 300, 200), { rx: -8, ry: -8 });   // fuera del elemento: se limita
 });
+
+test('inclinación: lo que tiene tablas se mueve suave (máx. 0,8°)', () => {
+  assert.equal(maxInclinacion(920, 600, { suave: true }), 0.8);
+  assert.equal(maxInclinacion(300, 200, { suave: true }), 0.8);
+  assert.deepEqual(inclinacion(920, 0, 920, 600, { suave: true }), { rx: 0.8, ry: 0.8 });
+});

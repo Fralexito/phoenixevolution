@@ -17,6 +17,8 @@ html[data-fx-3d][data-fx-reveal].js main [data-reveal] { transform-origin: 50% 0
   transition: opacity .7s ease, transform .95s var(--p3-ease), filter .7s ease; }
 html[data-fx-3d][data-fx-reveal].js main [data-reveal]:not(.visto) { opacity: 0; filter: blur(5px); transform: perspective(1200px) translate3d(0, 56px, -90px) rotateX(13deg); }
 html[data-fx-3d][data-fx-reveal].js main [data-reveal].visto { opacity: 1; filter: none; transform: none; }
+/* Secciones con tabla: aparecen más tranquilas (menos giro y sin desenfoque) — ronda 244 */
+html[data-fx-3d][data-fx-reveal].js main [data-reveal]:has(table):not(.visto) { filter: none; transform: perspective(1600px) translate3d(0, 24px, -30px) rotateX(4deg); }
 
 /* …y las tarjetas de adentro se levantan una tras otra (las demoras por posición vienen de dopamina.css) */
 @keyframes p3-tarjeta { from { opacity: 0; transform: perspective(900px) translate3d(0, 34px, -40px) rotateX(-22deg); } }
@@ -37,8 +39,10 @@ html[data-fx-3d] .camino-paso:nth-child(n+5) { animation-delay: .55s; }
 @supports (animation-timeline: view()) {
   html[data-fx-3d] main > header:not([data-portada]) { transform-origin: 50% 100%; animation: p3-aleja linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
   html[data-fx-3d] main [data-reveal].visto:not(:has(.sticky, [class*="sticky"], .anclas)) { animation: p3-sale linear none; animation-timeline: view(); animation-range: exit 15% exit 100%; transform-origin: 50% 100%; }
+  html[data-fx-3d] main [data-reveal].visto:has(table):not(:has(.sticky, [class*="sticky"], .anclas)) { animation-name: p3-sale-suave; }
 }
 @keyframes p3-aleja { to { opacity: .25; transform: perspective(1200px) translate3d(0, -1.5rem, -80px) rotateX(10deg); } }
+@keyframes p3-sale-suave { to { opacity: .75; transform: perspective(1800px) translate3d(0, -.25rem, -15px) rotateX(2deg); } }
 @keyframes p3-sale { to { opacity: .5; transform: perspective(1400px) translate3d(0, -.75rem, -50px) rotateX(6deg); } }
 
 /* 3 · Inclinación hacia el mouse (--p3x/--p3y y [data-p3] los pone js/features/prof3d.js; solo con mouse) */
@@ -47,6 +51,10 @@ html[data-fx-3d] .camino-paso:nth-child(n+5) { animation-delay: .55s; }
     transition: transform .5s var(--p3-ease), box-shadow .5s var(--p3-ease), border-color .25s; }
   html[data-fx-3d] main [data-p3] { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, -3px, 0); transition-duration: .14s, .4s, .25s;
     box-shadow: 0 22px 44px -22px rgb(0 0 0 / .75), 0 0 0 1px color-mix(in srgb, var(--color-galaxy-400) 16%, transparent); }
+  /* Con tabla (posiciones, estadísticas): casi quieto. Se levanta solo 1 px, más lento y sin borde encendido (ronda 244) */
+  html[data-fx-3d] main [data-p3][data-p3-suave] { transform: perspective(1600px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, -1px, 0); transition-duration: .5s, .5s, .25s;
+    box-shadow: 0 16px 36px -24px rgb(0 0 0 / .6); }
+  html[data-fx-3d] main [data-p3][data-p3-suave]:active { transform: perspective(1600px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)); }
   /* 4 · Presionar: se hunde un poco (mantiene la inclinación) */
   html[data-fx-3d] main [data-p3]:active { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, 0, 0) scale(.985); transition-duration: .1s; }
 }

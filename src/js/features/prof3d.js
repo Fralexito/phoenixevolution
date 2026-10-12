@@ -20,7 +20,7 @@ export function initProf3d() {
     const main = document.querySelector('main');
     if (!main) return;
     let actual = null; let pend = null; let raf = 0;
-    const soltar = (el) => { el.removeAttribute('data-p3'); el.style.removeProperty('--p3x'); el.style.removeProperty('--p3y'); };
+    const soltar = (el) => { el.removeAttribute('data-p3'); el.removeAttribute('data-p3-suave'); el.style.removeProperty('--p3x'); el.style.removeProperty('--p3y'); };
     const escribiendo = (el) => { const a = document.activeElement; return Boolean(a && el.contains(a) && a.matches('input, textarea, select, [contenteditable="true"]')); };
     const cuadro = () => {
       raf = 0;
@@ -31,7 +31,10 @@ export function initProf3d() {
       actual = t;
       if (!t) return;
       const r = t.getBoundingClientRect();
-      const { rx, ry } = inclinacion(e.clientX - r.left, e.clientY - r.top, r.width, r.height);
+      // Panel con tabla (posiciones, estadísticas…): modo suave, casi quieto (ronda 244).
+      const suave = Boolean(t.querySelector('table, [role="table"]'));
+      const { rx, ry } = inclinacion(e.clientX - r.left, e.clientY - r.top, r.width, r.height, { suave });
+      t.toggleAttribute('data-p3-suave', suave);
       t.setAttribute('data-p3', '');
       t.style.setProperty('--p3x', `${rx}deg`); t.style.setProperty('--p3y', `${ry}deg`);
     };

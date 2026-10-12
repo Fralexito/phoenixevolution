@@ -694,6 +694,14 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Comprobado simulando Windows sin animaciones: «Según el sistema» → todo quieto (correcto); «Siempre activas» → 3D, inclinación y ventanas en movimiento; «Reducidas» → quieto.
 - Regla nueva en `CLAUDE.md`. Pruebas 442. Build 45.
 
+### Ronda 244 — Las tablas se mueven más sutil
+- Fralex (con captura de la tabla de posiciones): «el movimiento de la tabla sea más sutil».
+- Todo panel que contiene una tabla (`table` o `role="table"`) va en **modo suave** (`data-p3-suave`):
+  - inclinación con el mouse: máx. **0,8°** (antes ~2,8° en la tabla de Liga); se levanta solo 1 px, más lento y sin borde encendido;
+  - al aparecer: menos giro (4°) y sin desenfoque; al salir por arriba: casi nada (2°).
+- Las tarjetas chicas (partidos, jugadores) siguen igual.
+- Archivos: `js/core/inclinacion.js` (opción `suave`, `MAX_SUAVE`), `tests/inclinacion.test.mjs`, `js/features/prof3d.js`, `styles/prof3d.css`. Medido en Liga: esquina de la tabla = 0,71°. Pruebas 443. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
