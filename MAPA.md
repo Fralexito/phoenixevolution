@@ -524,6 +524,15 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - No tocado: barra lateral, ticker, Red de enlaces, barra derecha, botones de historial/En vivo, estilo de las cápsulas, `tokens.css`.
 - **Propuestas pendientes de decisión (no aplicadas):** (A) menú en los 4 mundos: Competir · Salas (Duelos, Ahora mismo, Phoenix Link) · Mi equipo (Liga Máster, Mercado, Mi club) · Social; (B) reordenar las 8 pestañas de Competir; (C) pestañas Publicaciones/Clips del perfil con el estilo cápsula.
 - Pruebas: `npm test` 417/417, build 45 páginas, escaneo de Impeccable sin hallazgos. Perfil, Mis partidos y Mercado solo se vieron sin sesión (el entorno de la IA no llega a Supabase).
+### Ronda 227 — PRUEBA: portada con los 4 mundos y «Unirme» como camino (FX.portada)
+- Todo detrás de la bandera nueva **`FX.portada`** (`data/experimento.js`). `false` = portada y «Unirme» exactamente como antes. Fralex lo pidió «solo como prueba».
+- Portada (`pages/index.astro`, solo dentro de `FX.limpio`):
+  - Título nuevo «SOCIALIZA. COMPITE. / JUEGA. DIRIGE.» (2.ª línea con el degradado cian→púrpura); las palabras entran una tras otra (respeta `prefers-reduced-motion`). Frase nueva sin tecnicismos.
+  - «¿Qué quieres hacer?» visible otra vez, con 4 pestañas cápsula (mismo estilo que `.pilar-tabs-lista`; nombres elegidos por Fralex): **Zona Social · Competencia · Duelos · Mi Club**. Cada una muestra 3 accesos (lista `MUNDOS`). Abre en «Duelos». Teclado: flechas, Inicio, Fin. En celular ≤430 px se ocultan los íconos de las pestañas para que entren las 4 (texto sigue en 12 px).
+  - Cierre «¿Listo para entrar a la Galaxy?» grande con aurora: «Crear mi cuenta» (abre el registro; con sesión pasa a «Ir a mi perfil»), «Entrar al Discord» y enlace a la guía.
+- «Unirme» (`pages/unirme.astro`): chips «5 pasos · Gratis», los pasos unidos por una línea, pasos 1 y 2 destacados (borde cian y número relleno), «Crear mi cuenta» relleno púrpura. Textos sin cambios.
+- Archivos nuevos: `styles/portada.css`, `js/features/mundos.js`, `js/core/pestanas.js`, `tests/pestanas.test.mjs`. Sin cambios en colores, barras, ticker ni otras páginas.
+- Pruebas: 419 (2 nuevas). Build 45 páginas. Revisado en capturas a 1440, 390 y 360 px.
 
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.

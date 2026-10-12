@@ -1,0 +1,81 @@
+/* PRUEBA · Portada con los 4 mundos y «Unirme» como camino (FX.portada, ronda 227).
+   Solo usa colores y fuentes de tokens.css. Si FX.portada = false, nada de esto se pinta. */
+
+/* ── Título: 4 palabras, una por mundo ── */
+.portada-tit { display: flex; flex-direction: column; align-items: center; gap: .05em; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .02em; line-height: 1; font-size: clamp(2.4rem, 8.5vw, 5.25rem); color: #fff; }
+.portada-linea { display: block; }
+.portada-linea > span { display: inline-block; }
+.portada-linea-acento > span { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-500) 45%, var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; padding-bottom: .06em; }
+.portada-linea-acento > span:last-child { background: linear-gradient(90deg, var(--color-galaxy-500), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; }
+.portada-sub { max-width: 36rem; margin: 0 auto; font-size: .95rem; line-height: 1.55; color: #d1d5db; text-wrap: balance; }
+@media (min-width: 640px) { .portada-sub { font-size: 1.1rem; } }
+/* Las palabras entran una tras otra, rápido (solo si la persona no pidió menos movimiento). */
+@media (prefers-reduced-motion: no-preference) {
+  .portada-linea > span { animation: portada-entra .5s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--i) * 90ms + 60ms); }
+  .portada-sub { animation: portada-entra .5s cubic-bezier(.22,1,.36,1) .42s both; }
+}
+@keyframes portada-entra { from { opacity: 0; transform: translateY(.35em); } to { opacity: 1; transform: none; } }
+
+/* ── ¿Qué quieres hacer? (pestañas cápsula = mismo estilo que las de «Competir») ── */
+.mundos { display: grid; gap: .9rem; }
+.mundos-tit { text-align: center; font: 700 .8rem var(--font-display); letter-spacing: .25em; text-transform: uppercase; color: var(--color-galaxy-400); }
+.mundos-tabs { display: flex; justify-content: center; overflow-x: auto; scrollbar-width: none; margin: 0 -1rem; padding: 0 1rem; }
+.mundos-tabs::-webkit-scrollbar { display: none; }
+.mundos-tabs .pilar-tabs-lista { flex-shrink: 0; }
+/* Copia exacta del estilo de los enlaces de .pilar-tabs-lista, para botones */
+.mundos-tabs .pilar-tabs-lista button { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; padding: .4rem .9rem; border: 0; border-radius: 999px; background: transparent; cursor: pointer; font: 700 .75rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; transition: color .15s, background .15s; }
+.mundos-tabs .pilar-tabs-lista button i { font-size: .8em; opacity: .7; }
+.mundos-tabs .pilar-tabs-lista button:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.mundos-tabs .pilar-tabs-lista button[aria-selected='true'] { color: #000; background: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(34 211 238 / .45); }
+.mundos-tabs .pilar-tabs-lista button[aria-selected='true'] i { opacity: 1; }
+.mundos-tabs .pilar-tabs-lista button:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+/* Celular: las 4 pestañas deben verse completas (es lo que explica la web). Se aprieta el espacio, nunca la letra (mínimo 12 px). */
+@media (max-width: 639px) {
+  .mundos-tabs .pilar-tabs-lista { gap: .2rem; }
+  .mundos-tabs .pilar-tabs-lista button { padding: .45rem .6rem; letter-spacing: .03em; gap: .35rem; }
+}
+@media (max-width: 430px) { .mundos-tabs .pilar-tabs-lista button i { display: none; } .mundos-tabs .pilar-tabs-lista button { padding: .5rem .6rem; } }
+
+.mundo-lema { text-align: center; font-size: .85rem; color: #9ca3af; margin-bottom: .7rem; }
+.mundo-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; text-align: left; }
+@media (min-width: 640px) { .mundo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.mundo-grid .accion { background: rgb(8 6 24 / .55); backdrop-filter: blur(8px); }
+@media (prefers-reduced-motion: no-preference) {
+  .mundo-panel:not([hidden]) .accion { animation: portada-entra .26s cubic-bezier(.22,1,.36,1) both; }
+  .mundo-panel:not([hidden]) .accion:nth-child(2) { animation-delay: 40ms; }
+  .mundo-panel:not([hidden]) .accion:nth-child(3) { animation-delay: 80ms; }
+}
+
+/* ── Cierre: ¿Listo para entrar a la Galaxy? ── */
+.cierre { position: relative; overflow: hidden; isolation: isolate; border-radius: 1.25rem; border: 1px solid var(--color-galaxy-border); background: var(--color-galaxy-panel); padding: 2.75rem 1.25rem; text-align: center; }
+.cierre .hero-aurora i { opacity: .22; }
+.cierre-cuerpo { position: relative; z-index: 1; display: grid; justify-items: center; gap: .9rem; }
+.cierre-tit { font: 700 clamp(1.75rem, 5.5vw, 3rem)/1.05 var(--font-display); text-transform: uppercase; letter-spacing: .03em; color: #fff; text-wrap: balance; }
+.cierre-tit span { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; }
+.cierre-sub { max-width: 32rem; font-size: .95rem; line-height: 1.5; color: #d1d5db; }
+.cierre-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; padding-top: .35rem; }
+.cierre-btn { display: inline-flex; align-items: center; gap: .55rem; padding: .85rem 1.6rem; border-radius: .9rem; font: 700 .85rem var(--font-display); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: transform .16s cubic-bezier(.22,1,.36,1), background-color .16s, border-color .16s; }
+.cierre-btn:active { transform: scale(.97); }
+.cierre-btn-prim { border: 1px solid transparent; background: var(--color-galaxy-600); color: #fff; box-shadow: 0 10px 30px rgb(128 0 255 / .35); }
+.cierre-btn-prim:hover { background: var(--color-galaxy-700); }
+.cierre-btn-sec { border: 1px solid var(--color-galaxy-border); background: rgb(255 255 255 / .04); color: #fff; }
+.cierre-btn-sec:hover { border-color: var(--color-galaxy-400); }
+.cierre-guia a { font-size: .8rem; color: #9ca3af; }
+.cierre-guia a:hover { color: var(--color-galaxy-400); }
+@media (min-width: 640px) { .cierre { padding: 3.5rem 2rem; } }
+@media (max-width: 420px) { .cierre-btn { width: 100%; justify-content: center; } }
+
+/* ── «Unirme»: los pasos como un camino ── */
+.unirme-chips { display: flex; justify-content: center; gap: .5rem; padding-top: .25rem; }
+.unirme-chips span { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .8rem; border-radius: 999px; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .25); font: 700 .75rem var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: #d1d5db; }
+.unirme-chips i { color: var(--color-galaxy-400); font-size: .85em; }
+.camino { position: relative; }
+.camino-paso { position: relative; }
+/* Línea que baja de un número al siguiente */
+.camino-paso:not(:last-child)::after { content: ''; position: absolute; left: calc(1rem + 1.375rem - 1px); top: calc(1rem + 2.75rem + .35rem); bottom: calc(-.75rem - 1rem - .35rem); width: 2px; border-radius: 2px; background: linear-gradient(var(--color-galaxy-400), var(--color-galaxy-600)); opacity: .45; pointer-events: none; }
+@media (min-width: 640px) { .camino-paso:not(:last-child)::after { left: calc(1.25rem + 1.375rem - 1px); top: calc(1.25rem + 2.75rem + .35rem); bottom: calc(-.75rem - 1.25rem - .35rem); } }
+/* Pasos 1 y 2: lo esencial */
+.camino-clave { border-left: 3px solid var(--color-galaxy-400); }
+.camino-clave > span:first-child { background: linear-gradient(135deg, var(--color-galaxy-600), var(--color-galaxy-700)); border-color: transparent; color: #fff; }
+.unirme-btn-prim { background: var(--color-galaxy-600); border-color: transparent; color: #fff; }
+.unirme-btn-prim:hover { background: var(--color-galaxy-700); color: #fff; }

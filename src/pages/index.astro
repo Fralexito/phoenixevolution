@@ -15,6 +15,31 @@ const ACCIONES = [
   { href: 'mis-salas/', icono: 'fa-desktop', titulo: 'Vincular mi PC', txt: 'Phoenix Soda y Parsec', cuenta: true },
   { href: 'unirme/', icono: 'fa-door-open', titulo: 'Unirme a la liga', txt: 'Inscríbete para la próxima edición', invitado: true },
 ];
+// PRUEBA (FX.portada, ronda 227): los 4 mundos de la web. Cada pestaña muestra 3 accesos con su explicación corta.
+// `abierto` = la pestaña que se ve al entrar. Para cambiar un botón, se edita aquí.
+const MUNDOS = [
+  { id: 'social', icono: 'fa-users', nombre: 'Zona Social', lema: 'Tu perfil, tus amigos y toda la comunidad.', acciones: [
+    { href: 'social/', icono: 'fa-users', titulo: 'Comunidad', txt: 'Historias, publicaciones y el muro de todos' },
+    { href: 'mensajes/', icono: 'fa-comments', titulo: 'Mensajes', txt: 'Chatea con tus amigos y rivales' },
+    { href: 'clanes/', icono: 'fa-people-group', titulo: 'Clanes', txt: 'Arma tu grupo y representa a tu gente' },
+  ] },
+  { id: 'competencia', icono: 'fa-trophy', nombre: 'Competencia', lema: 'Ligas oficiales y torneos creados por la comunidad.', acciones: [
+    { href: 'liga/', icono: 'fa-table-list', titulo: 'Tabla de la liga', txt: 'Posiciones, fechas y resultados' },
+    { href: 'torneos/', icono: 'fa-sitemap', titulo: 'Torneos', txt: 'Crea tu torneo o entra a uno abierto' },
+    { href: 'ahora/', icono: 'fa-tower-broadcast', titulo: 'Ver en vivo', txt: 'Partidos y retos en este momento' },
+  ] },
+  { id: 'duelos', icono: 'fa-gamepad', nombre: 'Duelos', lema: 'Reta a alguien y jueguen en una sala de PES.', abierto: true, acciones: [
+    { href: 'duelos/', icono: 'fa-gamepad', titulo: 'Jugar un reto', txt: 'Reta a alguien y arma la sala', primario: true },
+    { href: 'en-vivo/', icono: 'fa-desktop', titulo: 'Salas en vivo', txt: 'Salas abiertas para entrar a jugar' },
+    { href: 'mis-salas/', icono: 'fa-plug', titulo: 'Vincular mi PC', txt: 'Phoenix Link y Parsec para ser host' },
+  ] },
+  { id: 'club', icono: 'fa-shield-halved', nombre: 'Mi Club', lema: 'Maneja tu equipo de la Liga Máster.', acciones: [
+    { href: 'mi-club/', icono: 'fa-shield-halved', titulo: 'Mi club', txt: 'Tu plantilla y las fichas de tus jugadores' },
+    { href: 'manager/', icono: 'fa-chess-knight', titulo: 'Liga Máster', txt: 'Tu carrera de DT: club y presupuesto' },
+    { href: 'mercado/', icono: 'fa-right-left', titulo: 'Mercado', txt: 'Fichajes y traspasos de la liga' },
+  ] },
+];
+const discord = 'https://discord.gg/jsxZ3mtfwe';
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
@@ -23,10 +48,18 @@ const ACCIONES = [
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="flex items-center justify-center w-full"><div class="max-w-4xl mx-auto text-center relative z-10 space-y-3 sm:space-y-5">
       <span class="inline-block text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-3 py-1 rounded border border-galaxy-400/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">Temporada Oficial 2026</span>
+      {FX.portada ? (<Fragment>
+      <h1 class="portada-tit" aria-label="Socializa. Compite. Juega. Dirige.">
+        <span class="portada-linea" aria-hidden="true"><span style="--i:0">Socializa.</span> <span style="--i:1">Compite.</span></span>
+        <span class="portada-linea portada-linea-acento" aria-hidden="true"><span style="--i:2">Juega.</span> <span style="--i:3">Dirige.</span></span>
+      </h1>
+      <p class="portada-sub">La casa de la comunidad de PES 2021: tu perfil, tus torneos, tus salas y tu club, todo en un solo lugar.</p>
+      </Fragment>) : (<Fragment>
       <h1 class="text-[1.85rem] leading-[1.15] sm:text-5xl md:text-6xl font-display font-extrabold text-white uppercase tracking-wider sm:leading-tight">
         EL SHOW MÁXIMO DE<br class="hidden sm:inline" /> LA <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 via-galaxy-500 to-galaxy-600 text-shadow-glow">GALAXY LEAGUE</span>
       </h1>
       <p class="text-gray-300 text-[13px] leading-snug sm:leading-normal sm:text-base md:text-lg max-w-2xl mx-auto">Comunidad competitiva de simulación futbolística. Matchmaking punto a punto, hosting remoto, transferencias de mercado y disputas de honor sobre el campo virtual.</p>
+      </Fragment>)}
       {!FX.limpio && <Fragment>
       <div class="flex flex-nowrap sm:flex-wrap items-center justify-center gap-2 sm:gap-4 pt-1 sm:pt-4">
         <a href={`${base}duelos/`} class="bg-gradient-to-r from-galaxy-600 to-galaxy-700 hover:from-galaxy-500 hover:to-galaxy-600 text-white font-display font-bold px-4 sm:px-8 py-2.5 sm:py-3.5 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(128,0,255,0.4)] flex items-center gap-2"><i class="fa-solid fa-gamepad"></i> Sala de Duelos</a>
@@ -38,6 +71,30 @@ const ACCIONES = [
   <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
   {FX.limpio ? (
     <div class="relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
+      {FX.portada ? (
+      <section class="mundos" aria-labelledby="mundos-t" data-mundos>
+        <h2 id="mundos-t" class="mundos-tit">¿Qué quieres hacer?</h2>
+        <div class="mundos-tabs">
+          <div class="pilar-tabs-lista" role="tablist" aria-label="Los 4 mundos de Phoenix Evolution">
+            {MUNDOS.map((m) => (
+              <button type="button" role="tab" id={`mundo-tab-${m.id}`} aria-controls={`mundo-${m.id}`} aria-selected={m.abierto ? 'true' : 'false'} tabindex={m.abierto ? 0 : -1}><i class={`fa-solid ${m.icono}`}></i>{m.nombre}</button>
+            ))}
+          </div>
+        </div>
+        {MUNDOS.map((m) => (
+          <div class="mundo-panel" role="tabpanel" id={`mundo-${m.id}`} aria-labelledby={`mundo-tab-${m.id}`} hidden={!m.abierto}>
+            <p class="mundo-lema">{m.lema}</p>
+            <div class="mundo-grid">
+              {m.acciones.map((a) => (
+                <a href={`${base}${a.href}`} class:list={['accion', a.primario && 'accion-primaria']}>
+                  <i class={`fa-solid ${a.icono}`}></i><span><b>{a.titulo}</b><small>{a.txt}</small></span><i class="fa-solid fa-arrow-right accion-flecha"></i>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+      ) : (
       <div class="acciones-grid acciones-hero">
         {ACCIONES.map((a) => (
           <a href={`${base}${a.href}`} class:list={['accion', a.tono === 'primario' && 'accion-primaria', a.invitado && 'solo-invitado', a.cuenta && 'solo-cuenta']}>
@@ -45,6 +102,7 @@ const ACCIONES = [
           </a>
         ))}
       </div>
+      )}
       <p class="pulso-linea" aria-label="Pulso de la comunidad">
         {[['jugadores', 'fichas', 'database/'], ['comunidad', 'registrados', 'database/'], ['hosts', 'hosts listos', 'duelos/'], ['retos', 'retos abiertos', 'duelos/']].map(([id, txt, href]) => (
           <a href={`${base}${href}`}><b id={`pulso-${id}`}>—</b> {txt}</a>
@@ -224,6 +282,21 @@ const ACCIONES = [
     </Plegable></>}
 
     <!-- 6. INVITACIÓN FINAL -->
+    {FX.portada ? (
+    <section class="cierre" aria-labelledby="cierre-t">
+      <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="cierre-cuerpo">
+        <h2 id="cierre-t" class="cierre-tit">¿Listo para entrar a la <span>Galaxy</span>?</h2>
+        <p class="cierre-sub">Crea tu cuenta gratis y empieza hoy: tu perfil, tus retos, tus torneos y tu club.</p>
+        <div class="cierre-botones">
+          <button type="button" id="cierre-registro" class="cierre-btn cierre-btn-prim solo-invitado"><i class="fa-solid fa-user-plus"></i> Crear mi cuenta</button>
+          <a href={`${base}perfil/`} class="cierre-btn cierre-btn-prim solo-cuenta"><i class="fa-solid fa-user"></i> Ir a mi perfil</a>
+          <a href={discord} target="_blank" rel="noopener" class="cierre-btn cierre-btn-sec"><i class="fa-brands fa-discord"></i> Entrar al Discord</a>
+        </div>
+        <p class="cierre-guia solo-invitado"><a href={`${base}unirme/`}>¿Primera vez? Mira la guía de 5 pasos <i class="fa-solid fa-arrow-right"></i></a></p>
+      </div>
+    </section>
+    ) : (
     <section class="glass-panel rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
       <div>
         <h2 class="font-display font-bold text-lg sm:text-xl text-white uppercase tracking-wider">¿Listo para entrar a la Galaxy?</h2>
@@ -231,8 +304,13 @@ const ACCIONES = [
       </div>
       <a href="https://discord.gg/jsxZ3mtfwe" target="_blank" rel="noopener" class="shrink-0 bg-[#5865F2] hover:bg-[#4752c4] text-white font-display font-bold px-6 py-3 rounded-xl text-sm uppercase tracking-wider transition-colors flex items-center gap-2"><i class="fa-brands fa-discord text-lg"></i> Unirme al Discord</a>
     </section>
+    )}
   </div>
 </Layout>
 <script>
   import '../js/pages/central.js';
+  import { montarMundos } from '../js/features/mundos.js';
+  import { openAuthModal } from '../js/features/auth.js';
+  montarMundos();
+  document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));
 </script>
