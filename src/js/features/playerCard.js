@@ -21,6 +21,14 @@ function fisicoHTML(p) {
 }
 
 /** `largo`: proporciones altas de la tarjeta (foto 5:4 y stats en 2 columnas); se usa en el perfil. En Jugadores la tarjeta es más compacta. */
+// Efecto «Sorpresa» (ronda 254): cada jugador tiene SIEMPRE el mismo efecto (sale de su id), pero distinto al de los demás.
+const EFECTOS = ['reflejo', 'foco', 'borde', 'holo'];
+export function efectoDe(p) {
+  const s = String(p?.id ?? p?.nombre ?? ''); let h = 0;
+  for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return EFECTOS[h % EFECTOS.length];
+}
+
 export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '', largo = false } = {}) {
   const img = safeImg(p.foto_url) || safeImg(p.foto);
   // La foto ocupa la parte alta de la tarjeta (formato 5:4, enfocada arriba para que se vea la cara).
@@ -36,7 +44,7 @@ export function playerCardHTML(p, index = 0, { wide = false, sizeClass = '', lar
   // La foto es una CAPA detrás de todo (proporción elegida). Un separador 5:4 reserva la zona de la foto y el contenido va encima:
   // con proporción «larga» la foto baja por detrás del nombre y las estadísticas sin agrandar la tarjeta.
   return `
-  <article data-nivel="${nivelDe(p.ovr).id}" class="${largo ? 'pc-largo ' : ''}${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
+  <article data-nivel="${nivelDe(p.ovr).id}" data-fx="${efectoDe(p)}" class="${largo ? 'pc-largo ' : ''}${size} relative rounded-xl overflow-hidden bg-gradient-to-b from-galaxy-900/90 via-galaxy-panel to-galaxy-deep border border-galaxy-600/40 shadow-[0_0_25px_rgba(128,0,255,0.25)] ${GLOWS[index % GLOWS.length]} transition-all duration-300 flex flex-col justify-between pc">
     <div data-foto-caja style="aspect-ratio:${ratioDe(p.foto_aspecto)}" class="absolute inset-x-0 top-0 bg-black/40 overflow-hidden">
       ${foto}
       <div class="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-galaxy-deep via-galaxy-deep/70 to-transparent pointer-events-none"></div>

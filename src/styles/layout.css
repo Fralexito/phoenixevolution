@@ -85,7 +85,7 @@ html[data-aj-contraste='alto'] { --color-galaxy-border: #6d4fe0; --color-galaxy-
 html[data-aj-contraste='alto'] .text-gray-400, html[data-aj-contraste='alto'] .text-gray-500, html[data-aj-contraste='alto'] .text-gray-600 { color: #e2e8f0 !important; }
 html[data-aj-subrayado='si'] main a:not(.btn) { text-decoration: underline; text-underline-offset: 3px; }
 html[data-aj-foco='si'] :focus-visible { outline: 3px solid #fff !important; outline-offset: 3px !important; box-shadow: 0 0 0 6px var(--color-galaxy-600) !important; }
-html[data-aj-cartas-brillo='no'] .pc-sheen { display: none; }
+/* (ronda 254) el interruptor «Brillo» se reemplazó por «Efecto al pasar el mouse»: ver styles/cartasEfecto.css */
 html[data-aj-cartas-insignia='no'] .div-badge { display: none; }
 html[data-aj-liga-zonas='no'] .tmp-fila, html[data-aj-liga-zonas='no'] .liga-tabla tbody tr.tmp-fila { box-shadow: none; background: none; }
 html[data-aj-liga-compacta='si'] .liga-tabla td { padding-top: .3rem; padding-bottom: .3rem; }

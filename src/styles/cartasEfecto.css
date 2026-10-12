@@ -1,0 +1,30 @@
+/* EFECTOS DE LAS CARTAS AL PASAR EL MOUSE (ronda 254). Ajustes → Jugadores y cartas → «Efecto al pasar el mouse».
+   Todos usan la misma capa (.pc-sheen) y son SUTILES. Con «Sorpresa», cada jugador tiene su efecto fijo (data-fx, sale de su id).
+   --mx / --my (posición del mouse dentro de la carta) los pone js/features/cartasEfecto.js. */
+.pc-sheen { display: none; border-radius: inherit; opacity: 0; transform: none; transition: opacity .45s cubic-bezier(.22, 1, .36, 1); }
+
+/* Reflejo suave: la franja de antes, mucho más tenue y lenta */
+:is(html[data-aj-cartas-efecto='reflejo'] .pc, html[data-aj-cartas-efecto='sorpresa'] .pc[data-fx='reflejo']) .pc-sheen {
+  display: block; opacity: 1; background: linear-gradient(115deg, transparent 42%, rgb(255 255 255 / .07) 50%, transparent 58%);
+  transform: translateX(-130%); transition: transform 1.4s cubic-bezier(.22, 1, .36, 1); }
+:is(html[data-aj-cartas-efecto='reflejo'] .pc, html[data-aj-cartas-efecto='sorpresa'] .pc[data-fx='reflejo']):hover .pc-sheen { transform: translateX(130%); }
+
+/* Luz que sigue al mouse: un círculo de luz muy suave donde está el puntero */
+:is(html[data-aj-cartas-efecto='foco'] .pc, html[data-aj-cartas-efecto='sorpresa'] .pc[data-fx='foco']) .pc-sheen {
+  display: block; background: radial-gradient(circle at var(--mx, 50%) var(--my, 30%), rgb(255 255 255 / .11), transparent 42%); }
+
+/* Borde que se enciende: el contorno toma el color del nivel de la carta */
+:is(html[data-aj-cartas-efecto='borde'] .pc, html[data-aj-cartas-efecto='sorpresa'] .pc[data-fx='borde']) .pc-sheen {
+  display: block; box-shadow: inset 0 0 0 1px rgb(var(--pc-tono) / .7), inset 0 0 22px rgb(var(--pc-tono) / .16); }
+
+/* Tornasol: un velo de colores que cambia según dónde pongas el mouse */
+:is(html[data-aj-cartas-efecto='holo'] .pc, html[data-aj-cartas-efecto='sorpresa'] .pc[data-fx='holo']) .pc-sheen {
+  display: block; mix-blend-mode: color-dodge;
+  background: linear-gradient(125deg, rgb(255 0 128 / .06), rgb(0 229 255 / .07), rgb(255 214 0 / .05), rgb(128 0 255 / .07));
+  background-size: 220% 220%; background-position: var(--mx, 50%) var(--my, 50%); }
+
+/* Se encienden solo al pasar el mouse (y en la carta ampliada) */
+:is(.pc:hover, .pcw-replica .pc) .pc-sheen { opacity: 1; }
+
+html[data-aj-cartas-efecto='ninguno'] .pc-sheen { display: none; }
+@media (prefers-reduced-motion: reduce) { .pc-sheen { transition: none; } }

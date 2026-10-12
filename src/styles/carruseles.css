@@ -24,14 +24,15 @@
 
 /* Variante 3D (cartas): la del centro de frente; las de los costados giran hacia adentro y se achican un poco.
    Va ligada al desplazamiento de la propia fila (animation-timeline: view(inline)): solo se mueve cuando TÚ la mueves. */
-.carru-3d .carru-pista { --carru-ancho: clamp(11.5rem, 42vw, 14.5rem); gap: .4rem; padding-block: 1.5rem 2rem; perspective: 1100px; }
+.carru-3d .carru-pista { --carru-ancho: clamp(11.5rem, 42vw, 14.5rem); gap: .6rem; padding-block: 1.5rem 2rem; perspective: 1100px; }
 .carru-3d .carru-pista > * { transform-style: preserve-3d; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    /* Ronda 254: cartas RECTAS (sin giro, pedido de Fralex). Las de los costados solo se achican un poco y se apagan. */
     @keyframes carru-cov {
-      0%   { transform: perspective(1100px) translate3d(0, 10px, -140px) rotateY(38deg); opacity: .45; filter: saturate(.6) brightness(.75); }
-      42%, 58% { transform: none; opacity: 1; filter: none; }
-      100% { transform: perspective(1100px) translate3d(0, 10px, -140px) rotateY(-38deg); opacity: .45; filter: saturate(.6) brightness(.75); }
+      0%   { transform: scale(.86); opacity: .5; filter: saturate(.6) brightness(.75); }
+      40%, 60% { transform: none; opacity: 1; filter: none; }
+      100% { transform: scale(.86); opacity: .5; filter: saturate(.6) brightness(.75); }
     }
     .carru-3d .carru-pista > * { animation: carru-cov linear both; animation-timeline: view(inline); }
   }

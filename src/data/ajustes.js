@@ -9,7 +9,10 @@ export const SECCIONES = [
     { clave: 'neon', tipo: 'opciones', etiqueta: 'Intensidad del neón', ayuda: 'Suave quita el resplandor de los títulos.', defecto: 'normal', opciones: [{ valor: 'normal', etiqueta: 'Normal' }, { valor: 'suave', etiqueta: 'Suave' }] },
   ] },
   { id: 'cartas', vista: true, titulo: 'Jugadores y cartas', icono: 'fa-id-card', texto: 'Cómo se ven y se mueven las cartas.', ajustes: [
-    { clave: 'cartasBrillo', tipo: 'switch', etiqueta: 'Brillo sobre las cartas', ayuda: 'El destello que cruza la carta.', defecto: true },
+    // Ronda 254: el «reflejo» de siempre aburría (Fralex). Ahora hay varios efectos sutiles al pasar el mouse; «Sorpresa» le da a cada jugador el suyo.
+    { clave: 'cartasEfecto', tipo: 'opciones', etiqueta: 'Efecto al pasar el mouse', ayuda: 'Todos son sutiles. «Sorpresa» le da a cada jugador su propio efecto.', defecto: 'sorpresa',
+      opciones: [{ valor: 'sorpresa', etiqueta: 'Sorpresa (uno distinto por jugador)' }, { valor: 'reflejo', etiqueta: 'Reflejo suave' }, { valor: 'foco', etiqueta: 'Luz que sigue al mouse' },
+        { valor: 'borde', etiqueta: 'Borde que se enciende' }, { valor: 'holo', etiqueta: 'Tornasol' }, { valor: 'ninguno', etiqueta: 'Ninguno' }] },
     { clave: 'cartasInclinacion', tipo: 'switch', etiqueta: 'Inclinación 3D de la carta ampliada', ayuda: 'Solo con mouse: la réplica sigue el cursor.', defecto: true },
     { clave: 'cartasInsignia', tipo: 'switch', etiqueta: 'Insignia de división (L1 / L2)', ayuda: 'La etiqueta en la esquina de cada carta.', defecto: true },
   ] },

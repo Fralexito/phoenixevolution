@@ -14,6 +14,7 @@ import { initReveal } from './features/reveal.js';
 import { initDopamina } from './features/dopamina.js';
 import { initProf3d } from './features/prof3d.js';
 import { initCarruseles } from './features/carruseles.js';
+import { initCartasEfecto } from './features/cartasEfecto.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
 import { FX } from '../data/experimento.js';
 
@@ -32,6 +33,7 @@ initReveal();
 initDopamina();
 initProf3d();
 initCarruseles();
+initCartasEfecto();
 // Barra lateral izquierda (experimento): solo en pantallas anchas; se descarga solo cuando hace falta.
 if (FX.barraLateral && document.getElementById('barra-lat')) {
   const ancha = window.matchMedia('(min-width: 1280px)'); let lista = false;

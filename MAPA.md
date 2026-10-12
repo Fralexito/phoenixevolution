@@ -760,6 +760,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Jugadores (`database.astro`/`database.js`): 4.ª vista **Carrusel** junto a Todos · Por estilo · Por nivel; usa el «Ordenar por» elegido y los filtros; toca una carta → su perfil. En modo Avanzada se ve la cuadrícula de siempre.
 - Se mantiene: botón «Jugadores» en el menú, carruseles de Creadores y del perfil, arreglo de animaciones de scroll. Pruebas 444. Build 45.
 
+### Ronda 254 — Carrusel recto y efectos sutiles en las cartas
+- Fralex: no le gustó la inclinación de las cartas del carrusel; el reflejo al pasar el mouse aburría (siempre igual); pidió más sutil u otras opciones de efecto, sutiles.
+- Carrusel (`styles/carruseles.css`): cartas rectas; las de los costados solo se achican un poco y se apagan.
+- Efectos (`styles/cartasEfecto.css`, `js/features/cartasEfecto.js`): misma capa `.pc-sheen` con 4 efectos sutiles: Reflejo suave (más tenue y lento), Luz que sigue al mouse, Borde que se enciende (color del nivel), Tornasol. Ajuste nuevo **Ajustes → Jugadores y cartas → «Efecto al pasar el mouse»** (`cartasEfecto`, reemplaza el interruptor «Brillo»): Sorpresa (por defecto: cada jugador su efecto fijo, `efectoDe` en playerCard.js según su id) · uno de los 4 · Ninguno.
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

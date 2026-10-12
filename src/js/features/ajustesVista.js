@@ -57,7 +57,7 @@ function notificaciones() {
 }
 function cartas() {
   const caja = $('vp-cartas'); if (!caja) return;
-  caja.innerHTML = `<div class="relative w-[210px] mx-auto">${playerCardHTML(DEMO, 0, { sizeClass: 'w-full' })}<span class="div-badge div-1"><b>L1</b><span>Galaxy League</span></span></div><p class="aj-nota text-center">Pasa el mouse por la carta para ver el brillo.</p>`;
+  caja.innerHTML = `<div class="relative w-[210px] mx-auto">${playerCardHTML(DEMO, 0, { sizeClass: 'w-full' })}<span class="div-badge div-1"><b>L1</b><span>Galaxy League</span></span></div><p class="aj-nota text-center">Pasa el mouse por la carta para ver el efecto.</p>`;
 }
 
 /** Pinta TODAS las vistas. Se llama al cargar y cada vez que cambia un ajuste. */
