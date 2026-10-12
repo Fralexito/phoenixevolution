@@ -790,6 +790,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `styles/marco.css` + `js/features/marco.js`: (A) mismo ancho en todas las páginas (80rem, como Inicio); (B) barra izquierda sin huecos entre grupos cuando está cerrada, ícono que reacciona, se oculta el bloque Amigos si está vacío, sube cuando el ticker se esconde; (C) ticker 2,25rem y, además de esconderse al bajar (ya existía, ticker.js), vuelve en cuanto subes un poco (`data-cab-compacta`); (D) Historial + En vivo en una cápsula de vidrio; (E) pie: aviso legal plegado («Aviso legal y marcas»), 11 px → 12 px; (F) Red de enlaces: cuadros más bajos, en grupos de 2 columnas ícono al lado del texto, texto mínimo 12 px.
 - Pruebas 444. Build 45.
 
+### Ronda 259 — Sala de Duelos sin tanto scroll y más premium (FX.duelosPro)
+- Fralex: la distribución y el diseño de Duelos le gustan, pero hay mucho scroll; será de las secciones más usadas, quiere que se sienta premium.
+- `js/features/duelosPro.js` (lo llama `pages/duelos.js`) + `styles/duelosPro.css`: «En el radar» y «Que lanzaste» pasan a pestañas cápsula con contador (copian `cnt-radar`/`cnt-pend`), en la misma fila que «Alquilar host» y «Actualizar»; al emitir un reto se abre «Que lanzaste» (evento `duelos:creado`). PC ancha: tarjetas de reto de a dos. PC: el formulario «Lanzar reto» queda pegado a la vista (sticky, se ajusta cuando el ticker se esconde). Celular: los retos se deslizan de lado. Cabecera con acabado premium y brillo en «Emitir reto».
+- Medido con 5 retos de prueba: PC ≈ 1,6 pantallas (antes las dos listas apiladas); celular 2,7 → 1,05 pantallas.
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

@@ -1,0 +1,70 @@
+/* SALA DE DUELOS «PRO» (FX.duelosPro, ronda 259). Misma distribución y diseño de Fralex; menos scroll y acabado premium.
+   1. Las listas de la derecha van en pestañas cápsula (una a la vez) y, en PC ancha, las tarjetas de reto van de a dos.
+   2. En PC el formulario «Lanzar reto» se queda pegado a la vista mientras recorres los retos (no hay que volver arriba).
+   3. Cabecera con el mismo acabado premium que el resto (placa de luz, línea de acento), un poco más compacta.
+   4. «Emitir reto» con un brillo que lo recorre al pasar el mouse. */
+
+/* 1 · pestañas */
+.dp-tabs { width: max-content; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.dp-tabs::-webkit-scrollbar { display: none; }
+.dp-tabs button { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; padding: .5rem 1rem; border-radius: 999px; font: 700 .78rem var(--font-display);
+  letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; transition: color .15s, background .15s, transform .18s cubic-bezier(.22, 1, .36, 1); }
+.dp-tabs button i { font-size: .85em; opacity: .75; }
+.dp-tabs button b { min-width: 1.35rem; padding: 0 .35rem; border-radius: 999px; font-size: .75rem; line-height: 1.35rem; text-align: center; background: rgb(255 255 255 / .08); color: #e5e7eb; }
+.dp-tabs button b:empty { display: none; }
+.dp-tabs button:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.dp-tabs button:active { transform: scale(.96); }
+.dp-tabs button[aria-selected='true'] { color: #000; background: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(34 211 238 / .45); }
+.dp-tabs button[aria-selected='true'] b { background: rgb(0 0 0 / .2); color: #000; }
+.dp-tabs button:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+#col-partidos[data-dp='radar'] #col-lanzados, #col-partidos[data-dp='lanzados'] #col-radar { display: none; }
+/* el título de cada lista ya lo dice la pestaña: se oculta (los botones Alquilar host / Actualizar se quedan) */
+#col-partidos[data-dp] :is(#h-radar, #h-lanzados) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+#col-partidos[data-dp] #col-radar > div:first-child { display: none; }
+.dp-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem .75rem; min-width: 0; }
+#col-partidos[data-dp] #col-lanzados > div:first-child { display: none; }
+#col-partidos[data-dp] { gap: .9rem; }
+@media (min-width: 1280px) {
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend, #lista-salas-radar) { grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); }
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend) > .col-span-full { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes dp-entra { from { opacity: 0; transform: translate3d(0, 8px, 0); } }
+  #col-partidos[data-dp] :is(#col-radar, #col-lanzados):not([hidden]) { animation: dp-entra .32s cubic-bezier(.22, 1, .36, 1) both; }
+}
+
+/* 2 · formulario pegado (solo PC con altura suficiente) */
+@media (min-width: 1024px) and (min-height: 760px) {
+  html[data-fx-duelos-pro] #col-lanzar { position: sticky; top: 6.9rem; max-height: calc(100dvh - 7.6rem); overflow-y: auto; scrollbar-width: thin; transition: top .3s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-duelos-pro][data-cab-compacta]:has(#ticker[data-oculto='true']) #col-lanzar { top: 4.7rem; max-height: calc(100dvh - 5.4rem); }
+}
+
+/* 3 · cabecera premium */
+html[data-fx-duelos-pro] main section.glass-panel:has(> div > h1) {
+  position: relative; overflow: hidden; isolation: isolate; padding: 1.1rem 1.4rem; border-radius: 1.25rem;
+  background: radial-gradient(90% 160% at 0% 0%, color-mix(in srgb, var(--color-galaxy-400) 11%, transparent), transparent 60%),
+    radial-gradient(70% 140% at 100% 100%, color-mix(in srgb, var(--color-galaxy-600) 14%, transparent), transparent 65%), var(--color-galaxy-panel);
+  border-color: color-mix(in srgb, var(--color-galaxy-400) 22%, var(--color-galaxy-border));
+}
+html[data-fx-duelos-pro] main section.glass-panel:has(> div > h1)::before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; z-index: -1;
+  background: linear-gradient(90deg, var(--color-galaxy-400), color-mix(in srgb, var(--color-galaxy-600) 80%, transparent) 45%, transparent 85%); }
+html[data-fx-duelos-pro] main section.glass-panel:has(> div > h1) h1 { font-size: clamp(1.4rem, 2.6vw, 2rem); letter-spacing: .06em; }
+
+/* 4 · botón «Emitir reto» */
+html[data-fx-duelos-pro] #form-crear-reto button[type='submit'] { position: relative; overflow: hidden; isolation: isolate; }
+html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / .22) 50%, transparent 65%); transform: translateX(-120%); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-fx-duelos-pro] #form-crear-reto button[type='submit']:not(:disabled)::after { transition: transform .8s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-duelos-pro] #form-crear-reto button[type='submit']:not(:disabled):hover::after { transform: translateX(120%); }
+}
+
+/* 5 · Celular: los retos se deslizan de lado (una tarjeta a la vista, se ve asomar la siguiente) en vez de apilarse */
+@media (max-width: 1023.98px) {
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend) { display: flex !important; gap: .75rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+    padding: .9rem .25rem .75rem; margin-inline: -.25rem; scrollbar-width: none; }
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend)::-webkit-scrollbar { display: none; }
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend) > * { flex: 0 0 88%; scroll-snap-align: center; }
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend) > .col-span-full,
+  #col-partidos[data-dp] :is(#lista-retos, #lista-pend) > :only-child { flex-basis: 100%; }
+}

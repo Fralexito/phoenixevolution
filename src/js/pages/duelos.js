@@ -16,6 +16,7 @@ import { pendientes } from '../core/misPartidos.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
+import { montarDuelosPro } from '../features/duelosPro.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -186,3 +187,4 @@ document.getElementById('btn-alquilar')?.addEventListener('click', () => import(
   document.getElementById('btn-plegar-form')?.addEventListener('click', () => plegar(true));
   document.getElementById('btn-abrir-form')?.addEventListener('click', () => { plegar(false); document.getElementById('form-crear-reto')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 }
+montarDuelosPro();   // ronda 259: pestañas para las listas (FX.duelosPro)
