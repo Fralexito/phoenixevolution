@@ -94,3 +94,18 @@ html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content
 @media (prefers-reduced-motion: no-preference) {
   .fr-simple :is(#tam-custom, [aria-labelledby='h-detalles-sala']:not([data-fr-plegado]) > :not(#h-detalles-sala)) { animation: dp-entra .28s cubic-bezier(.22, 1, .36, 1) both; }
 }
+
+/* 7 · Botón grande «Lanzar reto» (el formulario empieza plegado, ronda 261): brillo que lo recorre al pasar el mouse y respuesta al clic */
+@media (min-width: 1024px) {
+  html[data-fx-duelos-pro] #duelos-grid[data-plegado] .lanzar-flotante { position: relative; overflow: hidden; isolation: isolate; min-height: 3.4rem; font-size: .95rem; }
+  html[data-fx-duelos-pro] #duelos-grid[data-plegado] .lanzar-flotante::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / .2) 50%, transparent 65%); transform: translateX(-120%); }
+  html[data-fx-duelos-pro] #duelos-grid[data-plegado] .lanzar-flotante:active { transform: scale(.985); }
+}
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-fx-duelos-pro] #duelos-grid[data-plegado] .lanzar-flotante::after { transition: transform .8s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-duelos-pro] #duelos-grid[data-plegado] .lanzar-flotante:hover::after { transform: translateX(120%); }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  html[data-fx-duelos-pro] #duelos-grid:not([data-plegado]) #col-lanzar { animation: dp-entra .32s cubic-bezier(.22, 1, .36, 1) both; }
+}

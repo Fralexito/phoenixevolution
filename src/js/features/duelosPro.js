@@ -7,6 +7,11 @@ import { simplificarFormReto } from './formRetoSimple.js';
 export function montarDuelosPro() {
   if (!FX.duelosPro) return;
   simplificarFormReto();
+  // Ronda 261 (Fralex): «Lanzar reto» siempre empieza plegado y se despliega solo cuando quieres emitir uno
+  // (botón grande «Lanzar reto»). Después de emitirlo, se vuelve a plegar. En celular ya funcionaba así (botón de la cabecera).
+  const grid = document.getElementById('duelos-grid');
+  grid?.setAttribute('data-plegado', '');
+  window.addEventListener('duelos:creado', () => grid?.setAttribute('data-plegado', ''));
   const col = document.getElementById('col-partidos'); if (!col) return;
   try {
     const tabs = document.createElement('div');
