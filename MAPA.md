@@ -736,6 +736,15 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `data/site.js`: el grupo «Competir» pasa a llamarse **Competiciones**: bloque *Compite* = Ligas (Liga + página de copas oficiales, que se ilumina como «Ligas») · Torneos · Palmarés · Formatos · **Crear liga o torneo** (`torneos/#crear`, abre la ficha directo; `js/pages/torneos.js`) · bloque *Estadísticas* = Historial · Ranking · Jugadores. `pilar()` admite entradas sueltas (objeto) para acciones como «Crear».
 - Barra lateral: título «Competiciones». «Crear» con borde punteado (`reparto.css`). Pruebas 443. Build 45.
 
+### Ronda 251 — «Mi perfil»: menos scroll, Sistema Host plegable y Phoenix Link explicado (FX.perfilNuevo)
+- Fralex: la «biografía táctica» no se entendía; Sistema Host mareaba (muchas opciones de primera y mucho scroll); Phoenix Soda ahora se llama **Phoenix Link** y no se entendía cómo funciona; pidió más dinamismo y 3D sin exagerar.
+- `NOMBRE_APP` = «Phoenix Link» (site.js) + textos fijos en moderación, portada y misSalas.
+- Social: «Biografía» con explicación y ejemplo (mismo campo `bio`).
+- Sistema Host: si «Puedo ser host» está apagado, no se muestra nada más; encendido, 2 tarjetas plegables (Tu conexión · Qué hosteas) con resumen («500 Mbps · Ambos»), solo una abierta a la vez (`<details name>`).
+- Phoenix Link (`salas/vincularPC.js`, opción `pasos`): 3 pasos en tarjetas (Instala · Genera tu código · Escríbelo en la app) y «Tus PCs»; si ya hay PCs, salen primero y los pasos quedan en «Vincular otra PC». La página /mis-salas/ sigue con la vista de antes.
+- Fuera de Identidad, la tarjeta de foto se achica a una línea. Movimiento: pestaña nueva y lo que se despliega llegan con un giro 3D corto; tarjetas se levantan un poco al pasar el mouse. Arreglo: en celular nada se sale por el costado.
+- Probado con sesión y perfil de host simulados (PC y celular). Pruebas 443. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

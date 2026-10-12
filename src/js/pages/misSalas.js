@@ -35,7 +35,7 @@ async function pintarSalas() {
     const { data, error } = await supabase.from('salas').select('id, estado, visibilidad, juego, parche, region, latido, rival, limite_espectadores, acepta_espectadores, abierta_en')
       .eq('host', yo).in('estado', ['preparando', 'abierta', 'en_partida']).order('abierta_en', { ascending: false });
     if (error) throw error;
-    if (!data.length) { $('ms-salas').innerHTML = '<p class="text-xs text-gray-400">No tienes salas abiertas. Ábrela desde Phoenix Soda en tu PC.</p>'; return; }
+    if (!data.length) { $('ms-salas').innerHTML = '<p class="text-xs text-gray-400">No tienes salas abiertas. Ábrela desde Phoenix Link en tu PC.</p>'; return; }
     const ids = data.map((s) => s.id);
     const { data: esp } = await supabase.from('salas_espectadores').select('sala_id, usuario').in('sala_id', ids);
     const gente = [...new Set([...data.map((s) => s.rival).filter(Boolean), ...(esp ?? []).map((e) => e.usuario)])];

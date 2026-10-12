@@ -99,7 +99,7 @@ export const TICKER = [
 ];
 
 // Nombre visible de la app de salas (cámbialo aquí y se actualiza en toda la web).
-export const NOMBRE_APP = 'Phoenix Soda';
+export const NOMBRE_APP = 'Phoenix Link';   // antes «Phoenix Soda» (renombrada, ronda 251)
 
 // ───────── Mapa del sitio en PILARES (FX.pilares) ─────────
 // Cada sección vive en UN solo pilar. El menú de arriba muestra los pilares (desplegable con descripción) y cada página

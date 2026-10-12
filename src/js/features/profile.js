@@ -54,7 +54,9 @@ export function openProfileModal() {
   const avisoMenor = '<p class="text-[12px] text-gray-500 mt-1">Por privacidad, si eres menor de 18 años no guardamos ni mostramos tu país ni tu club.</p>';
   const fClub = `<div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}">${N ? '' : avisoMenor}</div>`;
   const ico = (i, campo) => N ? `<div class="pf2-ico"><i class="${i}" aria-hidden="true"></i>${campo}</div>` : campo;
-  const fBio = `<div><label class="label" for="p-bio">Biografía táctica</label><textarea id="p-bio" class="field" rows="3" maxlength="280">${escapeHTML(prof.bio)}</textarea>${N ? `<p class="pf2-cuenta"><span id="pf2-bio-n">${(prof.bio ?? '').length}</span>/280</p>` : ''}</div>`;
+  const fBio = N
+    ? `<div><label class="label" for="p-bio">Biografía</label><p class="text-[12px] text-gray-500 -mt-1 mb-2">Una frase sobre ti como jugador. Sale en tu perfil para que te conozcan.</p><textarea id="p-bio" class="field" rows="2" maxlength="280" placeholder="Ej.: Juego 4-3-3 con presión alta. Hincha del Barça. Busco rivales de noche.">${escapeHTML(prof.bio)}</textarea><p class="pf2-cuenta"><span id="pf2-bio-n">${(prof.bio ?? '').length}</span>/280</p></div>`
+    : `<div><label class="label" for="p-bio">Biografía táctica</label><textarea id="p-bio" class="field" rows="3" maxlength="280">${escapeHTML(prof.bio)}</textarea></div>`;
   const fDisc = `<div><label class="label" for="p-disc">Discord</label>${ico('fa-brands fa-discord', `<input id="p-disc" class="field" maxlength="40" value="${escapeHTML(prof.discord_tag)}">`)}</div>`;
   const fStream = `<div><label class="label" for="p-stream">Enlace de stream (https://…)</label>${ico('fa-solid fa-tower-broadcast', `<input id="p-stream" class="field" maxlength="200" value="${escapeHTML(prof.stream_url)}">`)}</div>`;
   const fSpeed = `<div>
@@ -67,8 +69,11 @@ export function openProfileModal() {
   const fJuegos = `<div><p class="label">Juegos y parches que hosteas <span class="text-gray-500 normal-case">(puedes elegir varios)</span></p><div id="p-hjuegos" class="space-y-2"></div></div>`;
   const fNotas = `<div><label class="label" for="p-hnotas">Aclaraciones sobre tu host <span class="text-gray-500 normal-case">(opcional)</span></label><textarea id="p-hnotas" class="field" rows="3" maxlength="300" placeholder="Horarios, ping, reglas de tu sala…">${escapeHTML(prof.host_notas)}</textarea></div>`;
 
+  // Sistema Host en 2 tarjetas plegables (solo una abierta a la vez): de primera solo se ve el resumen de cada una.
+  const plieg = (ic, t, idRes, cuerpo) => `<details name="pf2-host" class="pf2-plieg"><summary><span class="pf2-plieg-t"><i class="fa-solid ${ic}"></i><b>${t}</b></span><span class="pf2-resumen" id="${idRes}"></span><i class="fa-solid fa-chevron-down pf2-flecha"></i></summary><div class="pf2-plieg-c">${cuerpo}</div></details>`;
+
   const m = openModal(`
-    <form id="prof-form" class="${N ? 'pf2' : 'p-6 space-y-5'}" novalidate>
+    <form id="prof-form" class="${N ? 'pf2' : 'p-6 space-y-5'}" data-pf-tab="identidad" novalidate>
       ${N ? '<div class="pf2-cabeza">' : ''}
       <div class="flex justify-between items-center">
         <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest">Mi perfil</h2>
@@ -88,15 +93,17 @@ export function openProfileModal() {
       </div>
 
       <div data-pane="soda" role="tabpanel" hidden class="space-y-3">
-        <p class="${N ? 'pf2-aviso' : 'text-xs text-gray-300'}"><i class="fa-solid fa-desktop text-galaxy-400 mr-1.5"></i><b>Vincular ${NOMBRE_APP}</b>: genera un código de 6 dígitos (vale 10 minutos y un solo uso) y escríbelo en la app para que tu PC pueda abrir salas.</p>
+        ${N ? `<p class="pf2-aviso"><i class="fa-solid fa-desktop text-galaxy-400 mr-1.5"></i><b>${NOMBRE_APP}</b> es la app que conecta tu PC con la web: así puedes abrir salas de partido desde aquí.</p>`
+            : `<p class="text-xs text-gray-300"><i class="fa-solid fa-desktop text-galaxy-400 mr-1.5"></i><b>Vincular ${NOMBRE_APP}</b>: genera un código de 6 dígitos (vale 10 minutos y un solo uso) y escríbelo en la app para que tu PC pueda abrir salas.</p>`}
         <div id="p-soda" class="text-sm text-gray-300">Cargando…</div>
       </div>
       <div data-pane="host" role="tabpanel" hidden class="space-y-4">
         ${switchHTML({ id: 'p-host', checked: !!prof.puede_hostear, title: 'Puedo ser host', hint: 'Te avisamos cuando alguien necesite que le hosteen una partida.' })}
-        <div id="host-fields" class="space-y-4">
-          ${bloque('Tu conexión', fSpeed + fSoft)}
-          ${bloque('Qué hosteas', fJuegos + fNotas)}
-        </div>
+        ${N ? `<p id="pf2-host-off" class="pf2-apagado">Activa «Puedo ser host» para elegir tu conexión y lo que hosteas.</p>
+        <div id="host-fields" class="pf2-acordeon">
+          ${plieg('fa-gauge-high', 'Tu conexión', 'pf2-res-con', fSpeed + fSoft)}
+          ${plieg('fa-gamepad', 'Qué hosteas', 'pf2-res-jue', fJuegos + fNotas)}
+        </div>` : `<div id="host-fields" class="space-y-4">${fSpeed}${fSoft}${fJuegos}${fNotas}</div>`}
       </div>
       ${N ? '</div><div class="pf2-pie">' : ''}
       <p id="p-err" class="text-xs text-bad min-h-4" role="alert"></p>
@@ -115,7 +122,7 @@ export function openProfileModal() {
   m.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
     m.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
     m.querySelectorAll('[data-pane]').forEach((x) => { x.hidden = x.dataset.pane !== b.dataset.tab; });
-    if (N) m.querySelector('.modal-card')?.scrollTo({ top: 0 });
+    if (N) { $('#prof-form').dataset.pfTab = b.dataset.tab; m.querySelector('.modal-card')?.scrollTo({ top: 0 }); }
   }));
 
   /* ---- @usuario con verificación en vivo ---- */
@@ -125,12 +132,24 @@ export function openProfileModal() {
 
   /* ---- Host: interruptor + selectores segmentados ---- */
   const hostFields = $('#host-fields');
-  const syncHost = () => { hostFields.style.opacity = $('#p-host').checked ? '1' : '.4'; hostFields.inert = !$('#p-host').checked; };
+  const syncHost = N
+    ? () => { const on = $('#p-host').checked; hostFields.hidden = !on; $('#pf2-host-off').hidden = on; }
+    : () => { hostFields.style.opacity = $('#p-host').checked ? '1' : '.4'; hostFields.inert = !$('#p-host').checked; };
   syncHost(); $('#p-host').addEventListener('change', syncHost);
   const juegos = montarEditorJuegos($('#p-hjuegos'), catalogoDe(prof));
-  montarVincularPC($('#p-soda'), { esHost: !!prof.host_aprobado || ['ayudante', 'moderador', 'admin'].includes(prof.rol) });
-  bindSeg($('#p-speed'), (v) => { speed = Number(v); });
-  bindSeg($('#p-soft'), (v) => { soft = v; });
+  montarVincularPC($('#p-soda'), { esHost: !!prof.host_aprobado || ['ayudante', 'moderador', 'admin'].includes(prof.rol), pasos: N });
+  // Resúmenes de las tarjetas plegables de Sistema Host (se actualizan al cambiar algo)
+  const resumir = () => {
+    if (!N) return;
+    const vel = SPEED_BUCKETS.find((x) => x.v === speed)?.label ?? '';
+    $('#pf2-res-con').textContent = `${vel} Mbps · ${soft}`;
+    const cat = juegos.get();
+    $('#pf2-res-jue').textContent = cat.length ? cat.map((e) => e.opciones.length ? `${e.juego} (${e.opciones.length})` : e.juego).join(' · ') : 'Ninguno aún';
+  };
+  bindSeg($('#p-speed'), (v) => { speed = Number(v); resumir(); });
+  bindSeg($('#p-soft'), (v) => { soft = v; resumir(); });
+  $('#p-hjuegos').addEventListener('click', () => setTimeout(resumir, 0));
+  resumir();
 
   /* ---- Guardar ---- */
   $('#prof-form').addEventListener('submit', async (ev) => {

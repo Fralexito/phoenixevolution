@@ -36,3 +36,65 @@
 .pf2-ico > .field { padding-left: 2.3rem; }
 .pf2-cuenta { margin-top: .25rem; text-align: right; font-size: .75rem; color: #6b7280; }
 .pf2-aviso { padding: .8rem 1rem; border-radius: .75rem; border: 1px solid rgb(34 211 238 / .2); background: rgb(34 211 238 / .05); font-size: .8rem; line-height: 1.45; color: #d1d5db; }
+
+/* ── Ronda 251: menos scroll, más claro, movimiento 3D suave (nada se mueve solo: todo responde a tu clic) ── */
+/* Fuera de «Identidad», la tarjeta de foto se achica a una línea (los botones de foto solo hacen falta en Identidad) */
+.pf2[data-pf-tab]:not([data-pf-tab='identidad']) .pf2-tarjeta { padding: .6rem .9rem; }
+.pf2[data-pf-tab]:not([data-pf-tab='identidad']) .pf2-tarjeta [id$='-prev'] { width: 2.5rem; height: 2.5rem; }
+.pf2[data-pf-tab]:not([data-pf-tab='identidad']) .pf2-tarjeta .flex-wrap,
+.pf2[data-pf-tab]:not([data-pf-tab='identidad']) .pf2-tarjeta [id$='-gal'] { display: none; }
+
+/* Sistema Host: tarjetas plegables con resumen (de primera solo se ve el resumen) */
+.pf2-acordeon { display: grid; gap: .6rem; }
+.pf2-apagado { padding: .8rem 1rem; border-radius: .75rem; border: 1px dashed var(--color-galaxy-border); font-size: .8rem; color: #9ca3af; }
+.pf2-plieg { border-radius: 1rem; border: 1px solid var(--color-galaxy-border); background: rgb(255 255 255 / .02); transition: border-color .2s, background .2s; }
+.pf2-plieg[open] { border-color: rgb(34 211 238 / .4); background: rgb(34 211 238 / .03); }
+.pf2-plieg > summary { display: flex; align-items: center; gap: .75rem; padding: .85rem 1rem; cursor: pointer; list-style: none; border-radius: inherit; }
+.pf2-plieg > summary::-webkit-details-marker { display: none; }
+.pf2-plieg > summary:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+.pf2-plieg-t { display: inline-flex; align-items: center; gap: .6rem; flex-shrink: 0; }
+.pf2-plieg-t > i { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: .6rem; background: rgb(34 211 238 / .1); color: var(--color-galaxy-400); font-size: .85rem; }
+.pf2-plieg-t > b { font: 700 .85rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; }
+.pf2-resumen { flex: 1; min-width: 0; text-align: right; font-size: .78rem; color: var(--color-galaxy-400); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf2-flecha { margin-left: auto; font-size: .75rem; color: #6b7280; transition: transform .25s cubic-bezier(.22, 1, .36, 1); }
+.pf2-plieg[open] .pf2-flecha { transform: rotate(180deg); }
+.pf2-plieg-c { display: grid; gap: 1rem; padding: .25rem 1rem 1rem; }
+
+/* Phoenix Link: 3 pasos en tarjetas y tus PCs */
+.pf2-pasos { display: grid; gap: .6rem; list-style: none; margin: 0; padding: 0; }
+@media (min-width: 560px) { .pf2-pasos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.pf2-paso { display: flex; flex-direction: column; gap: .35rem; padding: .9rem; border-radius: 1rem; border: 1px solid var(--color-galaxy-border); background: rgb(255 255 255 / .02); transition: transform .3s cubic-bezier(.22, 1, .36, 1), border-color .2s; }
+.pf2-paso b { font: 700 .85rem var(--font-display); letter-spacing: .04em; color: #fff; }
+.pf2-paso p { flex: 1; font-size: .78rem; line-height: 1.4; color: #9ca3af; }
+.pf2-paso .btn { align-self: flex-start; }
+.pf2-num { width: 1.6rem; height: 1.6rem; display: grid; place-items: center; border-radius: 999px; background: var(--color-galaxy-400); color: #000; font: 800 .8rem var(--font-display); }
+.pf2-codigo { padding: .9rem; border-radius: 1rem; text-align: center; border: 1px solid rgb(34 211 238 / .45); background: rgb(34 211 238 / .06); }
+.pf2-sub { margin-top: .4rem; font: 700 .8rem var(--font-display); letter-spacing: .06em; color: #e5e7eb; }
+.pf2-pcs { display: grid; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.pf2-pc { display: flex; align-items: center; gap: .75rem; padding: .6rem .8rem; border-radius: .9rem; border: 1px solid var(--color-galaxy-border); background: rgb(255 255 255 / .02); }
+.pf2-pc > i { color: var(--color-galaxy-400); }
+.pf2-pc b { display: block; color: #fff; font: 700 .9rem var(--font-display); }
+.pf2-pc small { display: block; font-size: .75rem; color: #9ca3af; }
+
+/* Movimiento: la pestaña nueva llega con un pequeño giro 3D; lo que despliegas, igual. Al pasar el mouse, las tarjetas se levantan un poco. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pf2-entra { from { opacity: 0; transform: perspective(900px) translate3d(0, 10px, -20px) rotateX(-6deg); } }
+  .pf2 [data-pane]:not([hidden]) { transform-origin: 50% 0; animation: pf2-entra .38s cubic-bezier(.22, 1, .36, 1) both; }
+  .pf2-plieg[open] > .pf2-plieg-c { transform-origin: 50% 0; animation: pf2-entra .32s cubic-bezier(.22, 1, .36, 1) both; }
+  .pf2-codigo:not([hidden]) { animation: pf2-entra .4s cubic-bezier(.34, 1.56, .64, 1) both; }
+  .pf2-tabs button { transition: color .15s, background .15s, transform .18s cubic-bezier(.22, 1, .36, 1); }
+  .pf2-tabs button:active { transform: scale(.95); }
+  .pf2-tarjeta { transition: padding .3s cubic-bezier(.22, 1, .36, 1); }
+  .pf2-tarjeta [id$='-prev'] { transition: width .3s cubic-bezier(.22, 1, .36, 1), height .3s cubic-bezier(.22, 1, .36, 1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pf2-paso:hover, .pf2-plieg:not([open]):hover { transform: perspective(900px) translate3d(0, -2px, 0) rotateX(3deg); border-color: rgb(34 211 238 / .35); }
+  .pf2-plieg { transition: border-color .2s, background .2s, transform .3s cubic-bezier(.22, 1, .36, 1); }
+}
+/* Arreglos ronda 251: nada se sale por el costado en celular; botones de los pasos a lo ancho; aire antes de «Tus PCs» */
+.modal-card:has(.pf2) { overflow-x: hidden; }
+.pf2-cabeza > *, .pf2-cuerpo > * { min-width: 0; }
+.pf2-paso .btn { align-self: stretch; justify-content: center; white-space: nowrap; }
+.pf2-sub { margin-top: .9rem; }
+.pf2-pcs + .pf2-codigo, .pf2-pcs + .pf2-plieg, .pf2-codigo + .pf2-plieg { margin-top: .6rem; }
+.pf2-cabeza, .pf2-cuerpo { grid-template-columns: minmax(0, 1fr); }
