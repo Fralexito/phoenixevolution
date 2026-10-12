@@ -942,6 +942,9 @@ html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245
 .pilar-panel::before { content: ''; position: absolute; inset: -.7rem 0 auto; height: .7rem; }   /* puente: el mouse no «se cae» entre botón y panel */
 .pilar:hover .pilar-panel, .pilar:focus-within .pilar-panel, .pilar[data-abierto] .pilar-panel { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
 .pilar:hover .pilar-flecha, .pilar[data-abierto] .pilar-flecha { transform: rotate(180deg); }
+/* Cerrado con clic: gana al hover y al foco hasta que el mouse sale del botón */
+.pilar[data-cerrado] .pilar-panel, .pilar[data-cerrado]:hover .pilar-panel, .pilar[data-cerrado]:focus-within .pilar-panel { opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, -6px); }
+.pilar[data-cerrado]:hover .pilar-flecha { transform: none; }
 .pilar-lema { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; font: 800 .7rem var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: #67e8f9; }
 .pilar-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem; }
 .pilar-item { display: flex; align-items: flex-start; gap: .75rem; padding: .65rem .7rem; border-radius: .7rem; border: 1px solid transparent; transition: background .15s, border-color .15s; }

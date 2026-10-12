@@ -873,6 +873,10 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Fralex: el voto «rompe con el orden de sala». Sale del costado de «De toda la edición» y va en su propia franja al final («Vota tú · MVP de la afición»); en PC queda en una sola fila (título | ranking | elegir y votar).
 - Así los trofeos de la edición quedan en una malla limpia de 4 por fila en PC.
 
+## Ronda 273 — Menú de arriba: el clic abre y cierra (pilares)
+- Antes, tras el clic el desplegable se quedaba abierto (el botón conservaba el foco). Ahora el clic ALTERNA: si se ve, lo cierra y suelta el foco; si no, lo abre. Al sacar el mouse vuelve a abrirse con hover. En táctil funciona por toque (abrir/cerrar).
+- Archivos: `src/js/features/pilares.js`, `src/styles/components.css` (`.pilar[data-cerrado]`). Sin BD. Probado en navegador real (hover, clic, clic, clic, salir y volver) y 452 tests OK.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
