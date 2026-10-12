@@ -121,3 +121,28 @@ export function tamanosMuro(n) {
   else if (resto) out.push(...REMATE[resto]);
   return out;
 }
+
+// ── DATOS PARA LOS GRÁFICOS (ronda 270) ─────────────────────────────────────────────────────────────────────
+/** Partidos jugados por `nombre`, en orden de fecha: [{ fecha, rival, gf, gc, res: 'G'|'E'|'P' }]. */
+export function historialJugador(edicion, nombre) {
+  const out = [];
+  for (const f of (edicion?.fechas ?? [])) {
+    for (const x of (f?.partidos ?? [])) {
+      if (!jugado(x) || (x.l !== nombre && x.v !== nombre)) continue;
+      const local = x.l === nombre; const gf = local ? x.gl : x.gv; const gc = local ? x.gv : x.gl;
+      out.push({ fecha: f.n, rival: local ? x.v : x.l, gf, gc, res: gf > gc ? 'G' : gf < gc ? 'P' : 'E' });
+    }
+  }
+  return out;
+}
+/** Puesto de `nombre` en la tabla al cierre de cada fecha jugada: [{ fecha, pos, de }] (pos 1 = primero). */
+export function puestosPorFecha(edicion, nombre) {
+  const fechas = (edicion?.fechas ?? []).filter((f) => (f?.partidos ?? []).some(jugado));
+  const out = []; const acum = [];
+  for (const f of fechas) {
+    acum.push(...f.partidos);
+    const t = calcularTabla(acum).tabla; const i = t.findIndex((r) => r.nombre === nombre);
+    if (i >= 0) out.push({ fecha: f.n, pos: i + 1, de: t.length });
+  }
+  return out;
+}

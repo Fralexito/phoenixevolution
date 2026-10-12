@@ -10,6 +10,7 @@ import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { montarVotoSemana } from '../features/reconocimientos.js';
 import { FX } from '../../data/experimento.js';
+import { huecoGrafico, dibujarGraficos } from '../features/premiosGraficos.js';
 
 const $ = (id) => document.getElementById(id);
 const edicionDe = (lid) => { const eds = EDICIONES[lid] ?? []; return eds.find((e) => e.estado === 'en_curso') ?? eds.at(-1) ?? null; };
@@ -64,6 +65,7 @@ const trofeo = (pr, ed, i, destacado = false, t = '') => `<article ${t ? `data-t
     <header class="pr-t-cab">${SIN_IA ? '' : `<span class="pr-ico"><i class="fa-solid ${pr.icono}"></i></span>`}<h3>${escapeHTML(pr.titulo)}</h3></header>
     ${quien(pr, ed)}
     ${valorHTML(pr)}
+    ${FX.premiosGraficos ? huecoGrafico(pr) : ''}
     <p class="pr-det">${escapeHTML(pr.detalle)}</p>
   </article>`;
 
@@ -119,6 +121,7 @@ function pintarMuro(ed, fecha, edic, vacio) {
   const te = tamanosMuro(edic.length);
   $('pr-edicion').className = 'pr-muro';
   $('pr-edicion').innerHTML = edic.length ? edic.map((p, i) => trofeo(p, ed, i, false, te[i])).join('') : vacio('Los premios de la edición aparecen cuando cada jugador lleva al menos 3 partidos.');
+  if (FX.premiosGraficos) { dibujarGraficos($('pr-fecha'), ed); dibujarGraficos($('pr-edicion'), ed); }
 }
 
 document.querySelector('.pr-ligas')?.addEventListener('click', (e) => {

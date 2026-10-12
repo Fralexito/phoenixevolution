@@ -58,3 +58,13 @@ test('muro: cada cantidad de premios llena filas completas de 4 (sin huecos)', (
   }
   assert.equal(tamanosMuro(8)[0], 'g');           // el más importante va grande
 });
+
+import { historialJugador, puestosPorFecha } from '../src/js/core/premios.js';
+test('gráficos: historial y puestos de un jugador', () => {
+  const h = historialJugador(ed, 'Ana');
+  assert.deepEqual(h.map((x) => x.res), ['G', 'G', 'G']);           // la fecha 4 sin marcador no cuenta
+  assert.deepEqual(h[1], { fecha: 2, rival: 'Fede', gf: 1, gc: 0, res: 'G' });
+  const p = puestosPorFecha(ed, 'Ana');
+  assert.equal(p.length, 3);
+  assert.equal(p.at(-1).pos, 1);
+});

@@ -274,3 +274,42 @@ html[data-tema='sudario'] .pr-sinia { --pr-acento: #f5c542; }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .pr-sinia .pr-trofeo:hover { transform: translateY(-2px); border-color: rgba(148, 163, 184, .28); border-left-color: var(--c); box-shadow: none; }
 }
+
+/* ══ GRÁFICOS (ronda 270, FX.premiosGraficos) ═══════════════════════════════════════════════════════════════
+   Dibujados por js/features/premiosGraficos.js. Un color de acento (--c) + grises; marcas finas, eje casi invisible. */
+.pr-graf { position: relative; margin: .15rem 0 .1rem; line-height: 0; }
+.pr-graf svg { display: block; overflow: visible; }
+.pr-g-eje, .pr-g-guia { stroke: rgba(148, 163, 184, .22); stroke-width: 1; }
+.pr-g-guia { stroke-dasharray: 2 3; }
+.pr-g-barra { fill: color-mix(in srgb, var(--c) 55%, transparent); }
+.pr-g-barra.pr-g-top { fill: var(--c); }
+.pr-g-gris { fill: rgba(148, 163, 184, .35); }
+.pr-g-cero { fill: rgba(148, 163, 184, .4); }
+.pr-g-punto { fill: var(--c); stroke: #0b0d1c; stroke-width: 2; }
+.pr-g-res.pr-g-on.pr-g-lleno { fill: var(--c); }
+.pr-g-res.pr-g-on.pr-g-borde { fill: none; stroke: var(--c); stroke-width: 1.5; }
+.pr-g-res.pr-g-on.pr-g-raya { fill: var(--c); }
+.pr-g-res.pr-g-off.pr-g-lleno { fill: rgba(148, 163, 184, .38); }
+.pr-g-res.pr-g-off.pr-g-borde { fill: none; stroke: rgba(148, 163, 184, .45); stroke-width: 1.5; }
+.pr-g-res.pr-g-off.pr-g-raya { fill: rgba(148, 163, 184, .35); }
+.pr-g-llave { stroke: var(--c); stroke-width: 1.5; stroke-linecap: round; opacity: .7; }
+.pr-g-linea { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.pr-g-fin { fill: var(--c); stroke: #0b0d1c; stroke-width: 2; }
+.pr-g-txt { font-size: 12px; font-weight: 700; fill: #e5e7eb; font-variant-numeric: tabular-nums; }
+.pr-g-mut { fill: #6b7280; font-weight: 600; }
+.pr-g-hit { fill: transparent; cursor: crosshair; }
+.pr-g-hit[data-activo] { fill: rgba(255, 255, 255, .06); }
+.pr-globo { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; padding: .35rem .6rem; border-radius: .5rem; font-size: 12px; font-weight: 600; color: #f3f4f6;
+  background: #0b0d1c; border: 1px solid rgba(148, 163, 184, .28); box-shadow: 0 6px 20px rgba(0, 0, 0, .45); white-space: nowrap; }
+/* Los gráficos de las tarjetas chicas van al final, pegados abajo */
+.pr-muro [data-t='c'] .pr-graf { margin-top: auto; }
+.pr-muro [data-t='g'] .pr-graf { order: 3; margin-top: .4rem; }
+/* Aparecer una vez al entrar en pantalla: las barras crecen desde abajo, la línea se traza */
+@media (prefers-reduced-motion: no-preference) {
+  .pr-graf:not([data-visto]) :is(.pr-g-barra, .pr-g-punto, .pr-g-res) { transform: scaleY(0); }
+  .pr-graf:not([data-visto]) .pr-g-linea { stroke-dashoffset: 1; }
+  .pr-graf :is(.pr-g-barra, .pr-g-punto, .pr-g-res) { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .5s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(min(var(--k, 0), 14) * 30ms); }
+  .pr-graf .pr-g-res { transform-origin: 50% 50%; }
+  .pr-graf .pr-g-linea { stroke-dasharray: 1; transition: stroke-dashoffset .9s cubic-bezier(.22, 1, .36, 1); }
+}
+.pr-trofeo:has(.pr-graf[data-graf='tira']:not([hidden])) .pr-puntos { display: none; }

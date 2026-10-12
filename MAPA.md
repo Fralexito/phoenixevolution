@@ -858,6 +858,12 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Queda: fotos, escudos reales (sin foto, el escudo del club en vez de iniciales de colores), números, tipografía y el borde lateral de acento de la identidad. Se mantiene el muro de galería.
 - false = como la ronda 268.
 
+## Ronda 270 — Gráficos de los premios con JS (FX.premiosGraficos)
+- Pedido de Fralex: «usa JS para hacer todos los gráficos». `js/features/premiosGraficos.js` dibuja SVG a mano (sin librerías), al ancho real de cada tarjeta (ResizeObserver).
+- Barras de goles por partido (Cañonero) y goles recibidos (Muralla), con el máximo marcado; Cerrojo = vallas invictas como puntos y el resto en gris; tira de resultados (ganó = cuadro lleno, empató = borde, perdió = rayita) con la racha encendida (En Llamas, Imparable, Rey del Empate); línea del puesto en la tabla fecha a fecha (El que manda, Dominante, Revelación, Matagigantes).
+- Al pasar el mouse o tocar: globito con fecha, rival y resultado. Crecen/se trazan una vez al aparecer (respeta Animaciones reducidas). Un solo acento + grises; la forma también lleva el dato (no solo el color).
+- `core/premios.js`: `historialJugador`, `puestosPorFecha` (+1 test).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

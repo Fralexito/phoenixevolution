@@ -125,3 +125,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 267 (cuenta Opus, borrador): Premios con variedad dentro del orden (marcador, bolitas de racha, salto de puesto, barra, corona, escudo de fondo). Bandera FX.premiosVariedad.
 - Ronda 268 (cuenta Opus, borrador): Premios como muro de galería (cuadros de tamaños distintos sin huecos, tamanosMuro + test). Bandera FX.premiosGaleria.
 - Ronda 269 (cuenta Opus, borrador): Premios sin rastro de IA (un acento, sin íconos en cuadrito ni brillos, escudos reales). Bandera FX.premiosSinIA.
+- Ronda 270 (cuenta Opus, borrador): gráficos SVG con JS en cada premio (barras, tira de resultados, línea de puestos) con globito al pasar el mouse. Bandera FX.premiosGraficos.
