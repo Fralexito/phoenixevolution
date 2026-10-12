@@ -766,6 +766,13 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Efectos (`styles/cartasEfecto.css`, `js/features/cartasEfecto.js`): misma capa `.pc-sheen` con 4 efectos sutiles: Reflejo suave (más tenue y lento), Luz que sigue al mouse, Borde que se enciende (color del nivel), Tornasol. Ajuste nuevo **Ajustes → Jugadores y cartas → «Efecto al pasar el mouse»** (`cartasEfecto`, reemplaza el interruptor «Brillo»): Sorpresa (por defecto: cada jugador su efecto fijo, `efectoDe` en playerCard.js según su id) · uno de los 4 · Ninguno.
 - Pruebas 444. Build 45.
 
+### Ronda 255 — Toque premium en las páginas que faltaban (FX.premium) + «Ligas» vuelve a la vista en tarjetas
+- Fralex: «aplica tu toque premium al resto de páginas que faltan (no a las que están super bien)». Auditoría con capturas de 29 páginas: las de cabecera grande (Competiciones, Formatos, Historial, Torneos, Quiénes somos, Temporada, Divisiones, Palmarés, Noticias) ya estaban bien; las de cuenta/comunidad tenían cabecera chica y un aviso gris de «Inicia sesión».
+- `styles/premium.css` (html[data-fx-premium], sin tocar el HTML de cada página): toda `main header.glass-panel` con h1 → más aire, título grande, ícono en placa con luz, línea de acento arriba, brillo suave del color del tema (sale de --color-galaxy-*, vale para Sudario). Afecta a ~20 páginas (Amigos, Mensajes, Buscar, Guardados, Logros, Clanes, Eventos, Creadores, Chat general, Tienda, Ranking, Ahora mismo, Salas en vivo, Phoenix Link, Phoenix Sync, Mi club…).
+- `js/features/premium.js`: los paneles cuyo único texto es «Inicia sesión para…» pasan a tarjeta con candado + Entrar / Crear cuenta (abre el modal de acceso); se rearma si la página reescribe el aviso.
+- Fralex preguntó dónde quedó «Ligas activas en cuadrados» (página /competiciones/): en el menú, «Ligas» ahora abre esa vista en tarjetas (`competiciones>liga`).
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
