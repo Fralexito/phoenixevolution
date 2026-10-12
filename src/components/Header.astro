@@ -27,13 +27,16 @@ const pilarActual = pilarDe(active)?.id;
               <button type="button" class="nav-link pilar-btn" aria-expanded="false" aria-haspopup="true" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}<i class="fa-solid fa-chevron-down text-[.6em] ml-1.5 opacity-60 pilar-flecha"></i></button>
               <div class="pilar-panel" role="menu">
                 <p class="pilar-lema"><i class={`fa-solid ${p.icon}`}></i> {p.lema}</p>
+                {(p.bloques ?? [{ titulo: '', items: p.items }]).map((b) => (<Fragment>
+                {b.titulo && <p class="pilar-bloque">{b.titulo}</p>}
                 <div class="pilar-grid">
-                  {p.items.map((n) => (
+                  {b.items.map((n) => (
                     <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" aria-current={esDe(n, active) ? 'page' : undefined}>
                       <i class={`fa-solid ${n.icon}`}></i><span><b>{n.label}</b><small>{n.desc}</small></span>
                     </a>
                   ))}
                 </div>
+                </Fragment>))}
               </div>
             </div>
       )) : NAV.map((n) => (

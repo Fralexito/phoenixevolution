@@ -106,12 +106,35 @@ const RENOMBRE = { ahora: 'En vivo' };
 const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra,
   items: ids.map((spec) => { const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
     return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
-export const PILARES = [
+// REPARTO EN 3 GRUPOS (FX.reparto, ronda 247). Pedido de Fralex: cada sección en el grupo de su TIPO, y orden visual primero.
+//   Competir = la liga organizada y sus récords · Jugar = lo que haces tú ahora (partidos y tu club) · Comunidad = la gente y lo que se dice.
+//   Dentro de cada grupo, bloques pequeños (máx. 4) del más usado al menos usado. Las direcciones de las páginas NO cambian.
+//   Lo personal (perfil, mensajes, amigos, guardados, logros, ajustes) sigue en «Mi cuenta». false = vuelve el menú de 4 pilares.
+const conBloques = (id, label, icon, bloques, extra = {}) => {
+  const bs = bloques.map(([titulo, ids]) => ({ titulo, items: pilar(id, label, icon, ids).items }));
+  return { id, label, icon, ...extra, bloques: bs, items: bs.flatMap((b) => b.items) };
+};
+const PILARES_REPARTO = [
+  conBloques('competir', 'Competir', 'fa-trophy', [
+    ['La liga', ['liga', 'competiciones', 'torneos', 'formatos']],
+    ['Récords', ['historial', 'palmares', 'ranking', 'database']],
+  ], { lema: 'La liga organizada y sus récords' }),
+  conBloques('jugar', 'Jugar', 'fa-gamepad', [
+    ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
+    ['Tu club', ['manager>mercado', 'miclub']],
+  ], { lema: 'Lo que haces tú, ahora' }),
+  conBloques('comunidad', 'Comunidad', 'fa-people-group', [
+    ['Conversar', ['social', 'chatgeneral', 'noticias']],
+    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda']],
+  ], { lema: 'La gente y lo que se dice' }),
+];
+const PILARES_ANTES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
   pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado', 'miclub'], { lema: 'Del clic al partido' }),
   pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'chatgeneral', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];
+export const PILARES = FX.reparto ? PILARES_REPARTO : PILARES_ANTES;
 /** Pilar al que pertenece una página (por su `active`), o null (Central, cuenta, etc.). */
 export const esDe = (n, active) => n.id === active || n.tambien?.includes(active);
 export const pilarDe = (active) => PILARES.find((p) => p.items.some((n) => esDe(n, active))) ?? null;

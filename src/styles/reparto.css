@@ -1,0 +1,8 @@
+/* REPARTO EN 3 GRUPOS (FX.reparto, ronda 247): títulos de bloque dentro de cada grupo del menú y separador en las pestañas cápsula.
+   Las cápsulas conservan su estilo (protegido); solo se añade una rayita vertical entre bloques. Con la bandera en false estas clases no aparecen. */
+.pilar-bloque { margin: .7rem .7rem .3rem; font: 700 .75rem var(--font-display); letter-spacing: .2em; text-transform: uppercase; color: #6b7280; }
+.pilar-panel .pilar-lema + .pilar-bloque { margin-top: .2rem; }
+.pilar-sep { align-self: center; width: 1px; height: 1.1rem; margin: 0 .25rem; flex-shrink: 0; background: var(--color-galaxy-border); }
+.cuenta-bloque { padding: .35rem .25rem .25rem; font-size: .75rem; letter-spacing: .12em; color: #4b5563; text-transform: none; }
+/* Sin huecos: si un bloque tiene un número impar de secciones, la última ocupa todo el ancho (orden visual, nada «cojo»). */
+.pilar-bloque + .pilar-grid > .pilar-item:last-child:nth-child(odd) { grid-column: 1 / -1; }

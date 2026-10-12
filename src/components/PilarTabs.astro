@@ -10,9 +10,12 @@ const p = pilarDe(active);
   <nav class="pilar-tabs" aria-label={`Secciones de ${p.label}`}>
     <span class="pilar-tabs-tit"><i class={`fa-solid ${p.icon}`}></i> {p.label}</span>
     <div class="pilar-tabs-lista">
-      {p.items.map((n) => (
-        <a href={`${base}${n.path}`} aria-current={esDe(n, active) ? 'page' : undefined}><i class={`fa-solid ${n.icon}`}></i>{n.label}</a>
-      ))}
+      {(p.bloques ?? [{ items: p.items }]).map((b, k) => (<Fragment>
+        {k > 0 && <span class="pilar-sep" aria-hidden="true"></span>}
+        {b.items.map((n) => (
+          <a href={`${base}${n.path}`} aria-current={esDe(n, active) ? 'page' : undefined}><i class={`fa-solid ${n.icon}`}></i>{n.label}</a>
+        ))}
+      </Fragment>))}
     </div>
   </nav>
 )}
