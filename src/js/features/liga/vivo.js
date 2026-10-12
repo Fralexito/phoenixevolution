@@ -6,11 +6,15 @@ import { supabase } from '../../core/supabase.js';
 import { escapeHTML } from '../../core/dom.js';
 import { aplicarCambioVivo, limpiarVivos, normalizarVivo, ordenarVivos, huboGol, textoGol, textoEstado } from '../../core/ligaVivo.js';
 import { rafaga, salto } from '../dopamina.js';
+import { crearTablero } from './campoVivo.js';
 
 let lista = [];
 let iniciado = false;
 const secciones = new Set();
 const fechas = new Map();   // partido_id → «Fecha 10 · 1° Edición» (se pide una vez)
+// Tablero del campo 2D (ronda 236): se despliega al pulsar la tarjeta. Una elección del visitante (true/false) manda sobre lo automático.
+const eleccion = new Map();               // sala_id → true (desplegado) | false (plegado) por el visitante
+const tableros = new WeakMap();           // sección → Map(sala_id → tablero abierto)
 
 function chipTipo(x) {
   if (!x.partido_id) return '<span class="vivo-chip">Amistoso</span>';
@@ -24,11 +28,11 @@ function listaGoles(x, lado) {
   return `<ul class="vivo-goles ${lado === 'v' ? 'text-right' : ''}">${gs.map((g) => `<li>⚽ ${escapeHTML(textoGol(g))}</li>`).join('')}</ul>`;
 }
 
-function tarjeta(x) {
+function tarjeta(x, abierto) {
   const enJuego = x.fase === 'en_juego' && !x.terminado;
   const previa = x.fase === 'previa' && !x.terminado;   // antes del pitazo: eligiendo equipos, saliendo al campo…
   const reloj = textoEstado(x);
-  return `<article class="glass-panel rounded-xl p-4 vivo-card${x.terminado ? ' vivo-fin' : ''}" data-sala="${escapeHTML(x.sala_id)}">
+  return `<div class="vivo-item${abierto ? ' vivo-abierto' : ''}" data-item="${escapeHTML(x.sala_id)}"><article class="glass-panel rounded-xl p-4 vivo-card${x.terminado ? ' vivo-fin' : ''}" data-sala="${escapeHTML(x.sala_id)}" role="button" tabindex="0" aria-expanded="${abierto ? 'true' : 'false'}" aria-label="${escapeHTML(`${x.local} contra ${x.visitante}: ${abierto ? 'plegar' : 'ver'} el campo en vivo`)}">
     <div class="flex items-center justify-between gap-2 mb-3">
       ${chipTipo(x)}
       <span class="vivo-reloj">${enJuego || previa ? '<span class="live-dot" aria-hidden="true"></span>' : ''}${escapeHTML(reloj)}</span>
@@ -39,7 +43,8 @@ function tarjeta(x) {
       <p class="vivo-nombre text-right">${escapeHTML(x.visitante)}</p>
     </div>
     ${x.goles.length ? `<div class="grid grid-cols-2 gap-3 mt-3">${listaGoles(x, 'l') || '<span></span>'}${listaGoles(x, 'v')}</div>` : ''}
-  </article>`;
+    <p class="vivo-mas" aria-hidden="true">${abierto ? 'Plegar campo ▲' : 'Ver campo en vivo ▼'}</p>
+  </article><div data-panel></div></div>`;
 }
 
 function pintar(previas = new Map()) {
@@ -49,7 +54,20 @@ function pintar(previas = new Map()) {
     const cont = s.querySelector('[data-lista]');
     if (!cont) continue;
     s.hidden = orden.length === 0;
-    cont.innerHTML = orden.map(tarjeta).join('');
+    const abiertos = tableros.get(s) ?? new Map();
+    tableros.set(s, abiertos);
+    // Un partido terminado conserva su tablero si ya estaba abierto (dice «Partido terminado»); nunca se abre solo
+    const quiere = (x, i) => (x.terminado ? abiertos.has(x.sala_id) : eleccion.has(x.sala_id) ? eleccion.get(x.sala_id) : (s.dataset.tablero === 'auto' && i === 0));
+    const deseados = new Set(orden.filter(quiere).map((x) => x.sala_id));
+    for (const [id, t] of abiertos) if (!deseados.has(id)) { t.cerrar(); abiertos.delete(id); }   // se desuscribe al plegar
+    cont.innerHTML = orden.map((x, i) => tarjeta(x, deseados.has(x.sala_id))).join('');
+    for (const x of orden) {
+      if (!deseados.has(x.sala_id)) continue;
+      let t = abiertos.get(x.sala_id);
+      if (!t) { t = crearTablero(x.sala_id); abiertos.set(x.sala_id, t); }
+      t.actualizar({ local: x.local, visitante: x.visitante, terminado: x.terminado });
+      cont.querySelector(`[data-item="${CSS.escape(x.sala_id)}"] [data-panel]`)?.appendChild(t.el);
+    }
     const cuenta = s.querySelector('[data-cuenta]');
     if (cuenta) cuenta.textContent = orden.length ? String(orden.length) : '';
     // Efecto de gol (solo si cambió el marcador y la capa «dopamina» está encendida)
@@ -102,10 +120,28 @@ function iniciar() {
   setInterval(() => { if (lista.some((x) => x.terminado)) pintar(); }, 5000);
 }
 
+/** Pulsar (o Enter/Espacio sobre) la tarjeta despliega o pliega el tablero del campo. Los clics dentro del tablero no cuentan. */
+function enlazarClic(s) {
+  const alternar = (card) => {
+    const id = card?.dataset.sala;
+    if (!id) return;
+    const abierto = !!tableros.get(s)?.has(id);
+    eleccion.set(id, !abierto);
+    pintar();
+    s.querySelector(`[data-sala="${CSS.escape(id)}"]`)?.focus();
+  };
+  s.addEventListener('click', (e) => { const c = e.target.closest?.('[data-sala]'); if (c && s.contains(c)) alternar(c); });
+  s.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest?.('[data-sala]');
+    if (c && e.target === c) { e.preventDefault(); alternar(c); }
+  });
+}
+
 /** Monta el marcador en vivo en todas las secciones [data-liga-vivo] de la página. */
 export function montarMarcadorVivo() {
   try {
-    for (const s of document.querySelectorAll('[data-liga-vivo]')) secciones.add(s);
+    for (const s of document.querySelectorAll('[data-liga-vivo]')) { secciones.add(s); enlazarClic(s); }
     if (secciones.size) iniciar();
   } catch (e) { console.warn('[liga vivo]', e); }
 }

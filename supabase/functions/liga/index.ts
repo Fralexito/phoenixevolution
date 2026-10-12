@@ -1,9 +1,10 @@
-// Edge Function «liga» (1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
 //   GET  /v1/liga/partidos   → partidos oficiales por jugar (fecha en curso + atrasados), con los parsec_id de cada DT si los hay.
 //   POST /v1/liga/vivo       → marcador en vivo de la sala (upsert en liga_vivo; la web lo recibe por Realtime).
+//   POST /v1/liga/campo      → campo 2D en vivo (posiciones): no escribe en la base, se reenvía por Realtime Broadcast a «campo:<sala_id>».
 //   POST /v1/liga/resultado  → resultado del juego para un partido oficial: queda «propuesto» hasta que lo valide
 //                              el staff o el árbitro designado (nunca el host). Borra el «en vivo» de la sala.
 // Interruptor del staff: phoenix_config clave «liga_resultados» = false → todo responde LIGA_PAUSADA (503).
@@ -97,7 +98,7 @@ async function ligaActiva(): Promise<boolean> {
 }
 
 /** Token → dispositivo válido de un host aprobado (misma regla que la función «phoenix»). */
-async function autenticar(req: Request): Promise<Dispositivo> {
+async function autenticar(req: Request, frenarDispositivo = true): Promise<Dispositivo> {
   const m = /^Bearer\s+(phx_[A-Za-z0-9_-]{20,100})$/.exec(req.headers.get("authorization") ?? "");
   if (!m) throw new ErrorApi(req.headers.get("authorization") ? "TOKEN_INVALIDO" : "TOKEN_FALTANTE");
   const { data, error } = await sb.from("dispositivos_host").select("id, usuario, revocado, suspendido").eq("huella_token", await sha256(m[1])).maybeSingle();
@@ -105,7 +106,7 @@ async function autenticar(req: Request): Promise<Dispositivo> {
   if (!data) throw new ErrorApi("TOKEN_INVALIDO");
   if (data.revocado) throw new ErrorApi("TOKEN_REVOCADO");
   if (data.suspendido) throw new ErrorApi("DISPOSITIVO_SUSPENDIDO");
-  frenar(`d:${data.id}`, 60, 60_000);
+  if (frenarDispositivo) frenar(`d:${data.id}`, 60, 60_000);   // «campo» va aparte (1/s por sala): no gasta este cupo
   const { data: p, error: e2 } = await sb.from("perfiles").select("host_aprobado, rol").eq("id", data.usuario).maybeSingle();
   db(e2, "autenticar.perfil");
   if (!p || !(p.host_aprobado || ROLES_STAFF.includes(p.rol))) throw new ErrorApi("HOST_NO_AUTORIZADO");
@@ -190,6 +191,48 @@ async function vivo(req: Request) {
   return { guardado: true };
 }
 
+// ── POST /v1/liga/campo ─────────────────────────────────────────────────────────────────────────────
+// Campo 2D en vivo (Phoenix Link ≥ 0.2.21): posiciones de las fichitas y el balón. NO escribe en la base: se reenvía por Realtime
+// Broadcast al canal público de solo lectura «campo:<sala_id>» (evento «campo»). Sin nombres de cuentas ni ids de Parsec.
+const FASES_CAMPO = ["vivo", "repeticion", "otro", "pausa"];
+const num = (v: unknown, min: number, max: number) => typeof v === "number" && Number.isFinite(v) && v >= min && v <= max;
+async function campo(req: Request) {
+  const d = await autenticar(req, false);
+  const j = await leerJson(req);
+  const sala = await salaDe(d, uuid(j.sala_id));
+  if (!sala) throw new ErrorApi("CAMPO_INVALIDO", { campo: "sala_id" });
+  frenar(`campo:${sala}`, 2, 1_000);   // 2 por segundo por sala
+  if (!Array.isArray(j.j) || j.j.length > 30) throw new ErrorApi("CAMPO_INVALIDO", { campo: "j" });
+  const fichas: number[][] = [];
+  for (const p of j.j) {
+    if (!Array.isArray(p) || p.length < 3 || !num(p[0], -80, 80) || !num(p[1], -60, 60) || !Number.isInteger(p[2]) || p[2] < -1 || p[2] > 2)
+      throw new ErrorApi("CAMPO_INVALIDO", { campo: "j" });
+    fichas.push([p[0], p[1], p[2]]);
+  }
+  let b: number[] | null = null;
+  if (j.b !== null && j.b !== undefined) {
+    if (!Array.isArray(j.b) || j.b.length < 3 || !num(j.b[0], -80, 80) || !num(j.b[1], -60, 60) || !num(j.b[2], -5, 60)) throw new ErrorApi("CAMPO_INVALIDO", { campo: "b" });
+    b = [j.b[0], j.b[1], j.b[2]];
+  }
+  const carga: Record<string, unknown> = { v: 1, j: fichas, b, equipos: j.equipos === true, fase: typeof j.fase === "string" && FASES_CAMPO.includes(j.fase) ? j.fase : "vivo" };
+  if (j.posesion !== undefined && j.posesion !== null) {
+    if (!Array.isArray(j.posesion) || j.posesion.length !== 2 || !num(j.posesion[0], 0, 100) || !num(j.posesion[1], 0, 100)) throw new ErrorApi("CAMPO_INVALIDO", { campo: "posesion" });
+    carga.posesion = [j.posesion[0], j.posesion[1]];
+  }
+  const t = j.t as { l?: unknown; e?: unknown; listo?: unknown; vuelo?: unknown } | undefined;
+  if (t && typeof t === "object") {
+    const l = (Array.isArray(t.l) ? t.l : []).slice(0, 30).filter((x) => Array.isArray(x) && (x[0] === 0 || x[0] === 1)).map((x) => [x[0], x[1] === true || x[1] === 1 ? 1 : 0]);
+    carga.t = { l, e: t.e === 1 ? 1 : 0, listo: t.listo === true, vuelo: t.vuelo === true };
+  }
+  const r = await fetch(`${Deno.env.get("SUPABASE_URL")}/realtime/v1/api/broadcast`, {
+    method: "POST",
+    headers: { "content-type": "application/json", apikey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!}` },
+    body: JSON.stringify({ messages: [{ topic: `campo:${sala}`, event: "campo", payload: carga, private: false }] }),
+  });
+  if (!r.ok) { log("warn", "campo.broadcast", { estado: r.status }); throw new ErrorApi("ERROR_INTERNO"); }
+  return {};
+}
+
 // ── POST /v1/liga/resultado ─────────────────────────────────────────────────────────────────────────
 async function resultado(req: Request) {
   const d = await autenticar(req);
@@ -244,6 +287,7 @@ async function resultado(req: Request) {
 const RUTAS: Record<string, { metodo: string; fn: (r: Request) => Promise<Record<string, unknown>> }> = {
   "/v1/liga/partidos": { metodo: "GET", fn: partidos },
   "/v1/liga/vivo": { metodo: "POST", fn: vivo },
+  "/v1/liga/campo": { metodo: "POST", fn: campo },
   "/v1/liga/resultado": { metodo: "POST", fn: resultado },
 };
 
