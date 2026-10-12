@@ -13,6 +13,7 @@ import { escudoHTML } from '../js/core/escudos.js';
 import { titularesPortada, lineaEstado } from '../js/core/titulares.js';
 import { estadoLiga } from '../js/core/pulso.js';
 import { PORTADA } from '../data/portada.js';
+import { CLUBES_VISUAL } from '../data/clubesVisual.js';
 const base = import.meta.env.BASE_URL;
 // PRUEBA (FX.elite, ronda 228): portada «palco VIP». Va encima de FX.portada; si se apaga, vuelve la portada de la ronda 227.
 const ELITE = FX.limpio && FX.portada && FX.elite;
@@ -24,6 +25,12 @@ const liderClub = lider ? (edGalaxy?.clubes?.[lider.nombre] ?? '') : '';
 const TRANS = ELITE && FX.transmision;
 // PRUEBA (FX.estiloFC, ronda 230): menos «factor IA», estilo EA FC. Solo cambia estilos (styles/estilofc.css) y la marca del degradado.
 const FC = TRANS && FX.estiloFC;
+// PRUEBA (FX.escenario, ronda 231): «un solo escenario». Mismos titulares reales, pero solo 3 cosas en pantalla y todo suave.
+const ESC = TRANS && FX.escenario;
+const GALAXY_COLORES = ['#00e5ff', '#8000ff'];
+// Luz de fondo de cada titular = los dos colores del club del protagonista (data/clubesVisual.js); la bienvenida usa los de la Galaxy.
+const coloresDe = (t) => { if (t.id === 'bienvenida') return GALAXY_COLORES; const v = CLUBES_VISUAL[clubesG[prota(t)] ?? '']; return v ? [v.a, v.b] : GALAXY_COLORES; };
+const digitos = (n) => String(n).split('').map(Number);
 const clubesG = edGalaxy?.clubes ?? {};
 const tablaG = calcularTabla((edGalaxy?.fechas ?? []).flatMap((f) => f.partidos)).tabla.filter((t) => t.pj > 0);
 const TITULARES = TRANS ? titularesPortada(edGalaxy?.fechas ?? []) : [];
@@ -71,10 +78,59 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
-  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx', FX.limpio && FX.portada && FX.elite && FX.transmision && FX.estiloFC && 'portada-fc']} data-portada>
+  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', ESC && 'portada-esc', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx', FX.limpio && FX.portada && FX.elite && FX.transmision && FX.estiloFC && 'portada-fc']} data-portada>
     <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-    {TRANS ? (<Fragment>
+    {ESC ? (<Fragment>
+    <!-- ESCENARIO (FX.escenario): titular + marcador + los 4 mundos. Lo mueve js/features/escenario.js. Todos los titulares vienen en el HTML. -->
+    <div class="esc-luz" aria-hidden="true"><i></i><i></i></div>
+    {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
+    {!PORTADA.clip && PORTADA.imagen && <img class="tx-imagen" src={urlPortada(PORTADA.imagen)} alt="" aria-hidden="true" loading="eager" decoding="async" />}
+    <div class="esc" data-esc style={`--esc-seg:${PORTADA.segundos}s`}>
+      <h1 class="esc-tit" data-esc-tit>
+        {TITULARES.map((t, i) => (
+          <span class="esc-slide" data-esc-slide data-c1={coloresDe(t)[0]} data-c2={coloresDe(t)[1]} data-on={i === 0 ? '' : undefined} aria-hidden={i === 0 ? undefined : 'true'}>
+            <span class="esc-l1">{palabras(t.lineas[0]).map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
+            <span class:list={['esc-l2', t.id === 'bienvenida' && 'esc-marca']}>{palabras(t.lineas[1]).map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k + palabras(t.lineas[0]).length}`}>{w}</span>{' '}</Fragment>))}</span>
+          </span>
+        ))}
+      </h1>
+      <div class="esc-marcadores">
+        {TITULARES.map((t, i) => (
+          <div class="esc-marcador" data-esc-marcador data-on={i === 0 ? '' : undefined} aria-hidden={i === 0 ? undefined : 'true'}>
+            {t.partido ? (<Fragment>
+              <span class="esc-eq"><span class="esc-esc"><Fragment set:html={escudoHTML(clubesG[t.partido.l] ?? '', 30)} /></span><b class:list={[t.partido.gl !== null && t.partido.gl < t.partido.gv && 'esc-pierde']}>{t.partido.l}</b></span>
+              {t.partido.gl === null ? <span class="esc-res esc-vs">vs</span> : (
+                <span class="esc-res" aria-label={`${t.partido.gl} a ${t.partido.gv}`}>
+                  {[t.partido.gl, t.partido.gv].map((g, k) => (<Fragment>{k === 1 && <i aria-hidden="true"></i>}<span class="esc-num" aria-hidden="true">{digitos(g).map((d) => (<span class="esc-dig" style={`--n:${d}`}><span>{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((x) => <span>{x}</span>)}</span></span>))}</span></Fragment>))}
+                </span>
+              )}
+              <span class="esc-eq esc-der"><b class:list={[t.partido.gl !== null && t.partido.gv < t.partido.gl && 'esc-pierde']}>{t.partido.v}</b><span class="esc-esc"><Fragment set:html={escudoHTML(clubesG[t.partido.v] ?? '', 30)} /></span></span>
+              <small class="esc-etq">Fecha {t.partido.fecha} · {t.partido.etiqueta}</small>
+            </Fragment>) : (<Fragment>
+              {tablaG.slice(0, 2).map((x, k) => (<Fragment>{k === 1 && <span class="esc-res esc-vs">·</span>}<span class:list={['esc-eq', k === 1 && 'esc-der']}>{k === 1 && <b class="esc-pts">{x.pts}</b>}<span class="esc-esc"><Fragment set:html={escudoHTML(clubesG[x.nombre] ?? '', 30)} /></span><b>{x.nombre}</b>{k === 0 && <b class="esc-pts">{x.pts}</b>}</span></Fragment>))}
+              <small class="esc-etq">La cima · puntos</small>
+            </Fragment>)}
+          </div>
+        ))}
+      </div>
+      {TITULARES.length > 1 && <button type="button" class="esc-progreso" data-esc-pausa aria-pressed="false" aria-label="Pausar los titulares (también puedes usar las flechas)"><i></i></button>}
+      <nav class="esc-mundos" aria-label="Los 4 mundos de Phoenix Evolution">
+        <div class="mundos-tabs"><div class="pilar-tabs-lista">
+          {MUNDOS.map((m) => (<button type="button" data-esc-mundo={m.id} aria-expanded="false" aria-controls="esc-cajon"><i class={`fa-solid ${m.icono}`}></i>{m.nombre}</button>))}
+        </div></div>
+        <div class="esc-cajon" id="esc-cajon" data-esc-cajon>
+          <div class="esc-cajon-in">
+            {MUNDOS.map((m) => (
+              <div class="esc-panel" data-esc-panel={m.id} hidden>
+                {m.acciones.map((a) => (<a href={`${base}${a.href}`} class:list={['esc-link', a.primario && 'esc-link-prim']}><b>{a.titulo}</b><small>{a.txt}</small></a>))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </nav>
+    </div>
+    </Fragment>) : TRANS ? (<Fragment>
     <!-- TRANSMISIÓN (FX.transmision): titulares reales que rotan + el marcador que los respalda. Lo mueve js/features/transmision.js.
          Todos los titulares vienen en el HTML (uno visible); así la portada nunca salta de tamaño. -->
     {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
@@ -174,8 +230,8 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
     </Fragment>)}
     </div>
     </Fragment>)}
-  <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
-  {FX.limpio ? (
+  <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer). Con FX.escenario baja al contenido. -->
+  {ESC ? null : FX.limpio ? (
     <div class="portada-abajo relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
       {FX.portada ? (
       <section class="mundos" aria-labelledby="mundos-t" data-mundos>
@@ -260,6 +316,13 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
       <a class="campeones-ver" href={`${base}palmares/`}>Palmarés <i class="fa-solid fa-arrow-right"></i></a>
     </section>
     </Fragment>)}
+    {ESC && (
+      <p class="pulso-linea esc-pulso" aria-label="Pulso de la comunidad">
+        {[['jugadores', 'fichas', 'database/'], ['comunidad', 'registrados', 'database/'], ['hosts', 'hosts listos', 'duelos/'], ['retos', 'retos abiertos', 'duelos/']].map(([id, txt, href]) => (
+          <a href={`${base}${href}`}><b id={`pulso-${id}`}>—</b> {txt}</a>
+        ))}
+      </p>
+    )}
 
     {!FX.limpio && <Fragment>
     <!-- 00. ¿QUÉ QUIERES HACER? Accesos directos a lo más usado (que nada importante quede escondido en menús). -->
@@ -445,6 +508,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();
   import('../js/features/elite.js').then((m) => m.montarElite()).catch((e) => console.warn('[central] elite:', e));
+  import('../js/features/escenario.js').then((m) => m.montarEscenario()).catch((e) => console.warn('[central] escenario:', e));
   import('../js/features/transmision.js').then((m) => m.montarTransmision()).catch((e) => console.warn('[central] transmisión:', e));
   document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));
 </script>

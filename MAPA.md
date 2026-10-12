@@ -570,6 +570,22 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Nuevo en `data/portada.js`: `imagen` = captura real de un partido como fondo tenue cuando no hay video.
 - Pruebas 426. Build 45. Revisado a 1440 y 390 px.
 
+### Ronda 231 — PRUEBA: portada «un solo escenario» (FX.escenario)
+- Bandera nueva **`FX.escenario`**, encima de `FX.transmision`. `false` = vuelve la portada de la ronda 229 (transmisión). `FX.estiloFC` (ronda 230) quedó en `false`: a Fralex no le convenció.
+- Prioridades de Fralex (para SIEMPRE): **dinamismo total, suavidad, animaciones visuales y cero desorden visual**.
+- En pantalla solo 3 cosas: **titular real** (mismos de `core/titulares.js`), **marcador** en una sola línea sin caja, y los **4 mundos** (cápsulas). Las cifras de la comunidad bajan al contenido, bajo «Campeones vigentes».
+- Movimiento (una sola curva `cubic-bezier(.22,1,.36,1)`):
+  - el titular «enfoca»: cada palabra pasa de borrosa a nítida; el que sale se desenfoca hacia arriba;
+  - la **luz de fondo** toma los 2 colores del club del protagonista (`data/clubesVisual.js`) y cambia suave (variables CSS registradas con `@property`); en la bienvenida, cian y púrpura;
+  - los **goles giran** como un reloj hasta su número;
+  - una **línea fina** marca el tiempo (6 s, `data/portada.js`) con los colores del club; tocarla pausa; flechas ← → cambian; en celular se desliza con el dedo;
+  - los **4 mundos se despliegan** en el mismo lugar (cajón con `grid-template-rows`); Escape cierra;
+  - al bajar, la portada **se aleja** (animación ligada al scroll, solo navegadores compatibles).
+- Con sesión: la bienvenida dice «Hola de nuevo, <nombre>».
+- Pausa con mouse sobre el titular, foco de teclado, pestaña oculta. Nada se mueve con «menos movimiento».
+- Archivos: `js/features/escenario.js`, `styles/escenario.css`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
+- Pruebas 426. Build 45. Revisado a 1440 y 390 px y grabado un video de 24 s.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

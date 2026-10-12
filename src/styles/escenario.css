@@ -1,0 +1,130 @@
+/* PRUEBA · Portada «un solo escenario» (FX.escenario, ronda 231).
+   Prioridades de Fralex: dinamismo total, suavidad, animaciones visuales y CERO desorden visual.
+   · En pantalla solo 3 cosas: el titular, el marcador que lo respalda y los 4 mundos.
+   · Una sola curva de movimiento para todo (--esc-ease). Solo se anima transform, opacity, filter y los 2 colores de la luz.
+   · La luz de fondo usa los 2 colores del club del titular (data/clubesVisual.js) y cambia suave entre titulares.
+   · Las pestañas cápsula mantienen su estilo; «abierta» = el mismo resaltado cian que «elegida». */
+
+@property --esc-c1 { syntax: '<color>'; inherits: true; initial-value: #00e5ff; }
+@property --esc-c2 { syntax: '<color>'; inherits: true; initial-value: #8000ff; }
+
+.portada-esc { --esc-ease: cubic-bezier(.22, 1, .36, 1); min-height: calc(100svh - 8rem); transition: --esc-c1 1.8s cubic-bezier(.4, 0, .2, 1), --esc-c2 1.8s cubic-bezier(.4, 0, .2, 1); }
+@media (min-width: 1024px) { .portada-esc { min-height: calc(100dvh - 7rem); } }
+.portada-esc .hero-aurora, .portada-esc .hero-brillo, .portada-esc::before, .portada-esc::after { display: none; }
+
+/* ── Luz de fondo (colores del club) ── */
+.esc-luz { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.esc-luz i { position: absolute; width: 62vmax; height: 62vmax; border-radius: 999px; opacity: .5; }
+.esc-luz i:nth-child(1) { left: -12%; top: -38%; background: radial-gradient(circle, color-mix(in srgb, var(--esc-c1) 34%, transparent), transparent 62%); }
+.esc-luz i:nth-child(2) { right: -16%; bottom: -46%; background: radial-gradient(circle, color-mix(in srgb, var(--esc-c2) 34%, transparent), transparent 62%); }
+
+/* ── Escenario ── */
+.esc { position: relative; z-index: 1; display: grid; justify-items: center; gap: 1.75rem; width: 100%; max-width: 64rem; margin-inline: auto; padding-block: 1.5rem; text-align: center; }
+
+/* Titular: todos apilados en la misma celda (nunca salta de tamaño) */
+.esc-tit { display: grid; width: 100%; container-type: inline-size; font-family: var(--font-display); font-weight: 700; line-height: .96; letter-spacing: -.01em; color: #fff; touch-action: pan-y; }
+.esc-slide { grid-area: 1 / 1; align-self: center; font-size: clamp(2.4rem, 8.8cqi, 6.6rem); text-wrap: balance; }
+.esc-slide:not([data-on]):not([data-sale]) { opacity: 0; visibility: hidden; }
+.esc-l1, .esc-l2 { display: block; }
+.esc-l2 { color: var(--color-galaxy-400); }
+.esc-w { display: inline-block; }
+.esc-marca .esc-w { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; padding-bottom: .06em; }
+
+/* Marcador: una sola línea, sin caja */
+.esc-marcadores { display: grid; width: 100%; max-width: 38rem; }
+.esc-marcador { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: 'a r b' 'e e e'; align-items: center; column-gap: 1.1rem; row-gap: .45rem; }
+.esc-marcador:not([data-on]) { opacity: 0; visibility: hidden; }
+.esc-eq { grid-area: a; justify-self: end; min-width: 0; display: inline-flex; align-items: center; gap: .6rem; }
+.esc-der { grid-area: b; justify-self: start; }
+.esc-eq b { font: 600 1.2rem var(--font-display); letter-spacing: .02em; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color .4s; }
+.esc-eq b.esc-pierde { color: #6b7280; }
+.esc-eq b.esc-pts { color: var(--color-galaxy-400); font-variant-numeric: tabular-nums; }
+.esc-esc { flex-shrink: 0; display: grid; place-items: center; width: 2rem; height: 2rem; }
+.esc-esc img { max-width: 100%; max-height: 100%; }
+.esc-res { grid-area: r; display: inline-flex; align-items: center; gap: .55rem; font: 700 2.3rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.esc-res > i { width: .55rem; height: 2px; background: #4b5563; }
+.esc-vs { font-size: 1rem; letter-spacing: .25em; text-transform: uppercase; color: #9ca3af; }
+.esc-etq { grid-area: e; font: 600 .75rem var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #6b7280; }
+/* Goles que giran como un reloj hasta su número */
+.esc-num { display: inline-flex; }
+.esc-dig { display: inline-block; height: 1em; overflow: hidden; }
+.esc-dig > span { display: flex; flex-direction: column; }
+.esc-dig > span > span { display: block; height: 1em; line-height: 1; }
+.esc-marcador[data-on] .esc-dig > span { transform: translateY(calc(var(--n) * -1em)); }
+
+/* Línea de tiempo: se llena; al terminar pasa al siguiente titular. Tocarla pausa. */
+.esc-progreso { display: grid; align-items: center; width: 7.5rem; height: 1.5rem; padding: 0; border: 0; background: none; cursor: pointer; }
+.esc-progreso i { position: relative; display: block; height: 2px; border-radius: 2px; overflow: hidden; background: rgb(255 255 255 / .12); transition: transform .3s var(--esc-ease); }
+.esc-progreso i::after { content: ''; position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, var(--esc-c1), var(--esc-c2)); }
+.esc-progreso:hover i { transform: scaleY(2); }
+.esc-progreso[aria-pressed='true'] i::after { opacity: .45; }
+.esc-progreso:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 4px; border-radius: 4px; }
+.esc[data-quieto] .esc-progreso { display: none; }
+
+/* Los 4 mundos: cápsulas + cajón que se despliega en el mismo lugar */
+.esc-mundos { display: grid; justify-items: center; width: 100%; }
+.esc-mundos .pilar-tabs-lista button { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; padding: .4rem .9rem; border: 0; border-radius: 999px; background: transparent; cursor: pointer; font: 700 .75rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; transition: color .15s, background .15s; }
+.esc-mundos .pilar-tabs-lista button i { font-size: .8em; opacity: .7; }
+.esc-mundos .pilar-tabs-lista button:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.esc-mundos .pilar-tabs-lista button[aria-expanded='true'] { color: #000; background: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(34 211 238 / .45); }
+.esc-mundos .pilar-tabs-lista button[aria-expanded='true'] i { opacity: 1; }
+.esc-mundos .pilar-tabs-lista button:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+.esc-cajon { display: grid; grid-template-rows: 0fr; width: 100%; max-width: 46rem; transition: grid-template-rows .55s var(--esc-ease); }
+.esc-cajon[data-abierto] { grid-template-rows: 1fr; }
+.esc-cajon-in { min-height: 0; overflow: hidden; }
+.esc-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem 1rem; padding-top: 1rem; }
+.esc-link { display: grid; gap: .15rem; padding: .5rem .4rem; border-radius: .75rem; transition: background-color .2s; }
+.esc-link b { font: 600 1.15rem var(--font-display); color: #fff; transition: color .2s; }
+.esc-link small { font-size: .8rem; color: #9ca3af; }
+.esc-link-prim b { color: var(--color-galaxy-400); }
+.esc-link:hover { background: rgb(255 255 255 / .03); }
+.esc-link:hover b { color: var(--color-galaxy-400); }
+.esc-link:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+@media (max-width: 639px) {
+  .esc { gap: 1.4rem; }
+  .esc-panel { grid-template-columns: minmax(0, 1fr); gap: .1rem; }
+  .esc-mundos .pilar-tabs-lista { gap: .2rem; }
+  .esc-mundos .pilar-tabs-lista button { padding: .45rem .6rem; letter-spacing: .03em; gap: .35rem; }
+  .esc-eq b { font-size: 1.05rem; }
+  .esc-res { font-size: 2rem; }
+}
+@media (max-width: 430px) { .esc-mundos .pilar-tabs-lista button i { display: none; } .esc-mundos .pilar-tabs-lista button { padding: .5rem .6rem; } }
+
+/* Cifras de la comunidad: bajan al contenido (bajo los campeones) */
+.esc-pulso { justify-content: center; }
+
+/* ── Movimiento (nunca con «menos movimiento») ── */
+@media (prefers-reduced-motion: no-preference) {
+  .esc-luz i { will-change: transform; }
+  .esc-luz i:nth-child(1) { animation: esc-deriva-a 26s ease-in-out infinite alternate; }
+  .esc-luz i:nth-child(2) { animation: esc-deriva-b 31s ease-in-out infinite alternate; }
+
+  /* El titular «enfoca»: cada palabra pasa de borrosa a nítida, una tras otra */
+  .esc:not([data-quieto]) .esc-slide[data-on] .esc-w { animation: esc-enfoca 1s var(--esc-ease) both; animation-delay: calc(var(--i) * 45ms + .05s); }
+  .esc:not([data-quieto]) .esc-slide[data-sale] { opacity: 0; filter: blur(10px); transform: translateY(-.12em) scale(.985); transition: opacity .55s var(--esc-ease), filter .55s var(--esc-ease), transform .7s var(--esc-ease); }
+
+  /* El marcador llega un poco después; los goles giran */
+  .esc:not([data-quieto]) .esc-marcador { transition: opacity .7s var(--esc-ease), transform .8s var(--esc-ease), visibility .7s; }
+  .esc:not([data-quieto]) .esc-marcador:not([data-on]) { transform: translateY(10px); }
+  .esc:not([data-quieto]) .esc-marcador[data-on] { transition-delay: .3s; }
+  .esc:not([data-quieto]) .esc-marcador[data-on] .esc-dig > span { transition: transform 1.3s var(--esc-ease) .45s; }
+
+  .esc:not([data-quieto]) .esc-progreso[data-corre] i::after { animation: esc-llena var(--esc-seg, 6s) linear both; }
+  .esc[data-pausa] .esc-progreso[data-corre] i::after { animation-play-state: paused; }
+
+  .esc-cajon[data-abierto] .esc-panel:not([hidden]) .esc-link { animation: esc-enfoca .5s var(--esc-ease) both; }
+  .esc-cajon[data-abierto] .esc-panel:not([hidden]) .esc-link:nth-child(2) { animation-delay: 50ms; }
+  .esc-cajon[data-abierto] .esc-panel:not([hidden]) .esc-link:nth-child(3) { animation-delay: 100ms; }
+
+  /* Al bajar con la rueda, la portada se aleja despacio (solo navegadores que lo soportan) */
+  @supports (animation-timeline: view()) {
+    .portada-esc .esc { animation: esc-aleja linear both; animation-timeline: view(); animation-range: exit 0% exit 85%; }
+    .portada-esc .esc-luz { animation: esc-baja linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+  }
+}
+@keyframes esc-enfoca { from { opacity: 0; filter: blur(12px); transform: translateY(.2em); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes esc-llena { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes esc-deriva-a { from { transform: translate(0, 0) scale(1); } to { transform: translate(6vw, 4vh) scale(1.12); } }
+@keyframes esc-deriva-b { from { transform: translate(0, 0) scale(1.05); } to { transform: translate(-7vw, -5vh) scale(.95); } }
+@keyframes esc-aleja { to { opacity: 0; transform: translateY(-3rem) scale(.96); filter: blur(6px); } }
+@keyframes esc-baja { to { opacity: .2; transform: translateY(12%); } }
