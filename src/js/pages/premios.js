@@ -9,6 +9,7 @@ import { escudoHTML } from '../core/escudos.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { montarVotoSemana } from '../features/reconocimientos.js';
+import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);
 const edicionDe = (lid) => { const eds = EDICIONES[lid] ?? []; return eds.find((e) => e.estado === 'en_curso') ?? eds.at(-1) ?? null; };
@@ -30,10 +31,35 @@ function quien(pr, ed) {
   return `<div class="pr-quien">${av}<span class="min-w-0"><b>${nom}</b>${club ? `<small>${escudoHTML(club, 14)} ${escapeHTML(club)}</small>` : ''}</span></div>`;
 }
 
-const trofeo = (pr, ed, i, destacado = false) => `<article class="pr-trofeo${destacado ? ' pr-destacado' : ''}" style="--c:${pr.color};--i:${i}">
+// VARIEDAD (ronda 267, FX.premiosVariedad): misma malla y mismo orden, pero cada familia muestra su cifra a su manera.
+//   goleadas → marcador de estadio · rachas → bolitas (una por partido) · Matagigantes → salto de puesto ·
+//   Revelación → barra de rendimiento · líder y defensas → ícono grande de fondo (corona / escudo).
+const RACHAS = ['enllamas', 'imparable']; const AGUA = ['lider', 'muralla', 'cerrojo'];
+function valorHTML(pr) {
+  const v = escapeHTML(pr.valor), u = escapeHTML(pr.unidad);
+  if (!FX.premiosVariedad) return `<p class="pr-valor"><b>${v}</b><span>${u}</span></p>`;
+  const marc = /^(\d+)-(\d+)$/.exec(pr.valor);
+  if (marc) return `<p class="pr-valor pr-marcador"><b><em>${marc[1]}</em><em>${marc[2]}</em></b><span>${u}</span></p>`;
+  if (pr.id === 'matagigantes') {
+    const arriba = /(\d+)\.º/.exec(pr.unidad)?.[1];
+    if (arriba) return `<p class="pr-valor pr-salto"><b>${v}</b><i class="fa-solid fa-angles-right" aria-hidden="true"></i><b class="pr-gigante">${escapeHTML(arriba)}.º</b><span>le ganó</span></p>`;
+  }
+  if (RACHAS.includes(pr.id)) {
+    const n = Math.min(Number(pr.valor) || 0, 12);
+    return `<p class="pr-valor"><b>${v}</b><span>${u}</span></p><div class="pr-puntos" aria-hidden="true">${'<i></i>'.repeat(n)}</div>`;
+  }
+  if (pr.id === 'revelacion') {
+    const pct = Math.max(0, Math.min(100, parseInt(pr.valor, 10) || 0));
+    return `<p class="pr-valor"><b>${v}</b><span>${u}</span></p><div class="pr-barra" aria-hidden="true"><i style="width:${pct}%"></i></div>`;
+  }
+  return `<p class="pr-valor"><b>${v}</b><span>${u}</span></p>`;
+}
+
+const trofeo = (pr, ed, i, destacado = false) => `<article class="pr-trofeo${destacado ? ' pr-destacado' : ''}${FX.premiosVariedad && pr.id === 'lider' ? ' pr-corona' : ''}" data-premio="${escapeHTML(pr.id)}" style="--c:${pr.color};--i:${i}">
+    ${FX.premiosVariedad && AGUA.includes(pr.id) ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>` : ''}
     <header class="pr-t-cab"><span class="pr-ico"><i class="fa-solid ${pr.icono}"></i></span><h3>${escapeHTML(pr.titulo)}</h3></header>
     ${quien(pr, ed)}
-    <p class="pr-valor"><b>${escapeHTML(pr.valor)}</b><span>${escapeHTML(pr.unidad)}</span></p>
+    ${valorHTML(pr)}
     <p class="pr-det">${escapeHTML(pr.detalle)}</p>
   </article>`;
 

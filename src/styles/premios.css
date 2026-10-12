@@ -91,3 +91,46 @@ html[data-tema='sudario'] .pr-sec::before { background: #f5c542; box-shadow: 0 0
   .pr-det { grid-area: det; min-height: 0; margin-top: .25rem; }
   .pr-fam-t { margin-top: .35rem; }
 }
+
+/* ── VARIEDAD (ronda 267, FX.premiosVariedad): orden igual, cada cifra con su propia forma ── */
+.pr-agua { position: absolute; right: -.6rem; bottom: -1rem; z-index: -1; font-size: 6.5rem; line-height: 1; color: var(--c); opacity: .07; pointer-events: none; rotate: -12deg; }
+.pr-corona { border-color: color-mix(in srgb, var(--c) 55%, transparent); }
+.pr-corona::before { content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, transparent, var(--c), #fff8, var(--c), transparent); }
+.pr-corona .pr-av { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 25%, transparent), 0 0 18px -2px var(--c); }
+
+/* Marcador de estadio: dos casillas con el resultado */
+.pr-marcador b { display: inline-flex; gap: .25rem; text-shadow: none; }
+.pr-marcador em { font-style: normal; min-width: 2.1ch; padding: .12em .28em .08em; text-align: center; border-radius: .45rem; font-size: .82em;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 22%, #0b1020), #070a16); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .35), 0 0 14px -6px var(--c); }
+
+/* Salto de puesto: 8.º » 4.º (el gigante, apagado) */
+.pr-salto { align-items: center; }
+.pr-salto > i { color: var(--c); font-size: 1rem; opacity: .8; }
+.pr-salto .pr-gigante { color: #64748b; text-shadow: none; text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: color-mix(in srgb, var(--c) 70%, transparent); font-size: 1.5rem; }
+
+/* Rachas: una bolita por partido */
+.pr-puntos { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: -.15rem; }
+.pr-puntos i { width: .6rem; height: .6rem; border-radius: 99px; background: var(--c); box-shadow: 0 0 8px -1px var(--c); }
+
+/* Revelación: barra de rendimiento */
+.pr-barra { height: .4rem; border-radius: 99px; background: rgba(148, 163, 184, .15); overflow: hidden; margin-top: -.15rem; }
+.pr-barra i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 50%, transparent), var(--c)); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .pr-puntos i { animation: pr-punto .35s cubic-bezier(.22, 1, .36, 1) both; }
+  .pr-puntos i:nth-child(n) { animation-delay: calc(var(--i, 0) * 45ms + 250ms); }
+  @keyframes pr-punto { from { opacity: 0; transform: scale(.3); } }
+  .pr-barra i { animation: pr-llena .8s cubic-bezier(.22, 1, .36, 1) .3s both; transform-origin: left; }
+  @keyframes pr-llena { from { transform: scaleX(0); } }
+}
+@media (max-width: 639px) {
+  .pr-agua { font-size: 4.5rem; }
+  .pr-puntos, .pr-barra { grid-column: 2 / -1; grid-row: 3; margin: .2rem 0 0; }
+  .pr-trofeo:has(.pr-puntos, .pr-barra) { grid-template-areas: 'ico tit val' 'ico qui val' 'x x x' 'det det det'; }
+  .pr-trofeo:has(.pr-puntos, .pr-barra) .pr-det { grid-row: 4; }
+  .pr-salto { flex-direction: row; align-items: center; }
+  .pr-salto span { display: none; }
+  .pr-salto .pr-gigante { font-size: 1.15rem; }
+  .pr-marcador b { font-size: 1.45rem !important; }
+}

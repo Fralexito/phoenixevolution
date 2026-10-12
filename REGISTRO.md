@@ -122,3 +122,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 
 - Ronda 265 (cuenta Opus, borrador): sección propia «Premios» con 15 reconocimientos automáticos + voto MVP de la afición; pestaña dentro de Jugadores. Bandera FX.premios.
 - Ronda 266 (cuenta Opus, borrador): Premios con orden visual (malla de 4, familias La tabla/Ataque/Defensa/Rachas, fila «Esta semana» con el voto, tarjetas en fila en celular).
+- Ronda 267 (cuenta Opus, borrador): Premios con variedad dentro del orden (marcador, bolitas de racha, salto de puesto, barra, corona, escudo de fondo). Bandera FX.premiosVariedad.
