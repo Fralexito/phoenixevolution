@@ -13,6 +13,17 @@ const ETIQUETAS = { repeticion: 'REPETICIÓN', otro: 'SIN LECTURA EN VIVO', paus
 
 const finito = (v, min, max) => typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
 
+/** Filas de la tabla de estadísticas (clave de Link, texto). */
+export const FILAS_EST = [['pos', 'Posesión'], ['pas', 'Pases completados'], ['tir', 'Tiros'], ['pue', 'Tiros a puerta'], ['cor', 'Córners'], ['ban', 'Saques de banda'], ['met', 'Saques de puerta'], ['rec', 'Recuperaciones'], ['per', 'Pérdidas']];
+
+/** Estadísticas derivadas por Link: pares [A, B]; lo que no cuadre se descarta. null si no hay nada. */
+export function normalizarEst(e) {
+  if (!e || typeof e !== 'object' || Array.isArray(e)) return null;
+  const r = {};
+  for (const [k] of FILAS_EST) { const v = e[k]; if (Array.isArray(v) && v.length === 2 && finito(v[0], 0, 9999) && finito(v[1], 0, 9999)) r[k] = [v[0], v[1]]; }
+  return Object.keys(r).length ? r : null;
+}
+
 /** Valida y limpia un mensaje «campo». Devuelve null si no sirve (nunca lanza). */
 export function normalizarCampo(p) {
   if (!p || typeof p !== 'object' || !Array.isArray(p.j) || p.j.length > 30) return null;
@@ -30,9 +41,10 @@ export function normalizarCampo(p) {
     t = { l, e: p.t.e === 1 ? 1 : 0, listo: p.t.listo === true, vuelo: p.t.vuelo === true };
   }
   const colores = Array.isArray(p.c) && p.c.length === 2 && p.c.every((x) => typeof x === 'string' && /^#[0-9a-fA-F]{6}$/.test(x)) ? [p.c[0], p.c[1]] : null;
+  const est = normalizarEst(p.est);
   const poseedor = Number.isInteger(p.p) && p.p >= 0 && p.p < j.length ? p.p : -1;
   const ts = finito(p.ts, 1.6e12, 4e12) ? p.ts : null;
-  return { j, b, posesion, t, colores, poseedor, ts, equipos: p.equipos === true, fase: FASES.includes(p.fase) ? p.fase : 'vivo' };
+  return { j, b, posesion, t, colores, poseedor, ts, est, equipos: p.equipos === true, fase: FASES.includes(p.fase) ? p.fase : 'vivo' };
 }
 
 /** Color de cada equipo (0 = A, 1 = B, 2 = árbitros, -1 = sin equipo): el de su camiseta si Link lo mandó, si no el de siempre. */

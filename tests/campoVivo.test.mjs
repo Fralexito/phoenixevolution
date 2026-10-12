@@ -80,3 +80,14 @@ test('campoVivo: poseedor del balón, hora de lectura y suavizado', async () => 
   assert.equal(tauSegunIntervalo(30), 0.06);
   assert.equal(tauSegunIntervalo(NaN), 0.3);
 });
+
+test('campoVivo: estadísticas derivadas', async () => {
+  const { normalizarEst, FILAS_EST } = await import('../src/js/core/campoVivo.js');
+  const n = normalizarCampo({ j: [], est: { pos: [58.3, 41.7], pas: [10, 8], tir: [3, 1], raro: [1, 1], cor: [1] } });
+  assert.deepEqual(n.est, { pos: [58.3, 41.7], pas: [10, 8], tir: [3, 1] });   // lo que no cuadra se descarta
+  assert.equal(normalizarCampo({ j: [] }).est, null);
+  assert.equal(normalizarEst({ pas: ['a', 1] }), null);
+  assert.equal(normalizarEst([1, 2]), null);
+  assert.equal(normalizarEst({ pas: [-1, 2] }), null);
+  assert.ok(FILAS_EST.length >= 8 && FILAS_EST[0][0] === 'pos');
+});

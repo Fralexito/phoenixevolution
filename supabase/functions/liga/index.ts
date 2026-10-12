@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.6.0: estadísticas derivadas «est» en campo; 1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -242,6 +242,15 @@ async function campo(req: Request) {
   }
   if (Number.isInteger(j.p) && (j.p as number) >= -1 && (j.p as number) < 30) carga.p = j.p;   // índice en j de quien lleva el balón (-1 = libre)
   if (typeof j.ts === "number" && Number.isFinite(j.ts) && j.ts > 1_600_000_000_000 && j.ts < 4_000_000_000_000) carga.ts = j.ts;   // hora de la lectura en la PC del host (ms): para medir el retraso
+  // estadísticas derivadas del partido (Link ≥ 0.2.38): pares [A, B] de contadores y posesión %
+  if (j.est && typeof j.est === "object" && !Array.isArray(j.est)) {
+    const out: Record<string, number[]> = {};
+    for (const k of ["pos", "pas", "per", "rec", "tir", "pue", "cor", "ban", "met"]) {
+      const v = (j.est as Record<string, unknown>)[k];
+      if (Array.isArray(v) && v.length === 2 && v.every((x) => num(x, 0, 9999))) out[k] = [v[0] as number, v[1] as number];
+    }
+    if (Object.keys(out).length) carga.est = out;
+  }
   if (Array.isArray(j.c) && j.c.length === 2 && j.c.every((x) => typeof x === "string" && /^#[0-9a-fA-F]{6}$/.test(x))) carga.c = [j.c[0], j.c[1]];   // colores de camiseta de A y B (Link ≥ 0.2.30)
   const t = j.t as { l?: unknown; e?: unknown; listo?: unknown; vuelo?: unknown } | undefined;
   if (t && typeof t === "object") {

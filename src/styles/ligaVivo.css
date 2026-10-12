@@ -50,3 +50,8 @@
 .campo-stats { max-width: 760px; width: 100%; margin: 0 auto; display: grid; gap: .35rem; }
 .campo-tit { font: 700 12px/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--color-galaxy-400); }
 .campo-acciones { max-width: 760px; width: 100%; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+
+.campo-tabla { display: grid; grid-template-columns: 1fr auto auto; gap: .3rem 1rem; font-size: 13px; color: #e5e7eb; align-items: center; font-variant-numeric: tabular-nums; }
+.campo-tabla b { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; text-align: right; }
+.campo-tabla > span:not(.campo-fila-t) { text-align: right; font-weight: 700; }
+.campo-fila-t { color: #9ca3af; }

@@ -7,7 +7,7 @@ import { supabase } from '../../core/supabase.js';
 import { escapeHTML, safeUrl } from '../../core/dom.js';
 import { getState } from '../../core/session.js';
 import { toast } from '../../core/toast.js';
-import { LARGO, ANCHO, COLORES, colorEquipo, tauSegunIntervalo, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
+import { LARGO, ANCHO, COLORES, colorEquipo, tauSegunIntervalo, FILAS_EST, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
 
 const MX = 3, MZ = 3;
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -46,7 +46,8 @@ const HTML = `
       <p class="vivo-goles" style="text-align:center">Posesión: <b data-postxt>calculando…</b></p>
     </div>
     <p class="vivo-goles campo-nota" data-sinpos>Posesión: calculando…</p>
-    <p class="vivo-goles campo-nota">Disparos, córners, faltas y tarjetas llegarán cuando Link pueda leerlos del juego.</p>
+    <div class="campo-tabla" data-tabla hidden></div>
+    <p class="vivo-goles campo-nota">Calculadas con las posiciones del campo (aproximadas). Faltas, tarjetas, cambios y asistencias todavía no se pueden leer del juego.</p>
     </div>
     <div class="campo-tanda" data-tanda hidden></div>
     <div class="campo-acciones"><button type="button" class="btn btn-primary !min-h-9 !px-4 !text-[12px]" data-entrar><i class="fa-solid fa-door-open" aria-hidden="true"></i> Entrar a la sala</button>
@@ -101,6 +102,14 @@ export function crearTablero(salaId) {
     q('[data-pa]').style.width = `${n.posesion ? n.posesion[0] : 50}%`;
     q('[data-pb]').style.width = `${n.posesion ? n.posesion[1] : 50}%`;
     pintarTanda(n.t);
+    if (n.est) pintarTabla(n.est);
+  }
+
+  function pintarTabla(e) {
+    const cont = q('[data-tabla]');
+    const na = escapeHTML(estado.na || 'A'), nb = escapeHTML(estado.nb || 'B');
+    cont.hidden = false;
+    cont.innerHTML = `<span></span><b style="color:${estado.colA || COLORES[0]}">${na}</b><b style="color:${estado.colB || COLORES[1]}">${nb}</b>` + FILAS_EST.filter(([k]) => e[k]).map(([k, txt]) => `<span class="campo-fila-t">${txt}</span><span>${e[k][0]}${k === 'pos' ? ' %' : ''}</span><span>${e[k][1]}${k === 'pos' ? ' %' : ''}</span>`).join('');
   }
 
   // Leyenda, barra de posesión y tanda con los colores de camiseta (si Link los mandó)

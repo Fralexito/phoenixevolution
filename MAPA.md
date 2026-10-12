@@ -652,6 +652,11 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Link (0.2.37) manda 1 mensaje/s y **4/s si alguien mira con sesión** (liga_mirando). El tablero ajusta el suavizado al ritmo de llegada (≈ medio intervalo, 60–500 ms) y marca con un **halo** a quien lleva el balón. Con `?diag` en la URL, el tablero enseña mensajes/s y retraso desde la lectura.
 - Pruebas: 436. Build OK.
 
+### Ronda 239 — Estadísticas del partido en el tablero (derivadas del campo; chat LINK, con permiso de Fralex)
+- Edge **liga 1.6.0**: `POST /v1/liga/campo` acepta `est` = pares [A, B] de `pos` (posesión %), `pas` (pases completados), `per`/`rec` (pérdidas/recuperaciones), `tir`/`pue` (tiros / a puerta), `cor`, `ban` (saques de banda), `met` (saques de puerta).
+- Link (0.2.38) las calcula con las posiciones y el poseedor del balón (aproximadas: el juego no las da). El tablero las enseña en una tabla bajo el campo. Faltas, tarjetas, cambios y asistencias NO están (no se pueden leer del juego todavía).
+- Pruebas: 437. Build OK.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
