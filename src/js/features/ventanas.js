@@ -5,7 +5,7 @@
 //  · Se pausa con el mouse sobre las ventanas, con el foco del teclado y con la pestaña oculta. Con «menos movimiento» no rota.
 //  · Con sesión, el saludo dice «Hola de nuevo, <nombre>».
 import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
+import { escapeHTML, safeImg } from '../core/dom.js';
 import { avatarHTML } from '../core/avatar.js';
 import { onSession } from '../core/session.js';
 import { tiempoRelativo } from '../core/muro.js';
@@ -14,14 +14,21 @@ import { itemDuelo, itemSocial, itemFichaje } from '../core/ventanas.js';
 
 const TURNO_MS = 2800;
 // Si el elemento tiene persona, va su foto; si no (un fichaje), el ícono de la ventana.
-const itemHTML = (icono) => (it, i) => `<span class="vt-item"${i === 0 ? ' data-on' : ''}>
-  ${it.avatar ? `<span class="vt-media"><span class="vt-avatar">${avatarHTML(it.avatar.url ?? null, it.avatar.nombre ?? '?', 32)}</span></span>` : `<span class="vt-media vt-media-ico">${icono}</span>`}
+// Con «sin íconos» (FX.sinIconos) no se pone ícono de relleno: si no hay foto ni escudo real, va solo el texto.
+const mediaHTML = (it, icono, limpio) => {
+  if (it.avatar) return `<span class="vt-media"><span class="vt-avatar">${avatarHTML(it.avatar.url ?? null, it.avatar.nombre ?? '?', 32)}</span></span>`;
+  if (it.escudo) return `<span class="vt-media"><img src="${escapeHTML(it.escudo)}" alt="" loading="lazy" width="32" height="32"></span>`;
+  return limpio ? '' : `<span class="vt-media vt-media-ico">${icono}</span>`;
+};
+const itemHTML = (icono, limpio) => (it, i) => `<span class="vt-item"${i === 0 ? ' data-on' : ''}>
+  ${mediaHTML(it, icono, limpio)}
   <span class="vt-txt"><b>${escapeHTML(it.titulo)}</b><small>${escapeHTML(it.meta)}</small></span></span>`;
 
 function pintar(caja, items) {
   if (!caja || !items.length) return;
   const icono = caja.closest('[data-vt-ventana]')?.querySelector('.vt-ico')?.innerHTML ?? '';
-  caja.innerHTML = items.map(itemHTML(icono)).join('');
+  const limpio = Boolean(caja.closest('.vt-limpio'));
+  caja.innerHTML = items.map(itemHTML(icono, limpio)).join('');
 }
 
 async function social() {
@@ -48,10 +55,12 @@ async function mercado() {
   const cIds = [...new Set(data.flatMap((m) => [m.de_club, m.a_club]).filter(Boolean))];
   const [js, cs] = await Promise.all([
     jIds.length ? supabase.from('lm_jugadores').select('id, nombre').in('id', jIds) : { data: [] },
-    cIds.length ? supabase.from('lm_clubes').select('id, nombre').in('id', cIds) : { data: [] },
+    cIds.length ? supabase.from('lm_clubes').select('id, nombre, escudo_url').in('id', cIds) : { data: [] },
   ]);
   const nj = new Map((js.data ?? []).map((x) => [x.id, x.nombre])); const nc = new Map((cs.data ?? []).map((x) => [x.id, x.nombre]));
-  return data.map((m) => itemFichaje(m, nj.get(m.jugador_id), nc.get(m.a_club), nc.get(m.de_club)));
+  const esc = new Map((cs.data ?? []).map((x) => [x.id, safeImg(x.escudo_url)]));
+  // Si el club de destino tiene escudo real, se muestra (si no, solo el texto).
+  return data.map((m) => ({ ...itemFichaje(m, nj.get(m.jugador_id), nc.get(m.a_club), nc.get(m.de_club)), escudo: esc.get(m.a_club) || null }));
 }
 
 function saludo(tit) {

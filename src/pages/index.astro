@@ -101,7 +101,7 @@ const VENTANAS = [
     {INTER && <canvas class="vt-estrellas" data-vt-estrellas aria-hidden="true"></canvas>}
     {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
     {!PORTADA.clip && PORTADA.imagen && <img class="tx-imagen" src={urlPortada(PORTADA.imagen)} alt="" aria-hidden="true" loading="eager" decoding="async" />}
-    <div class:list={['vt', FX.ventanas3d && 'vt-3d', INTER && 'vt-plus']} data-vt>
+    <div class:list={['vt', FX.ventanas3d && 'vt-3d', INTER && 'vt-plus', INTER && FX.sinIconos && 'vt-limpio']} data-vt>
       <h1 class="vt-tit" data-vt-tit>
         <span class="esc-l1">{palabras('Bienvenido a la').map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
         <span class="esc-l2 esc-marca" data-vt-galaxy><span class="esc-w" style="--i:3">Galaxy</span></span>

@@ -1,0 +1,30 @@
+/* PRUEBA · Ventanas «sin íconos IA» (FX.sinIconos, ronda 235). Va encima de ventanasplus.css.
+   Criterio de la skill taste: un ícono dentro de un cuadradito de color es la marca más típica de lo hecho por IA, y un ícono de
+   relleno (control de juego, escudo genérico) no informa nada. Se quedan solo:
+   · lo REAL: fotos de las personas y escudos de los clubes;
+   · lo FUNCIONAL: la flecha que lleva a la sección y la × que cierra.
+   El color de cada mundo pasa a una rayita fina junto al nombre (tipografía primero, adorno después). */
+
+/* Encabezado: sin cuadradito; rayita del color del mundo + nombre en letra normal */
+.vt-limpio .vt-cab .vt-ico { display: none; }
+.vt-limpio .vt-cab { gap: .7rem; }
+.vt-limpio .vt-cab::before { content: ''; flex-shrink: 0; width: 1.4rem; height: 2px; border-radius: 2px; background: var(--vt-c); transition: width .5s cubic-bezier(.22, 1, .36, 1); }
+.vt-limpio .vt-cab b { font: 600 1.05rem var(--font-display); letter-spacing: .01em; text-transform: none; color: #f3f4f6; }
+/* Al pasar el mouse la rayita se estira (pequeña respuesta, sin agregar nada nuevo) */
+.vt-limpio .vt-v[data-hover] .vt-frente .vt-cab::before, .vt-limpio .vt-v[data-girada] .vt-dorso .vt-cab::before { width: 2.4rem; }
+@media (hover: hover) { .vt-limpio .vt-v:hover .vt-frente .vt-cab::before { width: 2.4rem; } }
+
+/* Sin íconos de relleno ni pista de girar */
+.vt-limpio .vt-media-ico, .vt-limpio .vt-pista { display: none; }
+.vt-limpio .vt-frente .vt-txt small { padding-right: 0; }
+/* La flecha y la ×: solo el trazo, más finos y discretos */
+.vt-limpio .vt-flecha { font-size: .8rem; }
+.vt-limpio .vt-volver { color: #9ca3af; }
+
+/* El texto toma el protagonismo que dejaban los íconos */
+.vt-limpio .vt-txt b { font-size: 1.3rem; }
+@media (max-width: 639px) {
+  .vt-limpio .vt-cab b { font-size: .95rem; }
+  .vt-limpio .vt-cab::before { width: 1rem; }
+  .vt-limpio .vt-txt b { font-size: 1.08rem; }
+}

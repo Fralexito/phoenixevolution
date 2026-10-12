@@ -624,6 +624,16 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Archivos: `styles/ventanasplus.css`, `js/features/estrellas.js`, `js/features/ventanas.js` (caras, destello, «Galaxy»), `styles/ventanas3d.css`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
 - Pruebas 429. Build 45. Probado: clic, teclado, Escape, toque en celular; revisado a 1440 y 390 px; video de 34 s.
 
+### Ronda 235 — PRUEBA: ventanas sin íconos «muy IA» (FX.sinIconos, skill taste)
+- Fralex pidió quitar los íconos que se ven «muy IA», usando la skill taste.
+- Bandera nueva **`FX.sinIconos`** (encima de `FX.interactivo`). `false` = vuelve la ronda 234. Comprobado en el build.
+- Fuera (criterio taste): el cuadradito de color con ícono junto al nombre de cada ventana (frente y dorso), los íconos de relleno cuando no hay foto (control de juego, escudo genérico) y el iconito de «girar».
+- Quedan: lo REAL (fotos de personas, escudos de clubes; en Mi Club, el escudo del club de destino si tiene `escudo_url`) y lo FUNCIONAL (flecha a la sección, ×).
+- El color de cada mundo pasa a una rayita fina junto al nombre, que se estira al pasar el mouse o al dar vuelta la ventana. Nombres en letra normal (no mayúsculas espaciadas). Títulos de las ventanas un poco más grandes.
+- Font Awesome se mantiene para la flecha y la × (es la familia de íconos de todo el sitio; taste pide una sola familia por proyecto).
+- Archivos: `styles/sinIconos.css`, `js/features/ventanas.js` (sin ícono de relleno; escudo real en Mi Club), `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
+- Pruebas 429. Build 45. Revisado a 1440 y 390 px; clic, teclado y toque siguen funcionando.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
