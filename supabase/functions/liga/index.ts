@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -219,6 +219,7 @@ async function campo(req: Request) {
     if (!Array.isArray(j.posesion) || j.posesion.length !== 2 || !num(j.posesion[0], 0, 100) || !num(j.posesion[1], 0, 100)) throw new ErrorApi("CAMPO_INVALIDO", { campo: "posesion" });
     carga.posesion = [j.posesion[0], j.posesion[1]];
   }
+  if (Array.isArray(j.c) && j.c.length === 2 && j.c.every((x) => typeof x === "string" && /^#[0-9a-fA-F]{6}$/.test(x))) carga.c = [j.c[0], j.c[1]];   // colores de camiseta de A y B (Link ≥ 0.2.30)
   const t = j.t as { l?: unknown; e?: unknown; listo?: unknown; vuelo?: unknown } | undefined;
   if (t && typeof t === "object") {
     const l = (Array.isArray(t.l) ? t.l : []).slice(0, 30).filter((x) => Array.isArray(x) && (x[0] === 0 || x[0] === 1)).map((x) => [x[0], x[1] === true || x[1] === 1 ? 1 : 0]);

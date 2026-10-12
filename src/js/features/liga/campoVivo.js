@@ -5,7 +5,7 @@
 // Lógica pura y pruebas: core/campoVivo.js · tests/campoVivo.test.mjs.
 import { supabase } from '../../core/supabase.js';
 import { escapeHTML } from '../../core/dom.js';
-import { LARGO, ANCHO, COLORES, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
+import { LARGO, ANCHO, COLORES, colorEquipo, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
 
 const MX = 3, MZ = 3;
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -27,7 +27,7 @@ function lineas() {
 
 const HTML = `
   <div class="campo-tab">
-    <div class="campo-leyenda"><span><i style="background:${COLORES[0]}"></i><b data-na></b></span><span><i style="background:${COLORES[1]}"></i><b data-nb></b></span><span><i style="background:${COLORES[2]}"></i>Árbitros</span></div>
+    <div class="campo-leyenda"><span><i data-ca style="background:${COLORES[0]}"></i><b data-na></b></span><span><i data-cb style="background:${COLORES[1]}"></i><b data-nb></b></span><span><i style="background:${COLORES[2]}"></i>Árbitros</span></div>
     <div class="campo-caja">
       <svg viewBox="${-LARGO / 2 - MX} ${-ANCHO / 2 - MZ} ${LARGO + MX * 2} ${ANCHO + MZ * 2}" role="img" aria-label="Campo con los jugadores en vivo">
         <rect x="${-LARGO / 2}" y="${-ANCHO / 2}" width="${LARGO}" height="${ANCHO}" fill="#0d3b24"/>${lineas()}
@@ -76,6 +76,7 @@ export function crearTablero(salaId) {
     const n = normalizarCampo(payload);
     if (!n) return;
     estado.obj = n; estado.ultimo = Date.now();
+    pintarColores(n.colores);
     aviso(estado.terminado ? 'Partido terminado.' : '');
     const etq = etiquetaFase(n.fase), e = q('[data-etq]');
     e.hidden = !etq; e.textContent = etq;
@@ -86,11 +87,21 @@ export function crearTablero(salaId) {
     pintarTanda(n.t);
   }
 
+  // Leyenda, barra de posesión y tanda con los colores de camiseta (si Link los mandó)
+  function pintarColores(c) {
+    const a = colorEquipo(0, c), b = colorEquipo(1, c);
+    if (estado.colA === a && estado.colB === b) return;
+    estado.colA = a; estado.colB = b;
+    q('[data-ca]').style.background = a; q('[data-cb]').style.background = b;
+    q('[data-pa]').style.background = a; q('[data-pb]').style.background = b;
+    if (estado.obj?.t) pintarTanda(estado.obj.t);
+  }
+
   function pintarTanda(t) {
     const cont = q('[data-tanda]');
     if (!t || !t.l.length) { cont.hidden = true; cont.innerHTML = ''; return; }
     const r = resumenTanda(t);
-    const fila = (eq, nombre) => `<div class="campo-tanda-fila"><i style="background:${COLORES[eq]}"></i><b>${escapeHTML(nombre)}</b><span class="campo-tanda-gol">${r[eq].filter(Boolean).length}</span>
+    const fila = (eq, nombre) => `<div class="campo-tanda-fila"><i style="background:${colorEquipo(eq, estado.obj?.colores)}"></i><b>${escapeHTML(nombre)}</b><span class="campo-tanda-gol">${r[eq].filter(Boolean).length}</span>
       ${r[eq].map((g) => `<span class="campo-bola ${g ? 'campo-bola-gol' : 'campo-bola-fallo'}" aria-label="${g ? 'gol' : 'fallo'}">${g ? '✓' : '✗'}</span>`).join('')}</div>`;
     cont.hidden = false;
     cont.innerHTML = `<p class="vivo-goles"><b>Tanda de penales</b>${t.listo ? ` · patea ${t.e ? 'B' : 'A'}` : ''}</p>${fila(0, estado.na || 'Equipo A')}${fila(1, estado.nb || 'Equipo B')}`;
@@ -108,7 +119,7 @@ export function crearTablero(salaId) {
       const c = circulo(i);
       estado.cur[i] = pasoInterpolado(estado.cur[i], o.j[i], dt);
       c.setAttribute('cx', estado.cur[i][0].toFixed(2)); c.setAttribute('cy', estado.cur[i][1].toFixed(2));
-      c.setAttribute('fill', COLORES[o.j[i][2]] ?? COLORES['-1']);
+      c.setAttribute('fill', colorEquipo(o.j[i][2], o.colores));
       c.setAttribute('r', o.j[i][2] === 2 ? '0.9' : '1.35');
     }
     while (circulos.length > o.j.length) { circulos.pop().remove(); estado.cur.pop(); }

@@ -51,3 +51,17 @@ test('campoVivo: aviso de campo ausente y interpolación', () => {
   const p = pasoInterpolado([0, 0], [2, 0], 0.3);
   assert.ok(p[0] > 1.2 && p[0] < 1.4);
 });
+
+test('campoVivo: colores de camiseta', async () => {
+  const { colorEquipo } = await import('../src/js/core/campoVivo.js');
+  const n = normalizarCampo({ j: [], c: ['#a50044', '#DC052D'] });
+  assert.deepEqual(n.colores, ['#a50044', '#DC052D']);
+  assert.equal(normalizarCampo({ j: [], c: ['rojo', '#dc052d'] }).colores, null);
+  assert.equal(normalizarCampo({ j: [], c: ['#a50044'] }).colores, null);
+  assert.equal(normalizarCampo({ j: [] }).colores, null);
+  assert.equal(colorEquipo(0, n.colores), '#a50044');
+  assert.equal(colorEquipo(1, n.colores), '#DC052D');
+  assert.equal(colorEquipo(2, n.colores), '#f5c451');   // los árbitros no cambian
+  assert.equal(colorEquipo(0, null), '#00e5ff');
+  assert.equal(colorEquipo(-1, n.colores), '#cfd8ee');
+});

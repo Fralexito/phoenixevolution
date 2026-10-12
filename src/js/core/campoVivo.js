@@ -29,7 +29,14 @@ export function normalizarCampo(p) {
     const l = (Array.isArray(p.t.l) ? p.t.l : []).filter((x) => Array.isArray(x) && (x[0] === 0 || x[0] === 1)).map((x) => [x[0], x[1] ? 1 : 0]).slice(0, 30);
     t = { l, e: p.t.e === 1 ? 1 : 0, listo: p.t.listo === true, vuelo: p.t.vuelo === true };
   }
-  return { j, b, posesion, t, equipos: p.equipos === true, fase: FASES.includes(p.fase) ? p.fase : 'vivo' };
+  const colores = Array.isArray(p.c) && p.c.length === 2 && p.c.every((x) => typeof x === 'string' && /^#[0-9a-fA-F]{6}$/.test(x)) ? [p.c[0], p.c[1]] : null;
+  return { j, b, posesion, t, colores, equipos: p.equipos === true, fase: FASES.includes(p.fase) ? p.fase : 'vivo' };
+}
+
+/** Color de cada equipo (0 = A, 1 = B, 2 = árbitros, -1 = sin equipo): el de su camiseta si Link lo mandó, si no el de siempre. */
+export function colorEquipo(eq, colores) {
+  if ((eq === 0 || eq === 1) && colores) return colores[eq];
+  return COLORES[eq] ?? COLORES['-1'];
 }
 
 /** Etiqueta que se pone sobre el campo según la fase («» si es juego en vivo). */
