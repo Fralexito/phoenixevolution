@@ -1,4 +1,4 @@
-// Modal de perfil con 3 pestañas (Identidad / Social / Sistema Host) sobre la tabla `perfiles`.
+// Modal de perfil con 4 pestañas (Identidad / Social / Sistema Host / Phoenix Soda) sobre la tabla `perfiles`.
 // Identidad = foto + apodo (nombre visible) + @usuario (único y público, como en TikTok).
 import { supabase } from '../core/supabase.js';
 import { getState, refreshProfile } from '../core/session.js';
@@ -16,6 +16,7 @@ import { montarVincularPC } from './salas/vincularPC.js';
 import { NOMBRE_APP } from '../../data/site.js';
 import { catalogoDe } from '../core/hostCatalogo.js';
 import { guardarHost } from './muro/api.js';
+import { FX } from '../../data/experimento.js';
 
 const PLATAFORMAS = ['Ambos', 'Smash Soda', 'Parsec'];
 
@@ -31,69 +32,90 @@ export function openProfileModal() {
   let speed = speedBucket(prof.ancho_banda_mbps);
   let soft = PLATAFORMAS.includes(prof.software_host) ? prof.software_host : 'Ambos';
 
-  const m = openModal(`
-    <form id="prof-form" class="p-6 space-y-5" novalidate>
-      <div class="flex justify-between items-center">
-        <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest">Mi perfil</h2>
-        <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-      </div>
+  // FX.perfilNuevo (ronda 249): mismas 4 pestañas y mismos campos que puso Fralex, mejor ordenados:
+  // cabecera fija (título + pestañas cápsula) · tarjeta con foto, apodo y @usuario en vivo · campos en pares · bloques con título · «Guardar» fijo abajo.
+  const N = FX.perfilNuevo;
+  const TABS = [['identidad', 'Identidad', 'fa-id-card'], ['social', 'Social', 'fa-comments'], ['host', 'Sistema Host', 'fa-server'], ['soda', NOMBRE_APP, 'fa-desktop']];
+  const tabsHTML = N
+    ? `<div role="tablist" aria-label="Secciones del perfil" class="pilar-tabs-lista pf2-tabs">${TABS.map(([k, l, ic], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}"><i class="fa-solid ${ic}"></i>${escapeHTML(l)}</button>`).join('')}</div>`
+    : `<div role="tablist" class="flex gap-1 border-b border-galaxy-border font-display text-sm uppercase tracking-wider">${TABS.map(([k, l], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}" class="px-3 py-2 text-gray-400 aria-selected:text-galaxy-400 aria-selected:border-b-2 aria-selected:border-galaxy-400">${escapeHTML(l)}</button>`).join('')}</div>`;
+  const yo = N ? `<p class="pf2-yo"><b id="pf2-nom">${escapeHTML(prof.nombre_display || 'Tu apodo')}</b><span id="pf2-arroba">@${escapeHTML(prof.username || 'usuario')}</span></p>` : '';
+  const bloque = (titulo, cuerpo) => N ? `<fieldset class="pf2-bloque"><legend>${titulo}</legend>${cuerpo}</fieldset>` : cuerpo;
+  const par = (a, b) => N ? `<div class="pf2-par">${a}${b}</div>` : a + b;
 
-      ${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user })}
-
-      <div role="tablist" class="flex gap-1 border-b border-galaxy-border font-display text-sm uppercase tracking-wider">
-        ${['identidad:Identidad', 'social:Social', 'host:Sistema Host', `soda:${NOMBRE_APP}`].map((t, i) => { const [k, l] = t.split(':'); return `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}" class="px-3 py-2 text-gray-400 aria-selected:text-galaxy-400 aria-selected:border-b-2 aria-selected:border-galaxy-400">${l}</button>`; }).join('')}
-      </div>
-
-      <div data-pane="identidad" class="space-y-4">
-        <div><label class="label" for="p-name">Apodo (nombre visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[12px] text-gray-500 mt-1">Es como te ven en tus partidos. Puedes poner lo que quieras.</p></div>
-        <div>
+  const fNombre = `<div><label class="label" for="p-name">Apodo (nombre visible)</label><input id="p-name" class="field" maxlength="30" value="${escapeHTML(prof.nombre_display)}"><p class="text-[12px] text-gray-500 mt-1">Es como te ven en tus partidos. Puedes poner lo que quieras.</p></div>`;
+  const fUser = `<div>
           <label class="label" for="p-user">Usuario único</label>
           <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-display font-bold">@</span><input id="p-user" class="field !pl-7" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" value="${escapeHTML(prof.username)}" ${cd.blocked ? 'disabled' : ''}></div>
           <p id="p-user-st" class="text-[12px] mt-1 min-h-4"></p>
           ${cd.blocked ? '' : prof.perfil_completo ? `<p class="text-[12px] text-gray-500">Ojo: después de cambiarlo, no podrás volver a hacerlo hasta pasados ${USERNAME_COOLDOWN_DAYS} días.</p>` : ''}
-        </div>
-        <div><label class="label" for="p-pais">País</label><select id="p-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>
-        <div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}"><p class="text-[12px] text-gray-500 mt-1">Por privacidad, si eres menor de 18 años no guardamos ni mostramos tu país ni tu club.</p></div>
-      </div>
-
-      <div data-pane="social" hidden class="space-y-4">
-        <div><label class="label" for="p-bio">Biografía táctica</label><textarea id="p-bio" class="field" rows="3" maxlength="280">${escapeHTML(prof.bio)}</textarea></div>
-        <div><label class="label" for="p-disc">Discord</label><input id="p-disc" class="field" maxlength="40" value="${escapeHTML(prof.discord_tag)}"></div>
-        <div><label class="label" for="p-stream">Enlace de stream (https://…)</label><input id="p-stream" class="field" maxlength="200" value="${escapeHTML(prof.stream_url)}"></div>
-      </div>
-
-      <div data-pane="soda" hidden class="space-y-3">
-        <p class="text-xs text-gray-300"><i class="fa-solid fa-desktop text-galaxy-400 mr-1.5"></i><b>Vincular ${NOMBRE_APP}</b>: genera un código de 6 dígitos (vale 10 minutos y un solo uso) y escríbelo en la app para que tu PC pueda abrir salas.</p>
-        <div id="p-soda" class="text-sm text-gray-300">Cargando…</div>
-      </div>
-      <div data-pane="host" hidden class="space-y-4">
-        ${switchHTML({ id: 'p-host', checked: !!prof.puede_hostear, title: 'Puedo ser host', hint: 'Te avisamos cuando alguien necesite que le hosteen una partida.' })}
-        <div id="host-fields" class="space-y-4">
-          <div>
+        </div>`;
+  const fPais = `<div><label class="label" for="p-pais">País</label><select id="p-pais" class="field">${PAISES.map(([c, n]) => `<option value="${c}" ${c === (prof.pais_codigo || 'PE') ? 'selected' : ''}>${escapeHTML(n)}</option>`).join('')}</select></div>`;
+  const avisoMenor = '<p class="text-[12px] text-gray-500 mt-1">Por privacidad, si eres menor de 18 años no guardamos ni mostramos tu país ni tu club.</p>';
+  const fClub = `<div><label class="label" for="p-club">Club favorito</label><input id="p-club" class="field uppercase" maxlength="60" value="${escapeHTML(prof.club_favorito)}">${N ? '' : avisoMenor}</div>`;
+  const ico = (i, campo) => N ? `<div class="pf2-ico"><i class="${i}" aria-hidden="true"></i>${campo}</div>` : campo;
+  const fBio = `<div><label class="label" for="p-bio">Biografía táctica</label><textarea id="p-bio" class="field" rows="3" maxlength="280">${escapeHTML(prof.bio)}</textarea>${N ? `<p class="pf2-cuenta"><span id="pf2-bio-n">${(prof.bio ?? '').length}</span>/280</p>` : ''}</div>`;
+  const fDisc = `<div><label class="label" for="p-disc">Discord</label>${ico('fa-brands fa-discord', `<input id="p-disc" class="field" maxlength="40" value="${escapeHTML(prof.discord_tag)}">`)}</div>`;
+  const fStream = `<div><label class="label" for="p-stream">Enlace de stream (https://…)</label>${ico('fa-solid fa-tower-broadcast', `<input id="p-stream" class="field" maxlength="200" value="${escapeHTML(prof.stream_url)}">`)}</div>`;
+  const fSpeed = `<div>
             <span class="label">Velocidad de subida (Mbps)</span>
             <div class="seg" id="p-speed" role="group" aria-label="Velocidad de subida en Mbps">
               ${SPEED_BUCKETS.map((b) => `<button type="button" data-v="${b.v}" aria-pressed="${b.v === speed}">${b.label}</button>`).join('')}
             </div>
-          </div>
-          <div><span class="label">Plataforma</span>${segHTML({ id: 'p-soft', options: PLATAFORMAS.map((v) => ({ v, label: v })), current: soft, label: 'Plataforma' })}</div>
-          <div><p class="label">Juegos y parches que hosteas <span class="text-gray-500 normal-case">(puedes elegir varios)</span></p><div id="p-hjuegos" class="space-y-2"></div></div>
-          <div><label class="label" for="p-hnotas">Aclaraciones sobre tu host <span class="text-gray-500 normal-case">(opcional)</span></label><textarea id="p-hnotas" class="field" rows="3" maxlength="300" placeholder="Horarios, ping, reglas de tu sala…">${escapeHTML(prof.host_notas)}</textarea></div>
-        </div>
+          </div>`;
+  const fSoft = `<div><span class="label">Plataforma</span>${segHTML({ id: 'p-soft', options: PLATAFORMAS.map((v) => ({ v, label: v })), current: soft, label: 'Plataforma' })}</div>`;
+  const fJuegos = `<div><p class="label">Juegos y parches que hosteas <span class="text-gray-500 normal-case">(puedes elegir varios)</span></p><div id="p-hjuegos" class="space-y-2"></div></div>`;
+  const fNotas = `<div><label class="label" for="p-hnotas">Aclaraciones sobre tu host <span class="text-gray-500 normal-case">(opcional)</span></label><textarea id="p-hnotas" class="field" rows="3" maxlength="300" placeholder="Horarios, ping, reglas de tu sala…">${escapeHTML(prof.host_notas)}</textarea></div>`;
+
+  const m = openModal(`
+    <form id="prof-form" class="${N ? 'pf2' : 'p-6 space-y-5'}" novalidate>
+      ${N ? '<div class="pf2-cabeza">' : ''}
+      <div class="flex justify-between items-center">
+        <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest">Mi perfil</h2>
+        <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      ${N ? `${tabsHTML}</div><div class="pf2-cuerpo"><div class="pf2-tarjeta">${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user, cabecera: yo })}</div>`
+          : `${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user })}${tabsHTML}`}
+
+      <div data-pane="identidad" role="tabpanel" class="space-y-4">
+        ${bloque('Cómo te ven', par(fNombre, fUser))}
+        ${bloque('De dónde eres', par(fPais, fClub) + (N ? avisoMenor : ''))}
       </div>
 
+      <div data-pane="social" role="tabpanel" hidden class="space-y-4">
+        ${bloque('Sobre ti', fBio)}
+        ${bloque('Dónde encontrarte', par(fDisc, fStream))}
+      </div>
+
+      <div data-pane="soda" role="tabpanel" hidden class="space-y-3">
+        <p class="${N ? 'pf2-aviso' : 'text-xs text-gray-300'}"><i class="fa-solid fa-desktop text-galaxy-400 mr-1.5"></i><b>Vincular ${NOMBRE_APP}</b>: genera un código de 6 dígitos (vale 10 minutos y un solo uso) y escríbelo en la app para que tu PC pueda abrir salas.</p>
+        <div id="p-soda" class="text-sm text-gray-300">Cargando…</div>
+      </div>
+      <div data-pane="host" role="tabpanel" hidden class="space-y-4">
+        ${switchHTML({ id: 'p-host', checked: !!prof.puede_hostear, title: 'Puedo ser host', hint: 'Te avisamos cuando alguien necesite que le hosteen una partida.' })}
+        <div id="host-fields" class="space-y-4">
+          ${bloque('Tu conexión', fSpeed + fSoft)}
+          ${bloque('Qué hosteas', fJuegos + fNotas)}
+        </div>
+      </div>
+      ${N ? '</div><div class="pf2-pie">' : ''}
       <p id="p-err" class="text-xs text-bad min-h-4" role="alert"></p>
       <button class="btn btn-primary w-full" type="submit">Guardar cambios</button>
-    </form>`, { id: 'profile-modal' });
+      ${N ? '</div>' : ''}
+    </form>`, { id: 'profile-modal', wide: N });
 
   const $ = (s) => m.querySelector(s);
   const err = $('#p-err');
   const picker = bindAvatarPicker(m, { user: session.user, getName: () => $('#p-name').value || prof.nombre_display, onError: (t) => { err.textContent = t; }, currentUrl: prof.avatar_url });
-  $('#p-name').addEventListener('input', () => picker.repaint());
+  $('#p-name').addEventListener('input', () => { picker.repaint(); if ($('#pf2-nom')) $('#pf2-nom').textContent = $('#p-name').value.trim() || 'Tu apodo'; });
+  $('#p-user').addEventListener('input', () => { if ($('#pf2-arroba')) $('#pf2-arroba').textContent = `@${toUsername($('#p-user').value) || 'usuario'}`; });
+  $('#p-bio').addEventListener('input', () => { if ($('#pf2-bio-n')) $('#pf2-bio-n').textContent = String($('#p-bio').value.length); });
 
   /* ---- Pestañas ---- */
   m.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
     m.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
     m.querySelectorAll('[data-pane]').forEach((x) => { x.hidden = x.dataset.pane !== b.dataset.tab; });
+    if (N) m.querySelector('.modal-card')?.scrollTo({ top: 0 });
   }));
 
   /* ---- @usuario con verificación en vivo ---- */

@@ -1,0 +1,38 @@
+/* VENTANA «MI PERFIL» (FX.perfilNuevo, ronda 249). Mismas pestañas y campos de Fralex, mejor ordenados.
+   La ventana desplaza por dentro (.modal-card): el título + pestañas quedan pegados arriba y «Guardar» abajo, así nunca se pierden. */
+.modal-card:has(.pf2) { padding: 0; }
+.pf2-cabeza { position: sticky; top: 0; z-index: 2; display: grid; gap: 1rem; padding: 1.25rem 1.5rem .9rem; background: var(--color-galaxy-panel); border-bottom: 1px solid var(--color-galaxy-border); }
+.pf2-cuerpo { display: grid; gap: 1.25rem; padding: 1.25rem 1.5rem; }
+.pf2-pie { position: sticky; bottom: 0; z-index: 2; padding: .5rem 1.5rem 1.25rem; background: linear-gradient(to top, var(--color-galaxy-panel) 75%, transparent); }
+.pf2-pie #p-err:empty { min-height: 0; margin: 0; }
+
+/* Pestañas: estilo cápsula de la web (protegido) aplicado a botones; en celular se deslizan de lado */
+.pf2-tabs { overflow-x: auto; scrollbar-width: none; width: max-content; max-width: 100%; }
+.pf2-tabs::-webkit-scrollbar { display: none; }
+.pf2-tabs button { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; padding: .45rem .9rem; border-radius: 999px; font: 700 .75rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; transition: color .15s, background .15s; }
+.pf2-tabs button i { font-size: .8em; opacity: .7; }
+.pf2-tabs button:hover { color: #fff; background: rgb(255 255 255 / .05); }
+.pf2-tabs button[aria-selected='true'] { color: #000; background: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(34 211 238 / .45); }
+.pf2-tabs button[aria-selected='true'] i { opacity: 1; }
+.pf2-tabs button:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+
+/* Tarjeta de identidad: foto + cómo te ven (se actualiza mientras escribes) + botones de foto */
+.pf2-tarjeta { padding: 1rem; border-radius: 1rem; border: 1px solid var(--color-galaxy-border); background: rgb(255 255 255 / .02); }
+.pf2-yo { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .6rem; min-width: 0; }
+.pf2-yo b { font: 700 1.15rem var(--font-display); color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.pf2-yo span { font-size: .85rem; color: var(--color-galaxy-400); }
+
+/* Bloques con título y campos en pares (en celular, uno debajo del otro) */
+.pf2-bloque { display: grid; gap: 1rem; min-width: 0; margin: 0; padding: 0; border: 0; }
+.pf2-bloque + .pf2-bloque { padding-top: 1.1rem; border-top: 1px solid rgb(255 255 255 / .06); }
+.pf2-bloque > legend { float: left; width: 100%; margin-bottom: .1rem; font: 700 .8rem var(--font-display); letter-spacing: .06em; color: #e5e7eb; }
+.pf2-bloque > legend + * { clear: both; }
+.pf2-par { display: grid; gap: 1rem; }
+@media (min-width: 560px) { .pf2-par { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
+
+/* Campo con ícono adentro (Discord, stream) y contador de la biografía */
+.pf2-ico { position: relative; }
+.pf2-ico > i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: #6b7280; pointer-events: none; }
+.pf2-ico > .field { padding-left: 2.3rem; }
+.pf2-cuenta { margin-top: .25rem; text-align: right; font-size: .75rem; color: #6b7280; }
+.pf2-aviso { padding: .8rem 1rem; border-radius: .75rem; border: 1px solid rgb(34 211 238 / .2); background: rgb(34 211 238 / .05); font-size: .8rem; line-height: 1.45; color: #d1d5db; }

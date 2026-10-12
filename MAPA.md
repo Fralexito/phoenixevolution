@@ -726,6 +726,11 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `BarraLateral.astro`: **Jugar ahora** (Duelos, En vivo, Phoenix Link) · **Competir** (Galaxy League, Liga Sudario, Ranking) · **Comunidad** (Chat general, Creadores, Eventos) · Mi cuenta · Amigos.
 - `styles/reparto.css`: cuadrículas sin huecos (4 → 2×2, 2 → 2 columnas). Pruebas 443. Build 45.
 
+### Ronda 249 — Ventana «Mi perfil» mejor ordenada (FX.perfilNuevo)
+- Fralex: «organiza mucho mejor esto pero mantén las opciones y la organización que yo le puse». Mismas 4 pestañas (Identidad, Social, Sistema Host, Phoenix Soda) y mismos campos e IDs (la lógica de guardar no cambia).
+- `features/profile.js`: título + pestañas cápsula fijos arriba; tarjeta con foto + apodo/@usuario que se actualizan al escribir (`avatarPickerHTML` acepta `cabecera`); bloques con título (Cómo te ven / De dónde eres · Sobre ti / Dónde encontrarte · Tu conexión / Qué hosteas); campos en pares desde 560 px; íconos en Discord y stream; contador 0/280 en la biografía; Phoenix Soda con aviso en recuadro; «Guardar cambios» fijo abajo; ventana más ancha. `styles/perfil2.css`.
+- Probado con sesión simulada en PC y celular. Pruebas 443. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

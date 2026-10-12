@@ -7,16 +7,18 @@ import { cropSquareJpeg } from '../core/image.js';
 import { PRESETS, presetId, presetValue, avatarHTML, providerAvatar, providerName } from '../core/avatar.js';
 
 /** HTML del selector. `ns` evita ids repetidos si hubiera dos a la vez. */
-export function avatarPickerHTML({ avatarUrl, name, user, ns = 'p' }) {
+export function avatarPickerHTML({ avatarUrl, name, user, ns = 'p', cabecera = '' }) {
   const prov = providerName(user); const foto = providerAvatar(user);
   return `
     <div class="flex items-center gap-4">
       <span id="${ns}-prev" class="w-16 h-16 shrink-0 rounded-full overflow-hidden border border-galaxy-400/50 bg-galaxy-card flex items-center justify-center">${avatarHTML(avatarUrl, name, 64)}</span>
+      ${cabecera ? `<div class="min-w-0 flex-1 space-y-2">${cabecera}` : ''}
       <div class="flex flex-wrap gap-2">
         <label class="btn btn-ghost cursor-pointer !px-3 !py-2"><i class="fa-solid fa-camera"></i> Subir foto<input id="${ns}-file" type="file" accept="image/*" hidden></label>
         <button type="button" id="${ns}-btn-gal" class="btn btn-ghost !px-3 !py-2" aria-expanded="false"><i class="fa-solid fa-masks-theater"></i> Avatares</button>
         ${foto ? `<button type="button" id="${ns}-btn-prov" class="btn btn-ghost !px-3 !py-2"><i class="fa-brands ${prov === 'Discord' ? 'fa-discord' : 'fa-google'}"></i> Usar la de ${escapeHTML(prov)}</button>` : ''}
       </div>
+      ${cabecera ? '</div>' : ''}
     </div>
     <div id="${ns}-gal" hidden class="grid grid-cols-6 gap-2" role="group" aria-label="Avatares disponibles">
       ${PRESETS.map((a) => `<button type="button" data-preset="${a.id}" aria-label="${escapeHTML(a.label)}" title="${escapeHTML(a.label)}" class="aspect-square rounded-full overflow-hidden border-2 border-transparent hover:border-galaxy-400 aria-pressed:border-white transition-colors" aria-pressed="false">${avatarHTML(presetValue(a.id), '', 44)}</button>`).join('')}
