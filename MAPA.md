@@ -826,6 +826,13 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `styles/jugadoresBarra.css` (sección ronda 264), `features/jugadoresBarra.js`, `features/reconocimientos.js`. Revertir: `FX.jugadoresPro = false` (o también `jugadoresBarra`).
 - Pruebas 444. Build 45.
 
+## Ronda 265 — Sección propia «Premios» (FX.premios)
+- Pedido de Fralex: los reconocimientos eran pocos y genéricos; muchos y concretos, en sección propia.
+- `core/premios.js` (+6 tests): premios calculados solos con los resultados. De la fecha: La Paliza, Pichichi de la fecha, Matagigantes, Partidazo. De la edición (mín. 3 partidos): El que manda, El Cañonero, La Muralla, En llamas, Imparable, El Cerrojo, Dominante, Rey del Empate, Revelación, Goleada histórica, El partido del año. Sin datos suficientes, no sale el premio.
+- Página `/premios/` (`pages/premios.astro`, `js/pages/premios.js`, `styles/premios.css`): trofeos con el color de cada premio, el primero de la fecha en grande, pestañas por liga, voto «MVP de la afición» al costado (`montarVotoSemana`).
+- Menú: «Jugadores» ahora tiene pestañas Jugadores · Premios. En la franja de reconocimientos de Jugadores, enlace «Ver todos los premios».
+- false = sin enlace ni pestaña (la página queda sin enlazar).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

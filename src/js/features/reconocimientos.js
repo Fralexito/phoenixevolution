@@ -68,12 +68,37 @@ export function montarReconocimientos(el, jugadores, edicion) {
         <span class="flex-1 min-w-0 flex flex-wrap gap-1.5 ${abierto ? 'invisible' : ''}">${TARJETAS.map((t) => pastilla(t, r[t.k])).join('')}${pVoto}</span>
         <i class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300 ${abierto ? 'rotate-180' : ''}"></i>
       </button>
+      ${FX.premios ? `<a href="${href('premios/')}" class="flex items-center justify-end gap-1.5 px-3 pb-2 -mt-1 text-[12px] font-semibold text-galaxy-400 hover:text-white">Ver todos los premios<i class="fa-solid fa-arrow-right text-[11px]"></i></a>` : ''}
       <div ${abierto ? '' : 'hidden'} class="p-3 pt-1"><div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">${TARJETAS.map((t) => tarjeta(t, r[t.k])).join('')}${panelVoto(jugadores, votos, sesion)}</div></div>
     </div>`;
   };
   const cargar = async () => { const uid = getState().session?.user?.id; sesion = !!uid; votos = await leerVotos(semana, uid); pintar(); };
   el.addEventListener('click', async (e) => {
     if (e.target.closest('[data-recon-toggle]')) { abierto = !abierto; pintar(); return; }
+    const go = e.target.closest('[data-voto-go]'); if (!go) return;
+    const id = el.querySelector('[data-voto-sel]')?.value; if (!id) { toast('Elige primero a un jugador.', 'info'); return; }
+    const uid = getState().session?.user?.id; if (!uid) { toast('Inicia sesión para votar.', 'info'); return; }
+    go.disabled = true;
+    try {
+      if (votos.mio) { const d = await supabase.from('votos_semana').delete().eq('id', votos.mio.id); if (d.error) throw d.error; }
+      const { error } = await supabase.from('votos_semana').insert({ semana, jugador_id: id, votante_id: uid });
+      if (error) throw error;
+      toast('¡Voto registrado!', 'ok'); await cargar();
+    } catch (err) {
+      console.error('[votos] votar:', err);
+      toast(err?.code === '42501' ? 'Solo se puede votar en la semana actual.' : 'No se pudo registrar tu voto. Intenta de nuevo.', 'error'); go.disabled = false;
+    }
+  });
+  pintar(); onSession(() => { cargar(); });
+}
+
+/** Solo el voto «MVP de la afición» (jugador de la semana) para la página Premios (ronda 265). Mismas reglas y tabla que arriba. */
+export function montarVotoSemana(el, jugadores) {
+  if (!el) return;
+  const semana = semanaActual(); let sesion = false; let votos = { conteo: [], mio: null };
+  const pintar = () => { el.innerHTML = panelVoto(jugadores, votos, sesion).replace('Jugador de la semana · voto de la comunidad', 'MVP de la afición · voto de la semana'); };
+  const cargar = async () => { const uid = getState().session?.user?.id; sesion = !!uid; votos = await leerVotos(semana, uid); pintar(); };
+  el.addEventListener('click', async (e) => {
     const go = e.target.closest('[data-voto-go]'); if (!go) return;
     const id = el.querySelector('[data-voto-sel]')?.value; if (!id) { toast('Elige primero a un jugador.', 'info'); return; }
     const uid = getState().session?.user?.id; if (!uid) { toast('Inicia sesión para votar.', 'info'); return; }

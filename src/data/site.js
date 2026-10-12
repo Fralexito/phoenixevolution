@@ -23,6 +23,7 @@ export const NAV_EXTRA = [
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
   { id: 'competiciones', label: 'Competiciones', path: 'competiciones/', icon: 'fa-trophy' },
   { id: 'historial', label: 'Historial', path: 'historial/', icon: 'fa-clock-rotate-left' },
+  { id: 'premios', label: 'Premios', path: 'premios/', icon: 'fa-award' },
   { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
 ];
 
@@ -111,7 +112,7 @@ const DESC = {
   duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
   missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
-  clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores',
+  clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores', premios: 'La Paliza, Matagigantes, La Muralla y más, con cada resultado',
   tienda: 'Estética y mejoras para tu perfil',
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
@@ -136,7 +137,7 @@ const PILARES_REPARTO = [
     ['Estadísticas', ['historial', 'ranking', ...(FX.carruseles ? [] : ['database'])]],
   ], { lema: 'Ligas, torneos y campeones' }),
   // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
-  ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
+  ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', FX.premios ? ['database', 'premios'] : ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
     ['Tu club', ['manager>mercado', 'miclub']],

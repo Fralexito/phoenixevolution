@@ -1,0 +1,69 @@
+/* PREMIOS (ronda 265): página propia de reconocimientos. Cada trofeo lleva su color en --c y su orden de entrada en --i. */
+.pr-cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.25rem; }
+.pr-ligas { flex-wrap: wrap; }
+
+.pr-sec { display: flex; align-items: baseline; gap: .6rem; font-family: var(--font-display, inherit); text-transform: uppercase; letter-spacing: .14em; font-size: 13px; font-weight: 800; color: #e5e7eb; }
+.pr-sec::before { content: ''; width: .25rem; height: 1em; align-self: center; border-radius: 99px; background: var(--color-galaxy-400, #00e5ff); box-shadow: 0 0 12px var(--color-galaxy-400, #00e5ff); }
+.pr-sec b { font-size: 12px; font-weight: 600; letter-spacing: .08em; color: #9ca3af; }
+
+.pr-grid { display: grid; gap: .875rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); align-content: start; }
+@media (min-width: 768px) { .pr-grid-fecha { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); } .pr-grid-fecha .pr-destacado { grid-column: span 2; } }
+.pr-ed-grid { display: grid; gap: .875rem; }
+@media (min-width: 1024px) { .pr-ed-grid { grid-template-columns: minmax(0, 1fr) 22rem; align-items: start; } #pr-voto { position: sticky; top: 7rem; } }
+
+.pr-trofeo {
+  --c: #00e5ff; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .55rem;
+  padding: 1rem 1rem .9rem; border-radius: 1rem; isolation: isolate;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 14%, transparent), rgba(8, 10, 24, .72) 55%);
+  border: 1px solid color-mix(in srgb, var(--c) 32%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 10px 30px -18px var(--c);
+  transition: transform .2s cubic-bezier(.22, 1, .36, 1), border-color .2s, box-shadow .2s;
+}
+.pr-trofeo::after { content: ''; position: absolute; inset: 0 0 auto auto; width: 9rem; height: 9rem; z-index: -1; translate: 35% -35%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%); pointer-events: none; }
+.pr-t-cab { display: flex; align-items: center; gap: .6rem; }
+.pr-ico { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: none; border-radius: .7rem; color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); box-shadow: 0 0 16px -4px var(--c); }
+.pr-t-cab h3 { font-family: var(--font-display, inherit); font-weight: 800; text-transform: uppercase; letter-spacing: .1em; font-size: 13px; color: #fff; line-height: 1.2; }
+
+.pr-quien { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+.pr-av { width: 2.5rem; height: 2.5rem; flex: none; border-radius: 999px; object-fit: cover; border: 2px solid color-mix(in srgb, var(--c) 60%, transparent); }
+.pr-av-ini { display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff; background: color-mix(in srgb, var(--c) 30%, #0b1020); }
+.pr-quien b { display: block; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-quien b a:hover { color: var(--c); }
+.pr-quien small { display: flex; align-items: center; gap: .3rem; font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-duelo { justify-content: flex-start; flex-wrap: wrap; font-weight: 700; color: #fff; font-size: 14px; }
+.pr-duelo i { font-style: normal; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--c); }
+
+.pr-valor { display: flex; align-items: baseline; gap: .4rem; margin-top: auto; }
+.pr-valor b { font-family: var(--font-display, inherit); font-size: 2rem; line-height: 1; font-weight: 900; color: var(--c); text-shadow: 0 0 18px color-mix(in srgb, var(--c) 55%, transparent); font-variant-numeric: tabular-nums; }
+.pr-valor span { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: .1em; }
+.pr-det { font-size: 12px; color: #cbd5e1; line-height: 1.45; }
+
+.pr-destacado { padding: 1.25rem; }
+.pr-destacado .pr-valor b { font-size: 2.75rem; }
+.pr-destacado .pr-av { width: 3rem; height: 3rem; }
+.pr-destacado .pr-quien b { font-size: 17px; }
+
+.pr-vacio { grid-column: 1 / -1; display: flex; align-items: center; gap: .6rem; padding: 1rem 1.1rem; border-radius: 1rem; font-size: 13px; color: #9ca3af;
+  border: 1px dashed rgba(148, 163, 184, .3); background: rgba(0, 0, 0, .2); }
+
+/* Sudario: la línea de sección toma el dorado */
+html[data-tema='sudario'] .pr-sec::before { background: #f5c542; box-shadow: 0 0 12px #f5c542; }
+
+/* Movimiento: entrada escalonada al cargar (una vez) y leve elevación con mouse */
+@media (prefers-reduced-motion: no-preference) {
+  .pr-trofeo { animation: pr-entra .45s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(min(var(--i, 0), 10) * 45ms); }
+  @keyframes pr-entra { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pr-trofeo:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c) 60%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 16px 36px -16px var(--c); }
+}
+@media (max-width: 639px) {
+  .pr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+  .pr-grid-fecha .pr-destacado, .pr-grid > .pr-trofeo:last-child:nth-child(even) { grid-column: 1 / -1; }
+  .pr-trofeo { padding: .8rem; }
+  .pr-valor b { font-size: 1.6rem; }
+  .pr-ico { width: 2rem; height: 2rem; }
+  .pr-t-cab h3 { font-size: 12px; letter-spacing: .06em; }
+}

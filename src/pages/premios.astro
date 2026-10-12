@@ -1,0 +1,39 @@
+---
+// PREMIOS (ronda 265): sección propia con los reconocimientos de la liga. Pedido de Fralex: los de antes eran genéricos y pocos.
+// Se calculan solos con los resultados (core/premios.js); las fotos salen de las cartas de Jugadores. Lo pinta js/pages/premios.js.
+import Layout from '../layouts/Layout.astro';
+import { LIGAS } from '../data/ligas.js';
+import { EDICIONES } from '../data/ligaResultados.js';
+const ligas = LIGAS.filter((l) => (EDICIONES[l.id] ?? []).some((e) => (e.fechas ?? []).length));
+---
+<Layout title="Premios" active="premios" description="Los premios de la Galaxy League: La Paliza, Matagigantes, La Muralla, El Cañonero y más, calculados con cada resultado.">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+    <header class="glass-panel px-4 py-3 rounded-2xl pr-cab">
+      <div class="min-w-0">
+        <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow"><i class="fa-solid fa-award text-galaxy-400 mr-2"></i>Premios</h1>
+        <p class="text-gray-300 text-xs mt-0.5">Se entregan solos con cada resultado: quién goleó, quién sorprendió, quién no deja pasar ni una.</p>
+      </div>
+      {ligas.length > 1 && (
+        <div class="pilar-tabs-lista pr-ligas" role="tablist" aria-label="Liga">
+          {ligas.map((l, i) => <button type="button" role="tab" data-liga={l.id} aria-selected={i === 0 ? 'true' : 'false'}><i class={`fa-solid ${l.icono}`}></i>{l.titulo.join(' ')}</button>)}
+        </div>
+      )}
+    </header>
+
+    <section aria-labelledby="pr-fecha-t" class="space-y-3">
+      <h2 id="pr-fecha-t" class="pr-sec"><span>De la fecha</span><b id="pr-fecha-n"></b></h2>
+      <div id="pr-fecha" class="pr-grid pr-grid-fecha"><div class="esqueleto h-48"></div><div class="esqueleto h-48"></div><div class="esqueleto h-48"></div></div>
+    </section>
+
+    <section aria-labelledby="pr-ed-t" class="space-y-3">
+      <h2 id="pr-ed-t" class="pr-sec"><span>De toda la edición</span><b id="pr-ed-n"></b></h2>
+      <div class="pr-ed-grid">
+        <div id="pr-edicion" class="pr-grid"></div>
+        <aside id="pr-voto" aria-label="MVP de la afición"></aside>
+      </div>
+    </section>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/premios.js';
+</script>
