@@ -76,20 +76,20 @@ html[data-tema='sudario'] .pr-sec::before { background: #f5c542; box-shadow: 0 0
 }
 /* Celular: una columna con tarjetas en fila (título y persona a la izquierda, cifra a la derecha): menos alto, nada apretado. */
 @media (max-width: 639px) {
-  .pr-malla { gap: .55rem; }
-  .pr-trofeo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'ico tit val' 'ico qui val' 'det det det'; gap: .2rem .7rem; padding: .75rem .85rem; align-items: center; }
-  .pr-t-cab { display: contents; }
-  .pr-ico { grid-area: ico; align-self: start; width: 2.25rem; height: 2.25rem; }
-  .pr-t-cab h3 { grid-area: tit; font-size: 12px; }
-  .pr-quien { grid-area: qui; min-height: 0; gap: .45rem; }
-  .pr-quien .pr-av { width: 1.6rem; height: 1.6rem; border-width: 1.5px; }
-  .pr-quien .pr-av-ini { font-size: 12px; }
-  .pr-quien b { font-size: 14px; }
-  .pr-valor { grid-area: val; flex-direction: column; align-items: flex-end; gap: .1rem; margin: 0; max-width: 7.5rem; }
-  .pr-valor b, .pr-destacado .pr-valor b { font-size: 1.75rem; }
-  .pr-valor span { max-width: 7.5rem; text-align: right; letter-spacing: .06em; white-space: normal; line-height: 1.2; }
-  .pr-det { grid-area: det; min-height: 0; margin-top: .25rem; }
-  .pr-fam-t { margin-top: .35rem; }
+  .pr-malla .pr-malla { gap: .55rem; }
+  .pr-malla .pr-trofeo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'ico tit val' 'ico qui val' 'det det det'; gap: .2rem .7rem; padding: .75rem .85rem; align-items: center; }
+  .pr-malla .pr-t-cab { display: contents; }
+  .pr-malla .pr-ico { grid-area: ico; align-self: start; width: 2.25rem; height: 2.25rem; }
+  .pr-malla .pr-t-cab h3 { grid-area: tit; font-size: 12px; }
+  .pr-malla .pr-quien { grid-area: qui; min-height: 0; gap: .45rem; }
+  .pr-malla .pr-quien .pr-av { width: 1.6rem; height: 1.6rem; border-width: 1.5px; }
+  .pr-malla .pr-quien .pr-av-ini { font-size: 12px; }
+  .pr-malla .pr-quien b { font-size: 14px; }
+  .pr-malla .pr-valor { grid-area: val; flex-direction: column; align-items: flex-end; gap: .1rem; margin: 0; max-width: 7.5rem; }
+  .pr-malla .pr-valor b, .pr-malla .pr-destacado .pr-valor b { font-size: 1.75rem; }
+  .pr-malla .pr-valor span { max-width: 7.5rem; text-align: right; letter-spacing: .06em; white-space: normal; line-height: 1.2; }
+  .pr-malla .pr-det { grid-area: det; min-height: 0; margin-top: .25rem; }
+  .pr-malla .pr-fam-t { margin-top: .35rem; }
 }
 
 /* ── VARIEDAD (ronda 267, FX.premiosVariedad): orden igual, cada cifra con su propia forma ── */
@@ -125,12 +125,118 @@ html[data-tema='sudario'] .pr-sec::before { background: #f5c542; box-shadow: 0 0
   @keyframes pr-llena { from { transform: scaleX(0); } }
 }
 @media (max-width: 639px) {
-  .pr-agua { font-size: 4.5rem; }
-  .pr-puntos, .pr-barra { grid-column: 2 / -1; grid-row: 3; margin: .2rem 0 0; }
-  .pr-trofeo:has(.pr-puntos, .pr-barra) { grid-template-areas: 'ico tit val' 'ico qui val' 'x x x' 'det det det'; }
-  .pr-trofeo:has(.pr-puntos, .pr-barra) .pr-det { grid-row: 4; }
-  .pr-salto { flex-direction: row; align-items: center; }
-  .pr-salto span { display: none; }
-  .pr-salto .pr-gigante { font-size: 1.15rem; }
-  .pr-marcador b { font-size: 1.45rem !important; }
+  .pr-malla .pr-agua { font-size: 4.5rem; }
+  .pr-malla .pr-puntos, .pr-malla .pr-barra { grid-column: 2 / -1; grid-row: 3; margin: .2rem 0 0; }
+  .pr-malla .pr-trofeo:has(.pr-puntos, .pr-barra) { grid-template-areas: 'ico tit val' 'ico qui val' 'x x x' 'det det det'; }
+  .pr-malla .pr-trofeo:has(.pr-puntos, .pr-barra) .pr-det { grid-row: 4; }
+  .pr-malla .pr-salto { flex-direction: row; align-items: center; }
+  .pr-malla .pr-salto span { display: none; }
+  .pr-malla .pr-salto .pr-gigante { font-size: 1.15rem; }
+  .pr-malla .pr-marcador b { font-size: 1.45rem !important; }
 }
+
+/* ══ MURO DE GALERÍA (ronda 268, FX.premiosGaleria) ══════════════════════════════════════════════════════════
+   Cuadros de tamaños distintos como una pared de museo. data-t: g grande 2×2 · w ancho 2×1 · t alto 1×2 · c chico · f franja.
+   Orden: core/premios.js (tamanosMuro) arma las combinaciones para que nunca queden huecos. */
+.pr-muro { display: grid; gap: .75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(8.75rem, auto); grid-auto-flow: row dense; }
+@media (min-width: 1024px) { .pr-muro { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(10rem, auto); gap: .875rem; } }
+.pr-muro > [data-t='g'] { grid-column: span 2; grid-row: span 2; }
+.pr-muro > [data-t='w'] { grid-column: span 2; }
+.pr-muro > [data-t='t'] { grid-row: span 2; }
+.pr-muro > [data-t='f'] { grid-column: 1 / -1; }
+
+.pr-muro .pr-trofeo { gap: .45rem; padding: .95rem 1rem; }
+.pr-muro .pr-quien { min-height: 0; }
+.pr-muro .pr-agua { font-size: 7rem; opacity: .06; }
+.pr-chip { position: absolute; top: .7rem; right: .75rem; font-size: 12px; line-height: 1; padding: .3rem .55rem; border-radius: 99px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700;
+  color: color-mix(in srgb, var(--c) 80%, #fff); background: color-mix(in srgb, var(--c) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); }
+.pr-muro .pr-t-cab { padding-right: 5.5rem; }
+
+/* Grande: el protagonista. Foto grande, cifra enorme, ícono gigante de fondo. */
+.pr-muro [data-t='g'] { padding: 1.4rem 1.5rem; justify-content: space-between;
+  background: radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--c) 26%, transparent), transparent 60%), linear-gradient(170deg, rgba(14, 16, 34, .9), rgba(6, 8, 20, .92)); }
+.pr-muro [data-t='g'] .pr-agua { font-size: 15rem; right: -1.5rem; bottom: -2.5rem; opacity: .07; }
+.pr-muro [data-t='g'] .pr-ico { width: 2.75rem; height: 2.75rem; font-size: 1.15rem; }
+.pr-muro [data-t='g'] .pr-t-cab h3 { font-size: 15px; letter-spacing: .14em; }
+.pr-muro [data-t='g'] .pr-av { width: 4.25rem; height: 4.25rem; border-width: 3px; font-size: 18px; }
+.pr-muro [data-t='g'] .pr-quien b { font-size: 22px; }
+.pr-muro [data-t='g'] .pr-valor b { font-size: 4.25rem; }
+.pr-muro [data-t='g'] .pr-det { font-size: 13px; max-width: 30ch; }
+
+/* Ancho y franja: datos a la izquierda, cifra grande a la derecha. */
+.pr-muro [data-t='w'], .pr-muro [data-t='f'] { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'cab val' 'qui val' 'det val' 'x val'; column-gap: 1rem; align-content: center; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-t-cab { grid-area: cab; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-quien { grid-area: qui; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-det { grid-area: det; min-height: 0; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-valor { grid-area: val; flex-direction: column; align-items: flex-end; justify-content: center; margin: 0; padding-top: 1.5rem; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-valor b { font-size: 3rem; }
+.pr-muro :is([data-t='w'], [data-t='f']) :is(.pr-puntos, .pr-barra) { grid-area: x; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-t-cab { padding-right: 0; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-chip { top: auto; bottom: .7rem; }
+
+/* Alto: retrato vertical centrado, como un cuadro colgado. */
+.pr-muro [data-t='t'] { align-items: center; text-align: center; justify-content: space-between; padding-top: 2.6rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 18%, transparent), rgba(8, 10, 24, .8) 60%); }
+.pr-muro [data-t='t'] .pr-t-cab { flex-direction: column; padding-right: 0; gap: .5rem; }
+.pr-muro [data-t='t'] .pr-chip { left: 50%; right: auto; translate: -50% 0; }
+.pr-muro [data-t='t'] .pr-quien { flex-direction: column; gap: .4rem; }
+.pr-muro [data-t='t'] .pr-quien small { justify-content: center; }
+.pr-muro [data-t='t'] .pr-av { width: 3.75rem; height: 3.75rem; }
+.pr-muro [data-t='t'] .pr-valor { flex-direction: column; align-items: center; gap: .15rem; margin: 0; }
+.pr-muro [data-t='t'] .pr-valor b { font-size: 2.75rem; }
+.pr-muro [data-t='t'] .pr-puntos { justify-content: center; }
+.pr-muro [data-t='t'] .pr-det { min-height: 0; }
+
+/* Chico: lo justo. Sin explicación (queda al pasar el mouse en «title» del detalle). */
+.pr-muro [data-t='c'] .pr-det { display: none; }
+.pr-muro [data-t='c'] .pr-av { width: 2rem; height: 2rem; }
+.pr-muro [data-t='c'] .pr-quien small { display: none; }
+.pr-muro [data-t='c'] .pr-chip { display: none; }
+.pr-muro [data-t='c'] .pr-t-cab { padding-right: 0; }
+.pr-muro [data-t='c'] .pr-valor b { font-size: 2.1rem; }
+
+/* El voto de la afición como un cuadro más */
+.pr-muro > .pr-voto > * { height: 100%; }
+
+/* Celular y tablet: 2 columnas; los cuadros grandes ocupan el ancho y bajan un poco su tamaño. Anula las tarjetas en fila. */
+@media (max-width: 1023px) {
+  .pr-muro .pr-trofeo { display: flex; flex-direction: column; grid-template-areas: none; }
+  .pr-muro .pr-t-cab { display: flex; }
+  .pr-muro .pr-valor { flex-direction: row; align-items: baseline; max-width: none; }
+  .pr-muro .pr-valor span { text-align: left; max-width: none; }
+  .pr-muro .pr-det { margin-top: 0; }
+  .pr-muro :is(.pr-puntos, .pr-barra) { grid-area: auto; margin: 0; }
+  .pr-muro [data-t='g'] { padding: 1.1rem; }
+  .pr-muro [data-t='g'] .pr-valor b { font-size: 3.25rem; }
+  .pr-muro [data-t='g'] .pr-agua { font-size: 10rem; }
+  .pr-muro [data-t='w'], .pr-muro [data-t='f'] { display: grid; grid-template-areas: 'cab val' 'qui val' 'det val' 'x val'; }
+  .pr-muro :is([data-t='w'], [data-t='f']) .pr-valor { flex-direction: column; align-items: flex-end; }
+  .pr-muro :is([data-t='w'], [data-t='f']) .pr-valor b { font-size: 2.25rem; }
+  .pr-muro [data-t='t'] .pr-valor { flex-direction: column; align-items: center; }
+  .pr-muro [data-t='t'] .pr-valor b { font-size: 2.25rem; }
+  .pr-muro [data-t='c'] { padding: .8rem; }
+  .pr-muro [data-t='c'] .pr-valor b { font-size: 1.75rem; }
+  .pr-muro [data-t='c'] .pr-t-cab h3 { font-size: 12px; letter-spacing: .05em; }
+  .pr-muro [data-t='c'] .pr-ico { width: 1.9rem; height: 1.9rem; }
+  .pr-muro .pr-chip { font-size: 12px; padding: .25rem .45rem; }
+  .pr-muro .pr-t-cab { padding-right: 4.5rem; }
+}
+@media (max-width: 639px) {
+  .pr-muro [data-t='t'] .pr-chip { display: none; }
+  .pr-muro [data-t='t'] { padding-top: 1rem; }
+  .pr-muro :is([data-t='w'], [data-t='f']) .pr-chip { display: none; }
+}
+
+/* Ajustes del muro (ronda 268) */
+.pr-muro > .pr-voto { display: flex; } .pr-muro > .pr-voto > * { flex: 1; height: auto; }
+.pr-muro [data-t='g'] .pr-det { order: 1; font-size: 14px; color: #e2e8f0; }
+.pr-muro [data-t='g'] .pr-valor { order: 2; margin-top: auto; }
+.pr-muro [data-t='g'] :is(.pr-puntos, .pr-barra) { order: 3; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-chip { top: .7rem; bottom: auto; }
+.pr-muro :is([data-t='w'], [data-t='f']) .pr-valor { padding-top: 2rem; }
+.pr-muro .pr-salto { flex-direction: row !important; flex-wrap: wrap; align-items: center !important; justify-content: flex-end; column-gap: .45rem; }
+.pr-muro .pr-salto span { flex-basis: 100%; text-align: right; }
+.pr-muro [data-t='t'] .pr-salto, .pr-muro [data-t='t'] .pr-salto span { justify-content: center; text-align: center; }
+.pr-muro :is([data-t='g'], [data-t='c']) .pr-salto { justify-content: flex-start; }
+.pr-muro :is([data-t='g'], [data-t='c']) .pr-salto span { text-align: left; }
+.pr-muro [data-t='c'] .pr-valor { flex-wrap: wrap; } .pr-muro [data-t='c'] .pr-valor span { white-space: normal; line-height: 1.2; }

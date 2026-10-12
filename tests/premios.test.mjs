@@ -48,3 +48,13 @@ test('premios: vienen ordenados del más llamativo al menos', () => {
   const pesos = premiosEdicion(ed).premios.map((p) => p.peso);
   assert.deepEqual(pesos, [...pesos].sort((a, b) => b - a));
 });
+
+import { tamanosMuro, CELDAS } from '../src/js/core/premios.js';
+test('muro: cada cantidad de premios llena filas completas de 4 (sin huecos)', () => {
+  for (let n = 1; n <= 20; n++) {
+    const t = tamanosMuro(n);
+    assert.equal(t.length, n);
+    assert.equal(t.reduce((s, x) => s + CELDAS[x], 0) % 4, 0, `n=${n}`);
+  }
+  assert.equal(tamanosMuro(8)[0], 'g');           // el más importante va grande
+});

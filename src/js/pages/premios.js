@@ -3,7 +3,7 @@
 import { supabase } from '../core/supabase.js';
 import { escapeHTML, safeImg } from '../core/dom.js';
 import { href } from '../core/config.js';
-import { premiosEdicion } from '../core/premios.js';
+import { premiosEdicion, tamanosMuro } from '../core/premios.js';
 import { nombreEnEdicion } from '../core/perfil.js';
 import { escudoHTML } from '../core/escudos.js';
 import { LIGAS } from '../../data/ligas.js';
@@ -55,8 +55,8 @@ function valorHTML(pr) {
   return `<p class="pr-valor"><b>${v}</b><span>${u}</span></p>`;
 }
 
-const trofeo = (pr, ed, i, destacado = false) => `<article class="pr-trofeo${destacado ? ' pr-destacado' : ''}${FX.premiosVariedad && pr.id === 'lider' ? ' pr-corona' : ''}" data-premio="${escapeHTML(pr.id)}" style="--c:${pr.color};--i:${i}">
-    ${FX.premiosVariedad && AGUA.includes(pr.id) ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>` : ''}
+const trofeo = (pr, ed, i, destacado = false, t = '') => `<article ${t ? `data-t="${t}"` : ''} class="pr-trofeo${destacado ? ' pr-destacado' : ''}${FX.premiosVariedad && pr.id === 'lider' ? ' pr-corona' : ''}" data-premio="${escapeHTML(pr.id)}" style="--c:${pr.color};--i:${i}">
+    ${t ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>${familiaDe(pr.id) ? `<span class="pr-chip">${familiaDe(pr.id)}</span>` : ''}` : FX.premiosVariedad && AGUA.includes(pr.id) ? `<i class="fa-solid ${pr.icono} pr-agua" aria-hidden="true"></i>` : ''}
     <header class="pr-t-cab"><span class="pr-ico"><i class="fa-solid ${pr.icono}"></i></span><h3>${escapeHTML(pr.titulo)}</h3></header>
     ${quien(pr, ed)}
     ${valorHTML(pr)}
@@ -71,6 +71,9 @@ const FAMILIAS = [
   { t: 'Rachas', i: 'fa-fire', ids: ['enllamas', 'imparable'] },
 ];
 let votoListo = false;
+const familiaDe = (id) => FAMILIAS.find((f) => f.ids.includes(id))?.t ?? '';
+// «Esta semana» en muro: el primero grande, el resto chicos/anchos y el voto como cuadro ancho; siempre 2 filas completas.
+const MURO_SEMANA = { 1: ['g'], 2: ['g', 'w'], 3: ['g', 'c', 'c'], 4: ['g', 'c', 'c', 'w'] };
 
 function pintar() {
   const ed = edicionDe(ligaActual);
@@ -80,6 +83,7 @@ function pintar() {
   $('pr-fecha-n').textContent = r.fecha ? `Fecha ${r.fecha}` : '';
   $('pr-ed-n').textContent = ed?.nombre ?? '';
   const vacio = (t) => `<p class="pr-vacio"><i class="fa-solid fa-hourglass-half"></i>${t}</p>`;
+  if (FX.premiosGaleria) { pintarMuro(ed, fecha, edic, vacio); return; }
   // «Esta semana»: premios de la fecha + el voto de la afición, siempre llenando filas de 4 en PC.
   const voto = $('pr-voto') ?? Object.assign(document.createElement('div'), { id: 'pr-voto', className: 'pr-voto' });
   const huecos = fecha.length + 1;
@@ -96,6 +100,21 @@ function pintar() {
   $('pr-edicion').innerHTML = cajas.length
     ? cajas.map((f) => `<div class="pr-familia" style="--n:${f.ps.length}"><h3 class="pr-fam-t"><i class="fa-solid ${f.i}"></i>${f.t}</h3>${f.ps.map((p) => trofeo(p, ed, k++)).join('')}</div>`).join('')
     : vacio('Los premios de la edición aparecen cuando cada jugador lleva al menos 3 partidos.');
+}
+
+// MURO DE GALERÍA (ronda 268, FX.premiosGaleria): cuadros de tamaños distintos como una pared de museo.
+// El tamaño lo decide la importancia (peso): el primero va grande. La familia (Ataque, Defensa…) va en una etiqueta del cuadro.
+function pintarMuro(ed, fecha, edic, vacio) {
+  const voto = $('pr-voto') ?? Object.assign(document.createElement('div'), { id: 'pr-voto', className: 'pr-voto' });
+  const fs = fecha.slice(0, 4); const ts = MURO_SEMANA[fs.length] ?? [];
+  $('pr-fecha').className = 'pr-muro';
+  $('pr-fecha').innerHTML = fs.length ? fs.map((p, i) => trofeo(p, ed, i, false, ts[i])).join('') : vacio('Los premios de la fecha aparecen cuando se juega una fecha.');
+  voto.dataset.t = fs.length === 1 ? 'g' : fs.length === 4 ? 'f' : 'w';
+  $('pr-fecha').append(voto);
+  if (!votoListo) { votoListo = true; montarVotoSemana(voto, jugadores); }
+  const te = tamanosMuro(edic.length);
+  $('pr-edicion').className = 'pr-muro';
+  $('pr-edicion').innerHTML = edic.length ? edic.map((p, i) => trofeo(p, ed, i, false, te[i])).join('') : vacio('Los premios de la edición aparecen cuando cada jugador lleva al menos 3 partidos.');
 }
 
 document.querySelector('.pr-ligas')?.addEventListener('click', (e) => {

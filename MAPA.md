@@ -845,6 +845,13 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Goleadas y partidos → marcador de estadio (dos casillas). Rachas → una bolita por partido. Matagigantes → salto de puesto «8.º » 4.º» (el gigante tachado). Revelación → barra de rendimiento. El que manda → borde y corona dorada. Muralla/Cerrojo → escudo/candado grande de fondo.
 - false = todas las cifras iguales como en la ronda 266.
 
+## Ronda 268 — Premios como «Muro de galería» (FX.premiosGaleria)
+- Fralex quería más variedad pero «como una galería»; eligió entre 3 estilos (muro, vitrina, álbum) el **Muro de galería**.
+- `core/premios.js` → `tamanosMuro(n)`: tamaños de cuadro (grande 2×2, ancho 2×1, alto 1×2, chico, franja) que llenan filas de 4 sin huecos (+1 test). El más importante (peso) va grande.
+- Cada cuadro: ícono gigante de fondo y etiqueta de su familia (Ataque, Defensa…). Grande = foto y cifra enormes; ancho = cifra a la derecha; alto = retrato centrado; chico = lo justo.
+- «Esta semana»: La Paliza grande + Matagigantes y voto MVP como cuadros anchos. En celular/tablet, 2 columnas.
+- false = malla por familias (ronda 267). Siguen activas las cifras con forma propia (marcador, bolitas, salto de puesto).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

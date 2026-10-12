@@ -103,3 +103,21 @@ export function premiosEdicion(edicion, { ovrDe } = {}) {
   premios.sort((a, b) => b.peso - a.peso);
   return { fecha: ult?.n ?? null, premios };
 }
+
+// ── MURO DE GALERÍA (ronda 268) ─────────────────────────────────────────────────────────────────────────────
+// Tamaños de cuadro para n premios en una malla de 4 columnas, sin dejar huecos (con grid-auto-flow: dense).
+//   g = grande 2×2 · w = ancho 2×1 · t = alto 1×2 · c = chico 1×1 · f = franja 4×1
+// Se repiten dos «paredes» de 7 cuadros (4×3 cada una, la segunda en espejo) y lo que sobra usa un remate que cierra la fila.
+const PARED_A = ['g', 'c', 'c', 'w', 'c', 'c', 'w'];
+const PARED_B = ['t', 'w', 'c', 'c', 'g', 'c', 'c'];
+const REMATE = { 1: ['f'], 2: ['w', 'w'], 3: ['w', 'c', 'c'], 4: ['g', 't', 'c', 'c'], 5: ['g', 'c', 'c', 'c', 'c'], 6: ['w', 'c', 'c', 'c', 'c', 'w'] };
+export const CELDAS = { g: 4, w: 2, t: 2, c: 1, f: 4 };
+export function tamanosMuro(n) {
+  const out = []; let k = 0;
+  while (n - out.length >= 7) { out.push(...(k++ % 2 ? PARED_B : PARED_A)); }
+  const resto = n - out.length;
+  // Sobra 1 después de una pared: mejor partir su cuadro ancho en dos chicos que poner una franja casi vacía.
+  if (resto === 1 && out.length) { const i = out.lastIndexOf('w'); out.splice(i, 1, 'c', 'c'); }
+  else if (resto) out.push(...REMATE[resto]);
+  return out;
+}
