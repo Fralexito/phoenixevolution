@@ -3,5 +3,6 @@
 //   · 10 a 15 segundos, sin audio (se reproduce en silencio y en bucle), idealmente 1280×720 y menos de 4 MB.
 //   · poster: una imagen del mismo clip (ej. 'goles.jpg'); es lo que se ve en celular y mientras el video carga.
 //   · Vacío ('') = sin video: la portada funciona igual.
+// FOTO DE FONDO (si no hay video): una captura real de un partido de la liga en public/portada/ (ej. 'captura.jpg'). Se ve muy tenue.
 // CADA CUÁNTO cambia el titular: `segundos`.
-export const PORTADA = { clip: '', poster: '', segundos: 6 };
+export const PORTADA = { clip: '', poster: '', imagen: '', segundos: 6 };

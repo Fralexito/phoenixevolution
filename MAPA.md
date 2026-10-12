@@ -557,6 +557,19 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Archivos: `js/core/titulares.js`, `tests/titulares.test.mjs`, `js/features/transmision.js`, `styles/transmision.css`, `data/portada.js`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
 - Pruebas: 426 (3 nuevas). Build 45 páginas. Revisado a 1440 y 390 px, como visitante y con sesión simulada; avance automático y pausa probados.
 
+### Ronda 230 — PRUEBA: menos «factor IA», estilo EA FC (FX.estiloFC)
+- Bandera nueva **`FX.estiloFC`**, ENCIMA de `FX.transmision`. `false` = vuelve la portada de la ronda 229. Comprobado en el build.
+- Fralex dio permiso para reducir lo que delata a la IA aunque toque la identidad, y nombró EA FC como referencia. Solo cambian estilos (`styles/estilofc.css`) y una clase:
+  - sin manchas de luz (aurora) ni luz de estadio: fondo oscuro plano;
+  - degradado cian→púrpura SOLO en «Galaxy» (clase `tx-l2-marca` del titular de bienvenida); el resto del acento es cian liso;
+  - titulares en letra normal (no mayúsculas), apretados; nombres del marcador y accesos también en letra normal;
+  - marcador y «Campeones vigentes» planos, sin vidrio ni brillo, con esquina cortada en diagonal y barra lateral (cian / dorada);
+  - una diagonal fina de fondo SOLO detrás del marcador (PC);
+  - la parte de abajo (¿Qué quieres hacer?, pestañas, accesos, cifras) alineada al mismo borde izquierdo que el titular (`.portada-abajo`).
+- Las pestañas cápsula no cambian de estilo (solo se alinean a la izquierda).
+- Nuevo en `data/portada.js`: `imagen` = captura real de un partido como fondo tenue cuando no hay video.
+- Pruebas 426. Build 45. Revisado a 1440 y 390 px.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

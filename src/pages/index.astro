@@ -22,6 +22,8 @@ const liderClub = lider ? (edGalaxy?.clubes?.[lider.nombre] ?? '') : '';
 // PRUEBA (FX.transmision, ronda 229): portada tipo transmisión. Titulares REALES que rotan (core/titulares.js) + el marcador que los respalda.
 // Encima de FX.elite: si se apaga, vuelve la portada de la ronda 228.
 const TRANS = ELITE && FX.transmision;
+// PRUEBA (FX.estiloFC, ronda 230): menos «factor IA», estilo EA FC. Solo cambia estilos (styles/estilofc.css) y la marca del degradado.
+const FC = TRANS && FX.estiloFC;
 const clubesG = edGalaxy?.clubes ?? {};
 const tablaG = calcularTabla((edGalaxy?.fechas ?? []).flatMap((f) => f.partidos)).tabla.filter((t) => t.pj > 0);
 const TITULARES = TRANS ? titularesPortada(edGalaxy?.fechas ?? []) : [];
@@ -69,13 +71,14 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
-  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx']} data-portada>
+  <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx', FX.limpio && FX.portada && FX.elite && FX.transmision && FX.estiloFC && 'portada-fc']} data-portada>
     <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     {TRANS ? (<Fragment>
     <!-- TRANSMISIÓN (FX.transmision): titulares reales que rotan + el marcador que los respalda. Lo mueve js/features/transmision.js.
          Todos los titulares vienen en el HTML (uno visible); así la portada nunca salta de tamaño. -->
     {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
+    {!PORTADA.clip && PORTADA.imagen && <img class="tx-imagen" src={urlPortada(PORTADA.imagen)} alt="" aria-hidden="true" loading="eager" decoding="async" />}
     <div class="tx" data-tx style={`--tx-seg:${PORTADA.segundos}s`}>
       <p class="tx-estado"><span class:list={['tx-punto', ESTADO.vivo && 'tx-punto-vivo']} aria-hidden="true"></span><span data-tx-estado>{ESTADO.texto}</span></p>
       <div class="tx-fila">
@@ -83,7 +86,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
           {TITULARES.map((t, i) => (
             <span class="tx-slide" data-tx-slide data-on={i === 0 ? '' : undefined} aria-hidden={i === 0 ? undefined : 'true'}>
               <span class="tx-l1">{palabras(t.lineas[0]).map((w, k) => (<Fragment><span class="tx-w"><span style={`--i:${k}`}>{w}</span></span>{' '}</Fragment>))}</span>
-              <span class="tx-l2">{palabras(t.lineas[1]).map((w, k) => (<Fragment><span class="tx-w"><span style={`--i:${k + palabras(t.lineas[0]).length}`}>{w}</span></span>{' '}</Fragment>))}</span>
+              <span class:list={['tx-l2', t.id === 'bienvenida' && 'tx-l2-marca']}>{palabras(t.lineas[1]).map((w, k) => (<Fragment><span class="tx-w"><span style={`--i:${k + palabras(t.lineas[0]).length}`}>{w}</span></span>{' '}</Fragment>))}</span>
             </span>
           ))}
         </h1>
@@ -173,7 +176,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
     </Fragment>)}
   <!-- PULSO DE LA COMUNIDAD (dentro de la portada, bajo los botones): cifras reales (se leen de la base al cargar; «—» si no se pudo leer) -->
   {FX.limpio ? (
-    <div class="relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
+    <div class="portada-abajo relative z-10 w-full max-w-5xl mx-auto pt-4 sm:pt-6 space-y-4">
       {FX.portada ? (
       <section class="mundos" aria-labelledby="mundos-t" data-mundos>
         <h2 id="mundos-t" class="mundos-tit">¿Qué quieres hacer?</h2>
@@ -242,7 +245,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
 
     {ELITE && (<Fragment>
     <!-- CAMPEONES VIGENTES (FX.elite): la pared de trofeos de la entrada. Datos: data/palmares.js (PODIO). -->
-    <section class="campeones" aria-labelledby="campeones-t">
+    <section class:list={['campeones', FC && 'campeones-fc']} aria-labelledby="campeones-t">
       <h2 id="campeones-t" class="campeones-tit"><i class="fa-solid fa-trophy"></i> Campeones vigentes</h2>
       <ul class="campeones-lista">
         {CAMPEONES.map((c) => (

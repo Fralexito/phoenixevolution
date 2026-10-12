@@ -1,0 +1,64 @@
+/* PRUEBA · Portada con menos «factor IA» y estilo EA FC (FX.estiloFC, ronda 230). Va encima de transmision.css.
+   Fralex dio permiso para reducir lo que delata a la IA aunque toque la identidad:
+   · sin manchas de luz ni luz de estadio: fondo oscuro plano;
+   · degradado cian→púrpura SOLO en la palabra «Galaxy»; el resto del acento es cian liso;
+   · titulares en letra normal (no mayúsculas), apretados, como un diario deportivo;
+   · paneles planos (sin vidrio ni brillo) con la esquina cortada en diagonal y una barra lateral de color (rasgo de los menús de EA FC);
+   · una sola diagonal fina de fondo en PC.
+   Las pestañas cápsula NO se tocan (estilo protegido). Solo colores y fuentes de tokens.css. */
+
+/* ── Fondo plano ── */
+.portada-fc .hero-aurora, .portada-fc .hero-brillo { display: none; }
+.portada-fc::before { display: none; }
+/* Diagonal de fondo (PC): un plano apenas más claro, cortado en diagonal con filo cian, SOLO detrás del marcador */
+@media (min-width: 1024px) {
+  .portada-fc .tx-fila { position: relative; }
+  .portada-fc .tx-fila::before { content: ''; position: absolute; z-index: -1; top: -4.5rem; bottom: -2.5rem; right: -2rem; width: 52%; pointer-events: none;
+    background: linear-gradient(104deg, transparent 0 calc(16% - 1px), rgb(0 229 255 / .28) calc(16% - 1px) 16%, rgb(255 255 255 / .022) 16%); }
+}
+.tx-imagen { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; opacity: .16; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 92%); mask-image: linear-gradient(to bottom, #000 30%, transparent 92%); }
+
+/* ── Titulares: letra normal, apretada y pesada ── */
+.portada-fc .tx-titulares { text-transform: none; letter-spacing: -.012em; line-height: .92; }
+.portada-fc .tx-slide { font-size: clamp(2.7rem, 10.2cqi, 7rem); }
+.portada-fc .tx-l2 .tx-w > span { color: var(--color-galaxy-400); background: none; }
+.portada-fc .tx-l2.tx-l2-marca .tx-w > span { color: transparent; background: linear-gradient(90deg, var(--color-galaxy-400), var(--color-galaxy-600)); -webkit-background-clip: text; background-clip: text; }
+.portada-fc .tx-estado { letter-spacing: .12em; color: #9ca3af; }
+
+/* ── Marcador: panel plano, esquina cortada, barra lateral ── */
+.portada-fc .tx-marcador { border: 0; border-left: 3px solid var(--color-galaxy-400); border-radius: 0; background: var(--color-galaxy-card); backdrop-filter: none;
+  clip-path: polygon(0 0, calc(100% - 1.4rem) 0, 100% 1.4rem, 100% 100%, 0 100%); }
+.portada-fc .tx-marcador::before { display: none; }
+.portada-fc .tx-fondo { opacity: .05; }
+.portada-fc .tx-m-etq { letter-spacing: .14em; }
+.portada-fc .tx-m-eq b, .portada-fc .tx-m-cima-fila b { text-transform: none; letter-spacing: 0; font-size: 1.3rem; }
+.portada-fc .tx-m-esc { border-radius: 4px; background: rgb(255 255 255 / .04); border: 0; }
+.portada-fc .tx-m-res { font-size: 3rem; }
+
+/* ── Parte de abajo alineada al mismo borde izquierdo que el titular (nada centrado «de molde») ── */
+.portada-fc .portada-abajo { max-width: 72rem; }
+.portada-fc .mundos { justify-items: start; }
+.portada-fc .mundos-tit, .portada-fc .mundo-lema { text-align: left; }
+.portada-fc .mundos-tabs { justify-content: flex-start; margin-left: 0; padding-left: 0; }
+.portada-fc .mundo-panel { width: 100%; }
+.portada-fc .pulso-linea { justify-content: flex-start; }
+
+/* ── Accesos: títulos en letra normal ── */
+.portada-fc .tx-link b { text-transform: none; letter-spacing: 0; font-size: 1.25rem; }
+.portada-fc .mundos-tit { font-size: 1.15rem; letter-spacing: 0; }
+
+/* ── Campeones vigentes: plano, barra lateral dorada, sin brillos ── */
+.campeones-fc { border: 0; border-left: 3px solid var(--color-gold-400); border-radius: 0; background: var(--color-galaxy-card);
+  clip-path: polygon(0 0, calc(100% - 1.4rem) 0, 100% 1.4rem, 100% 100%, 0 100%); }
+.campeones-fc .campeones-tit { letter-spacing: .14em; }
+.campeones-fc .campeon-escudo { border-radius: 4px; background: rgb(255 255 255 / .04); border: 0; }
+.campeones-fc .campeon-oro .campeon-escudo { box-shadow: none; border: 1px solid rgb(251 191 36 / .5); }
+.campeones-fc .campeon a { border-radius: 0; }
+.campeones-fc .campeon b { letter-spacing: .02em; }
+
+@media (max-width: 1023px) {
+  .portada-fc .tx-slide { font-size: clamp(2.5rem, 12.5cqi, 4rem); }
+  .portada-fc .tx-m-res { font-size: 2.5rem; }
+  .portada-fc .tx-marcador { clip-path: polygon(0 0, calc(100% - 1rem) 0, 100% 1rem, 100% 100%, 0 100%); }
+}
