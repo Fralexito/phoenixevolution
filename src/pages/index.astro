@@ -14,6 +14,7 @@ import { titularesPortada, lineaEstado } from '../js/core/titulares.js';
 import { estadoLiga } from '../js/core/pulso.js';
 import { PORTADA } from '../data/portada.js';
 import { CLUBES_VISUAL } from '../data/clubesVisual.js';
+import { itemsCompetencia } from '../js/core/ventanas.js';
 const base = import.meta.env.BASE_URL;
 // PRUEBA (FX.elite, ronda 228): portada «palco VIP». Va encima de FX.portada; si se apaga, vuelve la portada de la ronda 227.
 const ELITE = FX.limpio && FX.portada && FX.elite;
@@ -75,13 +76,49 @@ const MUNDOS = [
   ] },
 ];
 const discord = 'https://discord.gg/jsxZ3mtfwe';
+// PRUEBA (FX.ventanas, ronda 232): «las 4 ventanas». Cada mundo muestra en vivo lo que pasa ahí (muchas personas, no un solo jugador).
+// Competencia viene en el HTML (resultados reales); las otras 3 las llena js/features/ventanas.js desde la base (si no hay datos, queda el texto «vacío»).
+const VENT = ESC && FX.ventanas;
+const VENTANAS = [
+  { id: 'social', nombre: 'Zona Social', icono: 'fa-users', href: 'social/', color: 'var(--color-galaxy-600)', vacio: { titulo: 'Sé el primero en publicar hoy', meta: 'Historias, fotos y jugadas' } },
+  { id: 'competencia', nombre: 'Competencia', icono: 'fa-trophy', href: 'liga/', color: 'var(--color-gold-400)', items: itemsCompetencia(edGalaxy?.fechas ?? [], clubesG), vacio: { titulo: 'La liga arranca pronto', meta: 'Tabla, fechas y torneos' } },
+  { id: 'duelos', nombre: 'Duelos', icono: 'fa-gamepad', href: 'duelos/', color: 'var(--color-galaxy-400)', vacio: { titulo: 'Nadie espera rival ahora', meta: 'Crea el primer reto' } },
+  { id: 'club', nombre: 'Mi Club', icono: 'fa-shield-halved', href: 'manager/', color: 'var(--color-ok)', vacio: { titulo: 'Mercado de la Liga Máster', meta: 'Fichajes y traspasos' } },
+];
 ---
 <Layout title="Central" active="central">
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
   <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', ESC && 'portada-esc', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx', FX.limpio && FX.portada && FX.elite && FX.transmision && FX.estiloFC && 'portada-fc']} data-portada>
     <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
     <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
-    {ESC ? (<Fragment>
+    {VENT ? (<Fragment>
+    <!-- 4 VENTANAS (FX.ventanas): un saludo y 4 ventanas vivas, una por mundo. Lo mueve js/features/ventanas.js. -->
+    <div class="esc-luz" aria-hidden="true"><i></i><i></i></div>
+    {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
+    {!PORTADA.clip && PORTADA.imagen && <img class="tx-imagen" src={urlPortada(PORTADA.imagen)} alt="" aria-hidden="true" loading="eager" decoding="async" />}
+    <div class="vt" data-vt>
+      <h1 class="vt-tit" data-vt-tit>
+        <span class="esc-l1">{palabras('Bienvenido a la').map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
+        <span class="esc-l2 esc-marca"><span class="esc-w" style="--i:3">Galaxy</span></span>
+      </h1>
+      <p class="vt-sub">Esto está pasando ahora en la comunidad.</p>
+      <div class="vt-grid" data-vt-grid>
+        {VENTANAS.map((v, n) => (
+          <a href={`${base}${v.href}`} class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id}>
+            <span class="vt-cab"><span class="vt-ico"><i class={`fa-solid ${v.icono}`}></i></span><b>{v.nombre}</b><i class="fa-solid fa-arrow-right vt-flecha"></i></span>
+            <span class="vt-items" data-vt-items aria-live="off">
+              {(v.items?.length ? v.items : [v.vacio]).map((it, k) => (
+                <span class:list={['vt-item', !v.items?.length && 'vt-vacio']} data-on={k === 0 ? '' : undefined}>
+                  {it.escudos ? <span class="vt-media vt-escudos"><Fragment set:html={escudoHTML(it.escudos[0], 30) + escudoHTML(it.escudos[1], 30)} /></span> : <span class="vt-media vt-media-ico"><i class={`fa-solid ${v.icono}`}></i></span>}
+                  <span class="vt-txt"><b>{it.titulo}</b><small>{it.meta}</small></span>
+                </span>
+              ))}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+    </Fragment>) : ESC ? (<Fragment>
     <!-- ESCENARIO (FX.escenario): titular + marcador + los 4 mundos. Lo mueve js/features/escenario.js. Todos los titulares vienen en el HTML. -->
     <div class="esc-luz" aria-hidden="true"><i></i><i></i></div>
     {PORTADA.clip && <video class="tx-video" data-tx-video src={urlPortada(PORTADA.clip)} poster={urlPortada(PORTADA.poster) || undefined} muted loop playsinline preload="none" aria-hidden="true"></video>}
@@ -508,6 +545,7 @@ const discord = 'https://discord.gg/jsxZ3mtfwe';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();
   import('../js/features/elite.js').then((m) => m.montarElite()).catch((e) => console.warn('[central] elite:', e));
+  import('../js/features/ventanas.js').then((m) => m.montarVentanas()).catch((e) => console.warn('[central] ventanas:', e));
   import('../js/features/escenario.js').then((m) => m.montarEscenario()).catch((e) => console.warn('[central] escenario:', e));
   import('../js/features/transmision.js').then((m) => m.montarTransmision()).catch((e) => console.warn('[central] transmisión:', e));
   document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));

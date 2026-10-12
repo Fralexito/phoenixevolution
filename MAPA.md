@@ -586,6 +586,20 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Archivos: `js/features/escenario.js`, `styles/escenario.css`, `pages/index.astro`, `styles/global.css`, `data/experimento.js`.
 - Pruebas 426. Build 45. Revisado a 1440 y 390 px y grabado un video de 24 s.
 
+### Ronda 232 — PRUEBA: portada «las 4 ventanas» (FX.ventanas)
+- Bandera nueva **`FX.ventanas`**, encima de `FX.escenario`. `false` = vuelve la portada de la ronda 231. Comprobado en el build.
+- Fralex: la 231 era «muy simplista» y «no deberíamos enfocarnos en un solo jugador». Objetivo: que todos tengan protagonismo, con dinamismo y cero desorden.
+- Portada: saludo «Bienvenido a la Galaxy» (con sesión: «Hola de nuevo, <nombre>») + «Esto está pasando ahora en la comunidad.» + **4 ventanas iguales**, una por mundo, siempre en el mismo lugar (4 columnas en PC, 2×2 en celular). Cada una es un enlace a su sección.
+  - **Zona Social** (púrpura): publicaciones del muro de la comunidad (`muro_comunidad`), con foto del autor y «hace X».
+  - **Competencia** (dorado): TODOS los resultados de la última fecha jugada + lo que falta de la fecha en curso (al construir, desde `ligaResultados.js`).
+  - **Duelos** (cian): retos abiertos (`retos_matchmaking` en BUSCANDO): «<nombre> busca rival».
+  - **Mi Club** (verde): movimientos del mercado de la Liga Máster (`lm_movimientos`, liga galaxy).
+  - Sin datos, cada una muestra un texto amable («Nadie espera rival ahora · Crea el primer reto»).
+- Movimiento: las ventanas entran una tras otra; lo de adentro cambia **una ventana por turno** cada 2,8 s (como tableros de aeropuerto), con desenfoque suave; la luz del mundo late al cambiar; al pasar el mouse la ventana sube y su luz se enciende. Pausa con mouse encima, teclado y pestaña oculta. Nada con «menos movimiento».
+- Lógica pura en `js/core/ventanas.js` (con pruebas); carga y turnos en `js/features/ventanas.js`; estilos en `styles/ventanas.css` (reusa la luz y la curva de `escenario.css`).
+- Datos reales hoy (12 oct): Zona Social = publicaciones de prueba de Fralex; Duelos = ninguno abierto; Mi Club = movimientos «Demo …».
+- Pruebas 429 (3 nuevas). Build 45. Revisado a 1440 y 390 px con esos datos; video de 20 s.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
