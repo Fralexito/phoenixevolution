@@ -684,6 +684,16 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Revisado en 9 páginas (portada, liga, duelos, database, noticias, tienda, unirme, torneos, palmarés): 0 errores; la mancha borrosa junto al logo al bajar es el ticker escondiéndose (igual sin la capa).
 - Archivos: `styles/prof3d.css`, `js/features/prof3d.js`, `js/core/inclinacion.js`, `tests/inclinacion.test.mjs`, `js/boot.js`, `layouts/Layout.astro`, `styles/global.css`, `data/experimento.js`, `CLAUDE.md`. Pruebas 439. Build 45.
 
+### Ronda 243 — «Ajustes → Animaciones» ahora manda sobre Windows (la capa 3D no se veía)
+- Fralex no veía nada de la capa 3D. Revisado en el navegador de su propia PC: la versión nueva SÍ estaba publicada, pero su **Windows tiene las animaciones apagadas** (`prefers-reduced-motion: reduce`), y con «Animaciones: Según el sistema» la web apagaba todo.
+- Además había un fallo: elegir **«Siempre activas»** no encendía todo, porque gran parte del CSS (y 4 archivos JS) le preguntaba directamente al sistema operativo.
+- Arreglo:
+  - `tools/movimiento-postcss.mjs` (plugin de PostCSS en `astro.config.mjs`, con pruebas en `tests/movimientoPostcss.test.mjs`): al construir, cada `@media (prefers-reduced-motion: reduce)` pasa a `:root[data-aj-mov-efectivo='reducido'] …` y cada `no-preference` a `:root:not([data-aj-mov-efectivo='reducido']) …`. 210 reglas convertidas; 0 preguntas directas al sistema en el CSS final.
+  - Script corto en `Layout.astro` que pone `data-aj-mov-efectivo` ANTES de pintar (mismo criterio que `core/ajustes.js`) y salta la transición entre páginas si está «reducido» (antes lo hacía un `@media` dentro de `@view-transition`).
+  - `reveal.js`, `dopamina.js`, `notifications.js`: leen el atributo en vez de `matchMedia`.
+- Comprobado simulando Windows sin animaciones: «Según el sistema» → todo quieto (correcto); «Siempre activas» → 3D, inclinación y ventanas en movimiento; «Reducidas» → quieto.
+- Regla nueva en `CLAUDE.md`. Pruebas 442. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

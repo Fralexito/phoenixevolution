@@ -3,7 +3,8 @@
 export function initReveal() {
   try {
     if (!document.documentElement.hasAttribute('data-fx-reveal')) return;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    // Ronda 243: obedece a «Ajustes → Animaciones» (no solo al sistema operativo).
+    if (document.documentElement.getAttribute('data-aj-mov-efectivo') === 'reducido' || !('IntersectionObserver' in window)) return;
     const bloques = [...document.querySelectorAll('main section')].filter((s) => !s.parentElement.closest('section'));
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visto'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     bloques.forEach((b) => { b.setAttribute('data-reveal', ''); io.observe(b); });

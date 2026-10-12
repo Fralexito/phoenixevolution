@@ -54,7 +54,10 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
       <script is:inline>document.documentElement.classList.add('js');</script>
     {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','si');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
-    {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; } @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }`}</style>}
+    {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }`}</style>}
+    {/* Ronda 243: «Animaciones» de Ajustes, ANTES de pintar (así nada se mueve un instante si debe estar quieto, y «Siempre activas» manda sobre el sistema).
+         Mismo criterio que core/ajustes.js → movimientoReducido. También salta la transición entre páginas si está «reducido». */}
+    <script is:inline set:html={"try{var h=document.documentElement,a=JSON.parse(localStorage.getItem('pes-ajustes-v1')||'{}'),m=a&&a.movimiento,s=matchMedia('(prefers-reduced-motion: reduce)').matches;h.setAttribute('data-aj-mov-efectivo',m==='reducido'||(m!=='normal'&&s)?'reducido':'normal')}catch(e){}addEventListener('pagereveal',function(e){if(e.viewTransition&&document.documentElement.getAttribute('data-aj-mov-efectivo')==='reducido')e.viewTransition.skipTransition()});addEventListener('pageswap',function(e){if(e.viewTransition&&document.documentElement.getAttribute('data-aj-mov-efectivo')==='reducido')e.viewTransition.skipTransition()});"} />
   </head>
   <body class="flex flex-col min-h-screen">
     {import.meta.env.PUBLIC_PREVIEW && <div class="fase-beta-cinta" role="note" aria-label="Fase beta: versión privada de pruebas"><i class="fa-solid fa-flask"></i> FASE BETA · versión privada de pruebas</div>}

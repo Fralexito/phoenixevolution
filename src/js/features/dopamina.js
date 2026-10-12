@@ -7,7 +7,8 @@
 import { FX } from '../../data/experimento.js';
 import { valorEn, duracionPara } from '../core/contador.js';
 
-const reducido = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+// Ronda 243: obedece a «Ajustes → Animaciones» (que ya incluye lo que diga el sistema si está en «Según el sistema»).
+const reducido = () => document.documentElement.getAttribute('data-aj-mov-efectivo') === 'reducido';
 const activo = () => FX.dopamina && !reducido();
 const EASE = 'cubic-bezier(.22, 1, .36, 1)';
 const POP = 'cubic-bezier(.34, 1.56, .64, 1)';

@@ -31,7 +31,8 @@ const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month:
 const LIMIT = 30;
 const DESHACER_MS = 5000;
 const EASE = 'cubic-bezier(.22, 1, .36, 1)';
-const reducido = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+// Ronda 243: obedece a «Ajustes → Animaciones» (que ya incluye lo que diga el sistema si está en «Según el sistema»).
+const reducido = () => document.documentElement.getAttribute('data-aj-mov-efectivo') === 'reducido';
 const animar = (el, frames, opts) => { if (!el?.animate || reducido()) return null; try { return el.animate(frames, opts); } catch { return null; } };
 
 export function initNotifications(userId) {
