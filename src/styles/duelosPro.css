@@ -109,3 +109,36 @@ html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   html[data-fx-duelos-pro] #duelos-grid:not([data-plegado]) #col-lanzar { animation: dp-entra .32s cubic-bezier(.22, 1, .36, 1) both; }
 }
+
+/* 8 · Cabecera que aprovecha el espacio (ronda 262): la racha como píldora bajo la descripción y «Lanzar reto» bajo «Tu estado» */
+.dp-cab > div:last-child { display: grid; gap: .5rem; align-content: start; }
+@media (min-width: 768px) { .dp-cab > div:last-child { width: 22rem; } }
+.dp-cab > div:last-child #estado-hint { min-height: 0; margin-top: 0; }
+.dp-cab #racha-diaria:not([hidden]) { display: inline-flex !important; align-items: center; gap: .55rem; margin-top: .7rem; padding: .35rem .8rem .35rem .45rem !important;
+  border-radius: 999px !important; background: rgb(251 191 36 / .08) !important; box-shadow: none !important; backdrop-filter: none !important; max-width: 100%; }
+.dp-cab #racha-diaria > span { font-size: 1.05rem !important; }
+.dp-cab #racha-diaria > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .55rem; }
+.dp-cab #racha-diaria > div > p:first-child { font-size: .78rem !important; }
+.dp-cab .dp-lanzar { display: none; }
+@media (min-width: 1024px) {
+  html[data-fx-duelos-pro]:has(#duelos-grid[data-plegado]) .dp-cab .dp-lanzar { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; min-height: 3rem;
+    padding: .7rem 1rem; border-radius: .9rem; position: relative; overflow: hidden; isolation: isolate;
+    font-family: var(--font-display, inherit); font-weight: 800; font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; color: #fff;
+    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 22px rgb(128 0 255 / .45); transition: transform .2s, box-shadow .2s; }
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar > span { display: none; }
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgb(128 0 255 / .65); }
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar:active { transform: scale(.98); }
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / .2) 50%, transparent 65%); transform: translateX(-120%); }
+}
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar::after { transition: transform .8s cubic-bezier(.22, 1, .36, 1); }
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar:hover::after { transform: translateX(120%); }
+}
+/* Celular: el botón «Lanzar reto» de la cabecera con el mismo morado del de PC */
+@media (max-width: 1023.98px) {
+  .dp-cab #seg-vista { padding: 0; border: 0; background: none; }
+  .dp-cab #seg-vista > button { min-height: 2.9rem; border-radius: .9rem; color: #fff; font-size: .85rem;
+    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 18px rgb(128 0 255 / .4); }
+  .dp-cab #seg-vista > button[aria-pressed='true'] { background: rgb(255 255 255 / .06); box-shadow: inset 0 0 0 1px var(--color-galaxy-400); color: var(--color-galaxy-400); }
+}

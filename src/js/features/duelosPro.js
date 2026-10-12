@@ -11,6 +11,16 @@ export function montarDuelosPro() {
   // (botón grande «Lanzar reto»). Después de emitirlo, se vuelve a plegar. En celular ya funcionaba así (botón de la cabecera).
   const grid = document.getElementById('duelos-grid');
   grid?.setAttribute('data-plegado', '');
+  // Ronda 262 (Fralex: «todo ese espacio se podría aprovechar mejor»): la racha y el botón «Lanzar reto» entran en la cabecera
+  // (racha como píldora bajo la descripción; «Lanzar reto» bajo «Tu estado»). Se ahorran dos filas completas.
+  const cab = document.querySelector('main section.glass-panel:has(> div > h1)');
+  if (cab) {
+    cab.classList.add('dp-cab');
+    const [izq, der] = cab.children;
+    const racha = document.getElementById('racha-diaria'); if (racha && izq) izq.append(racha);
+    const lanzar = document.getElementById('btn-abrir-form'); if (lanzar && der) { lanzar.classList.add('dp-lanzar'); der.append(lanzar); }
+    const segVista = document.getElementById('seg-vista'); if (segVista && der) der.append(segVista);
+  }
   window.addEventListener('duelos:creado', () => grid?.setAttribute('data-plegado', ''));
   const col = document.getElementById('col-partidos'); if (!col) return;
   try {

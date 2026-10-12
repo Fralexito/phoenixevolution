@@ -809,6 +809,11 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - `duelosPro.js`: en PC `#duelos-grid` arranca con `data-plegado` (ignora lo recordado en el navegador) → se ve el botón grande «Lanzar reto» y las listas a todo el ancho; al tocarlo se abre el formulario; tras emitir (`duelos:creado`) se vuelve a plegar. En celular ya era así. Botón con brillo al pasar el mouse y entrada suave del formulario (`duelosPro.css` §7).
 - Pruebas 444. Build 45.
 
+### Ronda 262 — Duelos: la cabecera aprovecha el espacio
+- Fralex: sobraba espacio arriba (racha, cabecera y botón «Lanzar reto» en tres filas). Las pestañas En el radar / Que lanzaste se quedan igual.
+- `duelosPro.js`: mueve `#racha-diaria` dentro de la cabecera (píldora bajo la descripción), `#btn-abrir-form` bajo «Tu estado» (PC, solo con el formulario plegado) y `#seg-vista` (celular) también a la cabecera. `duelosPro.css` §8: estilos de la píldora y de los botones. Se ahorran dos filas completas.
+- Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
