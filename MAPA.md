@@ -796,6 +796,14 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Medido con 5 retos de prueba: PC ≈ 1,6 pantallas (antes las dos listas apiladas); celular 2,7 → 1,05 pantallas.
 - Pruebas 444. Build 45.
 
+### Ronda 260 — Formulario «Lanzar reto» más simple, sin perder opciones (FX.duelosPro)
+- Fralex: ¿se puede hacer más simple sin perder funcionalidad y más premium? «Haz lo que mejor consideres».
+- `js/features/formRetoSimple.js` (lo llama duelosPro.js) + sección 6 de `styles/duelosPro.css`. La lógica de `features/duelos/form.js` no cambia:
+  - Tamaño en una fila «1v1 · 2v2 · 3v3 · 4v4 · Otro» (chip 1v1 nuevo; «Personalizar» → «Otro»); contadores A/B, «Total…» solo con «Otro» (o si el tamaño ya es personalizado); «Volver a 1v1» sobra (lo hace el chip 1v1).
+  - «Detalles de la sala» plegado en una línea («Yo tengo host · Parsec · Sin espectadores») con [Cambiar] / [Listo].
+  - El resumen va como segunda línea del botón «Emitir reto» (boleto); ayuda de «¿Cuándo?» solo si no es «Ya».
+- Alto del formulario: ~640 px → ~417 px. Pruebas 444. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

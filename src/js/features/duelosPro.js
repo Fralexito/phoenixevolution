@@ -2,9 +2,11 @@
 // Las dos listas de la derecha («Retos en el radar» y «Retos que lanzaste») ya no van una debajo de otra:
 // se eligen con dos pestañas cápsula (con su contador). Así se ve una lista a la vez y la página mide la mitad.
 import { FX } from '../../data/experimento.js';
+import { simplificarFormReto } from './formRetoSimple.js';
 
 export function montarDuelosPro() {
   if (!FX.duelosPro) return;
+  simplificarFormReto();
   const col = document.getElementById('col-partidos'); if (!col) return;
   try {
     const tabs = document.createElement('div');

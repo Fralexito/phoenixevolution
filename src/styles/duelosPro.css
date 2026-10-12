@@ -68,3 +68,29 @@ html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content
   #col-partidos[data-dp] :is(#lista-retos, #lista-pend) > .col-span-full,
   #col-partidos[data-dp] :is(#lista-retos, #lista-pend) > :only-child { flex-basis: 100%; }
 }
+
+/* 6 · Formulario «Lanzar reto» más simple (ronda 260, js/features/formRetoSimple.js). Nada se quita; solo se esconde lo que casi nadie cambia. */
+.fr-simple #tam-presets { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
+/* contadores A/B, «Total…» y «Volver a 1v1» solo con «Otro» (o si el tamaño ya es personalizado) */
+.fr-simple div:not([data-fr-otro]):has(> #tam-presets):not(:has(#tam-personal[aria-pressed='true'])) > :is(#tam-custom, p) { display: none; }
+.fr-simple #tam-reset { display: none !important; }
+/* ayuda de «¿Cuándo?» solo si no es «Ya» */
+.fr-simple #presets:has([data-p='ya'][aria-pressed='true']) + #hint-when { display: none; }
+/* Detalles de la sala en una línea */
+.fr-simple [aria-labelledby='h-detalles-sala'] { padding-top: .75rem; }
+.fr-simple #h-detalles-sala { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin: 0 !important; }
+.fr-simple .fr-res { order: 3; flex-basis: 100%; min-width: 0; padding-left: 1.6rem; font: 600 .78rem var(--font-sans, inherit); letter-spacing: 0; text-transform: none; color: #cbd5e1; }
+.fr-simple [aria-labelledby='h-detalles-sala']:not([data-fr-plegado]) .fr-res { display: none; }
+.fr-simple .fr-cambiar { margin-left: auto; padding: .3rem .75rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 40%, transparent);
+  font: 700 .75rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--color-galaxy-400); transition: background .15s, transform .15s; }
+.fr-simple .fr-cambiar:hover { background: color-mix(in srgb, var(--color-galaxy-400) 12%, transparent); }
+.fr-simple .fr-cambiar:active { transform: scale(.95); }
+.fr-simple [aria-labelledby='h-detalles-sala'][data-fr-plegado] > :not(#h-detalles-sala) { display: none; }
+/* el resumen va dentro del botón (boleto); la fila «Resumen:» se oculta */
+.fr-simple div:has(> #resumen) { display: none; }
+.fr-simple #btn-emitir-reto { flex-wrap: wrap; min-height: 3.1rem !important; row-gap: .1rem; line-height: 1.1; }
+.fr-simple .fr-boleto { flex-basis: 100%; font: 600 .75rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; opacity: .85; }
+.fr-simple .fr-boleto:empty { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .fr-simple :is(#tam-custom, [aria-labelledby='h-detalles-sala']:not([data-fr-plegado]) > :not(#h-detalles-sala)) { animation: dp-entra .28s cubic-bezier(.22, 1, .36, 1) both; }
+}
