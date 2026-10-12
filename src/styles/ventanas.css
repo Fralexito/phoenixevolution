@@ -28,9 +28,12 @@
 .vt-flecha { font-size: .75rem; color: #6b7280; transition: transform .35s var(--esc-ease), color .25s; }
 
 /* ── Lo de adentro: todos los elementos apilados en la misma celda (la ventana nunca cambia de tamaño) ── */
-.vt-items { display: grid; align-items: start; }
-.vt-item { grid-area: 1 / 1; display: grid; gap: .7rem; align-content: start; }
-.vt-item:not([data-on]):not([data-sale]) { opacity: 0; visibility: hidden; }
+/* Cambio = DESPLAZAMIENTO HACIA ARRIBA (pedido de Fralex, ronda 241), como una cinta: el actual sube y sale por arriba y el
+   siguiente sube desde abajo, PEGADOS. Cada elemento ocupa toda la altura de la caja (align-self: stretch), así los dos miden
+   lo mismo, se mueven exactamente 100 % y nunca se enciman. La caja recorta lo que sale (overflow: clip). */
+.vt-items { display: grid; overflow: clip; overflow-clip-margin: 6px; }
+.vt-item { grid-area: 1 / 1; align-self: stretch; display: grid; gap: .7rem; align-content: start; }
+.vt-item:not([data-on]):not([data-sale]) { visibility: hidden; transform: translateY(100%); }
 .vt-media { display: flex; align-items: center; gap: .25rem; min-height: 2rem; }
 .vt-media img { width: 2rem; height: 2rem; object-fit: contain; }
 .vt-escudos img + img { margin-left: -.35rem; }
@@ -67,10 +70,11 @@
   /* Las 4 ventanas entran una tras otra */
   .vt-v { animation: vt-entra .9s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--n) * 90ms + .45s); }
   /* Cambio de elemento: el que sale se desenfoca hacia arriba y el que entra enfoca desde abajo */
-  .vt:not([data-quieto]) .vt-item { transition: opacity .7s cubic-bezier(.22,1,.36,1), filter .7s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1), visibility .7s; }
-  .vt:not([data-quieto]) .vt-item:not([data-on]) { opacity: 0; filter: blur(8px); transform: translateY(14px); }
-  .vt:not([data-quieto]) .vt-item[data-sale] { transform: translateY(-14px); transition: transform .35s cubic-bezier(.55, 0, 1, .45), opacity .2s linear, filter .2s linear, visibility 0s linear .35s; }
-  /* En turnos: el que entra espera a que el que sale ya no se vea (si no, se ven encimados un instante) */
-  .vt:not([data-quieto]) .vt-item[data-on] { transition: transform .8s cubic-bezier(.22,1,.36,1) .22s, opacity .5s cubic-bezier(.22,1,.36,1) .22s, filter .5s linear .22s, visibility 0s linear .22s; }
+  /* Animaciones (no transiciones): las dos arrancan en el mismo cuadro, con la misma duración y curva → avanzan pegadas.
+     data-entra y data-sale los pone js/features/ventanas.js al cambiar y los quita a los 0,7 s. */
+  .vt:not([data-quieto]) .vt-item[data-entra] { animation: vt-cinta-entra .65s cubic-bezier(.65, 0, .35, 1) both; }
+  .vt:not([data-quieto]) .vt-item[data-sale] { animation: vt-cinta-sale .65s cubic-bezier(.65, 0, .35, 1) both; }
 }
+@keyframes vt-cinta-entra { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes vt-cinta-sale { from { transform: translateY(0); } to { transform: translateY(-100%); } }
 @keyframes vt-entra { from { opacity: 0; transform: translateY(18px) scale(.98); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }

@@ -2,7 +2,7 @@
    Fralex: «más movimiento, sensación 3D, que cada sensación se sienta progresiva».
    Todo en capas que se suman, nunca de golpe:
    ENTRADA  fondo → título enfoca → ventanas se levantan en 3D una tras otra → encabezado → contenido → luz del mundo → recién ahí rota.
-   CAMBIO   el contenido gira como un tablero de aeropuerto (sale hacia arriba, entra desde abajo) → una luz recorre el borde → la luz del mundo late.
+   CAMBIO   el contenido se desplaza hacia arriba como una cinta (el actual sale por arriba, el siguiente sube pegado desde abajo) → una luz recorre el borde → la luz del mundo late.
    MOUSE    la escena entera se inclina poco → la ventana bajo el mouse sube → se inclina más → su brillo sigue al mouse → sus capas se separan.
    SCROLL   la portada se inclina hacia atrás y se aleja de a poco.
    Solo transform / opacity / filter. Nada se mueve con «menos movimiento». Inclinaciones solo con mouse. */
@@ -41,8 +41,6 @@
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 
 /* ── El contenido gira como un tablero: cada ventana es su propio escenario 3D ── */
-.vt-3d .vt-items { perspective: 520px; }
-.vt-3d .vt-item { transform-origin: 50% 50% -1.2rem; backface-visibility: hidden; }
 
 @media (prefers-reduced-motion: no-preference) {
   /* ENTRADA, etapa 3: las ventanas se levantan en 3D, una tras otra (backwards: al terminar vuelve a mandar el transform normal) */
@@ -53,14 +51,7 @@
   /* etapa 6: se enciende la luz del mundo */
   .vt-3d .vt-v::before { animation: vt3-luz 1.6s cubic-bezier(.22, 1, .36, 1) backwards; animation-delay: calc(var(--n) * 120ms + 1.35s); }
 
-  /* CAMBIO: sale girando hacia arriba, entra girando desde abajo */
-  .vt-3d:not([data-quieto]) .vt-item { transition: transform .85s cubic-bezier(.22, 1, .36, 1), opacity .55s cubic-bezier(.22, 1, .36, 1), filter .55s, visibility .85s; }
-  .vt-3d:not([data-quieto]) .vt-item:not([data-on]) { opacity: 0; filter: blur(3px); transform: rotateX(-88deg); }
-  .vt-3d:not([data-quieto]) .vt-item[data-sale] { transform: rotateX(88deg); }
-  /* EN TURNOS (no a la vez): el que sale se va rápido (se apaga en 0,18 s) y el que entra espera 0,2 s a que el otro ya no se vea.
-     Antes los dos se animaban juntos ~0,5 s y por un instante se veían encimados. */
-  .vt-3d:not([data-quieto]) .vt-item[data-sale] { transition: transform .38s cubic-bezier(.55, 0, 1, .45), opacity .18s linear, filter .18s linear, visibility 0s linear .38s; }
-  .vt-3d:not([data-quieto]) .vt-item[data-on] { transition: transform .8s cubic-bezier(.22, 1, .36, 1) .2s, opacity .4s cubic-bezier(.22, 1, .36, 1) .2s, filter .4s linear .2s, visibility 0s linear .2s; }
+  /* CAMBIO: el contenido se desplaza hacia arriba (reglas en ventanas.css, ronda 241); aquí solo la luz que recorre el borde */
   .vt-3d .vt-v[data-latido]::after { animation: vt3-borde 1.4s cubic-bezier(.4, 0, .2, 1); }
 
   /* Vida en reposo: la escena se balancea apenas (no con el mouse encima: ahí manda el mouse) */

@@ -663,6 +663,13 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 - Arreglo (solo CSS, `styles/ventanas3d.css` y `styles/ventanas.css`): ahora van EN TURNOS. El que sale se apaga en ~0,18 s; el que entra espera ~0,2 s y recién ahí aparece.
 - Medido en el navegador cada 30 ms: 0 momentos con los dos visibles. Pruebas 437. Build 45.
 
+### Ronda 241 — Las ventanas cambian con un desplazamiento hacia arriba (cinta)
+- Fralex: tras la ronda 240 seguía viendo el texto encimado y pidió «una especie de desplazamiento hacia arriba cuando va a cambiar algo».
+- Ahora el cambio es una **cinta**: el contenido actual sube y sale por arriba, y el siguiente sube pegado desde abajo. Se quitaron el giro (3D) y el fundido.
+- Cómo se garantiza que no se enciman: cada elemento ocupa toda la altura de la caja (`align-self: stretch`), así los dos miden lo mismo y se mueven exactamente 100 %; la caja recorta lo que sale (`overflow: clip`). Son **animaciones** (no transiciones) que arrancan en el mismo cuadro: `data-sale` y el nuevo `data-entra` (los pone y quita `js/features/ventanas.js`). Con transiciones el que entraba arrancaba ~0,15 s tarde.
+- Medido cada 25 ms: el borde de arriba del nuevo coincide con el de abajo del viejo en todo momento (diferencia ≤ 1 px por redondeo).
+- Archivos: `styles/ventanas.css`, `styles/ventanas3d.css` (sin las reglas de giro), `js/features/ventanas.js`. Pruebas 437. Build 45.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

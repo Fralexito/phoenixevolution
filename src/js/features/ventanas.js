@@ -111,7 +111,8 @@ export function montarVentanas() {
       const i = items.findIndex((x) => x.hasAttribute('data-on'));
       const sale = items[i]; const entra = items[(i + 1) % items.length];
       sale.removeAttribute('data-on'); sale.setAttribute('data-sale', ''); setTimeout(() => sale.removeAttribute('data-sale'), 700);
-      entra.setAttribute('data-on', '');
+      // data-entra arranca su animación en el MISMO instante que la del que sale (data-sale): avanzan pegados, como una cinta.
+      entra.setAttribute('data-on', ''); entra.setAttribute('data-entra', ''); setTimeout(() => entra.removeAttribute('data-entra'), 700);
       v.setAttribute('data-latido', ''); setTimeout(() => v.removeAttribute('data-latido'), 900);
       turno = (turno + k + 1) % ventanas.length;
       return;
