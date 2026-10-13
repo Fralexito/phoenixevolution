@@ -49,10 +49,10 @@ const ACCOUNT_NAV_BASE = [
   { id: 'clanes',   label: 'Clanes',       path: 'clanes/',        icon: 'fa-shield-halved', grupo: 'social' },
   { id: 'ranking',  label: 'Ranking',      path: 'ranking/',       icon: 'fa-ranking-star', grupo: 'comunidad' },
   { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store', grupo: 'comunidad' },
-  { id: 'manager',  label: 'Liga Máster', path: 'manager/',       icon: 'fa-user-tie', grupo: 'jugar' },
+  { id: 'manager',  label: FX.clubUnificado ? 'Mi club' : 'Liga Máster', path: 'manager/',       icon: 'fa-user-tie', grupo: 'jugar' },
   { id: 'formatos', label: 'Formatos',     path: 'formatos/',      icon: 'fa-sitemap', grupo: 'comunidad' },
   { id: 'torneos',  label: 'Torneos',      path: 'torneos/',       icon: 'fa-trophy', grupo: 'comunidad' },
-  { id: 'miclub',   label: 'Mi club',      path: 'mi-club/',       icon: 'fa-shirt', grupo: 'jugar' },
+  { id: 'miclub',   label: 'Mi club',      path: 'mi-club/',       icon: 'fa-shirt', grupo: 'jugar', ...(FX.clubUnificado ? { menu: false } : {}) },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
@@ -66,7 +66,7 @@ const ACCOUNT_NAV_BASE = [
 // Lo público (En vivo, Salas, Chat, Clanes, Eventos, Ranking, Tienda, Torneos, Formatos) ya vive en los 3 grupos del menú
 // (arriba en PC, al inicio del panel en celular): aquí se ocultaba duplicado. Siguen en el buscador (`menu: false`).
 const ORDEN_CUENTA = { perfil: ['tu', 1], muro: ['tu', 2], logros: ['tu', 3], guardados: ['tu', 4], mensajes: ['tu', 5], amigos: ['tu', 6],
-  partidos: ['juego', 1], missalas: ['juego', 2], manager: ['juego', 3], miclub: ['juego', 4], moderacion: ['staff', 1], auditoria: ['staff', 2] };
+  partidos: ['juego', 1], missalas: ['juego', 2], manager: ['juego', 3], ...(FX.clubUnificado ? {} : { miclub: ['juego', 4] }), moderacion: ['staff', 1], auditoria: ['staff', 2] };
 const repartirCuenta = (lista) => {
   const pos = (n) => (ORDEN_CUENTA[n.id]?.[1] ?? 99);
   return lista.map((n) => n.abajo ? n : ORDEN_CUENTA[n.id] ? { ...n, grupo: ORDEN_CUENTA[n.id][0] } : { ...n, menu: false })
@@ -110,7 +110,7 @@ const DESC = {
   liga: FX.reparto ? 'Tabla, fechas y resultados de cada liga' : 'Tabla, fechas y resultados de cada división', competiciones: FX.reparto ? 'Todas las ligas en tarjetas: sede, organizador y accesos' : 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
   palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
   duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
-  missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
+  missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: FX.clubUnificado ? 'Tu club: carrera de DT, fichajes y vestuario del juego' : 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores', premios: 'La Paliza, Matagigantes, La Muralla y más, con cada resultado',
   tienda: 'Estética y mejoras para tu perfil',
@@ -140,7 +140,7 @@ const PILARES_REPARTO = [
   ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', FX.premios ? ['database', 'premios'] : ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
-    ['Tu club', ['manager>mercado', 'miclub']],
+    ['Tu club', FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub']],
   ], { lema: 'Lo que haces tú, ahora' }),
   conBloques('comunidad', 'Comunidad', 'fa-people-group', [
     ['Conversar', ['social', 'chatgeneral', 'noticias']],
@@ -149,7 +149,7 @@ const PILARES_REPARTO = [
 ];
 const PILARES_ANTES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
-  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'manager>mercado', 'miclub'], { lema: 'Del clic al partido' }),
+  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', ...(FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub'])], { lema: 'Del clic al partido' }),
   pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'chatgeneral', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];

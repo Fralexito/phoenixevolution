@@ -910,6 +910,12 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - «Elige tu club»: escudos en un anillo orbital (gira un poco al pasar el mouse), presupuesto y cuántos jugadores tiene cada club con su mejor media (nueva consulta pintarPlanteles). Sin sesión: tarjeta Entrar / Crear cuenta. Textos de la Liga Máster a 12 px mínimo.
 - Plantilla, Mercado, Oficina, Movimientos y el centro de control del staff funcionan igual.
 
+## Ronda 280 — Liga Máster y Mi club unificados en «Mi club» (FX.clubUnificado)
+- Fralex: «¿qué sentido tiene tener Liga Máster y Mi club? Mejor unificar», con toque fino, elegante, dinámico y premium.
+- /manager/ es ahora «Mi club»: una cabecera (chips: ventana de fichajes + estado de Phoenix Sync) y dos modos tipo tarjeta-interruptor: «Carrera de DT» (elegir club, plantilla, mercado, oficina, movimientos, staff — manager.js) y «Vestuario del juego» (antes /mi-club/: misión de 3 pasos, vestuario, aviso a mi juego — miClub.js y buzon.js cargados por `js/features/clubUnificado.js`). Modo en la dirección: #vestuario.
+- /mi-club/ redirige a /manager/#vestuario (así funcionan los enlaces viejos y lo que diga Phoenix Sync). Menú: un solo botón «Mi club» (manager adopta mercado y miclub); miclub fuera del panel de cuenta.
+- Las secciones de los modos no usan la aparición al bajar (quedaban invisibles un momento al cambiar de modo).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

@@ -4,6 +4,7 @@
 // BD: migración 079 (lm_*). Lógica: js/pages/manager.js. Conexión con el juego: /mercado/ (programa Phoenix Sync).
 import Layout from '../layouts/Layout.astro';
 import { FX } from '../data/experimento.js';
+import Plegable from '../components/Plegable.astro';
 const base = import.meta.env.BASE_URL;
 const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-magnifying-glass-dollar', 'Mercado'], ['oficina', 'fa-envelope-open-text', 'Oficina'], ['movimientos', 'fa-right-left', 'Movimientos']];
 ---
@@ -22,9 +23,9 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
           </svg>
           <div class="mcg-insignia lmg-insignia" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></div>
           <div class="mcg-texto min-w-0">
-            <div class="mcg-chips"><span class="mcg-chip mcg-beta">Beta · Galaxy League</span><span id="lmg-ventana" class="mcg-chip lmg-ventana"><i></i><b>Cargando…</b></span></div>
-            <h1 class="mcg-titulo">Liga Máster</h1>
-            <p class="mcg-sub">Tu carrera de DT: eliges un club, manejas su presupuesto y fichas jugadores. Al cerrar cada ventana, los movimientos llegan al juego con el option file oficial.</p>
+            <div class="mcg-chips"><span class="mcg-chip mcg-beta">Beta · Liga Máster</span><span id="lmg-ventana" class="mcg-chip lmg-ventana"><i></i><b>Cargando…</b></span>{FX.clubUnificado && <span class="mcg-chip" id="mc-estado" data-estado="out"><i></i><b class="mcg-e-out">Phoenix Sync</b><b class="mcg-e-off">Juego sin conectar</b><b class="mcg-e-on">Juego conectado</b></span>}</div>
+            <h1 class="mcg-titulo">{FX.clubUnificado ? 'Mi club' : 'Liga Máster'}</h1>
+            <p class="mcg-sub">{FX.clubUnificado ? 'Todo tu club en un solo lugar: tu carrera de DT en la Galaxy (presupuesto, fichajes y ofertas) y el vestuario de tu partida de PES 2021, que Phoenix Sync aplica en el juego.' : 'Tu carrera de DT: eliges un club, manejas su presupuesto y fichas jugadores. Al cerrar cada ventana, los movimientos llegan al juego con el option file oficial.'}</p>
           </div>
           <div id="mg-club" class="lmg-club"></div>
         </header>
@@ -47,6 +48,13 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </Fragment>
     )}
 
+    {FX.clubUnificado && (
+      <nav class="cu-modos" role="tablist" aria-label="Mi club">
+        <button type="button" role="tab" data-modo="carrera" aria-selected="true"><i class="fa-solid fa-user-tie"></i><span><b>Carrera de DT</b><small>Club, fichajes y ofertas</small></span></button>
+        <button type="button" role="tab" data-modo="vestuario" aria-selected="false"><i class="fa-solid fa-shirt"></i><span><b>Vestuario del juego</b><small>Fichas de tu partida de PES</small></span></button>
+      </nav>
+    )}
+    <div id="cu-carrera" class="space-y-6">
     <!-- Sin club: elegir uno -->
     <section id="mg-elegir" hidden class="space-y-3">
       <p class="mcg-kicker lmg-only">El vestuario te espera</p>
@@ -173,6 +181,56 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
         <div id="tr-lista" class="space-y-2"></div>
       </div>
     </section>
+    </div>
+
+    {FX.clubUnificado && (
+      <div id="cu-vestuario" hidden class="space-y-4">
+        <!-- Vestuario (antes /mi-club/): mismos ids que usa js/pages/miClub.js -->
+        <p id="mc-sin-sesion" class="!hidden"></p>
+        <div id="mc-vacio" hidden class="mcg-mision">
+          <div class="mcg-panel mcg-pasos">
+            <p class="mcg-kicker">Conecta tu partida</p>
+            <h2 class="mcg-h2">Trae tu club desde PES 2021</h2>
+            <ol class="mcg-ruta">
+              <li><span class="mcg-planeta">1</span><div><b>Abre Phoenix Sync en tu PC</b><p>El programa que conecta tu partida de Liga Máster con la web.</p></div></li>
+              <li><span class="mcg-planeta">2</span><div><b>Elige «Subir mi club a la web»</b><p>Sube tu plantilla, fichas y finanzas en segundos.</p></div></li>
+              <li><span class="mcg-planeta">3</span><div><b>Edita aquí y juega</b><p>Dorsales, posiciones, habilidades… Phoenix Sync los aplica en tu partida.</p></div></li>
+            </ol>
+            <div class="mcg-acciones"><a class="btn btn-primary" href={`${base}mis-salas/`}><i class="fa-solid fa-desktop"></i> Vincular mi PC</a><a class="btn btn-ghost" href={`${base}mercado/`}><i class="fa-solid fa-plug"></i> Qué es Phoenix Sync</a></div>
+          </div>
+          <div class="mcg-panel mcg-vista" aria-hidden="true">
+            <p class="mcg-kicker">Así se verá tu vestuario</p>
+            <div class="mcg-fantasma">
+              <div class="mcg-f-lista">{[['1','PT'],['4','DEC'],['8','MC'],['10','MO'],['7','ED'],['9','DC']].map(([n, p]) => <div class="mcg-f-fila"><span class="mcg-f-cara"></span><b>{n}</b><span class="mcg-f-linea"></span><small>{p}</small></div>)}</div>
+              <div class="mcg-f-ficha"><div class="mcg-f-top"><span class="mcg-f-cara mcg-f-grande"></span><span class="mcg-f-linea w-24"></span><b class="mcg-f-media">84</b></div>
+                {['Dorsal','Posición','Pie','Altura'].map((x) => <div class="mcg-f-campo"><small>{x}</small><span></span></div>)}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="mc-app" hidden class="space-y-4">
+          <div id="mc-selector" class="flex flex-wrap gap-2" hidden></div>
+          <section id="mc-cabecera" class="mc-cabecera glass-panel rounded-2xl p-4"></section>
+          <div class="mc-cuerpo">
+            <aside id="mc-plantilla" class="mc-plantilla" aria-label="Plantilla"></aside>
+            <section id="mc-detalle" class="mc-detalle" aria-live="polite"></section>
+          </div>
+        </div>
+        <div id="bz-card" hidden>
+          <Plegable titulo="Mandar aviso a mi juego" icono="fa-bell" resumen="Sale en PES 2021 (barra espaciadora) con Phoenix Link abierto">
+            <div class="space-y-3">
+              <label class="block text-xs text-gray-300" for="bz-texto">Tu mensaje <span id="bz-contador" class="text-gray-400 ml-1">0/600</span></label>
+              <textarea id="bz-texto" rows="3" maxlength="600" class="w-full rounded-lg bg-black/30 border border-white/15 p-2 text-sm text-white" placeholder="Ej.: Partido a las 9, conéctate"></textarea>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="bz-pc" class="rounded-lg bg-black/30 border border-white/15 p-2 text-sm text-white" aria-label="PC de destino"><option value="">Todas mis PCs</option></select>
+                <button type="button" id="bz-enviar" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+              </div>
+              <div id="bz-lista" class="space-y-2" aria-live="polite"></div>
+            </div>
+          </Plegable>
+        </div>
+      </div>
+    )}
   </div>
 </Layout>
-<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js'; import '../js/pages/managerTraspasosReales.js';</script>
+<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js'; import '../js/pages/managerTraspasosReales.js'; import '../js/features/clubUnificado.js';</script>
