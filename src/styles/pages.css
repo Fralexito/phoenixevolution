@@ -411,6 +411,8 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 :is(#cu-carrera, #cu-vestuario) section[data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; }
 /* Foto chiquita en las cartas de Mi club (ronda 284) */
 .mg-carta-top { gap: .4rem; }
-.mg-foto { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; margin-left: auto; border-radius: 99px; overflow: hidden; font-size: .9rem; color: rgb(var(--lc) / .55); background: rgb(var(--lc) / .08); border: 1px solid rgb(var(--lc) / .3); flex: none; }
-.mg-foto.con-foto { display: block; border-color: rgb(var(--lc) / .6); }
-.mg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
+.mg-foto { display: grid; place-items: center; align-self: center; width: 6.5rem; height: 6.5rem; margin: .1rem auto .25rem; border-radius: 99px; overflow: hidden; font-size: 2.4rem; color: rgb(var(--lc) / .45); background: radial-gradient(circle at 50% 35%, rgb(var(--lc) / .16), rgb(var(--lc) / .04) 70%); border: 2px solid rgb(var(--lc) / .3); box-shadow: 0 10px 24px -10px rgb(0 0 0 / .8); flex: none; }
+.mg-foto.con-foto { display: block; border-color: rgb(var(--lc) / .65); box-shadow: 0 0 0 4px rgb(var(--lc) / .08), 0 10px 24px -10px rgb(0 0 0 / .8); }
+.mg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
+@media (min-width: 1024px) { .mg-foto { width: 7rem; height: 7rem; } }
+.mg-carta .mg-nombre { text-align: center; } .mg-carta .mg-meta { text-align: center; }

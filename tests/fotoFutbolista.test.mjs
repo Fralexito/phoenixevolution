@@ -35,3 +35,16 @@ test('carrusel: solo fotos JPG con el nombre del jugador, sin logos ni la foto p
   const f = await fotosExtra('Lamine Yamal (test)', 'Lamine Yamal', 'https://upload.wikimedia.org/a/Lamine_Yamal_2024.jpg/330px-Lamine_Yamal_2024.jpg');
   assert.deepEqual(f.map((x) => x.url), ['https://upload.wikimedia.org/a/Lamine_Yamal_Euro.jpg/500px-Lamine_Yamal_Euro.jpg']);
 });
+
+test('carrusel: junta varias fuentes, sin repetir, máx. 4 extra; Commons exige el nombre completo (ronda 289)', async () => {
+  const { juntarFotos, esFotoDe } = await import('../src/js/features/fotoFutbolista.js');
+  assert.equal(esFotoDe('File:Rodrigo Moreno 2022.jpg', 'Rodri Hernández', true), false);
+  assert.equal(esFotoDe('File:Lamine Yamal Euro 2024.jpg', 'Lamine Yamal', true), true);
+  const f = (t) => ({ title: `File:${t}.jpg`, imageinfo: [{ mime: 'image/jpeg', thumburl: `https://upload.wikimedia.org/a/${t}.jpg/500px-${t}.jpg` }] });
+  const r = juntarFotos([
+    { pags: [f('Lamine Yamal 1'), f('Yamal 2')] },
+    { pags: [f('Lamine Yamal 1'), f('Yamal 3')] },
+    { pags: [f('Yamal 4'), f('Lamine Yamal 5'), f('Lamine Yamal 6'), f('Lamine Yamal 7')], estricto: true },
+  ], 'Lamine Yamal', 'https://upload.wikimedia.org/a/Yamal_2.jpg/330px-Yamal_2.jpg');
+  assert.deepEqual(r.map((x) => x.url.split('/').pop()), ['500px-Lamine Yamal 1.jpg', '500px-Yamal 3.jpg', '500px-Lamine Yamal 5.jpg', '500px-Lamine Yamal 6.jpg']);
+});

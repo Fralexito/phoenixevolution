@@ -80,31 +80,45 @@ export function montarFotos(root) {
 // ── Carrusel de la ficha (ronda 285). Pedido de Fralex: «la primera sí o sí de pecho para arriba, después otras, pero que sea reconocible».
 // La 1.ª es la foto principal del artículo (la del recuadro de Wikipedia, casi siempre un retrato). Las demás son las fotos del mismo
 // artículo cuyo NOMBRE DE ARCHIVO lleva el nombre del jugador (así es él, no un estadio ni un escudo). Solo JPG, sin logos ni banderas.
-const MAX_EXTRA = 5;
+const MAX_EXTRA = 4;   // + la principal = hasta 5 fotos en el carrusel
 const PROHIBIDAS = /(logo|crest|badge|flag|bandera|escudo|signature|firma|kit|icon|map|mapa|stadium|estadio|trophy|trofeo|\.svg|\.png|\.gif)/i;
 /** Nombre de archivo de una URL de Wikimedia, sin el «330px-» de la miniatura (para no repetir la foto principal). */
 export const archivoDe = (u) => { try { return norm(decodeURIComponent(String(u).split('?')[0].split('/').pop() || '').replace(/^\d+px-/, '')).replace(/^(file|archivo):/, '').replace(/ /g, '_'); } catch { return ''; } };
-/** ¿El archivo «File:…» parece una foto del jugador? (nombre de archivo con su nombre o apellido, sin palabras prohibidas) */
-export function esFotoDe(archivo, nombre) {
+/** ¿El archivo «File:…» parece una foto del jugador? estricto = deben estar TODAS las palabras de su nombre (para la búsqueda general). */
+export function esFotoDe(archivo, nombre, estricto = false) {
   const a = norm(archivo); if (!/\.jpe?g$/i.test(a) || PROHIBIDAS.test(a)) return false;
   const palabras = norm(nombre).split(/[\s-]+/).filter((w) => w.length > 2);
-  return palabras.some((w) => a.includes(w));
+  return estricto ? palabras.length > 0 && palabras.every((w) => a.includes(w)) : palabras.some((w) => a.includes(w));
 }
-/** Hasta 5 fotos más del jugador, del mismo artículo de Wikipedia (titulo). Devuelve [{ url }] (puede ser vacío). */
+// Varias fuentes LIBRES (ronda 289, pedido de Fralex «usa fotos de varias fuentes, unas 5»): todas con licencia que permite mostrarlas.
+//   1) fotos del artículo en Wikipedia en inglés  2) en Wikipedia en español  3) búsqueda en Wikimedia Commons (la biblioteca de fotos libres).
+const IMG = 'prop=imageinfo&iiprop=url|mime|size&iiurlwidth=500';
+async function paginas(u) { try { const r = await fetch(u); if (!r.ok) return []; return Object.values((await r.json())?.query?.pages ?? {}); } catch { return []; } }
+/** Une, limpia y ordena las fotos de las fuentes. Exportada para el test. */
+export function juntarFotos(grupos, nombre, principal, max = MAX_EXTRA) {
+  const vistos = new Set([archivoDe(principal)]); const fotos = [];
+  for (const { pags, estricto } of grupos) {
+    for (const p of pags) {
+      const ii = p.imageinfo?.[0]; if (ii?.mime !== 'image/jpeg' || !esFotoDe(p.title, nombre, estricto)) continue;
+      const url = ii.thumburl || ii.url; const a = archivoDe(p.title);
+      if (!esWikimedia(url) || vistos.has(a)) continue;
+      vistos.add(a); fotos.push({ url });
+      if (fotos.length >= max) return fotos;
+    }
+  }
+  return fotos;
+}
+/** Hasta 4 fotos más del jugador (además de la principal). Devuelve [{ url }] (puede ser vacío). */
 export async function fotosExtra(titulo, nombre, principal) {
-  const clave = `x|${norm(titulo)}`;
+  const clave = `x2|${norm(titulo)}`;
   const c = cache[clave]; if (c && Date.now() - c.t < DIAS) return c.fotos ?? [];
-  try {
-    const u = `${API}?action=query&format=json&origin=*&titles=${encodeURIComponent(titulo)}&generator=images&gimlimit=40&prop=imageinfo&iiprop=url|mime&iiurlwidth=500`;
-    const r = await fetch(u); if (!r.ok) return [];
-    const pags = Object.values((await r.json())?.query?.pages ?? {});
-    const ya = archivoDe(principal);
-    const fotos = pags
-      .filter((p) => p.imageinfo?.[0]?.mime === 'image/jpeg' && esFotoDe(p.title, nombre))
-      .map((p) => ({ url: p.imageinfo[0].thumburl || p.imageinfo[0].url, archivo: archivoDe(p.title) }))
-      .filter((f) => esWikimedia(f.url) && f.archivo !== ya)
-      .slice(0, MAX_EXTRA).map(({ url }) => ({ url }));
-    cache[clave] = { fotos, t: Date.now() }; guardar();
-    return fotos;
-  } catch { return []; }
+  const t = encodeURIComponent(titulo); const q = encodeURIComponent(`"${nombre}"`);
+  const [en, es, commons] = await Promise.all([
+    paginas(`${API}?action=query&format=json&origin=*&titles=${t}&generator=images&gimlimit=40&${IMG}`),
+    paginas(`https://es.wikipedia.org/w/api.php?action=query&format=json&origin=*&titles=${encodeURIComponent(nombre)}&redirects=1&generator=images&gimlimit=40&${IMG}`),
+    paginas(`https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=25&gsrsearch=${q}&${IMG}`),
+  ]);
+  const fotos = juntarFotos([{ pags: en }, { pags: es }, { pags: commons, estricto: true }], nombre, principal);
+  cache[clave] = { fotos, t: Date.now() }; guardar();
+  return fotos;
 }

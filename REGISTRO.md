@@ -163,3 +163,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 2026-10-13 09:27 (Lima) | Cuenta Opus | Chat flotante · contactos | Ronda 286: lista de amigos separada en «En línea» y «Desconectados», cada grupo con su título | — | HECHO | —
 2026-10-13 09:29 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 287: fotos pequeñas de las cartas de Mi club (quitado loading=lazy en una imagen fuera de la página) | — | HECHO | —
 2026-10-13 09:31 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 288: carrusel de la ficha avanza solo cada 4 s en loop (FX.carruselAuto), se pausa al tocarlo y con Animaciones reducidas. Transfermarkt descartado como fuente de fotos (derechos) | — | HECHO | —
+2026-10-13 09:36 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 289: carrusel con varias fuentes libres (Wikipedia en/es + Wikimedia Commons), hasta 5 fotos; foto de las cartas de Mi club mucho más grande y centrada | — | HECHO | —
