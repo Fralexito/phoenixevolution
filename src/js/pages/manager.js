@@ -100,8 +100,11 @@ async function pintarPlantilla() {
     return;
   }
   const off = cfg.ventana_abierta ? '' : 'disabled';
-  const btn = (j) => `<div class="mg-acciones"><button type="button" class="mg-mini" data-vender="${j.id}" data-nombre="${esc(j.nombre)}" data-valor="${j.valor}" ${off} title="Vender a un club CPU por su valor"><i class="fa-solid fa-hand-holding-dollar"></i></button><button type="button" class="mg-mini" data-liberar="${j.id}" ${off} title="Liberar (queda agente libre)"><i class="fa-solid fa-user-minus"></i></button></div>`;
-  $('mg-plantilla').innerHTML = LINEAS.map(([id, t]) => { const g = data.filter((j) => linea(j.posicion) === id); return g.length ? `<div class="mg-linea" data-linea="${id}">
+  // Ronda 292: las acciones van ABAJO de la carta (antes tapaban la posición), con su palabra.
+  const btn = (j) => `<div class="mg-acciones"><button type="button" class="mg-mini" data-vender="${j.id}" data-nombre="${esc(j.nombre)}" data-valor="${j.valor}" ${off} title="Vender a un club CPU por su valor"><i class="fa-solid fa-hand-holding-dollar"></i><span>Vender</span></button><button type="button" class="mg-mini" data-liberar="${j.id}" ${off} title="Liberar (queda agente libre)"><i class="fa-solid fa-user-minus"></i><span>Liberar</span></button></div>`;
+  const vistos = ordenar(data.filter((j) => !herr.linea || linea(j.posicion) === herr.linea));
+  if (!vistos.length) { $('mg-plantilla').innerHTML = vacio('fa-filter', 'No tienes jugadores en esa línea', 'Elige «Todos» para ver toda tu plantilla.'); return; }
+  $('mg-plantilla').innerHTML = LINEAS.map(([id, t]) => { const g = vistos.filter((j) => linea(j.posicion) === id); return g.length ? `<div class="mg-linea" data-linea="${id}">
       <h3 class="mg-linea-tit"><span></span>${t} <small>${g.length}</small></h3><div class="mg-grid">${g.map((j) => carta(j, btn(j))).join('')}</div></div>` : ''; }).join('');
   montarFotos($('mg-plantilla'));
 }
@@ -118,16 +121,40 @@ function ponerVista(v) {
 { let v = 'grande'; try { v = localStorage.getItem(CLAVE_VISTA) || 'grande'; } catch { /* sin almacenamiento */ } ponerVista(v); }
 document.addEventListener('click', (e) => { const b = e.target.closest('.mg-vista [data-vista]'); if (b) ponerVista(b.dataset.vista); });
 
+// Herramientas de las cartas (ronda 292, pedido de Fralex): ver solo una línea, ordenar a gusto y agrandar/alejar.
+const CLAVE_HERR = 'pes-mg-herr';
+const herr = { linea: '', orden: 'media', tam: 2 };
+try { const g = JSON.parse(localStorage.getItem(CLAVE_HERR) || '{}'); if (['media', 'valor', 'edad', 'nombre'].includes(g.orden)) herr.orden = g.orden; if (g.tam >= 1 && g.tam <= 4) herr.tam = g.tam; } catch { /* sin almacenamiento */ }
+const ORDEN = { media: (a, b) => (b.media ?? 0) - (a.media ?? 0), valor: (a, b) => Number(b.valor || 0) - Number(a.valor || 0), edad: (a, b) => (a.edad ?? 99) - (b.edad ?? 99), nombre: (a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es') };
+const ordenar = (lista) => [...lista].sort((a, b) => ORDEN[herr.orden](a, b) || ORDEN.media(a, b));
+const POS_DE = (l) => Object.keys(LINEA).filter((k) => LINEA[k] === l);
+function pintarHerr() {
+  $('mg-panel')?.setAttribute('data-tam', String(herr.tam));
+  document.querySelectorAll('.mg-lineas [data-linea]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.linea === herr.linea)));
+  document.querySelectorAll('.mg-herr [data-orden]').forEach((x) => { x.value = herr.orden; });
+  document.querySelectorAll('.mg-tam [data-tam]').forEach((b) => { b.disabled = (b.dataset.tam === '-1' && herr.tam <= 1) || (b.dataset.tam === '1' && herr.tam >= 4); });
+  try { localStorage.setItem(CLAVE_HERR, JSON.stringify({ orden: herr.orden, tam: herr.tam })); } catch { /* no se recuerda */ }
+}
+const repintarCartas = () => { pintarHerr(); if (tabActual() === 'mercado') pintarMercado(); else pintarPlantilla(); };
+document.addEventListener('click', (e) => {
+  const l = e.target.closest('.mg-lineas [data-linea]'); if (l) { herr.linea = l.dataset.linea; repintarCartas(); return; }
+  const t = e.target.closest('.mg-tam [data-tam]'); if (t && !t.disabled) { herr.tam = Math.max(1, Math.min(4, herr.tam + Number(t.dataset.tam))); pintarHerr(); }   // solo cambia el tamaño: no hace falta volver a pedir datos
+});
+document.addEventListener('change', (e) => { if (e.target.matches('.mg-herr [data-orden]')) { herr.orden = e.target.value; repintarCartas(); } });
+pintarHerr();
+
 let tBuscar = null;
 async function pintarMercado() {
   const q = $('mg-buscar').value.trim(); const pos = $('mg-pos').value; const libres = $('mg-libres').checked;
-  let s = supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, club_id').eq('liga', LIGA).order('media', { ascending: false }).limit(60);
+  const col = { media: ['media', false], valor: ['valor', false], edad: ['edad', true], nombre: ['nombre', true] }[herr.orden];
+  let s = supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, club_id').eq('liga', LIGA).order(col[0], { ascending: col[1], nullsFirst: false }).limit(60);
+  if (herr.linea) s = s.in('posicion', POS_DE(herr.linea));
   if (q) s = s.ilike('nombre', `%${q.replace(/[%_]/g, '')}%`);
   if (pos) s = s.eq('posicion', pos);
   if (libres) s = s.is('club_id', null); else if (club) s = s.neq('club_id', club.id);
   const { data, error } = await s;
   if (error) { $('mg-mercado').textContent = 'No se pudo buscar.'; return; }
-  const lista = data.filter((j) => j.club_id !== club?.id);
+  const lista = ordenar(data.filter((j) => j.club_id !== club?.id));
   $('mg-mercado').innerHTML = !lista.length ? vacio('fa-magnifying-glass', 'Sin resultados', 'Prueba con otro nombre o posición.')
     : `<div class="mg-grid">${lista.map((j) => { const vend = clubes.get(j.club_id); const directo = !vend || !vend.dueno;
       const origen = `<p class="mg-club-chip">${vend ? `${escudo(vend, 'w-4 h-4')} <span>${esc(vend.nombre)}</span>` : '<i class="fa-solid fa-unlock text-emerald-300"></i> <span>Agente libre</span>'}</p>${dtHTML(vend)}`;

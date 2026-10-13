@@ -166,3 +166,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 2026-10-13 09:36 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 289: carrusel con varias fuentes libres (Wikipedia en/es + Wikimedia Commons), hasta 5 fotos; foto de las cartas de Mi club mucho más grande y centrada | — | HECHO | —
 2026-10-13 09:41 (Lima) | Cuenta Opus | Liga Máster · Mi club | Ronda 290: selector Grandes / Compactas para ver las cartas de Plantilla y Mercado | — | HECHO | —
 2026-10-13 09:46 (Lima) | Cuenta Opus | Liga Máster · Mi club | Ronda 291: club centrado en las cartas del Mercado y DT dueño mostrado de forma sutil (foto + nombre, enlace a su perfil) | — | HECHO | —
+2026-10-13 09:52 (Lima) | Cuenta Opus | Liga Máster · Mi club | Ronda 292: filtro por línea, ordenar y agrandar/alejar las cartas; Vender/Liberar movidos abajo de la carta | — | HECHO | —

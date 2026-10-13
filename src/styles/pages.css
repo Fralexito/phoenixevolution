@@ -252,7 +252,6 @@
 .mg-carta-pie { margin-top: auto; padding-top: .55rem; }
 .mg-carta .mg-mini { position: absolute; top: .55rem; right: .55rem; width: 1.7rem; height: 1.7rem; display: grid; place-items: center; border-radius: .5rem; font-size: .7rem; color: #9ca3af; background: rgb(0 0 0 / .45); opacity: 0; transition: opacity .15s, color .15s; }
 .mg-carta:hover .mg-mini, .mg-mini:focus-visible { opacity: 1; } .mg-mini:hover { color: #fda4af; }
-.mg-carta-pie:has(.mg-mini) { padding: 0; }
 @media (pointer: coarse) { .mg-carta .mg-mini { opacity: .8; } }
 
 .mg-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding: .7rem; border-radius: 1rem; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); }
@@ -327,8 +326,7 @@
 .mg-club-t b { display: block; font-size: .82rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .mg-club-t small { display: block; font-size: .68rem; color: #9ca3af; }
 .mg-club-t small i { color: var(--color-galaxy-400); }
 @media (prefers-reduced-motion: reduce) { .mg-switch::after, .mg-drop { transition: none; } .mg-prev { animation: none; } }
-.mg-acciones { position: absolute; top: .55rem; right: .55rem; display: flex; gap: .3rem; }
-.mg-acciones .mg-mini { position: static; }
+.mg-acciones { display: flex; justify-content: center; gap: .4rem; }
 .mg-carta:hover .mg-acciones .mg-mini { opacity: 1; }
 
 /* ---------- Perfil · sección «Resumen» (ronda 226) ----------
@@ -414,7 +412,6 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 .mg-foto { display: grid; place-items: center; align-self: center; width: 6.5rem; height: 6.5rem; margin: .1rem auto .25rem; border-radius: 99px; overflow: hidden; font-size: 2.4rem; color: rgb(var(--lc) / .45); background: radial-gradient(circle at 50% 35%, rgb(var(--lc) / .16), rgb(var(--lc) / .04) 70%); border: 2px solid rgb(var(--lc) / .3); box-shadow: 0 10px 24px -10px rgb(0 0 0 / .8); flex: none; }
 .mg-foto.con-foto { display: block; border-color: rgb(var(--lc) / .65); box-shadow: 0 0 0 4px rgb(var(--lc) / .08), 0 10px 24px -10px rgb(0 0 0 / .8); }
 .mg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
-@media (min-width: 1024px) { .mg-foto { width: 7rem; height: 7rem; } }
 .mg-carta .mg-nombre { text-align: center; } .mg-carta .mg-meta { text-align: center; }
 
 /* Ronda 290 · selector «Grandes / Compactas» y la vista compacta de las cartas de Mi club */
@@ -423,12 +420,8 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 .mg-vista button:hover { color: #fff; } .mg-vista button:active { transform: scale(.96); }
 .mg-vista button[aria-pressed='true'] { color: #fff; background: rgb(0 229 255 / .14); box-shadow: inset 0 0 0 1px rgb(0 229 255 / .35); }
 @media (max-width: 420px) { .mg-vista button span { display: none; } }
-#mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
-@media (min-width: 640px) { #mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { #mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1440px) { #mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-#mg-panel[data-vista='compacta'] .mg-carta { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) auto; column-gap: .7rem; row-gap: .1rem; align-items: center; padding: .6rem .75rem; }
-#mg-panel[data-vista='compacta'] .mg-foto { grid-column: 1; grid-row: 1 / span 2; width: 3.25rem; height: 3.25rem; margin: 0; font-size: 1.2rem; border-width: 1.5px; }
+#mg-panel[data-vista='compacta'] .mg-carta { display: grid; grid-template-columns: var(--mg-foto) minmax(0, 1fr) auto; column-gap: .7rem; row-gap: .1rem; align-items: center; padding: .6rem .75rem; }
+#mg-panel[data-vista='compacta'] .mg-foto { grid-column: 1; grid-row: 1 / span 2; width: var(--mg-foto); height: var(--mg-foto); margin: 0; font-size: calc(var(--mg-foto) * .38); border-width: 1.5px; }
 #mg-panel[data-vista='compacta'] .mg-carta-top { grid-column: 3; grid-row: 1 / span 2; flex-direction: row; align-items: center; gap: .5rem; }
 #mg-panel[data-vista='compacta'] .mg-media { font-size: 1.5rem; }
 #mg-panel[data-vista='compacta'] .mg-nombre { grid-column: 2; grid-row: 1; margin: 0; text-align: left; align-self: end; }
@@ -447,3 +440,38 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 .mg-carta:hover .mg-dt, .mg-dt:focus-within { opacity: 1; } .mg-dt a:hover span { color: #fff; text-decoration: underline; }
 #mg-panel[data-vista='compacta'] .mg-club-chip, #mg-panel[data-vista='compacta'] .mg-dt { justify-content: flex-start; }
 #mg-panel[data-vista='compacta'] .mg-carta > .mg-club-chip, #mg-panel[data-vista='compacta'] .mg-carta > .mg-dt { grid-column: 2 / -1; }
+
+/* Ronda 292 · herramientas de las cartas: línea, orden y tamaño (agrandar / alejar) */
+.mg-herr { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.mg-herr-der { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.mg-lineas { display: flex; gap: .3rem; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.mg-lineas button { flex: none; min-height: 2rem; padding: 0 .8rem; border-radius: 99px; font: 800 12px var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #9ca3af; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .25); transition: background-color 160ms cubic-bezier(.22,1,.36,1), color 160ms cubic-bezier(.22,1,.36,1), border-color 160ms cubic-bezier(.22,1,.36,1), transform 120ms cubic-bezier(.22,1,.36,1); }
+.mg-lineas button:hover { color: #fff; } .mg-lineas button:active { transform: scale(.96); }
+.mg-lineas button[aria-pressed='true'] { color: #fff; background: rgb(0 229 255 / .14); border-color: rgb(0 229 255 / .45); }
+.mg-orden { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.4rem; padding: 0 .6rem; border-radius: .7rem; font-size: 12px; color: #9ca3af; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); }
+.mg-orden select { background: transparent; color: #e5e7eb; font: 700 12px var(--font-display); letter-spacing: .04em; text-transform: uppercase; padding-right: .2rem; outline: none; cursor: pointer; }
+.mg-orden select option { background: #0b0d1c; color: #e5e7eb; text-transform: none; }
+.mg-tam { display: inline-flex; gap: .2rem; padding: .2rem; border-radius: .7rem; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); }
+.mg-tam button { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: .5rem; font-size: 13px; color: #9ca3af; transition: background-color 160ms cubic-bezier(.22,1,.36,1), color 160ms cubic-bezier(.22,1,.36,1), transform 120ms cubic-bezier(.22,1,.36,1); }
+.mg-tam button:hover:not(:disabled) { color: #fff; background: rgb(255 255 255 / .06); } .mg-tam button:active:not(:disabled) { transform: scale(.92); }
+.mg-tam button:disabled { opacity: .3; cursor: default; }
+/* Tamaños: 1 = alejado (más cartas) … 4 = muy grandes. Grandes y compactas usan su propia medida. */
+#mg-panel { --mg-min: 10.5rem; --mg-cap: calc(50% - .35rem); --mg-foto: 6.5rem; }
+#mg-panel[data-tam='1'] { --mg-min: 8.5rem; --mg-foto: 4.75rem; }
+#mg-panel[data-tam='3'] { --mg-min: 13.5rem; --mg-foto: 8.5rem; }
+#mg-panel[data-tam='4'] { --mg-min: 17rem; --mg-cap: 100%; --mg-foto: 11rem; }
+#mg-panel[data-vista='compacta'] { --mg-min: 17rem; --mg-cap: 100%; --mg-foto: 3.25rem; }
+#mg-panel[data-vista='compacta'][data-tam='1'] { --mg-min: 13rem; --mg-foto: 2.5rem; }
+#mg-panel[data-vista='compacta'][data-tam='3'] { --mg-min: 21rem; --mg-foto: 4.25rem; }
+#mg-panel[data-vista='compacta'][data-tam='4'] { --mg-min: 26rem; --mg-foto: 5.5rem; }
+#mg-panel .mg-grid { grid-template-columns: repeat(auto-fill, minmax(min(var(--mg-min), var(--mg-cap)), 1fr)); }
+#mg-panel[data-vista='compacta'] .mg-grid { gap: .5rem; }
+#mg-panel .mg-foto { width: var(--mg-foto); height: var(--mg-foto); font-size: calc(var(--mg-foto) * .37); }
+#mg-panel[data-tam='1'] .mg-media { font-size: 1.5rem; } #mg-panel[data-tam='4'] .mg-media { font-size: 2.4rem; }
+#mg-panel[data-tam='4'] .mg-nombre { font-size: 1rem; }
+/* Acciones (Vender / Liberar) abajo de la carta, sutiles */
+.mg-carta .mg-acciones .mg-mini { position: static; display: inline-flex; align-items: center; gap: .35rem; width: auto; height: 1.9rem; padding: 0 .6rem; border-radius: .55rem; font: 700 12px var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #9ca3af; background: rgb(255 255 255 / .04); border: 1px solid rgb(255 255 255 / .08); opacity: .75; transition: opacity 160ms cubic-bezier(.22,1,.36,1), color 160ms cubic-bezier(.22,1,.36,1), border-color 160ms cubic-bezier(.22,1,.36,1); }
+.mg-carta:hover .mg-acciones .mg-mini, .mg-carta .mg-acciones .mg-mini:focus-visible { opacity: 1; }
+.mg-carta .mg-acciones .mg-mini:hover:not(:disabled) { color: #fda4af; border-color: rgb(253 164 175 / .4); }
+.mg-carta .mg-acciones .mg-mini:disabled { opacity: .35; cursor: not-allowed; }
+#mg-panel[data-tam='1'] .mg-acciones .mg-mini span { display: none; }
