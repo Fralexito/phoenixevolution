@@ -7,6 +7,7 @@ import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { haceCuanto } from '../core/notifs.js';
 import { href } from '../core/config.js';
 import { montarFotos } from '../features/fotoFutbolista.js';
+import { avatarHTML } from '../core/avatar.js';
 import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);
@@ -16,7 +17,7 @@ const ERR = { YA_TIENES_CLUB: 'Ya tienes un club.', CLUB_OCUPADO: 'Ese club ya t
   PRESUPUESTO_INSUFICIENTE: 'No te alcanza el presupuesto.', OFERTA_BAJA: 'La oferta es menor al valor del jugador.', YA_OFERTASTE: 'Ya tienes una oferta pendiente por él.',
   PLANTILLA_LLENA: 'Plantilla llena (máx. 40). Libera o vende a un jugador antes de fichar.', JUGADOR_NO_DISPONIBLE: 'Ese jugador acaba de cambiar de club. Recarga.', NO_ES_CPU: 'Ese club tiene DT: hazle una oferta.', YA_ES_TUYO: 'Ya es tu jugador.', YA_NO_ES_TUYO: 'Ese jugador ya no está en tu club.', YA_REVERTIDO: 'Ese movimiento ya fue revertido.', JUGADOR_YA_CAMBIO: 'El jugador ya cambió de club después; no se puede revertir.', SIN_CLUB: 'Primero elige un club.' };
 const msg = (e) => { const k = Object.keys(ERR).find((x) => String(e?.message).includes(x)); return k ? ERR[k] : (e?.message || 'Error'); };
-let yo = null; let club = null; let cfg = null; let clubes = new Map();
+let yo = null; let club = null; let cfg = null; let clubes = new Map(); let dts = new Map();   // dts: perfil de cada DT dueño de un club
 const escudo = (c, cls = 'w-10 h-10') => safeUrl(c?.escudo_url) ? `<img src="${esc(safeUrl(c.escudo_url))}" alt="" class="${cls} object-contain">` : `<span class="${cls} rounded-full bg-galaxy-800 grid place-items-center text-galaxy-400"><i class="fa-solid fa-shield-halved"></i></span>`;
 const LINEA = { PT: 'por', DEC: 'def', LD: 'def', LI: 'def', MCD: 'med', MC: 'med', MO: 'med', MD: 'med', MI: 'med', ED: 'del', EI: 'del', SD: 'del', DC: 'del' };
 const LINEAS = [['por', 'Porteros'], ['def', 'Defensas'], ['med', 'Mediocampo'], ['del', 'Delanteros'], ['otros', 'Otros']];
@@ -38,7 +39,14 @@ async function cargarBase() {
     supabase.from('lm_clubes').select('id, nombre, escudo_url, aprobado, dueno, presupuesto').eq('liga', LIGA).order('nombre'),
   ]);
   cfg = c; clubes = new Map((cl ?? []).map((x) => [x.id, x])); club = (cl ?? []).find((x) => x.dueno === yo) ?? null;
+  const ids = [...new Set((cl ?? []).map((x) => x.dueno).filter(Boolean))];
+  if (ids.length) { const { data: pf } = await supabase.from('perfiles').select('id, username, nombre_display, avatar_url').in('id', ids); dts = new Map((pf ?? []).map((p) => [p.id, p])); }
 }
+/** DT dueño del club, sutil: su foto pequeña y su nombre (ronda 291, pedido de Fralex). */
+const dtHTML = (c) => { const p = c?.dueno && dts.get(c.dueno); if (!p) return c?.dueno ? '<p class="mg-dt"><i class="fa-solid fa-user-tie"></i><span>DT de la liga</span></p>' : '';
+  const nom = p.nombre_display || p.username || 'DT'; const url = p.username ? href(`perfil/?u=${encodeURIComponent(p.username)}`) : null;
+  const dentro = `<span class="mg-dt-av">${avatarHTML(p.avatar_url, nom, 18)}</span><span>${esc(nom)}</span>`;
+  return `<p class="mg-dt" title="Este jugador es del club de ${esc(nom)}">${url ? `<a href="${esc(url)}">${dentro}</a>` : dentro}</p>`; };
 
 let resumen = { n: 0, valor: 0, mediaXI: null };
 function pintarCabecera() {
@@ -122,7 +130,7 @@ async function pintarMercado() {
   const lista = data.filter((j) => j.club_id !== club?.id);
   $('mg-mercado').innerHTML = !lista.length ? vacio('fa-magnifying-glass', 'Sin resultados', 'Prueba con otro nombre o posición.')
     : `<div class="mg-grid">${lista.map((j) => { const vend = clubes.get(j.club_id); const directo = !vend || !vend.dueno;
-      const origen = `<p class="mg-club-chip">${vend ? `${escudo(vend, 'w-4 h-4')} ${esc(vend.nombre)}${vend.dueno ? ' <i class="fa-solid fa-user-tie text-galaxy-400" title="Club de otro DT"></i>' : ''}` : '<i class="fa-solid fa-unlock text-emerald-300"></i> Agente libre'}</p>`;
+      const origen = `<p class="mg-club-chip">${vend ? `${escudo(vend, 'w-4 h-4')} <span>${esc(vend.nombre)}</span>` : '<i class="fa-solid fa-unlock text-emerald-300"></i> <span>Agente libre</span>'}</p>${dtHTML(vend)}`;
       return carta(j, `<button type="button" class="btn ${directo ? 'btn-primary' : ''} !min-h-8 !text-[11px] w-full" data-ofertar="${j.id}" data-valor="${j.valor}" data-directo="${directo ? 1 : 0}" data-nombre="${esc(j.nombre)}" ${cfg.ventana_abierta ? '' : 'disabled'}>${directo ? '<i class="fa-solid fa-signature"></i> Fichar' : '<i class="fa-solid fa-hand-holding-dollar"></i> Ofertar'}</button>`, origen); }).join('')}</div>`;
   montarFotos($('mg-mercado'));
 }

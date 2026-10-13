@@ -434,3 +434,16 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 #mg-panel[data-vista='compacta'] .mg-nombre { grid-column: 2; grid-row: 1; margin: 0; text-align: left; align-self: end; }
 #mg-panel[data-vista='compacta'] .mg-meta { grid-column: 2; grid-row: 2; text-align: left; align-self: start; }
 #mg-panel[data-vista='compacta'] .mg-carta > :not(.mg-foto, .mg-carta-top, .mg-nombre, .mg-meta) { grid-column: 1 / -1; }
+
+/* Ronda 291 · club centrado en las cartas grandes y el DT dueño, sutil */
+.mg-club-chip { justify-content: center; } .mg-club-chip span { overflow: hidden; text-overflow: ellipsis; }
+.mg-dt { display: flex; justify-content: center; margin-top: .15rem; font-size: 12px; color: #9ca3af; opacity: .8; transition: opacity 160ms cubic-bezier(.22,1,.36,1); }
+.mg-dt a, .mg-dt { align-items: center; gap: .35rem; min-width: 0; } .mg-dt a { display: inline-flex; color: inherit; }
+.mg-dt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mg-dt-av { display: inline-grid; flex: none; width: 18px; height: 18px; border-radius: 99px; overflow: hidden; font-size: 10px; box-shadow: 0 0 0 1px rgb(255 255 255 / .18); }
+.mg-dt-av { place-items: center; background: rgb(255 255 255 / .06); } .mg-dt-av img { width: 100%; height: 100%; object-fit: cover; }
+.mg-dt .mg-dt-av + span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mg-dt i { font-size: 11px; color: var(--color-galaxy-400); }
+.mg-carta:hover .mg-dt, .mg-dt:focus-within { opacity: 1; } .mg-dt a:hover span { color: #fff; text-decoration: underline; }
+#mg-panel[data-vista='compacta'] .mg-club-chip, #mg-panel[data-vista='compacta'] .mg-dt { justify-content: flex-start; }
+#mg-panel[data-vista='compacta'] .mg-carta > .mg-club-chip, #mg-panel[data-vista='compacta'] .mg-carta > .mg-dt { grid-column: 2 / -1; }
