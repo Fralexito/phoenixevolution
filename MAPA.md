@@ -904,6 +904,12 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Sin club: «Misión de lanzamiento» en 3 pasos como planetas unidos por una órbita (Abrir Phoenix Sync → Subir mi club → Editar y jugar) con botones «Vincular mi PC» y «Ver la Liga Máster»; al lado, vista previa (maqueta) del vestuario. Sin sesión: tarjeta con Entrar / Crear cuenta. Sudario: azul + dorado.
 - Con club: el vestuario sigue igual que antes.
 
+## Ronda 279 — Liga Máster galáctica (FX.ligaMasterGalaxia)
+- Pedido de Fralex: mejorar también el diseño de Liga Máster, misma familia que Mi club (ronda 278). `pages/manager.astro` (rama tras bandera, mismos ids), `js/pages/manager.js`, estilos al final de `styles/pages.css` (todo dentro de `.lmg`; reutiliza `.mcg-*` de miClub.css).
+- Cabecera con estrellas, órbitas e insignia (DT); chip de la ventana de fichajes en vivo (abierta/cerrada); tu club y sus 4 cifras dentro de la cabecera.
+- «Elige tu club»: escudos en un anillo orbital (gira un poco al pasar el mouse), presupuesto y cuántos jugadores tiene cada club con su mejor media (nueva consulta pintarPlanteles). Sin sesión: tarjeta Entrar / Crear cuenta. Textos de la Liga Máster a 12 px mínimo.
+- Plantilla, Mercado, Oficina, Movimientos y el centro de control del staff funcionan igual.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

@@ -3,12 +3,38 @@
 // elegir un club aprobado, y fichar/vender en ventanas. Los movimientos se reflejan en el juego vía option file (claude/liga-master-plan.md).
 // BD: migración 079 (lm_*). Lógica: js/pages/manager.js. Conexión con el juego: /mercado/ (programa Phoenix Sync).
 import Layout from '../layouts/Layout.astro';
+import { FX } from '../data/experimento.js';
 const base = import.meta.env.BASE_URL;
 const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-magnifying-glass-dollar', 'Mercado'], ['oficina', 'fa-envelope-open-text', 'Oficina'], ['movimientos', 'fa-right-left', 'Movimientos']];
 ---
 <Layout title="Liga Máster" active="manager" description="Tu carrera de DT en la Galaxy League: club, presupuesto y fichajes que llegan al juego.">
-  <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6">
+  <div class={`max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6${FX.ligaMasterGalaxia ? ' lmg' : ''}`}>
 
+    {FX.ligaMasterGalaxia ? (
+      <Fragment>
+        <!-- Ronda 279 (FX.ligaMasterGalaxia): cabecera galáctica, igual familia que Mi club. Mismos ids que usa manager.js -->
+        <header id="mg-portada" class="mcg-hero lmg-hero">
+          <div class="mcg-estrellas" aria-hidden="true"></div>
+          <svg class="mcg-orbitas" viewBox="0 0 240 240" aria-hidden="true">
+            <ellipse cx="120" cy="120" rx="112" ry="44" transform="rotate(-18 120 120)"/>
+            <ellipse cx="120" cy="120" rx="88" ry="30" transform="rotate(24 120 120)"/>
+            <circle class="mcg-luna" cx="226" cy="98" r="5"/><circle class="mcg-luna mcg-luna2" cx="40" cy="96" r="3.5"/>
+          </svg>
+          <div class="mcg-insignia lmg-insignia" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="mcg-texto min-w-0">
+            <div class="mcg-chips"><span class="mcg-chip mcg-beta">Beta · Galaxy League</span><span id="lmg-ventana" class="mcg-chip lmg-ventana"><i></i><b>Cargando…</b></span></div>
+            <h1 class="mcg-titulo">Liga Máster</h1>
+            <p class="mcg-sub">Tu carrera de DT: eliges un club, manejas su presupuesto y fichas jugadores. Al cerrar cada ventana, los movimientos llegan al juego con el option file oficial.</p>
+          </div>
+          <div id="mg-club" class="lmg-club"></div>
+        </header>
+        <section id="mg-sin-sesion" class="mcg-panel mcg-acceso">
+          <div><h2 class="mcg-h2">Activa tu carrera de DT</h2><p>Entra para elegir tu club y empezar a fichar.</p></div>
+          <div class="flex flex-wrap gap-2"><button type="button" class="btn btn-primary" data-pr-auth="login"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button><button type="button" class="btn btn-ghost" data-pr-auth="register"><i class="fa-solid fa-user-plus"></i> Crear cuenta</button></div>
+        </section>
+      </Fragment>
+    ) : (
+      <Fragment>
     <header id="mg-portada" class="mg-portada">
       <span class="text-[11px] font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta · Galaxy League</span>
       <h1 class="text-3xl sm:text-5xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-user-tie text-galaxy-400 mr-2"></i>Liga Máster</h1>
@@ -18,9 +44,13 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
 
     <p id="mg-sin-sesion" class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Inicia sesión para activar tu carrera de mánager.</p>
 
+      </Fragment>
+    )}
+
     <!-- Sin club: elegir uno -->
     <section id="mg-elegir" hidden class="space-y-3">
-      <h2 class="font-display font-bold text-white uppercase tracking-wider">Elige tu club</h2>
+      <p class="mcg-kicker lmg-only">El vestuario te espera</p>
+      <h2 class="font-display font-bold text-white uppercase tracking-wider lmg-h2">Elige tu club</h2>
       <p class="text-xs text-gray-400">Es opcional: si no activas tu carrera, todo lo demás de la web sigue igual. Puedes dejar el club cuando quieras.</p>
       <div id="mg-clubes-libres" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
     </section>

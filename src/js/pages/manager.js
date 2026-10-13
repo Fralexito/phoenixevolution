@@ -5,6 +5,7 @@ import { toast } from '../core/toast.js';
 import { confirmar, elegir, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { haceCuanto } from '../core/notifs.js';
+import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);
 const LIGA = 'galaxy';
@@ -40,11 +41,13 @@ let resumen = { n: 0, valor: 0, mediaXI: null };
 function pintarCabecera() {
   const ventana = cfg?.ventana_abierta ? '<span class="mg-ventana abierta"><i class="fa-solid fa-door-open"></i> Ventana abierta</span>'
     : '<span class="mg-ventana"><i class="fa-solid fa-lock"></i> Ventana cerrada</span>';
-  if (!club) { $('mg-club').innerHTML = `<div class="mt-1">${ventana}</div>`; return; }
+  const chip = $('lmg-ventana');
+  if (chip) { chip.dataset.abierta = cfg?.ventana_abierta ? '1' : '0'; chip.querySelector('b').textContent = cfg?.ventana_abierta ? 'Ventana de fichajes abierta' : 'Ventana cerrada'; }
+  if (!club) { $('mg-club').innerHTML = chip ? '' : `<div class="mt-1">${ventana}</div>`; return; }
   const stat = (lbl, val, ic) => `<div class="mg-stat"><i class="fa-solid ${ic}"></i><span><small>${lbl}</small><b>${val}</b></span></div>`;
   $('mg-club').innerHTML = `<div class="mg-club">
       <div class="mg-escudo">${escudo(club, 'w-16 h-16 sm:w-20 sm:h-20')}</div>
-      <div class="min-w-0"><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT · ${ventana}</p></div>
+      <div class="min-w-0"><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT${chip ? '' : ` · ${ventana}`}</p></div>
     </div>
     <div class="mg-stats">
       ${stat('Presupuesto', millones(club.presupuesto), 'fa-wallet')}
@@ -57,7 +60,14 @@ function pintarCabecera() {
 function pintarElegir() {
   const libres = [...clubes.values()].filter((c) => c.aprobado && !c.dueno);
   $('mg-clubes-libres').innerHTML = !libres.length ? vacio('fa-shield-halved', 'Aún no hay clubes disponibles', 'El staff los habilita al importar el option file oficial.')
-    : libres.map((c) => `<button type="button" data-elegir="${c.id}" class="mg-club-op">${escudo(c, 'w-14 h-14')}<b>${esc(c.nombre)}</b><small>${millones(cfg?.presupuesto_inicial)} de presupuesto</small><span class="mg-club-op-cta">Dirigir este club <i class="fa-solid fa-arrow-right"></i></span></button>`).join('');
+    : libres.map((c) => `<button type="button" data-elegir="${c.id}" class="mg-club-op">${FX.ligaMasterGalaxia ? '<span class="lmg-anillo" aria-hidden="true"></span>' : ''}${escudo(c, 'w-14 h-14')}<b>${esc(c.nombre)}</b><small>${millones(cfg?.presupuesto_inicial)} de presupuesto</small>${FX.ligaMasterGalaxia ? `<span class="lmg-plantel" data-plantel="${c.id}"></span>` : ''}<span class="mg-club-op-cta">Dirigir este club <i class="fa-solid fa-arrow-right"></i></span></button>`).join('');
+  if (FX.ligaMasterGalaxia && libres.length) pintarPlanteles(libres.map((c) => c.id));
+}
+// Ronda 279: cuántos jugadores tiene cada club libre y su mejor media (ayuda a elegir).
+async function pintarPlanteles(ids) {
+  const { data } = await supabase.from('lm_jugadores').select('club_id, media').in('club_id', ids);
+  const por = new Map(); (data ?? []).forEach((j) => { const x = por.get(j.club_id) ?? { n: 0, top: 0 }; x.n += 1; x.top = Math.max(x.top, j.media ?? 0); por.set(j.club_id, x); });
+  document.querySelectorAll('[data-plantel]').forEach((el) => { const x = por.get(Number(el.dataset.plantel)); el.innerHTML = x ? `<i class="fa-solid fa-people-group"></i>${x.n} ${x.n === 1 ? 'jugador' : 'jugadores'} · <b>${x.top}</b> mejor media` : '<i class="fa-solid fa-people-group"></i>Plantilla por armar'; });
 }
 
 const fila = (j, acciones) => `<tr class="border-t border-galaxy-border/60"><td class="py-2 pr-2 text-galaxy-400 font-bold">${esc(j.posicion ?? '—')}</td><td class="pr-2 text-white">${esc(j.nombre)}</td>
