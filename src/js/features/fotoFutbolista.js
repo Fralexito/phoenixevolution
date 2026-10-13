@@ -65,7 +65,8 @@ export function montarFotos(root) {
   if (!root) return;
   const poner = async (el) => {
     const f = await fotoFutbolista(el.dataset.foto, el.dataset.club); const u = f && seguro(f.url); if (!u) return;
-    const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.src = u;
+    // Sin loading=lazy: la imagen aún no está en la página y el navegador nunca la cargaría (ronda 287). Ya solo se pide cuando la carta se ve.
+    const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = u;
     img.onload = () => { el.replaceChildren(img); el.classList.add('con-foto'); el.title = `Foto: Wikipedia / Wikimedia Commons (${f.titulo})`; };
     img.onerror = () => console.warn('[fotos] no cargó la imagen de', el.dataset.foto, u);
   };

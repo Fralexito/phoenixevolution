@@ -161,3 +161,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 2026-10-13 09:22 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 284h: la foto se salía del recuadro y tapaba el texto «Foto: Wikipedia»; arreglado en perfilJugador.css | — | HECHO | —
 2026-10-13 09:26 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 285: carrusel de fotos en la ficha (1.ª retrato principal de Wikipedia, luego hasta 5 fotos del mismo artículo con el nombre del jugador en el archivo). Sin autoplay | — | HECHO | falta: que Fralex lo vea
 2026-10-13 09:27 (Lima) | Cuenta Opus | Chat flotante · contactos | Ronda 286: lista de amigos separada en «En línea» y «Desconectados», cada grupo con su título | — | HECHO | —
+2026-10-13 09:29 (Lima) | Cuenta Opus | Liga Máster · fotos | Ronda 287: fotos pequeñas de las cartas de Mi club (quitado loading=lazy en una imagen fuera de la página) | — | HECHO | —

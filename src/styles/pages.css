@@ -412,5 +412,5 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 /* Foto chiquita en las cartas de Mi club (ronda 284) */
 .mg-carta-top { gap: .4rem; }
 .mg-foto { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; margin-left: auto; border-radius: 99px; overflow: hidden; font-size: .9rem; color: rgb(var(--lc) / .55); background: rgb(var(--lc) / .08); border: 1px solid rgb(var(--lc) / .3); flex: none; }
-.mg-foto.con-foto { border-color: rgb(var(--lc) / .6); }
-.mg-foto img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
+.mg-foto.con-foto { display: block; border-color: rgb(var(--lc) / .6); }
+.mg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
