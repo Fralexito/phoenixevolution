@@ -81,7 +81,13 @@ async function pintarPlantilla() {
   const xi = data.slice(0, 11);
   resumen = { n: data.length, valor: data.reduce((s, j) => s + Number(j.valor || 0), 0), mediaXI: xi.length ? Math.round(xi.reduce((s, j) => s + (j.media || 0), 0) / xi.length) : null };
   pintarCabecera();
-  if (!data.length) { $('mg-plantilla').innerHTML = vacio('fa-people-group', 'Tu plantilla está vacía', 'Ficha jugadores en el Mercado.'); return; }
+  if (!data.length) {
+    // Ronda 282: si la liga entera no tiene jugadores todavía, el problema no es tu club: falta el catálogo del parche.
+    const { count } = await supabase.from('lm_jugadores').select('id', { count: 'exact', head: true }).eq('liga', LIGA);
+    $('mg-plantilla').innerHTML = count ? vacio('fa-people-group', 'Tu plantilla está vacía', 'Ficha jugadores en el Mercado.')
+      : vacio('fa-satellite-dish', 'Los jugadores aún no llegan del juego', 'Phoenix Sync tiene que subir el catálogo del parche (los futbolistas reales de cada club). En cuanto llegue, tu plantilla aparece aquí sola.');
+    return;
+  }
   const off = cfg.ventana_abierta ? '' : 'disabled';
   const btn = (j) => `<div class="mg-acciones"><button type="button" class="mg-mini" data-vender="${j.id}" data-nombre="${esc(j.nombre)}" data-valor="${j.valor}" ${off} title="Vender a un club CPU por su valor"><i class="fa-solid fa-hand-holding-dollar"></i></button><button type="button" class="mg-mini" data-liberar="${j.id}" ${off} title="Liberar (queda agente libre)"><i class="fa-solid fa-user-minus"></i></button></div>`;
   $('mg-plantilla').innerHTML = LINEAS.map(([id, t]) => { const g = data.filter((j) => linea(j.posicion) === id); return g.length ? `<div class="mg-linea" data-linea="${id}">
