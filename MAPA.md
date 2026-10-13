@@ -916,6 +916,14 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - /mi-club/ redirige a /manager/#vestuario (así funcionan los enlaces viejos y lo que diga Phoenix Sync). Menú: un solo botón «Mi club» (manager adopta mercado y miclub); miclub fuera del panel de cuenta.
 - Las secciones de los modos no usan la aparición al bajar (quedaban invisibles un momento al cambiar de modo).
 
+## Ronda 281 — Fichajes del juego aplicados solos (migración 106, PENDIENTE de pegar)
+- Fralex: «ya empieza» (parte web de docs/SYNC-AUTOMATICO.md). Archivo `supabase/migrations/106_lm_fichajes_desde_juego.sql`:
+  - disparador en `mercado_reportes`: los cambios `jugador_equipo` se aplican solos si la ventana está abierta y quien reporta es el DT de un lado y el otro es CPU/libre (o es staff); si no, quedan para el staff. Tipo nuevo `juego` en `lm_movimientos` (+ `origen_reporte`, `revertido_en`).
+  - `mercado_revisar` al aprobar aplica lo que faltaba; `lm_staff_revertir(p_mov)` deshace un movimiento (jugador y dinero).
+  - `sistema_lm_importar` casa equipos del catálogo con los 12 clubes ya creados por nombre normalizado (no los duplica).
+- Web: «Movimientos» muestra «Desde el juego» y, para el staff, botón Revertir (manager.js lee `select('*')` para funcionar antes y después de la 106).
+- El MCP canceló el apply_migration: el SQL (sin comentarios) se entregó a Fralex para pegarlo en el SQL Editor.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

@@ -12,7 +12,7 @@ const LIGA = 'galaxy';
 const plata = (n) => `€ ${Number(n || 0).toLocaleString('es-PE')}`;
 const ERR = { YA_TIENES_CLUB: 'Ya tienes un club.', CLUB_OCUPADO: 'Ese club ya tiene DT.', CLUB_NO_DISPONIBLE: 'Ese club no está disponible.', VENTANA_CERRADA: 'La ventana de fichajes está cerrada.',
   PRESUPUESTO_INSUFICIENTE: 'No te alcanza el presupuesto.', OFERTA_BAJA: 'La oferta es menor al valor del jugador.', YA_OFERTASTE: 'Ya tienes una oferta pendiente por él.',
-  PLANTILLA_LLENA: 'Plantilla llena (máx. 40). Libera o vende a un jugador antes de fichar.', JUGADOR_NO_DISPONIBLE: 'Ese jugador acaba de cambiar de club. Recarga.', NO_ES_CPU: 'Ese club tiene DT: hazle una oferta.', YA_ES_TUYO: 'Ya es tu jugador.', YA_NO_ES_TUYO: 'Ese jugador ya no está en tu club.', SIN_CLUB: 'Primero elige un club.' };
+  PLANTILLA_LLENA: 'Plantilla llena (máx. 40). Libera o vende a un jugador antes de fichar.', JUGADOR_NO_DISPONIBLE: 'Ese jugador acaba de cambiar de club. Recarga.', NO_ES_CPU: 'Ese club tiene DT: hazle una oferta.', YA_ES_TUYO: 'Ya es tu jugador.', YA_NO_ES_TUYO: 'Ese jugador ya no está en tu club.', YA_REVERTIDO: 'Ese movimiento ya fue revertido.', JUGADOR_YA_CAMBIO: 'El jugador ya cambió de club después; no se puede revertir.', SIN_CLUB: 'Primero elige un club.' };
 const msg = (e) => { const k = Object.keys(ERR).find((x) => String(e?.message).includes(x)); return k ? ERR[k] : (e?.message || 'Error'); };
 let yo = null; let club = null; let cfg = null; let clubes = new Map();
 const escudo = (c, cls = 'w-10 h-10') => safeUrl(c?.escudo_url) ? `<img src="${esc(safeUrl(c.escudo_url))}" alt="" class="${cls} object-contain">` : `<span class="${cls} rounded-full bg-galaxy-800 grid place-items-center text-galaxy-400"><i class="fa-solid fa-shield-halved"></i></span>`;
@@ -123,18 +123,19 @@ async function pintarOficina() {
 }
 
 async function pintarMovimientos() {
-  const { data, error } = await supabase.from('lm_movimientos').select('id, jugador_id, de_club, a_club, monto, tipo, aplicado_en, created_at').eq('liga', LIGA).order('created_at', { ascending: false }).limit(40);
+  const { data, error } = await supabase.from('lm_movimientos').select('*').eq('liga', LIGA).order('created_at', { ascending: false }).limit(40);
   if (error) { $('mg-movs').textContent = 'No se pudo cargar.'; return; }
   const ids = [...new Set(data.map((m) => m.jugador_id))];
   const { data: js } = ids.length ? await supabase.from('lm_jugadores').select('id, nombre').in('id', ids) : { data: [] };
   const nj = (id) => esc((js ?? []).find((x) => x.id === id)?.nombre ?? 'Jugador');
-  const TIPO = { compra: ['fa-right-left', 'Traspaso'], libre: ['fa-signature', 'Fichaje libre'], liberado: ['fa-user-minus', 'Liberado'], staff: ['fa-shield-halved', 'Staff'] };
+  const TIPO = { compra: ['fa-right-left', 'Traspaso'], libre: ['fa-signature', 'Fichaje libre'], liberado: ['fa-user-minus', 'Liberado'], staff: ['fa-shield-halved', 'Staff'], juego: ['fa-gamepad', 'Desde el juego'] };
+  const staff = can('resolverReportes');
   $('mg-movs').innerHTML = !data.length ? vacio('fa-right-left', 'Aún no hubo fichajes', 'El primer movimiento de la ventana aparecerá aquí.')
     : `<ol class="mg-timeline">${data.map((m) => { const [ic, t] = TIPO[m.tipo] ?? TIPO.staff; return `<li>
         <span class="mg-tl-ic"><i class="fa-solid ${ic}"></i></span>
         <div class="flex-1 min-w-0"><p><b class="text-white">${nj(m.jugador_id)}</b> <span class="text-[11px] text-gray-500 uppercase tracking-wider ml-1">${t}</span></p>
           <p class="text-xs text-gray-400">${nomClub(m.de_club)} <i class="fa-solid fa-arrow-right text-[10px] mx-1 text-galaxy-400"></i> <span class="text-gray-200">${nomClub(m.a_club)}</span></p></div>
-        <div class="text-right shrink-0">${m.monto ? `<p class="mg-monto">${millones(m.monto)}</p>` : ''}<p class="text-[11px] text-gray-500">${m.aplicado_en ? '<i class="fa-solid fa-gamepad text-emerald-400" title="Ya está en el juego"></i>' : '<i class="fa-regular fa-clock" title="Llega al juego al cerrar la ventana"></i>'} ${esc(haceCuanto(m.created_at) ?? '')}</p></div></li>`; }).join('')}</ol>`;
+        <div class="text-right shrink-0">${m.revertido_en ? '<p class="text-[12px] text-amber-300"><i class="fa-solid fa-rotate-left"></i> Revertido</p>' : staff && m.tipo !== 'staff' ? `<button type="button" class="mg-mini !static !opacity-100" data-revertir="${m.id}" title="Revertir este movimiento (staff)"><i class="fa-solid fa-rotate-left"></i></button>` : ''}${m.monto ? `<p class="mg-monto">${millones(m.monto)}</p>` : ''}<p class="text-[11px] text-gray-500">${m.aplicado_en ? '<i class="fa-solid fa-gamepad text-emerald-400" title="Ya está en el juego"></i>' : '<i class="fa-regular fa-clock" title="Llega al juego al cerrar la ventana"></i>'} ${esc(haceCuanto(m.created_at) ?? '')}</p></div></li>`; }).join('')}</ol>`;
 }
 
 // ── Staff: centro de control (autoguardado) ──
@@ -205,7 +206,7 @@ async function refrescar() {
 
 const rpc = async (fn, args) => { const { data, error } = await supabase.rpc(fn, args); if (error) throw error; return data; };
 document.addEventListener('click', async (ev) => {
-  const b = ev.target.closest('[data-elegir],[data-vender],[data-liberar],[data-ofertar],[data-responder],[data-cancelar],#mg-dejar'); if (!b || b.disabled) return;
+  const b = ev.target.closest('[data-elegir],[data-vender],[data-liberar],[data-ofertar],[data-responder],[data-cancelar],[data-revertir],#mg-dejar'); if (!b || b.disabled) return;
   b.disabled = true;
   try {
     if (b.dataset.elegir) { const c = clubes.get(Number(b.dataset.elegir)); if (!(await confirmar(`¿Ser el DT de ${c?.nombre}? Recibirás ${plata(cfg?.presupuesto_inicial)} de presupuesto.`))) return; await rpc('lm_activar', { p_club: c.id }); toast('¡Bienvenido a tu club, mánager!', 'ok'); await refrescar(); }
@@ -227,6 +228,7 @@ document.addEventListener('click', async (ev) => {
       toast(r?.estado === 'cerrada' ? `¡Fichaje cerrado por ${plata(r.monto)}!` : 'Oferta enviada. Te avisaremos cuando respondan.', 'ok'); await refrescar();
     }
     else if (b.dataset.responder) { await rpc('lm_responder', { p_oferta: Number(b.dataset.responder), p_aceptar: b.dataset.si === '1' }); toast(b.dataset.si === '1' ? 'Traspaso cerrado.' : 'Oferta rechazada.', 'ok'); await refrescar(); }
+    else if (b.dataset.revertir) { if (!(await confirmar('¿Revertir este movimiento? El jugador vuelve a su club anterior y el dinero se devuelve.', { peligro: true }))) return; await rpc('lm_staff_revertir', { p_mov: Number(b.dataset.revertir) }); toast('Movimiento revertido.', 'ok'); await refrescar(); pintarMovimientos(); }
     else if (b.dataset.cancelar) { await rpc('lm_cancelar_oferta', { p_oferta: Number(b.dataset.cancelar) }); toast('Oferta cancelada.', 'ok'); pintarOficina(); }
   } catch (e) { console.error('[manager]', e); toast(msg(e), 'error'); }
   finally { b.disabled = false; }
