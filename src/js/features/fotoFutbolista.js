@@ -3,7 +3,8 @@
 // así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
 // Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
 // (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
-const CLAVE = 'pes-fotos-lm-v3'; const DIAS = 14 * 864e5; const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente const MAX = 3;
+const CLAVE = 'pes-fotos-lm-v3'; const DIAS = 14 * 864e5; const MAX = 3;
+const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente
 const API = 'https://en.wikipedia.org/w/api.php';
 let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
 const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
