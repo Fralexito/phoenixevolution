@@ -895,6 +895,9 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
   - Forma: últimos 5 como bolitas + palabra (En racha / Al alza / Irregular / Mala racha).
 - Barras, números, calor y bolitas se animan UNA vez al cargar (hayMovimientoReducido respetado). Nada se mueve solo después.
 
+## Ronda 277 — Perfil de jugador: vuelve el diseño de la ronda 275
+- Fralex: «me gustaba el diseño anterior». FX.perfilJugadorVivo = false (el bloque scouting queda en el código, apagado). Queda el perfil ordenado de la ronda 275.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

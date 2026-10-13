@@ -134,3 +134,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 2026-10-13 01:10 (Lima) | Cuenta LINK (chat Campo 2D, con permiso de Fralex) | Ronda 240 | Campo en vivo: fases «detenido» (reloj del juego parado: repetición/celebración/pausa) y «descanso» con cartel; Edge liga 1.6.1 | supabase/functions/liga/index.ts, src/js/core/campoVivo.js, tests/campoVivo.test.mjs | HECHO
 - Ronda 275 (cuenta Opus, borrador): perfil de jugador con orden y elegancia (ficha técnica, menú Editar, pestañas Temporada/Análisis/Trayectoria, campaña compacta). Bandera FX.perfilJugadorPro. Sin BD.
 - Ronda 276 (cuenta Opus, borrador): perfil de jugador con bloque scouting (mini cancha con calor, barras de atributos color FC, forma). Bandera FX.perfilJugadorVivo. Sin BD.
+- Ronda 277 (cuenta Opus, borrador): FX.perfilJugadorVivo apagado; el perfil vuelve al diseño de la ronda 275.
