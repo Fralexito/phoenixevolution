@@ -5,7 +5,7 @@
 Pegar al inicio de cualquier chat que toque la web, la base o los programas. **Antes de cambiar algo: leer `docs/REGLAS-ECOSISTEMA.md`.**
 
 ## Básico
-- Repo `Fralexito/phoenixevolution`, rama de trabajo **`borrador`**, publicada en la vista previa privada **`/phoenixevolution/fase-beta/`** (la URL `/borrador/` se retiró porque se compartía sin permiso). A `main` solo cuando Fralex dice **«Súbelo»** (aún no se ha subido lo de abajo).
+- Repo `Fralexito/phoenixevolution`, rama de trabajo **`borrador`**, publicada en la vista previa privada **`/phoenixevolution/fase-beta-1-0/`** (la URL `/borrador/` se retiró porque se compartía sin permiso). A `main` solo cuando Fralex dice **«Súbelo»** (aún no se ha subido lo de abajo).
 - Stack: Astro + Tailwind 4 + JS vanilla + Supabase (proyecto `fiibiyijojkxqlsrhcil`). Hosting: GitHub Pages.
 - Funciones experimentales con interruptores en `src/data/experimento.js` (FX).
 - Migraciones en `supabase/migrations/` (última: **094**; siguiente libre **095**). Si la aplicación automática falla, Fralex pega el SQL en el SQL Editor. Edge Functions: Fralex pega el archivo y despliega.
@@ -42,9 +42,9 @@ Un chat no toca la pieza de otro: le pasa un prompt. Endpoints publicados no se 
 - Menú: Jugadores en Competir; «Modo Mánager» → «Liga Máster»; «Phoenix Soda» → «Phoenix Link» (Mis salas).
 - CLS en PC corregido (data-sesion si/no). Sin ventanas nativas (diálogo `elegir()`).
 - 092: RLS optimizadas, índices, funciones internas de Liga Máster solo para el servidor. 093: avisos de amistad huérfanos.
-- Vista previa movida a `/fase-beta/` con cinta «FASE BETA».
+- Vista previa movida a `/fase-beta-1-0/` con cinta «FASE BETA 1.0».
 
 ## Pendiente
-- Fralex: Redirect URL `https://fralexito.github.io/phoenixevolution/fase-beta/**` en Supabase Auth; protección de contraseñas filtradas; GitHub Pages Source = GitHub Actions; ¿borrar `backup_20261003`?; ¿beta solo para cuentas autorizadas?; probar con 2–3 DTs; «Súbelo».
+- Fralex: Redirect URL `https://fralexito.github.io/phoenixevolution/fase-beta-1-0/**` en Supabase Auth; protección de contraseñas filtradas; GitHub Pages Source = GitHub Actions; ¿borrar `backup_20261003`?; ¿beta solo para cuentas autorizadas?; probar con 2–3 DTs; «Súbelo».
 - Chat Mercado: subir catálogo real (`/catalogo`) **antes** de las equivalencias; luego mandar el informe Conmegol→Sudamerican en lotes ≤3000. Al llegar el catálogo real, borrar los datos demo.
 - Web: pantalla del staff para cargar traspasos reales (Capa 1); ordenar el interior de páginas con capturas de Fralex. (Ya hechos: salto de Liga, selector de club CPU, «sin_motivo».)

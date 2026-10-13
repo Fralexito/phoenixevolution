@@ -168,3 +168,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 2026-10-13 09:46 (Lima) | Cuenta Opus | Liga Máster · Mi club | Ronda 291: club centrado en las cartas del Mercado y DT dueño mostrado de forma sutil (foto + nombre, enlace a su perfil) | — | HECHO | —
 2026-10-13 09:52 (Lima) | Cuenta Opus | Liga Máster · Mi club | Ronda 292: filtro por línea, ordenar y agrandar/alejar las cartas; Vender/Liberar movidos abajo de la carta | — | HECHO | —
 2026-10-13 09:53 (Lima) | Cuenta Opus | Ligas | Ronda 293: «2da división» al lado de LIGA SUDARIO (liga, competiciones, portada) | — | HECHO | —
+- Ronda 274 (cuenta WEB, borrador): vista previa renombrada de /fase-beta/ a /fase-beta-1-0/ (cinta «FASE BETA 1.0»). deploy.yml, astro.config, Layout, CLAUDE.md, docs. Fralex debe añadir la Redirect URL nueva en Supabase Auth.

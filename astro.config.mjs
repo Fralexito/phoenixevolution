@@ -8,7 +8,7 @@ import movimientoSegunAjustes from './tools/movimiento-postcss.mjs';
 
 export default defineConfig({
   site: 'https://fralexito.github.io',
-  // PES_BASE solo la usa la vista previa (/phoenixevolution/fase-beta); sin ella, la web oficial.
+  // PES_BASE solo la usa la vista previa (/phoenixevolution/fase-beta-1-0); sin ella, la web oficial.
   base: process.env.PES_BASE || '/phoenixevolution',
   trailingSlash: 'always',
   vite: { plugins: [tailwindcss()], css: { postcss: { plugins: [movimientoSegunAjustes()] } } },

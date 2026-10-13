@@ -936,6 +936,10 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Mi club: foto redonda chiquita en cada carta (plantilla y mercado). /futbolista/: foto grande en la carta con mini escudo y crédito.
 - Riesgo conocido: si el buscador acierta mal o el jugador no tiene foto libre (canteranos), se ve el icono; no se puede verificar desde el entorno de pruebas (sin internet), revisar en la FASE BETA.
 
+## Ronda 274 — «Fase beta» pasa a «Fase beta 1.0»
+- La vista previa privada ahora vive en `/phoenixevolution/fase-beta-1-0/` (antes `/fase-beta/`) y la cinta dice «FASE BETA 1.0». Cambiado en `deploy.yml`, `astro.config.mjs`, `Layout.astro`, CLAUDE.md y docs. La carpeta vieja `/fase-beta/` deja de publicarse al desplegar. Las rondas antiguas de MAPA/REGISTRO conservan el nombre viejo (historial).
+- **Pendiente de Fralex:** en Supabase Auth → URL Configuration añadir `https://fralexito.github.io/phoenixevolution/fase-beta-1-0/**` (para iniciar sesión en la vista previa).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

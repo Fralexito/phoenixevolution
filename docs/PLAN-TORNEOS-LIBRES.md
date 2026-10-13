@@ -41,4 +41,4 @@ Reglas del partido (13) · Equipos y plantillas (8) · Locuras y bromas (12) · 
 Tope de partidos por llamada 2000 · cupo máx. 256 (ajustable) · 50 torneos activos por usuario (ajustable) · quien anota un resultado lo hace bajo palabra: el organizador y el staff pueden corregir y todo queda en la bitácora.
 
 ## G. Cómo se prueba
-`npm test` (384 pasan) · `npm run build` (43 páginas) · pruebas SQL con transacción revertida · capturas Galaxy y Sudario con datos simulados. Falta probar con cuentas reales en /fase-beta/.
+`npm test` (384 pasan) · `npm run build` (43 páginas) · pruebas SQL con transacción revertida · capturas Galaxy y Sudario con datos simulados. Falta probar con cuentas reales en /fase-beta-1-0/.
