@@ -3,7 +3,7 @@
 // así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
 // Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
 // (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
-const CLAVE = 'pes-fotos-lm-v1'; const DIAS = 14 * 864e5; const MAX = 3;
+const CLAVE = 'pes-fotos-lm-v2'; const DIAS = 14 * 864e5; const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente const MAX = 3;
 const API = 'https://en.wikipedia.org/w/api.php';
 let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
 const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
@@ -18,13 +18,25 @@ async function buscar(q, nombre) {
   const ok = pags.find((p) => p.thumbnail?.source && palabras.some((w) => norm(p.title).includes(w)));
   return ok ? { url: ok.thumbnail.source, titulo: ok.title } : null;
 }
+// Plan B: la ficha resumida del artículo (REST, también con CORS). Prueba en inglés y en español.
+async function resumen(nombre) {
+  for (const w of ['en', 'es']) {
+    try {
+      const r = await fetch(`https://${w}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(nombre.replace(/ /g, '_'))}`);
+      if (!r.ok) continue;
+      const d = await r.json();
+      if (d?.type !== 'disambiguation' && d?.thumbnail?.source) return { url: d.thumbnail.source, titulo: d.title };
+    } catch { /* sigue con el otro idioma */ }
+  }
+  return null;
+}
 function siguiente() {
   while (activos < MAX && cola.length) {
     const { clave, nombre, club, listo } = cola.shift(); activos += 1;
     (async () => {
       let res = null;
-      try { res = (await buscar(`${nombre} ${club ?? ''} footballer`, nombre)) ?? (await buscar(`${nombre} footballer`, nombre)); }
-      catch { res = undefined; }                                      // error de red: no se recuerda, se reintenta otro día
+      try { res = (await buscar(`${nombre} ${club ?? ''} footballer`, nombre)) ?? (await buscar(`${nombre} footballer`, nombre)) ?? (await resumen(nombre)); }
+      catch (e) { console.warn('[fotos] Wikipedia no respondió:', e?.message ?? e); res = (await resumen(nombre).catch(() => null)) ?? undefined; }                                      // error de red: no se recuerda, se reintenta otro día
       if (res !== undefined) { cache[clave] = { ...(res ?? {}), t: Date.now() }; guardar(); }
       listo(res ?? null);
     })().finally(() => { activos -= 1; siguiente(); });
@@ -33,7 +45,7 @@ function siguiente() {
 /** Foto libre de Wikipedia para «nombre» (del «club»). Devuelve { url, titulo } o null. */
 export function fotoFutbolista(nombre, club) {
   const clave = norm(`${nombre}|${club ?? ''}`);
-  const c = cache[clave]; if (c && Date.now() - c.t < DIAS) return Promise.resolve(c.url ? { url: c.url, titulo: c.titulo } : null);
+  const c = cache[clave]; if (c && Date.now() - c.t < (c.url ? DIAS : DIAS_SIN)) return Promise.resolve(c.url ? { url: c.url, titulo: c.titulo } : null);
   if (enCurso.has(clave)) return enCurso.get(clave);
   const p = new Promise((listo) => { cola.push({ clave, nombre, club, listo }); siguiente(); });
   enCurso.set(clave, p); p.finally(() => enCurso.delete(clave));
