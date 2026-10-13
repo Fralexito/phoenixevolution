@@ -9,6 +9,7 @@ import { haceCuanto } from '../core/notifs.js';
 import * as Fotos from '../features/fotoFutbolista.js';
 const { fotoFutbolista, tamano, esWikimedia, fotosExtra } = Fotos;
 import { hayMovimientoReducido } from '../features/ajustes.js';
+import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);
 const POS = { PT: 'Portero', DEC: 'Defensa central', LD: 'Lateral derecho', LI: 'Lateral izquierdo', MCD: 'Mediocentro defensivo', MC: 'Mediocentro', MO: 'Mediapunta',
@@ -110,13 +111,38 @@ function carrusel(box, extra) {
     box.insertAdjacentHTML('beforeend', `<button type="button" class="fb-car-fl" data-dir="-1" aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="fb-car-fl" data-dir="1" aria-label="Foto siguiente"><i class="fa-solid fa-chevron-right"></i></button>`);
     box.insertAdjacentHTML('afterend', `<div class="fb-car-puntos" id="fb-car-puntos">${Array.from({ length: n }, (_, k) => `<button type="button" aria-label="Foto ${k + 1} de ${n}" data-i="${k}"${k ? '' : ' aria-current="true"'}></button>`).join('')}</div>`);
     const puntos = [...$('fb-car-puntos').children];
-    const actual = () => Math.round(pista.scrollLeft / Math.max(1, pista.clientWidth));
-    const ir = (k) => { const i = Math.max(0, Math.min(n - 1, k)); pista.scrollTo({ left: i * pista.clientWidth, behavior: hayMovimientoReducido() ? 'auto' : 'smooth' }); };
-    let raf = 0;
-    pista.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const a = actual(); puntos.forEach((p, k) => (k === a ? p.setAttribute('aria-current', 'true') : p.removeAttribute('aria-current'))); }); }, { passive: true });
-    box.querySelectorAll('.fb-car-fl').forEach((b) => b.addEventListener('click', () => ir(actual() + Number(b.dataset.dir))));
-    puntos.forEach((p) => p.addEventListener('click', () => ir(Number(p.dataset.i))));
-    box.querySelector('.fb-car').addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); ir(actual() + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); ir(actual() - 1); } });
+    // LOOP sin salto (ronda 288, pedido de Fralex: «que avance solo y sea un loop»): al final va una copia de la 1.ª foto;
+    // al llegar a la copia se vuelve a la 1.ª de golpe (se ve igual), así el carrusel siempre avanza hacia la derecha.
+    const CADA = 4000; let reloj = 0; let encima = false; let visible = true; let pausaToque = 0;
+    const copia = pista.firstElementChild.cloneNode(); copia.alt = ''; copia.setAttribute('aria-hidden', 'true'); pista.append(copia);
+    const ancho = () => Math.max(1, pista.clientWidth);
+    const actual = () => Math.round(pista.scrollLeft / ancho());
+    const suave = () => (hayMovimientoReducido() ? 'auto' : 'smooth');
+    const ir = (k) => {
+      if (k < 0) { pista.scrollTo({ left: n * ancho(), behavior: 'auto' }); k = n - 1; }   // antes de la 1.ª: salta a la copia y retrocede
+      pista.scrollTo({ left: Math.min(k, n) * ancho(), behavior: suave() });
+    };
+    const marcar = () => { const a = actual() % n; puntos.forEach((p, k) => (k === a ? p.setAttribute('aria-current', 'true') : p.removeAttribute('aria-current'))); };
+    let raf = 0; let tFin = 0;
+    pista.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(marcar);
+      clearTimeout(tFin); tFin = setTimeout(() => { if (actual() >= n) pista.scrollTo({ left: 0, behavior: 'auto' }); }, 140);   // terminó de moverse
+    }, { passive: true });
+    box.querySelectorAll('.fb-car-fl').forEach((b) => b.addEventListener('click', () => { ir(actual() + Number(b.dataset.dir)); reiniciar(); }));
+    puntos.forEach((p) => p.addEventListener('click', () => { ir(Number(p.dataset.i)); reiniciar(); }));
+    box.querySelector('.fb-car').addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); ir(actual() + 1); reiniciar(); } if (e.key === 'ArrowLeft') { e.preventDefault(); ir(actual() - 1); reiniciar(); } });
+    // AVANCE SOLO cada 4 s. Se pausa mientras tienes el mouse o el dedo encima, si la pestaña no se ve o la ficha está fuera de pantalla,
+    // y no corre con «Ajustes → Animaciones: Reducidas».
+    if (!FX.carruselAuto) return;
+    const puede = () => !encima && visible && !document.hidden && Date.now() > pausaToque && !hayMovimientoReducido();
+    const tic = () => { if (puede()) ir(actual() + 1); };
+    function reiniciar() { clearInterval(reloj); if (FX.carruselAuto) reloj = setInterval(tic, CADA); }
+    box.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') encima = true; });
+    box.addEventListener('pointerleave', () => { encima = false; });
+    box.addEventListener('focusin', () => { encima = true; }); box.addEventListener('focusout', () => { encima = false; });
+    pista.addEventListener('touchstart', () => { pausaToque = Date.now() + 6000; }, { passive: true });   // si lo deslizas con el dedo, espera un rato
+    if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(box);
+    reiniciar();
   });
 }
 
