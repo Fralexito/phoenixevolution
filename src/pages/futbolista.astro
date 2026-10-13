@@ -1,0 +1,12 @@
+---
+// FICHA DE FUTBOLISTA de la Liga Máster (ronda 283): ?id=<lm_jugadores.id>. Pedido de Fralex: «haz la ficha de perfil de todos».
+// Datos: lm_jugadores + lm_clubes + lm_movimientos (lectura pública). Lógica: js/pages/futbolista.js · estilos: perfilJugador.css (.pj-*) + .fb-*
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Futbolista" active="manager" description="Ficha del futbolista en la Liga Máster: club, valor de mercado, datos y traspasos.">
+  <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6">
+    <a href={`${import.meta.env.BASE_URL}manager/`} class="inline-flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-galaxy-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i> Mi club</a>
+    <div id="fb-root" aria-live="polite"><div class="esqueleto h-72"></div></div>
+  </div>
+</Layout>
+<script>import '../js/pages/futbolista.js';</script>

@@ -165,3 +165,30 @@ html[data-tema='sudario'] .pj-camp-liga { color: #f5c542; }
   .pj-scout { padding: 1rem; }
   .pj-attr { grid-template-columns: 5.6rem minmax(0, 1fr) 2rem; gap: .55rem; }
 }
+
+/* ══ FICHA DE FUTBOLISTA de la Liga Máster (ronda 283, /futbolista/) ══ */
+.fb-grid { display: grid; gap: 2rem; align-items: start; }
+@media (min-width: 1024px) { .fb-grid { grid-template-columns: 300px minmax(0, 1fr); } .fb-carta { position: sticky; top: 6rem; } }
+.fb-carta { --lc: 0 229 255; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: .4rem; padding: 1.4rem 1.25rem 1.25rem; border-radius: 1.4rem; text-align: center; max-width: 320px; margin: 0 auto; width: 100%;
+  background: radial-gradient(120% 70% at 50% 0%, rgb(var(--lc) / .28), transparent 65%), linear-gradient(180deg, #121034, #07061a); border: 1px solid rgb(var(--lc) / .4); box-shadow: 0 24px 50px -24px rgb(var(--lc) / .55); }
+.fb-carta[data-linea='por'] { --lc: 251 191 36; } .fb-carta[data-linea='def'] { --lc: 56 189 248; } .fb-carta[data-linea='med'] { --lc: 52 211 153; } .fb-carta[data-linea='del'] { --lc: 251 113 133; }
+.fb-carta-top { display: flex; width: 100%; justify-content: space-between; align-items: baseline; }
+.fb-media { font: 900 3rem/1 var(--font-display); color: #fff; text-shadow: 0 0 18px rgb(var(--lc) / .6); }
+.fb-pos { font: 800 13px var(--font-display); letter-spacing: .1em; padding: .25rem .55rem; border-radius: .45rem; color: rgb(var(--lc)); background: rgb(var(--lc) / .12); border: 1px solid rgb(var(--lc) / .4); }
+.fb-escudo { display: grid; place-items: center; width: 8rem; height: 8rem; margin: .4rem 0; border-radius: 99px; background: radial-gradient(circle, rgb(255 255 255 / .06), transparent 70%); filter: drop-shadow(0 10px 20px rgb(0 0 0 / .5)); }
+.fb-carta-nombre { font: 800 1.35rem/1.1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: #fff; }
+.fb-carta-club { font-size: 13px; color: #9ca3af; text-transform: uppercase; letter-spacing: .1em; }
+.fb-valor { width: 100%; margin-top: .8rem; padding-top: .9rem; border-top: 1px solid rgb(255 255 255 / .1); }
+.fb-valor small { display: block; font: 700 12px var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: #9ca3af; }
+.fb-valor b { font: 900 1.9rem var(--font-display); color: #fde68a; text-shadow: 0 0 16px rgb(253 230 138 / .35); }
+.fb-dt { margin-top: .5rem; font-size: 13px; color: #a5f3fc; }
+.fb-accion { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.fb-tuyo { display: inline-flex; align-items: center; gap: .45rem; padding: .55rem .9rem; border-radius: 99px; font: 700 13px var(--font-display); color: #a7f3d0; background: rgb(16 185 129 / .12); border: 1px solid rgb(52 211 153 / .4); }
+.fb-nota { font-size: 12px; color: #9ca3af; }
+.fb-comp { display: flex; flex-wrap: wrap; gap: .45rem; }
+.fb-chip { --lc: 156 163 175; display: inline-flex; align-items: center; gap: .45rem; padding: .35rem .7rem; border-radius: 99px; font-size: 13px; color: #e5e7eb; background: rgb(255 255 255 / .03); border: 1px solid rgb(var(--lc) / .3); transition: border-color .15s, background .15s; }
+.fb-chip[data-linea='por'] { --lc: 251 191 36; } .fb-chip[data-linea='def'] { --lc: 56 189 248; } .fb-chip[data-linea='med'] { --lc: 52 211 153; } .fb-chip[data-linea='del'] { --lc: 251 113 133; }
+.fb-chip b { font-family: var(--font-display); color: rgb(var(--lc)); } .fb-chip small { font-size: 12px; color: #6b7280; }
+.fb-chip:hover { border-color: rgb(var(--lc) / .7); background: rgb(var(--lc) / .08); }
+/* Nombres de las cartas de Mi club como enlace a la ficha */
+a.mg-nombre { display: block; } a.mg-nombre:hover { color: var(--color-galaxy-400); }

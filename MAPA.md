@@ -924,6 +924,12 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Web: «Movimientos» muestra «Desde el juego» y, para el staff, botón Revertir (manager.js lee `select('*')` para funcionar antes y después de la 106).
 - El MCP canceló el apply_migration: el SQL (sin comentarios) se entregó a Fralex para pegarlo en el SQL Editor.
 
+## Ronda 283 — Valores reales y ficha de cada futbolista de la Liga Máster
+- Fralex: «ponles valoraciones de dinero de la vida real y haz la ficha de perfil de todos».
+- Datos (sin migración): `lm_jugadores.valor` y `altura` de los 314 temporales con el valor de mercado real de oct-2026 (footballtransfers.com/fotmob «Estimated Transfer Value», unos pocos de soccerway/prensa citando Transfermarkt). 308 con valor real; los 6 sin dato conservan el de la regla. Ej.: Lamine Yamal €226 M, Olise €198 M, Cubarsí €186 M, Haaland €159 M.
+- Página nueva `/futbolista/?id=` (`pages/futbolista.astro`, `js/pages/futbolista.js`, estilos `.fb-*` en perfilJugador.css): carta con media, posición, escudo y valor; cabecera estilo perfil (club · posición, nombre, ficha Media · Posición · Edad · Altura · Dorsal · País); botón Fichar / Hacer oferta (mismos RPC que Mi club, respeta ventana y sesión); historial de traspasos; compañeros de club. Nota de «ficha temporal» si no tiene pes_id.
+- En Mi club, el nombre de cada carta (plantilla y mercado) abre su ficha.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

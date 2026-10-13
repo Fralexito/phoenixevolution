@@ -5,6 +5,7 @@ import { toast } from '../core/toast.js';
 import { confirmar, elegir, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { haceCuanto } from '../core/notifs.js';
+import { href } from '../core/config.js';
 import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);
@@ -23,7 +24,7 @@ const millones = (n) => { const v = Number(n || 0) / 1e6; return v >= 1 ? `€${
 /** Tarjeta de jugador estilo carta: media grande, posición coloreada, nombre, edad y valor. */
 const carta = (j, pie = '', extra = '') => `<article class="mg-carta" data-linea="${linea(j.posicion)}">
   <div class="mg-carta-top"><span class="mg-media">${j.media ?? '—'}</span><span class="mg-pos">${esc(j.posicion ?? '—')}</span></div>
-  <p class="mg-nombre" title="${esc(j.nombre)}">${esc(j.nombre)}</p>
+  <a class="mg-nombre" title="Ver la ficha de ${esc(j.nombre)}" href="${href(`futbolista/?id=${j.id}`)}">${esc(j.nombre)}</a>
   <p class="mg-meta">${j.edad ? `${j.edad} años · ` : ''}<b>${millones(j.valor)}</b></p>${extra}
   ${pie ? `<div class="mg-carta-pie">${pie}</div>` : ''}</article>`;
 const vacio = (icono, titulo, txt) => `<div class="mg-vacio"><i class="fa-solid ${icono}"></i><b>${titulo}</b><span>${txt}</span></div>`;
