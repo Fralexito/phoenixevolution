@@ -11,6 +11,8 @@ let DEPURAR = true; setTimeout(() => { DEPURAR = false; }, 20000);
 let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
 const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
 const norm = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+/** Último problema al hablar con Wikipedia (para mostrarlo en la ficha). */
+export let ultimoError = '';
 const enCurso = new Map(); const cola = []; let activos = 0;
 
 async function buscar(q, nombre) {
@@ -41,7 +43,7 @@ function siguiente() {
     (async () => {
       let res = null;
       try { res = (await buscar(`${nombre} ${club ?? ''} footballer`, nombre)) ?? (await buscar(`${nombre} footballer`, nombre)) ?? (await resumen(nombre)); }
-      catch (e) { console.warn('[fotos] Wikipedia no respondió:', e?.message ?? e); res = (await resumen(nombre).catch(() => null)) ?? undefined; }                                      // error de red: no se recuerda, se reintenta otro día
+      catch (e) { ultimoError = String(e?.message ?? e); console.warn('[fotos] Wikipedia no respondió:', ultimoError); res = (await resumen(nombre).catch(() => null)) ?? undefined; }                                      // error de red: no se recuerda, se reintenta otro día
       if (res !== undefined) { cache[clave] = { ...(res ?? {}), t: Date.now() }; guardar(); }
       if (DEPURAR) console.info('[fotos] resultado', nombre, res ?? 'sin foto');
       listo(res ?? null);
