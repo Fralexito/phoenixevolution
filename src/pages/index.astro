@@ -445,7 +445,7 @@ const VENTANAS = [
               <img src={l.imagen} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen group-hover:scale-105 transition-transform duration-[1400ms] ease-out" />
               <div class="relative z-20 p-5 flex flex-col justify-end h-full min-h-[170px]">
                 <span class:list={['liga-sello self-start mb-2', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
-                <h3 class="text-2xl font-display font-bold text-white uppercase leading-none">{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span></h3>
+                <h3 class="text-2xl font-display font-bold text-white uppercase leading-none">{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span> {l.division && <span class="liga-division">{l.division}</span>}</h3>
                 <p class="text-xs font-display tracking-[0.2em] text-gray-300 uppercase mt-1">{l.juego}</p>
               </div>
             </a>

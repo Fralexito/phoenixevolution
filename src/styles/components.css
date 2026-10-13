@@ -1005,3 +1005,5 @@ html[data-sesion='si'] .solo-invitado, html:not([data-sesion='si']) .solo-cuenta
 .pulso-linea { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1.25rem; font-size: .8rem; color: #9ca3af; }
 .pulso-linea a:hover { color: #fff; }
 .pulso-linea b { color: var(--color-galaxy-400); font-family: var(--font-display); font-size: .95rem; }
+/* Ronda 293 · división de la liga al lado del nombre (Liga Sudario = 2da división) */
+.liga-division { display: inline-block; vertical-align: middle; margin-left: .4em; padding: .3em .75em; border-radius: 999px; font: 800 max(12px, .26em) var(--font-display); letter-spacing: .14em; line-height: 1; text-transform: uppercase; color: #fde68a; text-shadow: none; background: linear-gradient(90deg, rgb(245 197 66 / .16), rgb(96 165 250 / .14)); border: 1px solid rgb(245 197 66 / .45); white-space: nowrap; position: relative; top: -.12em; }

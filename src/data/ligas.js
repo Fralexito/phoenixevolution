@@ -37,6 +37,7 @@ export const LIGAS = [
     estado: 'activa',
     enCentral: false,
     titulo: ['LIGA', 'SUDARIO'],
+    division: '2da división',   // ronda 293: se muestra al lado del nombre
     juego: 'SP Football Life 26',
     icono: 'fa-star',
     imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400&auto=format&fit=crop',

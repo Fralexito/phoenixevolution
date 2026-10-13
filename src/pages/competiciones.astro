@@ -37,7 +37,7 @@ const tarjetas = LIGAS.map((l) => {
         <div class="absolute inset-0 bg-gradient-to-t from-black via-galaxy-900/80 to-black/30"></div>
         <div class="relative z-10 p-5 sm:p-6 flex flex-col gap-3 flex-1 justify-end">
           <span class:list={['liga-sello self-start', l.estado === 'proxima' ? 'liga-sello-prox' : '']}>{ETIQUETA_ESTADO[l.estado]}</span>
-          <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase leading-none"><i class={`fa-solid ${l.icono} text-galaxy-400 mr-2 text-2xl`}></i>{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span></h2>
+          <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase leading-none"><i class={`fa-solid ${l.icono} text-galaxy-400 mr-2 text-2xl`}></i>{l.titulo[0]} <span class="text-galaxy-400">{l.titulo[1]}</span> {l.division && <span class="liga-division">{l.division}</span>}</h2>
           <p class="text-xs font-display tracking-[0.2em] text-gray-300 uppercase">{l.juego}</p>
           {l.descripcion && <p class="text-sm text-gray-300 leading-relaxed">{l.descripcion}</p>}
           <ul class="flex flex-wrap gap-1.5">{chips.map(([i, t]) => (<li class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-gray-100 rounded-full border border-galaxy-400/30 bg-black/40 px-2.5 py-1"><i class={`fa-solid ${i} text-galaxy-400`}></i>{t}</li>))}</ul>
