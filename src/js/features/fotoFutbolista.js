@@ -75,3 +75,35 @@ export function montarFotos(root) {
   const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) { io.unobserve(e.target); poner(e.target); } }), { rootMargin: '200px' });
   els.forEach((el) => io.observe(el));
 }
+
+// ── Carrusel de la ficha (ronda 285). Pedido de Fralex: «la primera sí o sí de pecho para arriba, después otras, pero que sea reconocible».
+// La 1.ª es la foto principal del artículo (la del recuadro de Wikipedia, casi siempre un retrato). Las demás son las fotos del mismo
+// artículo cuyo NOMBRE DE ARCHIVO lleva el nombre del jugador (así es él, no un estadio ni un escudo). Solo JPG, sin logos ni banderas.
+const MAX_EXTRA = 5;
+const PROHIBIDAS = /(logo|crest|badge|flag|bandera|escudo|signature|firma|kit|icon|map|mapa|stadium|estadio|trophy|trofeo|\.svg|\.png|\.gif)/i;
+/** Nombre de archivo de una URL de Wikimedia, sin el «330px-» de la miniatura (para no repetir la foto principal). */
+export const archivoDe = (u) => { try { return norm(decodeURIComponent(String(u).split('?')[0].split('/').pop() || '').replace(/^\d+px-/, '')).replace(/^(file|archivo):/, '').replace(/ /g, '_'); } catch { return ''; } };
+/** ¿El archivo «File:…» parece una foto del jugador? (nombre de archivo con su nombre o apellido, sin palabras prohibidas) */
+export function esFotoDe(archivo, nombre) {
+  const a = norm(archivo); if (!/\.jpe?g$/i.test(a) || PROHIBIDAS.test(a)) return false;
+  const palabras = norm(nombre).split(/[\s-]+/).filter((w) => w.length > 2);
+  return palabras.some((w) => a.includes(w));
+}
+/** Hasta 5 fotos más del jugador, del mismo artículo de Wikipedia (titulo). Devuelve [{ url }] (puede ser vacío). */
+export async function fotosExtra(titulo, nombre, principal) {
+  const clave = `x|${norm(titulo)}`;
+  const c = cache[clave]; if (c && Date.now() - c.t < DIAS) return c.fotos ?? [];
+  try {
+    const u = `${API}?action=query&format=json&origin=*&titles=${encodeURIComponent(titulo)}&generator=images&gimlimit=40&prop=imageinfo&iiprop=url|mime&iiurlwidth=500`;
+    const r = await fetch(u); if (!r.ok) return [];
+    const pags = Object.values((await r.json())?.query?.pages ?? {});
+    const ya = archivoDe(principal);
+    const fotos = pags
+      .filter((p) => p.imageinfo?.[0]?.mime === 'image/jpeg' && esFotoDe(p.title, nombre))
+      .map((p) => ({ url: p.imageinfo[0].thumburl || p.imageinfo[0].url, archivo: archivoDe(p.title) }))
+      .filter((f) => esWikimedia(f.url) && f.archivo !== ya)
+      .slice(0, MAX_EXTRA).map(({ url }) => ({ url }));
+    cache[clave] = { fotos, t: Date.now() }; guardar();
+    return fotos;
+  } catch { return []; }
+}

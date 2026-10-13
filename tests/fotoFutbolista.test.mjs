@@ -17,3 +17,21 @@ test('fotos: acepta las dos direcciones de Wikimedia (upload y thumb) y rechaza 
   assert.equal(esWikimedia('https://ejemplo.com/a.jpg'), false);
   assert.equal(esWikimedia(null), false);
 });
+
+test('carrusel: solo fotos JPG con el nombre del jugador, sin logos ni la foto principal repetida (ronda 285)', async () => {
+  const { esFotoDe, archivoDe, fotosExtra } = await import('../src/js/features/fotoFutbolista.js');
+  assert.equal(esFotoDe('File:Lamine Yamal 2024 (cropped).jpg', 'Lamine Yamal'), true);
+  assert.equal(esFotoDe('File:FC Barcelona logo.jpg', 'Lamine Yamal'), false);
+  assert.equal(esFotoDe('File:Yamal signature.jpg', 'Lamine Yamal'), false);
+  assert.equal(esFotoDe('File:Camp Nou.jpg', 'Lamine Yamal'), false);
+  assert.equal(archivoDe('File:LY 2024.jpg'), 'ly_2024.jpg');
+  assert.equal(archivoDe('https://thumb.wikimedia.org/wikipedia/commons/a/ab/LY_2024.jpg/330px-LY_2024.jpg'), 'ly_2024.jpg');
+  const info = (t, url) => ({ title: t, imageinfo: [{ mime: 'image/jpeg', thumburl: url }] });
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ query: { pages: {
+    1: info('File:Lamine Yamal 2024.jpg', 'https://upload.wikimedia.org/a/Lamine_Yamal_2024.jpg/500px-Lamine_Yamal_2024.jpg'),
+    2: info('File:Lamine Yamal Euro.jpg', 'https://upload.wikimedia.org/a/Lamine_Yamal_Euro.jpg/500px-Lamine_Yamal_Euro.jpg'),
+    3: info('File:Escudo Barça.jpg', 'https://upload.wikimedia.org/a/E.jpg/500px-E.jpg'),
+  } } }) });
+  const f = await fotosExtra('Lamine Yamal (test)', 'Lamine Yamal', 'https://upload.wikimedia.org/a/Lamine_Yamal_2024.jpg/330px-Lamine_Yamal_2024.jpg');
+  assert.deepEqual(f.map((x) => x.url), ['https://upload.wikimedia.org/a/Lamine_Yamal_Euro.jpg/500px-Lamine_Yamal_Euro.jpg']);
+});

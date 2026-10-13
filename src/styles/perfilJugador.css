@@ -194,6 +194,20 @@ html[data-tema='sudario'] .pj-camp-liga { color: #f5c542; }
 a.mg-nombre { display: block; } a.mg-nombre:hover { color: var(--color-galaxy-400); }
 /* Fotos reales (ronda 284, Wikipedia / Commons) */
 .fb-escudo.con-foto { position: relative; display: block; flex: none; width: 11rem; height: 11rem; border-radius: 1.2rem; overflow: visible; background: none; }
-.fb-escudo.con-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; border-radius: 1.2rem; border: 2px solid rgb(var(--lc) / .5); box-shadow: 0 14px 30px -10px rgb(0 0 0 / .7); }
+.fb-escudo.con-foto .fb-car { width: 100%; height: 100%; border-radius: 1.2rem; overflow: hidden; border: 2px solid rgb(var(--lc) / .5); box-shadow: 0 14px 30px -10px rgb(0 0 0 / .7); }
+.fb-escudo.con-foto .fb-car:focus-visible { outline: 2px solid rgb(var(--lc)); outline-offset: 3px; }
+.fb-car-pista { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.fb-car-pista::-webkit-scrollbar { display: none; }
+.fb-car-pista img { display: block; flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; scroll-snap-align: center; }
+/* Flechas: discretas, sobre los bordes de la foto */
+.fb-car-fl { position: absolute; top: 50%; display: grid; place-items: center; width: 2rem; height: 2rem; margin-top: -1rem; border-radius: 99px; font-size: 12px; color: #fff; background: rgb(11 13 28 / .7); border: 1px solid rgb(255 255 255 / .18); backdrop-filter: blur(6px); transition: transform 160ms cubic-bezier(.22,1,.36,1), opacity 160ms cubic-bezier(.22,1,.36,1); }
+.fb-car-fl[data-dir='-1'] { left: -.9rem; } .fb-car-fl[data-dir='1'] { right: -.9rem; }
+.fb-car-fl:active { transform: scale(.92); }
+@media (hover: hover) { .fb-car-fl { opacity: .55; } .fb-escudo.con-varias:hover .fb-car-fl { opacity: 1; } .fb-car-fl:hover { transform: scale(1.08); } }
+/* Puntos: cuál foto estás viendo */
+.fb-car-puntos { display: flex; gap: .4rem; justify-content: center; margin-top: .55rem; }
+.fb-car-puntos button { width: .45rem; height: .45rem; padding: 0; border-radius: 99px; background: rgb(255 255 255 / .22); transition: transform 180ms cubic-bezier(.22,1,.36,1), background-color 180ms cubic-bezier(.22,1,.36,1); }
+.fb-car-puntos button[aria-current='true'] { background: rgb(var(--lc)); transform: scale(1.35); }
+.fb-car-puntos button::before { content: ''; position: absolute; inset: -.5rem; } .fb-car-puntos button { position: relative; }
 .fb-mini-escudo { position: absolute; right: -.6rem; bottom: -.6rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 99px; background: #0b0d1c; border: 1px solid rgb(255 255 255 / .15); }
 .fb-credito { font-size: 12px; color: #6b7280; } .fb-credito a { text-decoration: underline; }

@@ -7,7 +7,8 @@ import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { haceCuanto } from '../core/notifs.js';
 import * as Fotos from '../features/fotoFutbolista.js';
-const { fotoFutbolista, tamano, esWikimedia } = Fotos;
+const { fotoFutbolista, tamano, esWikimedia, fotosExtra } = Fotos;
+import { hayMovimientoReducido } from '../features/ajustes.js';
 
 const $ = (id) => document.getElementById(id);
 const POS = { PT: 'Portero', DEC: 'Defensa central', LD: 'Lateral derecho', LI: 'Lateral izquierdo', MCD: 'Mediocentro defensivo', MC: 'Mediocentro', MO: 'Mediapunta',
@@ -87,8 +88,35 @@ function pintar(movs, comp) {
     const img = new Image(); img.alt = `Foto de ${j.nombre}`; img.src = tamano(f.url, 500);
     const intentos = [tamano(f.url, 330), f.url];
     img.onerror = () => { const sig = intentos.shift(); if (sig && sig !== img.src) { img.src = sig; } else if (intentos.length) { img.onerror(); } else { console.warn('[fotos] no cargó la foto de', j.nombre); estado(`La foto existe pero no cargó: ${img.src.slice(0, 70)}…`); } };
-    img.onload = () => { const box = $('fb-foto'); if (!box) return; box.classList.add('con-foto'); box.replaceChildren(img); if (club) box.insertAdjacentHTML('beforeend', `<span class="fb-mini-escudo">${escudo(club, 30)}</span>`);
-      const cr = $('fb-credito'); cr.hidden = false; cr.innerHTML = `Foto: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(f.titulo)}" target="_blank" rel="noopener noreferrer">Wikipedia</a> · Wikimedia Commons`; };
+    img.onload = () => { const box = $('fb-foto'); if (!box) return; box.classList.add('con-foto');
+      box.innerHTML = `<div class="fb-car" data-no3d role="region" aria-roledescription="carrusel" aria-label="Fotos de ${esc(j.nombre)}" tabindex="0"><div class="fb-car-pista"></div></div>`;
+      box.querySelector('.fb-car-pista').append(img);
+      if (club) box.insertAdjacentHTML('beforeend', `<span class="fb-mini-escudo">${escudo(club, 30)}</span>`);
+      const cr = $('fb-credito'); cr.hidden = false; cr.innerHTML = `Foto: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(f.titulo)}" target="_blank" rel="noopener noreferrer">Wikipedia</a> · Wikimedia Commons`;
+      fotosExtra(f.titulo, j.nombre, f.url).then((extra) => carrusel(box, extra));
+    };
+  });
+}
+
+// Carrusel de fotos (ronda 285): la 1.ª es el retrato principal; las demás solo aparecen si cargan bien.
+// Nada se mueve solo: se pasa deslizando con el dedo, con las flechas, con los puntos o con ← → del teclado.
+function carrusel(box, extra) {
+  const pista = box.querySelector('.fb-car-pista'); if (!pista || !extra.length) return;
+  const cargadas = extra.map(({ url }) => new Promise((ok) => { const im = new Image(); im.alt = `Otra foto de ${j.nombre}`; im.decoding = 'async'; im.onload = () => ok(im); im.onerror = () => ok(null); im.src = url; }));
+  Promise.all(cargadas).then((ims) => {
+    ims.filter(Boolean).forEach((im) => pista.append(im));
+    const n = pista.children.length; if (n < 2) return;
+    box.classList.add('con-varias');
+    box.insertAdjacentHTML('beforeend', `<button type="button" class="fb-car-fl" data-dir="-1" aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="fb-car-fl" data-dir="1" aria-label="Foto siguiente"><i class="fa-solid fa-chevron-right"></i></button>`);
+    box.insertAdjacentHTML('afterend', `<div class="fb-car-puntos" id="fb-car-puntos">${Array.from({ length: n }, (_, k) => `<button type="button" aria-label="Foto ${k + 1} de ${n}" data-i="${k}"${k ? '' : ' aria-current="true"'}></button>`).join('')}</div>`);
+    const puntos = [...$('fb-car-puntos').children];
+    const actual = () => Math.round(pista.scrollLeft / Math.max(1, pista.clientWidth));
+    const ir = (k) => { const i = Math.max(0, Math.min(n - 1, k)); pista.scrollTo({ left: i * pista.clientWidth, behavior: hayMovimientoReducido() ? 'auto' : 'smooth' }); };
+    let raf = 0;
+    pista.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const a = actual(); puntos.forEach((p, k) => (k === a ? p.setAttribute('aria-current', 'true') : p.removeAttribute('aria-current'))); }); }, { passive: true });
+    box.querySelectorAll('.fb-car-fl').forEach((b) => b.addEventListener('click', () => ir(actual() + Number(b.dataset.dir))));
+    puntos.forEach((p) => p.addEventListener('click', () => ir(Number(p.dataset.i))));
+    box.querySelector('.fb-car').addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); ir(actual() + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); ir(actual() - 1); } });
   });
 }
 
