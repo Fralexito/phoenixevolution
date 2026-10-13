@@ -6,6 +6,8 @@
 const CLAVE = 'pes-fotos-lm-v3'; const DIAS = 14 * 864e5; const MAX = 3;
 const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente
 const API = 'https://en.wikipedia.org/w/api.php';
+// Diagnóstico temporal (ronda 284e): escribe en la consola qué encontró Wikipedia para las primeras búsquedas.
+let DEPURAR = true; setTimeout(() => { DEPURAR = false; }, 20000);
 let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
 const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
 const norm = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -13,11 +15,12 @@ const enCurso = new Map(); const cola = []; let activos = 0;
 
 async function buscar(q, nombre) {
   const u = `${API}?action=query&format=json&origin=*&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(q)}&prop=pageimages&piprop=thumbnail&pithumbsize=330`;
-  const r = await fetch(u); if (!r.ok) throw new Error(String(r.status));
+  const r = await fetch(u); if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const pags = Object.values((await r.json())?.query?.pages ?? {}).sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
   const palabras = norm(nombre).split(/[\s-]+/).filter((w) => w.length > 2);
   if (!pags.length) console.warn('[fotos] sin resultados en Wikipedia para', q);
   const ok = pags.find((p) => p.thumbnail?.source && palabras.some((w) => norm(p.title).includes(w)));
+  if (DEPURAR) console.info('[fotos]', q, '→', pags.map((p) => `${p.title}${p.thumbnail ? ' (con foto)' : ' (sin foto)'}`).join(' | ') || 'nada', ok ? `✓ ${ok.title}` : '✗');
   return ok ? { url: ok.thumbnail.source, titulo: ok.title } : null;
 }
 // Plan B: la ficha resumida del artículo (REST, también con CORS). Prueba en inglés y en español.
@@ -40,6 +43,7 @@ function siguiente() {
       try { res = (await buscar(`${nombre} ${club ?? ''} footballer`, nombre)) ?? (await buscar(`${nombre} footballer`, nombre)) ?? (await resumen(nombre)); }
       catch (e) { console.warn('[fotos] Wikipedia no respondió:', e?.message ?? e); res = (await resumen(nombre).catch(() => null)) ?? undefined; }                                      // error de red: no se recuerda, se reintenta otro día
       if (res !== undefined) { cache[clave] = { ...(res ?? {}), t: Date.now() }; guardar(); }
+      if (DEPURAR) console.info('[fotos] resultado', nombre, res ?? 'sin foto');
       listo(res ?? null);
     })().finally(() => { activos -= 1; siguiente(); });
   }

@@ -153,3 +153,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 284b (cuenta Opus, borrador): fotos — plan B con la ficha resumida de Wikipedia (en/es), sin foto se reintenta al día siguiente (antes 14 días), clave de caché nueva v2, aviso en consola si Wikipedia no responde.
 - Ronda 284c (cuenta Opus, borrador): fotos — miniaturas de Wikimedia en tamaños estándar (330 / 500 px; los tamaños raros como 320/480 pueden no servirse), sin 'no-referrer', caché v3 y avisos en consola si algo falla.
 - Ronda 284d (cuenta Opus, borrador): fotos — ARREGLO: en la 284b un comentario se tragó «const MAX = 3» (ReferenceError en el navegador, por eso no salía ninguna foto). Visto en la consola que mandó Fralex.
+- Ronda 284e (cuenta Opus, borrador): fotos — diagnóstico temporal en consola ([fotos] … qué devuelve Wikipedia, 20 s) para ver por qué no salen en el navegador de Fralex. QUITAR cuando se resuelva.
