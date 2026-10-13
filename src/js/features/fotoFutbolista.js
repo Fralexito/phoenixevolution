@@ -3,7 +3,7 @@
 // así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
 // Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
 // (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
-const CLAVE = 'pes-fotos-lm-v2'; const DIAS = 14 * 864e5; const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente const MAX = 3;
+const CLAVE = 'pes-fotos-lm-v3'; const DIAS = 14 * 864e5; const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente const MAX = 3;
 const API = 'https://en.wikipedia.org/w/api.php';
 let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
 const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
@@ -11,10 +11,11 @@ const norm = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toL
 const enCurso = new Map(); const cola = []; let activos = 0;
 
 async function buscar(q, nombre) {
-  const u = `${API}?action=query&format=json&origin=*&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(q)}&prop=pageimages&piprop=thumbnail&pithumbsize=320`;
+  const u = `${API}?action=query&format=json&origin=*&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(q)}&prop=pageimages&piprop=thumbnail&pithumbsize=330`;
   const r = await fetch(u); if (!r.ok) throw new Error(String(r.status));
   const pags = Object.values((await r.json())?.query?.pages ?? {}).sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
   const palabras = norm(nombre).split(/[\s-]+/).filter((w) => w.length > 2);
+  if (!pags.length) console.warn('[fotos] sin resultados en Wikipedia para', q);
   const ok = pags.find((p) => p.thumbnail?.source && palabras.some((w) => norm(p.title).includes(w)));
   return ok ? { url: ok.thumbnail.source, titulo: ok.title } : null;
 }
@@ -51,14 +52,17 @@ export function fotoFutbolista(nombre, club) {
   enCurso.set(clave, p); p.finally(() => enCurso.delete(clave));
   return p;
 }
-const seguro = (u) => (/^https:\/\/upload\.wikimedia\.org\//.test(u) ? u : null);
+// Wikimedia limita las miniaturas a tamaños estándar (120, 250, 330, 500, 960…): un tamaño raro puede no cargar. Se fuerza uno estándar.
+export const tamano = (u, px = 330) => String(u).replace(/\/(\d+)px-([^/]+)$/, `/${px}px-$2`);
+const seguro = (u) => (/^https:\/\/upload\.wikimedia\.org\//.test(u) ? tamano(u) : null);
 /** Pone las fotos en los elementos [data-foto] dentro de root cuando aparecen en pantalla. */
 export function montarFotos(root) {
   if (!root) return;
   const poner = async (el) => {
     const f = await fotoFutbolista(el.dataset.foto, el.dataset.club); const u = f && seguro(f.url); if (!u) return;
-    const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.referrerPolicy = 'no-referrer'; img.src = u;
+    const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.src = u;
     img.onload = () => { el.replaceChildren(img); el.classList.add('con-foto'); el.title = `Foto: Wikipedia / Wikimedia Commons (${f.titulo})`; };
+    img.onerror = () => console.warn('[fotos] no cargó la imagen de', el.dataset.foto, u);
   };
   const els = [...root.querySelectorAll('[data-foto]:not([data-foto-listo])')];
   els.forEach((el) => el.setAttribute('data-foto-listo', ''));

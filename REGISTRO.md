@@ -151,3 +151,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 283 (cuenta Opus, borrador): valores de mercado reales (oct-2026) y alturas en los 314 lm_jugadores temporales (UPDATE de datos) + página /futbolista/ con la ficha de cada uno; nombres de las cartas de Mi club enlazan a la ficha. Sin migración. 47 páginas.
 - Ronda 284 (cuenta Opus, borrador): fotos reales de los futbolistas de la Liga Máster desde Wikipedia/Commons (solo imágenes libres, con crédito), en cartas de Mi club y en /futbolista/. Sin BD.
 - Ronda 284b (cuenta Opus, borrador): fotos — plan B con la ficha resumida de Wikipedia (en/es), sin foto se reintenta al día siguiente (antes 14 días), clave de caché nueva v2, aviso en consola si Wikipedia no responde.
+- Ronda 284c (cuenta Opus, borrador): fotos — miniaturas de Wikimedia en tamaños estándar (330 / 500 px; los tamaños raros como 320/480 pueden no servirse), sin 'no-referrer', caché v3 y avisos en consola si algo falla.

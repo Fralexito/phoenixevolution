@@ -6,7 +6,7 @@ import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { haceCuanto } from '../core/notifs.js';
-import { fotoFutbolista } from '../features/fotoFutbolista.js';
+import { fotoFutbolista, tamano } from '../features/fotoFutbolista.js';
 
 const $ = (id) => document.getElementById(id);
 const POS = { PT: 'Portero', DEC: 'Defensa central', LD: 'Lateral derecho', LI: 'Lateral izquierdo', MCD: 'Mediocentro defensivo', MC: 'Mediocentro', MO: 'Mediapunta',
@@ -79,8 +79,8 @@ function pintar(movs, comp) {
   // Foto real (Wikipedia, imágenes libres). Mientras llega se ve el escudo; si no hay foto, se queda el escudo.
   fotoFutbolista(j.nombre, club?.nombre).then((f) => {
     if (!f || !/^https:\/\/upload\.wikimedia\.org\//.test(f.url)) return;
-    const img = new Image(); img.alt = `Foto de ${j.nombre}`; img.referrerPolicy = 'no-referrer'; img.src = f.url.replace(/\/\d+px-/, '/480px-');
-    img.onerror = () => { img.src = f.url; };
+    const img = new Image(); img.alt = `Foto de ${j.nombre}`; img.src = tamano(f.url, 500);
+    img.onerror = () => { if (!img.dataset.otra) { img.dataset.otra = '1'; img.src = tamano(f.url, 330); } else console.warn('[fotos] no cargó la foto de', j.nombre); };
     img.onload = () => { const box = $('fb-foto'); if (!box) return; box.classList.add('con-foto'); box.replaceChildren(img); if (club) box.insertAdjacentHTML('beforeend', `<span class="fb-mini-escudo">${escudo(club, 30)}</span>`);
       const cr = $('fb-credito'); cr.hidden = false; cr.innerHTML = `Foto: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(f.titulo)}" target="_blank" rel="noopener noreferrer">Wikipedia</a> · Wikimedia Commons`; };
   });
