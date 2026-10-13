@@ -416,3 +416,21 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 .mg-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
 @media (min-width: 1024px) { .mg-foto { width: 7rem; height: 7rem; } }
 .mg-carta .mg-nombre { text-align: center; } .mg-carta .mg-meta { text-align: center; }
+
+/* Ronda 290 · selector «Grandes / Compactas» y la vista compacta de las cartas de Mi club */
+.mg-vista { display: inline-flex; gap: .2rem; padding: .2rem; border-radius: .7rem; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); }
+.mg-vista button { display: inline-flex; align-items: center; gap: .4rem; min-height: 2rem; padding: 0 .7rem; border-radius: .5rem; font: 800 12px var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; transition: background-color 160ms cubic-bezier(.22,1,.36,1), color 160ms cubic-bezier(.22,1,.36,1), transform 120ms cubic-bezier(.22,1,.36,1); }
+.mg-vista button:hover { color: #fff; } .mg-vista button:active { transform: scale(.96); }
+.mg-vista button[aria-pressed='true'] { color: #fff; background: rgb(0 229 255 / .14); box-shadow: inset 0 0 0 1px rgb(0 229 255 / .35); }
+@media (max-width: 420px) { .mg-vista button span { display: none; } }
+#mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+@media (min-width: 640px) { #mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { #mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1440px) { #mg-panel[data-vista='compacta'] .mg-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+#mg-panel[data-vista='compacta'] .mg-carta { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) auto; column-gap: .7rem; row-gap: .1rem; align-items: center; padding: .6rem .75rem; }
+#mg-panel[data-vista='compacta'] .mg-foto { grid-column: 1; grid-row: 1 / span 2; width: 3.25rem; height: 3.25rem; margin: 0; font-size: 1.2rem; border-width: 1.5px; }
+#mg-panel[data-vista='compacta'] .mg-carta-top { grid-column: 3; grid-row: 1 / span 2; flex-direction: row; align-items: center; gap: .5rem; }
+#mg-panel[data-vista='compacta'] .mg-media { font-size: 1.5rem; }
+#mg-panel[data-vista='compacta'] .mg-nombre { grid-column: 2; grid-row: 1; margin: 0; text-align: left; align-self: end; }
+#mg-panel[data-vista='compacta'] .mg-meta { grid-column: 2; grid-row: 2; text-align: left; align-self: start; }
+#mg-panel[data-vista='compacta'] .mg-carta > :not(.mg-foto, .mg-carta-top, .mg-nombre, .mg-meta) { grid-column: 1 / -1; }

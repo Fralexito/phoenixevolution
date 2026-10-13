@@ -68,12 +68,13 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       <nav class="mg-tabs" role="tablist">
         {TABS.map(([id, ic, t], i) => <a href={`#${id}`} role="tab" data-tab={id} aria-current={i === 0 ? 'page' : undefined}><i class={`fa-solid ${ic}`}></i>{t}</a>)}
       </nav>
-      <section data-panel="plantilla" class="space-y-5"><div id="mg-plantilla" class="space-y-6"></div></section>
+      <section data-panel="plantilla" class="space-y-5"><div class="flex justify-start"><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas grandes"><i class="fa-solid fa-table-cells-large"></i><span>Grandes</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista compacta"><i class="fa-solid fa-list"></i><span>Compactas</span></button></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
       <section data-panel="mercado" hidden class="space-y-4">
         <div class="mg-filtros">
           <label class="relative flex-1 min-w-48"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i><input id="mg-buscar" type="search" placeholder="Buscar jugador…" class="field w-full !pl-8"></label>
           <select id="mg-pos" class="field w-32"><option value="">Posición</option>{['PT','DEC','LD','LI','MCD','MC','MO','MD','MI','ED','EI','SD','DC'].map((p) => <option>{p}</option>)}</select>
           <label class="mg-toggle"><input id="mg-libres" type="checkbox"><span><i class="fa-solid fa-unlock"></i> Solo libres</span></label>
+          <div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas grandes"><i class="fa-solid fa-table-cells-large"></i><span>Grandes</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista compacta"><i class="fa-solid fa-list"></i><span>Compactas</span></button></div>
         </div>
         <div id="mg-mercado"></div>
       </section>

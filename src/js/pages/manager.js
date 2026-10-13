@@ -98,6 +98,18 @@ async function pintarPlantilla() {
   montarFotos($('mg-plantilla'));
 }
 
+// Dos formas de ver las cartas (ronda 290, pedido de Fralex): «Grandes» (foto grande al centro) o «Compactas» (fila: foto pequeña,
+// nombre y media; caben más). Se recuerda en este navegador.
+const CLAVE_VISTA = 'pes-mg-vista';
+function ponerVista(v) {
+  const vista = v === 'compacta' ? 'compacta' : 'grande';
+  $('mg-panel')?.setAttribute('data-vista', vista);
+  document.querySelectorAll('.mg-vista [data-vista]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === vista)));
+  try { localStorage.setItem(CLAVE_VISTA, vista); } catch { /* no se recuerda */ }
+}
+{ let v = 'grande'; try { v = localStorage.getItem(CLAVE_VISTA) || 'grande'; } catch { /* sin almacenamiento */ } ponerVista(v); }
+document.addEventListener('click', (e) => { const b = e.target.closest('.mg-vista [data-vista]'); if (b) ponerVista(b.dataset.vista); });
+
 let tBuscar = null;
 async function pintarMercado() {
   const q = $('mg-buscar').value.trim(); const pos = $('mg-pos').value; const libres = $('mg-libres').checked;
