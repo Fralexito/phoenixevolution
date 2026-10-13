@@ -930,6 +930,12 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Página nueva `/futbolista/?id=` (`pages/futbolista.astro`, `js/pages/futbolista.js`, estilos `.fb-*` en perfilJugador.css): carta con media, posición, escudo y valor; cabecera estilo perfil (club · posición, nombre, ficha Media · Posición · Edad · Altura · Dorsal · País); botón Fichar / Hacer oferta (mismos RPC que Mi club, respeta ventana y sesión); historial de traspasos; compañeros de club. Nota de «ficha temporal» si no tiene pes_id.
 - En Mi club, el nombre de cada carta (plantilla y mercado) abre su ficha.
 
+## Ronda 284 — Fotos reales de los futbolistas (Wikipedia / Commons)
+- Fralex: «falta su foto real». `js/features/fotoFutbolista.js`: en el navegador busca el artículo del jugador en la API de Wikipedia (CORS origin=*) y usa su imagen principal; PageImages solo da imágenes LIBRES de Wikimedia Commons, por eso se puede mostrar con crédito («Foto: Wikipedia · Wikimedia Commons»). Solo se aceptan URLs de upload.wikimedia.org.
+- Ligero: máx. 3 consultas a la vez, solo las cartas que entran en pantalla (IntersectionObserver), resultado recordado 14 días en localStorage (con try/catch). Sin foto → queda el icono/escudo de siempre. Sin migración.
+- Mi club: foto redonda chiquita en cada carta (plantilla y mercado). /futbolista/: foto grande en la carta con mini escudo y crédito.
+- Riesgo conocido: si el buscador acierta mal o el jugador no tiene foto libre (canteranos), se ve el icono; no se puede verificar desde el entorno de pruebas (sin internet), revisar en la FASE BETA.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

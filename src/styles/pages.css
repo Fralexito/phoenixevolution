@@ -409,3 +409,8 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 @media (max-width: 639px) { .cu-modos button { flex-direction: column; text-align: center; gap: .45rem; padding: .75rem .5rem; } .cu-modos small { display: none; } }
 /* Las secciones que aparecen y desaparecen al cambiar de modo no usan la aparición al bajar (quedaban invisibles un momento) */
 :is(#cu-carrera, #cu-vestuario) section[data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; }
+/* Foto chiquita en las cartas de Mi club (ronda 284) */
+.mg-carta-top { gap: .4rem; }
+.mg-foto { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; margin-left: auto; border-radius: 99px; overflow: hidden; font-size: .9rem; color: rgb(var(--lc) / .55); background: rgb(var(--lc) / .08); border: 1px solid rgb(var(--lc) / .3); flex: none; }
+.mg-foto.con-foto { border-color: rgb(var(--lc) / .6); }
+.mg-foto img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }

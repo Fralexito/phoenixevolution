@@ -6,6 +6,7 @@ import { confirmar, elegir, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { haceCuanto } from '../core/notifs.js';
 import { href } from '../core/config.js';
+import { montarFotos } from '../features/fotoFutbolista.js';
 import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);
@@ -23,7 +24,7 @@ const linea = (pos) => LINEA[String(pos ?? '').toUpperCase()] ?? 'otros';
 const millones = (n) => { const v = Number(n || 0) / 1e6; return v >= 1 ? `€${v.toLocaleString('es-PE', { maximumFractionDigits: 1 })} M` : plata(n); };
 /** Tarjeta de jugador estilo carta: media grande, posición coloreada, nombre, edad y valor. */
 const carta = (j, pie = '', extra = '') => `<article class="mg-carta" data-linea="${linea(j.posicion)}">
-  <div class="mg-carta-top"><span class="mg-media">${j.media ?? '—'}</span><span class="mg-pos">${esc(j.posicion ?? '—')}</span></div>
+  <div class="mg-carta-top"><span class="mg-media">${j.media ?? '—'}</span><span class="mg-foto" data-foto="${esc(j.nombre)}" data-club="${esc(clubes.get(j.club_id)?.nombre ?? '')}" aria-hidden="true"><i class="fa-solid fa-user"></i></span><span class="mg-pos">${esc(j.posicion ?? '—')}</span></div>
   <a class="mg-nombre" title="Ver la ficha de ${esc(j.nombre)}" href="${href(`futbolista/?id=${j.id}`)}">${esc(j.nombre)}</a>
   <p class="mg-meta">${j.edad ? `${j.edad} años · ` : ''}<b>${millones(j.valor)}</b></p>${extra}
   ${pie ? `<div class="mg-carta-pie">${pie}</div>` : ''}</article>`;
@@ -93,6 +94,7 @@ async function pintarPlantilla() {
   const btn = (j) => `<div class="mg-acciones"><button type="button" class="mg-mini" data-vender="${j.id}" data-nombre="${esc(j.nombre)}" data-valor="${j.valor}" ${off} title="Vender a un club CPU por su valor"><i class="fa-solid fa-hand-holding-dollar"></i></button><button type="button" class="mg-mini" data-liberar="${j.id}" ${off} title="Liberar (queda agente libre)"><i class="fa-solid fa-user-minus"></i></button></div>`;
   $('mg-plantilla').innerHTML = LINEAS.map(([id, t]) => { const g = data.filter((j) => linea(j.posicion) === id); return g.length ? `<div class="mg-linea" data-linea="${id}">
       <h3 class="mg-linea-tit"><span></span>${t} <small>${g.length}</small></h3><div class="mg-grid">${g.map((j) => carta(j, btn(j))).join('')}</div></div>` : ''; }).join('');
+  montarFotos($('mg-plantilla'));
 }
 
 let tBuscar = null;
@@ -109,6 +111,7 @@ async function pintarMercado() {
     : `<div class="mg-grid">${lista.map((j) => { const vend = clubes.get(j.club_id); const directo = !vend || !vend.dueno;
       const origen = `<p class="mg-club-chip">${vend ? `${escudo(vend, 'w-4 h-4')} ${esc(vend.nombre)}${vend.dueno ? ' <i class="fa-solid fa-user-tie text-galaxy-400" title="Club de otro DT"></i>' : ''}` : '<i class="fa-solid fa-unlock text-emerald-300"></i> Agente libre'}</p>`;
       return carta(j, `<button type="button" class="btn ${directo ? 'btn-primary' : ''} !min-h-8 !text-[11px] w-full" data-ofertar="${j.id}" data-valor="${j.valor}" data-directo="${directo ? 1 : 0}" data-nombre="${esc(j.nombre)}" ${cfg.ventana_abierta ? '' : 'disabled'}>${directo ? '<i class="fa-solid fa-signature"></i> Fichar' : '<i class="fa-solid fa-hand-holding-dollar"></i> Ofertar'}</button>`, origen); }).join('')}</div>`;
+  montarFotos($('mg-mercado'));
 }
 
 async function pintarOficina() {

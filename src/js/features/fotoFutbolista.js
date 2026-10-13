@@ -1,0 +1,56 @@
+// FOTOS REALES de los futbolistas de la Liga Máster (ronda 284). Pedido de Fralex: «falta su foto real».
+// Se piden a Wikipedia en el navegador (API pública con CORS, origin=*). PageImages solo devuelve imágenes LIBRES (Wikimedia Commons),
+// así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
+// Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
+// (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
+const CLAVE = 'pes-fotos-lm-v1'; const DIAS = 14 * 864e5; const MAX = 3;
+const API = 'https://en.wikipedia.org/w/api.php';
+let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
+const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
+const norm = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const enCurso = new Map(); const cola = []; let activos = 0;
+
+async function buscar(q, nombre) {
+  const u = `${API}?action=query&format=json&origin=*&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(q)}&prop=pageimages&piprop=thumbnail&pithumbsize=320`;
+  const r = await fetch(u); if (!r.ok) throw new Error(String(r.status));
+  const pags = Object.values((await r.json())?.query?.pages ?? {}).sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  const palabras = norm(nombre).split(/[\s-]+/).filter((w) => w.length > 2);
+  const ok = pags.find((p) => p.thumbnail?.source && palabras.some((w) => norm(p.title).includes(w)));
+  return ok ? { url: ok.thumbnail.source, titulo: ok.title } : null;
+}
+function siguiente() {
+  while (activos < MAX && cola.length) {
+    const { clave, nombre, club, listo } = cola.shift(); activos += 1;
+    (async () => {
+      let res = null;
+      try { res = (await buscar(`${nombre} ${club ?? ''} footballer`, nombre)) ?? (await buscar(`${nombre} footballer`, nombre)); }
+      catch { res = undefined; }                                      // error de red: no se recuerda, se reintenta otro día
+      if (res !== undefined) { cache[clave] = { ...(res ?? {}), t: Date.now() }; guardar(); }
+      listo(res ?? null);
+    })().finally(() => { activos -= 1; siguiente(); });
+  }
+}
+/** Foto libre de Wikipedia para «nombre» (del «club»). Devuelve { url, titulo } o null. */
+export function fotoFutbolista(nombre, club) {
+  const clave = norm(`${nombre}|${club ?? ''}`);
+  const c = cache[clave]; if (c && Date.now() - c.t < DIAS) return Promise.resolve(c.url ? { url: c.url, titulo: c.titulo } : null);
+  if (enCurso.has(clave)) return enCurso.get(clave);
+  const p = new Promise((listo) => { cola.push({ clave, nombre, club, listo }); siguiente(); });
+  enCurso.set(clave, p); p.finally(() => enCurso.delete(clave));
+  return p;
+}
+const seguro = (u) => (/^https:\/\/upload\.wikimedia\.org\//.test(u) ? u : null);
+/** Pone las fotos en los elementos [data-foto] dentro de root cuando aparecen en pantalla. */
+export function montarFotos(root) {
+  if (!root) return;
+  const poner = async (el) => {
+    const f = await fotoFutbolista(el.dataset.foto, el.dataset.club); const u = f && seguro(f.url); if (!u) return;
+    const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.referrerPolicy = 'no-referrer'; img.src = u;
+    img.onload = () => { el.replaceChildren(img); el.classList.add('con-foto'); el.title = `Foto: Wikipedia / Wikimedia Commons (${f.titulo})`; };
+  };
+  const els = [...root.querySelectorAll('[data-foto]:not([data-foto-listo])')];
+  els.forEach((el) => el.setAttribute('data-foto-listo', ''));
+  if (!('IntersectionObserver' in window)) { els.forEach(poner); return; }
+  const io = new IntersectionObserver((en) => en.forEach((e) => { if (e.isIntersecting) { io.unobserve(e.target); poner(e.target); } }), { rootMargin: '200px' });
+  els.forEach((el) => io.observe(el));
+}
