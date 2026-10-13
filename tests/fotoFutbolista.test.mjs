@@ -9,3 +9,11 @@ test('fotos: busca en Wikipedia y devuelve la miniatura (y no revienta sin local
   assert.match(f.url, /upload\.wikimedia\.org/);
   assert.equal(tamano('https://upload.wikimedia.org/x/thumb/a/ab/LY.jpg/320px-LY.jpg', 500), 'https://upload.wikimedia.org/x/thumb/a/ab/LY.jpg/500px-LY.jpg');
 });
+
+test('fotos: acepta las dos direcciones de Wikimedia (upload y thumb) y rechaza otras (ronda 284g)', async () => {
+  const { esWikimedia } = await import('../src/js/features/fotoFutbolista.js');
+  assert.equal(esWikimedia('https://upload.wikimedia.org/wikipedia/commons/a.jpg'), true);
+  assert.equal(esWikimedia('https://thumb.wikimedia.org/wikipedia/commons/a.jpg'), true);
+  assert.equal(esWikimedia('https://ejemplo.com/a.jpg'), false);
+  assert.equal(esWikimedia(null), false);
+});

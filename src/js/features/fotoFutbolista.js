@@ -3,11 +3,9 @@
 // así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
 // Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
 // (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
-const CLAVE = 'pes-fotos-lm-v4'; const DIAS = 14 * 864e5; const MAX = 3;
+const CLAVE = 'pes-fotos-lm-v5'; const DIAS = 14 * 864e5; const MAX = 3;
 const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente
 const API = 'https://en.wikipedia.org/w/api.php';
-// Diagnóstico temporal (ronda 284e): escribe en la consola qué encontró Wikipedia para las primeras búsquedas.
-let DEPURAR = true; setTimeout(() => { DEPURAR = false; }, 20000);
 let cache = {}; try { cache = JSON.parse(localStorage.getItem(CLAVE) || '{}') || {}; } catch { cache = {}; }
 const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cache)); } catch { /* sin almacenamiento: no pasa nada */ } };
 const norm = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -22,7 +20,6 @@ async function buscar(q, nombre) {
   const palabras = norm(nombre).split(/[\s-]+/).filter((w) => w.length > 2);
   if (!pags.length) console.warn('[fotos] sin resultados en Wikipedia para', q);
   const ok = pags.find((p) => p.thumbnail?.source && palabras.some((w) => norm(p.title).includes(w)));
-  if (DEPURAR) console.info('[fotos]', q, '→', pags.map((p) => `${p.title}${p.thumbnail ? ' (con foto)' : ' (sin foto)'}`).join(' | ') || 'nada', ok ? `✓ ${ok.title}` : '✗');
   return ok ? { url: ok.thumbnail.source, titulo: ok.title } : null;
 }
 // Plan B: la ficha resumida del artículo (REST, también con CORS). Prueba en inglés y en español.
@@ -45,7 +42,6 @@ function siguiente() {
       try { res = (await buscar(`${nombre} ${club ?? ''} footballer`, nombre)) ?? (await buscar(`${nombre} footballer`, nombre)) ?? (await resumen(nombre)); }
       catch (e) { ultimoError = String(e?.message ?? e); console.warn('[fotos] Wikipedia no respondió:', ultimoError); res = (await resumen(nombre).catch(() => null)) ?? undefined; }                                      // error de red: no se recuerda, se reintenta otro día
       if (res !== undefined) { cache[clave] = { ...(res ?? {}), t: Date.now() }; guardar(); }
-      if (DEPURAR) console.info('[fotos] resultado', nombre, res ?? 'sin foto');
       listo(res ?? null);
     })().finally(() => { activos -= 1; siguiente(); });
   }
@@ -61,7 +57,9 @@ export function fotoFutbolista(nombre, club) {
 }
 // Wikimedia limita las miniaturas a tamaños estándar (120, 250, 330, 500, 960…): un tamaño raro puede no cargar. Se fuerza uno estándar.
 export const tamano = (u, px = 330) => String(u).replace(/\/(\d+)px-([^/]+)$/, `/${px}px-$2`);
-const seguro = (u) => (/^https:\/\/upload\.wikimedia\.org\//.test(u) ? tamano(u) : null);
+// Wikipedia sirve las fotos desde upload.wikimedia.org o (desde 2026) thumb.wikimedia.org: se aceptan las dos (ronda 284g).
+export const esWikimedia = (u) => /^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(String(u ?? ''));
+const seguro = (u) => (esWikimedia(u) ? u : null);
 /** Pone las fotos en los elementos [data-foto] dentro de root cuando aparecen en pantalla. */
 export function montarFotos(root) {
   if (!root) return;
