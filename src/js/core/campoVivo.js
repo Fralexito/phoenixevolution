@@ -8,8 +8,8 @@ export const SIN_CAMPO_MS = 5000;
 
 export const COLORES = { 0: '#00e5ff', 1: '#b07bff', 2: '#f5c451', '-1': '#cfd8ee' };
 
-const FASES = ['vivo', 'repeticion', 'otro', 'pausa'];
-const ETIQUETAS = { repeticion: 'REPETICIÓN', otro: 'SIN LECTURA EN VIVO', pausa: 'PAUSA' };
+const FASES = ['vivo', 'repeticion', 'otro', 'pausa', 'detenido', 'descanso'];
+const ETIQUETAS = { repeticion: 'REPETICIÓN', otro: 'SIN LECTURA EN VIVO', pausa: 'PAUSA', detenido: 'REPETICIÓN O PAUSA', descanso: 'DESCANSO' };
 
 const finito = (v, min, max) => typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
 

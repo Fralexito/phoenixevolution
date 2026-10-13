@@ -91,3 +91,10 @@ test('campoVivo: estadísticas derivadas', async () => {
   assert.equal(normalizarEst({ pas: [-1, 2] }), null);
   assert.ok(FILAS_EST.length >= 8 && FILAS_EST[0][0] === 'pos');
 });
+
+test('campoVivo: fases detenido y descanso', () => {
+  assert.equal(normalizarCampo({ j: [], fase: 'detenido' }).fase, 'detenido');
+  assert.equal(normalizarCampo({ j: [], fase: 'descanso' }).fase, 'descanso');
+  assert.equal(etiquetaFase('detenido'), 'REPETICIÓN O PAUSA');
+  assert.equal(etiquetaFase('descanso'), 'DESCANSO');
+});

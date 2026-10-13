@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.6.0: estadísticas derivadas «est» en campo; 1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.6.1: fases detenido/descanso del campo; 1.6.0: estadísticas derivadas «est» en campo; 1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -195,7 +195,7 @@ async function vivo(req: Request) {
 // ── POST /v1/liga/campo ─────────────────────────────────────────────────────────────────────────────
 // Campo 2D en vivo (Phoenix Link ≥ 0.2.21): posiciones de las fichitas y el balón. NO escribe en la base: se reenvía por Realtime
 // Broadcast al canal público de solo lectura «campo:<sala_id>» (evento «campo»). Sin nombres de cuentas ni ids de Parsec.
-const FASES_CAMPO = ["vivo", "repeticion", "otro", "pausa"];
+const FASES_CAMPO = ["vivo", "repeticion", "otro", "pausa", "detenido", "descanso"];
 // «campo» llega hasta 4 veces por segundo: se recuerda 60 s quién es la PC (token) y 30 s que la sala es suya, para no hacer 3 consultas por mensaje.
 // Coste: una PC revocada o una sala cerrada puede seguir mandando posiciones hasta 60 s (solo posiciones; el resto de rutas siguen sin caché).
 const cacheCampo = new Map<string, { d: Dispositivo; hasta: number; salas: Map<string, number> }>();
