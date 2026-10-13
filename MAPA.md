@@ -888,6 +888,13 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Campaña de cada edición más compacta: ficha de una línea (Puesto · Puntos · Jugados · Goles · Diferencia), barra de avance, una sola barra G/E/P, 4 resultados y 4 próximos con «Ver N más», «Contra cada rival» plegado. Compartir campaña como botón redondo.
 - Historial: los contadores en 0 quedan apagados. PC: 2,2 → 1,65 pantallas; celular: 4,5 → 3,2.
 
+## Ronda 276 — Perfil de jugador vivo y futbolístico (FX.perfilJugadorVivo)
+- Pedido de Fralex: «más técnico, más vivo y más futbolístico, muy dinámico». Bloque «scouting» bajo la cabecera (js/pages/jugador.js: scoutingHTML, miniCancha, animarScout; estilos al final de perfilJugador.css):
+  - En la cancha: mini cancha SVG con césped a franjas, zonas de calor (core/estilo.js mapaCalor) y la ficha de su posición; al pasar el mouse por cada tercio, el % de juego ahí.
+  - Atributos: los 6 ejes en barras con color de nivel tipo FC (cian 85+, verde 78+, lima 70+, amarillo 62+, naranja); globito con las stats que forman cada eje. Arquetipos arriba (Finalizador, Muro defensivo…).
+  - Forma: últimos 5 como bolitas + palabra (En racha / Al alza / Irregular / Mala racha).
+- Barras, números, calor y bolitas se animan UNA vez al cargar (hayMovimientoReducido respetado). Nada se mueve solo después.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

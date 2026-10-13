@@ -23,6 +23,7 @@ import { posInfo } from '../../data/posiciones.js';
 import { cargarMuro } from '../features/muro/api.js';
 import { muroCompactoHTML, reproductorYT } from '../features/muro/render.js';
 import { href } from '../core/config.js';
+import { hayMovimientoReducido } from '../features/ajustes.js';
 
 const $ = (id) => document.getElementById(id);
 const COLOR = { G: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40', E: 'bg-amber-500/20 text-amber-300 border-amber-400/40', P: 'bg-rose-500/20 text-rose-300 border-rose-400/40' };
@@ -273,6 +274,78 @@ function seccionEdicion2(liga, ed, nombre) {
   </section>`;
 }
 
+// ── PERFIL VIVO (ronda 276, FX.perfilJugadorVivo) ───────────────────────────────────────────────────────────
+// Pedido de Fralex: «más técnico, más vivo y más futbolístico, muy dinámico». Un bloque «scouting» bajo la cabecera:
+//   · En la cancha: mini cancha (SVG) con sus zonas de calor y el punto de su posición; al pasar el mouse por cada tercio
+//     dice cuánto juega ahí.
+//   · Atributos: los 6 ejes (Ataque, Creación, Técnica, Defensa, Presión, Mentalidad) en barras con el color de nivel tipo FC;
+//     al pasar el mouse, de qué stats sale cada número.
+//   · Forma: los últimos 5 resultados como bolitas y una palabra («En racha», «Irregular», «Mala racha»).
+// Las barras se llenan y los números suben una sola vez al cargar (respeta «Animaciones reducidas»). Nada se mueve solo después.
+const NIVEL = (v) => (v >= 85 ? '#22d3ee' : v >= 78 ? '#34d399' : v >= 70 ? '#a3e635' : v >= 62 ? '#fbbf24' : '#fb923c');
+function momento(ult) {
+  if (!ult.length) return null;
+  const g = ult.filter((r) => r === 'G').length; const pp = ult.filter((r) => r === 'P').length;
+  if (g >= 3) return ['En racha', '#34d399', 'fa-fire'];
+  if (pp >= 3) return ['Mala racha', '#fb7185', 'fa-arrow-trend-down'];
+  if (ult.slice(-2).every((r) => r === 'G')) return ['Al alza', '#a3e635', 'fa-arrow-trend-up'];
+  return ['Irregular', '#fbbf24', 'fa-wave-square'];
+}
+function miniCancha(p) {
+  const m = mapaCalor(p); const t = m.tercios; const z0 = [...m.zonas].sort((a, b) => b.peso - a.peso)[0];
+  const W = 105; const H = 68; const X = (x) => (x * 1.05).toFixed(1); const Y = (y) => (y * 0.68).toFixed(1);
+  const blobs = m.zonas.map((z, i) => `<ellipse class="pj-blob" style="--k:${i}" cx="${X(z.x)}" cy="${Y(z.y)}" rx="${(z.rx * 1.3).toFixed(1)}" ry="${(z.ry * 0.85).toFixed(1)}" fill="url(#pjcalor)" opacity="${Math.min(1, 0.45 + z.peso * 0.55).toFixed(2)}"/>`).join('');
+  const l = 'fill="none" stroke="rgba(255,255,255,.28)" stroke-width=".45"';
+  const tercio = (i, n, v) => `<rect class="pj-tercio" x="${(i * 35).toFixed(1)}" y="0" width="35" height="${H}" data-tip="${n}: ${v}% del juego"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" class="pj-cancha" role="img" aria-label="Zonas donde más juega: defensa ${t.defensa}%, medio ${t.medio}%, ataque ${t.ataque}%">
+    <defs><radialGradient id="pjcalor"><stop offset="0" stop-color="#ff3b30" stop-opacity=".9"/><stop offset=".45" stop-color="#ffb300" stop-opacity=".5"/><stop offset="1" stop-color="#00e5ff" stop-opacity="0"/></radialGradient>
+      <filter id="pjdifuso" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.8"/></filter>
+      <linearGradient id="pjcesped" x1="0" x2="1"><stop offset="0" stop-color="#0d4a30"/><stop offset="1" stop-color="#0a3a27"/></linearGradient></defs>
+    <rect width="${W}" height="${H}" rx="3" fill="url(#pjcesped)"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => (i % 2 ? `<rect x="${i * 15}" width="15" height="${H}" fill="rgba(255,255,255,.035)"/>` : '')).join('')}
+    <g ${l}><rect x="1.5" y="1.5" width="102" height="65" rx="1"/><line x1="52.5" y1="1.5" x2="52.5" y2="66.5"/><circle cx="52.5" cy="34" r="9"/><circle cx="52.5" cy="34" r=".6" fill="rgba(255,255,255,.35)"/>
+      <rect x="1.5" y="14" width="16" height="40"/><rect x="1.5" y="24" width="6" height="20"/><rect x="87.5" y="14" width="16" height="40"/><rect x="97.5" y="24" width="6" height="20"/>
+      <path d="M17.5 27a8 8 0 0 1 0 14M87.5 27a8 8 0 0 0 0 14"/></g>
+    <g filter="url(#pjdifuso)" style="mix-blend-mode:screen">${blobs}</g>
+    <g class="pj-marca" transform="translate(${X(z0.x)} ${Y(z0.y)})"><circle r="4.2" fill="rgba(0,0,0,.45)"/><circle r="3" fill="#fff"/><text y="1.1" text-anchor="middle" font-size="2.6" font-weight="800" fill="#0b0d1c">${escapeHTML(p.posicion ?? '')}</text></g>
+    ${tercio(0, 'Zona defensiva', t.defensa)}${tercio(1, 'Zona media', t.medio)}${tercio(2, 'Zona de ataque', t.ataque)}
+  </svg>
+  <div class="pj-tercios"><span><b>${t.defensa}%</b> defensa</span><span><b>${t.medio}%</b> medio</span><span><b>${t.ataque}%</b> ataque</span></div>`;
+}
+function scoutingHTML(p, ult) {
+  const ej = ejesEstilo(p); const mo = momento(ult);
+  const barras = ej.map((e, i) => {
+    const def = EJES.find((x) => x.id === e.id); const tip = def.keys.map((k) => `${STAT_INFO[k]?.nombre ?? k} ${p?.[k] ?? '—'}`).join(' · ');
+    return `<li class="pj-attr" style="--v:${e.valor};--n:${NIVEL(e.valor)};--k:${i}" data-tip="${escapeHTML(tip)}" tabindex="0"><span class="pj-attr-n">${escapeHTML(e.nombre)}</span><span class="pj-attr-b"><i></i></span><b class="pj-cuenta" data-to="${e.valor}">${e.valor}</b></li>`;
+  }).join('');
+  return `<section class="pj-scout" aria-label="Perfil técnico">
+    <div class="pj-scout-cancha"><h3 class="pj-sub">En la cancha</h3>${miniCancha(p)}</div>
+    <div class="pj-scout-attr"><div class="pj-scout-t"><h3 class="pj-sub">Atributos</h3><div class="pj-arq">${arquetipos(p).map((a) => `<span>${escapeHTML(a)}</span>`).join('')}</div></div>
+      <ul class="pj-attrs">${barras}</ul>
+      ${ult.length ? `<div class="pj-momento"><span class="pj-sub">Forma</span><span class="pj-bolas">${ult.map((r) => `<i data-res="${r}" title="${TXT_RES[r]}"></i>`).join('')}</span>${mo ? `<b style="--m:${mo[1]}"><i class="fa-solid ${mo[2]}"></i>${mo[0]}</b>` : ''}</div>` : ''}
+    </div>
+  </section>`;
+}
+/** Números que suben y barras que se llenan, una vez. Globito al pasar el mouse por los tercios y atributos. */
+function animarScout(root) {
+  if (!root) return;
+  const reducido = hayMovimientoReducido();
+  root.querySelectorAll('.pj-cuenta[data-to]').forEach((el) => {
+    const fin = Number(el.dataset.to); if (reducido || !Number.isFinite(fin)) return;
+    const t0 = performance.now(); const dur = 700;
+    const paso = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(fin * (1 - (1 - k) ** 3)); if (k < 1) requestAnimationFrame(paso); };
+    el.textContent = '0'; requestAnimationFrame(paso);
+  });
+  requestAnimationFrame(() => root.classList.add('pj-listo'));
+  let globo = document.querySelector('.pj-globo');
+  if (!globo) { globo = document.createElement('div'); globo.className = 'pj-globo'; globo.hidden = true; document.body.append(globo); }
+  const ver = (el, x, y) => { globo.textContent = el.dataset.tip; globo.hidden = false; const r = globo.getBoundingClientRect(); globo.style.transform = `translate(${Math.min(Math.max(8, x - r.width / 2), innerWidth - r.width - 8)}px, ${Math.max(8, y - r.height - 12)}px)`; };
+  root.addEventListener('pointermove', (e) => { const el = e.target.closest('[data-tip]'); if (el) ver(el, e.clientX, e.clientY); else globo.hidden = true; });
+  root.addEventListener('pointerleave', () => { globo.hidden = true; });
+  root.addEventListener('focusin', (e) => { const el = e.target.closest('[data-tip]'); if (el) { const r = el.getBoundingClientRect(); ver(el, r.left + r.width / 2, r.top); } });
+  root.addEventListener('focusout', () => { globo.hidden = true; });
+  addEventListener('scroll', () => { globo.hidden = true; }, { passive: true });
+}
+
 // ── PERFIL PRO (ronda 275, FX.perfilJugadorPro) ─────────────────────────────────────────────────────────────
 // Pedido de Fralex: orden visual, elegancia y sensación premium en el perfil de jugador. Mismos datos y mismas acciones:
 //   · cabecera: club y posición en una línea fina, nombre grande, apodo como firma (sin píldora), y una «ficha técnica»
@@ -291,6 +364,8 @@ function render2(p, filasHistorial, campanas, enCurso, cc) {
     cc?.fila ? celda('En la tabla', `${cc.puesto}.º<small>de ${cc.total}</small>`) : '',
   ].join('');
   const trayectoria = `${seccionHistorial(filasHistorial, enCurso)}${datosPerfil(p)}`;
+  const prim = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre)).at(-1);
+  const ultForma = prim ? forma(prim.ed.fechas, prim.nombre, 5) : [];
   const inicial = PESTANAS.some((t) => t[0] === location.hash.slice(1)) ? location.hash.slice(1) : 'temporada';
   caja(`<div class="pj2 grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] gap-8 items-start">
     <div class="w-full max-w-[320px] mx-auto lg:mx-0 lg:sticky lg:top-24">${playerCardHTML(p, 0, { largo: true })}</div>
@@ -302,6 +377,7 @@ function render2(p, filasHistorial, campanas, enCurso, cc) {
         <dl class="pj-ficha">${ficha}</dl>
         ${p.descripcion ? `<p class="pj-desc">${escapeHTML(p.descripcion)}</p>` : ''}
       </header>
+      ${FX.perfilJugadorVivo ? scoutingHTML(p, ultForma) : ''}
       <div class="pj-barra">
         <div class="pilar-tabs-lista pj-tabs" role="tablist" aria-label="Secciones del perfil">${PESTANAS.map(([id, ic, n]) => `<button type="button" role="tab" id="pj-tab-${id}" aria-controls="pj-${id}" aria-selected="${id === inicial}" data-pj-tab="${id}"><i class="fa-solid ${ic}"></i>${n}</button>`).join('')}</div>
         <details class="pj-editar" id="pj-editar-menu" hidden><summary class="btn btn-ghost"><i class="fa-solid fa-pen"></i> Editar <i class="fa-solid fa-chevron-down text-[11px]"></i></summary>
@@ -341,6 +417,7 @@ function render2(p, filasHistorial, campanas, enCurso, cc) {
   menu.addEventListener('click', (e) => { if (e.target.closest('[role=menuitem]')) menu.open = false; });
   document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target)) menu.open = false; });
   mostrarEditar();
+  if (FX.perfilJugadorVivo) animarScout(document.querySelector('.pj-scout'));
 }
 
 function mostrarEditar() {

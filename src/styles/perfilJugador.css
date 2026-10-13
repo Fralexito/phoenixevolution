@@ -115,3 +115,53 @@ html[data-tema='sudario'] .pj-camp-liga { color: #f5c542; }
   .pj-icono { margin-left: auto; }
   .pj-ficha-camp > div { flex: 1 1 30%; }
 }
+
+/* ══ PERFIL VIVO (ronda 276, FX.perfilJugadorVivo) — bloque «scouting» ═══════════════════════════════════════ */
+.pj-scout { display: grid; gap: 1.25rem; padding: 1.1rem 1.25rem; border-radius: 1.1rem; border: 1px solid rgb(0 229 255 / .2);
+  background: radial-gradient(120% 140% at 0% 0%, rgb(0 229 255 / .08), transparent 55%), radial-gradient(120% 140% at 100% 100%, rgb(128 0 255 / .12), transparent 55%), rgb(0 0 0 / .25); }
+@media (min-width: 900px) { .pj-scout { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; } }
+.pj-cancha { display: block; width: 100%; height: auto; border-radius: .75rem; box-shadow: 0 12px 30px -12px rgb(0 0 0 / .7), inset 0 0 0 1px rgb(255 255 255 / .06); }
+.pj-tercio { fill: transparent; cursor: crosshair; transition: fill .15s; }
+.pj-tercio:hover { fill: rgb(255 255 255 / .06); }
+.pj-tercios { display: flex; justify-content: space-between; margin-top: .5rem; font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: .08em; }
+.pj-tercios b { color: #fff; font: 800 14px var(--font-display); margin-right: .2rem; }
+.pj-marca { filter: drop-shadow(0 0 4px rgb(255 255 255 / .6)); }
+
+.pj-scout-t { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
+.pj-arq { display: flex; gap: .35rem; flex-wrap: wrap; }
+.pj-arq span { font: 700 12px var(--font-display); letter-spacing: .06em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 99px; color: var(--color-galaxy-400); background: rgb(0 229 255 / .1); border: 1px solid rgb(0 229 255 / .3); }
+.pj-attrs { display: grid; gap: .55rem; }
+.pj-attr { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 2.2rem; align-items: center; gap: .75rem; padding: .15rem .25rem; border-radius: .5rem; cursor: default; outline: none; }
+.pj-attr:hover, .pj-attr:focus-visible { background: rgb(255 255 255 / .04); }
+.pj-attr-n { font: 700 12px var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: #cbd5e1; }
+.pj-attr-b { height: .5rem; border-radius: 99px; background: rgb(255 255 255 / .07); overflow: hidden; }
+.pj-attr-b i { display: block; height: 100%; width: calc(var(--v) * 1%); border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--n) 45%, transparent), var(--n)); box-shadow: 0 0 10px -2px var(--n); }
+.pj-attr b { text-align: right; font: 800 1.1rem var(--font-display); color: var(--n); font-variant-numeric: tabular-nums; }
+
+.pj-momento { display: flex; align-items: center; gap: .75rem; margin-top: .9rem; padding-top: .8rem; border-top: 1px solid rgb(148 163 184 / .12); }
+.pj-momento .pj-sub { margin: 0; }
+.pj-bolas { display: flex; gap: .3rem; }
+.pj-bolas i { width: .8rem; height: .8rem; border-radius: 99px; background: var(--r); box-shadow: 0 0 8px -1px var(--r); }
+.pj-momento > b { margin-left: auto; display: inline-flex; align-items: center; gap: .4rem; font: 800 12px var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--m); padding: .3rem .65rem; border-radius: 99px; background: color-mix(in srgb, var(--m) 12%, transparent); border: 1px solid color-mix(in srgb, var(--m) 40%, transparent); }
+
+.pj-globo { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; max-width: 18rem; padding: .4rem .65rem; border-radius: .55rem; font-size: 12px; font-weight: 600; color: #f3f4f6; background: #0b0d1c; border: 1px solid rgb(0 229 255 / .3); box-shadow: 0 8px 24px rgb(0 0 0 / .5); }
+
+/* Entrada (una sola vez): barras que se llenan, calor que aparece, punto que cae en su lugar */
+@media (prefers-reduced-motion: no-preference) {
+  .pj-scout:not(.pj-listo) .pj-attr-b i { transform: scaleX(0); }
+  .pj-attr-b i { transform-origin: left; transition: transform .8s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--k) * 70ms); }
+  .pj-scout:not(.pj-listo) .pj-blob { opacity: 0 !important; }
+  .pj-blob { transition: opacity .9s ease-out; transition-delay: calc(var(--k) * 120ms + 150ms); }
+  .pj-scout:not(.pj-listo) .pj-marca { opacity: 0; }
+  .pj-marca { transition: opacity .4s ease-out .5s; }
+  .pj-scout:not(.pj-listo) .pj-bolas i { transform: scale(0); }
+  .pj-bolas i { transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+  .pj-bolas i:nth-child(2) { transition-delay: 60ms; } .pj-bolas i:nth-child(3) { transition-delay: 120ms; } .pj-bolas i:nth-child(4) { transition-delay: 180ms; } .pj-bolas i:nth-child(5) { transition-delay: 240ms; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pj-attr:hover .pj-attr-b i { filter: brightness(1.2); }
+}
+@media (max-width: 639px) {
+  .pj-scout { padding: 1rem; }
+  .pj-attr { grid-template-columns: 5.6rem minmax(0, 1fr) 2rem; gap: .55rem; }
+}
