@@ -880,6 +880,14 @@ Pedido de Fralex: el contenido se sentía «regado» (todo con el mismo peso). S
 ## Ronda 274 — Traspasos en vivo entre Phoenix Link (migración 105, Edge Function «traspasos»)
 Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un lote «jugador → equipo» y el Link de cada amigo que lo sigue (con un código de 8 caracteres) lo aplica sobre su propia base. Función **aparte** de «liga» (un fallo aquí no toca el marcador en vivo ni el campo 2D), tablas `liga_traspasos`, `liga_traspasos_codigos`, `liga_traspasos_seguidores` (RLS sin permisos: solo la función). Probado de punta a punta contra la web real (29 comprobaciones, dispositivo temporal ya borrado). Contrato y rutas: `docs/TRASPASOS-EN-VIVO.md`. Falta que Phoenix Link use las rutas (chat LINK). Sin cambios de pantalla en la web.
 
+## Ronda 275 — Perfil de jugador con orden y elegancia (FX.perfilJugadorPro)
+- Pedido de Fralex: reorganizar el perfil de jugador con orden visual, elegancia y sensación premium. Mismos datos y acciones; `render2()` y `seccionEdicion2()` en `js/pages/jugador.js`, estilos en `styles/perfilJugador.css`.
+- Cabecera: línea fina con escudo + club + posición, nombre grande, apodo como firma (texto con degradado, sin píldora), y una «ficha técnica» de un solo estilo (Media · Posición · Altura · Pie · En la tabla) que reemplaza las 5 etiquetas de colores. Se quitó la etiqueta «PERFIL DE JUGADOR».
+- Los 3 botones de edición (solo staff) van juntos en un menú «Editar» (Ficha y stats · Biografía y redes · Historial y títulos).
+- Pestañas cápsula: Temporada · Análisis · Trayectoria (se recuerda con #analisis / #trayectoria en la dirección; flechas del teclado). El análisis ya no necesita un botón aparte.
+- Campaña de cada edición más compacta: ficha de una línea (Puesto · Puntos · Jugados · Goles · Diferencia), barra de avance, una sola barra G/E/P, 4 resultados y 4 próximos con «Ver N más», «Contra cada rival» plegado. Compartir campaña como botón redondo.
+- Historial: los contadores en 0 quedan apagados. PC: 2,2 → 1,65 pantallas; celular: 4,5 → 3,2.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

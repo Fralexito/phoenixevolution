@@ -211,11 +211,12 @@ function render(p, filasHistorial = []) {
   actual = p; historial = filasHistorial;
   const pos = posInfo(p.posicion);
   const campanas = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre))
-    .map((x) => seccionEdicion(x.l, x.ed, x.nombre)).filter(Boolean);
+    .map((x) => (FX.perfilJugadorPro ? seccionEdicion2 : seccionEdicion)(x.l, x.ed, x.nombre)).filter(Boolean);
   const primera = LIGAS.flatMap((l) => (EDICIONES[l.id] ?? []).map((ed) => ({ l, ed, nombre: nombreEnEdicion(p, ed) })).filter((x) => x.nombre && x.ed.estado === 'en_curso'))[0];
   const cc = primera ? campana(primera.ed, primera.nombre) : null;
   const enCurso = primera ? { liga: primera.l.titulo.join(' '), edicion: primera.ed.nombre, puesto: cc?.fila ? cc.puesto : 0 } : null;
   document.title = `${p.nombre} · Perfil · Phoenix Evolution Series`;
+  if (FX.perfilJugadorPro) { render2(p, filasHistorial, campanas, enCurso, cc); return; }
   caja(`<div class="grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] gap-8 items-start">
     <div class="w-full max-w-[320px] mx-auto lg:mx-0 lg:sticky lg:top-20">${playerCardHTML(p, 0, { largo: true })}</div>
     <div class="space-y-5 min-w-0">
@@ -241,7 +242,109 @@ function render(p, filasHistorial = []) {
     </div></div>`);
   montarAnalisis(p); mostrarEditar();
 }
+// Campaña de una edición, versión ordenada (ronda 275): todo lo importante en una «ficha» de una línea, una sola barra de
+// resultados, y lo secundario (más próximos partidos, contra cada rival) plegado.
+function seccionEdicion2(liga, ed, nombre) {
+  const c = campana(ed, nombre); if (!c) return '';
+  const f = c.fila; const rivales = contraRivales(c.jugados); const ult = forma(ed.fechas, nombre, 5);
+  const total = c.jugados.length + c.proximos.length; const avance = total ? pct(c.jugados.length, total) : 0;
+  const celda = (dt, dd, cls = '') => `<div class="${cls}"><dt>${dt}</dt><dd>${dd}</dd></div>`;
+  const fila = (p) => `<li class="pj-res" data-res="${p.res}"><span class="pj-res-f">F${p.n}</span><span class="flex-1 min-w-0">${rival(ed, p.rival)}</span><span class="pj-res-m"><b>${p.gf}–${p.gc}</b><small>${TXT_RES[p.res]} · ${p.local ? 'local' : 'visita'}</small></span></li>`;
+  const prox = (p) => `<li class="pj-res pj-prox"><span class="pj-res-f">F${p.n}</span><span class="flex-1 min-w-0">${rival(ed, p.rival)}</span><span class="pj-res-m"><small>${p.local ? 'Local' : 'Visita'}</small></span></li>`;
+  return `<section class="pj-camp">
+    <header class="pj-camp-cab">
+      <span class="pj-camp-esc">${escudoHTML(c.club, 34)}</span>
+      <div class="min-w-0 flex-1"><p class="pj-camp-liga">${escapeHTML(liga.titulo.join(' '))}</p><h2 class="pj-camp-ed">${escapeHTML(ed.nombre)}${c.club ? ` <span>· ${escapeHTML(c.club)}</span>` : ''}</h2></div>
+      ${ult.length ? `<div class="pj-forma" aria-label="Últimos resultados">${ult.map((r) => `<span data-res="${r}" title="${TXT_RES[r]}">${r}</span>`).join('')}</div>` : ''}
+      ${FX.compartir && f ? `<button type="button" data-compartir-camp="${escapeHTML(`${liga.id}|${ed.id}`)}" class="pj-icono" aria-label="Compartir mi campaña" title="Compartir mi campaña"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+    </header>
+    ${f ? `<dl class="pj-ficha pj-ficha-camp">${celda('Puesto', `${c.puesto}.º<small>de ${c.total}</small>`, 'pj-media')}${celda('Puntos', f.pts)}${celda('Jugados', f.pj)}${celda('Goles', `${f.gf}<small>–</small>${f.gc}`)}${celda('Diferencia', f.dg > 0 ? `+${f.dg}` : f.dg)}</dl>
+      <div class="pj-avance"><div class="pj-avance-t"><span>${zonaBadge(liga, c.puesto, c.total)}</span><span>${c.jugados.length} de ${total} partidos jugados</span></div><div class="pj-avance-b"><i style="width:${avance}%"></i></div></div>
+      <div class="pj-gep" role="img" aria-label="${f.g} ganados, ${f.e} empatados, ${f.p} perdidos"><span data-res="G" style="flex:${f.g || 0}"></span><span data-res="E" style="flex:${f.e || 0}"></span><span data-res="P" style="flex:${f.p || 0}"></span></div>
+      <p class="pj-gep-l"><span data-res="G">${f.g} ganados</span><span data-res="E">${f.e} empates</span><span data-res="P">${f.p} perdidos</span></p>`
+    : '<p class="text-sm text-gray-400">Aún no tiene partidos jugados en esta edición.</p>'}
+    <div class="grid md:grid-cols-2 gap-5">
+      <div><h3 class="pj-sub">Resultados <span>· del más reciente</span></h3>
+        ${c.jugados.length ? `<ul class="pj-lista">${[...c.jugados].reverse().slice(0, 4).map(fila).join('')}</ul>${c.jugados.length > 4 ? `<details class="pj-mas"><summary>Ver ${c.jugados.length - 4} más</summary><ul class="pj-lista">${[...c.jugados].reverse().slice(4).map(fila).join('')}</ul></details>` : ''}` : '<p class="text-sm text-gray-500">Sin resultados todavía.</p>'}</div>
+      <div><h3 class="pj-sub">Próximos partidos</h3>
+        ${c.proximos.length ? `<ul class="pj-lista">${c.proximos.slice(0, 4).map(prox).join('')}</ul>${c.proximos.length > 4 ? `<details class="pj-mas"><summary>Ver ${c.proximos.length - 4} más</summary><ul class="pj-lista">${c.proximos.slice(4).map(prox).join('')}</ul></details>` : ''}` : '<p class="text-sm text-gray-500">No quedan partidos pendientes o el calendario aún no está confirmado.</p>'}</div>
+    </div>
+    ${rivales.length ? `<details class="pj-mas pj-rivales"><summary>Contra cada rival <span>(${rivales.length})</span></summary><div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-2 mt-3">${rivales.map((r) => { const t = r.g + r.e + r.p; return `<div class="pj-rival"><div class="flex items-center justify-between gap-2 text-sm">${rival(ed, r.rival)}<b class="text-white tabular-nums shrink-0">${r.gf}–${r.gc}</b></div><div class="pj-gep pj-gep-fino"><span data-res="G" style="flex:${r.g}"></span><span data-res="E" style="flex:${r.e}"></span><span data-res="P" style="flex:${r.p}"></span></div><p class="text-[12px] text-gray-400 mt-1">${r.g} G · ${r.e} E · ${r.p} P${t ? '' : ''}</p></div>`; }).join('')}</div></details>` : ''}
+  </section>`;
+}
+
+// ── PERFIL PRO (ronda 275, FX.perfilJugadorPro) ─────────────────────────────────────────────────────────────
+// Pedido de Fralex: orden visual, elegancia y sensación premium en el perfil de jugador. Mismos datos y mismas acciones:
+//   · cabecera: club y posición en una línea fina, nombre grande, apodo como firma (sin píldora), y una «ficha técnica»
+//     de un solo estilo (Media · Posición · Altura · Pie · Puesto) en vez de 5 etiquetas de colores distintos;
+//   · los 3 botones de edición (solo staff) van juntos en un menú «Editar»;
+//   · el contenido largo se reparte en 3 pestañas cápsula: Temporada · Análisis · Trayectoria (menos scroll).
+const PESTANAS = [['temporada', 'fa-futbol', 'Temporada'], ['analisis', 'fa-chart-pie', 'Análisis'], ['trayectoria', 'fa-trophy', 'Trayectoria']];
+function render2(p, filasHistorial, campanas, enCurso, cc) {
+  const pos = posInfo(p.posicion);
+  const celda = (dt, dd, cls = '') => `<div class="${cls}"><dt>${dt}</dt><dd>${dd}</dd></div>`;
+  const ficha = [
+    celda('Media', escapeHTML(p.ovr ?? '--'), 'pj-media'),
+    p.posicion ? celda('Posición', `<span class="pj-punto" style="background:${pos.color}"></span>${escapeHTML(p.posicion)}`) : '',
+    p.altura_cm ? celda('Altura', `${escapeHTML(p.altura_cm)}<small>cm</small>`) : '',
+    p.pie ? celda('Pie', p.pie === 'Izquierdo' ? 'Izquierdo' : 'Derecho') : '',
+    cc?.fila ? celda('En la tabla', `${cc.puesto}.º<small>de ${cc.total}</small>`) : '',
+  ].join('');
+  const trayectoria = `${seccionHistorial(filasHistorial, enCurso)}${datosPerfil(p)}`;
+  const inicial = PESTANAS.some((t) => t[0] === location.hash.slice(1)) ? location.hash.slice(1) : 'temporada';
+  caja(`<div class="pj2 grid lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] gap-8 items-start">
+    <div class="w-full max-w-[320px] mx-auto lg:mx-0 lg:sticky lg:top-24">${playerCardHTML(p, 0, { largo: true })}</div>
+    <div class="space-y-6 min-w-0">
+      <header class="pj-cab">
+        <p class="pj-kicker">${p.club ? `${escudoHTML(p.club, 20)}<span>${escapeHTML(p.club)}</span><i aria-hidden="true">·</i>` : ''}<span>${escapeHTML(pos.nombre || p.posicion || '')}</span></p>
+        <h1 class="pj-nombre">${escapeHTML(p.nombre)}</h1>
+        ${p.apodo ? `<p class="pj-apodo">«${escapeHTML(p.apodo)}»</p>` : ''}
+        <dl class="pj-ficha">${ficha}</dl>
+        ${p.descripcion ? `<p class="pj-desc">${escapeHTML(p.descripcion)}</p>` : ''}
+      </header>
+      <div class="pj-barra">
+        <div class="pilar-tabs-lista pj-tabs" role="tablist" aria-label="Secciones del perfil">${PESTANAS.map(([id, ic, n]) => `<button type="button" role="tab" id="pj-tab-${id}" aria-controls="pj-${id}" aria-selected="${id === inicial}" data-pj-tab="${id}"><i class="fa-solid ${ic}"></i>${n}</button>`).join('')}</div>
+        <details class="pj-editar" id="pj-editar-menu" hidden><summary class="btn btn-ghost"><i class="fa-solid fa-pen"></i> Editar <i class="fa-solid fa-chevron-down text-[11px]"></i></summary>
+          <div class="pj-editar-lista" role="menu">
+            <button type="button" id="perfil-editar" role="menuitem"><i class="fa-solid fa-id-card"></i>Ficha y stats</button>
+            <button type="button" id="perfil-editar-bio" role="menuitem"><i class="fa-solid fa-book-open"></i>Biografía y redes</button>
+            <button type="button" id="perfil-editar-hist" role="menuitem"><i class="fa-solid fa-trophy"></i>Historial y títulos</button>
+          </div></details>
+      </div>
+      <div id="pj-temporada" role="tabpanel" aria-labelledby="pj-tab-temporada" class="space-y-5" ${inicial === 'temporada' ? '' : 'hidden'}>${campanas.join('') || '<section class="pj-vacio">Este jugador todavía no figura en ninguna edición de liga.</section>'}</div>
+      <div id="pj-analisis" role="tabpanel" aria-labelledby="pj-tab-analisis" ${inicial === 'analisis' ? '' : 'hidden'}><section id="perfil-analisis" class="pj-panel"></section></div>
+      <div id="pj-trayectoria" role="tabpanel" aria-labelledby="pj-tab-trayectoria" class="space-y-5" ${inicial === 'trayectoria' ? '' : 'hidden'}>${trayectoria}</div>
+    </div></div>`);
+  const panel = $('perfil-analisis');
+  const pintarA = (id) => {
+    const TABS = tabsDe(p); const t = TABS.find((x) => x[0] === id) ?? TABS[0];
+    panel.innerHTML = `<div class="flex flex-wrap gap-2 mb-4" role="tablist">${TABS.map(([i, ic, n]) => `<button type="button" role="tab" data-tab="${i}" aria-selected="${i === t[0]}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${n}</button>`).join('')}</div><div>${t[3](p)}</div>`;
+    if (t[0] === 'muro') cargarMuroTab(p);
+  };
+  panel.addEventListener('click', (e) => { const yt = e.target.closest('[data-act=video-yt]'); if (yt) { reproductorYT(yt); return; } const b = e.target.closest('[data-tab]'); if (b) pintarA(b.dataset.tab); });
+  const abrir = (id) => {
+    document.querySelectorAll('[data-pj-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.pjTab === id)));
+    PESTANAS.forEach(([t]) => { $(`pj-${t}`).hidden = t !== id; });
+    if (id === 'analisis' && !panel.innerHTML.trim()) pintarA('calor');
+    history.replaceState(null, '', id === 'temporada' ? location.pathname + location.search : `#${id}`);
+  };
+  document.querySelector('.pj-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-pj-tab]'); if (b) abrir(b.dataset.pjTab); });
+  document.querySelector('.pj-tabs').addEventListener('keydown', (e) => {
+    if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+    const ids = PESTANAS.map((t) => t[0]); const i = ids.indexOf(document.querySelector('[data-pj-tab][aria-selected="true"]').dataset.pjTab);
+    const n = ids[(i + (e.key === 'ArrowRight' ? 1 : -1) + ids.length) % ids.length]; abrir(n); $(`pj-tab-${n}`).focus();
+  });
+  if (inicial === 'analisis') pintarA('calor');
+  // Contadores del historial en cero: apagados, para que resalte lo que sí hay
+  document.querySelectorAll('#pj-trayectoria .grid-cols-4 > div').forEach((k) => { if (k.firstElementChild?.textContent.trim() === '0') k.classList.add('pj-cero'); });
+  const menu = $('pj-editar-menu');
+  menu.addEventListener('click', (e) => { if (e.target.closest('[role=menuitem]')) menu.open = false; });
+  document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target)) menu.open = false; });
+  mostrarEditar();
+}
+
 function mostrarEditar() {
+  const menu = $('pj-editar-menu'); if (menu) menu.hidden = !can('editarLiga');
   const b = $('perfil-editar'); if (!b) return;
   b.hidden = !can('editarLiga'); b.onclick = () => openPlayerForm(actual, init);
   const hist = $('perfil-editar-hist'); if (hist) { hist.hidden = !can('editarLiga'); hist.onclick = () => abrirEditorHistorial(actual, historial, init, { puedeBorrar: can('borrarLiga') }); }
