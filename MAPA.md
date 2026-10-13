@@ -940,6 +940,10 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - La vista previa privada ahora vive en `/phoenixevolution/fase-beta-1-0/` (antes `/fase-beta/`) y la cinta dice «FASE BETA 1.0». Cambiado en `deploy.yml`, `astro.config.mjs`, `Layout.astro`, CLAUDE.md y docs. La carpeta vieja `/fase-beta/` deja de publicarse al desplegar. Las rondas antiguas de MAPA/REGISTRO conservan el nombre viejo (historial).
 - **Pendiente de Fralex:** en Supabase Auth → URL Configuration añadir `https://fralexito.github.io/phoenixevolution/fase-beta-1-0/**` (para iniciar sesión en la vista previa).
 
+## Ronda 275 — PUBLICADO a main (orden «Publícalo», 13-oct-2026)
+- `main` avanzó (fast-forward) de 42bccd6 a 4883ebc: entran las 131 rondas acumuladas de `borrador` (hasta la 274). Tests 457/457 y build 47 páginas antes de subir. BD al día (migraciones hasta 106; la 106 la pegó Fralex en el SQL Editor).
+- Desde ahora la vista previa es `/fase-beta-1-0/` y `borrador` y `main` quedan iguales.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 
