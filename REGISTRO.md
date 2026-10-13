@@ -135,3 +135,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 275 (cuenta Opus, borrador): perfil de jugador con orden y elegancia (ficha técnica, menú Editar, pestañas Temporada/Análisis/Trayectoria, campaña compacta). Bandera FX.perfilJugadorPro. Sin BD.
 - Ronda 276 (cuenta Opus, borrador): perfil de jugador con bloque scouting (mini cancha con calor, barras de atributos color FC, forma). Bandera FX.perfilJugadorVivo. Sin BD.
 - Ronda 277 (cuenta Opus, borrador): FX.perfilJugadorVivo apagado; el perfil vuelve al diseño de la ronda 275.
+- 2026-10-13 (cuenta Opus): tarea programada «Redacción IA Phoenix» (todos los días 9:54 Lima, en la nube): si hay fecha nueva, escribe Crónica, Analista, Ranking de poder y Previa como BORRADORES en `noticias` (publicada=false, slugs ia-<liga>-<edición>-f<N>-<sección>). No toca el repo. FRALEX publica desde el editor de Noticias.
