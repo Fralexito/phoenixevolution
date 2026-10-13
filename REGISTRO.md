@@ -129,3 +129,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 271 (cuenta Opus, borrador): Premios vuelve al look de la ronda 265; retiradas las banderas de las rondas 267–270. Regla nueva: JS y recursos que aporten, sin hacer pesada la web.
 - Ronda 272 (cuenta Opus, borrador): Premios — voto MVP en franja propia al final; trofeos de la edición en malla limpia.
 - Ronda 273 (cuenta WEB, borrador): menú de arriba (pilares) — el clic ahora abre y cierra el desplegable, ya no se queda pegado. pilares.js + components.css. Sin BD.
+2026-10-12 20:10 (Lima) | Cuenta LINK (chat principal de Link, con permiso de Fralex: «haz lo de la web de una vez aquí mismo») | RESERVADO 105 y ronda 274: traspasos en vivo entre Phoenix Link (liga_traspasos, códigos y seguidores; rutas /v1/liga/traspasos* de la Edge Function «liga» 1.7.0). Solo cambios jugador→equipo, sin datos personales | — | EN CURSO | falta: migración 105, rutas, pruebas, despliegue
