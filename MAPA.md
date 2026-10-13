@@ -898,6 +898,12 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ## Ronda 277 — Perfil de jugador: vuelve el diseño de la ronda 275
 - Fralex: «me gustaba el diseño anterior». FX.perfilJugadorVivo = false (el bloque scouting queda en el código, apagado). Queda el perfil ordenado de la ronda 275.
 
+## Ronda 278 — Mi club galáctico (FX.miClubGalaxia)
+- Pedido de Fralex: Mi club con diseño distribuido, premium, innovador y galáctico. `src/pages/mi-club.astro` (rama nueva tras la bandera, mismos ids que usa miClub.js) + estilos al final de `styles/miClub.css`.
+- Cabecera: cielo estrellado (solo gradientes), órbitas SVG con 2 lunas (giran un poco solo al pasar el mouse), insignia-camiseta con degradado cian→púrpura, título en degradado y chip de estado en vivo: Sin sesión / Esperando tu club / Club conectado (miClub.js pone data-estado).
+- Sin club: «Misión de lanzamiento» en 3 pasos como planetas unidos por una órbita (Abrir Phoenix Sync → Subir mi club → Editar y jugar) con botones «Vincular mi PC» y «Ver la Liga Máster»; al lado, vista previa (maqueta) del vestuario. Sin sesión: tarjeta con Entrar / Crear cuenta. Sudario: azul + dorado.
+- Con club: el vestuario sigue igual que antes.
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

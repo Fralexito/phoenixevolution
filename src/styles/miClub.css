@@ -51,3 +51,94 @@ html[data-tema='sudario'] .mc-titulo { background: linear-gradient(90deg, #fff 4
 .mc-media { margin-left: auto; text-align: center; padding: .4rem 1rem; border-radius: .9rem; background: linear-gradient(135deg, rgba(0,229,255,.2), rgba(139,92,246,.25)); border: 1px solid rgba(0,229,255,.35); }
 .mc-media b { display: block; font-size: 2rem; line-height: 1; color: #fff; font-weight: 800; }
 .mc-media small { font-size: 12px; letter-spacing: .14em; color: #9ca3af; }
+
+/* ══ MI CLUB GALÁCTICO (ronda 278, FX.miClubGalaxia) ═══════════════════════════════════════════════════════
+   Cielo estrellado (gradientes, sin imágenes), órbitas en SVG y una insignia-camiseta. Nada se mueve solo: las lunas giran un poco
+   solo al pasar el mouse por la cabecera. Galaxy = cian + púrpura · Sudario = azul + dorado. */
+.mcg-hero { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.75rem;
+  padding: 2rem 2rem 2rem 1.75rem; border-radius: 1.5rem; border: 1px solid rgb(0 229 255 / .22);
+  background: radial-gradient(90% 140% at 0% 50%, rgb(0 229 255 / .16), transparent 55%), radial-gradient(70% 120% at 100% 0%, rgb(128 0 255 / .32), transparent 60%), linear-gradient(160deg, #0b0a24, #05040f 70%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 30px 60px -30px rgb(128 0 255 / .45); }
+.mcg-estrellas { position: absolute; inset: 0; z-index: -1; opacity: .8;
+  background-image: radial-gradient(1px 1px at 12% 22%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 28% 78%, #cfe9ff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 46% 34%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 63% 66%, #e9d5ff 50%, transparent 51%), radial-gradient(1px 1px at 77% 18%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 88% 58%, #a5f3fc 50%, transparent 51%),
+    radial-gradient(1px 1px at 94% 86%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 55% 90%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 36% 10%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 64%, #e9d5ff 50%, transparent 51%), radial-gradient(1px 1px at 70% 42%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 20% 46%, #a5f3fc 50%, transparent 51%); }
+.mcg-orbitas { position: absolute; left: -1.5rem; top: 50%; width: 15rem; height: 15rem; translate: 0 -50%; z-index: -1; overflow: visible; }
+.mcg-orbitas ellipse { fill: none; stroke: rgb(0 229 255 / .28); stroke-width: 1; stroke-dasharray: 2 5; }
+.mcg-orbitas ellipse + ellipse { stroke: rgb(168 85 247 / .35); }
+.mcg-luna { fill: #00e5ff; filter: drop-shadow(0 0 6px #00e5ff); transform-origin: 120px 120px; transition: transform 1.2s cubic-bezier(.22, 1, .36, 1); }
+.mcg-luna2 { fill: #c084fc; filter: drop-shadow(0 0 6px #a855f7); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .mcg-hero:hover .mcg-luna { transform: rotate(-14deg); } .mcg-hero:hover .mcg-luna2 { transform: rotate(18deg); } }
+.mcg-insignia { position: relative; display: grid; place-items: center; width: 7.5rem; height: 7.5rem; margin-left: 2.25rem; border-radius: 2rem; rotate: -6deg;
+  font-size: 3.4rem; color: #001018; background: linear-gradient(145deg, #5ff3ff, #00b8d4 45%, #7c3aed); box-shadow: 0 0 0 1px rgb(255 255 255 / .25) inset, 0 18px 40px -12px rgb(0 229 255 / .6), 0 0 60px -10px rgb(128 0 255 / .6); }
+.mcg-insignia::after { content: ''; position: absolute; inset: 6px; border-radius: 1.6rem; border: 1px solid rgb(255 255 255 / .35); }
+.mcg-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.mcg-chip { display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .7rem; border-radius: 99px; font: 700 12px var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #e5e7eb; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .14); }
+.mcg-beta { color: #fcd34d; border-color: rgb(252 211 77 / .35); background: rgb(252 211 77 / .08); }
+#mc-estado i { width: .5rem; height: .5rem; border-radius: 99px; background: var(--e, #6b7280); box-shadow: 0 0 8px var(--e, transparent); }
+#mc-estado b { display: none; font-weight: 700; }
+#mc-estado[data-estado='out'] .mcg-e-out, #mc-estado[data-estado='off'] .mcg-e-off, #mc-estado[data-estado='on'] .mcg-e-on { display: inline; }
+#mc-estado[data-estado='off'] { --e: #fbbf24; } #mc-estado[data-estado='on'] { --e: #34d399; color: #a7f3d0; border-color: rgb(52 211 153 / .4); }
+.mcg-titulo { margin-top: .6rem; font: 800 clamp(2.75rem, 7vw, 5rem)/.92 var(--font-display); letter-spacing: .05em; text-transform: uppercase;
+  background: linear-gradient(95deg, #fff 30%, #7df9ff 60%, #c084fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mcg-sub { margin-top: .7rem; max-width: 56ch; font-size: 14px; line-height: 1.6; color: #cbd5e1; }
+
+.mcg-panel { position: relative; border-radius: 1.25rem; border: 1px solid rgb(148 163 184 / .16); background: linear-gradient(180deg, rgb(255 255 255 / .035), rgb(0 0 0 / .25)); padding: 1.5rem; }
+.mcg-acceso { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.mcg-acceso p { font-size: 14px; color: #9ca3af; margin-top: .2rem; }
+.mcg-kicker { font: 700 12px var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: #7df9ff; }
+.mcg-h2 { margin-top: .3rem; font: 800 1.5rem/1.15 var(--font-display); letter-spacing: .03em; text-transform: uppercase; color: #fff; }
+
+.mcg-mision:not([hidden]) { display: grid; gap: 1.25rem; }
+@media (min-width: 960px) { .mcg-mision:not([hidden]) { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: stretch; } }
+.mcg-ruta { position: relative; display: grid; gap: 1.1rem; margin-top: 1.4rem; }
+.mcg-ruta::before { content: ''; position: absolute; left: 1.35rem; top: 1.4rem; bottom: 1.4rem; width: 2px; background: linear-gradient(180deg, #00e5ff, #a855f7, rgb(168 85 247 / .2)); border-radius: 2px; }
+.mcg-ruta li { position: relative; display: flex; gap: 1rem; align-items: flex-start; }
+.mcg-ruta b { display: block; font: 700 15px var(--font-display); letter-spacing: .03em; color: #fff; }
+.mcg-ruta p { margin-top: .2rem; font-size: 13px; color: #9ca3af; line-height: 1.5; }
+.mcg-planeta { position: relative; z-index: 1; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: 99px; font: 800 1.05rem var(--font-display); color: #001018;
+  background: radial-gradient(circle at 32% 30%, #fff 0 12%, #7df9ff 30%, #00b8d4 60%, #4c1d95); box-shadow: 0 0 0 4px #090818, 0 0 18px -2px rgb(0 229 255 / .7); }
+.mcg-ruta li:nth-child(2) .mcg-planeta { background: radial-gradient(circle at 32% 30%, #fff 0 12%, #a5b4fc 30%, #6366f1 60%, #312e81); box-shadow: 0 0 0 4px #090818, 0 0 18px -2px rgb(99 102 241 / .7); }
+.mcg-ruta li:nth-child(3) .mcg-planeta { color: #1e0b3a; background: radial-gradient(circle at 32% 30%, #fff 0 12%, #e9d5ff 28%, #a855f7 58%, #4c1d95); box-shadow: 0 0 0 4px #090818, 0 0 18px -2px rgb(168 85 247 / .8); }
+.mcg-acciones { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.5rem; }
+
+/* Vista previa del vestuario (maqueta, sin datos) */
+.mcg-vista { overflow: hidden; }
+.mcg-fantasma { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: .75rem; margin-top: 1rem; opacity: .85; -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 60%, transparent); }
+.mcg-f-lista { display: grid; gap: .4rem; }
+.mcg-f-fila { display: flex; align-items: center; gap: .5rem; padding: .4rem .5rem; border-radius: .6rem; background: rgb(255 255 255 / .035); border-left: 3px solid transparent; font-size: 12px; color: #6b7280; }
+.mcg-f-fila:nth-child(3) { border-left-color: #00e5ff; background: rgb(0 229 255 / .08); }
+.mcg-f-fila b { color: #9ca3af; width: 1.2rem; text-align: center; }
+.mcg-f-cara { width: 1.6rem; height: 1.6rem; border-radius: 99px; background: linear-gradient(135deg, rgb(255 255 255 / .12), rgb(255 255 255 / .04)); flex: none; }
+.mcg-f-grande { width: 2.6rem; height: 2.6rem; }
+.mcg-f-linea { flex: 1; height: .5rem; border-radius: 99px; background: rgb(255 255 255 / .08); }
+.mcg-f-ficha { border-radius: .9rem; padding: .8rem; background: rgb(255 255 255 / .03); border: 1px solid rgb(148 163 184 / .12); display: grid; gap: .55rem; align-content: start; }
+.mcg-f-top { display: flex; align-items: center; gap: .6rem; }
+.mcg-f-media { margin-left: auto; font: 800 1.4rem var(--font-display); color: #7df9ff; }
+.mcg-f-campo small { font-size: 12px; color: #6b7280; }
+.mcg-f-campo span { display: block; height: 1.6rem; margin-top: .2rem; border-radius: .45rem; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); }
+
+/* Sudario: azul + dorado */
+html[data-tema='sudario'] .mcg-hero { border-color: rgb(245 197 66 / .25); background: radial-gradient(90% 140% at 0% 50%, rgb(96 165 250 / .16), transparent 55%), radial-gradient(70% 120% at 100% 0%, rgb(245 197 66 / .18), transparent 60%), linear-gradient(160deg, #081226, #040811 70%); }
+html[data-tema='sudario'] .mcg-insignia { background: linear-gradient(145deg, #fde68a, #f5c542 45%, #2563eb); }
+html[data-tema='sudario'] .mcg-titulo { background-image: linear-gradient(95deg, #fff 30%, #fde68a 60%, #60a5fa); }
+html[data-tema='sudario'] .mcg-kicker { color: #fde68a; }
+
+/* Entrada al cargar (una vez) */
+@media (prefers-reduced-motion: no-preference) {
+  .mcg-insignia { animation: mcg-aterriza .7s cubic-bezier(.34, 1.56, .64, 1) both; }
+  @keyframes mcg-aterriza { from { opacity: 0; transform: translateY(-14px) scale(.85) rotate(-14deg); } }
+  .mcg-ruta li { animation: mcg-paso .5s cubic-bezier(.22, 1, .36, 1) both; }
+  .mcg-ruta li:nth-child(2) { animation-delay: .08s; } .mcg-ruta li:nth-child(3) { animation-delay: .16s; }
+  @keyframes mcg-paso { from { opacity: 0; transform: translateX(-10px); } }
+}
+@media (max-width: 639px) {
+  .mcg-hero { grid-template-columns: 1fr; padding: 1.5rem 1.25rem; gap: 1rem; }
+  .mcg-insignia { width: 5rem; height: 5rem; font-size: 2.3rem; margin-left: .5rem; border-radius: 1.4rem; }
+  .mcg-insignia::after { border-radius: 1.1rem; }
+  .mcg-orbitas { width: 11rem; height: 11rem; left: -2rem; top: 4rem; }
+  .mcg-panel { padding: 1.15rem; }
+  .mcg-fantasma { grid-template-columns: 1fr; }
+  .mcg-f-ficha { display: none; }
+}

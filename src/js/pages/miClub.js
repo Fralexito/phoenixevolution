@@ -25,6 +25,7 @@ async function cargarClubes() {
   if (error) { toast('No se pudieron cargar los clubes.', 'error'); return; }
   st.clubes = data ?? [];
   $('mc-vacio').hidden = st.clubes.length > 0; $('mc-app').hidden = st.clubes.length === 0;
+  const est = $('mc-estado'); if (est) est.dataset.estado = st.clubes.length ? 'on' : 'off';
   if (!st.clubes.length) return;
   const propio = st.clubes.find((c) => c.usuario_id === st.yo);
   await abrirClub((st.club && st.clubes.find((c) => c.id === st.club.id))?.id ?? (propio ?? st.clubes[0]).id);
@@ -141,7 +142,7 @@ document.addEventListener('change', (ev) => { const el = ev.target.closest('[dat
 document.addEventListener('visibilitychange', () => { if (!document.hidden && st.yo && !st.guardando && !cambiosDe(jugador()?.ficha ?? {}, st.borrador).length) cargarClubes(); });
 
 onSession((s) => {
-  const id = s?.session?.user?.id ?? null; $('mc-sin-sesion').hidden = !!id;
+  const id = s?.session?.user?.id ?? null; $('mc-sin-sesion').hidden = !!id; { const est = $('mc-estado'); if (est && !id) est.dataset.estado = 'out'; }
   if (id === st.yo) return; st.yo = id;
   if (!id) { $('mc-app').hidden = true; $('mc-vacio').hidden = true; return; }
   cargarClubes();

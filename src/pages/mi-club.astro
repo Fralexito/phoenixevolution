@@ -4,9 +4,64 @@
 // BD: migración 095 (vestuario_*). Lógica: js/core/vestuario.js · pantalla: js/pages/miClub.js · estilos: styles/miClub.css
 import Layout from '../layouts/Layout.astro';
 import Plegable from '../components/Plegable.astro';
+import { FX } from '../data/experimento.js';
+const B = import.meta.env.BASE_URL;
 ---
 <Layout title="Mi club" active="miclub" description="Edita la ficha de los jugadores de tu equipo de Liga Máster y mándala a tu juego.">
   <div class="max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-5">
+    {FX.miClubGalaxia ? (
+      <Fragment>
+        <!-- Ronda 278 (FX.miClubGalaxia): cabecera galáctica + misión de lanzamiento. Mismos ids que usa miClub.js -->
+        <header class="mcg-hero">
+          <div class="mcg-estrellas" aria-hidden="true"></div>
+          <svg class="mcg-orbitas" viewBox="0 0 240 240" aria-hidden="true">
+            <ellipse cx="120" cy="120" rx="112" ry="44" transform="rotate(-18 120 120)"/>
+            <ellipse cx="120" cy="120" rx="88" ry="30" transform="rotate(24 120 120)"/>
+            <circle class="mcg-luna" cx="226" cy="98" r="5"/><circle class="mcg-luna mcg-luna2" cx="40" cy="96" r="3.5"/>
+          </svg>
+          <div class="mcg-insignia" aria-hidden="true"><i class="fa-solid fa-shirt"></i></div>
+          <div class="mcg-texto">
+            <div class="mcg-chips">
+              <span class="mcg-chip mcg-beta">Beta · Phoenix Sync</span>
+              <span class="mcg-chip" id="mc-estado" data-estado="out"><i></i><b class="mcg-e-out">Sin sesión</b><b class="mcg-e-off">Esperando tu club</b><b class="mcg-e-on">Club conectado</b></span>
+            </div>
+            <h1 class="mcg-titulo">Mi club</h1>
+            <p class="mcg-sub">El vestuario de tu equipo de Liga Máster. Cambia la ficha de tus jugadores aquí y Phoenix Sync la aplica en tu partida de PES 2021.</p>
+          </div>
+        </header>
+
+        <section id="mc-sin-sesion" class="mcg-panel mcg-acceso">
+          <div><h2 class="mcg-h2">Entra para abrir tu vestuario</h2><p>Tu club y tus jugadores se guardan en tu cuenta.</p></div>
+          <div class="flex flex-wrap gap-2"><button type="button" class="btn btn-primary" data-pr-auth="login"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button><button type="button" class="btn btn-ghost" data-pr-auth="register"><i class="fa-solid fa-user-plus"></i> Crear cuenta</button></div>
+        </section>
+
+        <section id="mc-vacio" hidden class="mcg-mision">
+          <div class="mcg-panel mcg-pasos">
+            <p class="mcg-kicker">Misión de lanzamiento</p>
+            <h2 class="mcg-h2">Trae tu club desde PES 2021</h2>
+            <ol class="mcg-ruta">
+              <li><span class="mcg-planeta">1</span><div><b>Abre Phoenix Sync en tu PC</b><p>El programa que conecta tu partida de Liga Máster con la web.</p></div></li>
+              <li><span class="mcg-planeta">2</span><div><b>Elige «Subir mi club a la web»</b><p>Sube tu plantilla, fichas y finanzas en segundos.</p></div></li>
+              <li><span class="mcg-planeta">3</span><div><b>Edita aquí y juega</b><p>Dorsales, posiciones, habilidades… Phoenix Sync los aplica en tu partida.</p></div></li>
+            </ol>
+            <div class="mcg-acciones">
+              <a class="btn btn-primary" href={`${B}mis-salas/`}><i class="fa-solid fa-desktop"></i> Vincular mi PC</a>
+              <a class="btn btn-ghost" href={`${B}manager/`}><i class="fa-solid fa-user-tie"></i> Ver la Liga Máster</a>
+            </div>
+          </div>
+          <div class="mcg-panel mcg-vista" aria-hidden="true">
+            <p class="mcg-kicker">Así se verá tu vestuario</p>
+            <div class="mcg-fantasma">
+              <div class="mcg-f-lista">{[['1','PT'],['4','DEC'],['8','MC'],['10','MO'],['7','ED'],['9','DC']].map(([n, p]) => <div class="mcg-f-fila"><span class="mcg-f-cara"></span><b>{n}</b><span class="mcg-f-linea"></span><small>{p}</small></div>)}</div>
+              <div class="mcg-f-ficha"><div class="mcg-f-top"><span class="mcg-f-cara mcg-f-grande"></span><span class="mcg-f-linea w-24"></span><b class="mcg-f-media">84</b></div>
+                {['Dorsal','Posición','Pie','Altura'].map((x) => <div class="mcg-f-campo"><small>{x}</small><span></span></div>)}
+              </div>
+            </div>
+          </div>
+        </section>
+      </Fragment>
+    ) : (
+      <Fragment>
     <header>
       <span class="text-xs font-display font-bold text-amber-300 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">Beta · Phoenix Sync</span>
       <h1 class="text-3xl sm:text-5xl font-display font-extrabold text-white uppercase tracking-wider mt-2"><i class="fa-solid fa-shirt text-galaxy-400 mr-2"></i>Mi club</h1>
@@ -15,6 +70,9 @@ import Plegable from '../components/Plegable.astro';
 
     <p id="mc-sin-sesion" class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Inicia sesión para ver tu club.</p>
     <p id="mc-vacio" hidden class="glass-panel rounded-2xl p-6 text-center text-sm text-gray-300">Todavía no has subido tu club. En Phoenix Sync elige «Subir mi club a la web» y vuelve aquí.</p>
+
+      </Fragment>
+    )}
 
     <div id="mc-app" hidden class="space-y-4">
       <div id="mc-selector" class="flex flex-wrap gap-2" hidden></div>
