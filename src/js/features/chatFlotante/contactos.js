@@ -34,8 +34,11 @@ function filasHTML() {
   const filaGrupo = (g) => `<button type="button" class="cf-fila" data-cf-conv="${escapeHTML(g.id)}" title="${escapeHTML(tituloConv(g, nombre))}">
       <span class="cf-av cf-av-grupo" style="--cf-av:32px"><i class="fa-solid fa-user-group"></i></span><span class="cf-nom">${escapeHTML(tituloConv(g, nombre))}</span>${g.no_leidos && !g.silenciado ? `<b class="cf-badge">${insignia(g.no_leidos)}</b>` : ''}</button>`;
   if (!S.amigos.length && !grupos.length) return `<p class="cf-aviso">Aún no tienes amigos. <a href="${escapeHTML(href('amigos/'))}">Búscalos aquí</a>.</p>`;
-  return `<p class="cf-sub"><i class="cf-on-mini" aria-hidden="true"></i>En línea · ${enLinea}</p>
-    ${contactos.length ? contactos.map(fila).join('') : '<p class="cf-aviso">Nadie coincide.</p>'}
+  // Dos grupos (ronda 286, pedido de Fralex): primero los conectados y debajo los desconectados, cada uno con su título.
+  const on = contactos.filter((c) => c.enLinea); const off = contactos.filter((c) => !c.enLinea);
+  return `${!contactos.length ? '<p class="cf-aviso">Nadie coincide.</p>' : ''}
+    ${on.length ? `<p class="cf-sub"><i class="cf-on-mini" aria-hidden="true"></i>En línea · ${enLinea}</p>${on.map(fila).join('')}` : ''}
+    ${off.length ? `<p class="cf-sub cf-sub-off"><i class="cf-on-mini cf-off-mini" aria-hidden="true"></i>Desconectados · ${off.length}</p>${off.map(fila).join('')}` : ''}
     ${grupos.length ? `<p class="cf-sub">Grupos</p>${grupos.map(filaGrupo).join('')}` : ''}`;
 }
 

@@ -25,6 +25,8 @@ html[data-cf-compacto] { --cf-col-w: 4.25rem; }
 .cf-buscar input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; color: #fff; font-size: .8rem; }
 .cf-buscar:focus-within { border-color: color-mix(in srgb, var(--color-galaxy-400) 55%, transparent); }
 .cf-lista { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 .2rem .3rem; }
+.cf-off-mini { background: #4b5563; box-shadow: none; }
+.cf-sub.cf-sub-off { margin-top: .9rem; }
 .cf-sub { margin: .55rem .55rem .25rem; font: 700 .75rem var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: #6b7280; display: flex; align-items: center; white-space: nowrap; }
 .cf-fila { width: 100%; display: flex; align-items: center; gap: .65rem; min-height: 2.75rem; padding: .3rem .5rem; border-radius: .7rem; text-align: left; color: #e5e7eb; transition: background-color .15s, transform .12s cubic-bezier(.22, 1, .36, 1); }
 .cf-fila:hover, .cf-fila:focus-visible { background: rgb(255 255 255 / .06); outline: none; }
