@@ -37,15 +37,29 @@ export function tipoAfiche(n, dep = departamentoDe(n)) {
 }
 
 const LIMPIA = /^\s*(\[[^\]]*\]|¡bombazo!|¡bomba!)\s*/i;
-/** Corta el titular largo en un grito corto de diario: «¡NADIE PUEDE CON ÉL! Victor ya va…» → «¡NADIE PUEDE CON ÉL!». */
+const COLGADAS = /\s+(y|o|de|del|al|a|en|con|que|por|para|un|una|el|la|los|las|su|se|lo|no|es|tras|sin|sobre)$/i;
+/**
+ * Corta el titular largo en un grito corto de diario. Por orden:
+ * la exclamación de adelante («¡NADIE PUEDE CON ÉL!»), lo que hay antes o después de los dos puntos,
+ * y si aun así es largo, corta en una palabra entera y se come las palabras colgadas del final.
+ */
 export function grito(titulo, max = 38) {
   let t = String(titulo ?? '').replace(LIMPIA, '').trim();
-  const corte = t.search(/[:·]/);
-  if (corte > 7 && corte <= max) t = t.slice(0, corte).trim();
+  const grita = t.match(/^¡[^!]{6,}!/);                       // «¡Otro frenazo! …» → se queda con el grito
+  if (grita && grita[0].length <= max) t = grita[0];
+  else {
+    const corte = t.search(/[:·]/);
+    if (corte > 0) {                                           // «El Archivo: …» → el rótulo corto sobra; «Aviso del Tribunal: …» manda
+      const antes = t.slice(0, corte).trim(); const despues = t.slice(corte + 1).trim();
+      t = antes.length <= 13 && despues ? despues : antes;
+    }
+  }
   if (t.length > max) {
     const hasta = t.lastIndexOf(' ', max);
-    t = t.slice(0, hasta > 12 ? hasta : max).replace(/[,;.]$/, '').trim();
+    t = t.slice(0, hasta > 12 ? hasta : max);
   }
+  t = t.replace(/[,;.:·]+$/, '').trim();
+  let antes; do { antes = t; t = t.replace(COLGADAS, '').replace(/[,;.]$/, '').trim(); } while (t !== antes);
   return t.toUpperCase();
 }
 
@@ -70,7 +84,8 @@ export function datosAfiche(n, { hoy = new Date(), dep = null } = {}) {
   const fijo = { tribunal: '#e23b2e', joda: '#f97316', comunicado: '#e5e7eb' };
   const acento = fijo[tipo] ?? COLORES_DIA[hash(claveDia(hoy)) % COLORES_DIA.length];
   const texto = grito(n?.titulo);
-  const ls = lineas(texto);
+  // un grito corto se parte en dos para que siempre haya una palabra resaltada: así se ve como un afiche y no como una frase suelta
+  const ls = lineas(texto, texto.length <= 20 ? Math.max(5, Math.ceil(texto.length / 2)) : 14);
   const resaltado = ls.length > 1 ? ls[ls.length - 1] : '';
   const marcador = marcadorDe(`${n?.titulo ?? ''} ${n?.resumen ?? ''}`);
   const bajada = String(n?.resumen ?? '').trim().slice(0, 120);

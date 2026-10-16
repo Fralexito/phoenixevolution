@@ -115,11 +115,18 @@ test('afiche: elige el tipo según lo que pasó', () => {
   assert.equal(tipoAfiche(n({ titulo: 'Hoy no se jugó nada', tag: 'Tranquilo' })), 'tranquilo');
 });
 
+const COLGADA = /\s(Y|O|DE|DEL|AL|A|EN|CON|QUE|POR|PARA|UN|UNA|EL|LA|LOS|LAS|SU|SE|LO|NO|ES|TRAS|SIN|SOBRE)$/;
 test('afiche: el grito es corto y en mayúsculas', () => {
   const g = grito('¡NADIE PUEDE CON ÉL! Victor ya va 9 de 9 y la Galaxy entera tiembla');
   assert.ok(g.length <= 38 && g === g.toUpperCase());
   assert.equal(grito('[EJEMPLO] Se abre el mercado'), 'SE ABRE EL MERCADO');
   assert.ok(!/\s$/.test(grito('Fecha 9: Camilo golea a Jack 4-1')));
+  // se queda con el grito de adelante y nunca corta a media frase
+  assert.equal(grito('¡Otro frenazo! Victor y Beto firman un 0-0 y la cima se congela'), '¡OTRO FRENAZO!');
+  assert.equal(grito('¡El muro aguantó! Degox le sacó un 0-0 a Victor y la fecha 10 se llenó de ceros'), '¡EL MURO AGUANTÓ!');
+  assert.equal(grito('Aviso del Tribunal: cuatro partidos siguen sin resultado'), 'AVISO DEL TRIBUNAL');
+  assert.equal(grito('El Archivo: el 10-0 de Victor a Camilo sigue siendo la goleada'), 'EL 10-0 DE VICTOR A CAMILO SIGUE');
+  assert.ok(!COLGADA.test(grito('El Analista: la liga pasó de 5,4 goles por partido a 1,9 en dos fechas')));
 });
 
 test('afiche: parte el grito en líneas sin cortar palabras', () => {
@@ -134,6 +141,10 @@ test('afiche: datos completos y color del día', () => {
   assert.deepEqual(d.marcador, { gl: 9, gv: 0, texto: '9-0' });
   assert.match(d.acento, /^#[0-9a-f]{6}$/i);
   assert.ok(d.lineas.length >= 1 && d.firma && d.kicker);
+  // hasta un grito corto se parte en dos, para que siempre haya palabra resaltada
+  const corto = datosAfiche(n({ titulo: '¡Otro frenazo! Victor y Beto firman un 0-0', tag: 'Fecha 11 · Crónica' }), { hoy: HOY });
+  assert.equal(corto.lineas.length, 2);
+  assert.ok(corto.resaltado);
   assert.equal(datosAfiche(LISTA[4], { hoy: HOY }).acento, '#e23b2e');
   assert.equal(datosAfiche(LISTA[5], { hoy: HOY }).acento, '#f97316');
   const otros = new Set([16, 17, 18, 19, 20, 21].map((x) => datosAfiche(LISTA[0], { hoy: new Date(`2026-10-${x}T12:00:00`) }).acento));
