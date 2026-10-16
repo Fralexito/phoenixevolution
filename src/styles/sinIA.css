@@ -1,0 +1,13 @@
+/* «SIN HUELLA DE IA» (ronda 303, PRUEBA SOLO EN LIGA): quita brillos de neón, texto con degradado y cristal desenfocado.
+   Se aplica por página con main[data-activa='liga']; si gusta, se añade el id de otras páginas a la lista. Para quitarlo: borrar el @import en global.css. */
+main[data-activa='liga'] { --sia: 1; }
+/* 1 · Sin brillos */
+main[data-activa='liga'] * { text-shadow: none !important; }
+main[data-activa='liga'] :is(.btn, .hero-cta, .liga-sello, .pc-chip, .adv-chip, .liga-podio, .liga-podio-fila, .glass-panel, [class*='shadow-'], img) { box-shadow: none !important; filter: none; }
+/* 2 · Sin degradado en el texto: un color liso */
+main[data-activa='liga'] .bg-clip-text { background: none !important; -webkit-text-fill-color: currentColor; color: var(--color-galaxy-400) !important; }
+/* 3 · Tarjetas planas: sin desenfoque ni sombra interior, fondo liso */
+main[data-activa='liga'] :is(.glass-panel, .premium-glass, .liga-podio, .hero-cta-s) { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #0e0b1f; }
+/* 4 · Sin manchas de luz ni capas de adorno detrás del titular */
+main[data-activa='liga'] > header > .absolute { display: none; }
+main[data-activa='liga'] > header * { box-shadow: none !important; }
