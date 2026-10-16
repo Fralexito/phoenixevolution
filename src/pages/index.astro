@@ -349,7 +349,7 @@ const VENTANAS = [
       )}
       <p class="pulso-linea" aria-label="Pulso de la comunidad">
         {[['jugadores', 'fichas', 'database/'], ['comunidad', 'registrados', 'database/'], ['hosts', 'hosts listos', 'duelos/'], ['retos', 'retos abiertos', 'duelos/']].map(([id, txt, href]) => (
-          <a href={`${base}${href}`}><b id={`pulso-${id}`}>—</b> {txt}</a>
+          <a href={`${base}${href}`}><b id={`pulso-${id}`} data-vivo-num>—</b> {txt}</a>
         ))}
       </p>
     </div>
@@ -594,6 +594,7 @@ const VENTANAS = [
   import { montarMundos } from '../js/features/mundos.js';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();
+  import('../js/features/numerosVivos.js').then((m) => m.montarNumerosVivos()).catch((e) => console.warn('[central] números vivos:', e));
   import('../js/features/primerosPasos.js').then((m) => m.montarPrimerosPasos()).catch((e) => console.warn('[central] primeros pasos:', e));
   import('../js/features/elite.js').then((m) => m.montarElite()).catch((e) => console.warn('[central] elite:', e));
   import('../js/features/estrellas.js').then((m) => m.montarEstrellas()).catch((e) => console.warn('[central] estrellas:', e));

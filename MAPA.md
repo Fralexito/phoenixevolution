@@ -399,3 +399,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 329 (cuenta WEB, borrador): «Tu próximo partido» fijo (cupón de apuestas): core/proximoPartido.js (+test), features/proximoPartido.js, FX.proximoPartido. Solo con sesión y partido ACEPTADO/EN_JUEGO; oculto en Duelos y Mis partidos. NO probado con sesión real (solo la parte visual). Hora local ya existía en Duelos (regionAhora).
 
 ### Ronda 330 (cuenta WEB, borrador): «Empieza en 3 pasos» en la portada solo para quien no tiene sesión (features/primerosPasos.js; estilos en styles/barraInferior.css). Pendiente de las ideas de apuestas/gaming: franja de aliados (no hay datos), inicio personalizado con sesión, números con color suave, cartera.
+
+### Ronda 331 (cuenta WEB, borrador): números en vivo con destello suave verde/rojo (features/numerosVivos.js, marca data-vivo-num; puesto en las cifras del pulso de la portada). Para usarlo en otro número: añadir data-vivo-num al elemento.
