@@ -125,17 +125,19 @@ const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra
 //   Dentro de cada grupo, bloques pequeños (máx. 4) del más usado al menos usado. Las direcciones de las páginas NO cambian.
 //   Lo personal (perfil, mensajes, amigos, guardados, logros, ajustes) sigue en «Mi cuenta». false = vuelve el menú de 4 pilares.
 const conBloques = (id, label, icon, bloques, extra = {}) => {
-  const bs = bloques.map(([titulo, ids]) => ({ titulo, items: pilar(id, label, icon, ids).items }));
+  const bs = bloques.map(([titulo, ids, opc = {}]) => ({ titulo, ...opc, items: pilar(id, label, icon, ids).items }));
   return { id, label, icon, ...extra, bloques: bs, items: bs.flatMap((b) => b.items) };
 };
 const PILARES_REPARTO = [
   // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
   // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
+  // Ronda 302: el menú muestra solo 3 entradas (cada una abre un GRUPO) y las pestañas de abajo enseñan las páginas de ese grupo.
   conBloques('competir', 'Competiciones', 'fa-trophy', [
-    ['Compite', ['liga', 'competiciones', 'unirme', 'torneos>formatos', 'palmares', ...(FX.premios ? ['premios'] : []),
+    ['Ligas', ['liga', 'competiciones', 'unirme'], { compacto: true, icon: 'fa-crown', desc: 'Tablas, todas las ligas y cómo unirte' }],
+    ['Torneos', ['torneos>formatos',
       { id: 'crearliga', label: 'Crear', path: 'crear-liga/', icon: 'fa-circle-plus', desc: 'Tu liga lista en 30 segundos', staff: 'editarLiga' },
-      { id: 'crear', label: 'Crear', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos', noStaff: 'editarLiga' }]],
-    ['Estadísticas', ['historial', 'ranking', ...(FX.carruseles ? [] : ['database'])]],
+      { id: 'crear', label: 'Crear', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos', noStaff: 'editarLiga' }], { compacto: true, icon: 'fa-sitemap', desc: 'Juega uno, crea el tuyo o mira los formatos' }],
+    ['Campeones', ['palmares', ...(FX.premios ? ['premios'] : []), 'historial', 'ranking', ...(FX.carruseles ? [] : ['database'])], { compacto: true, icon: 'fa-medal', desc: 'Palmarés, premios, historial y ranking' }],
   ], { lema: 'Ligas, torneos y campeones' }),
   // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
   ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),

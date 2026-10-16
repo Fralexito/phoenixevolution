@@ -4,7 +4,10 @@
 import { pilarDe, esDe } from '../data/site.js';
 const base = import.meta.env.BASE_URL;
 const { active } = Astro.props;
-const p = pilarDe(active);
+const p0 = pilarDe(active);
+// Con grupos compactos (Competiciones), las pestañas son solo las páginas del GRUPO actual: el menú de arriba elige el grupo.
+const grupo = p0?.bloques?.some((b) => b.compacto) ? p0.bloques.find((b) => b.items.some((n) => esDe(n, active))) : null;
+const p = grupo ? { ...p0, label: `${p0.label} · ${grupo.titulo}`, bloques: [grupo], items: grupo.items } : p0;
 ---
 {p && p.items.length > 1 && (
   <nav class="pilar-tabs" aria-label={`Secciones de ${p.label}`}>
