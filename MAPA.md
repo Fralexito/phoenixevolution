@@ -335,3 +335,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 297 (cuenta WEB, borrador): cada puerta con su mundo — Jugadores violeta, Jugar rosa, Mi club verde, Comunidad naranja; Competiciones conserva el cian de Galaxy (+ dorado). Brillo de ambiente y pestañas por mundo (styles/mundos.css, main[data-mundo] desde Layout). Se apaga con Sudario o con acento elegido en Ajustes. Arreglo: textos del menú sin partirse en 2 líneas. Tests 466/0, build 48.
 
 ### Ronda 298 (cuenta WEB, borrador): vuelve la barra lateral izquierda (FX.barraLateral=true), por pedido de Fralex; era un error apagarla.
+
+### Ronda 299 (cuenta WEB, borrador): se apagan los colores por mundo (ronda 297) porque a Fralex no le gustaron. styles/mundos.css queda guardado sin importar; para volver a probarlo, re-añadir su @import en global.css.
