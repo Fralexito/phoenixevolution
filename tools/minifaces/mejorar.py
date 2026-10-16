@@ -5,7 +5,7 @@
 # en vez de solo estirar) y la guarda como .webp liviana para la web. La transparencia (alpha) se agranda aparte con Lanczos.
 #
 # Uso:  python3 tools/minifaces/mejorar.py <carpeta_entrada> <carpeta_salida> [--pesos RealESRGAN_x4plus.pth] [--px 256]
-# Pesos: https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth (BSD-3, libre).
+# Pesos (BSD-3, libres): RealESRGAN_x4plus.pth (v0.1.0) o RealESRGAN_x2plus.pth (v0.2.1, unas 4 veces más rápido), en github.com/xinntao/Real-ESRGAN/releases
 # Necesita: pip install torch pillow
 import argparse, pathlib, sys, time
 import torch, torch.nn as nn, torch.nn.functional as F
@@ -36,9 +36,10 @@ class RRDB(nn.Module):
 
 
 class RRDBNet(nn.Module):
-    def __init__(self, nf=64, nb=23, gc=32):
+    def __init__(self, nf=64, nb=23, gc=32, escala=4):
         super().__init__()
-        self.conv_first = nn.Conv2d(3, nf, 3, 1, 1)
+        self.escala = escala   # x2plus: la entrada se despliega (pixel_unshuffle) y trabaja a media resolución, unas 4 veces más rápido
+        self.conv_first = nn.Conv2d(12 if escala == 2 else 3, nf, 3, 1, 1)
         self.body = nn.Sequential(*[RRDB(nf, gc) for _ in range(nb)])
         self.conv_body = nn.Conv2d(nf, nf, 3, 1, 1)
         self.conv_up1 = nn.Conv2d(nf, nf, 3, 1, 1); self.conv_up2 = nn.Conv2d(nf, nf, 3, 1, 1)
@@ -46,6 +47,7 @@ class RRDBNet(nn.Module):
         self.lrelu = nn.LeakyReLU(0.2, True)
 
     def forward(self, x):
+        if self.escala == 2: x = F.pixel_unshuffle(x, 2)
         feat = self.conv_first(x); feat = feat + self.conv_body(self.body(feat))
         feat = self.lrelu(self.conv_up1(F.interpolate(feat, scale_factor=2, mode='nearest')))
         feat = self.lrelu(self.conv_up2(F.interpolate(feat, scale_factor=2, mode='nearest')))
@@ -53,23 +55,37 @@ class RRDBNet(nn.Module):
 
 
 def cargar(pesos):
-    m = RRDBNet(); d = torch.load(pesos, map_location='cpu', weights_only=True)
+    m = RRDBNet(escala=2 if 'x2' in str(pesos) else 4); d = torch.load(pesos, map_location='cpu', weights_only=True)
     m.load_state_dict(d.get('params_ema', d.get('params', d)), strict=True)
     return m.eval()
+
+
+def sangrar(rgba):
+    """Quita el BORDE BLANCO: en las minifaces la zona transparente guarda color blanco y se cuela en el contorno.
+    Rellena el color de los píxeles semitransparentes con el de sus vecinos opacos (promedio ponderado por alpha)."""
+    a = np.asarray(rgba, dtype=np.float32) / 255.0
+    rgb, al = a[..., :3], a[..., 3:4]
+    t = torch.from_numpy(np.concatenate([rgb * al, al], 2)).permute(2, 0, 1).unsqueeze(0)
+    for _ in range(6):   # varias pasadas de desenfoque solo para estimar el color de fondo cercano
+        t = F.avg_pool2d(F.pad(t, (2, 2, 2, 2), mode='replicate'), 5, 1)
+    b = t.squeeze(0).permute(1, 2, 0).numpy()
+    vecino = b[..., :3] / np.maximum(b[..., 3:4], 1e-4)
+    peso = np.clip(al * 1.15, 0, 1)   # casi opaco → su propio color; transparente → color del vecino
+    return (rgb * peso + vecino * (1 - peso)).clip(0, 1).astype(np.float32)
 
 
 @torch.no_grad()
 def agrandar(modelo, img):
     """img: PIL RGBA o RGB → PIL RGBA x4 (el color con la red, la transparencia con Lanczos)."""
-    rgba = img.convert('RGBA'); w, h = rgba.size
-    rgb = np.asarray(rgba.convert('RGB'), dtype=np.float32) / 255.0
+    rgba = img.convert('RGBA'); w, h = rgba.size; k = modelo.escala
+    rgb = sangrar(rgba)
     t = torch.from_numpy(rgb).permute(2, 0, 1).unsqueeze(0)
     # relleno espejo para que los bordes no salgan raros
     t = F.pad(t, (8, 8, 8, 8), mode='reflect')
-    out = modelo(t).clamp_(0, 1)[:, :, 32:32 + h * 4, 32:32 + w * 4]
+    out = modelo(t).clamp_(0, 1)[:, :, 8 * k:8 * k + h * k, 8 * k:8 * k + w * k]
     arr = (out.squeeze(0).permute(1, 2, 0).numpy() * 255.0).round().astype(np.uint8)
     res = Image.fromarray(arr, 'RGB').convert('RGBA')
-    res.putalpha(rgba.getchannel('A').resize((w * 4, h * 4), Image.LANCZOS))
+    res.putalpha(rgba.getchannel('A').resize((w * k, h * k), Image.LANCZOS))
     return res
 
 

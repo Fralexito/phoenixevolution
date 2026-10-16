@@ -475,3 +475,6 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 .mg-carta .mg-acciones .mg-mini:hover:not(:disabled) { color: #fda4af; border-color: rgb(253 164 175 / .4); }
 .mg-carta .mg-acciones .mg-mini:disabled { opacity: .35; cursor: not-allowed; }
 #mg-panel[data-tam='1'] .mg-acciones .mg-mini span { display: none; }
+/* Ronda 338 · cara del juego en las cartas de Mi club: se ve sobre el círculo de color de su línea */
+.mg-foto.con-miniface { background: radial-gradient(circle at 50% 35%, rgb(var(--lc) / .3), rgb(var(--lc) / .06) 70%); }
+.mg-foto.con-miniface img { object-fit: cover; object-position: 50% 30%; }

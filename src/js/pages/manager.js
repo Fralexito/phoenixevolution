@@ -26,7 +26,7 @@ const millones = (n) => { const v = Number(n || 0) / 1e6; return v >= 1 ? `€${
 /** Tarjeta de jugador estilo carta: media grande, posición coloreada, nombre, edad y valor. */
 const carta = (j, pie = '', extra = '') => `<article class="mg-carta" data-linea="${linea(j.posicion)}">
   <div class="mg-carta-top"><span class="mg-media">${j.media ?? '—'}</span><span class="mg-pos">${esc(j.posicion ?? '—')}</span></div>
-  <span class="mg-foto" data-foto="${esc(j.nombre)}" data-club="${esc(clubes.get(j.club_id)?.nombre ?? '')}" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+  <span class="mg-foto" data-foto="${esc(j.nombre)}" data-pes="${j.pes_id ?? ''}" data-club="${esc(clubes.get(j.club_id)?.nombre ?? '')}" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
   <a class="mg-nombre" title="Ver la ficha de ${esc(j.nombre)}" href="${href(`futbolista/?id=${j.id}`)}">${esc(j.nombre)}</a>
   <p class="mg-meta">${j.edad ? `${j.edad} años · ` : ''}<b>${millones(j.valor)}</b></p>${extra}
   ${pie ? `<div class="mg-carta-pie">${pie}</div>` : ''}</article>`;
@@ -87,7 +87,7 @@ const fila = (j, acciones) => `<tr class="border-t border-galaxy-border/60"><td 
 const tabla = (filas, conClub = false) => `<div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[12px] text-gray-500 uppercase tracking-wider"><tr><th class="text-left">Pos</th><th class="text-left">Jugador</th><th>Media</th><th class="hidden sm:table-cell">Edad</th><th class="hidden md:table-cell text-left">${conClub ? 'Club' : ''}</th><th class="text-right">Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table></div>`;
 
 async function pintarPlantilla() {
-  const { data, error } = await supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor').eq('club_id', club.id).order('media', { ascending: false });
+  const { data, error } = await supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, pes_id').eq('club_id', club.id).order('media', { ascending: false });
   if (error) { $('mg-plantilla').innerHTML = vacio('fa-triangle-exclamation', 'No se pudo cargar la plantilla', 'Recarga la página.'); return; }
   const xi = data.slice(0, 11);
   resumen = { n: data.length, valor: data.reduce((s, j) => s + Number(j.valor || 0), 0), mediaXI: xi.length ? Math.round(xi.reduce((s, j) => s + (j.media || 0), 0) / xi.length) : null };
@@ -147,7 +147,7 @@ let tBuscar = null;
 async function pintarMercado() {
   const q = $('mg-buscar').value.trim(); const pos = $('mg-pos').value; const libres = $('mg-libres').checked;
   const col = { media: ['media', false], valor: ['valor', false], edad: ['edad', true], nombre: ['nombre', true] }[herr.orden];
-  let s = supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, club_id').eq('liga', LIGA).order(col[0], { ascending: col[1], nullsFirst: false }).limit(60);
+  let s = supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, club_id, pes_id').eq('liga', LIGA).order(col[0], { ascending: col[1], nullsFirst: false }).limit(60);
   if (herr.linea) s = s.in('posicion', POS_DE(herr.linea));
   if (q) s = s.ilike('nombre', `%${q.replace(/[%_]/g, '')}%`);
   if (pos) s = s.eq('posicion', pos);

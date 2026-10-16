@@ -3,6 +3,7 @@
 // así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
 // Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
 // (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
+import { MINIFACES } from '../../data/minifaces.js';
 const CLAVE = 'pes-fotos-lm-v5'; const DIAS = 14 * 864e5; const MAX = 3;
 const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente
 const API = 'https://en.wikipedia.org/w/api.php';
@@ -60,10 +61,21 @@ export const tamano = (u, px = 330) => String(u).replace(/\/(\d+)px-([^/]+)$/, `
 // Wikipedia sirve las fotos desde upload.wikimedia.org o (desde 2026) thumb.wikimedia.org: se aceptan las dos (ronda 284g).
 export const esWikimedia = (u) => /^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(String(u ?? ''));
 const seguro = (u) => (esWikimedia(u) ? u : null);
+// MINIFACES DEL JUEGO (ronda 338, pedido de Fralex): la carita que tiene cada jugador en el parche Conmegol, mejorada con
+// Real-ESRGAN (tools/minifaces/). Se guardan en public/minifaces/<pes_id>.webp. Si el jugador la tiene, MANDA sobre Wikipedia.
+/** URL de la miniface del juego para ese pes_id, o null si no hay. */
+const BASE_MINI = `${import.meta.env?.BASE_URL ?? '/'}minifaces/`;   // igual que core/escudos.js: funciona en el navegador y en los tests
+export const minifaceUrl = (pesId) => (pesId != null && pesId !== '' && MINIFACES.has(Number(pesId)) ? `${BASE_MINI}${Number(pesId)}.webp` : null);
 /** Pone las fotos en los elementos [data-foto] dentro de root cuando aparecen en pantalla. */
 export function montarFotos(root) {
   if (!root) return;
   const poner = async (el) => {
+    const mini = minifaceUrl(el.dataset.pes);
+    if (mini) {   // carita del juego: fondo transparente, se ve sobre el círculo de color de la línea
+      const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = mini;
+      img.onload = () => { el.replaceChildren(img); el.classList.add('con-foto', 'con-miniface'); el.title = 'Su cara en el juego (parche Conmegol)'; };
+      return;
+    }
     const f = await fotoFutbolista(el.dataset.foto, el.dataset.club); const u = f && seguro(f.url); if (!u) return;
     // Sin loading=lazy: la imagen aún no está en la página y el navegador nunca la cargaría (ronda 287). Ya solo se pide cuando la carta se ve.
     const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = u;

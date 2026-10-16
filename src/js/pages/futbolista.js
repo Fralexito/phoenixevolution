@@ -7,7 +7,7 @@ import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { href } from '../core/config.js';
 import { haceCuanto } from '../core/notifs.js';
 import * as Fotos from '../features/fotoFutbolista.js';
-const { fotoFutbolista, tamano, esWikimedia, fotosExtra } = Fotos;
+const { fotoFutbolista, tamano, esWikimedia, fotosExtra, minifaceUrl } = Fotos;
 import { hayMovimientoReducido } from '../features/ajustes.js';
 import { FX } from '../../data/experimento.js';
 
@@ -75,10 +75,34 @@ function pintar(movs, comp) {
           : '<p class="text-sm text-gray-400">Todavía no tuvo traspasos en la Liga Máster.</p>'}
       </section>
       ${comp.length ? `<section class="pj-camp"><h2 class="pj-sub">Compañeros en ${esc(club?.nombre ?? '')}</h2><div class="fb-comp">${comp.map((x) => `<a href="${href(`futbolista/?id=${x.id}`)}" class="fb-chip" data-linea="${LINEA[x.posicion] ?? 'otros'}"><b>${esc(x.media ?? '')}</b>${esc(x.nombre)}<small>${esc(x.posicion ?? '')}</small></a>`).join('')}</div></section>` : ''}
-      ${j.pes_id ? '' : '<p class="fb-nota"><i class="fa-solid fa-circle-info"></i> Ficha temporal: los datos vienen de la temporada real 2026-27. Cuando llegue el catálogo del parche desde Phoenix Sync, se reemplaza por la ficha del juego.</p>'}
+      ${j.fuente ? '' : '<p class="fb-nota"><i class="fa-solid fa-circle-info"></i> Ficha temporal: los datos vienen de la temporada real 2026-27. Cuando llegue el catálogo del parche desde Phoenix Sync, se reemplaza por la ficha del juego.</p>'}
     </div>
   </div>`;
   $('fb-fichar')?.addEventListener('click', fichar);
+  // Ronda 338: si el jugador tiene su CARA DEL JUEGO (miniface del parche Conmegol, mejorada), esa es la 1.ª foto,
+  // la misma que en su carta de Mi club; las fotos de Wikipedia van detrás en el carrusel.
+  const mini = minifaceUrl(j.pes_id);
+  if (mini) {
+    const im = new Image(); im.alt = `${j.nombre} en el juego`; im.className = 'es-mini'; im.src = mini;
+    im.onload = () => {
+      const box = $('fb-foto'); if (!box) return; box.classList.add('con-foto');
+      box.innerHTML = `<div class="fb-car" data-no3d role="region" aria-roledescription="carrusel" aria-label="Fotos de ${esc(j.nombre)}" tabindex="0"><div class="fb-car-pista"></div></div>`;
+      box.querySelector('.fb-car-pista').append(im);
+      if (club) box.insertAdjacentHTML('beforeend', `<span class="fb-mini-escudo">${escudo(club, 30)}</span>`);
+      const cr = $('fb-credito'); cr.hidden = false; cr.textContent = 'Cara del juego · parche Conmegol';
+      fotoFutbolista(j.nombre, club?.nombre).then((f) => {
+        if (!f || !esWikimedia(f.url)) return;
+        cr.innerHTML = `Cara del juego · fotos: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(f.titulo)}" target="_blank" rel="noopener noreferrer">Wikipedia</a>`;
+        fotosExtra(f.titulo, j.nombre, f.url).then((extra) => carrusel(box, [{ url: tamano(f.url, 500) }, ...extra].slice(0, 5)));
+      });
+    };
+    im.onerror = () => fotoWikipedia();
+    return;
+  }
+  fotoWikipedia();
+}
+
+function fotoWikipedia() {
   // Foto real (Wikipedia, imágenes libres). Mientras llega se ve el escudo; si no hay foto, se queda el escudo.
   const estado = (t) => { const cr = $('fb-credito'); if (cr) { cr.hidden = false; cr.textContent = t; } };
   estado('Buscando su foto en Wikipedia…');

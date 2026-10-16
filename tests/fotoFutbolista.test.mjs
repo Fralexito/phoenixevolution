@@ -48,3 +48,14 @@ test('carrusel: junta varias fuentes, sin repetir, máx. 4 extra; Commons exige 
   ], 'Lamine Yamal', 'https://upload.wikimedia.org/a/Yamal_2.jpg/330px-Yamal_2.jpg');
   assert.deepEqual(r.map((x) => x.url.split('/').pop()), ['500px-Lamine Yamal 1.jpg', '500px-Yamal 3.jpg', '500px-Lamine Yamal 5.jpg', '500px-Lamine Yamal 6.jpg']);
 });
+
+test('minifaces del juego: URL solo si el jugador tiene su cara del parche (ronda 338)', async () => {
+  const { minifaceUrl } = await import('../src/js/features/fotoFutbolista.js');
+  const { MINIFACES } = await import('../src/data/minifaces.js');
+  const una = [...MINIFACES][0];
+  assert.match(minifaceUrl(una), new RegExp(`minifaces/${una}\\.webp$`));
+  assert.match(minifaceUrl(String(una)), /\.webp$/);   // llega como texto desde data-pes
+  assert.equal(minifaceUrl(''), null);
+  assert.equal(minifaceUrl(null), null);
+  assert.equal(minifaceUrl(999999999), null);
+});
