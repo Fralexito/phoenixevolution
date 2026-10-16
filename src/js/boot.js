@@ -8,6 +8,7 @@ import { initLiveDock } from './features/liveDock.js';
 import { initWelcome } from './features/welcome.js';
 import { initEdad } from './features/edad.js';
 import { initAjustes } from './features/ajustes.js';
+import { initModoLigero } from './features/modoLigero.js';
 import { initAvatarFallback } from './core/avatar.js';
 import { initBuscadorGlobal } from './features/buscadorGlobal.js';
 import { initReveal } from './features/reveal.js';
@@ -25,6 +26,7 @@ import { initAvisoSancion } from './features/moderacion/aviso.js';
 import { FX } from '../data/experimento.js';
 
 initAjustes();
+initModoLigero();
 initSitio();
 initSidebar();
 initNavbar();

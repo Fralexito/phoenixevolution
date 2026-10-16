@@ -1,0 +1,7 @@
+/* Ronda 346 · modo ligero automático (js/features/modoLigero.js). Solo cuando <html data-rend-ligero="1">.
+   El fondo borroso (backdrop-filter) es lo que más cansa a un celular modesto: se quita y los paneles quedan más sólidos para que se lean igual. */
+/* (el prefijo -webkit- va PRIMERO y el estándar DESPUÉS: si no, el minificador de la build se queda con uno solo y en Chrome el borrado no funcionaba) */
+html[data-rend-ligero='1'] *, html[data-rend-ligero='1'] *::before, html[data-rend-ligero='1'] *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-rend-ligero='1'] .glass-panel { background: rgb(14 8 30 / .94); }
+html[data-rend-ligero='1'] .prox-partido, html[data-rend-ligero='1'] .barra-inf { background: rgb(8 8 20 / .98); }
+html[data-rend-ligero='1'] .rf-poly { filter: none; }

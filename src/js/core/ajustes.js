@@ -26,7 +26,8 @@ export function guardarAjustes(almacen, ajustes) {
 export const atributosDe = (a) => Object.fromEntries(LISTA.map((x) => [`data-aj-${kebab(x.clave)}`, typeof a[x.clave] === 'boolean' ? (a[x.clave] ? 'si' : 'no') : a[x.clave]]));
 
 /** ¿Hay que reducir animaciones? `sistemaReduce` = lo que dice el dispositivo (prefers-reduced-motion). */
-export const movimientoReducido = (a, sistemaReduce) => a.movimiento === 'reducido' || (a.movimiento === 'sistema' && !!sistemaReduce);
+/** `ligero` = el modo ligero automático está activo (ronda 346): cuenta como «sistema pide menos movimiento», salvo que elijas «Siempre activas». */
+export const movimientoReducido = (a, sistemaReduce, ligero = false) => a.movimiento === 'reducido' || (a.movimiento === 'sistema' && (!!sistemaReduce || !!ligero));
 /** Factor de velocidad de la barra de última hora. */
 export const factorTicker = (v) => ({ lenta: 0.6, rapida: 1.6 })[v] ?? 1;
 /** Opciones de Intl para horas según el ajuste de región (vacías = lo que haga el dispositivo). */
