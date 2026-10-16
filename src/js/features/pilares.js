@@ -11,6 +11,10 @@ export function montarPilares() {
   document.addEventListener('pointerdown', (e) => { tactil = e.pointerType === 'touch' || e.pointerType === 'pen'; }, true);
   pilares.forEach((p) => {
     const b = p.querySelector('.pilar-btn'); const panel = p.querySelector('.pilar-panel');
+    // Si el panel se saldría de la pantalla (ventana angosta), se corre lo justo hacia adentro.
+    const encajar = () => { if (!panel) return; panel.style.setProperty('--desp', '0px'); const r = panel.getBoundingClientRect(); const m = 8; const w = document.documentElement.clientWidth;
+      const dx = r.left < m ? m - r.left : (r.right > w - m ? w - m - r.right : 0); panel.style.setProperty('--desp', `${Math.round(dx)}px`); };
+    ['mouseenter', 'focusin', 'click'].forEach((ev) => p.addEventListener(ev, encajar)); window.addEventListener('resize', encajar);
     // Un clic ALTERNA: si el panel se ve (por hover, foco o clic) lo cierra y suelta el foco; si no, lo abre.
     b?.addEventListener('click', () => {
       const visible = tactil ? p.hasAttribute('data-abierto') : (p.hasAttribute('data-abierto') || (panel && getComputedStyle(panel).visibility === 'visible'));
