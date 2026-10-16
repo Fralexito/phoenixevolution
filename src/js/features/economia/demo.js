@@ -41,6 +41,26 @@ let n = 20;
 const eco = () => ({ saldo: E.saldo, gemas: E.gemas, en_garantia: 0, puede_apostar: true, xp: E.xp, nivel: E.nivel, xp_nivel: 300, xp_siguiente: 600 });
 const falla = (m) => { throw new Error(m); };
 
+// Fase B (migración 120): recompensa diaria, misiones semanales y logros de mentira. Se puede reclamar y ver subir las ascuas.
+const GAN = { racha: 2, mejor: 5, hoy: false, topeLogros: 200, usado: 0,
+  misiones: [
+    { clave: 'm_partidos10', titulo: 'Diez partidos', descripcion: 'Juega 10 partidos con marcador confirmado esta semana.', meta: 10, progreso: 10, ascuas: 80, cobrado: false },
+    { clave: 'm_rivales3', titulo: 'Tres rivales', descripcion: 'Juega con 3 rivales distintos esta semana.', meta: 3, progreso: 2, ascuas: 60, cobrado: false },
+    { clave: 'm_ganar4', titulo: 'Cuatro victorias', descripcion: 'Gana 4 partidos con marcador confirmado esta semana.', meta: 4, progreso: 1, ascuas: 90, cobrado: false }],
+  logros: [
+    { clave: 'primer_duelo', titulo: 'Primer duelo', descripcion: 'Juega y finaliza tu primer duelo.', icono: 'fa-futbol', nivel: 'bronce', meta: 1, progreso: 1, ascuas: 20, obtenido: true, cobrado: false },
+    { clave: 'primera_victoria', titulo: 'Primera victoria', descripcion: 'Gana un duelo con marcador confirmado.', icono: 'fa-medal', nivel: 'bronce', meta: 1, progreso: 1, ascuas: 30, obtenido: true, cobrado: false },
+    { clave: 'duelista_10', titulo: 'Duelista', descripcion: 'Finaliza 10 duelos.', icono: 'fa-bolt', nivel: 'plata', meta: 10, progreso: 4, ascuas: 40, obtenido: false, cobrado: false },
+    { clave: 'ganador_50', titulo: 'Imparable', descripcion: 'Gana 50 duelos con marcador confirmado.', icono: 'fa-ranking-star', nivel: 'oro', meta: 50, progreso: 6, ascuas: 200, obtenido: false, cobrado: false }],
+};
+const ganDemo = () => {
+  const sig = GAN.racha + 1, ciclo = ((sig - 1) % 7) + 1;
+  return { racha: { actual: GAN.racha, mejor: GAN.mejor, reclamada_hoy: GAN.hoy, siguiente: sig, ciclo_siguiente: ciclo, ascuas_siguiente: 5 + (({ 3: 10, 7: 40 })[ciclo] ?? 0) },
+    primer_partido: { ascuas: 5, ganado_hoy: false },
+    misiones: { semana_fin: en(72), items: GAN.misiones.map((m) => ({ ...m, cobrable: !m.cobrado && m.progreso >= m.meta })) },
+    logros: { tope_dia: GAN.topeLogros, usado_hoy: GAN.usado, items: GAN.logros.map((l) => ({ ...l, cobrable: l.obtenido && !l.cobrado })) } };
+};
+
 export async function rpcDemo(nombre, a = {}) {
   await new Promise((r) => setTimeout(r, 60));
   switch (nombre) {
@@ -90,6 +110,23 @@ export async function rpcDemo(nombre, a = {}) {
     case 'admin_guardar_metodo': { const m = METODOS.find((x) => x.clave === a.p_clave); if (m) Object.assign(m, { nombre: a.p_nombre, activo: !!a.p_activo, minimo_centimos: a.p_minimo, instrucciones: a.p_instrucciones, datos: a.p_datos ?? {} }); return null; }
     case 'admin_set_precios_item': { const i = ITEMS.find((x) => x.id === a.p_id); if (i) { i.precio_ascuas = a.p_precio_ascuas; i.precio_gemas = a.p_precio_gemas; i.precio = a.p_precio_ascuas ?? i.precio; } return null; }
     case 'economia_auditar': return { ok: true, diferencias: 0, detalle: [], ascuas_en_circulacion: E.saldo, gemas_en_circulacion: E.gemas, revisado: ahora() };
+    case 'mis_ascuas_extra': return ganDemo();
+    case 'reclamar_racha_diaria': {
+      if (GAN.hoy) falla('Ya reclamaste tu racha de hoy. Vuelve mañana.');
+      const n = GAN.racha + 1, bono = ({ 3: 10, 7: 40 })[((n - 1) % 7) + 1] ?? 0;
+      GAN.racha = n; GAN.mejor = Math.max(GAN.mejor, n); GAN.hoy = true; E.saldo += 5 + bono; return { racha: n, ciclo: ((n - 1) % 7) + 1, ascuas: 5 + bono, bono };
+    }
+    case 'reclamar_mision': {
+      const m = GAN.misiones.find((x) => x.clave === a.p_clave); if (!m) falla('Esa misión no está activa esta semana.');
+      if (m.cobrado) falla('Ya reclamaste esta misión esta semana.'); if (m.progreso < m.meta) falla(`Aún no cumples esta misión (${m.progreso} de ${m.meta}).`);
+      m.cobrado = true; E.saldo += m.ascuas; return m.ascuas;
+    }
+    case 'reclamar_logro': {
+      const l = GAN.logros.find((x) => x.clave === a.p_id); if (!l) falla('Ese logro no tiene premio.');
+      if (l.cobrado) falla('Ya reclamaste este logro.'); if (!l.obtenido) falla('Aún no consigues este logro.');
+      if (GAN.usado + l.ascuas > GAN.topeLogros) falla(`Hoy ya reclamaste muchos logros (máximo ${GAN.topeLogros} ascuas al día). Vuelve mañana.`);
+      l.cobrado = true; GAN.usado += l.ascuas; E.saldo += l.ascuas; return l.ascuas;
+    }
     default: return null;
   }
 }

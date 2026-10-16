@@ -12,10 +12,11 @@ import * as rec from '../features/economia/recargas.js';
 import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin, EFECTOS_CARTA, PATRONES_BANNER } from '../core/economia.js';
 import { SONIDOS_CHAT } from '../core/sonidosChat.js';
 import { initSonidosChat } from '../features/sonidosChat.js';
+import * as gan from '../features/economia/ganar.js';
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
-const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas', metodos: [], pagosManuales: [], admPagos: [], admMetodos: [], alertas: [], mfa: null, auditoria: null };
+const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas', metodos: [], pagosManuales: [], admPagos: [], admMetodos: [], alertas: [], mfa: null, auditoria: null, ganar: null };
 const avisoError = (m) => { $('ti-error-txt').textContent = m; $('ti-error').hidden = !m; };
 const vacio = (t) => vacioHTML(t, { icono: 'fa-store' });
 const fecha = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? '' : d.toLocaleString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -61,8 +62,8 @@ function inventarioHTML() {
     <button type="button" data-equipar="${i.id}" data-valor="${i.equipado ? 'no' : 'si'}" class="btn ${i.equipado ? 'btn-ghost' : 'btn-primary'} !min-h-8 !px-3 !text-[12px] mt-auto">${i.equipado ? 'Quitar' : 'Equipar'}</button></article>`).join('')}</div>`;
 }
 function ganarHTML() {
-  if (!S.reglas.length) return vacio('Aún no hay reglas publicadas.');
-  return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Cómo ganar XP y ascuas</h3>
+  if (!S.reglas.length) return gan.ganarExtraHTML() || vacio('Aún no hay reglas publicadas.');
+  return gan.ganarExtraHTML() + `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Cómo ganar XP y ascuas</h3>
     <ul class="divide-y divide-galaxy-border/40 mt-2">${S.reglas.map((r) => `<li class="flex flex-wrap items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 text-white">${escapeHTML(r.descripcion || r.fuente)}</span>
       <span class="text-xs text-cyan-300">+${r.xp} XP</span><span class="text-xs text-amber-300">+${r.tokens} ascuas</span>${r.topeDiario ? `<span class="text-[12px] text-gray-500">máx. ${r.topeDiario}/día</span>` : ''}</li>`).join('')}</ul>
     <p class="text-[12px] text-gray-400 mt-2">Los partidos solo cuentan cuando el resultado queda confirmado. Las ascuas no se pueden transferir ni cambiar por dinero. Las gemas se compran en la pestaña «Comprar gemas».</p></section>`;
@@ -117,14 +118,14 @@ async function cargar() {
   const mi = ++S.req; avisoError('');
   const sesion = !!S.yo, pedir = (p, def) => p.catch((e) => { console.error('[tienda]', e); if (!S.fallo) S.fallo = e.message; return def; });
   S.fallo = '';
-  const [items, reglas, pq, eco, inv, movs, ord, adm, admItems, extra] = await Promise.all([
+  const [items, reglas, pq, eco, inv, movs, ord, adm, admItems, extra, bonus] = await Promise.all([
     pedir(api.tienda(), []), pedir(api.reglas(), []), pedir(api.paquetes(), null),
     sesion ? pedir(api.miEconomia(), null) : null, sesion ? pedir(api.miInventario(), []) : [], sesion ? pedir(api.movimientos(30), []) : [], sesion ? pedir(api.misOrdenes(), []) : [],
     sesion && esAdmin() ? pedir(api.adminResumen(), null) : null, sesion && esAdmin() ? pedir(api.adminItems(), []) : [],
-    rec.cargarDatos(sesion, esAdmin(), pedir),
+    rec.cargarDatos(sesion, esAdmin(), pedir), gan.cargarDatos(sesion, pedir),
   ]);
   if (mi !== S.req) return;
-  Object.assign(S, { items, reglas, pq, eco, inv, movs, ordenes: Array.isArray(ord) ? ord : [], adm, admItems, ...extra });
+  Object.assign(S, { items, reglas, pq, eco, inv, movs, ordenes: Array.isArray(ord) ? ord : [], adm, admItems, ...extra, ...bonus });
   if (S.fallo) avisoError(S.fallo);
   pintar();
 }
@@ -167,11 +168,13 @@ function modalAjuste(usuario, nombre) {
 
 rec.iniciar({ S, hacer, cargar, esAdmin });
 initSonidosChat();   // botones «Escuchar» de los sonidos de chat (solo suenan al pulsarlos)
+gan.iniciar({ S, hacer });
 
 // ── Eventos ──────────────────────────────────────────────────────────────────────────────────────────────────
 $('ti-contenido').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return; const d = b.dataset;
   if (rec.click(ev)) return; // recargas: paquetes, comprobantes y revisión de pagos
+  if (gan.click(ev)) return; // cómo ganar: racha diaria, misiones y logros
   if (d.cat) { S.cat = d.cat; pintar(); }
   else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i) modalCompra(i, d.moneda === 'gemas' ? 'gemas' : 'ascuas'); }
   else if (d.equipar) hacer(() => api.equipar(Number(d.equipar), d.valor === 'si').then((r) => { import('../features/efectosCarta.js').then((m) => m.olvidarEfectosCarta()); return r; }), d.valor === 'si' ? 'Equipado.' : 'Quitado.');

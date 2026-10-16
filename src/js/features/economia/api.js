@@ -1,6 +1,7 @@
 // Economía: llama a las RPC (reglas en la BD, migraciones 049-051). Esquema: pages/tienda → features/economia/api → core/economia (puro).
 import { supabase } from '../../core/supabase.js';
 import { normalizarEconomia, normalizarLista, normalizarMovimiento, normalizarRegla, normalizarPaquetes, normalizarEquipamiento, normalizarEfectosCarta, normalizarMetodos, normalizarPagoManual } from '../../core/economia.js';
+import { normalizarGanar } from '../../core/ganarAscuas.js';
 
 // Modo demostración (SOLO en desarrollo: en la web publicada este código no existe). Se activa con ?demo en la dirección y usa datos de mentira.
 const DEMO = import.meta.env.DEV && typeof location !== 'undefined' && new URLSearchParams(location.search).has('demo');
@@ -27,6 +28,11 @@ export const comprar = (item, moneda = 'ascuas') => rpc('comprar_item', { p_item
 export const equipar = (item, equipar) => rpc('equipar_item', { p_item: item, p_equipar: equipar });
 export const paquetes = async () => normalizarPaquetes(await rpc('paquetes_lista'));
 export const aceptarTerminos = () => rpc('aceptar_terminos_compra');
+// ── Fase B (migración 120): recompensa diaria con racha, misiones semanales y premios de logros ──
+export const misAscuasExtra = async () => normalizarGanar(await rpc('mis_ascuas_extra'));
+export const reclamarRachaDiaria = () => rpc('reclamar_racha_diaria');
+export const reclamarMision = (clave) => rpc('reclamar_mision', { p_clave: clave });
+export const reclamarLogro = (id) => rpc('reclamar_logro', { p_id: id });
 export const crearOrden = (paquete) => rpc('crear_orden', { p_paquete: paquete });
 export const misOrdenes = () => rpc('mis_ordenes');
 export const adminItems = async () => normalizarLista(await rpc('admin_tienda_items'));
