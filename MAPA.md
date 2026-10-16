@@ -389,3 +389,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 324 (cuenta WEB, borrador): iconos vuelven a Bold y ganan presencia (tamaño 1.2em + trazo extra .35px en styles/sinIconosWeb.css).
 
 ### Ronda 325 (cuenta WEB, borrador): el estilo «sin huella de IA» ahora cubre también database, tienda, palmares, premios, logros, envivo y ahora (solo quedan fuera la portada y Duelos, que tienen diseño propio). Revisado: perfil de jugador ya tenía gráficos (barra G/E/P, goles, tendencia) y el menú ya está agrupado (Competiciones/Jugar/Comunidad).
+
+### Ronda 326 (cuenta WEB, borrador): clips de portada aceptan Twitch (slug del clip) y Kick (canal) además de YouTube: core/clips.js (+test), highlights.js e index.astro. Los clips de YouTube de ejemplo siguen y la sección sigue oculta (FX.highlightsDemo) hasta que Fralex dé sus clips reales.

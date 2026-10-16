@@ -17,6 +17,7 @@ export const DEMO_XI = [
   { pos: 'MCD', nombre: 'ROBERTO', cls: 'bg-yellow-500 text-black' },
 ];
 // Highlights (ronda 307): videos REALES de YouTube de PES 2021 como MODELO del tipo de clip que se pondrá (goles y jugadas de ligas online).
+// Cada clip puede llevar fuente: 'youtube' (por defecto, id del video), 'twitch' (slug del clip) o 'kick' (nombre del canal).
 // Para cambiarlos, pon el id de YouTube (lo que va después de watch?v=). El primero es el grande; el resto, la lista.
 export const DEMO_CLIPS = [
   { id: 'd9815MC-efg', tag: 'TOP GOLES', titulo: 'Mejores goles de la temporada', canal: 'Terry F.C.' },

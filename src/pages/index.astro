@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
+import { miniatura, etiquetaFuente } from '../js/core/clips.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import MarcadorVivo from '../components/MarcadorVivo.astro';
 import { EDICIONES } from '../data/ligaResultados.js';
@@ -542,17 +543,17 @@ const VENTANAS = [
         <div class="lg:col-span-2">
           <div class="hl-visor glass-panel rounded-2xl overflow-hidden relative aspect-video w-full" id="hl-visor">
             <button type="button" class="hl-poster" data-hl-play aria-label={`Reproducir: ${DEMO_CLIPS[0].titulo}`}>
-              <img src={`https://i.ytimg.com/vi/${DEMO_CLIPS[0].id}/hqdefault.jpg`} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" id="hl-img" />
+              {miniatura(DEMO_CLIPS[0]) ? <img src={miniatura(DEMO_CLIPS[0])} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" id="hl-img" /> : <span class="absolute inset-0 grid place-items-center bg-gradient-to-br from-purple-900/60 to-black font-display font-bold uppercase tracking-widest text-white text-lg">{etiquetaFuente(DEMO_CLIPS[0])}</span>}
               <span class="hl-play"><i class="fa-solid fa-play"></i></span>
             </button>
           </div>
-          <div class="mt-3"><span class="clip-tag" id="hl-tag">{DEMO_CLIPS[0].tag}</span><h3 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wide" id="hl-titulo">{DEMO_CLIPS[0].titulo}</h3><p class="text-xs text-gray-400 mt-0.5" id="hl-canal">{DEMO_CLIPS[0].canal} · YouTube</p></div>
+          <div class="mt-3"><span class="clip-tag" id="hl-tag">{DEMO_CLIPS[0].tag}</span><h3 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wide" id="hl-titulo">{DEMO_CLIPS[0].titulo}</h3><p class="text-xs text-gray-400 mt-0.5" id="hl-canal">{DEMO_CLIPS[0].canal} · {etiquetaFuente(DEMO_CLIPS[0])}</p></div>
         </div>
         <div class="space-y-2.5">
           <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Más clips</h3>
           {DEMO_CLIPS.map((c, i) => (
-            <button type="button" class="clip-row group/clip w-full text-left" data-hl-id={c.id} data-hl-tag={c.tag} data-hl-titulo={c.titulo} data-hl-canal={c.canal} aria-pressed={i === 0 ? 'true' : 'false'}>
-              <span class="clip-thumb"><img src={`https://i.ytimg.com/vi/${c.id}/default.jpg`} alt="" loading="lazy" class="w-full h-full object-cover rounded" /></span>
+            <button type="button" class="clip-row group/clip w-full text-left" data-hl-id={c.id} data-hl-fuente={c.fuente ?? 'youtube'} data-hl-tag={c.tag} data-hl-titulo={c.titulo} data-hl-canal={c.canal} aria-pressed={i === 0 ? 'true' : 'false'}>
+              <span class="clip-thumb">{miniatura(c, 'default') ? <img src={miniatura(c, 'default')} alt="" loading="lazy" class="w-full h-full object-cover rounded" /> : <span class="grid place-items-center w-full h-full text-[12px] font-display font-bold uppercase text-white bg-purple-900/50 rounded">{etiquetaFuente(c)}</span>}</span>
               <span class="min-w-0 flex-1"><b class="clip-tag">{c.tag}</b><span class="block text-sm text-white font-semibold leading-snug truncate">{c.titulo}</span></span>
               <span class="text-[12px] text-gray-400 font-display shrink-0">{c.canal}</span>
             </button>

@@ -1208,3 +1208,13 @@ test('buscador tolera errores de tipeo (Fuse.js) sin romper la búsqueda exacta'
   assert.equal(buscarPaginas('liga', ix)[0].id, 'liga');
   assert.deepEqual(buscarPaginas('zzzzqq', ix), []);
 });
+
+import { urlEmbed, miniatura, etiquetaFuente } from '../src/js/core/clips.js';
+test('clips: embed y miniatura por plataforma', () => {
+  assert.match(urlEmbed({ id: 'abc' }), /youtube-nocookie\.com\/embed\/abc/);
+  assert.match(urlEmbed({ fuente: 'twitch', id: 'Slug' }, 'sitio.com'), /clips\.twitch\.tv\/embed\?clip=Slug&parent=sitio\.com/);
+  assert.equal(urlEmbed({ fuente: 'kick', id: 'canal' }), 'https://player.kick.com/canal?autoplay=true');
+  assert.equal(miniatura({ fuente: 'kick', id: 'x' }), null);
+  assert.match(miniatura({ id: 'abc' }), /ytimg\.com\/vi\/abc\/hqdefault/);
+  assert.equal(etiquetaFuente({ fuente: 'twitch', id: 'x' }), 'Twitch');
+});
