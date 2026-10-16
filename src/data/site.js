@@ -25,6 +25,7 @@ export const NAV_EXTRA = [
   { id: 'historial', label: 'Historial', path: 'historial/', icon: 'fa-clock-rotate-left' },
   { id: 'premios', label: 'Premios', path: 'premios/', icon: 'fa-award' },
   { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
+  { id: 'hosts', label: 'Alquilar host', path: 'alquilar-host/', icon: 'fa-server' },
 ];
 
 // Apoyo voluntario a la comunidad (tipo «invítanos un café»). Vacío = no se muestra el botón. Pon aquí el enlace cuando lo tengas (solo https).
@@ -114,7 +115,7 @@ const DESC = {
   missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: FX.clubUnificado ? 'Tu club: carrera de DT, fichajes y vestuario del juego' : 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores', premios: 'La Paliza, Matagigantes, La Muralla y más, con cada resultado',
-  tienda: 'Estética y mejoras para tu perfil',
+  tienda: 'Estética y mejoras para tu perfil', hosts: 'Catálogo de hosts: precios, ping y contacto',
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
 const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas', competiciones: 'Todas las ligas' } : {}) };
@@ -143,7 +144,7 @@ const PILARES_REPARTO = [
   // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
   ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
-    ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
+    ['Partidos', ['duelos', 'ahora>envivo', 'hosts', 'missalas']],
   ], { lema: 'Lo que haces tú, ahora' }),
   pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub'], { lema: 'Tu club, tus fichajes, tu vestuario' }),
   conBloques('comunidad', 'Comunidad', 'fa-people-group', [
@@ -153,7 +154,7 @@ const PILARES_REPARTO = [
 ];
 const PILARES_ANTES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
-  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', ...(FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub'])], { lema: 'Del clic al partido' }),
+  pilar('jugar', 'Jugar', 'fa-gamepad', ['duelos', 'ahora>envivo', 'hosts', ...(FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub'])], { lema: 'Del clic al partido' }),
   pilar('comunidad', 'Comunidad', 'fa-people-group', ['noticias', 'social', 'chatgeneral', 'creadores', 'clanes', 'eventos'], { lema: 'Lo que se dice y quién lo dice' }),
   pilar('tienda', 'Tienda', 'fa-store', ['tienda'], { lema: 'Tu estilo en la liga' }),
 ];

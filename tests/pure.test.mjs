@@ -1236,3 +1236,19 @@ test('proximoPartido: elige el más cercano y escribe cuándo', () => {
   assert.match(cuando({ estado: 'ACEPTADO', fecha_programada: '2026-10-16T20:00:00Z' }, ahora, 'UTC'), /^Hoy /);
   assert.match(cuando({ estado: 'ACEPTADO', fecha_programada: '2026-10-17T20:00:00Z' }, ahora, 'UTC'), /^Mañana /);
 });
+
+import { filtrarHosts, calidadPing } from '../src/js/core/hostsCatalogo.js';
+test('hostsCatalogo: filtra, ordena y califica ping', () => {
+  const H = [
+    { nombre: 'Ana', username: 'ana', ping_ms: 90, precio_partido_centimos: 500, acepta_gemas: false, completados: 1, juegos: [{ juego: 'PES 2021' }] },
+    { nombre: 'Beto', username: 'beto', ping_ms: 30, precio_hora_centimos: 300, acepta_gemas: true, completados: 5, juegos: [{ juego: 'SP Football Life' }] },
+    { nombre: 'Cami', username: 'cami', ping_ms: null, acepta_gemas: true, completados: 0, juegos: [] },
+  ];
+  assert.deepEqual(filtrarHosts(H, { orden: 'ping' }).map((h) => h.nombre), ['Beto', 'Ana', 'Cami']);
+  assert.deepEqual(filtrarHosts(H, { orden: 'precio' }).map((h) => h.nombre), ['Beto', 'Ana', 'Cami']);
+  assert.deepEqual(filtrarHosts(H, { orden: 'alquileres' }).map((h) => h.nombre), ['Beto', 'Ana', 'Cami']);
+  assert.deepEqual(filtrarHosts(H, { gemas: true, orden: 'ping' }).map((h) => h.nombre), ['Beto', 'Cami']);
+  assert.deepEqual(filtrarHosts(H, { juego: 'PES 2021' }).map((h) => h.nombre), ['Ana']);
+  assert.deepEqual(filtrarHosts(H, { q: 'BET' }).map((h) => h.nombre), ['Beto']);
+  assert.equal(calidadPing(30).nivel, 'bueno'); assert.equal(calidadPing(100).nivel, 'medio'); assert.equal(calidadPing(200).nivel, 'malo'); assert.equal(calidadPing(null).nivel, 'nd');
+});
