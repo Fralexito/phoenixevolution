@@ -7,7 +7,7 @@ Reglas que no se tocan: **solo cosmético y comodidad**, nada de ventaja ni azar
 - ¿El pase es una suscripción que cobra sola? **NO.** Se compra **una vez por temporada**, con gemas. Si no lo compras, no pasa nada.
 - ¿El pase da ventaja en el juego? **NO.** Solo marcos, fondos, insignias, títulos, ascuas y algunas gemas.
 - ¿Se puede jugar sin pagar? **SÍ.** La pista gratis siempre existe.
-- ¿Ya está construido? **SÍ** en el código (pestaña «Pase» en la tienda y botón «Hacer premium» en el torneo). La migración 123 está escrita y probada solo en lectura: **falta aplicarla a la base** (ver docs/ECONOMIA-FASE-E.md). Lo de propinas y overlay para TikTok es **solo papel** (abajo).
+- ¿Ya está construido? **SÍ** en el código (pestaña «Pase» en la tienda y botón «Hacer premium» en el torneo). La migración 123 está aplicada y probada (ver docs/ECONOMIA-FASE-E.md). Lo de propinas y overlay para TikTok es **solo papel** (abajo).
 
 ---
 

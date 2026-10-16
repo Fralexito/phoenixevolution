@@ -3,7 +3,7 @@
 Hilo `economia-fase-e` · 16-oct-2026. Diseño completo y preguntas para Fralex: `docs/DISENO-PASS-Y-ORGANIZADORES.md`.
 
 ## Estado en una línea
-**Código listo y publicado en `borrador`; la migración 123 está escrita pero FALTA APLICARLA a la base** (el permiso para aplicar migraciones a la base real fue denegado a este hilo). Mientras no se aplique, la web no se rompe: la pestaña «Pase» dice «todavía no está activado» y el botón «Hacer premium» no aparece.
+**Hecho y probado:** la migración 123 está aplicada en la base (la aplicó Fralex pegándola en el SQL Editor) y la prueba SQL terminó en `TODO_OK_REVERTIDO` (11 pruebas, 16-oct-2026). Código publicado en `borrador`.
 
 ## Qué hay
 | Pieza | Dónde |
@@ -24,16 +24,13 @@ Hilo `economia-fase-e` · 16-oct-2026. Diseño completo y preguntas para Fralex:
 - **Temporada 1 «Despegue»** (17-oct → 16-dic-2026, 30 niveles, 100 XP por nivel, 150 gemas): gratis = 2 160 ascuas + 3 objetos comunes que ya existen (`marco_hielo`, `titulo_imparable`, `insignia_rayo`); premium = 6 objetos exclusivos (inactivos en la tienda, solo llegan por el pase), 1 080 ascuas y 60 gemas de regreso. `torneo_premium_gemas = 300`, `pase_gracia_dias = 7` en `economia_config`.
 - **Reutilización de otras fases**: los premios apuntan a un objeto de `tienda_items` por clave; los efectos/banners/sonidos de la Fase C (121) y lo que traiga la Fase B se pueden añadir al pase con `admin_pase_recompensa` sin cambiar código.
 
-## Cómo aplicarla (lo que falta)
-1. Aplicar `supabase/migrations/123_economia_fase_e_pase_y_torneo_premium.sql` (con `apply_migration`, o pegando el archivo entero en el SQL Editor de Supabase).
-2. Pegar `supabase/tests/123_fase_e_test.sql` en el SQL Editor: **debe terminar con el error `TODO_OK_REVERTIDO`**. Cualquier otro mensaje es un fallo (dice cuál prueba).
-3. Recargar `/tienda/` → pestaña «Pase»; abrir un torneo propio → «Opciones del organizador» → «Hacer premium».
-Nota: la temporada empieza el 17-oct 00:00 (Lima); antes de esa fecha la pestaña dirá «la próxima temporada empieza pronto».
+## Cómo se aplicó
+Migración pegada en el SQL Editor, comprobada (1 temporada, 60 premios, 7 funciones, 3 tipos nuevos en el libro) y prueba `supabase/tests/123_fase_e_test.sql` ejecutada. La temporada empieza el 17-oct 00:00 (Lima); antes dirá «la próxima temporada empieza pronto».
 
 ## Verificado
 - `node --test tests/*.test.mjs`: 530 pruebas, 0 fallos. `npm run build`: 53 páginas.
 - Demo (`/tienda/?demo`, `&pase=si`, `&xp=1450`, `&pase=cerrado`): reclamar sube las ascuas; con 85 gemas la compra queda desactivada («No te alcanzan las gemas»); sin desborde horizontal a 375 px.
-- NO verificado contra la base real (migración pendiente): la prueba SQL no se ha ejecutado.
+- Base real: prueba SQL deshecha OK (T1 a T11: compra única, reclamo único, libro idempotente, exclusivos no vendibles, límites del admin, torneo premium, 0 diferencias).
 
 ## Riesgos / pendientes
 - Si otra fase vuelve a reconstruir el check de tipos del libro con una lista fija, puede quitar los 3 tipos de esta fase: tras aplicar cualquier migración nueva, comprobar `select pg_get_constraintdef(oid) from pg_constraint where conname='movimientos_tokens_tipo_check'`.
