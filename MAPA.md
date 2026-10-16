@@ -357,3 +357,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 308 (cuenta WEB, borrador): el desplegable del menú ya no se sale de la pantalla por la izquierda en ventanas angostas: pilares.js lo corre hacia adentro lo justo (variable --desp, margen 8 px) al abrir y al cambiar el tamaño. components.css. Tests 466/0, build 48.
 
 ### Ronda 309 (cuenta WEB, borrador): el desplegable de Competiciones (3 grupos) ya no deja hueco a la derecha: panel angosto de 1 columna (clase pilar-panel-chico en Header + components.css). Tests 466/0, build 48.
+
+### Ronda 310 (cuenta WEB, borrador): barra lateral izquierda en 4 grupos, lo más usado primero: Comunidad (Noticias · Social · Chat general) · Jugar (Duelos · En vivo · Mi club) · Competir (Galaxy League · Liga Sudario · Torneos · Ranking) · Mi cuenta (Mi muro · Mensajes · Amigos) + amigos en línea. Salen de la barra Phoenix Link, Creadores, Eventos, Jugadores y Mis partidos (siguen en el menú de arriba / Mi cuenta). BarraLateral.astro. Tests 466/0, build 48.
