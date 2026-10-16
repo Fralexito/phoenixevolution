@@ -16,9 +16,13 @@ import { pendientes } from '../core/misPartidos.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
+import { elegirProximo, cuando } from '../core/proximoPartido.js';
+import { montarNumerosVivos } from '../features/numerosVivos.js';
 import { montarDuelosPro } from '../features/duelosPro.js';
 
 const $ = (id) => document.getElementById(id);
+montarNumerosVivos();
+$('lista-retos').addEventListener('click', (e) => { if (!e.target.closest('[data-lanzar]')) return; const f = $('btn-abrir-form'); if (f && getComputedStyle(f).display !== 'none') f.click(); else { $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('form-crear-reto').querySelector('input, button')?.focus({ preventScroll: true }); } });
 
 /* ---------- Vistas ----------
    PC: todo a la vista. Móvil: «Lanzar reto» se abre/cierra con su botón; «Retos en el radar» está siempre visible debajo.
@@ -31,7 +35,7 @@ function setVista(v) {
 /* ---------- Pintado ---------- */
 function renderAll() {
   // No repintar mientras el usuario escribe dentro de una tarjeta (perdería lo tecleado).
-  if (document.activeElement?.closest?.('#lista-retos, #lista-pend') && document.activeElement.matches('input, textarea, select')) return;
+  if (document.activeElement?.closest?.('#lista-retos, #lista-pend, #tp-card') && document.activeElement.matches('input, textarea, select')) return;
   const id = me();
   const visible = visibleRetos();
   const mine = id ? visible.filter((r) => isMine(r, id)) : [];
@@ -39,9 +43,16 @@ function renderAll() {
   const pend = pendientes(mine);
   const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-400 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
   $('lista-pend').innerHTML = !id ? vacio('Inicia sesión para ver los retos que lanzaste.', 'py-10') : pend.length ? pend.map((r) => card(r, id)).join('') : vacio('No tienes retos pendientes. Lanza uno desde el formulario.', 'py-10');
-  $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio('No hay retos públicos activos en este momento.', 'py-10');
+  $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio(`<p class="text-sm text-gray-300 mb-3">Nadie espera rival ahora. ¡Sé el primero en lanzar un reto!</p><button type="button" data-lanzar class="btn btn-primary !min-h-10"><i class="ph-bold ph-sword"></i> Lanzar reto</button>`, 'py-10');
   $('cnt-pend').textContent = pend.length ? `(${pend.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
+  // «Tu próximo partido» arriba (reutiliza la tarjeta de Duelos, con sus botones) y cifras en vivo
+  const prox = id ? elegirProximo(data.retos, id) : null;
+  $('tu-partido').hidden = !prox;
+  if (prox) { $('tp-cuando').textContent = cuando(prox); $('tp-card').innerHTML = card(prox, id); }
+  $('cf-abiertos').textContent = String(rest.length);
+  $('cf-juego').textContent = String(visible.filter((r) => r.estado === 'EN_JUEGO').length);
+  $('cf-mios').textContent = String(mine.length);
 }
 
 async function fetchAll() {
@@ -153,7 +164,7 @@ $('btn-refrescar').addEventListener('click', fetchAll);
 $('seg-vista').addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) setVista($('duelos-grid').dataset.vista === b.dataset.v ? 'ninguna' : b.dataset.v); });
 // Un reto recién emitido aún no es un «partido» (nadie lo aceptó): se lleva al usuario a «Tus retos pendientes».
 window.addEventListener('duelos:creado', () => { setVista('ninguna'); setTimeout(() => $('col-lanzados').scrollIntoView({ behavior: 'smooth', block: 'start' }), 800); });
-['lista-retos', 'lista-pend'].forEach((id) => {
+['lista-retos', 'lista-pend', 'tp-card'].forEach((id) => {
   $(id).addEventListener('click', onCardClick);
   $(id).addEventListener('submit', (e) => {
     const f = e.target.closest('[data-form="link"]'); if (!f) return;
