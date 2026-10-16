@@ -171,3 +171,4 @@ Protocolo de dos cuentas: ver `docs/REGLAS-ECOSISTEMA.md` §7.
 - Ronda 274 (cuenta WEB, borrador): vista previa renombrada de /fase-beta/ a /fase-beta-1-0/ (cinta «FASE BETA 1.0»). deploy.yml, astro.config, Layout, CLAUDE.md, docs. Fralex debe añadir la Redirect URL nueva en Supabase Auth.
 - Ronda 275 (cuenta WEB): PUBLICADO a main por orden de Fralex («publícalo»). main 42bccd6 → 4883ebc (fast-forward, 131 commits). Tests 457/0, build 47 páginas.
 - Ronda 294 (cuenta WEB, borrador): página /crear-liga/ (creación rápida de 3 pasos + Personalizar/Avanzado plegados, solo staff). Usa torneo_crear existente; sin BD nueva. crear-liga.astro, crearLiga.js (pages y core), crearLiga.css, tests/crearLiga.test.mjs.
+2026-10-15 21:30 (Lima) | Cuenta WEB | RESERVADO 107 y ronda 295: «solo staff» de Crear liga también en el servidor (torneo_crear rechaza origen crear-liga si no es moderador/admin); MAPA/REGISTRO ordenados | — | EN CURSO | —
