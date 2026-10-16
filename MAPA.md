@@ -385,3 +385,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 322 (cuenta WEB, borrador): iconos Phosphor pasan de Light a Bold (más presencia); cambio en styles/global.css y features/sinIconosWeb.js. Si aún se ven suaves: probar 'fill'.
 
 ### Ronda 323 (cuenta WEB, borrador): iconos Phosphor pasan de Bold a Fill (rellenos). Para volver: cambiar 'fill' por 'bold' en styles/global.css y 'ph-fill' por 'ph-bold' en features/sinIconosWeb.js.
+
+### Ronda 324 (cuenta WEB, borrador): iconos vuelven a Bold y ganan presencia (tamaño 1.2em + trazo extra .35px en styles/sinIconosWeb.css).

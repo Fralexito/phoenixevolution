@@ -4,4 +4,4 @@ html[data-sin-ico] .barra-item[data-mono]::before { content: attr(data-mono); fl
 html[data-sin-ico] .barra-item[data-mono][aria-current='page']::before { background: var(--color-galaxy-400); color: #07051a; border-color: transparent; }
 
 /* Iconos finos (Phosphor Light) */
-html[data-sin-ico] .ico-fino { font-style: normal; line-height: 1; font-size: 1.12em; vertical-align: -.12em; }
+html[data-sin-ico] .ico-fino { font-style: normal; line-height: 1; font-size: 1.2em; vertical-align: -.17em; -webkit-text-stroke: .35px currentColor; }
