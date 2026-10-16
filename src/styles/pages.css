@@ -478,3 +478,31 @@ html[data-tema='sudario'] .cu-modos button[aria-selected='true'] > i { backgroun
 /* Ronda 338 · cara del juego en las cartas de Mi club: se ve sobre el círculo de color de su línea */
 .mg-foto.con-miniface { background: radial-gradient(circle at 50% 35%, rgb(var(--lc) / .3), rgb(var(--lc) / .06) 70%); }
 .mg-foto.con-miniface img { object-fit: cover; object-position: 50% 30%; }
+/* Ronda 345 · BANDEJA IA (/bandeja-ia/) */
+.bia-cuenta { font: 700 13px var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #cbd5e1; }
+.bia-cuenta b { font-size: 1.4rem; color: #fff; margin-right: .2rem; } .bia-urg { color: #fda4af; } .bia-ok { color: #6ee7b7; }
+.bia-resumen { border-left: 3px solid var(--color-galaxy-400); }
+.bia-resumen-cab { display: flex; align-items: center; gap: .75rem; margin-bottom: .6rem; }
+.bia-resumen-cab h2 { font: 800 15px var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: #fff; } .bia-resumen-cab small { font-size: 12px; color: #9ca3af; }
+.bia-ico { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; flex: none; border-radius: .8rem; color: #0b0d1c; background: linear-gradient(135deg, #00e5ff, #a855f7); box-shadow: 0 6px 18px -6px rgb(0 229 255 / .6); }
+.bia-texto, .bia-detalle, .bia-cuerpo { font-size: 14px; line-height: 1.6; color: #d1d5db; }
+.bia-texto p + p, .bia-texto ul, .bia-cuerpo p + p, .bia-detalle p + p { margin-top: .55rem; }
+.bia-texto ul, .bia-detalle ul, .bia-cuerpo ul { padding-left: 1.1rem; list-style: disc; } .bia-texto b, .bia-detalle b { color: #fff; }
+.bia-card { --c: 0 229 255; position: relative; padding: 1rem; border-radius: 1rem; background: rgb(255 255 255 / .03); border: 1px solid rgb(var(--c) / .25); border-left: 3px solid rgb(var(--c)); transition: opacity 200ms cubic-bezier(.22,1,.36,1), transform 200ms cubic-bezier(.22,1,.36,1); }
+.bia-card[data-pri='urgente'] { --c: 251 113 133; } .bia-card[data-pri='baja'] { --c: 148 163 184; }
+.bia-card.bia-sale { opacity: 0; transform: translateX(16px); }
+.bia-card-top { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; } .bia-card-top small { margin-left: auto; font-size: 12px; color: #6b7280; }
+.bia-chip, .bia-pri, .bia-tag { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .55rem; border-radius: 99px; font: 700 12px var(--font-display); letter-spacing: .05em; text-transform: uppercase; }
+.bia-chip { color: #e5e7eb; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .1); }
+.bia-pri { color: rgb(var(--c)); background: rgb(var(--c) / .1); border: 1px solid rgb(var(--c) / .3); }
+.bia-tag { color: var(--color-galaxy-400); background: rgb(0 229 255 / .08); margin: .25rem 0; }
+.bia-titulo { margin: .55rem 0 .35rem; font: 800 16px/1.3 var(--font-display); color: #fff; }
+.bia-noticia { margin-top: .6rem; border-radius: .75rem; background: rgb(0 0 0 / .25); border: 1px solid rgb(255 255 255 / .07); padding: .55rem .8rem; }
+.bia-noticia summary { cursor: pointer; font: 700 13px var(--font-display); color: var(--color-galaxy-400); text-transform: uppercase; letter-spacing: .06em; }
+.bia-noticia h3 { margin-top: .6rem; font: 800 15px var(--font-display); color: #fff; } .bia-res { font-size: 13px; color: #9ca3af; margin: .3rem 0 .5rem; }
+.bia-acciones { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .8rem; }
+.bia-hist { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .5rem .7rem; border-radius: .6rem; background: rgb(255 255 255 / .03); font-size: 13px; color: #d1d5db; }
+.bia-hist > i { width: 1.3rem; text-align: center; color: #6ee7b7; } .bia-hist[data-estado='rechazada'] > i { color: #fda4af; }
+.bia-hist-t { flex: 1; min-width: 10rem; } .bia-hist-t small { display: block; font-size: 12px; color: #9ca3af; } .bia-hist > small { font-size: 12px; color: #6b7280; }
+.bia-guia b { color: #fff; }
+@media (prefers-reduced-motion: reduce) { .bia-card { transition: none; } }

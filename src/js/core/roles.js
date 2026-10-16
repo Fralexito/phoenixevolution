@@ -43,6 +43,7 @@ export const PERMISOS = Object.freeze({
   gestionarUltimaHora:  ['moderador', 'admin'],   // noticias de «Última hora» para Phoenix Link (migración 100; la BD lo exige igual)
   gestionarTorneos:     ['moderador', 'admin'],   // ocultar/cancelar torneos propios y ajustar topes (migración 097)
   gestionarEventos:     ['moderador', 'admin'],   // crear, editar y cancelar eventos de la comunidad (migración 042)
+  bandejaIA:            ['moderador', 'admin'],   // aprobar o rechazar lo que prepara la IA (migración 117; la BD lo exige igual)
 });
 
 export const puede = (rol, permiso) => (PERMISOS[permiso] ?? []).includes(normalizarRol(rol));
