@@ -329,3 +329,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 **Visión del usuario (en sus palabras):** _pendiente de dictar; completar cuando la dé._
 
 **Mapa rápido de archivos:** `src/data/` (ligas, ligaResultados, temporada, experimento, organizadores) · `src/js/core/` (lógica pura con test: tabla, ligaStats, central, compartir, escudos, temporada) · `src/js/features/` · `src/js/pages/` · `src/pages/*.astro` · `src/styles/components.css` · `supabase/migrations/` · `.github/workflows/` (deploy, escudos, respaldo, keep-alive).
+
+### Ronda 296 (cuenta WEB, borrador): menú en 5 puertas (Competiciones · Jugadores · Jugar · Mi club · Comunidad). Mi club sale de Jugar; Premios pasa a Competiciones; «Unirme a la liga» y «Crear mi liga» (solo staff) en Competiciones; «Quiénes somos» en Comunidad. Barra lateral de iconos apagada (FX.barraLateral=false, reversible) y pie «Explora» = las mismas 5 puertas. URLs sin cambios. site.js, Header/PilarTabs (data-solo-staff), pilares.js, Footer, experimento.js. Tests 466/0, build 48.

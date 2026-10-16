@@ -1,7 +1,10 @@
+import { onSession, can } from '../core/session.js';
 // Pilares del menú de arriba: el desplegable se abre con hover/teclado por CSS; aquí solo el clic (pantallas táctiles),
 // Escape y clic afuera para cerrar, y aria-expanded para lectores de pantalla.
 export function montarPilares() {
   const pilares = [...document.querySelectorAll('.pilar')]; if (!pilares.length) return;
+  // Entradas solo para staff (p. ej. «Crear mi liga»): se muestran si la persona tiene ese permiso.
+  onSession(() => { document.querySelectorAll('.pilar [data-solo-staff], .pilar-tabs [data-solo-staff]').forEach((el) => { el.hidden = !can(el.dataset.soloStaff); }); });
   const cerrar = (salvo) => pilares.forEach((p) => { if (p !== salvo) { p.removeAttribute('data-abierto'); p.removeAttribute('data-cerrado'); p.querySelector('.pilar-btn')?.setAttribute('aria-expanded', 'false'); } });
   let tactil = false;   // el último toque fue con el dedo: ahí el «hover» es un reflejo del toque y no cuenta como abierto
   document.addEventListener('pointerdown', (e) => { tactil = e.pointerType === 'touch' || e.pointerType === 'pen'; }, true);

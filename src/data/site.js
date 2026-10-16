@@ -132,19 +132,20 @@ const PILARES_REPARTO = [
   // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
   // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
   conBloques('competir', 'Competiciones', 'fa-trophy', [
-    ['Compite', ['liga', 'competiciones', 'torneos', 'palmares', 'formatos',
+    ['Compite', ['liga', 'competiciones', 'unirme', 'torneos', 'palmares', ...(FX.premios ? ['premios'] : []), 'formatos',
+      { id: 'crearliga', label: 'Crear mi liga', path: 'crear-liga/', icon: 'fa-wand-magic-sparkles', desc: 'Tu liga lista en 30 segundos (staff)', staff: 'editarLiga' },
       { id: 'crear', label: 'Crear liga o torneo', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos' }]],
     ['Estadísticas', ['historial', 'ranking', ...(FX.carruseles ? [] : ['database'])]],
   ], { lema: 'Ligas, torneos y campeones' }),
   // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
-  ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', FX.premios ? ['database', 'premios'] : ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
+  ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'missalas']],
-    ['Tu club', FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub']],
   ], { lema: 'Lo que haces tú, ahora' }),
+  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub'], { lema: 'Tu club, tus fichajes, tu vestuario' }),
   conBloques('comunidad', 'Comunidad', 'fa-people-group', [
     ['Conversar', ['social', 'chatgeneral', 'noticias']],
-    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda']],
+    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda', 'organizadores']],
   ], { lema: 'La gente y lo que se dice' }),
 ];
 const PILARES_ANTES = [

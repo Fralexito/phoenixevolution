@@ -1,10 +1,10 @@
 ---
 import SocialIcon from './SocialIcon.astro';
-import { SOCIALS, NAV, NAV_EXTRA, APOYO } from '../data/site.js';
+import { SOCIALS, PILARES, APOYO } from '../data/site.js';
 import { DOCS, DESCARGO } from '../data/legal.js';
 import { FX } from '../data/experimento.js';
 const discord = SOCIALS.find((s) => s.label === 'Discord')?.href;
-const rapidos = [...NAV.filter((n) => ['liga', 'database', 'duelos'].includes(n.id)), ...NAV_EXTRA.filter((n) => ['competiciones', 'historial', 'ranking', 'unirme'].includes(n.id))];
+const rapidos = PILARES.map((p) => ({ ...p, path: p.items[0]?.path ?? '' })).filter((p) => p.items.length);   // las mismas puertas del menú de arriba
 const actualizada = new Date().toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/Lima' });   // fecha de la última publicación (se fija al compilar)
 const apoyo = /^https:\/\//.test(APOYO.href) ? APOYO : null;
 const base = import.meta.env.BASE_URL;
