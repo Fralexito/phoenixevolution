@@ -1,9 +1,11 @@
 // Configuración editable del sitio (Panel). Lógica PURA: sin DOM ni red, con test (tests/sitio.test.mjs).
 // Forma: { portada: { titulo, sub, orden: [ids], ventanas: { <id>: { on, vista, principal:{titulo,href}, extra:[{titulo,href}] } } },
-//          menu: { ocultos: [idNav] }, lateral: { ocultos: [idNav] } }
+//          menu: { ocultos: [idNav] }, lateral: { ocultos: [idNav] },
+//          textos: { <idPagina>: 'Título nuevo (h1)' }, enlaces: [{ titulo, href }] (botones nuevos en barra lateral y pie) }
 export const VENTANAS = ['social', 'competencia', 'duelos', 'club'];
 export const VISTAS = ['vivo', 'mosaico', 'grande'];
 export const MAX_EXTRA = 3;
+export const MAX_ENLACES = 4;
 
 const txt = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const lista = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x.length <= 40) : []);
@@ -18,6 +20,12 @@ function normVentana(v) {
   return { on: o.on !== false, vista: VISTAS.includes(o.vista) ? o.vista : '', principal, extra };
 }
 
+function normTextos(t) {
+  const out = {};
+  if (t && typeof t === 'object' && !Array.isArray(t)) for (const [k, v] of Object.entries(t).slice(0, 40)) { const x = txt(v, 60); if (/^[a-z0-9-]{1,30}$/.test(k) && x) out[k] = x; }
+  return out;
+}
+
 /** Convierte lo que venga (incluso basura) en una configuración completa y segura. */
 export function normalizar(c) {
   const o = c && typeof c === 'object' ? c : {};
@@ -29,6 +37,8 @@ export function normalizar(c) {
     portada: { titulo: txt(p.titulo, 40), sub: txt(p.sub, 120), orden, ventanas },
     menu: { ocultos: unicos(lista(o.menu?.ocultos)) },
     lateral: { ocultos: unicos(lista(o.lateral?.ocultos)) },
+    textos: normTextos(o.textos),
+    enlaces: (Array.isArray(o.enlaces) ? o.enlaces : []).filter((e) => e && txt(e.titulo, 22) && hrefValido(e.href)).slice(0, MAX_ENLACES).map((e) => ({ titulo: txt(e.titulo, 22), href: e.href.trim() })),
   };
 }
 

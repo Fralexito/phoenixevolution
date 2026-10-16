@@ -4,7 +4,7 @@ import { onSession, can } from '../core/session.js';
 import { supabase } from '../core/supabase.js';
 import { toast } from '../core/toast.js';
 import { confirmar } from '../core/dialogo.js';
-import { normalizar, mover, moverA, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA } from '../core/sitio.js';
+import { normalizar, mover, moverA, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA, MAX_ENLACES } from '../core/sitio.js';
 import { aplicar, guardarCache } from '../features/sitioAplicar.js';
 import Sortable from 'sortablejs';
 import { animate } from 'motion';
@@ -13,6 +13,8 @@ import { FX } from '../../data/experimento.js';
 import { hayMovimientoReducido } from '../features/ajustes.js';
 
 const $ = (id) => document.getElementById(id);
+import { NAV, NAV_EXTRA } from '../../data/site.js';
+const PAGINAS = [...NAV, ...NAV_EXTRA].filter((n, i, a) => n.id !== 'central' && a.findIndex((m) => m.id === n.id) === i).map((n) => [n.id, n.label]);
 const NOMBRES = { social: 'Zona Social', competencia: 'Competencia', duelos: 'Duelos', club: 'Mi Club' };
 const VISTA_TXT = { '': 'Como está', vivo: 'Botón grande + atajos', mosaico: 'Mosaico de iconos', grande: 'Una grande y dos chicas' };
 const S = { tab: 'portada', sel: null, arrastra: null, guardada: normalizar({}), borrador: normalizar({}), puedeDes: false, puedeReh: false, ocupado: false, iniciado: false };
@@ -86,11 +88,21 @@ function lateralHTML() {
   return `<div class="pn-lateral">${[...m].map(([id, v]) => chip(id, v.t, o, 'data-lat', `<i class="${esc(v.ic)}"></i>`)).join('')}</div>`;
 }
 
+function textosHTML() {
+  const t = S.borrador.textos;
+  return `<div class="grid sm:grid-cols-2 gap-2">${PAGINAS.map(([id, n]) => `<label class="pn-campo"><span class="text-[12px] text-gray-400">${esc(n)}</span><input type="text" data-tx="${id}" class="pn-tit" maxlength="60" value="${esc(t[id] ?? '')}" placeholder="Título original"></label>`).join('')}</div>`;
+}
+function enlacesHTML() {
+  const l = S.borrador.enlaces;
+  return `<div class="space-y-2">${l.map((e, k) => `<div class="grid grid-cols-[1fr_1fr_auto] gap-2" data-en="${k}"><input type="text" data-en-t class="pn-tit" maxlength="22" value="${esc(e.titulo)}" aria-label="Nombre del botón"><input type="text" data-en-h class="pn-tit" value="${esc(e.href)}" aria-label="Dirección (liga/ o https://…)"><button type="button" class="btn btn-ghost !min-h-9 !px-2.5" data-en-quita aria-label="Quitar enlace"><i class="fa-solid fa-xmark"></i></button></div>`).join('')}
+    ${l.length < MAX_ENLACES ? '<button type="button" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]" data-en-suma><i class="fa-solid fa-plus mr-1"></i>Añadir enlace</button>' : '<p class="text-[12px] text-gray-400">Máximo 4 enlaces.</p>'}</div>`;
+}
+
 function pintar() {
   const b = S.borrador;
   if (S.sel && !VENTANAS.includes(S.sel)) S.sel = null;
-  const TABS = [['portada', 'fa-house', 'Portada'], ['menu', 'fa-bars', 'Menú de arriba'], ['lateral', 'fa-table-columns', 'Barra lateral']];
-  const AYUDA = { portada: 'Arrastra las ventanas para ordenarlas. Toca una para editarla.', menu: 'Toca un botón para ocultarlo o mostrarlo.', lateral: 'Toca un acceso para ocultarlo o mostrarlo.' };
+  const TABS = [['portada', 'fa-house', 'Portada'], ['menu', 'fa-bars', 'Menú de arriba'], ['lateral', 'fa-table-columns', 'Barra lateral'], ['textos', 'fa-pen', 'Textos'], ['enlaces', 'fa-link', 'Enlaces']];
+  const AYUDA = { portada: 'Arrastra las ventanas para ordenarlas. Toca una para editarla.', menu: 'Toca un botón para ocultarlo o mostrarlo.', lateral: 'Toca un acceso para ocultarlo o mostrarlo.', textos: 'Cambia el título grande de cada página. Déjalo vacío para volver al original.', enlaces: 'Crea botones nuevos: salen en la barra lateral y en el pie de página.' };
   const foco = document.activeElement?.id;
   const tab = S.tab;
   const cont = tab === 'portada'
@@ -101,7 +113,7 @@ function pintar() {
           <input type="text" data-sub class="pn-sub" value="${esc(b.portada.sub)}" maxlength="120" placeholder="Esto está pasando ahora en la comunidad." aria-label="Frase debajo del título">
           <div class="pn-tiles">${b.portada.orden.map(tileHTML).join('')}</div></div>
         <aside class="pn-lado" id="pn-editor">${editorHTML(S.sel)}</aside></div>`
-    : tab === 'menu' ? menuHTML() : lateralHTML();
+    : tab === 'menu' ? menuHTML() : tab === 'textos' ? textosHTML() : tab === 'enlaces' ? enlacesHTML() : lateralHTML();
   $('pn-cuerpo').innerHTML =
     `<nav class="pn-tabs" role="tablist" aria-label="Qué quieres cambiar">${TABS.map(([id, ic, t]) => `<button type="button" role="tab" data-tab="${id}" aria-selected="${tab === id}" class="pn-tab ${tab === id ? 'pn-tab-on' : ''}"><i class="fa-solid ${ic}"></i><span>${t}</span></button>`).join('')}</nav>
      <p class="pn-ayuda"><i class="fa-solid fa-lightbulb"></i> ${AYUDA[tab]}</p>${cont}`;
@@ -137,6 +149,8 @@ function enlazar() {
     if (bt?.matches('[data-vista]')) return cambiar((b) => { b.portada.ventanas[V(bt)].vista = bt.dataset.vista; });
     if (bt?.matches('[data-suma]')) return cambiar((b) => { b.portada.ventanas[V(bt)].extra.push({ titulo: 'Nuevo', href: 'liga/' }); });
     if (bt?.matches('[data-quita]')) return cambiar((b) => { b.portada.ventanas[V(bt)].extra.splice(Number(bt.closest('[data-k]').dataset.k), 1); });
+    if (bt?.matches('[data-en-suma]')) return cambiar((b) => { b.enlaces.push({ titulo: 'Nuevo', href: 'liga/' }); });
+    if (bt?.matches('[data-en-quita]')) return cambiar((b) => { b.enlaces.splice(Number(bt.closest('[data-en]').dataset.en), 1); });
     if (bt?.matches('[data-menu]')) return cambiar((b) => { b.menu.ocultos = alternar(b.menu.ocultos, bt.dataset.menu); });
     if (bt?.matches('[data-lat]')) return cambiar((b) => { b.lateral.ocultos = alternar(b.lateral.ocultos, bt.dataset.lat); });
     if (tile) { S.sel = tile.dataset.v; pintar(); if (!hayMovimientoReducido()) { const e = $('pn-editor'); if (e) animate(e, { opacity: [0.4, 1], transform: ['translateY(6px)', 'translateY(0px)'] }, { duration: 0.22 }); } }
@@ -147,6 +161,8 @@ function enlazar() {
     if (t.matches('[data-titulo]')) b.portada.titulo = t.value;
     else if (t.matches('[data-sub]')) b.portada.sub = t.value;
     else if (t.matches('[data-pt],[data-ph]')) { const v = b.portada.ventanas[V(t)]; const p = v.principal ?? { titulo: '', href: '' }; if (t.matches('[data-pt]')) p.titulo = t.value; else p.href = t.value; v.principal = p; }
+    else if (t.matches('[data-tx]')) { if (t.value.trim()) b.textos[t.dataset.tx] = t.value; else delete b.textos[t.dataset.tx]; }
+    else if (t.matches('[data-en-t],[data-en-h]')) { const e = b.enlaces[Number(t.closest('[data-en]').dataset.en)]; if (t.matches('[data-en-t]')) e.titulo = t.value; else e.href = t.value; }
     else if (t.matches('[data-et],[data-eh]')) { const v = b.portada.ventanas[V(t)]; const k = Number(t.closest('[data-k]').dataset.k); if (t.matches('[data-et]')) v.extra[k].titulo = t.value; else v.extra[k].href = t.value; }
   };
   // Al escribir NO se repinta (se perdería el cursor); solo se actualizan los botones de arriba.

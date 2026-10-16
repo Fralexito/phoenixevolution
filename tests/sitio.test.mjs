@@ -40,3 +40,11 @@ test('moverA: arrastrar un elemento al lugar de otro', () => {
   assert.deepEqual(moverA(['a', 'b'], 'a', 'a'), ['a', 'b']);
   assert.deepEqual(moverA(['a', 'b'], 'x', 'a'), ['a', 'b']);
 });
+
+test('normalizar: textos y enlaces nuevos', () => {
+  const c = normalizar({ textos: { liga: ' Mi Liga ', 'MAL KEY': 'x', noticias: '' }, enlaces: [{ titulo: 'Discord', href: 'https://discord.gg/x' }, { titulo: 'Malo', href: 'javascript:alert(1)' }, ...[1, 2, 3, 4, 5].map((n) => ({ titulo: 'E' + n, href: 'liga/' }))] });
+  assert.deepEqual(c.textos, { liga: 'Mi Liga' });
+  assert.equal(c.enlaces.length, 4);
+  assert.equal(c.enlaces[0].titulo, 'Discord');
+  assert.ok(esBase(normalizar({ textos: {}, enlaces: [] })));
+});

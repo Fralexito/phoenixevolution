@@ -33,10 +33,32 @@ function portada(p) {
   });
 }
 
+// Cambia el texto del primer título (h1) de una página sin romper sus iconos: reemplaza solo el último trozo de texto.
+function textos(t) {
+  const main = document.querySelector('main[data-activa]'); const id = main?.dataset.activa;
+  if (!id || !t[id]) return;
+  const h1 = main.querySelector('h1'); if (!h1) return;
+  if (!h1.dataset.orig) h1.dataset.orig = h1.textContent;
+  const w = document.createTreeWalker(h1, NodeFilter.SHOW_TEXT); let ult = null;
+  while (w.nextNode()) if (w.currentNode.nodeValue.trim()) ult = w.currentNode;
+  if (ult) ult.nodeValue = t[id];
+}
+
+function enlaces(lista) {
+  document.querySelectorAll('[data-enlace-extra]').forEach((n) => n.remove());
+  const lat = document.querySelector('#barra-lat .barra-sec:last-of-type'); const pie = document.querySelector('footer nav[aria-label="Exploración rápida"]');
+  for (const e of lista.filter((x) => hrefValido(x.href))) {
+    const ext = /^https:/i.test(e.href);
+    if (lat) { const a = document.createElement('a'); a.className = 'barra-item'; a.dataset.enlaceExtra = ''; a.href = url(e.href); a.title = e.titulo; if (ext) { a.target = '_blank'; a.rel = 'noopener noreferrer'; } const sp = document.createElement('span'); sp.className = 'barra-txt'; sp.textContent = e.titulo; a.appendChild(sp); lat.appendChild(a); }
+    if (pie) { const a = document.createElement('a'); a.className = 'text-gray-400 hover:text-galaxy-400 transition-colors'; a.dataset.enlaceExtra = ''; a.href = url(e.href); if (ext) { a.target = '_blank'; a.rel = 'noopener noreferrer'; } a.textContent = e.titulo; pie.appendChild(a); }
+  }
+}
+
 /** Aplica una config (ya normalizada o no) a la página actual. Lo usa también el Panel para la vista previa. */
 export function aplicar(cfg) {
   const c = normalizar(cfg);
   portada(c.portada);
+  textos(c.textos); enlaces(c.enlaces);
   ocultar(c.menu.ocultos, '.pilar-item[data-nav-id]');
   ocultar(c.lateral.ocultos, '.barra-item[data-nav-id]');
   return c;
