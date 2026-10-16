@@ -1,4 +1,4 @@
-// Lógica pura del «Centro de partido» (ronda 338). Sin React: la usan la isla y los tests.
+// Lógica pura del «Centro de partido» (ronda 340). Sin React: la usan la isla y los tests.
 export function eventosHasta(eventos, min) {
   return (eventos || []).filter((e) => e.min <= min).sort((a, b) => b.min - a.min);
 }
