@@ -107,3 +107,4 @@
 .vt-v[data-vista='grande'] .vt-acc { margin-top: 0; flex-grow: 1; grid-template-rows: 1fr auto; }
 .vt-v[data-vista='grande'] .vt-principal { align-items: flex-end; min-height: 8rem; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .1); border-left: 4px solid var(--vt-c); color: #fff; font-size: 1.5rem; padding: 1rem; }
 .vt-v[data-vista='grande'] .vt-atajos a { flex: 1; justify-content: center; padding: .65rem .5rem; }
+.vt-frente .vt-acc, .vt-frente .vt-cab { position: relative; z-index: 2; } .vt-frente .vt-pista { bottom: auto; top: 3.4rem; }

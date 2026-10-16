@@ -112,12 +112,13 @@ const VENTANAS = [
         <span class="esc-l1">{palabras('Bienvenido a la').map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
         <span class="esc-l2 esc-marca" data-vt-galaxy><span class="esc-w" style="--i:3">Galaxy</span></span>
       </h1>
-      <p class="vt-sub">{INTER ? 'Esto está pasando ahora en la comunidad. Entra a lo que te interesa.' : 'Esto está pasando ahora en la comunidad.'}</p>
+      <p class="vt-sub">{INTER ? 'Esto está pasando ahora en la comunidad. Toca una ventana para girarla y ver más.' : 'Esto está pasando ahora en la comunidad.'}</p>
       <div class="vt-escena"><div class="vt-grid" data-vt-grid>
         {INTER ? VENTANAS.map((v, n) => (
           <div class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id} data-vista={VISTA[v.id]}>
             <div class="vt-giro">
               <div class="vt-cara vt-frente">
+                <button type="button" class="vt-girar" data-vt-girar aria-expanded="false" aria-controls={`vt-dorso-${v.id}`} aria-label={`Ver qué puedes hacer en ${v.nombre}`}></button>
                 <span class="vt-cab"><span class="vt-ico"><i class={`fa-solid ${v.icono}`}></i></span><b>{v.nombre}</b><a class="vt-ir" href={`${base}${v.href}`} aria-label={`Ir a ${v.nombre}`}><i class="fa-solid fa-arrow-right vt-flecha"></i></a></span>
                 <span class="vt-items" data-vt-items aria-live="off">
                   {(v.items?.length ? v.items : [v.vacio]).map((it, k) => (
@@ -127,9 +128,16 @@ const VENTANAS = [
                     </span>
                   ))}
                 </span>
+                <span class="vt-pista" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
                 <span class="vt-acc">
                   <a class="vt-principal" href={`${base}${PRINCIPAL[v.id].href}`}><i class={`fa-solid ${v.icono} vt-pico`}></i><span>{PRINCIPAL[v.id].titulo}</span><i class="fa-solid fa-arrow-right"></i></a>
                   <span class="vt-atajos">{atajosDe(v.id).map((a) => (<a href={`${base}${a.href}`}><i class={`fa-solid ${a.icono}`}></i>{a.titulo}</a>))}</span>
+                </span>
+              </div>
+              <div class="vt-cara vt-dorso" id={`vt-dorso-${v.id}`} inert>
+                <span class="vt-cab"><span class="vt-ico"><i class={`fa-solid ${v.icono}`}></i></span><b>{v.nombre}</b><button type="button" class="vt-volver" data-vt-volver aria-label="Volver"><i class="fa-solid fa-xmark"></i></button></span>
+                <span class="vt-acciones">
+                  {accionesDe(v.id).map((a) => (<a href={`${base}${a.href}`} class:list={['vt-accion', a.primario && 'vt-accion-prim']}><span>{a.titulo}</span><i class="fa-solid fa-arrow-right"></i></a>))}
                 </span>
               </div>
             </div>
