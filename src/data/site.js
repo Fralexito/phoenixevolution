@@ -58,6 +58,7 @@ const ACCOUNT_NAV_BASE = [
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
   { id: 'panel', label: 'Panel del sitio', path: 'panel/', icon: 'fa-sliders', staff: 'verAuditoriaCompleta', grupo: 'staff' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
+  { id: 'ayudaia',  label: 'Ayuda con IA', path: 'ayuda-ia/',     icon: 'fa-robot', grupo: 'comunidad' },
   { id: 'bandejaia', label: 'Bandeja IA',  path: 'bandeja-ia/',    icon: 'fa-inbox',          staff: 'bandejaIA',    grupo: 'staff' },
   // `grupo` = bloque del panel «Mi cuenta» (ver GRUPOS_CUENTA). `menu: false` = no sale en el panel (ya está a la vista: la lupa del header), pero sí en el buscador.
   // `abajo: true` = va en el bloque inferior del menú, pegado al fondo del panel.

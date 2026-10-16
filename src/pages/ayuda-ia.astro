@@ -1,0 +1,33 @@
+---
+// AYUDA CON IA (ronda 345): chat para resolver dudas de la comunidad. La IA NO tiene poderes: solo responde.
+// La clave de la API vive en los secretos de Supabase (función «ayuda-ia»), nunca aquí. Plan: docs/PLAN-IA-WEB.md
+import Layout from '../layouts/Layout.astro';
+import { FX } from '../data/experimento.js';
+---
+<Layout title="Ayuda con IA" active="ayudaia">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow"><i class="fa-solid fa-robot text-galaxy-400 mr-2"></i>Ayuda con IA</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Pregúntale a «Phoenix» cómo funciona la liga, la web o Phoenix Link. Responde al toque.</p>
+    </header>
+    {FX.ayudaIA ? (
+      <section class="aia glass-panel rounded-2xl" aria-label="Chat de ayuda">
+        <div id="aia-mensajes" class="aia-mensajes" aria-live="polite">
+          <div class="aia-msg aia-ia"><span class="aia-av"><i class="fa-solid fa-robot"></i></span><div class="aia-burbuja"><p>¡Hola! Soy <b>Phoenix</b>, el asistente de la comunidad. ¿En qué te ayudo?</p></div></div>
+        </div>
+        <div id="aia-sugerencias" class="aia-sugerencias"></div>
+        <form id="aia-form" class="aia-form">
+          <label class="sr-only" for="aia-input">Tu pregunta</label>
+          <textarea id="aia-input" rows="1" maxlength="600" placeholder="Escribe tu pregunta…" autocomplete="off"></textarea>
+          <button type="submit" id="aia-enviar" class="btn btn-primary" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+        <p id="aia-pie" class="aia-pie">La IA puede equivocarse. No compartas contraseñas ni datos de pago. Para algo de tu cuenta, habla con el staff.</p>
+      </section>
+    ) : (
+      <div class="glass-panel rounded-2xl p-8 text-center text-sm text-gray-400">La ayuda con IA no está disponible por ahora.</div>
+    )}
+  </div>
+</Layout>
+<script>
+  import '../js/pages/ayudaIA.js';
+</script>
