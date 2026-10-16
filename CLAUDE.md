@@ -38,5 +38,9 @@ Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sud
 - Mismos colores/tema (Galaxy/Sudario), mismas clases (`glass-panel`, `btn-primary`), texto ≥12 px y las reglas de movimiento de este archivo.
 - No reescribir páginas existentes a React sin que el usuario lo pida. Primera isla de prueba: `src/islas/CentroPartido.jsx` en `/laboratorio/` (datos inventados; sin enlace en el menú).
 
+## Anotaciones e informes (norma desde 16-oct-2026)
+- Subir las anotaciones y avances importantes SOLO a GitHub (`docs/`, `MAPA.md`, `REGISTRO.md`): el usuario no tiene Drive disponible por ahora. No escribir docs nuevos en el proyecto de claude.ai.
+- Cuando el usuario vuelva a tener Drive, subir TAMBIÉN todo a Drive (incluidos los informes de `docs/`). Ver `docs/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`.
+
 ## Diferido por el usuario
 Webhook/bot de Discord, pasarela de pago, pruebas de clanes. El cumplimiento legal de monetización y escudos es responsabilidad del usuario.

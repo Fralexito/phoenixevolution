@@ -4,11 +4,11 @@ import { FX } from '../data/experimento.js';
 ---
 <Layout title="Jugadores" active="database">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-galaxy-line pb-6 gap-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
       <div>
-        <span class="text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2.5 py-1 rounded border border-galaxy-400/30 inline-block mb-2">REGISTRO OFICIAL</span>
-        <h1 class="text-3xl font-display font-bold text-white uppercase tracking-widest text-shadow-glow">JUGADORES</h1>
-        <p class="text-gray-400 text-sm mt-1">Base de datos global: registro oficial de estadísticas y valoraciones.</p>
+        <span class="text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30 inline-block">Registro oficial</span>
+        <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-id-card text-galaxy-400 mr-2"></i>Jugadores</h1>
+        <p class="text-gray-300 text-xs mt-0.5">Base de datos global: registro oficial de estadísticas y valoraciones.</p>
       </div>
       <div class="flex flex-col sm:flex-row sm:flex-wrap sm:justify-end items-stretch sm:items-center gap-3 w-full md:w-auto md:max-w-[75%]">
         <button id="btn-compare" type="button" class="btn btn-ghost shrink-0"><i class="fa-solid fa-scale-balanced"></i> Comparar</button>
@@ -22,7 +22,7 @@ import { FX } from '../data/experimento.js';
         </div>
         <button id="btn-avanzada" type="button" class="btn btn-ghost shrink-0" aria-expanded="false" aria-controls="adv-panel"><i class="fa-solid fa-sliders"></i> Avanzada</button>
       </div>
-    </div>
+    </header>
     <div id="adv-panel" hidden></div>
     <!-- Filtros por liga, torneo y temporada: un jugador aparece si en ALGUNA participación cumplió todo lo elegido (y con el club de esa participación). -->
     <details id="hist-filtros" class="glass-panel rounded-xl px-4 py-3 group">

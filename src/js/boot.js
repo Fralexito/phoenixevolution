@@ -54,6 +54,7 @@ if (FX.barraLateral && document.getElementById('barra-lat')) {
 }
 // Chat flotante (experimento): contactos + ventanitas. Se descarga aparte para no frenar la primera carga.
 if (FX.contactos) import('./features/chatFlotante/index.js').then((m) => m.initChatFlotante()).catch((e) => console.error('[boot] chat flotante:', e));
+import('./features/tirasDeslizables.js').then((m) => m.initTirasDeslizables()).catch((e) => console.error('[boot] tiras:', e));
 if (FX.pilares) import('./features/pilares.js').then((m) => m.montarPilares()).catch((e) => console.error('[boot] pilares:', e));
 if (FX.proximoPartido) import('./features/proximoPartido.js').then((m) => m.initProximoPartido()).catch((e) => console.error('[boot] próximo partido:', e));
 initSession().catch((e) => console.error('[boot] sesión:', e));
