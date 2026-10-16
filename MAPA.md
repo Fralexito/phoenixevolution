@@ -403,3 +403,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 331 (cuenta WEB, borrador): números en vivo con destello suave verde/rojo (features/numerosVivos.js, marca data-vivo-num; puesto en las cifras del pulso de la portada). Para usarlo en otro número: añadir data-vivo-num al elemento.
 
 ### Ronda 332 (cuenta WEB, borrador): revisión de las 49 páginas en PC (1280) y celular (390): 0 errores JS, 0 archivos rotos, 0 desbordes horizontales. Corregido texto <12 px (text-[9/10/11px]→12px en .astro/.js, pilar-tabs-tit, vit-torneo, vit-ayuda, mg-chip, <small> con mínimo 12px, pc-k/pc-apodo). Limitación: en el entorno de pruebas Supabase está bloqueado, así que NO se probó nada con datos reales ni con sesión (salen «Failed to fetch»).
+
+### Ronda 333 (cuenta WEB, borrador): scroll suave (Lenis) ENCENDIDO (FX.scrollSuave = true). Solo con mouse; apagado con Animaciones→Reducidas. Probado: la rueda avanza con inercia (155 px a los 80 ms, 600 px al final), sin errores. Para apagarlo: scrollSuave: false en data/experimento.js.
