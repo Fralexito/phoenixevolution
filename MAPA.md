@@ -383,3 +383,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 321 (cuenta WEB, borrador): librerías Fuse.js (buscador tolera errores de escritura) y Floating UI (el menú de pilares no se sale de la pantalla). Gráficos nuevos: «Goles por fecha» en Liga (uPlot barras, plegable cerrado; core/ligaStats.golesPorFecha + test) y «Gráfico de los 8 primeros» en Ranking (barras, plegable). Pendiente: gráfico en perfil de jugador.
 
 ### Ronda 322 (cuenta WEB, borrador): iconos Phosphor pasan de Light a Bold (más presencia); cambio en styles/global.css y features/sinIconosWeb.js. Si aún se ven suaves: probar 'fill'.
+
+### Ronda 323 (cuenta WEB, borrador): iconos Phosphor pasan de Bold a Fill (rellenos). Para volver: cambiar 'fill' por 'bold' en styles/global.css y 'ph-fill' por 'ph-bold' en features/sinIconosWeb.js.

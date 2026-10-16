@@ -18,7 +18,7 @@ function revisar(raiz) {
     if (MANTENER.test(i.className)) return;                                // flechas, ✕, ✓…: se quedan como están
     const fa = [...i.classList].find((c) => c.startsWith('fa-') && c !== 'fa-solid' && c !== 'fa-regular');
     const ph = fa && FA_A_PH[fa.slice(3)];
-    if (ph) { i.classList.remove('fa-solid', 'fa-regular', fa); i.classList.add('ph-bold', `ph-${ph}`, 'ico-fino'); return; }  // cambio por icono fino
+    if (ph) { i.classList.remove('fa-solid', 'fa-regular', fa); i.classList.add('ph-fill', `ph-${ph}`, 'ico-fino'); return; }  // cambio por icono fino
     const item = i.closest('.barra-item');
     if (item) { const t = (item.getAttribute('title') || item.textContent || '').replace(/\s+/g, ' ').trim(); item.dataset.mono = t.slice(0, 2).toUpperCase(); i.classList.add('ico-deco'); return; }
     const host = i.parentElement; if (!host) return;
