@@ -31,7 +31,22 @@ export function normalizarItem(r) {
     categoria: ORDEN_CATEGORIAS.includes(o.categoria) ? o.categoria : 'insignia', precio: Math.max(0, entero(o.precio)),
     precioAscuas: o.precio_ascuas === undefined ? Math.max(0, entero(o.precio)) : (o.precio_ascuas == null ? null : Math.max(0, entero(o.precio_ascuas))),
     precioGemas: o.precio_gemas == null ? null : Math.max(0, entero(o.precio_gemas)), nivelMin: Math.max(1, entero(o.nivel_min, 1)),
-    stock: o.stock == null ? null : Math.max(0, entero(o.stock)), agotado: !!o.agotado, estilo: estiloSeguro(o.estilo), tengo: !!o.tengo, equipado: !!o.equipado, activo: o.activo !== false };
+    stock: o.stock == null ? null : Math.max(0, entero(o.stock)), agotado: !!o.agotado, estilo: estiloSeguro(o.estilo), tengo: !!o.tengo, equipado: !!o.equipado, activo: o.activo !== false,
+    rareza: RAREZAS[o.rareza] ? o.rareza : 'comun', limitadaHasta: o.limitada_hasta ? String(o.limitada_hasta) : null };
+}
+/** Rarezas de los objetos: etiqueta y clases de color (la base decide cuál tiene cada objeto). */
+export const RAREZAS = Object.freeze({
+  comun: { etiqueta: 'Común', clase: 'text-gray-300 border-gray-500/50' },
+  raro: { etiqueta: 'Raro', clase: 'text-cyan-300 border-cyan-300/50' },
+  epico: { etiqueta: 'Épico', clase: 'text-fuchsia-300 border-fuchsia-300/50' },
+  legendario: { etiqueta: 'Legendario', clase: 'text-amber-300 border-amber-300/60' },
+});
+/** «Termina en 3 días» / «Termina hoy» / «Terminó» para una edición limitada. Puro (recibe la hora de referencia). */
+export function textoLimitada(iso, ahora = Date.now()) {
+  const t = Date.parse(iso ?? ''); if (Number.isNaN(t)) return '';
+  const ms = t - ahora; if (ms <= 0) return 'Terminó';
+  const h = Math.ceil(ms / 3600000); if (h < 24) return h <= 1 ? 'Termina en menos de 1 hora' : `Termina en ${h} horas`;
+  const d = Math.ceil(h / 24); return d === 1 ? 'Termina mañana' : `Termina en ${d} días`;
 }
 export const normalizarLista = (d) => (Array.isArray(d) ? d.map(normalizarItem).filter((i) => i.id) : []);
 export function normalizarMovimiento(r) {
@@ -45,10 +60,11 @@ export function normalizarRegla(r) {
 export function normalizarPaquetes(d) {
   const o = d && typeof d === 'object' ? d : {};
   return { pagosActivos: o.pagos_activos === true, version: String(o.version_terminos ?? '1'), terminosAceptados: o.terminos_aceptados === true, edad: o.edad ?? null,
+    bonoPct: Math.max(0, entero(o.bono_primera_pct)), bonoDisponible: o.bono_disponible === true,
     paquetes: (Array.isArray(o.paquetes) ? o.paquetes : []).map((p) => ({ id: entero(p.id), nombre: String(p.nombre ?? ''), tokens: Math.max(0, entero(p.tokens)), precioCentimos: Math.max(0, entero(p.precio_centimos)), moneda: String(p.moneda ?? 'PEN') })) };
 }
 
-export const TIPOS_MOVIMIENTO = Object.freeze({ ganado: 'Ganados jugando', compra_tienda: 'Compra en la tienda', compra_dinero: 'Compra de gemas', reembolso: 'Reembolso', ajuste_admin: 'Ajuste del staff', devolucion: 'Devolución', apuesta_garantia: 'Ascuas puestas en un reto', apuesta_premio: 'Pozo ganado', apuesta_devolucion: 'Pozo devuelto' });
+export const TIPOS_MOVIMIENTO = Object.freeze({ ganado: 'Ganados jugando', compra_tienda: 'Compra en la tienda', compra_dinero: 'Compra de gemas', bono_primera_compra: 'Bono de primera compra', reembolso: 'Reembolso', ajuste_admin: 'Ajuste del staff', devolucion: 'Devolución', apuesta_garantia: 'Ascuas puestas en un reto', apuesta_premio: 'Pozo ganado', apuesta_devolucion: 'Pozo devuelto' });
 export const textoTipo = (t) => TIPOS_MOVIMIENTO[t] ?? 'Movimiento';
 
 /** 500 + 'PEN' → «S/ 5.00». Para otras monedas, «5.00 USD». */

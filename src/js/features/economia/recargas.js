@@ -42,11 +42,12 @@ function motivoBloqueo() {
   return '';
 }
 function paqueteHTML(k, mejor, razon) {
-  const gps = gemasPorSol(k.tokens, k.precioCentimos);
+  const gps = gemasPorSol(k.tokens, k.precioCentimos), p = C.S.pq, bono = p?.bonoDisponible && p.bonoPct > 0 ? Math.floor(k.tokens * p.bonoPct / 100) : 0;
   return `<article class="relative rounded-2xl border ${mejor ? 'border-cyan-300/60' : 'border-galaxy-border'} bg-galaxy-900/40 p-4 text-center flex flex-col gap-1">
     ${mejor ? '<span class="absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-display font-bold uppercase tracking-wider bg-cyan-300 text-galaxy-950 rounded-full px-2 py-0.5">Mejor valor</span>' : ''}
     <p class="font-display font-extrabold text-3xl text-cyan-300"><i class="fa-solid fa-gem text-2xl"></i> ${formatoTokens(k.tokens)}</p>
     <p class="text-xs text-gray-300">${escapeHTML(k.nombre)}</p><p class="text-[12px] text-gray-500">${gps} gemas por sol</p>
+    ${bono ? `<p class="text-[12px] font-display font-bold text-emerald-300"><i class="fa-solid fa-gift"></i> +${formatoTokens(bono)} de bono en tu primera compra</p>` : ''}
     <button type="button" data-paquete="${k.id}" class="btn btn-primary !min-h-10 !px-3 !text-sm mt-2 w-full" ${razon ? 'disabled' : ''}>${razon ? escapeHTML(razon) : formatoPrecio(k.precioCentimos, k.moneda)}</button>
     ${razon ? `<p class="text-[12px] text-gray-400">${formatoPrecio(k.precioCentimos, k.moneda)}</p>` : ''}</article>`;
 }
@@ -59,7 +60,7 @@ export function recargasHTML() {
     : (S.yo && p.edad !== 'adulto' ? '<p class="text-sm text-amber-200 mt-3">La compra con dinero real es solo para mayores de 18 años con fecha de nacimiento declarada en tu perfil.</p>' : '');
   const terminos = S.yo && p.pagosActivos && p.edad === 'adulto' && !p.terminosAceptados ? `<form id="ti-terminos" class="mt-3 space-y-2"><label class="flex items-start gap-2 text-xs text-gray-300"><input type="checkbox" id="ti-acepto" class="mt-0.5"><span>Soy mayor de 18 años y acepto los términos de compra (versión ${escapeHTML(p.version)}): las gemas son virtuales, no reembolsables salvo lo que exija la ley, no canjeables por dinero y solo sirven dentro del sitio.</span></label><button class="btn btn-primary !min-h-9 !px-3 !text-xs" type="submit">Aceptar y continuar</button></form>` : '';
   const metodos = S.metodos.length ? `<p class="text-[12px] text-gray-400 mt-3">Formas de pago: ${S.metodos.map((m) => `<span class="inline-block rounded-full border border-galaxy-border px-2 py-0.5 mr-1">${escapeHTML(m.nombre)}</span>`).join('')}</p>` : '';
-  const grid = p.paquetes.length ? `<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">${p.paquetes.map((k) => paqueteHTML(k, k.id === mejor && p.paquetes.length > 1, razon)).join('')}</div>` : vacio('No hay paquetes disponibles.');
+  const grid = p.paquetes.length ? `<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">${p.paquetes.map((k) => paqueteHTML(k, k.id === mejor && p.paquetes.length > 1, razon)).join('')}</div>` : vacio('No hay paquetes disponibles.');
   const paquetes = `<section class="glass-panel rounded-2xl p-4">${grid}${aviso}${terminos}${metodos}</section>`;
   return intro + paquetes + misRecargasHTML() + '<p class="text-[12px] text-gray-400">Las gemas no se transfieren entre personas ni se cambian por dinero. Compra reservada a mayores de 18 años con fecha de nacimiento declarada.</p>';
 }

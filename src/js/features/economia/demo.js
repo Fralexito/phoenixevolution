@@ -13,7 +13,8 @@ const ITEMS = [
   I(10, 'marco_plasma', 'Marco Plasma', 'marco', 0, 1, { color: '#a855f7', color2: '#22d3ee' }, { descripcion: 'Premium: solo con gemas.', precio_ascuas: null, precio_gemas: 150 }),
 ];
 ITEMS[3].tengo = true; ITEMS[3].equipado = true;
-const PAQ = [{ id: 11, nombre: '100 gemas', tokens: 100, precio_centimos: 1000, moneda: 'PEN' }, { id: 12, nombre: '300 gemas', tokens: 300, precio_centimos: 2700, moneda: 'PEN' }, { id: 13, nombre: '700 gemas', tokens: 700, precio_centimos: 5500, moneda: 'PEN' }];
+ITEMS.push(I(21, 'marco_galaxia', 'Marco Galaxia', 'marco', 1000, 1, { color: '#ff3dc8', color2: '#00e5ff' }, { rareza: 'epico' }), I(22, 'marco_supernova', 'Marco Supernova', 'marco', 0, 1, { color: '#ffffff', color2: '#ffc828' }, { rareza: 'legendario', precio_ascuas: null, precio_gemas: 400 }), I(23, 'marco_halloween', 'Marco Halloween', 'marco', 0, 1, { color: '#ff7a00', color2: '#7a00ff' }, { rareza: 'epico', precio_ascuas: null, precio_gemas: 150, limitada_hasta: en(72) }));
+const PAQ = [{ id: 11, nombre: 'Chispa', tokens: 50, precio_centimos: 500, moneda: 'PEN' }, { id: 12, nombre: 'Brasa', tokens: 110, precio_centimos: 1000, moneda: 'PEN' }, { id: 13, nombre: 'Llama', tokens: 300, precio_centimos: 2500, moneda: 'PEN' }, { id: 14, nombre: 'Fénix', tokens: 650, precio_centimos: 5000, moneda: 'PEN' }];
 const METODOS = [
   { clave: 'manual_yape', nombre: 'Yape (pago manual)', tipo: 'manual', proveedor: 'yape', activo: true, orden: 10, minimo_centimos: 500, maximo_centimos: null, instrucciones: 'Yapea el monto exacto, luego sube la captura y escribe el código de operación. Un administrador lo revisa.', datos: { yape: '999 888 777', titular: 'Titular de prueba' } },
   { clave: 'manual_plin', nombre: 'Plin (pago manual)', tipo: 'manual', proveedor: 'plin', activo: false, orden: 20, minimo_centimos: 500, maximo_centimos: null, instrucciones: 'Paga con Plin el monto exacto, luego sube la captura y escribe el código de operación.', datos: {} },
@@ -41,7 +42,7 @@ export async function rpcDemo(nombre, a = {}) {
     case 'mi_inventario': return ITEMS.filter((i) => i.tengo).map((i) => ({ id: i.id, clave: i.clave, nombre: i.nombre, categoria: i.categoria, estilo: i.estilo, equipado: i.equipado, comprado: ahora() }));
     case 'mis_movimientos': return [{ id: 3, delta: -80, tipo: 'compra_tienda', fuente: 'tienda', saldo: 420, cuando: en(-5) }, { id: 2, delta: 100, tipo: 'compra_dinero', fuente: 'manual', saldo: 85, cuando: en(-48) }, { id: 1, delta: 10, tipo: 'ganado', fuente: 'partido', saldo: 500, cuando: en(-70) }];
     case 'reglas_economia': return [{ fuente: 'partido_jugado', descripcion: 'Jugar un partido confirmado', xp: 20, tokens: 10, tope_diario: 5, activa: true }, { fuente: 'partido_ganado', descripcion: 'Ganar un partido', xp: 15, tokens: 5, tope_diario: 5, activa: true }, { fuente: 'valoracion_enviada', descripcion: 'Valorar a un rival', xp: 5, tokens: 2, tope_diario: 5, activa: true }];
-    case 'paquetes_lista': return { pagos_activos: E.pagos, version_terminos: '1', terminos_aceptados: E.terminos, edad: 'adulto', paquetes: PAQ };
+    case 'paquetes_lista': return { pagos_activos: E.pagos, version_terminos: '1', terminos_aceptados: E.terminos, edad: 'adulto', bono_primera_pct: 50, bono_disponible: true, paquetes: PAQ };
     case 'aceptar_terminos_compra': E.terminos = true; return null;
     case 'mis_ordenes': return [];
     case 'pagos_metodos_lista': return METODOS.filter((m) => m.activo);

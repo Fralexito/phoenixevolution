@@ -103,3 +103,23 @@ test('resumenMfa: sin factor, con factor y sesión normal, con factor y sesión 
   const r = E.resumenMfa([{ id: 'b', factor_type: 'totp', status: 'verified' }], 'aal2');
   assert.equal(r.estado, 'activa'); assert.equal(r.factorId, 'b');
 });
+
+test('rarezas y ediciones limitadas: se normalizan y el texto de cuenta atrás es claro', () => {
+  const i = E.normalizarItem({ id: 1, clave: 'a', nombre: 'Aaa', categoria: 'marco', rareza: 'legendario', limitada_hasta: '2026-11-30T23:59:59-05:00', precio_gemas: 400, precio_ascuas: null });
+  assert.equal(i.rareza, 'legendario'); assert.equal(i.limitadaHasta, '2026-11-30T23:59:59-05:00');
+  assert.equal(E.normalizarItem({ id: 2, clave: 'b', nombre: 'Bbb', rareza: 'inventada' }).rareza, 'comun');
+  const t0 = Date.parse('2026-11-01T12:00:00Z');
+  assert.equal(E.textoLimitada('2026-11-01T12:00:00Z', t0), 'Terminó');
+  assert.equal(E.textoLimitada('2026-11-01T12:30:00Z', t0), 'Termina en menos de 1 hora');
+  assert.equal(E.textoLimitada('2026-11-01T17:00:00Z', t0), 'Termina en 5 horas');
+  assert.equal(E.textoLimitada('2026-11-02T12:00:00Z', t0), 'Termina mañana');
+  assert.equal(E.textoLimitada('2026-11-05T10:00:00Z', t0), 'Termina en 4 días');
+  assert.equal(E.textoLimitada('no-es-fecha', t0), '');
+});
+
+test('paquetes: bono de primera compra', () => {
+  const p = E.normalizarPaquetes({ pagos_activos: false, bono_primera_pct: 50, bono_disponible: true, paquetes: [{ id: 1, nombre: 'Chispa', tokens: 50, precio_centimos: 500, moneda: 'PEN' }] });
+  assert.equal(p.bonoPct, 50); assert.equal(p.bonoDisponible, true); assert.equal(p.paquetes.length, 1);
+  assert.equal(E.normalizarPaquetes({}).bonoDisponible, false);
+  assert.equal(E.textoTipo('bono_primera_compra'), 'Bono de primera compra');
+});

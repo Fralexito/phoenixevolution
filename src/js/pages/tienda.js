@@ -9,7 +9,7 @@ import { openModal, closeModal } from '../core/modal.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/economia/api.js';
 import * as rec from '../features/economia/recargas.js';
-import { CATEGORIAS, ORDEN_CATEGORIAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, validarItemAdmin } from '../core/economia.js';
+import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin } from '../core/economia.js';
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
@@ -40,9 +40,11 @@ function botonCompra(i, moneda) {
     <i class="fa-solid ${gem ? 'fa-gem text-cyan-200' : 'fa-fire text-amber-300'}"></i> ${formatoTokens(precio)}${razon ? ` · <span class="font-normal">${escapeHTML(razon)}</span>` : ''}</button>`;
 }
 function itemHTML(i) {
+  const r = RAREZAS[i.rareza] ?? RAREZAS.comun, lim = i.limitadaHasta ? textoLimitada(i.limitadaHasta) : '';
   return `<article class="glass-panel rounded-2xl p-3 flex flex-col gap-2"><div class="h-14 flex items-center justify-center">${vistaPrevia(i)}</div>
-    <div class="min-w-0"><h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[12px] text-gray-400 line-clamp-2">${escapeHTML(i.descripcion)}</p>
-    <p class="text-[12px] text-gray-500 mt-1">${CATEGORIAS[i.categoria].etiqueta}${i.nivelMin > 1 ? ` · Nivel ${i.nivelMin}+` : ''}${i.stock !== null ? ` · Quedan ${i.stock}` : ''}</p></div>
+    <div class="min-w-0"><div class="flex flex-wrap gap-1 mb-1"><span class="text-[11px] font-display font-bold uppercase tracking-wider border rounded-full px-2 ${r.clase}">${r.etiqueta}</span>${lim ? `<span class="text-[11px] font-display font-bold uppercase tracking-wider border rounded-full px-2 text-rose-300 border-rose-300/50">Limitada</span>` : ''}</div>
+    <h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[12px] text-gray-400 line-clamp-2">${escapeHTML(i.descripcion)}</p>
+    <p class="text-[12px] text-gray-500 mt-1">${CATEGORIAS[i.categoria].etiqueta}${i.nivelMin > 1 ? ` · Nivel ${i.nivelMin}+` : ''}${i.stock !== null ? ` · Quedan ${i.stock}` : ''}</p>${lim ? `<p class="text-[12px] text-rose-300">${escapeHTML(lim)}</p>` : ''}</div>
     <div class="mt-auto flex flex-col gap-1.5">${i.tengo ? '<p class="text-xs text-emerald-300 text-center py-1"><i class="fa-solid fa-circle-check"></i> Ya lo tienes</p>' : ['ascuas', 'gemas'].map((m) => botonCompra(i, m)).join('')}</div></article>`;
 }
 const tiendaHTML = () => {
