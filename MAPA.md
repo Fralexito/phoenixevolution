@@ -300,6 +300,15 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Web: core/noticiaSocial.js (+7 pruebas), features/noticias/social.js (dentro del lector, antes de los botones; comentarios plegados), styles/noticiaSocial.css; Bandeja IA: tipo «Encuesta» y caja plegable «Comentarios de noticias» (aislada: si la 124 falta, el resto de la bandeja sigue).
 - Probado: SQL en transacción deshecha (TODO_OK_REVERTIDO, supabase/tests/124_noticias_social_test.sql); visual en PC y celular con datos simulados (0 errores, 0 textos <12 px). 572 pruebas, build 53. PENDIENTE: FRALEX pega el SQL; avisar a la tarea «Redacción IA Phoenix» cómo proponer encuestas (necesita su aprobación).
 
+### Ronda 351 (cuenta Opus, borrador): Noticias nueva — EL FÉNIX (diario chicha) + zona seria + lector de página completa (FX.noticiasV2)
+- Pedido de FRALEX: rediseño total; arriba un diario «chicha»/farándula tipo diario popular peruano pero gamer (humor peruano, TikTok, shitpost, con cariño), descargable para mandar a grupos; abajo lo serio. Diseño aprobado en el lienzo «Noticias Phoenix — rediseño total» (Claude Design).
+- REGLA: una portada POR SEMANA (sale el lunes con el paquete); «edición extra» solo si ese día pasa algo nuevo. Portadas en src/data/portadas.js (core/portadas.js + tests/portadas.test.mjs).
+- EL FÉNIX (features/noticias/fenix.js): portada con ampay, La Lechuza del Parsec, patch notes, horóscopo gamer, cupón, logro, escudos de los clubes como «fotos»; ediciones (Extra / Esta semana / Semana 41); descarga PNG con html-to-image (post y 9:16) + compartir del celular; WhatsApp; copiar para Discord; álbum de cupones (solo en el navegador).
+- Zona seria (features/noticias/zonaSeria.js): marcadores de la última fecha + top 3, primera plana, 2 destacadas, Lo último, Secciones en 5 bloques, resto y La Tribuna al final.
+- Lector (features/noticias/lector.js): página completa con ?n=<slug>, Volver, reacciones/encuesta/comentarios (ronda 350), tabla y «Sigue leyendo»; staff: editar/ocultar/eliminar.
+- Lo anterior NO se borró: se ve con ?clasica=1 (botón «Vista clásica · acomodar» para el staff) o con FX.noticiasV2=false. Si la vista nueva falla al cargar, cae sola a la clásica.
+- Letras nuevas alojadas en la web: @fontsource anton, oswald, permanent-marker, press-start-2p. 577 pruebas, build 53, revisado en PC y celular con datos simulados (0 errores, 0 textos <12 px, descarga PNG ok).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-16 (cuenta WEB):** rondas 340–347 (React isla, radar FIFA, orden visual, modo ligero, anti-lag) y pendientes en **`docs/BITACORA-16-OCT-2026-CUENTA-WEB.md`**; siguiente ronda 348.
 > **Actualización 2026-10-16 (cuenta Opus):** esta sección es vieja. Para el estado actual leer **`docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md`** (cómo retomar, qué se hizo 13–16 oct, pendientes de FRALEX, siguiente migración 119 / ronda 347) y la última línea **TRASPASO** de `REGISTRO.md`.
