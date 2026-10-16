@@ -28,7 +28,9 @@ export function normalizarEconomia(d) {
 export function normalizarItem(r) {
   const o = r && typeof r === 'object' ? r : {};
   return { id: entero(o.id), clave: String(o.clave ?? ''), nombre: String(o.nombre ?? ''), descripcion: String(o.descripcion ?? ''),
-    categoria: ORDEN_CATEGORIAS.includes(o.categoria) ? o.categoria : 'insignia', precio: Math.max(0, entero(o.precio)), nivelMin: Math.max(1, entero(o.nivel_min, 1)),
+    categoria: ORDEN_CATEGORIAS.includes(o.categoria) ? o.categoria : 'insignia', precio: Math.max(0, entero(o.precio)),
+    precioAscuas: o.precio_ascuas === undefined ? Math.max(0, entero(o.precio)) : (o.precio_ascuas == null ? null : Math.max(0, entero(o.precio_ascuas))),
+    precioGemas: o.precio_gemas == null ? null : Math.max(0, entero(o.precio_gemas)), nivelMin: Math.max(1, entero(o.nivel_min, 1)),
     stock: o.stock == null ? null : Math.max(0, entero(o.stock)), agotado: !!o.agotado, estilo: estiloSeguro(o.estilo), tengo: !!o.tengo, equipado: !!o.equipado, activo: o.activo !== false };
 }
 export const normalizarLista = (d) => (Array.isArray(d) ? d.map(normalizarItem).filter((i) => i.id) : []);
@@ -46,7 +48,7 @@ export function normalizarPaquetes(d) {
     paquetes: (Array.isArray(o.paquetes) ? o.paquetes : []).map((p) => ({ id: entero(p.id), nombre: String(p.nombre ?? ''), tokens: Math.max(0, entero(p.tokens)), precioCentimos: Math.max(0, entero(p.precio_centimos)), moneda: String(p.moneda ?? 'PEN') })) };
 }
 
-export const TIPOS_MOVIMIENTO = Object.freeze({ ganado: 'Ganados jugando', compra_tienda: 'Compra en la tienda', compra_dinero: 'Compra de tokens', reembolso: 'Reembolso', ajuste_admin: 'Ajuste del staff', devolucion: 'Devolución', apuesta_garantia: 'Ascuas puestas en un reto', apuesta_premio: 'Pozo ganado', apuesta_devolucion: 'Pozo devuelto' });
+export const TIPOS_MOVIMIENTO = Object.freeze({ ganado: 'Ganados jugando', compra_tienda: 'Compra en la tienda', compra_dinero: 'Compra de gemas', reembolso: 'Reembolso', ajuste_admin: 'Ajuste del staff', devolucion: 'Devolución', apuesta_garantia: 'Ascuas puestas en un reto', apuesta_premio: 'Pozo ganado', apuesta_devolucion: 'Pozo devuelto' });
 export const textoTipo = (t) => TIPOS_MOVIMIENTO[t] ?? 'Movimiento';
 
 /** 500 + 'PEN' → «S/ 5.00». Para otras monedas, «5.00 USD». */
@@ -56,14 +58,43 @@ export function formatoPrecio(centimos, moneda = 'PEN') {
 }
 export const formatoTokens = (n) => entero(n).toLocaleString('es-PE');
 
-/** Razón por la que NO se puede comprar un objeto (o '' si se puede). Es solo ayuda visual: la base decide de verdad. */
-export function motivoNoComprable(item, eco) {
+/** Razón por la que NO se puede comprar un objeto con una moneda ('ascuas' o 'gemas'); '' si se puede. Es solo ayuda visual: la base decide de verdad. */
+export function motivoNoComprable(item, eco, moneda = 'ascuas') {
+  const gemas = moneda === 'gemas', precio = gemas ? item.precioGemas : item.precioAscuas, saldo = gemas ? eco.gemas : eco.saldo;
   if (item.tengo) return 'Ya lo tienes';
   if (item.agotado) return 'Agotado';
   if (eco.nivel < item.nivelMin) return `Nivel ${item.nivelMin}`;
-  if (eco.saldo < item.precio) return eco.saldo < 0 ? 'Saldo negativo' : 'Tokens insuficientes';
+  if (precio == null) return gemas ? 'Solo con ascuas' : 'Solo con gemas';
+  if (saldo < precio) return saldo < 0 ? 'Saldo negativo' : (gemas ? 'Gemas insuficientes' : 'Ascuas insuficientes');
   return '';
 }
+
+/** Métodos de pago activos (pagos_metodos_lista). Los «datos» (número de Yape, cuenta…) se limitan a texto corto. */
+export function normalizarMetodos(d) {
+  const lista = Array.isArray(d) ? d : [];
+  return lista.map((m) => {
+    const o = m && typeof m === 'object' ? m : {}, datos = {};
+    for (const [k, v] of Object.entries(o.datos && typeof o.datos === 'object' ? o.datos : {})) if (/^[a-z_]{2,30}$/.test(k) && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')) datos[k] = String(v).slice(0, 120);
+    return { clave: String(o.clave ?? ''), nombre: String(o.nombre ?? ''), tipo: ['pasarela', 'efectivo', 'manual'].includes(o.tipo) ? o.tipo : 'manual',
+      minimoCentimos: Math.max(0, entero(o.minimo_centimos)), maximoCentimos: o.maximo_centimos == null ? null : Math.max(0, entero(o.maximo_centimos)), instrucciones: String(o.instrucciones ?? '').slice(0, 600), datos };
+  }).filter((m) => m.clave);
+}
+/** Una recarga manual del jugador (mis_pagos_manuales). */
+export function normalizarPagoManual(r) {
+  const o = r && typeof r === 'object' ? r : {};
+  return { orden: String(o.orden ?? ''), metodo: String(o.metodo ?? ''), montoCentimos: Math.max(0, entero(o.monto_centimos)), gemas: Math.max(0, entero(o.gemas)), estadoOrden: String(o.estado_orden ?? ''),
+    expiraAt: o.expira_at ? String(o.expira_at) : null, creada: String(o.creada ?? ''), comprobante: o.comprobante ? String(o.comprobante) : null, nota: o.nota ? String(o.nota).slice(0, 300) : null };
+}
+/** Texto claro del estado de una recarga manual (orden + comprobante). */
+export function textoEstadoRecarga(p) {
+  if (p.estadoOrden === 'PAGADA') return { texto: 'Acreditada', tono: 'ok' };
+  if (p.estadoOrden === 'EXPIRADA') return { texto: 'Venció sin comprobante', tono: 'mal' };
+  if (p.estadoOrden === 'REEMBOLSADA' || p.estadoOrden === 'DISPUTADA') return { texto: 'Revertida', tono: 'mal' };
+  if (p.comprobante === 'en_revision') return { texto: 'En revisión', tono: 'espera' };
+  if (p.comprobante === 'rechazado' || p.estadoOrden === 'FALLIDA') return { texto: 'Rechazada' + (p.nota ? ': ' + p.nota : ''), tono: 'mal' };
+  return { texto: 'Falta tu comprobante', tono: 'falta' };
+}
+export const gemasPorSol = (gemas, centimos) => (centimos > 0 ? Math.round((entero(gemas) / (entero(centimos) / 100)) * 10) / 10 : 0);
 
 /** Estilos en línea ya saneados (solo colores validados) para pintar un marco/fondo/etiqueta. */
 export function estiloMarco(e) { const s = estiloSeguro(e); return s.color ? `box-shadow:0 0 0 2px ${s.color}${s.color2 ? `,0 0 10px 2px ${s.color2}` : ''}` : ''; }

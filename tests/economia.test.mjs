@@ -17,7 +17,7 @@ test('normalizarItem y motivoNoComprable', () => {
   const eco = { nivel: 2, saldo: 100 };
   const base = { id: 1, clave: 'a', nombre: 'A', categoria: 'marco', precio: 80, nivel_min: 1, estilo: { color: '#ff0000' } };
   assert.equal(E.motivoNoComprable(E.normalizarItem(base), eco), '');
-  assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, precio: 500 }), eco), 'Tokens insuficientes');
+  assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, precio: 500 }), eco), 'Ascuas insuficientes');
   assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, nivel_min: 5 }), eco), 'Nivel 5');
   assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, tengo: true }), eco), 'Ya lo tienes');
   assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, agotado: true }), eco), 'Agotado');
@@ -54,4 +54,42 @@ test('validarItemAdmin', () => {
   assert.equal(E.validarItemAdmin({ clave: 'tit_x', nombre: 'Título X', categoria: 'titulo', precio: 5, texto: '<script>' }).ok, false);
   assert.equal(E.validarItemAdmin({ clave: 'ins_x', nombre: 'Insignia X', categoria: 'insignia', precio: 5, icono: 'crown' }).ok, false);
   assert.equal(E.validarItemAdmin({ clave: 'tit_x', nombre: 'Título X', categoria: 'titulo', precio: 5, texto: 'Rey', stock: '3' }).valores.stock, 3);
+});
+test('precios por moneda: ascuas y gemas se leen aparte y motivoNoComprable las distingue', () => {
+  const eco = { nivel: 2, saldo: 100, gemas: 10 };
+  const base = { id: 1, clave: 'a', nombre: 'A', categoria: 'marco', precio: 80, precio_ascuas: 80, precio_gemas: 16, nivel_min: 1, estilo: {} };
+  const i = E.normalizarItem(base);
+  assert.equal(i.precioAscuas, 80); assert.equal(i.precioGemas, 16);
+  assert.equal(E.motivoNoComprable(i, eco, 'ascuas'), '');
+  assert.equal(E.motivoNoComprable(i, eco, 'gemas'), 'Gemas insuficientes');
+  assert.equal(E.motivoNoComprable(i, { ...eco, gemas: 16 }, 'gemas'), '');
+  assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, precio_ascuas: null }), eco, 'ascuas'), 'Solo con gemas');
+  assert.equal(E.motivoNoComprable(E.normalizarItem({ ...base, precio_gemas: null }), eco, 'gemas'), 'Solo con ascuas');
+  assert.equal(E.motivoNoComprable(i, { nivel: 2, saldo: 5, gemas: -3 }, 'gemas'), 'Saldo negativo');
+  // una base vieja (sin precio_ascuas) sigue funcionando con el precio de siempre
+  const viejo = E.normalizarItem({ id: 2, clave: 'b', nombre: 'B', categoria: 'marco', precio: 120, nivel_min: 1 });
+  assert.equal(viejo.precioAscuas, 120); assert.equal(viejo.precioGemas, null);
+});
+test('normalizarMetodos conserva solo datos cortos y tipos conocidos', () => {
+  const m = E.normalizarMetodos([{ clave: 'manual_yape', nombre: 'Yape', tipo: 'manual', minimo_centimos: 500, instrucciones: 'Paga', datos: { yape: '999 999 999', '<x>': 'mal', largo: 'a'.repeat(300), obj: { a: 1 } } }, { nombre: 'sin clave' }, null]);
+  assert.equal(m.length, 1);
+  assert.equal(m[0].tipo, 'manual'); assert.equal(m[0].minimoCentimos, 500);
+  assert.deepEqual(Object.keys(m[0].datos).sort(), ['largo', 'yape']);
+  assert.equal(m[0].datos.largo.length, 120);
+  assert.equal(E.normalizarMetodos({ no: 'lista' }).length, 0);
+  assert.equal(E.normalizarMetodos([{ clave: 'x1', tipo: 'inventado' }])[0].tipo, 'manual');
+});
+test('textoEstadoRecarga explica cada estado de una recarga manual', () => {
+  const p = (o) => E.normalizarPagoManual({ orden: 'o', monto_centimos: 1000, gemas: 100, ...o });
+  assert.deepEqual(E.textoEstadoRecarga(p({ estado_orden: 'PAGADA', comprobante: 'aprobado' })), { texto: 'Acreditada', tono: 'ok' });
+  assert.equal(E.textoEstadoRecarga(p({ estado_orden: 'PENDIENTE', comprobante: 'en_revision' })).tono, 'espera');
+  assert.equal(E.textoEstadoRecarga(p({ estado_orden: 'PENDIENTE' })).tono, 'falta');
+  assert.equal(E.textoEstadoRecarga(p({ estado_orden: 'EXPIRADA' })).tono, 'mal');
+  assert.match(E.textoEstadoRecarga(p({ estado_orden: 'FALLIDA', comprobante: 'rechazado', nota: 'No llegó' })).texto, /No llegó/);
+});
+test('gemasPorSol y textos nuevos', () => {
+  assert.equal(E.gemasPorSol(100, 1000), 10);
+  assert.equal(E.gemasPorSol(300, 2700), 11.1);
+  assert.equal(E.gemasPorSol(5, 0), 0);
+  assert.equal(E.textoTipo('compra_dinero'), 'Compra de gemas');
 });

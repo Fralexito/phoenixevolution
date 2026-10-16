@@ -8,34 +8,42 @@ import { toast } from '../core/toast.js';
 import { openModal, closeModal } from '../core/modal.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/economia/api.js';
+import * as rec from '../features/economia/recargas.js';
 import { CATEGORIAS, ORDEN_CATEGORIAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, validarItemAdmin } from '../core/economia.js';
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
-const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas' };
+const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas', metodos: [], pagosManuales: [], admPagos: [], admMetodos: [], alertas: [], auditoria: null };
 const avisoError = (m) => { $('ti-error-txt').textContent = m; $('ti-error').hidden = !m; };
 const vacio = (t) => vacioHTML(t, { icono: 'fa-store' });
 const fecha = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? '' : d.toLocaleString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
-const esAdmin = () => can('administrarTienda');
+const demoAdmin = api.esDemo() && new URLSearchParams(location.search).get('admin') !== 'no';
+const esAdmin = () => demoAdmin || can('administrarTienda');
 
 function carteraHTML() {
   const e = S.eco; if (!e) return '<p class="text-xs text-gray-400">Inicia sesión para ver tu nivel y tus tokens.</p>';
   return `<div class="flex flex-wrap items-center gap-4"><div><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Nivel</p><p class="font-display font-extrabold text-3xl text-white">${e.nivel}</p></div>
     <div class="flex-1 min-w-[10rem]"><div class="h-2 rounded-full bg-galaxy-800 overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(e.progreso * 100)}" aria-label="Progreso al siguiente nivel"><div class="h-full bg-gradient-to-r from-galaxy-400 to-cyan-300" style="width:${Math.round(e.progreso * 100)}%"></div></div>
       <p class="text-[12px] text-gray-400 mt-1">${formatoTokens(e.xp)} / ${formatoTokens(e.xpSiguiente)} XP para el nivel ${e.nivel + 1}</p></div>
-    <div class="text-right"><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Tokens</p><p class="font-display font-extrabold text-2xl ${e.saldo < 0 ? 'text-rose-300' : 'text-amber-300'}"><i class="fa-solid fa-coins"></i> ${formatoTokens(e.saldo)}</p></div></div>
-    ${e.saldo < 0 ? '<p class="text-[12px] text-rose-300 mt-2">Tu saldo es negativo por un reembolso o disputa. Ganando tokens o comprando un paquete se compensa; mientras tanto no puedes comprar en la tienda.</p>' : ''}`;
+    <div class="flex gap-5 text-right"><div><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Ascuas</p><p class="font-display font-extrabold text-2xl ${e.saldo < 0 ? 'text-rose-300' : 'text-amber-300'}" title="Se ganan jugando"><i class="fa-solid fa-fire"></i> ${formatoTokens(e.saldo)}</p></div>
+      <div><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Gemas</p><p class="font-display font-extrabold text-2xl ${e.gemas < 0 ? 'text-rose-300' : 'text-cyan-300'}" title="Se compran con dinero real"><i class="fa-solid fa-gem"></i> ${formatoTokens(e.gemas)}</p></div></div></div>
+    ${e.saldo < 0 || e.gemas < 0 ? '<p class="text-[12px] text-rose-300 mt-2">Tu saldo es negativo por un reembolso o disputa. Ganando ascuas o comprando gemas se compensa; mientras tanto no puedes comprar con esa moneda.</p>' : ''}`;
 }
 function filtroHTML() {
   return `<div class="flex flex-wrap gap-2">${['todas', ...ORDEN_CATEGORIAS].map((c) => `<button type="button" data-cat="${c}" aria-pressed="${S.cat === c}" class="adv-chip !min-h-8">${c === 'todas' ? 'Todo' : CATEGORIAS[c].etiqueta}</button>`).join('')}</div>`;
 }
+/** Botón de compra con una moneda: muestra el precio; si no se puede, queda apagado y dice por qué (la base decide de verdad). */
+function botonCompra(i, moneda) {
+  const precio = moneda === 'gemas' ? i.precioGemas : i.precioAscuas; if (precio == null) return '';
+  const razon = S.eco ? motivoNoComprable(i, S.eco, moneda) : 'Inicia sesión', gem = moneda === 'gemas';
+  return `<button type="button" data-comprar="${i.id}" data-moneda="${moneda}" title="${razon ? escapeHTML(razon) : 'Comprar con ' + moneda}" class="btn ${gem ? 'btn-primary' : 'btn-ghost'} !min-h-8 !px-3 !text-[12px] w-full justify-center ${razon ? 'opacity-60' : ''}" ${razon ? 'disabled' : ''}>
+    <i class="fa-solid ${gem ? 'fa-gem text-cyan-200' : 'fa-fire text-amber-300'}"></i> ${formatoTokens(precio)}${razon ? ` · <span class="font-normal">${escapeHTML(razon)}</span>` : ''}</button>`;
+}
 function itemHTML(i) {
-  const razon = S.eco ? motivoNoComprable(i, S.eco) : 'Inicia sesión';
   return `<article class="glass-panel rounded-2xl p-3 flex flex-col gap-2"><div class="h-14 flex items-center justify-center">${vistaPrevia(i)}</div>
     <div class="min-w-0"><h3 class="font-display font-bold text-white text-sm truncate">${escapeHTML(i.nombre)}</h3><p class="text-[12px] text-gray-400 line-clamp-2">${escapeHTML(i.descripcion)}</p>
     <p class="text-[12px] text-gray-500 mt-1">${CATEGORIAS[i.categoria].etiqueta}${i.nivelMin > 1 ? ` · Nivel ${i.nivelMin}+` : ''}${i.stock !== null ? ` · Quedan ${i.stock}` : ''}</p></div>
-    <div class="mt-auto flex items-center gap-2"><span class="font-display font-extrabold text-amber-300 text-sm"><i class="fa-solid fa-coins"></i> ${formatoTokens(i.precio)}</span>
-    <button type="button" data-comprar="${i.id}" class="btn btn-primary !min-h-8 !px-3 !text-[12px] ml-auto" ${razon ? 'disabled' : ''}>${razon ? escapeHTML(razon) : 'Comprar'}</button></div></article>`;
+    <div class="mt-auto flex flex-col gap-1.5">${i.tengo ? '<p class="text-xs text-emerald-300 text-center py-1"><i class="fa-solid fa-circle-check"></i> Ya lo tienes</p>' : ['ascuas', 'gemas'].map((m) => botonCompra(i, m)).join('')}</div></article>`;
 }
 const tiendaHTML = () => {
   const l = S.items.filter((i) => S.cat === 'todas' || i.categoria === S.cat);
@@ -50,26 +58,18 @@ function inventarioHTML() {
 }
 function ganarHTML() {
   if (!S.reglas.length) return vacio('Aún no hay reglas publicadas.');
-  return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Cómo ganar XP y tokens</h3>
+  return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Cómo ganar XP y ascuas</h3>
     <ul class="divide-y divide-galaxy-border/40 mt-2">${S.reglas.map((r) => `<li class="flex flex-wrap items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 text-white">${escapeHTML(r.descripcion || r.fuente)}</span>
-      <span class="text-xs text-cyan-300">+${r.xp} XP</span><span class="text-xs text-amber-300">+${r.tokens} tokens</span>${r.topeDiario ? `<span class="text-[12px] text-gray-500">máx. ${r.topeDiario}/día</span>` : ''}</li>`).join('')}</ul>
-    <p class="text-[12px] text-gray-400 mt-2">Los partidos solo cuentan cuando el resultado queda confirmado. Los tokens no se pueden transferir ni cambiar por dinero.</p></section>`;
+      <span class="text-xs text-cyan-300">+${r.xp} XP</span><span class="text-xs text-amber-300">+${r.tokens} ascuas</span>${r.topeDiario ? `<span class="text-[12px] text-gray-500">máx. ${r.topeDiario}/día</span>` : ''}</li>`).join('')}</ul>
+    <p class="text-[12px] text-gray-400 mt-2">Los partidos solo cuentan cuando el resultado queda confirmado. Las ascuas no se pueden transferir ni cambiar por dinero. Las gemas se compran en la pestaña «Comprar gemas».</p></section>`;
 }
-function tokensHTML() {
-  const p = S.pq; if (!p) return vacio('Cargando…');
-  const aviso = '<p class="text-[12px] text-gray-400 mt-2">Los tokens son una moneda virtual del sitio: sirven solo para objetos cosméticos, no se transfieren entre personas ni se cambian por dinero. Compra reservada a mayores de 18 años con fecha de nacimiento declarada.</p>';
-  if (!p.pagosActivos) return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-lock text-gray-400"></i> Compra de tokens</h3><p class="text-sm text-gray-300 mt-1">Todavía no está disponible. Mientras tanto, los tokens se ganan jugando.</p>${aviso}</section>`;
-  if (!S.yo) return vacio('Inicia sesión para comprar tokens.');
-  if (p.edad !== 'adulto') return `<section class="glass-panel rounded-2xl p-4"><p class="text-sm text-amber-200">La compra con dinero real es solo para mayores de 18 años con fecha de nacimiento declarada en tu perfil.</p></section>`;
-  const terminos = p.terminosAceptados ? '' : `<form id="ti-terminos" class="mt-3 space-y-2"><label class="flex items-start gap-2 text-xs text-gray-300"><input type="checkbox" id="ti-acepto" class="mt-0.5"><span>Soy mayor de 18 años y acepto los términos de compra (versión ${escapeHTML(p.version)}): los tokens son virtuales, no reembolsables salvo lo que exija la ley, no canjeables por dinero y solo sirven para cosméticos.</span></label><button class="btn btn-primary !min-h-9 !px-3 !text-xs" type="submit">Aceptar y continuar</button></form>`;
-  const lista = p.terminosAceptados ? `<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">${p.paquetes.map((k) => `<article class="rounded-xl border border-galaxy-border p-3 text-center"><p class="font-display font-extrabold text-amber-300 text-lg"><i class="fa-solid fa-coins"></i> ${formatoTokens(k.tokens)}</p><p class="text-xs text-gray-300">${escapeHTML(k.nombre)}</p><button type="button" data-paquete="${k.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs mt-2 w-full">${formatoPrecio(k.precioCentimos, k.moneda)}</button></article>`).join('')}</div>` : '';
-  return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider">Comprar tokens</h3>${terminos}${lista}${aviso}</section>`;
-}
+// La pestaña «Comprar gemas» vive en features/economia/recargas.js (paquetes, métodos de pago, comprobante y mis recargas).
+const tokensHTML = () => rec.recargasHTML();
 function historialHTML() {
   if (!S.yo) return vacio('Inicia sesión para ver tu historial.');
   const m = S.movs.length ? `<ul class="divide-y divide-galaxy-border/40">${S.movs.map((x) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 text-white">${escapeHTML(textoTipo(x.tipo))} <span class="text-[12px] text-gray-500">${escapeHTML(fecha(x.fecha))}</span></span><span class="font-display font-bold ${x.delta > 0 ? 'text-emerald-300' : 'text-rose-300'}">${x.delta > 0 ? '+' : ''}${x.delta}</span><span class="text-[12px] text-gray-500 w-16 text-right">saldo ${x.saldoDespues}</span></li>`).join('')}</ul>` : '<p class="text-xs text-gray-500">Sin movimientos todavía.</p>';
   const o = S.ordenes.length ? `<h4 class="font-display font-bold text-white text-xs uppercase tracking-wider mt-4 mb-1">Órdenes de compra</h4><ul class="divide-y divide-galaxy-border/40">${S.ordenes.map((x) => `<li class="flex items-center gap-2 py-2 text-xs text-gray-300"><span class="flex-1">${escapeHTML(x.paquete)} · ${formatoPrecio(x.monto_centimos, x.moneda)}</span><span>${escapeHTML(x.estado)}</span></li>`).join('')}</ul>` : '';
-  return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider mb-1">Movimientos de tokens</h3>${m}${o}</section>`;
+  return `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider mb-1">Movimientos de ascuas y gemas</h3>${m}${o}</section>`;
 }
 function adminHTML() {
   if (!esAdmin()) return vacio('Solo el administrador.');
@@ -97,7 +97,7 @@ function adminHTML() {
     <button type="button" data-ajustar="${escapeHTML(S.yo)}" class="btn btn-primary !min-h-9 !px-3 !text-xs mt-2"><i class="fa-solid fa-coins"></i> Ajustarme a mí</button>
     <form id="ti-buscar" class="flex gap-2 mt-2"><input id="ti-buscar-q" class="field flex-1 min-w-0" maxlength="40" placeholder="Buscar persona" aria-label="Buscar persona"><button class="btn btn-ghost !min-h-9 !px-3 !text-xs" type="submit">Buscar</button></form>
     <ul class="divide-y divide-galaxy-border/40 mt-1">${S.encontrados.map((u) => `<li class="flex items-center gap-2 py-2 text-sm"><span class="flex-1 min-w-0 truncate text-white">${escapeHTML(u.nombre)} <span class="text-gray-500 text-xs">@${escapeHTML(u.username)}</span></span><button type="button" data-ajustar="${escapeHTML(u.id)}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Ajustar</button></li>`).join('')}</ul></section>`;
-  return resumen + items + f + reglas + aj;
+  return resumen + rec.adminRecargasHTML() + items + f + reglas + aj;
 }
 function pintar() {
   $('ti-cartera').innerHTML = carteraHTML(); $('ti-tab-admin').hidden = !esAdmin();
@@ -111,13 +111,14 @@ async function cargar() {
   const mi = ++S.req; avisoError('');
   const sesion = !!S.yo, pedir = (p, def) => p.catch((e) => { console.error('[tienda]', e); if (!S.fallo) S.fallo = e.message; return def; });
   S.fallo = '';
-  const [items, reglas, pq, eco, inv, movs, ord, adm, admItems] = await Promise.all([
+  const [items, reglas, pq, eco, inv, movs, ord, adm, admItems, extra] = await Promise.all([
     pedir(api.tienda(), []), pedir(api.reglas(), []), pedir(api.paquetes(), null),
     sesion ? pedir(api.miEconomia(), null) : null, sesion ? pedir(api.miInventario(), []) : [], sesion ? pedir(api.movimientos(30), []) : [], sesion ? pedir(api.misOrdenes(), []) : [],
     sesion && esAdmin() ? pedir(api.adminResumen(), null) : null, sesion && esAdmin() ? pedir(api.adminItems(), []) : [],
+    rec.cargarDatos(sesion, esAdmin(), pedir),
   ]);
   if (mi !== S.req) return;
-  Object.assign(S, { items, reglas, pq, eco, inv, movs, ordenes: Array.isArray(ord) ? ord : [], adm, admItems });
+  Object.assign(S, { items, reglas, pq, eco, inv, movs, ordenes: Array.isArray(ord) ? ord : [], adm, admItems, ...extra });
   if (S.fallo) avisoError(S.fallo);
   pintar();
 }
@@ -131,14 +132,16 @@ async function hacer(fn, ok) {
 
 // ── Ventanas propias (en lugar de los cuadros del navegador) ──────────────────────────────────────────────────
 const cabecera = (titulo) => `<div class="flex items-start justify-between border-b border-galaxy-border pb-3"><h3 class="font-display font-bold text-lg text-white uppercase">${escapeHTML(titulo)}</h3><button type="button" data-close aria-label="Cerrar" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button></div>`;
-function modalCompra(i) {
-  const despues = (S.eco?.saldo ?? 0) - i.precio;
+function modalCompra(i, moneda = 'ascuas') {
+  const gem = moneda === 'gemas', precio = gem ? i.precioGemas : i.precioAscuas, icono = gem ? 'fa-gem text-cyan-300' : 'fa-fire text-amber-300', nombreMoneda = gem ? 'gemas' : 'ascuas';
+  if (precio == null) return;
+  const despues = (gem ? (S.eco?.gemas ?? 0) : (S.eco?.saldo ?? 0)) - precio;
   openModal(`<div class="p-5 sm:p-6 space-y-4">${cabecera('Confirmar compra')}
     <div class="flex items-center gap-4"><div class="w-20 h-14 flex items-center justify-center shrink-0">${vistaPrevia(i)}</div><div class="min-w-0"><p class="font-display font-bold text-white">${escapeHTML(i.nombre)}</p><p class="text-xs text-gray-400">${escapeHTML(i.descripcion)}</p></div></div>
-    <dl class="text-sm space-y-1"><div class="flex justify-between"><dt class="text-gray-400">Precio</dt><dd class="text-amber-300 font-display font-bold"><i class="fa-solid fa-coins"></i> ${formatoTokens(i.precio)}</dd></div>
-      <div class="flex justify-between"><dt class="text-gray-400">Tu saldo después</dt><dd class="text-white font-display font-bold">${formatoTokens(despues)}</dd></div></dl>
+    <dl class="text-sm space-y-1"><div class="flex justify-between"><dt class="text-gray-400">Precio</dt><dd class="font-display font-bold text-white"><i class="fa-solid ${icono}"></i> ${formatoTokens(precio)} ${nombreMoneda}</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-400">Te quedarán</dt><dd class="text-white font-display font-bold">${formatoTokens(despues)} ${nombreMoneda}</dd></div></dl>
     <div class="flex gap-2 justify-end"><button type="button" data-close class="btn btn-ghost">Cancelar</button><button type="button" id="tm-ok" class="btn btn-primary">Comprar</button></div></div>`, { id: 'tienda-modal' })
-    .querySelector('#tm-ok').addEventListener('click', () => { closeModal('tienda-modal'); const origen = document.querySelector(`[data-comprar="${i.id}"]`); hacer(() => api.comprar(i.id), (r) => { rafaga(origen, ['🛒', '✨', '🎉', '⭐'], { n: 12 }); return `¡Listo! Te quedan ${r?.saldo ?? ''} tokens.`; }); });
+    .querySelector('#tm-ok').addEventListener('click', () => { closeModal('tienda-modal'); const origen = document.querySelector(`[data-comprar="${i.id}"]`); hacer(() => api.comprar(i.id, moneda), (r) => { rafaga(origen, ['🛒', '✨', '🎉', '⭐'], { n: 12 }); return `¡Listo! Te quedan ${gem ? (r?.gemas ?? '') : (r?.saldo ?? '')} ${nombreMoneda}.`; }); });
 }
 function modalAjuste(usuario, nombre) {
   const m = openModal(`<form id="tm-form" class="p-5 sm:p-6 space-y-4" novalidate>${cabecera('Ajustar tokens')}
@@ -156,13 +159,15 @@ function modalAjuste(usuario, nombre) {
   });
 }
 
+rec.iniciar({ S, hacer, cargar, esAdmin });
+
 // ── Eventos ──────────────────────────────────────────────────────────────────────────────────────────────────
 $('ti-contenido').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return; const d = b.dataset;
+  if (rec.click(ev)) return; // recargas: paquetes, comprobantes y revisión de pagos
   if (d.cat) { S.cat = d.cat; pintar(); }
-  else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i) modalCompra(i); }
+  else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i) modalCompra(i, d.moneda === 'gemas' ? 'gemas' : 'ascuas'); }
   else if (d.equipar) hacer(() => api.equipar(Number(d.equipar), d.valor === 'si'), d.valor === 'si' ? 'Equipado.' : 'Quitado.');
-  else if (d.paquete) hacer(() => api.crearOrden(Number(d.paquete)), 'Orden creada. El pago se completará en la pasarela (aún por conectar).');
   else if (d.editarItem) { const i = S.admItems.find((x) => x.id === Number(d.editarItem)); if (i) { S.edit = { id: i.id, clave: i.clave, nombre: i.nombre, descripcion: i.descripcion, categoria: i.categoria, precio: i.precio, nivelMin: i.nivelMin, stock: i.stock, color: i.estilo.color, color2: i.estilo.color2, texto: i.estilo.texto, icono: i.estilo.icono, activo: i.activo }; pintar(); } }
   else if (b.id === 'ai-nuevo') { S.edit = null; pintar(); }
   else if (d.ajustar) modalAjuste(d.ajustar, d.ajustar === S.yo ? 'Tú' : (S.encontrados.find((u) => u.id === d.ajustar)?.nombre ?? 'esta persona'));
@@ -170,6 +175,7 @@ $('ti-contenido').addEventListener('click', (ev) => {
 $('ti-contenido').addEventListener('change', (ev) => { if (ev.target.id === 'ti-pagos') { const v = ev.target.checked; hacer(() => api.adminPagos(v), v ? 'Pagos activados.' : 'Pagos desactivados.'); } });
 $('ti-contenido').addEventListener('submit', async (ev) => {
   ev.preventDefault(); const f = ev.target;
+  if (rec.submit(ev)) return; // recargas: métodos de pago y precios por moneda
   if (f.id === 'ti-terminos') { if (!$('ti-acepto').checked) { toast('Marca la casilla para continuar.', 'error'); return; } hacer(() => api.aceptarTerminos(), 'Términos aceptados.'); }
   else if (f.id === 'ti-item') {
     const v = validarItemAdmin({ clave: $('ai-clave').value.trim(), nombre: $('ai-nombre').value, descripcion: $('ai-desc').value, categoria: $('ai-cat').value, precio: $('ai-precio').value, nivelMin: $('ai-nivel').value, stock: $('ai-stock').value, color: $('ai-color').value.trim(), color2: $('ai-color2').value.trim(), texto: $('ai-texto').value.trim(), icono: $('ai-icono').value.trim(), activo: $('ai-activo').checked });
@@ -185,7 +191,8 @@ $('ti-contenido').addEventListener('submit', async (ev) => {
 });
 $('ti-tabs').addEventListener('click', (ev) => { const b = ev.target.closest('[data-tab]'); if (!b || b.dataset.tab === S.tab) return; S.tab = b.dataset.tab; pintar(); });
 $('ti-reintentar').addEventListener('click', cargar);
-onSession(({ session }) => {
+if (api.esDemo()) { S.listo = true; S.yo = 'demo'; S.adminVisto = esAdmin(); cargar(); } // demostración (solo desarrollo): sin sesión real
+else onSession(({ session }) => {
   const id = session?.user?.id ?? null;
   const adm = esAdmin();
   if (S.listo && id === S.yo && adm === S.adminVisto) { pintar(); return; }
