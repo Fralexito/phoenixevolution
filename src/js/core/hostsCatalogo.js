@@ -18,3 +18,18 @@ export function filtrarHosts(hosts, f = {}) {
     : f.orden === 'alquileres' ? (a, b) => (b.completados ?? 0) - (a.completados ?? 0) : (a, b) => ping(a) - ping(b);
   return [...l].sort((a, b) => (por(a, b) || 0) || minusc(a.nombre).localeCompare(minusc(b.nombre)));
 }
+
+/** Total de una solicitud: precios del host {ph, pp, gh, gp} (céntimos / gemas), modo 'horas'|'partidos', cantidad y pago 'externo'|'gemas'. null si no hay precio. */
+export function calcularTotal(precios, modo, cant, pago) {
+  const n = Number(cant); if (!Number.isFinite(n) || n < 1) return null;
+  const v = pago === 'gemas' ? (modo === 'horas' ? precios.gh : precios.gp) : (modo === 'horas' ? precios.ph : precios.pp);
+  if (v == null || v === '' || Number.isNaN(Number(v))) return null;
+  return { valor: Number(v) * n, unidad: pago === 'gemas' ? 'gemas' : 'centimos' };
+}
+/** Ids de alquileres ACEPTADOS del host que chocan en horario (menos de 2 horas entre uno y otro). */
+export function marcarChoques(lista, margenMs = 2 * 3600000) {
+  const acept = (lista ?? []).filter((a) => a.soy_host && a.estado === 'ACEPTADO').map((a) => ({ id: a.id, t: new Date(a.fecha).getTime() })).filter((a) => !Number.isNaN(a.t));
+  const out = new Set();
+  for (const a of acept) for (const b of acept) if (a.id !== b.id && Math.abs(a.t - b.t) < margenMs) out.add(a.id);
+  return out;
+}

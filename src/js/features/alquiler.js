@@ -15,12 +15,15 @@ export const precios = (h) => [
 export const juegos = (h) => (Array.isArray(h.juegos) ? h.juegos.map((j) => j.juego).join(', ') : '');
 
 export function formSolicitud(h) {
-  return `<form data-alq="${escapeHTML(h.host)}" class="grid grid-cols-2 gap-1.5 text-xs">
+  const ahora = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+  const local = (ms) => new Date(ms).toISOString().slice(0, 16);
+  return `<form data-alq="${escapeHTML(h.host)}" data-ph="${h.precio_hora_centimos ?? ''}" data-pp="${h.precio_partido_centimos ?? ''}" data-gh="${h.acepta_gemas ? (h.gemas_hora ?? '') : ''}" data-gp="${h.acepta_gemas ? (h.gemas_partido ?? '') : ''}" class="grid grid-cols-2 gap-1.5 text-xs">
       <select name="modo" class="field !py-1.5"><option value="partidos">Partidos</option><option value="horas">Horas</option></select>
       <input name="cant" type="number" min="1" max="24" value="1" class="field !py-1.5" aria-label="Cantidad">
-      <input name="fecha" type="datetime-local" required class="field !py-1.5 col-span-2" aria-label="Fecha y hora">
+      <input name="fecha" type="datetime-local" required min="${local(ahora.getTime())}" max="${local(ahora.getTime() + 59 * 86400000)}" class="field !py-1.5 col-span-2" aria-label="Fecha y hora">
       <select name="pago" class="field !py-1.5 col-span-2"><option value="externo">Pago por fuera (Yape, etc.)</option>${h.acepta_gemas ? '<option value="gemas">Con gemas (se guardan hasta que confirmes)</option>' : ''}</select>
       <input name="msg" maxlength="300" placeholder="Mensaje para el host (opcional)" class="field !py-1.5 col-span-2">
+      <p data-total class="col-span-2 text-[12px] text-gray-300" aria-live="polite"></p>
       <button class="btn btn-primary !min-h-9 !text-xs col-span-2"><i class="fa-solid fa-handshake"></i> Solicitar alquiler</button></form>`;
 }
 
@@ -40,9 +43,12 @@ export function alquilerHTML(a) {
   if (a.soy_host && a.estado === 'SOLICITADO') acc.push(`<button data-r="aceptar" data-id="${a.id}" class="btn btn-primary !min-h-8 !text-[12px]">Aceptar</button>`, `<button data-r="rechazar" data-id="${a.id}" class="btn !min-h-8 !text-[12px]">Rechazar</button>`);
   if (!a.soy_host && a.estado === 'ACEPTADO') acc.push(`<button data-r="completar" data-id="${a.id}" class="btn btn-primary !min-h-8 !text-[12px]">Confirmar que se cumplió</button>`);
   if (['SOLICITADO', 'ACEPTADO'].includes(a.estado)) acc.push(`<button data-r="cancelar" data-id="${a.id}" class="btn !min-h-8 !text-[12px]">Cancelar</button>`);
-  return `<li class="py-2 border-b border-galaxy-border/40 text-xs space-y-1">
-    <p><b class="text-white">${a.soy_host ? 'Te alquila' : 'Alquilas a'} ${escapeHTML(a.otro)}</b> · ${a.cantidad} ${a.modalidad} · ${new Date(a.fecha).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })} · ${escapeHTML(monto)} <b class="${c}">${t}</b></p>
-    ${a.mensaje ? `<p class="text-gray-400">«${escapeHTML(a.mensaje)}»</p>` : ''}${acc.length ? `<div class="flex flex-wrap gap-1.5">${acc.join('')}</div>` : ''}</li>`;
+  const base = import.meta.env.BASE_URL;
+  const lnk = [a.otro_id && `<a class="text-galaxy-400 underline" href="${base}mensajes/?con=${encodeURIComponent(a.otro_id)}">Escribir mensaje</a>`, a.otro_username && `<a class="text-galaxy-400 underline" href="${base}perfil/?u=${encodeURIComponent(a.otro_username)}">Ver perfil</a>`].filter(Boolean).join(' · ');
+  const cont = a.contacto ? `<p class="text-gray-200"><i class="ph-bold ph-chat-circle-text text-galaxy-400"></i> Contacto del host: <b>${escapeHTML(a.contacto)}</b> <button type="button" data-copiar="${escapeHTML(a.contacto)}" class="text-galaxy-400 font-bold uppercase text-[12px] ml-1">Copiar</button></p>` : (!a.soy_host && a.estado === 'SOLICITADO' ? '<p class="text-gray-500">El contacto del host aparece cuando acepte tu solicitud.</p>' : '');
+  return `<li data-alq-id="${a.id}" class="py-2 border-b border-galaxy-border/40 text-xs space-y-1">
+    <p><b class="text-white">${a.soy_host ? 'Te alquila' : 'Alquilas a'} ${escapeHTML(a.otro)}</b> · ${a.cantidad} ${a.modalidad === 'horas' ? (a.cantidad === 1 ? 'hora' : 'horas') : (a.cantidad === 1 ? 'partido' : 'partidos')} · ${new Date(a.fecha).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })} · ${escapeHTML(monto)} <b class="${c}">${t}</b></p>
+    ${a.mensaje ? `<p class="text-gray-400">«${escapeHTML(a.mensaje)}»</p>` : ''}${cont}${lnk && ['ACEPTADO', 'COMPLETADO', 'SOLICITADO'].includes(a.estado) ? `<p>${lnk}</p>` : ''}${acc.length ? `<div class="flex flex-wrap gap-1.5">${acc.join('')}</div>` : ''}</li>`;
 }
 
 export async function abrirAlquiler() {
@@ -100,8 +106,7 @@ export async function enviarSolicitud(f) {
 /** Formulario «Mi oferta de alquiler» (para hosts aprobados). */
 export async function montarOfertaHost(caja) {
   if (!caja) return;
-  const { data: { user } = {} } = await supabase.auth.getUser(); if (!user) return;
-  const { data: o } = await supabase.from('ofertas_host').select('*').eq('host', user.id).maybeSingle();
+  let o = null; try { o = await rpc('mi_oferta_host'); } catch (e) { console.warn('[oferta]', e.message); }
   const soles = (c) => (c == null ? '' : (c / 100).toFixed(2));
   caja.innerHTML = `<form id="f-oferta" class="grid sm:grid-cols-2 gap-2 text-xs">
     <label class="flex items-center gap-2 sm:col-span-2 text-sm text-white"><input type="checkbox" name="activa" ${o?.activa !== false ? 'checked' : ''} class="w-4 h-4 accent-cyan-400"> Ofrecer mi host en alquiler</label>

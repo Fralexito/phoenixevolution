@@ -1252,3 +1252,14 @@ test('hostsCatalogo: filtra, ordena y califica ping', () => {
   assert.deepEqual(filtrarHosts(H, { q: 'BET' }).map((h) => h.nombre), ['Beto']);
   assert.equal(calidadPing(30).nivel, 'bueno'); assert.equal(calidadPing(100).nivel, 'medio'); assert.equal(calidadPing(200).nivel, 'malo'); assert.equal(calidadPing(null).nivel, 'nd');
 });
+
+import { calcularTotal, marcarChoques } from '../src/js/core/hostsCatalogo.js';
+test('hostsCatalogo: total estimado y choques de horario', () => {
+  const pr = { ph: 500, pp: 200, gh: 50, gp: 20 };
+  assert.deepEqual(calcularTotal(pr, 'partidos', 3, 'externo'), { valor: 600, unidad: 'centimos' });
+  assert.deepEqual(calcularTotal(pr, 'horas', 2, 'gemas'), { valor: 100, unidad: 'gemas' });
+  assert.equal(calcularTotal({ ph: 500 }, 'partidos', 1, 'externo'), null);
+  assert.equal(calcularTotal(pr, 'horas', 0, 'externo'), null);
+  const L = [{ id: 1, soy_host: true, estado: 'ACEPTADO', fecha: '2026-10-20T20:00:00Z' }, { id: 2, soy_host: true, estado: 'ACEPTADO', fecha: '2026-10-20T21:00:00Z' }, { id: 3, soy_host: true, estado: 'ACEPTADO', fecha: '2026-10-21T20:00:00Z' }, { id: 4, soy_host: false, estado: 'ACEPTADO', fecha: '2026-10-20T20:30:00Z' }];
+  assert.deepEqual([...marcarChoques(L)].sort(), [1, 2]);
+});

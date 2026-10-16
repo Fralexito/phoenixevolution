@@ -6,14 +6,15 @@ import { escapeHTML, safeUrl } from '../core/dom.js';
 import { toast } from '../core/toast.js';
 import { openAuthModal } from '../features/auth.js';
 import { rpc, precios, juegos, alquilerHTML, formSolicitud, accionAlquiler, enviarSolicitud, montarOfertaHost } from '../features/alquiler.js';
-import { filtrarHosts, calidadPing } from '../core/hostsCatalogo.js';
+import { filtrarHosts, calidadPing, calcularTotal, marcarChoques } from '../core/hostsCatalogo.js';
+import { formatoPrecio } from '../core/economia.js';
 
 const $ = (id) => document.getElementById(id);
-const S = { hosts: [], contactos: new Map(), sesion: null, tab: 'catalogo', cargado: false };
+const S = { hosts: [], sesion: null, tab: 'catalogo', cargado: false };
 const TONO = { bueno: 'text-emerald-300 border-emerald-400/40', medio: 'text-amber-300 border-amber-400/40', malo: 'text-red-300 border-red-400/40', nd: 'text-gray-400 border-galaxy-border' };
 
 function tarjeta(h) {
-  const c = calidadPing(h.ping_ms); const contacto = S.contactos.get(h.host);
+  const c = calidadPing(h.ping_ms);
   const lista = Array.isArray(h.juegos) ? h.juegos : [];
   return `<article class="glass-panel rounded-2xl p-3.5 space-y-2.5 flex flex-col" data-host="${escapeHTML(h.host)}">
     <div class="flex items-center gap-2.5">
@@ -26,7 +27,7 @@ function tarjeta(h) {
       ${h.software ? `<span class="rounded-md border border-galaxy-border px-2 py-0.5 text-[12px] text-gray-400">${escapeHTML(h.software)}</span>` : ''}${h.ancho_banda_mbps ? `<span class="rounded-md border border-galaxy-border px-2 py-0.5 text-[12px] text-gray-400">${Math.round(h.ancho_banda_mbps)} Mbps</span>` : ''}</div>
     <p class="text-sm font-display font-bold text-galaxy-400">${escapeHTML(precios(h) || 'Precio a convenir')}</p>
     ${h.notas ? `<p class="text-[12px] text-gray-400 leading-snug">${escapeHTML(h.notas)}</p>` : ''}
-    ${contacto ? `<p class="text-[12px] text-gray-300 flex items-center gap-2"><i class="ph-bold ph-chat-circle-text text-galaxy-400"></i><span class="min-w-0 truncate">${escapeHTML(contacto)}</span><button type="button" data-copiar="${escapeHTML(contacto)}" class="ml-auto text-galaxy-400 hover:text-white text-[12px] font-bold uppercase">Copiar</button></p>` : ''}
+    <p class="text-[12px] text-gray-500 flex items-center gap-1.5"><i class="ph-bold ph-lock-simple"></i> El contacto se muestra cuando el host acepta tu solicitud.</p>
     <details class="mt-auto"><summary class="btn btn-primary !min-h-10 w-full cursor-pointer justify-center"><i class="ph-bold ph-handshake"></i> Solicitar alquiler</summary><div class="pt-2">${formSolicitud(h)}</div></details>
   </article>`;
 }
@@ -44,8 +45,6 @@ async function cargarCatalogo() {
   if (!S.sesion) { S.hosts = []; return pintarCatalogo(); }
   try {
     S.hosts = (await rpc('hosts_en_alquiler')) ?? [];
-    const c = await supabase.from('ofertas_host').select('host, contacto');
-    S.contactos = new Map((c.data ?? []).filter((x) => x.contacto).map((x) => [x.host, x.contacto]));
     const juegosUnicos = [...new Set(S.hosts.flatMap((h) => (Array.isArray(h.juegos) ? h.juegos.map((j) => j.juego) : [])))].sort();
     $('ah-juego').innerHTML = '<option value="">Todos</option>' + juegosUnicos.map((j) => `<option>${escapeHTML(j)}</option>`).join('');
   } catch (e) { console.error('[hosts]', e); $('ah-lista').innerHTML = `<p class="col-span-full text-center py-10 text-bad text-xs">${escapeHTML(e.message || 'No se pudo cargar el catálogo.')}</p>`; return; }
@@ -55,8 +54,18 @@ async function cargarCatalogo() {
 async function cargarMios() {
   const ul = $('ah-mios-lista');
   if (!S.sesion) { ul.innerHTML = '<li class="text-xs text-gray-400">Inicia sesión para ver tus alquileres.</li>'; return; }
-  try { const l = await rpc('mis_alquileres'); ul.innerHTML = l.length ? l.map(alquilerHTML).join('') : '<li class="text-xs text-gray-400">Todavía no tienes alquileres.</li>'; }
+  try { const l = await rpc('mis_alquileres'); ul.innerHTML = l.length ? l.map(alquilerHTML).join('') : '<li class="text-xs text-gray-400">Todavía no tienes alquileres.</li>';
+    for (const id of marcarChoques(l)) ul.querySelector(`[data-alq-id="${id}"] p`)?.insertAdjacentHTML('beforeend', ' <span class="text-red-300 font-bold">· Choca con otro alquiler tuyo</span>'); }
   catch (e) { ul.textContent = e.message; }
+}
+
+async function mostrarOferta() {
+  const caja = $('ah-oferta-caja');
+  if (!S.sesion) { caja.innerHTML = '<p class="text-xs text-gray-400">Inicia sesión para ofrecer tu host.</p>'; return; }
+  let ok = false;
+  try { const r = await supabase.from('perfiles').select('host_aprobado').eq('id', S.sesion).maybeSingle(); ok = !!r.data?.host_aprobado; } catch { /* se trata como no aprobado */ }
+  $('ah-oferta-aviso').textContent = ok ? 'Pon tus precios y cómo contactarte. Tu contacto solo lo recibe quien alquile contigo, cuando aceptes su solicitud.' : 'Aún no eres host aprobado. Para ofrecer tu host, el staff debe verificarte primero: vincula tu PC en Phoenix Link y pídelo en el Discord.';
+  caja.innerHTML = ''; if (ok) montarOfertaHost(caja);
 }
 
 function irA(tab) {
@@ -64,7 +73,7 @@ function irA(tab) {
   document.querySelectorAll('#ah-tabs button').forEach((b) => { const on = b.dataset.tab === tab; b.setAttribute('aria-selected', String(on)); b.setAttribute('aria-pressed', String(on)); });
   $('ah-catalogo').hidden = tab !== 'catalogo'; $('ah-mios').hidden = tab !== 'mios'; $('ah-oferta').hidden = tab !== 'oferta';
   if (tab === 'mios') cargarMios();
-  if (tab === 'oferta') { if (S.sesion) montarOfertaHost($('ah-oferta-caja')); else $('ah-oferta-caja').innerHTML = '<p class="text-xs text-gray-400">Inicia sesión para ofrecer tu host.</p>'; }
+  if (tab === 'oferta') mostrarOferta();
 }
 
 $('ah-tabs').addEventListener('click', (e) => { const b = e.target.closest('button[data-tab]'); if (b) irA(b.dataset.tab); });
@@ -76,6 +85,13 @@ document.addEventListener('click', async (e) => {
   const b = e.target.closest('#ah-mios [data-r]'); if (!b || b.disabled) return; b.disabled = true;
   try { if (await accionAlquiler(b)) { toast('Listo.', 'ok'); cargarMios(); } } catch (err) { toast(err.message, 'error'); } finally { b.disabled = false; }
 });
+const pintarTotal = (f) => {
+  const d = new FormData(f); const t = calcularTotal({ ph: f.dataset.ph, pp: f.dataset.pp, gh: f.dataset.gh, gp: f.dataset.gp }, d.get('modo'), d.get('cant'), d.get('pago'));
+  f.querySelector('[data-total]').textContent = t ? `Total estimado: ${t.unidad === 'gemas' ? `💎 ${t.valor}` : formatoPrecio(t.valor)}` : 'Este host no tiene precio para esa opción.';
+};
+document.addEventListener('input', (e) => { const f = e.target.closest('form[data-alq]'); if (f) pintarTotal(f); });
+document.addEventListener('change', (e) => { const f = e.target.closest('form[data-alq]'); if (f) pintarTotal(f); });
+document.addEventListener('toggle', (e) => { const f = e.target.querySelector?.('form[data-alq]'); if (f && e.target.open) pintarTotal(f); }, true);
 document.addEventListener('submit', async (e) => {
   const f = e.target.closest('[data-alq]'); if (!f) return; e.preventDefault();
   const btn = f.querySelector('button'); if (btn) btn.disabled = true;
