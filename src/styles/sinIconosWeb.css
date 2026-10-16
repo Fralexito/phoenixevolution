@@ -2,3 +2,6 @@
 html[data-sin-ico] .ico-deco { display: none !important; }
 html[data-sin-ico] .barra-item[data-mono]::before { content: attr(data-mono); flex: none; display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border: 1px solid rgb(255 255 255 / .22); border-radius: 4px; font-family: var(--font-display); font-weight: 800; font-size: .75rem; letter-spacing: .04em; color: var(--color-galaxy-400); }
 html[data-sin-ico] .barra-item[data-mono][aria-current='page']::before { background: var(--color-galaxy-400); color: #07051a; border-color: transparent; }
+
+/* Iconos finos (Phosphor Light) */
+html[data-sin-ico] .ico-fino { font-style: normal; line-height: 1; font-size: 1.12em; vertical-align: -.12em; }

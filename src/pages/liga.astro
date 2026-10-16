@@ -8,7 +8,7 @@ import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
 import { escudoDe } from '../js/core/escudos.js';
 import { SISTEMA, SISTEMAS_LIGA } from '../data/temporada.js';
 import { zonasDivision, zonasLiga } from '../js/core/temporada.js';
-import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas } from '../js/core/ligaStats.js';
+import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas, evolucionPuntos } from '../js/core/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 // Clases completas (Tailwind solo detecta nombres escritos enteros).
 const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black', P: 'bg-rose-500/90 text-white' };
@@ -31,6 +31,7 @@ const datos = LIGAS.map((l) => ({
     total: totalFechas(e), jugadas: e.fechas.filter((f) => estadoFecha(f) === 'jugada').length,
     zonas: e.estado === 'en_curso' && SISTEMAS_LIGA[l.id] ? zonasLiga(tablaCompleta(e).map((f) => f.nombre), SISTEMAS_LIGA[l.id]) : e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(tablaCompleta(e).map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
     fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
+    evolucion: evolucionPuntos(e.fechas, tablaCompleta(e).slice(0, 4).map((f) => f.nombre)),
   })).reverse(),   // la más reciente primero
 }));
 ---
@@ -149,6 +150,12 @@ const datos = LIGAS.map((l) => ({
                 </table>
               </div>
               {e.zonas && <p class="text-xs text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1"><span><span class="tmp-dot tmp-copa"></span>Zona de copa</span><span><span class="tmp-dot tmp-baja"></span>Zona de descenso</span>{SISTEMAS_LIGA[l.id] ? <a href={`${base}sudario-divisiones/`} class="text-galaxy-400 underline"><i class="fa-solid fa-layer-group mr-1"></i>{SISTEMAS_LIGA[l.id].nombre} <span class="liga-sello liga-sello-prox !text-[12px] !py-0">Beta</span></a>: <a href={`${base}temporada/`} class="text-galaxy-400 underline">Sistema de divisiones <span class="liga-sello liga-sello-prox !text-[12px] !py-0">Beta</span></a>}</p>}
+              {e.evolucion.x.length >= 2 && (
+                <details class="liga-guia" data-evo>
+                  <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none">Evolución de puntos (los 4 primeros)</summary>
+                  <div class="liga-evo mt-2" data-grafico={JSON.stringify(e.evolucion)}></div>
+                </details>
+              )}
               <details class="liga-guia">
                 <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none inline-flex items-center gap-1.5 min-h-9"><i class="fa-solid fa-circle-info"></i>¿Cómo se lee la tabla?</summary>
                 <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · Últimos: flechas, rueda o arrastre para ver partidos anteriores. Toca un jugador para resaltar sus partidos en Resultados.</p>

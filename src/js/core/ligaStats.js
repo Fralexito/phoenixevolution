@@ -65,3 +65,20 @@ export function totalFechas(ed) {
   const rondas = n % 2 === 0 ? n - 1 : n;
   return Math.max(cargadas, /ida y vuelta/i.test(ed.formato) ? rondas * 2 : rondas);
 }
+
+/** Puntos acumulados fecha a fecha (3 victoria, 1 empate) para pintar el gráfico de evolución. Solo cuenta partidos jugados. */
+export function evolucionPuntos(fechas, nombres) {
+  const lista = [...(fechas ?? [])].filter((f) => (f.partidos ?? []).some(jugado)).sort((a, b) => a.n - b.n);
+  const acum = Object.fromEntries(nombres.map((n) => [n, 0]));
+  const series = Object.fromEntries(nombres.map((n) => [n, []]));
+  for (const f of lista) {
+    for (const m of f.partidos) {
+      if (!jugado(m)) continue;
+      const pl = m.gl > m.gv ? 3 : m.gl === m.gv ? 1 : 0, pv = m.gv > m.gl ? 3 : m.gl === m.gv ? 1 : 0;
+      if (m.l in acum) acum[m.l] += pl;
+      if (m.v in acum) acum[m.v] += pv;
+    }
+    for (const n of nombres) series[n].push(acum[n]);
+  }
+  return { x: lista.map((f) => f.n), series: nombres.map((n) => ({ nombre: n, datos: series[n] })) };
+}

@@ -113,3 +113,11 @@ document.addEventListener('click', (e) => {
     for (const a of enlaces) { const j = (data ?? []).find((x) => coincide(x, a.dataset.orgJugador)); if (j) a.href = href(`jugador/?id=${encodeURIComponent(j.id)}`); else console.warn('[liga] organizador sin ficha:', a.dataset.orgJugador); }
   } catch (e) { console.warn('[liga] no se pudo enlazar al organizador:', e); }
 })();
+
+// Gráfico «Evolución de puntos» (uPlot): se pinta la primera vez que se abre el plegable.
+document.addEventListener('toggle', async (e) => {
+  const d = e.target; if (!d.matches?.('[data-evo]') || !d.open) return;
+  const c = d.querySelector('[data-grafico]'); if (!c || c.dataset.listo) return;
+  c.dataset.listo = '1';
+  try { const { pintarLinea } = await import('../features/grafico.js'); await pintarLinea(c, JSON.parse(c.dataset.grafico)); } catch (err) { console.warn('[liga] gráfico:', err); c.textContent = 'No se pudo cargar el gráfico.'; }
+}, true);
