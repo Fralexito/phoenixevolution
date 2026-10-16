@@ -34,7 +34,14 @@ function pintar(caja, items) {
 async function social() {
   const { data, error } = await supabase.rpc('muro_comunidad', { p_antes: null, p_limite: 6 });
   if (error) throw error;
-  return (data?.items ?? []).map((p) => itemSocial(p, tiempoRelativo(p.created_at)));
+  const posts = (data?.items ?? []).map((p) => itemSocial(p, tiempoRelativo(p.created_at)));
+  // La última noticia oficial va primero (si falla, se siguen viendo las publicaciones).
+  let noticias = [];
+  try {
+    const r = await supabase.from('noticias').select('titulo, publicada_en').eq('publicada', true).order('publicada_en', { ascending: false }).limit(1);
+    noticias = (r.data ?? []).map((n) => ({ titulo: n.titulo, meta: ['Noticia', tiempoRelativo(n.publicada_en)].filter(Boolean).join(' · ') }));
+  } catch { /* sin noticias: solo muro */ }
+  return [...noticias, ...posts];
 }
 
 async function duelos() {

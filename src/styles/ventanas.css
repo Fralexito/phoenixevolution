@@ -78,3 +78,16 @@
 @keyframes vt-cinta-entra { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes vt-cinta-sale { from { transform: translateY(0); } to { transform: translateY(-100%); } }
 @keyframes vt-entra { from { opacity: 0; transform: translateY(18px) scale(.98); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+
+/* Ronda 311: ventana = vista en vivo + un botón grande + atajos chicos */
+.vt-acc { display: grid; gap: .55rem; align-self: end; position: relative; z-index: 2; }
+.vt-principal { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .7rem .9rem; border-radius: 6px; background: var(--vt-c); color: #060410; font-family: var(--font-display); font-weight: 800; font-size: .95rem; letter-spacing: .08em; text-transform: uppercase; transition: transform .15s cubic-bezier(.22,1,.36,1), filter .15s; }
+.vt-principal:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.vt-atajos { display: flex; flex-wrap: wrap; gap: .4rem; }
+.vt-atajos a { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .65rem; border-radius: 6px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .08); color: #d7d2f0; font-size: .75rem; font-family: var(--font-display); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.vt-atajos a:hover { border-color: var(--vt-c); color: #fff; }
+.vt-atajos a i { color: var(--vt-c); font-size: .8em; }
+.vt-items { min-height: 7.5rem; }
+.vt-frente { display: flex; flex-direction: column; }
+.vt-frente .vt-acc { margin-top: auto; }
+.vt-atajos { min-height: 4.9rem; align-content: flex-start; }
