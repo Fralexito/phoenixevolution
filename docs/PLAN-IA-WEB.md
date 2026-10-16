@@ -53,3 +53,6 @@ La IA **prepara**, FRALEX (o un moderador) **aprueba**. Nada importante se publi
 2. **Bandeja:** desde el día siguiente a las 9:54 a. m. aparece el resumen y las propuestas en Staff → Bandeja IA.
 3. **Chat (opcional, cuesta dinero):** crear una clave en console.anthropic.com (con un límite de gasto mensual en Billing) → Supabase → Edge Functions → Secrets → `ANTHROPIC_API_KEY`. Opcionales: `IA_MAX_USUARIO` (15), `IA_MAX_TOTAL` (300), `IA_MODELO`. Nunca pegar la clave en un chat ni en GitHub.
 4. Para apagar el chat: `FX.ayudaIA = false` en `src/data/experimento.js` o borrar el secreto.
+
+## Recordatorio
+- Fralex pidió que se le recuerde el paso 3 (clave del chat) más adelante: tarea programada `trig_01U25BkMjL7LVdWejUJhYgSg` para el lunes 19-oct-2026, 10:00 a. m. (Lima). Si otra sesión retoma esto, también puede recordárselo.
