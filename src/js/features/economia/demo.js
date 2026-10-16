@@ -92,6 +92,7 @@ export async function rpcDemo(nombre, a = {}) {
       if (gem) E.gemas -= precio; else E.saldo -= precio; i.tengo = true; return { saldo: E.saldo, gemas: E.gemas, moneda: a.p_moneda, precio, objeto: i.nombre };
     }
     case 'equipar_item': { const i = ITEMS.find((x) => x.id === a.p_item); if (i) { for (const o of ITEMS) if (o.categoria === i.categoria) o.equipado = false; i.equipado = !!a.p_equipar; } return null; }
+    case 'pase_estado': case 'pase_comprar': case 'pase_reclamar': return (await import('./pase-demo.js')).rpcPase(nombre, a, E, falla);
     case 'admin_economia_resumen': return { tokens_en_circulacion: E.saldo + E.gemas, billeteras_negativas: 0, ingresos_centimos: 1000, ordenes: { PAGADA: 1, PENDIENTE: 1, FALLIDA: 1 }, pagos_activos: E.pagos };
     case 'admin_set_pagos_activos': E.pagos = !!a.p_activo; return null;
     case 'admin_pagos_manuales': return COLA.filter((c) => c.estado === (a.p_estado ?? 'en_revision')).map((c) => ({ ...c }));

@@ -1,5 +1,6 @@
 // Acceso a datos de TORNEOS PROPIOS (migración 097). Lee por RLS; escribe solo por RPC. Los errores de la base llegan como «CODIGO: texto».
 import { supabase } from '../../core/supabase.js';
+import { normalizarTorneoPremium } from '../../core/phoenix-pass.js';
 
 const MENSAJES = {
   NO_AUTORIZADO: 'No tienes permiso para hacer eso en este torneo.',
@@ -95,5 +96,8 @@ export const quitarResultado = (id, clave) => rpc('torneo_resultado_quitar', { p
 export const guardarEstado = (id, estado, detalle = null) => rpc('torneo_estado_guardar', { p_id: id, p_estado: estado, p_detalle: detalle });
 export const cerrar = (id, campeon) => rpc('torneo_cerrar', { p_id: id, p_campeon: campeon ?? null });
 export const cancelar = (id) => rpc('torneo_cancelar', { p_id: id });
+// Torneo premium (migración 123): marca que el organizador compra con gemas. Si la base aún no la tiene, la info llega como null y el botón no se muestra.
+export const premiumInfo = async (id) => { try { return normalizarTorneoPremium(await rpc('torneo_premium_info', { p_torneo: id })); } catch { return null; } };
+export const hacerPremium = (id) => rpc('torneo_hacer_premium', { p_torneo: id });
 export const staffModerar = (id, accion, motivo = null) => rpc('staff_torneo_moderar', { p_id: id, p_accion: accion, p_motivo: motivo });
 export const staffTopes = (t) => rpc('staff_torneos_config', { p_habilitado: t.habilitado, p_max_activos: t.max_activos, p_max_jugadores: t.max_jugadores });

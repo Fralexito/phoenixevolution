@@ -9,6 +9,7 @@ import { openModal, closeModal } from '../core/modal.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/economia/api.js';
 import * as rec from '../features/economia/recargas.js';
+import * as pase from '../features/economia/pase.js';
 import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin, EFECTOS_CARTA, PATRONES_BANNER } from '../core/economia.js';
 import { SONIDOS_CHAT } from '../core/sonidosChat.js';
 import { initSonidosChat } from '../features/sonidosChat.js';
@@ -109,7 +110,7 @@ function adminHTML() {
 function pintar() {
   $('ti-cartera').innerHTML = carteraHTML(); $('ti-tab-admin').hidden = !esAdmin();
   for (const b of $('ti-tabs').querySelectorAll('[data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
-  const v = { tienda: tiendaHTML, inventario: inventarioHTML, ganar: ganarHTML, tokens: tokensHTML, historial: historialHTML, admin: adminHTML }[S.tab] ?? tiendaHTML;
+  const v = { tienda: tiendaHTML, inventario: inventarioHTML, ganar: ganarHTML, tokens: tokensHTML, pase: pase.paseHTML, historial: historialHTML, admin: adminHTML }[S.tab] ?? tiendaHTML;
   $('ti-contenido').innerHTML = v();
 }
 
@@ -118,14 +119,14 @@ async function cargar() {
   const mi = ++S.req; avisoError('');
   const sesion = !!S.yo, pedir = (p, def) => p.catch((e) => { console.error('[tienda]', e); if (!S.fallo) S.fallo = e.message; return def; });
   S.fallo = '';
-  const [items, reglas, pq, eco, inv, movs, ord, adm, admItems, extra, bonus] = await Promise.all([
+  const [items, reglas, pq, eco, inv, movs, ord, adm, admItems, extra, bonus, extraPase] = await Promise.all([
     pedir(api.tienda(), []), pedir(api.reglas(), []), pedir(api.paquetes(), null),
     sesion ? pedir(api.miEconomia(), null) : null, sesion ? pedir(api.miInventario(), []) : [], sesion ? pedir(api.movimientos(30), []) : [], sesion ? pedir(api.misOrdenes(), []) : [],
     sesion && esAdmin() ? pedir(api.adminResumen(), null) : null, sesion && esAdmin() ? pedir(api.adminItems(), []) : [],
-    rec.cargarDatos(sesion, esAdmin(), pedir), gan.cargarDatos(sesion, pedir),
+    rec.cargarDatos(sesion, esAdmin(), pedir), gan.cargarDatos(sesion, pedir), pase.cargarDatos(),
   ]);
   if (mi !== S.req) return;
-  Object.assign(S, { items, reglas, pq, eco, inv, movs, ordenes: Array.isArray(ord) ? ord : [], adm, admItems, ...extra, ...bonus });
+  Object.assign(S, { items, reglas, pq, eco, inv, movs, ordenes: Array.isArray(ord) ? ord : [], adm, admItems, ...extra, ...bonus, ...extraPase });
   if (S.fallo) avisoError(S.fallo);
   pintar();
 }
@@ -167,6 +168,7 @@ function modalAjuste(usuario, nombre) {
 }
 
 rec.iniciar({ S, hacer, cargar, esAdmin });
+pase.iniciar({ S, hacer, cargar });
 initSonidosChat();   // botones «Escuchar» de los sonidos de chat (solo suenan al pulsarlos)
 gan.iniciar({ S, hacer });
 
@@ -175,6 +177,7 @@ $('ti-contenido').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return; const d = b.dataset;
   if (rec.click(ev)) return; // recargas: paquetes, comprobantes y revisión de pagos
   if (gan.click(ev)) return; // cómo ganar: racha diaria, misiones y logros
+  if (pase.click(ev)) return; // Phoenix Pass: comprar el pase y reclamar premios
   if (d.cat) { S.cat = d.cat; pintar(); }
   else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i) modalCompra(i, d.moneda === 'gemas' ? 'gemas' : 'ascuas'); }
   else if (d.equipar) hacer(() => api.equipar(Number(d.equipar), d.valor === 'si').then((r) => { import('../features/efectosCarta.js').then((m) => m.olvidarEfectosCarta()); return r; }), d.valor === 'si' ? 'Equipado.' : 'Quitado.');

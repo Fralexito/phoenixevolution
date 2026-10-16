@@ -7,7 +7,7 @@ Reglas que no se tocan: **solo cosmético y comodidad**, nada de ventaja ni azar
 - ¿El pase es una suscripción que cobra sola? **NO.** Se compra **una vez por temporada**, con gemas. Si no lo compras, no pasa nada.
 - ¿El pase da ventaja en el juego? **NO.** Solo marcos, fondos, insignias, títulos, ascuas y algunas gemas.
 - ¿Se puede jugar sin pagar? **SÍ.** La pista gratis siempre existe.
-- ¿Ya está construido? **SÍ** lo del pase y el «Hacer premium» de torneos (migración 123 + pestaña «Pase» en la tienda). Lo de propinas y overlay para TikTok es **solo papel** (abajo).
+- ¿Ya está construido? **SÍ** en el código (pestaña «Pase» en la tienda y botón «Hacer premium» en el torneo). La migración 123 está escrita y probada solo en lectura: **falta aplicarla a la base** (ver docs/ECONOMIA-FASE-E.md). Lo de propinas y overlay para TikTok es **solo papel** (abajo).
 
 ---
 
@@ -19,7 +19,7 @@ Reglas que no se tocan: **solo cosmético y comodidad**, nada de ventaja ni azar
 3. En cada nivel hay **dos premios**: uno de la **pista gratis** y otro de la **pista premium**.
 4. Todos reclaman la pista gratis. La premium se reclama solo si compraste el pase.
 5. Si compras el pase a mitad de temporada, **puedes reclamar los premios premium de los niveles que ya alcanzaste** (no pierdes nada por comprar tarde).
-6. Al terminar la temporada hay **7 días de gracia** para reclamar lo ya ganado. Después, la temporada se cierra y los premios que no reclamaste se pierden. Lo que reclamaste es tuyo para siempre.
+6. Al terminar la temporada hay **7 días de gracia** para reclamar lo ya ganado. Después, la temporada se cierra y los premios que no reclamaste se pierden (si otra temporada empieza antes de que acabe la gracia, la gracia se corta ahí: dejar un hueco de fechas entre temporadas). Lo que reclamaste es tuyo para siempre.
 
 ### Precio
 | Concepto | Valor propuesto | Equivale a |
@@ -31,7 +31,7 @@ Reglas que no se tocan: **solo cosmético y comodidad**, nada de ventaja ni azar
 Por qué las «gemas de regreso»: es una razón honesta para comprar (el pase «se paga solo» si juegas), sin ser azar ni ventaja. **Gemas en la pista gratis: NO**, porque sería una fuente gratuita de gemas (moneda de dinero real).
 
 ### Qué trae la primera temporada («Despegue»)
-- **Pista gratis:** ascuas en cada nivel (de 40 a 120, total 1 800) y 3 objetos ya existentes en la tienda (niveles 10, 20 y 30).
+- **Pista gratis:** ascuas en 27 niveles (40, 80 y 120 por tramo de 10 niveles: 2 160 en total) y 3 objetos ya existentes en la tienda (niveles 10, 20 y 30).
 - **Pista premium:** 6 objetos **exclusivos del pase** (marco, fondo, insignia, título, color de clan y un marco legendario final), ascuas extra y 60 gemas de regreso.
 - Los objetos exclusivos **no se pueden comprar en la tienda**; solo salen del pase (se esconden de la lista y quedan en tu inventario). Los de otras fases (efectos de carta, banners, sonidos de chat) se pueden añadir al pase sin cambiar nada: el premio apunta a «un objeto de la tienda por su clave».
 

@@ -1,5 +1,6 @@
 // Economía: llama a las RPC (reglas en la BD, migraciones 049-051). Esquema: pages/tienda → features/economia/api → core/economia (puro).
 import { supabase } from '../../core/supabase.js';
+import { normalizarPase } from '../../core/phoenix-pass.js';
 import { normalizarEconomia, normalizarLista, normalizarMovimiento, normalizarRegla, normalizarPaquetes, normalizarEquipamiento, normalizarEfectosCarta, normalizarMetodos, normalizarPagoManual } from '../../core/economia.js';
 import { normalizarGanar } from '../../core/ganarAscuas.js';
 
@@ -73,6 +74,10 @@ export const adminMetodos = () => rpc('admin_metodos_pago');
 export const adminGuardarMetodo = (m) => rpc('admin_guardar_metodo', { p_clave: m.clave, p_nombre: m.nombre, p_tipo: m.tipo, p_activo: m.activo, p_orden: m.orden, p_minimo: m.minimo, p_maximo: m.maximo, p_instrucciones: m.instrucciones, p_datos: m.datos });
 export const adminSetPrecios = (id, ascuas, gemas) => rpc('admin_set_precios_item', { p_id: id, p_precio_ascuas: ascuas, p_precio_gemas: gemas });
 export const economiaAuditar = () => rpc('economia_auditar');
+// ── Phoenix Pass (migración 123): pase de temporada, compra única con gemas y reclamo de premios ──
+export const paseEstado = async () => normalizarPase(await rpc('pase_estado'));
+export const paseComprar = () => rpc('pase_comprar');
+export const paseReclamar = (nivel, pista) => rpc('pase_reclamar', { p_nivel: nivel, p_pista: pista });
 /** Dirección temporal (5 minutos) para que el administrador vea una captura. */
 export async function urlComprobante(ruta) {
   if (DEMO) return '';

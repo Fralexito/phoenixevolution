@@ -15,7 +15,7 @@ import { rafaga } from '../features/dopamina.js';
 
 const raiz = document.getElementById('to-raiz');
 const id = Number(new URLSearchParams(location.search).get('id'));
-const st = { yo: null, t: null, insc: [], partidos: [], nombres: {}, eventos: [], cargando: false };
+const st = { yo: null, t: null, insc: [], partidos: [], nombres: {}, eventos: [], prem: null, cargando: false };
 
 const nombresEq = (a, b) => String(a ?? '').toLowerCase() === String(b ?? '').toLowerCase();
 const dins = () => st.t?.config?.dinamicas ?? [];
@@ -148,7 +148,7 @@ function cabecera() {
   const t = st.t; const f = formatoFicha(t.formato); const e = ESTADO_TXT[t.estado];
   const enlace = safeUrl(t.config?.enlace ?? '');
   return `<header class="glass-panel to-cab"><div class="to-cab-top"><span class="tn-pill"><i class="fa-solid ${esc(e?.icono ?? 'fa-circle')}" aria-hidden="true"></i> ${esc(e?.nombre ?? t.estado)}</span>
-    <span class="tn-pill"><i class="fa-solid ${esc(f?.icono ?? 'fa-trophy')}" aria-hidden="true"></i> ${esc(f?.nombre ?? t.formato)}</span>${t.oculto ? '<span class="tn-pill tn-alerta">Oculto por el staff</span>' : ''}</div>
+    <span class="tn-pill"><i class="fa-solid ${esc(f?.icono ?? 'fa-trophy')}" aria-hidden="true"></i> ${esc(f?.nombre ?? t.formato)}</span>${t.oculto ? '<span class="tn-pill tn-alerta">Oculto por el staff</span>' : ''}${st.prem?.premium ? '<span class="tn-pill" title="Torneo premium"><i class="fa-solid fa-crown" aria-hidden="true"></i> Premium</span>' : ''}</div>
     <h1>${esc(t.nombre)}</h1><p class="to-por">Organiza <b>${esc(st.nombres[t.creador] ?? 'un jugador')}</b>${t.inicia ? ` · Empieza ${esc(new Date(t.inicia).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }))}` : ''}</p>
     ${t.descripcion ? `<p class="to-desc">${esc(t.descripcion)}</p>` : ''}
     ${t.config?.premio ? `<p class="to-premio"><i class="fa-solid fa-gift" aria-hidden="true"></i> Premio: ${esc(t.config.premio)}</p>` : ''}
@@ -160,11 +160,20 @@ function bloqueCampeon() {
   if (t.estado === 'en_curso' && s) return `<p class="to-sugerido"><i class="fa-solid fa-crown" aria-hidden="true"></i> ${s.definitivo ? 'Campeón' : 'Va ganando'}: <b>${esc(s.nombre)}</b></p>`;
   return '';
 }
+/** Bloque «Torneo premium» del panel del organizador: botón «Hacer premium» (gemas, una vez por torneo) o la lista de lo que ya tiene. */
+function premiumHTML() {
+  const p = st.prem; if (!p) return '';
+  if (p.premium) return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b><p class="tn-ayuda">Este torneo ya es premium: overlay de transmisión, llaves, estadísticas y página propia se activan aquí en cuanto estén listos.</p></div>`;
+  if (!p.puede) return '';
+  return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b>
+    <p class="tn-ayuda">Una sola vez por torneo, con gemas. Desbloquea el overlay de transmisión, las llaves de pantalla completa, las estadísticas y una página propia. Es solo presentación: no cambia las reglas ni da ventajas.</p>
+    <button type="button" class="btn btn-primary" data-hacer-premium><i class="fa-solid fa-gem" aria-hidden="true"></i> Hacer premium · ${p.precioGemas.toLocaleString('es-PE')} gemas</button></div>`;
+}
 function panelOrganizador() {
   if (!gestiona() || ['terminado', 'cancelado'].includes(st.t.estado)) return '';
   const t = st.t; const c = t.config ?? {};
   const cerrar = t.estado === 'en_curso' ? '<button type="button" class="btn btn-primary" data-cerrar-torneo><i class="fa-solid fa-flag-checkered"></i> Cerrar torneo y coronar</button>' : '';
-  return plegable('Opciones del organizador', 'fa-sliders', 'Editar, cerrar o cancelar', `<form id="to-editar" class="space-y-3">
+  return plegable('Opciones del organizador', 'fa-sliders', 'Editar, cerrar o cancelar', `${premiumHTML()}<form id="to-editar" class="space-y-3">
     <label class="tn-campo" for="te-nombre">Nombre</label><input id="te-nombre" name="nombre" class="field" maxlength="80" required value="${esc(t.nombre)}">
     <label class="tn-campo" for="te-desc">Descripción</label><textarea id="te-desc" name="descripcion" rows="3" maxlength="2000" class="field">${esc(t.descripcion ?? '')}</textarea>
     <div class="tn-rejilla"><div><label class="tn-campo" for="te-vis">Quién lo ve</label><select id="te-vis" name="visibilidad" class="field">${['publico', 'enlace', 'privado'].map((v) => `<option value="${v}"${t.visibilidad === v ? ' selected' : ''}>${{ publico: 'Público', enlace: 'Solo con enlace', privado: 'Privado' }[v]}</option>`).join('')}</select></div>
@@ -197,6 +206,7 @@ async function cargar({ silencioso = false } = {}) {
     st.t = await api.leerTorneo(id);
     if (st.t) {
       [st.insc, st.partidos] = await Promise.all([api.inscritosDe([id]), api.partidosDe(id)]);
+      st.prem = await api.premiumInfo(id);
       st.eventos = (st.yo && (st.t.creador === st.yo || can('gestionarTorneos'))) ? await api.eventosDe(id).catch(() => []) : [];
       st.nombres = await api.nombresDe([st.t.creador, ...st.eventos.map((e) => e.usuario)]);
     }
@@ -294,6 +304,7 @@ raiz.addEventListener('click', async (e) => {
   else if (b.dataset.cerrarGrupos !== undefined) await cerrarGrupos();
   else if (b.dataset.sigSuizo !== undefined) await siguienteSuizo();
   else if (b.dataset.cerrarTorneo !== undefined) await cerrarTorneo();
+  else if (b.dataset.hacerPremium !== undefined) { if (await confirmar(`¿Hacer premium este torneo por ${st.prem?.precioGemas ?? ''} gemas? Se paga una sola vez y no se devuelve automáticamente.`, { aceptar: 'Hacer premium', cancelar: 'Volver' })) await hacer(() => api.hacerPremium(id), '¡Tu torneo ahora es premium!'); }
   else if (b.dataset.cancelarTorneo !== undefined) { if (await confirmar('¿Cancelar el torneo? Ya no se podrá seguir jugando.', { aceptar: 'Cancelar torneo', cancelar: 'Volver', peligro: true })) await hacer(() => api.cancelar(id), 'Torneo cancelado.'); }
   else if (b.dataset.copiar !== undefined) { try { await navigator.clipboard.writeText(location.href); toast('Enlace copiado.', 'ok'); } catch { toast('No se pudo copiar. Copia la dirección de la barra.', 'warn'); } }
 });
