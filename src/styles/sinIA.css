@@ -1,16 +1,14 @@
-/* «SIN HUELLA DE IA» (ronda 303, PRUEBA SOLO EN LIGA): quita brillos de neón, texto con degradado y cristal desenfocado.
-   Se aplica por página con main[data-activa='liga']; si gusta, se añade el id de otras páginas a la lista. Para quitarlo: borrar el @import en global.css. */
+/* «SIN HUELLA DE IA» + gaming (PRUEBA SOLO EN LIGA). Ronda 305: EQUILIBRIO con la identidad Galaxy.
+   Se quedan la forma y el toque e-sports; vuelven el degradado cian→púrpura del título, el cristal oscuro con borde púrpura
+   y un brillo MUY suave solo en el título. Siguen fuera los resplandores en botones, chips y tarjetas. Para quitarlo: borrar el @import en global.css. */
 main[data-activa='liga'] { --sia: 1; }
-/* 1 · Sin brillos */
-main[data-activa='liga'] * { text-shadow: none !important; }
-main[data-activa='liga'] :is(.btn, .hero-cta, .liga-sello, .pc-chip, .adv-chip, .liga-podio, .liga-podio-fila, .glass-panel, [class*='shadow-'], img) { box-shadow: none !important; filter: none; }
-/* 2 · Sin degradado en el texto: un color liso */
-main[data-activa='liga'] .bg-clip-text { background: none !important; -webkit-text-fill-color: currentColor; color: var(--color-galaxy-400) !important; }
-/* 3 · Tarjetas planas: sin desenfoque ni sombra interior, fondo liso */
-main[data-activa='liga'] :is(.glass-panel, .premium-glass, .liga-podio, .hero-cta-s) { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #0e0b1f; }
-/* 4 · Sin manchas de luz ni capas de adorno detrás del titular */
-main[data-activa='liga'] section > header > .absolute { display: none; }
-main[data-activa='liga'] section > header * { box-shadow: none !important; }
+/* Sin resplandor en textos, salvo un halo suave en el título principal */
+main[data-activa='liga'] :not(h1) { text-shadow: none; }
+main[data-activa='liga'] h1 { text-shadow: 0 0 16px rgb(0 229 255 / .22); }
+/* Sin sombras de neón en botones, chips y podio */
+main[data-activa='liga'] :is(.btn, .hero-cta, .liga-sello, .pc-chip, .adv-chip, .liga-podio, .liga-podio-fila) { box-shadow: none !important; }
+/* Tarjetas: cristal oscuro de Galaxy, un poco más plano (menos desenfoque) y con su borde púrpura */
+main[data-activa='liga'] :is(.glass-panel, .premium-glass) { backdrop-filter: blur(6px); background: rgba(10, 5, 28, .78); }
 /* 5 · Toque gaming / e-sports (ronda 304, solo Liga): bordes duros, rayas diagonales y marcador de torneo. Sin brillos. */
 main[data-activa='liga'] section > header { position: relative; border-bottom: 2px solid var(--color-galaxy-400); background: repeating-linear-gradient(135deg, rgb(255 255 255 / .025) 0 2px, transparent 2px 14px), #0a0818; }
 /* esquinas tipo «mira» en el titular */
