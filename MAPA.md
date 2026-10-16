@@ -333,3 +333,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 296 (cuenta WEB, borrador): menú en 5 puertas (Competiciones · Jugadores · Jugar · Mi club · Comunidad). Mi club sale de Jugar; Premios pasa a Competiciones; «Unirme a la liga» y «Crear mi liga» (solo staff) en Competiciones; «Quiénes somos» en Comunidad. Barra lateral de iconos apagada (FX.barraLateral=false, reversible) y pie «Explora» = las mismas 5 puertas. URLs sin cambios. site.js, Header/PilarTabs (data-solo-staff), pilares.js, Footer, experimento.js. Tests 466/0, build 48.
 
 ### Ronda 297 (cuenta WEB, borrador): cada puerta con su mundo — Jugadores violeta, Jugar rosa, Mi club verde, Comunidad naranja; Competiciones conserva el cian de Galaxy (+ dorado). Brillo de ambiente y pestañas por mundo (styles/mundos.css, main[data-mundo] desde Layout). Se apaga con Sudario o con acento elegido en Ajustes. Arreglo: textos del menú sin partirse en 2 líneas. Tests 466/0, build 48.
+
+### Ronda 298 (cuenta WEB, borrador): vuelve la barra lateral izquierda (FX.barraLateral=true), por pedido de Fralex; era un error apagarla.
