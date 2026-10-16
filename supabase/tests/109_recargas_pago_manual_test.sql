@@ -1,3 +1,4 @@
+-- OBSOLETA desde la migración 112: enviar_comprobante_manual ahora pide 4 argumentos, captura real en storage y perfil completo. Se conserva como referencia; las pruebas vigentes son 111_integridad_test.sql y 113_vigilancia_test.sql.
 -- Pruebas de la migración 109 (recargas: pago manual). SE DESHACEN SOLAS (el bloque termina con un error a propósito).
 -- Cómo correrlas: aplicar antes la 109 y pegar este archivo entero en el SQL Editor (o con execute_sql). Debe terminar con:
 --   ERROR: PRUEBAS109(se deshace todo): A ok;B ok;C ok;D ok;E ok;F ok;G ok;H ok;I ok;J1 ok;J2 ok;K ok;L ok;M ok;N ok;
