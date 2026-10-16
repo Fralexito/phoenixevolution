@@ -944,6 +944,13 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - `main` avanzó (fast-forward) de 42bccd6 a 4883ebc: entran las 131 rondas acumuladas de `borrador` (hasta la 274). Tests 457/457 y build 47 páginas antes de subir. BD al día (migraciones hasta 106; la 106 la pegó Fralex en el SQL Editor).
 - Desde ahora la vista previa es `/fase-beta-1-0/` y `borrador` y `main` quedan iguales.
 
+## Ronda 294 — «Crear mi liga»: creación rápida (etapa 1)
+- Página nueva `/crear-liga/` (solo staff por ahora, decisión de Fralex): 3 pasos (nombre · tipo · jugadores) con 4 tarjetas (Liga, Copa, Grupos + copa, Suizo) y un resumen en vivo («con 8 jugadores se juegan 28 partidos»). Todo lo completo va plegado: «Personalizar» (visibilidad, yo juego, ida y vuelta, 3.er puesto, grupos, premio, descripción) y dentro «Avanzado» (fecha, enlace, reglas, dinámicas, sorteo, jugadores que reportan, más jugadores del recomendado).
+- Crea un torneo propio con la misma RPC `torneo_crear` de /torneos/ (tabla `torneos_libres`): SIN base de datos nueva y SIN cambios en lo que ya funcionaba. Marca `config.origen = 'crear-liga'`. Tras crear, lleva a `/torneo/?id=…`.
+- OJO: el límite «solo staff» es de pantalla; la RPC sigue permitiendo crear torneos a cualquiera desde /torneos/ (ya era así). Si se quiere blindar en servidor, es una migración aparte.
+- Archivos: `src/pages/crear-liga.astro`, `src/js/pages/crearLiga.js`, `src/js/core/crearLiga.js` (+ `tests/crearLiga.test.mjs`, 9 pruebas), `src/styles/crearLiga.css`, `global.css`. Probado en navegador real. 466 tests OK, 48 páginas.
+- Pendiente (etapas 2–4 del plan): plantillas guardadas, enlace de invitación, desempates/puntos configurables, ligas automáticas con Phoenix Link; y enlazar la página desde el menú (hoy solo por URL `/crear-liga/`).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

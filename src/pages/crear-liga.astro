@@ -1,0 +1,86 @@
+---
+// CREAR MI LIGA (ronda 276): creación rápida (nombre · tipo · jugadores) y, plegado, todo lo demás. Solo staff por ahora.
+// Usa los mismos torneos propios de /torneos/ (migración 097): ningún dato nuevo. Lógica: js/core/crearLiga.js · pantalla: js/pages/crearLiga.js
+import Layout from '../layouts/Layout.astro';
+import Plegable from '../components/Plegable.astro';
+import { href } from '../js/core/config.js';
+---
+<Layout title="Crear mi liga" active="torneos" description="Crea tu liga en 30 segundos: ponle nombre, elige el tipo y cuántos juegan.">
+  <header class="relative overflow-hidden border-b border-galaxy-border/40">
+    <div class="absolute inset-0 bg-gradient-to-b from-galaxy-900/70 to-transparent"></div>
+    <div class="relative z-10 max-w-3xl mx-auto px-5 sm:px-8 py-9 sm:py-11 text-center space-y-3">
+      <span class="liga-sello">Listo en 30 segundos</span>
+      <h1 class="text-4xl sm:text-5xl font-display font-extrabold text-white uppercase leading-none text-shadow-glow">Crear mi <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">liga</span></h1>
+      <p class="text-sm sm:text-base text-gray-300 max-w-xl mx-auto">Tres pasos y la web arma el calendario. Lo demás está plegado abajo, por si quieres afinarlo.</p>
+    </div>
+  </header>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-6">
+    <section id="cl-sin-sesion" class="glass-panel rounded-2xl p-6 text-center space-y-3" hidden>
+      <p class="text-gray-200"><i class="fa-solid fa-lock" aria-hidden="true"></i> Inicia sesión para crear tu liga.</p>
+    </section>
+    <section id="cl-no-staff" class="glass-panel rounded-2xl p-6 text-center space-y-3" hidden>
+      <p class="text-gray-200"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Por ahora, solo el staff crea ligas desde aquí.</p>
+      <p class="tn-ayuda">Mientras tanto puedes armar un torneo propio con tus reglas.</p>
+      <a class="btn btn-primary" href={href('torneos/')}><i class="fa-solid fa-trophy"></i> Ir a Torneos</a>
+    </section>
+
+    <form id="cl-form" class="space-y-6" novalidate hidden>
+      <section class="cl-paso glass-panel" aria-labelledby="cl-h1">
+        <h2 id="cl-h1" class="cl-t"><span class="cl-num" aria-hidden="true">1</span> ¿Cómo se llama?</h2>
+        <div class="tn-fila">
+          <input id="cl-nombre" name="nombre" class="field" maxlength="80" autocomplete="off" placeholder="Ej.: Liga del Pollo Veloz" aria-describedby="cl-err">
+          <button type="button" id="cl-azar" class="btn btn-ghost" title="Inventar un nombre"><i class="fa-solid fa-dice"></i> Sorpréndeme</button>
+        </div>
+      </section>
+
+      <section class="cl-paso glass-panel" aria-labelledby="cl-h2">
+        <h2 id="cl-h2" class="cl-t"><span class="cl-num" aria-hidden="true">2</span> ¿Qué tipo?</h2>
+        <div id="cl-tipos" class="cl-tipos" role="group" aria-label="Tipo de liga"></div>
+      </section>
+
+      <section class="cl-paso glass-panel" aria-labelledby="cl-h3">
+        <h2 id="cl-h3" class="cl-t"><span class="cl-num" aria-hidden="true">3</span> ¿Cuántos juegan?</h2>
+        <div class="cl-paso-fila">
+          <div class="cl-stepper" role="group" aria-label="Cantidad de jugadores">
+            <button type="button" id="cl-menos" class="cl-bot" aria-label="Uno menos"><i class="fa-solid fa-minus"></i></button>
+            <input id="cl-jugadores" name="jugadores" class="cl-num-in" type="number" inputmode="numeric" aria-label="Jugadores">
+            <button type="button" id="cl-mas" class="cl-bot" aria-label="Uno más"><i class="fa-solid fa-plus"></i></button>
+          </div>
+          <p id="cl-resumen" class="cl-resumen" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <p id="cl-err" class="tn-aviso" role="alert" hidden></p>
+      <div class="cl-crear">
+        <button type="submit" id="cl-crear" class="btn btn-primary cl-grande"><i class="fa-solid fa-wand-magic-sparkles"></i> Crear mi liga</button>
+        <span id="cl-estado" class="tn-ayuda" aria-live="polite"></span>
+      </div>
+
+      <Plegable titulo="Personalizar" icono="fa-sliders" resumen="Visibilidad, ida y vuelta, grupos, premio…">
+        <div class="cl-campos">
+          <div><label class="tn-campo" for="cl-vis">Quién la ve</label>
+            <select id="cl-vis" name="visibilidad" class="field"><option value="publico">Pública (sale en la lista)</option><option value="enlace">Solo con enlace</option><option value="privado">Privada</option></select></div>
+          <label class="tn-check"><input type="checkbox" name="juega" checked> Yo también juego</label>
+          <label class="tn-check" data-solo="liga"><input type="checkbox" name="idaVuelta"> Ida y vuelta <small>(cada rival, dos veces · hasta 10 jugadores)</small></label>
+          <label class="tn-check" data-solo="copa mundial"><input type="checkbox" name="tercer"> Partido por el 3.er puesto</label>
+          <div data-solo="mundial"><label class="tn-campo" for="cl-grupos">Cantidad de grupos (vacío = automático)</label><input id="cl-grupos" name="grupos" type="number" min="2" max="16" class="field" placeholder="Automático"></div>
+          <div><label class="tn-campo" for="cl-premio">Premio (opcional)</label><input id="cl-premio" name="premio" class="field" maxlength="120" placeholder="Ej.: Rol «Campeón» en Discord"></div>
+          <div class="cl-ancho"><label class="tn-campo" for="cl-desc">Descripción (opcional)</label><textarea id="cl-desc" name="descripcion" rows="2" maxlength="500" class="field" placeholder="De qué trata y cuándo se juega…"></textarea></div>
+        </div>
+        <Plegable titulo="Avanzado" icono="fa-gears" resumen="Fecha, enlace, reglas, dinámicas divertidas…" clase="mt-3">
+          <div class="cl-campos">
+            <div><label class="tn-campo" for="cl-inicia">Cuándo empieza</label><input id="cl-inicia" name="inicia" type="datetime-local" class="field"></div>
+            <div><label class="tn-campo" for="cl-enlace">Enlace (Discord, grupo…)</label><input id="cl-enlace" name="enlace" class="field" maxlength="300" placeholder="https://…"></div>
+            <label class="tn-check"><input type="checkbox" name="reportan" checked> Los jugadores pueden anotar sus resultados <small>(tú siempre puedes corregirlos)</small></label>
+            <label class="tn-check"><input type="checkbox" name="sorteo"> Sortear el orden al empezar</label>
+            <label class="tn-check"><input type="checkbox" name="sinTope"> Permitir más jugadores de lo recomendado</label>
+            <div class="cl-ancho"><label class="tn-campo" for="cl-reglas">Reglas escritas (una por línea)</label><textarea id="cl-reglas" name="reglas" rows="3" maxlength="1500" class="field" placeholder="Escribe aquí tus reglas…"></textarea></div>
+            <div class="cl-ancho"><span class="tn-campo">Dinámicas divertidas</span><div id="cl-dinamicas"></div></div>
+          </div>
+        </Plegable>
+      </Plegable>
+    </form>
+  </div>
+  <script>import '../js/pages/crearLiga.js';</script>
+</Layout>
