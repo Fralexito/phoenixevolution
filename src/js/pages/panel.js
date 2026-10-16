@@ -4,13 +4,13 @@ import { onSession, can } from '../core/session.js';
 import { supabase } from '../core/supabase.js';
 import { toast } from '../core/toast.js';
 import { confirmar } from '../core/dialogo.js';
-import { normalizar, mover, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA } from '../core/sitio.js';
+import { normalizar, mover, moverA, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA } from '../core/sitio.js';
 import { aplicar, guardarCache } from '../features/sitioAplicar.js';
 
 const $ = (id) => document.getElementById(id);
 const NOMBRES = { social: 'Zona Social', competencia: 'Competencia', duelos: 'Duelos', club: 'Mi Club' };
 const VISTA_TXT = { '': 'Como está', vivo: 'Botón grande + atajos', mosaico: 'Mosaico de iconos', grande: 'Una grande y dos chicas' };
-const S = { guardada: normalizar({}), borrador: normalizar({}), puedeDes: false, puedeReh: false, ocupado: false, iniciado: false };
+const S = { sel: null, arrastra: null, guardada: normalizar({}), borrador: normalizar({}), puedeDes: false, puedeReh: false, ocupado: false, iniciado: false };
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const sucio = () => !iguales(S.borrador, S.guardada);
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -18,62 +18,115 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 function error(msg) { const e = $('pn-error'); e.textContent = msg || ''; e.hidden = !msg; }
 const msg = (err) => /NADA_QUE/.test(err?.message || '') ? 'No hay más pasos.' : /NO_AUTORIZADO/.test(err?.message || '') ? 'Solo el admin puede cambiar esto.' : (err?.message || 'Algo salió mal. Inténtalo de nuevo.');
 
-function lista(selector) {
-  const m = new Map();
-  document.querySelectorAll(selector).forEach((a) => { const id = a.dataset.navId; if (id && !a.dataset.soloStaff && !m.has(id)) m.set(id, (a.getAttribute('title') || a.textContent || id).replace(/\s+/g, ' ').trim()); });
-  return [...m];
-}
-const checks = (items, ocultos, nombre) => items.length ? `<ul class="grid sm:grid-cols-2 gap-1.5">${items.map(([id, t]) => `<li><label class="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-sm text-gray-200 cursor-pointer"><input type="checkbox" data-${nombre}="${esc(id)}" ${ocultos.includes(id) ? '' : 'checked'}> ${esc(t)}</label></li>`).join('')}</ul>` : '<p class="text-xs text-gray-400">No hay botones para mostrar aquí.</p>';
+const COLOR = { social: '#7c3aed', competencia: '#fbbf24', duelos: '#00e5ff', club: '#00ff85' };
+const ICONO = { social: 'fa-comments', competencia: 'fa-trophy', duelos: 'fa-gamepad', club: 'fa-shirt' };
 const campo = (rot, v, extra = '') => `<label class="block text-[12px] text-gray-400 uppercase tracking-wider">${rot}<input type="text" class="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white" value="${esc(v)}" ${extra}></label>`;
+const ojo = (on) => `<i class="fa-solid ${on ? 'fa-eye' : 'fa-eye-slash'}"></i>`;
 
-function ventanaHTML(id, i) {
-  const c = S.borrador.portada.ventanas[id];
-  const pr = c.principal ?? { titulo: '', href: '' };
-  return `<div class="rounded-xl border border-white/10 bg-white/5 p-3 space-y-3" data-v="${id}">
-    <div class="flex items-center gap-2">
-      <label class="flex items-center gap-2 flex-1 font-display font-bold text-white uppercase tracking-wider text-sm"><input type="checkbox" data-on ${c.on ? 'checked' : ''}> ${NOMBRES[id]}</label>
-      <button type="button" class="btn btn-ghost !min-h-8 !px-2.5 !text-[12px]" data-sube aria-label="Subir" ${i === 0 ? 'disabled' : ''}><i class="fa-solid fa-arrow-up"></i></button>
-      <button type="button" class="btn btn-ghost !min-h-8 !px-2.5 !text-[12px]" data-baja aria-label="Bajar" ${i === VENTANAS.length - 1 ? 'disabled' : ''}><i class="fa-solid fa-arrow-down"></i></button>
-    </div>
-    <label class="block text-[12px] text-gray-400 uppercase tracking-wider">Diseño al girar
-      <select data-vista class="mt-1 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white">${['', ...VISTAS].map((v) => `<option value="${v}" ${c.vista === v ? 'selected' : ''}>${VISTA_TXT[v]}</option>`).join('')}</select></label>
+/* Dibujitos de cada diseño al girar (solo CSS, sin imágenes). */
+const DIBUJO = {
+  '': '<i class="pn-d"></i><i class="pn-d pn-d2"></i><i class="pn-d pn-d3"></i>',
+  vivo: '<i class="pn-d"></i><i class="pn-d pn-bt"></i><span class="pn-fila"><i class="pn-d pn-ch"></i><i class="pn-d pn-ch"></i></span>',
+  mosaico: '<span class="pn-mos"><i class="pn-d"></i><i class="pn-d"></i><i class="pn-d"></i><i class="pn-d"></i></span>',
+  grande: '<i class="pn-d pn-gr"></i><span class="pn-fila"><i class="pn-d pn-ch"></i><i class="pn-d pn-ch"></i></span>',
+};
+
+function tileHTML(id, i) {
+  const c = S.borrador.portada.ventanas[id]; const sel = S.sel === id;
+  const pr = c.principal?.titulo || 'Botón grande';
+  return `<div class="pn-tile ${c.on ? '' : 'pn-off'} ${sel ? 'pn-sel' : ''}" draggable="true" data-v="${id}" style="--c:${COLOR[id]}" tabindex="0" role="button" aria-pressed="${sel}">
+    <div class="pn-tile-cab"><i class="fa-solid fa-grip-vertical pn-grip" title="Arrastra para cambiar el orden"></i><i class="fa-solid ${ICONO[id]}"></i><b>${NOMBRES[id]}</b>
+      <button type="button" data-izq class="pn-mini" aria-label="Mover a la izquierda" ${i === 0 ? 'disabled' : ''}><i class="fa-solid fa-arrow-left"></i></button>
+      <button type="button" data-der class="pn-mini" aria-label="Mover a la derecha" ${i === VENTANAS.length - 1 ? 'disabled' : ''}><i class="fa-solid fa-arrow-right"></i></button>
+      <button type="button" data-ojo class="pn-mini" aria-label="${c.on ? 'Ocultar' : 'Mostrar'} ${NOMBRES[id]}">${ojo(c.on)}</button></div>
+    <div class="pn-tile-cuerpo">${DIBUJO[c.vista] ?? DIBUJO['']}</div>
+    <div class="pn-tile-pie">${esc(pr)}</div></div>`;
+}
+
+function editorHTML(id) {
+  if (!id) return '<p class="text-sm text-gray-400 text-center py-4"><i class="fa-solid fa-hand-pointer mr-1"></i>Toca una ventana para editarla.</p>';
+  const c = S.borrador.portada.ventanas[id]; const pr = c.principal ?? { titulo: '', href: '' };
+  return `<div data-v="${id}" class="space-y-3" style="--c:${COLOR[id]}">
+    <p class="font-display font-bold text-white uppercase tracking-wider text-sm"><i class="fa-solid ${ICONO[id]} mr-2" style="color:var(--c)"></i>Editando: ${NOMBRES[id]}</p>
+    <div><p class="text-[12px] text-gray-400 uppercase tracking-wider mb-1.5">Cómo se ve al girar</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${['', ...VISTAS].map((v) => `<button type="button" data-vista="${v}" class="pn-op ${c.vista === v ? 'pn-op-on' : ''}" aria-pressed="${c.vista === v}"><span class="pn-dib">${DIBUJO[v]}</span><span>${VISTA_TXT[v]}</span></button>`).join('')}</div></div>
     <div class="grid sm:grid-cols-2 gap-2">${campo('Botón grande · texto', pr.titulo, 'data-pt maxlength="28" placeholder="Como está"')}${campo('Botón grande · a dónde va', pr.href, 'data-ph placeholder="liga/"')}</div>
-    <div class="space-y-2"><p class="text-[12px] text-gray-400 uppercase tracking-wider">Atajos añadidos (${c.extra.length}/${MAX_EXTRA})</p>
+    <div class="space-y-2"><p class="text-[12px] text-gray-400 uppercase tracking-wider">Atajos que tú añades (${c.extra.length}/${MAX_EXTRA})</p>
       ${c.extra.map((e, k) => `<div class="grid grid-cols-[1fr_1fr_auto] gap-2" data-k="${k}">${campo('', e.titulo, 'data-et maxlength="22"')}${campo('', e.href, 'data-eh')}<button type="button" class="btn btn-ghost !min-h-9 !px-2.5" data-quita aria-label="Quitar atajo"><i class="fa-solid fa-xmark"></i></button></div>`).join('')}
       ${c.extra.length < MAX_EXTRA ? '<button type="button" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]" data-suma><i class="fa-solid fa-plus mr-1"></i>Añadir atajo</button>' : ''}</div>
   </div>`;
 }
 
+/* Menú de arriba: se lee de la propia página (cada grupo y sus botones). */
+function gruposMenu() {
+  const out = [];
+  document.querySelectorAll('.pilar[data-pilar]').forEach((p) => {
+    const rot = (p.querySelector('.pilar-btn')?.textContent || p.dataset.pilar).replace(/\s+/g, ' ').trim();
+    const m = new Map();
+    p.querySelectorAll('.pilar-item[data-nav-id]').forEach((a) => { if (!a.dataset.soloStaff && !m.has(a.dataset.navId)) m.set(a.dataset.navId, (a.querySelector('b, .pilar-t, span')?.textContent || a.textContent).replace(/\s+/g, ' ').trim().slice(0, 28)); });
+    if (m.size) out.push({ rot, items: [...m] });
+  });
+  return out;
+}
+const chip = (id, t, ocultos, attr, ico = '') => { const on = !ocultos.includes(id); return `<button type="button" ${attr}="${esc(id)}" class="pn-chip ${on ? '' : 'pn-chip-off'}" aria-pressed="${on}">${ico}<span>${esc(t)}</span>${ojo(on)}</button>`; };
+function menuHTML() {
+  const g = gruposMenu(); const o = S.borrador.menu.ocultos;
+  if (!g.length) return '<p class="text-xs text-gray-400">Abre esta página en una pantalla ancha para ver el menú.</p>';
+  return `<div class="pn-barra-menu">${g.map((x) => `<div class="pn-pilar"><p>${esc(x.rot)}</p><div class="flex flex-wrap gap-1.5">${x.items.map(([id, t]) => chip(id, t, o, 'data-menu')).join('')}</div></div>`).join('')}</div>`;
+}
+function lateralHTML() {
+  const o = S.borrador.lateral.ocultos; const m = new Map();
+  document.querySelectorAll('.barra-item[data-nav-id]').forEach((a) => { const id = a.dataset.navId; if (!m.has(id)) m.set(id, { t: (a.getAttribute('title') || a.textContent).replace(/\s+/g, ' ').trim(), ic: a.querySelector('i')?.className || 'fa-solid fa-circle' }); });
+  if (!m.size) return '<p class="text-xs text-gray-400">La barra lateral solo se ve en pantallas anchas.</p>';
+  return `<div class="pn-lateral">${[...m].map(([id, v]) => chip(id, v.t, o, 'data-lat', `<i class="${esc(v.ic)}"></i>`)).join('')}</div>`;
+}
+
 function pintar() {
   const b = S.borrador;
+  if (S.sel && !VENTANAS.includes(S.sel)) S.sel = null;
   const sec = (ico, t, res, cont, ab = false) => `<details class="glass-panel rounded-2xl px-4 py-3" ${ab ? 'open' : ''}><summary class="cursor-pointer font-display font-bold text-white uppercase tracking-wider text-sm select-none"><i class="fa-solid ${ico} text-galaxy-400 mr-2"></i>${t} <span class="text-gray-400 normal-case tracking-normal font-normal text-xs">· ${res}</span></summary><div class="mt-3 space-y-3">${cont}</div></details>`;
   const foco = document.activeElement?.id;
   $('pn-cuerpo').innerHTML =
-    sec('fa-house', 'Portada', 'ventanas, orden y textos',
-      `<div class="grid sm:grid-cols-2 gap-2">${campo('Título de arriba (vacío = «Bienvenido a la», sigue «Galaxy» debajo)', b.portada.titulo, 'data-titulo maxlength="40"')}${campo('Frase debajo del título', b.portada.sub, 'data-sub maxlength="120"')}</div>` + b.portada.orden.map(ventanaHTML).join(''), true) +
-    sec('fa-bars', 'Menú de arriba', 'quita o pon botones', checks(lista('.pilar-item[data-nav-id]'), b.menu.ocultos, 'menu')) +
-    sec('fa-table-columns', 'Barra lateral izquierda', 'quita o pon accesos', checks(lista('.barra-item[data-nav-id]'), b.lateral.ocultos, 'lat'));
+    sec('fa-house', 'Portada', 'arrastra las ventanas y toca una para editarla',
+      `<div class="pn-lienzo">
+        <input type="text" data-titulo class="pn-tit" value="${esc(b.portada.titulo)}" maxlength="40" placeholder="Bienvenido a la" aria-label="Título de arriba">
+        <p class="pn-galaxy">Galaxy</p>
+        <input type="text" data-sub class="pn-sub" value="${esc(b.portada.sub)}" maxlength="120" placeholder="Esto está pasando ahora en la comunidad." aria-label="Frase debajo del título">
+        <div class="pn-tiles">${b.portada.orden.map(tileHTML).join('')}</div></div>
+       <div class="rounded-xl border border-white/10 bg-white/5 p-3" id="pn-editor">${editorHTML(S.sel)}</div>`, true) +
+    sec('fa-bars', 'Menú de arriba', 'toca un botón para ocultarlo o mostrarlo', menuHTML()) +
+    sec('fa-table-columns', 'Barra lateral izquierda', 'toca un acceso para ocultarlo o mostrarlo', lateralHTML());
   if (foco) $(foco)?.focus();
   const hay = sucio();
   $('pn-estado').textContent = S.ocupado ? 'Guardando…' : hay ? 'Tienes cambios sin guardar.' : 'Todo guardado.';
   $('pn-guardar').disabled = S.ocupado || !hay; $('pn-descartar').disabled = S.ocupado || !hay;
   $('pn-deshacer').disabled = S.ocupado || hay || !S.puedeDes; $('pn-rehacer').disabled = S.ocupado || hay || !S.puedeReh;
   $('pn-restaurar').hidden = esBase(S.guardada) && !hay;
-  aplicar(S.borrador); // vista previa en vivo de los menús de esta página
 }
 
-function cambiar(fn) { fn(S.borrador); S.borrador = normalizar(S.borrador); pintar(); }
+function cambiar(fn) { fn(S.borrador); S.borrador = normalizar(S.borrador); pintar(); aplicar(S.borrador); }
 const V = (el) => el.closest('[data-v]').dataset.v;
 
 function enlazar() {
   const c = $('pn-cuerpo');
-  c.addEventListener('change', (e) => {
-    const t = e.target;
-    if (t.matches('[data-on]')) cambiar((b) => { b.portada.ventanas[V(t)].on = t.checked; });
-    else if (t.matches('[data-vista]')) cambiar((b) => { b.portada.ventanas[V(t)].vista = t.value; });
-    else if (t.matches('[data-menu]')) cambiar((b) => { b.menu.ocultos = alternar(b.menu.ocultos, t.dataset.menu); });
-    else if (t.matches('[data-lat]')) cambiar((b) => { b.lateral.ocultos = alternar(b.lateral.ocultos, t.dataset.lat); });
+  c.addEventListener('click', (e) => {
+    const bt = e.target.closest('button'); const tile = e.target.closest('.pn-tile');
+    if (bt?.matches('[data-ojo]')) return cambiar((b) => { const v = b.portada.ventanas[V(bt)]; v.on = !v.on; });
+    if (bt?.matches('[data-izq]')) return cambiar((b) => { b.portada.orden = mover(b.portada.orden, V(bt), -1); });
+    if (bt?.matches('[data-der]')) return cambiar((b) => { b.portada.orden = mover(b.portada.orden, V(bt), 1); });
+    if (bt?.matches('[data-vista]')) return cambiar((b) => { b.portada.ventanas[V(bt)].vista = bt.dataset.vista; });
+    if (bt?.matches('[data-suma]')) return cambiar((b) => { b.portada.ventanas[V(bt)].extra.push({ titulo: 'Nuevo', href: 'liga/' }); });
+    if (bt?.matches('[data-quita]')) return cambiar((b) => { b.portada.ventanas[V(bt)].extra.splice(Number(bt.closest('[data-k]').dataset.k), 1); });
+    if (bt?.matches('[data-menu]')) return cambiar((b) => { b.menu.ocultos = alternar(b.menu.ocultos, bt.dataset.menu); });
+    if (bt?.matches('[data-lat]')) return cambiar((b) => { b.lateral.ocultos = alternar(b.lateral.ocultos, bt.dataset.lat); });
+    if (tile) { S.sel = tile.dataset.v; pintar(); }
   });
+  c.addEventListener('keydown', (e) => { const t = e.target.closest?.('.pn-tile'); if (t && t === e.target && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); S.sel = t.dataset.v; pintar(); } });
+  // Arrastrar y soltar para cambiar el orden de las ventanas.
+  c.addEventListener('dragstart', (e) => { const t = e.target.closest?.('.pn-tile'); if (!t) return; S.arrastra = t.dataset.v; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', S.arrastra); t.classList.add('pn-arrastrando'); });
+  c.addEventListener('dragend', () => { S.arrastra = null; c.querySelectorAll('.pn-arrastrando, .pn-sobre').forEach((x) => x.classList.remove('pn-arrastrando', 'pn-sobre')); });
+  c.addEventListener('dragover', (e) => { const t = e.target.closest?.('.pn-tile'); if (!t || !S.arrastra) return; e.preventDefault(); c.querySelectorAll('.pn-sobre').forEach((x) => x.classList.remove('pn-sobre')); t.classList.add('pn-sobre'); });
+  c.addEventListener('drop', (e) => { const t = e.target.closest?.('.pn-tile'); if (!t || !S.arrastra) return; e.preventDefault(); const id = S.arrastra; S.arrastra = null; cambiar((b) => { b.portada.orden = moverA(b.portada.orden, id, t.dataset.v); }); });
   const campoTxt = (t) => {
     const b = S.borrador;
     if (t.matches('[data-titulo]')) b.portada.titulo = t.value;
@@ -81,16 +134,9 @@ function enlazar() {
     else if (t.matches('[data-pt],[data-ph]')) { const v = b.portada.ventanas[V(t)]; const p = v.principal ?? { titulo: '', href: '' }; if (t.matches('[data-pt]')) p.titulo = t.value; else p.href = t.value; v.principal = p; }
     else if (t.matches('[data-et],[data-eh]')) { const v = b.portada.ventanas[V(t)]; const k = Number(t.closest('[data-k]').dataset.k); if (t.matches('[data-et]')) v.extra[k].titulo = t.value; else v.extra[k].href = t.value; }
   };
-  // Al escribir NO se repinta (se perdería el cursor); se guarda el borrador y solo se actualizan los botones de arriba.
-  c.addEventListener('input', (e) => { if (!e.target.matches('input[type=text]')) return; const v = e.target.closest('[data-v]'); const antes = clone(S.borrador); campoTxt(e.target); if (JSON.stringify(antes) !== JSON.stringify(S.borrador)) { const hay = !iguales(normalizar(S.borrador), S.guardada); $('pn-guardar').disabled = !hay; $('pn-descartar').disabled = !hay; $('pn-estado').textContent = hay ? 'Tienes cambios sin guardar.' : 'Todo guardado.'; $('pn-deshacer').disabled = hay || !S.puedeDes; $('pn-rehacer').disabled = hay || !S.puedeReh; void v; } });
-  c.addEventListener('focusout', (e) => { if (e.target.matches('input[type=text]')) { S.borrador = normalizar(S.borrador); const aviso = validar(); if (aviso) error(aviso); else error(''); pintar(); } });
-  c.addEventListener('click', (e) => {
-    const bt = e.target.closest('button'); if (!bt) return;
-    if (bt.matches('[data-sube]')) cambiar((b) => { b.portada.orden = mover(b.portada.orden, V(bt), -1); });
-    else if (bt.matches('[data-baja]')) cambiar((b) => { b.portada.orden = mover(b.portada.orden, V(bt), 1); });
-    else if (bt.matches('[data-suma]')) cambiar((b) => { b.portada.ventanas[V(bt)].extra.push({ titulo: 'Nuevo', href: 'liga/' }); });
-    else if (bt.matches('[data-quita]')) cambiar((b) => { b.portada.ventanas[V(bt)].extra.splice(Number(bt.closest('[data-k]').dataset.k), 1); });
-  });
+  // Al escribir NO se repinta (se perdería el cursor); solo se actualizan los botones de arriba.
+  c.addEventListener('input', (e) => { if (!e.target.matches('input[type=text]')) return; campoTxt(e.target); const hay = !iguales(S.borrador, S.guardada); $('pn-guardar').disabled = !hay; $('pn-descartar').disabled = !hay; $('pn-estado').textContent = hay ? 'Tienes cambios sin guardar.' : 'Todo guardado.'; $('pn-deshacer').disabled = hay || !S.puedeDes; $('pn-rehacer').disabled = hay || !S.puedeReh; });
+  c.addEventListener('focusout', (e) => { if (e.target.matches('input[type=text]')) { S.borrador = normalizar(S.borrador); error(validar()); pintar(); aplicar(S.borrador); } });
 }
 
 function validar() {
@@ -109,7 +155,7 @@ async function rpc(nombre, args) {
     if (err) throw err;
     S.guardada = normalizar(data.config); S.borrador = clone(S.guardada);
     S.puedeDes = !!data.puede_deshacer; S.puedeReh = !!data.puede_rehacer;
-    guardarCache(S.guardada);
+    guardarCache(S.guardada); aplicar(S.guardada);
     return true;
   } catch (e) { console.error('[panel]', e); error(msg(e)); return false; }
   finally { S.ocupado = false; pintar(); }
@@ -119,7 +165,7 @@ async function cargar() {
   const { data, error: err } = await supabase.rpc('sitio_estado');
   if (err) { error('Falta preparar la base de datos (migración 108). ' + (err.message || '')); $('pn-estado').textContent = 'Sin conexión al panel.'; return; }
   S.guardada = normalizar(data.config); S.borrador = clone(S.guardada); S.puedeDes = !!data.puede_deshacer; S.puedeReh = !!data.puede_rehacer;
-  pintar();
+  pintar(); aplicar(S.borrador);
 }
 
 function iniciar() {

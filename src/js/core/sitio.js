@@ -40,6 +40,15 @@ export function mover(orden, id, paso) {
   return a;
 }
 
+/** Arrastrar: pone `id` en el lugar de `haciaId` (los demás se corren). */
+export function moverA(orden, id, haciaId) {
+  const a = orden.filter((x) => x !== id); const j = a.indexOf(haciaId);
+  if (j < 0 || !orden.includes(id)) return [...orden];
+  const i0 = orden.indexOf(id), j0 = orden.indexOf(haciaId);
+  a.splice(i0 < j0 ? j + 1 : j, 0, id);
+  return a;
+}
+
 /** Pone o quita un id de una lista (para ocultar/mostrar botones). */
 export function alternar(lista0, id) {
   return lista0.includes(id) ? lista0.filter((x) => x !== id) : [...lista0, id];

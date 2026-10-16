@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizar, mover, alternar, hrefValido, esBase, iguales, VENTANAS } from '../src/js/core/sitio.js';
+import { normalizar, mover, moverA, alternar, hrefValido, esBase, iguales, VENTANAS } from '../src/js/core/sitio.js';
 
 test('normalizar: basura → config completa y segura', () => {
   const c = normalizar(null);
@@ -33,4 +33,10 @@ test('mover y alternar', () => {
 test('iguales ignora campos de más', () => {
   assert.ok(iguales({}, { portada: { titulo: ' ' }, extra: 1 }));
   assert.ok(!iguales({}, { menu: { ocultos: ['x'] } }));
+});
+test('moverA: arrastrar un elemento al lugar de otro', () => {
+  assert.deepEqual(moverA(['a', 'b', 'c', 'd'], 'a', 'c'), ['b', 'c', 'a', 'd']);
+  assert.deepEqual(moverA(['a', 'b', 'c', 'd'], 'd', 'b'), ['a', 'd', 'b', 'c']);
+  assert.deepEqual(moverA(['a', 'b'], 'a', 'a'), ['a', 'b']);
+  assert.deepEqual(moverA(['a', 'b'], 'x', 'a'), ['a', 'b']);
 });
