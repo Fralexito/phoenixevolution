@@ -109,3 +109,43 @@ Carpeta «Phoenix Link — Guías y logros» (y la del libro, id `1t5Cg5sc1gdP7e
 - `docs/PLAN-MONEDAS-VIRTUALES.md`, `docs/DISENO-RECARGAS.md`, `docs/SEGURIDAD-ECONOMIA.md`, este archivo.
 - Libro personal local: `D:\Frank\Games_\PRUEBA_CANCHA\informes\LIBRO_PERSONAL\` (`00_BITACORA_VIVA.md` actualizada y `cap_13_diario_15_a_16_oct.md` nuevo). Estado de la subida anterior: `_estado_subida_drive.md` (unidad `H:` no montada).
 - Borrar a mano en Drive los 4 documentos «[TRUNCADO — NO USAR]» (ver `_estado_subida_drive.md`).
+
+---
+
+## 8. ACTUALIZACIÓN (16-oct, tarde): estado al cerrar esta cuenta
+
+### Hecho desde la sección 7
+- **Economía Fase A** (migración 119): rarezas, 16 objetos, paquetes Chispa 50/S5 · Brasa 110/S10 · Llama 300/S25 · Fénix 650/S50, bono de primera compra +50 %.
+- **Fase B** (120): racha diaria, primer partido, misiones semanales, logros (todo en ascuas). Informe: `docs/ECONOMIA-FASE-B.md`.
+- **Fase C** (121): efectos de carta, banners, sonidos de chat. Informe: `docs/ECONOMIA-FASE-C.md`.
+- **Fase D** (122): pasarela Mercado Pago (webhook firmado, `pago-crear`, `pago-conciliar`), método `mercadopago` INACTIVO. Informe: `docs/ECONOMIA-FASE-D.md`; guía simple para Fralex: `docs/GUIA-PASARELA.md`.
+- **Fase E** (123): Phoenix Pass (Temporada 1 «Despegue», empieza el 17-oct) y marca «torneo premium». Informe: `docs/ECONOMIA-FASE-E.md`; diseño y 7 preguntas: `docs/DISENO-PASS-Y-ORGANIZADORES.md`.
+- **MFA:** pantalla en Tienda → Administrar → «Seguridad de tu cuenta». Fralex pidió quitar la exigencia: `admin_exige_mfa` debe quedar en `false` (verificar con una consulta; la pantalla sigue disponible).
+- Estado verificado: `pagos_activos=false`, 0 alertas, 0 diferencias, 550 pruebas, 53 páginas.
+- Plan completo y precios propuestos: `docs/DISENO-ECONOMIA-COMPLETA.md`.
+
+### Decisiones de Fralex (16-oct)
+- Solo cosmético y comodidad; sin ventaja en el juego ni azar de pago. Las gemas NO se retiran ni se cambian por ascuas.
+- Apuestas entre jugadores: **solo con ascuas** (sin dinero). Las apuestas con dinero real NO se construyen (requieren licencia de Mincetur con garantía de millones de soles; cifras sin confirmar, ver abogado). Se evaluó: ser afiliado de una casa autorizada (futuro, sin prisa) y torneos con cuota fija y premio prefijado (competencia de habilidad; falta confirmar con abogado).
+- Pagos reales a un grupo pequeño: «dentro de un mes más o menos», PERO antes hace falta empresa y RUC (ver abajo).
+- Lo que la IA no pueda ejecutar se entrega como SQL listo para pegar en el SQL Editor.
+- Anotar todo en GitHub; sin Drive por ahora (copiar a Drive cuando vuelva).
+
+### Prerrequisitos legales antes de cobrar dinero real (resumen de una investigación con Gemini, SIN verificar por un abogado)
+1. Constituir una empresa (S.A.C. o E.I.R.L.) y sacar RUC; régimen MYPE Tributario (el contador decide). Cobrar muchas ventas en un Yape personal sin RUC es riesgo.
+2. Libro de Reclamaciones virtual visible en la portada, sin iniciar sesión.
+3. Casilla obligatoria antes de pagar: entrega inmediata de gemas y pérdida del derecho de retracto.
+4. Precios en soles con IGV incluido; boletas electrónicas.
+5. Consentimiento (casilla no premarcada) para datos personales, política de privacidad, aviso de que el chat se modera; inscribir el banco de datos ante la autoridad de protección de datos; conservar comprobantes 5 años.
+6. Aviso de que las ascuas no tienen valor en dinero y no se transfieren.
+7. Revisar el uso de escudos, nombres y fotos de clubes y jugadores reales (cartas, Liga Máster) y el riesgo de PES 2021 (Konami) y del parche de comunidad.
+8. Las pasarelas prohíben apuestas sin licencia: no mezclar.
+Los cambios 2, 3, 4, 5 y 6 se pueden construir ya en la web.
+
+### Pendiente (para la cuenta que continúe)
+- Fralex debe responder las 7 preguntas de `docs/DISENO-PASS-Y-ORGANIZADORES.md` (pase 150 gemas, temporada 60 días/30 niveles, torneo premium 300 gemas, propinas solo en ascuas, patrocinios, overlay TikTok, 7 días de gracia). Si no responde, queda lo propuesto.
+- Construir los cambios legales de la web (puntos 2–6 de arriba) y revisar imágenes de clubes.
+- Pruebas SQL de la migración 112 (`supabase/tests/112_riesgo_test.sql`) y reescribir/borrar la 109.
+- Diseñar el «torneo con inscripción» (cuota fija, premio prefijado) para llevar al abogado.
+- Fralex: abogado, contador, empresa/RUC, secretos de Mercado Pago (guía), leaked password protection, repos de Link/overlay en privado, Drive.
+- Siguiente migración libre: **124**. Antes de usarla, mirar el final de `REGISTRO.md` y escribir «RESERVADO 124».
