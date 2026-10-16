@@ -17,6 +17,8 @@ import { initCarruseles } from './features/carruseles.js';
 import { initCartasEfecto } from './features/cartasEfecto.js';
 import { initPremium } from './features/premium.js';
 import { initSinIconosWeb } from './features/sinIconosWeb.js';
+import { initPwa } from './features/pwa.js';
+import { initScrollSuave } from './features/scrollSuave.js';
 import { initMarco } from './features/marco.js';
 import { initSitio } from './features/sitioAplicar.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
@@ -41,6 +43,8 @@ initCarruseles();
 initCartasEfecto();
 initPremium();
 if (FX.sinIconosWeb) initSinIconosWeb();
+if (FX.pwa) initPwa();
+if (FX.scrollSuave) initScrollSuave();
 initMarco();
 // Barra lateral izquierda (experimento): solo en pantallas anchas; se descarga solo cuando hace falta.
 if (FX.barraLateral && document.getElementById('barra-lat')) {

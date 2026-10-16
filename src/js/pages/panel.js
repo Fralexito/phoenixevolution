@@ -6,6 +6,11 @@ import { toast } from '../core/toast.js';
 import { confirmar } from '../core/dialogo.js';
 import { normalizar, mover, moverA, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA } from '../core/sitio.js';
 import { aplicar, guardarCache } from '../features/sitioAplicar.js';
+import Sortable from 'sortablejs';
+import { animate } from 'motion';
+import { celebrar } from '../features/celebrar.js';
+import { FX } from '../../data/experimento.js';
+import { hayMovimientoReducido } from '../features/ajustes.js';
 
 const $ = (id) => document.getElementById(id);
 const NOMBRES = { social: 'Zona Social', competencia: 'Competencia', duelos: 'Duelos', club: 'Mi Club' };
@@ -34,7 +39,7 @@ const DIBUJO = {
 function tileHTML(id, i) {
   const c = S.borrador.portada.ventanas[id]; const sel = S.sel === id;
   const pr = c.principal?.titulo || 'Botón grande';
-  return `<div class="pn-tile ${c.on ? '' : 'pn-off'} ${sel ? 'pn-sel' : ''}" draggable="true" data-v="${id}" style="--c:${COLOR[id]}" tabindex="0" role="button" aria-pressed="${sel}">
+  return `<div class="pn-tile ${c.on ? '' : 'pn-off'} ${sel ? 'pn-sel' : ''}" data-v="${id}" style="--c:${COLOR[id]}" tabindex="0" role="button" aria-pressed="${sel}">
     <div class="pn-tile-cab"><i class="fa-solid fa-grip-vertical pn-grip" title="Arrastra para cambiar el orden"></i><i class="fa-solid ${ICONO[id]}"></i><b>${NOMBRES[id]}</b>
       <button type="button" data-izq class="pn-mini" aria-label="Mover a la izquierda" ${i === 0 ? 'disabled' : ''}><i class="fa-solid fa-arrow-left"></i></button>
       <button type="button" data-der class="pn-mini" aria-label="Mover a la derecha" ${i === VENTANAS.length - 1 ? 'disabled' : ''}><i class="fa-solid fa-arrow-right"></i></button>
@@ -101,11 +106,21 @@ function pintar() {
     `<nav class="pn-tabs" role="tablist" aria-label="Qué quieres cambiar">${TABS.map(([id, ic, t]) => `<button type="button" role="tab" data-tab="${id}" aria-selected="${tab === id}" class="pn-tab ${tab === id ? 'pn-tab-on' : ''}"><i class="fa-solid ${ic}"></i><span>${t}</span></button>`).join('')}</nav>
      <p class="pn-ayuda"><i class="fa-solid fa-lightbulb"></i> ${AYUDA[tab]}</p>${cont}`;
   if (foco) $(foco)?.focus();
+  montarArrastre();
   const hay = sucio();
   $('pn-estado').textContent = S.ocupado ? 'Guardando…' : hay ? 'Tienes cambios sin guardar.' : 'Todo guardado.';
   $('pn-guardar').disabled = S.ocupado || !hay; $('pn-descartar').disabled = S.ocupado || !hay;
   $('pn-deshacer').disabled = S.ocupado || hay || !S.puedeDes; $('pn-rehacer').disabled = S.ocupado || hay || !S.puedeReh;
   $('pn-restaurar').hidden = esBase(S.guardada) && !hay;
+}
+
+/* Arrastrar (SortableJS): funciona con mouse y con el dedo. Se ata de nuevo cada vez que se repinta. */
+function montarArrastre() {
+  const cont = document.querySelector('.pn-tiles'); if (!cont) return;
+  Sortable.create(cont, {
+    animation: hayMovimientoReducido() ? 0 : 160, handle: '.pn-grip', draggable: '.pn-tile', ghostClass: 'pn-arrastrando', delay: 120, delayOnTouchOnly: true, filter: 'button', preventOnFilter: false,
+    onEnd: () => { const orden = [...cont.querySelectorAll('.pn-tile')].map((t) => t.dataset.v); cambiar((b) => { b.portada.orden = orden; }); },
+  });
 }
 
 function cambiar(fn) { fn(S.borrador); S.borrador = normalizar(S.borrador); pintar(); aplicar(S.borrador); }
@@ -124,14 +139,9 @@ function enlazar() {
     if (bt?.matches('[data-quita]')) return cambiar((b) => { b.portada.ventanas[V(bt)].extra.splice(Number(bt.closest('[data-k]').dataset.k), 1); });
     if (bt?.matches('[data-menu]')) return cambiar((b) => { b.menu.ocultos = alternar(b.menu.ocultos, bt.dataset.menu); });
     if (bt?.matches('[data-lat]')) return cambiar((b) => { b.lateral.ocultos = alternar(b.lateral.ocultos, bt.dataset.lat); });
-    if (tile) { S.sel = tile.dataset.v; pintar(); }
+    if (tile) { S.sel = tile.dataset.v; pintar(); if (!hayMovimientoReducido()) { const e = $('pn-editor'); if (e) animate(e, { opacity: [0.4, 1], transform: ['translateY(6px)', 'translateY(0px)'] }, { duration: 0.22 }); } }
   });
   c.addEventListener('keydown', (e) => { const t = e.target.closest?.('.pn-tile'); if (t && t === e.target && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); S.sel = t.dataset.v; pintar(); } });
-  // Arrastrar y soltar para cambiar el orden de las ventanas.
-  c.addEventListener('dragstart', (e) => { const t = e.target.closest?.('.pn-tile'); if (!t) return; S.arrastra = t.dataset.v; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', S.arrastra); t.classList.add('pn-arrastrando'); });
-  c.addEventListener('dragend', () => { S.arrastra = null; c.querySelectorAll('.pn-arrastrando, .pn-sobre').forEach((x) => x.classList.remove('pn-arrastrando', 'pn-sobre')); });
-  c.addEventListener('dragover', (e) => { const t = e.target.closest?.('.pn-tile'); if (!t || !S.arrastra) return; e.preventDefault(); c.querySelectorAll('.pn-sobre').forEach((x) => x.classList.remove('pn-sobre')); t.classList.add('pn-sobre'); });
-  c.addEventListener('drop', (e) => { const t = e.target.closest?.('.pn-tile'); if (!t || !S.arrastra) return; e.preventDefault(); const id = S.arrastra; S.arrastra = null; cambiar((b) => { b.portada.orden = moverA(b.portada.orden, id, t.dataset.v); }); });
   const campoTxt = (t) => {
     const b = S.borrador;
     if (t.matches('[data-titulo]')) b.portada.titulo = t.value;
@@ -175,7 +185,7 @@ async function cargar() {
 
 function iniciar() {
   if (S.iniciado) return; S.iniciado = true; enlazar();
-  $('pn-guardar').addEventListener('click', async () => { const a = validar(); if (a) return error(a); if (await rpc('sitio_guardar', { p_config: S.borrador, p_nota: 'Cambios del panel' })) toast('Guardado. Ya se ve en la web.', 'ok'); });
+  $('pn-guardar').addEventListener('click', async () => { const a = validar(); if (a) return error(a); if (await rpc('sitio_guardar', { p_config: S.borrador, p_nota: 'Cambios del panel' })) { toast('Guardado. Ya se ve en la web.', 'ok'); if (FX.confeti) celebrar($('pn-guardar')); } });
   $('pn-descartar').addEventListener('click', () => { S.borrador = clone(S.guardada); error(''); pintar(); });
   $('pn-deshacer').addEventListener('click', async () => { if (await rpc('sitio_mover', { p_paso: -1 })) toast('Deshecho.', 'ok'); });
   $('pn-rehacer').addEventListener('click', async () => { if (await rpc('sitio_mover', { p_paso: 1 })) toast('Rehecho.', 'ok'); });
