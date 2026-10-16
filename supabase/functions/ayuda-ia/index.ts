@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
   if (!mensajes.length || mensajes[mensajes.length - 1].role !== "user") return json({ error: "FORMATO" }, 400);
 
   // 4) Límite de uso (se cuenta ANTES de llamar a la IA).
-  const maxU = Number(Deno.env.get("IA_MAX_USUARIO") ?? 15); const maxT = Number(Deno.env.get("IA_MAX_TOTAL") ?? 300);
+  const maxU = Number.parseInt(Deno.env.get("IA_MAX_USUARIO") ?? "", 10) || 15; const maxT = Number.parseInt(Deno.env.get("IA_MAX_TOTAL") ?? "", 10) || 300;   // un valor mal escrito no apaga el chat
   const { data: turno, error: eT } = await sb.rpc("ia_chat_turno", { p_usuario: usuario, p_max_usuario: maxU, p_max_total: maxT });
   if (eT) { console.error("[ayuda-ia] contador", eT.message); return json({ error: "CONTADOR" }, 500); }
   if (turno === "LIMITE_USUARIO") return json({ error: "LIMITE_USUARIO", max: maxU }, 429);

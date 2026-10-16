@@ -43,3 +43,13 @@ La IA **prepara**, FRALEX (o un moderador) **aprueba**. Nada importante se publi
 | Gasto descontrolado del chat | Límite por persona y por día, respuestas cortas |
 | Alguien engaña al chat | El chat no tiene ningún poder |
 | Fuga de la clave | Solo vive en los secretos de Supabase |
+
+## Estado al terminar (16-oct-2026)
+- Hecho y subido a `borrador`: página `/bandeja-ia/`, página `/ayuda-ia/`, migraciones 116-118, tarea programada actualizada (v2), función `ayuda-ia` **desplegada** (versión 2).
+- Revisión de seguridad independiente: sin fallas altas ni medias. Arreglados 2 detalles bajos (permisos sobrantes en 117; un ajuste mal escrito ya no apaga el chat). Aceptados a propósito: el chat confía en el historial que manda la página (sin herramientas, el peor caso es una respuesta fuera de tema); varias cuentas pueden gastar el tope diario común (el tope protege el dinero).
+
+## Cómo activarlo (FRALEX)
+1. **SQL:** Supabase → SQL Editor → pegar el bloque de las migraciones 116 + 117 + 118 (sin comentarios) → Run. Comprobar: `select to_regclass('public.ia_propuestas'), to_regclass('public.ia_chat_uso');` debe devolver los dos nombres.
+2. **Bandeja:** desde el día siguiente a las 9:54 a. m. aparece el resumen y las propuestas en Staff → Bandeja IA.
+3. **Chat (opcional, cuesta dinero):** crear una clave en console.anthropic.com (con un límite de gasto mensual en Billing) → Supabase → Edge Functions → Secrets → `ANTHROPIC_API_KEY`. Opcionales: `IA_MAX_USUARIO` (15), `IA_MAX_TOTAL` (300), `IA_MODELO`. Nunca pegar la clave en un chat ni en GitHub.
+4. Para apagar el chat: `FX.ayudaIA = false` en `src/data/experimento.js` o borrar el secreto.

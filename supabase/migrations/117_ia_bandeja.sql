@@ -30,7 +30,7 @@ create table if not exists public.ia_resumenes (
 alter table public.ia_propuestas enable row level security;
 alter table public.ia_resumenes enable row level security;
 revoke all on public.ia_propuestas, public.ia_resumenes from anon;
-revoke insert, update, delete on public.ia_propuestas, public.ia_resumenes from authenticated;
+revoke all on public.ia_propuestas, public.ia_resumenes from authenticated;   -- también TRUNCATE/TRIGGER/REFERENCES que Supabase da por defecto
 grant select on public.ia_propuestas, public.ia_resumenes to authenticated;
 drop policy if exists ia_propuestas_staff on public.ia_propuestas;
 create policy ia_propuestas_staff on public.ia_propuestas for select to authenticated using (private.es_moderador());
