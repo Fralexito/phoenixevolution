@@ -90,3 +90,5 @@ Vender gemas con dinero real suele requerir **RUC y comprobante de pago electró
 - La sección 5 de este documento describe el modelo; lo implementado en 109 cubre `pagos_metodos`, `pagos_manuales` y las columnas nuevas de `ordenes_pago`. `pagos_eventos` y `conciliaciones` quedan para R2/R4.
 
 - **2026-10-16 · Interfaz hecha:** el jugador compra desde la pestaña «Comprar gemas» y el administrador revisa en Administrar › Pagos por revisar. Para abrir el método: Administrar › Métodos de pago → poner el número de Yape, marcar «Activo» y activar «Compras con dinero real». Mientras no lo actives, todo sigue cerrado.
+
+- **2026-10-16 · R2 (Mercado Pago) HECHA en migración 122:** adaptador, webhook firmado, `pagos_eventos`, `pagos_conciliaciones` y conciliación listos y desplegados, apagados hasta que Fralex ponga los secretos. Ver `docs/GUIA-PASARELA.md` y `docs/ECONOMIA-FASE-D.md`. Culqi/PagoEfectivo siguen sin hacer.

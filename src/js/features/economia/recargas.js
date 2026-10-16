@@ -78,7 +78,7 @@ function misRecargasHTML() {
 function modalMetodo(k) {
   const S = C.S, ok = (m) => k.precioCentimos >= m.minimoCentimos && (m.maximoCentimos == null || k.precioCentimos <= m.maximoCentimos);
   const lista = S.metodos.map((m, i) => `<label class="flex items-start gap-3 rounded-xl border border-galaxy-border p-3 ${ok(m) ? 'cursor-pointer' : 'opacity-50'}"><input type="radio" name="rc-m" value="${escapeHTML(m.clave)}" class="mt-1" ${ok(m) && i === S.metodos.findIndex(ok) ? 'checked' : ''} ${ok(m) ? '' : 'disabled'}>
-      <span class="min-w-0"><b class="text-white text-sm">${escapeHTML(m.nombre)}</b><span class="block text-[12px] text-gray-400">${ok(m) ? 'Revisión manual: tarda un rato en acreditarse.' : `Mínimo ${formatoPrecio(m.minimoCentimos)} con este método.`}</span></span></label>`).join('');
+      <span class="min-w-0"><b class="text-white text-sm">${escapeHTML(m.nombre)}</b><span class="block text-[12px] text-gray-400">${ok(m) ? (m.tipo === 'pasarela' ? 'Pagas en la página segura de Mercado Pago: las gemas llegan solas.' : 'Revisión manual: tarda un rato en acreditarse.') : `Mínimo ${formatoPrecio(m.minimoCentimos)} con este método.`}</span></span></label>`).join('');
   const m = openModal(`<div class="p-5 sm:p-6 space-y-4">${cab('Comprar ' + k.nombre)}
     <p class="text-sm text-gray-300">Pagas <b class="text-white">${formatoPrecio(k.precioCentimos, k.moneda)}</b> y recibes <b class="text-cyan-300">${formatoTokens(k.tokens)} gemas</b>.</p>
     <p class="text-xs text-gray-400">Elige cómo vas a pagar:</p><div class="space-y-2">${lista}</div>
@@ -87,7 +87,9 @@ function modalMetodo(k) {
   m.querySelector('#rc-sig').addEventListener('click', async () => {
     const sel = m.querySelector('input[name="rc-m"]:checked'), err = m.querySelector('#rc-err'); if (!sel) { err.textContent = 'Elige un método de pago.'; err.hidden = false; return; }
     const b = m.querySelector('#rc-sig'); b.disabled = true;
-    try { const o = await api.crearOrdenMetodo(k.id, sel.value); closeModal('tienda-modal'); await C.cargar(); modalComprobante({ orden: o.orden, montoCentimos: o.monto_centimos, gemas: o.gemas, metodo: o.metodo, expiraAt: o.expira_at, instrucciones: o.instrucciones, datos: o.datos }); }
+    try { const o = await api.crearOrdenMetodo(k.id, sel.value);
+      if (o.tipo === 'pasarela') { window.location.href = await api.enlacePasarela(o.orden); return; }
+      closeModal('tienda-modal'); await C.cargar(); modalComprobante({ orden: o.orden, montoCentimos: o.monto_centimos, gemas: o.gemas, metodo: o.metodo, expiraAt: o.expira_at, instrucciones: o.instrucciones, datos: o.datos }); }
     catch (e) { console.error('[recargas] crear orden:', e); err.textContent = e?.message || 'No se pudo crear la orden.'; err.hidden = false; b.disabled = false; }
   });
 }

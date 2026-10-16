@@ -38,6 +38,13 @@ export const adminRegla = (r) => rpc('admin_guardar_regla', { p_fuente: r.fuente
 // ── Recargas (migraciones 109 y 110): pago manual por Yape/Plin/transferencia con revisión del administrador ──
 export const metodosPago = async () => normalizarMetodos(await rpc('pagos_metodos_lista'));
 export const crearOrdenMetodo = (paquete, metodo) => rpc('crear_orden_metodo', { p_paquete: paquete, p_metodo: metodo });
+/** Pasarela (Mercado Pago): pide a la Edge Function «pago-crear» el enlace de pago de TU orden. Monto y datos salen de la base. */
+export async function enlacePasarela(orden) {
+  if (DEMO) throw new Error('El pago con tarjeta no está disponible en la demostración.');
+  const { data, error } = await supabase.functions.invoke('pago-crear', { body: { orden } });
+  if (error || !data?.checkout_url) { console.error('[economia] pago-crear:', error?.message); throw new Error('No se pudo abrir la página de pago. Inténtalo de nuevo en un momento.'); }
+  return String(data.checkout_url);
+}
 export const misPagosManuales = async () => { const d = await rpc('mis_pagos_manuales'); return Array.isArray(d) ? d.map(normalizarPagoManual) : []; };
 export const enviarComprobante = (orden, referencia, ruta, nombrePagador) => rpc('enviar_comprobante_manual', { p_orden: orden, p_referencia: referencia, p_comprobante_path: ruta, p_nombre_pagador: nombrePagador });
 /** Sube la captura al bucket privado «comprobantes-pago» (carpeta = tu id) y devuelve la ruta. */

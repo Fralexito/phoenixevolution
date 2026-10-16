@@ -1,41 +1,66 @@
-// Esqueleto del webhook de pagos. NO está desplegado ni conectado a ninguna pasarela todavía.
-// Variables de entorno (Supabase → Edge Functions → Secrets): PAGO_WEBHOOK_SECRET (clave compartida con la pasarela),
-// SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (las inyecta Supabase solas).
-// Para activarlo: elegir pasarela, completar `interpretar()` según su documentación y desplegar con verify_jwt = false.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// Webhook de pagos de Mercado Pago (Checkout Pro, Perú). Se despliega con verify_jwt = false: la seguridad es la FIRMA x-signature (obligatoria).
+// Secretos (solo en Supabase → Edge Functions → Secrets, nunca en el código): MP_WEBHOOK_SECRET (clave secreta de la aplicación → Webhooks),
+// MP_ACCESS_TOKEN (credencial de la aplicación). SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY las inyecta Supabase.
+// Flujo: firma → (si falla: se registra y 401) → se consulta el pago a la API oficial (no se confía en el cuerpo del aviso) → public.pasarela_procesar
+// (idempotente, registra todo en pagos_eventos y acredita con procesar_pago_evento). Guía: docs/GUIA-PASARELA.md
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { firmaValida } from "../_shared/mp.mjs";
+import { consultarPago, leerModo, procesarPagoMP } from "../_shared/proceso.mjs";
 
-type Evento = { evento: "pagado" | "fallido" | "reembolsado" | "disputado" | "disputa_ganada"; orden: string; proveedor: string; ref: string | null; monto: number | null; moneda: string | null; comprobante: string | null };
-
-async function firmaValida(cuerpo: string, firmaHex: string, secreto: string): Promise<boolean> {
-  const clave = await crypto.subtle.importKey("raw", new TextEncoder().encode(secreto), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const esperada = new Uint8Array(await crypto.subtle.sign("HMAC", clave, new TextEncoder().encode(cuerpo)));
-  const recibida = Uint8Array.from((firmaHex.match(/../g) ?? []).map((h) => parseInt(h, 16)));
-  if (recibida.length !== esperada.length) return false;
-  let diff = 0;
-  for (let i = 0; i < esperada.length; i++) diff |= esperada[i] ^ recibida[i];
-  return diff === 0;
-}
-
-// ADAPTADOR: traduce el JSON de la pasarela elegida a nuestro formato neutro. Pendiente de completar.
-function interpretar(_json: unknown): Evento {
-  throw new Error("Adaptador de pasarela sin implementar");
-}
+const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json" } });
 
 Deno.serve(async (req) => {
-  if (req.method !== "POST") return new Response("Método no permitido", { status: 405 });
-  const secreto = Deno.env.get("PAGO_WEBHOOK_SECRET");
-  if (!secreto) { console.error("[pago-webhook] falta PAGO_WEBHOOK_SECRET"); return new Response("No configurado", { status: 503 }); }
-  const cuerpo = await req.text();
-  const firma = req.headers.get("x-signature") ?? "";
-  if (!(await firmaValida(cuerpo, firma, secreto))) { console.warn("[pago-webhook] firma inválida"); return new Response("Firma inválida", { status: 401 }); }
-  try {
-    const e = interpretar(JSON.parse(cuerpo));
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const { data, error } = await sb.rpc("procesar_pago_evento", { p_evento: e.evento, p_orden: e.orden, p_proveedor: e.proveedor, p_proveedor_ref: e.ref, p_monto_centimos: e.monto, p_moneda: e.moneda, p_comprobante: e.comprobante });
-    if (error) { console.error("[pago-webhook] rpc:", error.message); return new Response("Error", { status: 500 }); }
-    return new Response(JSON.stringify({ ok: true, resultado: data }), { status: 200, headers: { "content-type": "application/json" } });
-  } catch (err) {
-    console.error("[pago-webhook]", err);
-    return new Response("Error", { status: 500 });
+  if (req.method !== "POST") return json({ error: "metodo_no_permitido" }, 405);
+  const secreto = Deno.env.get("MP_WEBHOOK_SECRET");
+  const token = Deno.env.get("MP_ACCESS_TOKEN");
+  if (!secreto || !token) { console.error("[pago-webhook] faltan secretos de configuración"); return json({ error: "no_configurado" }, 503); }
+
+  const texto = await req.text();
+  if (texto.length > 20_000) return json({ error: "demasiado_grande" }, 413);
+  const url = new URL(req.url);
+  const xSignature = req.headers.get("x-signature") ?? "";
+  const xRequestId = req.headers.get("x-request-id") ?? "";
+  const idQuery = url.searchParams.get("data.id");
+  let cuerpo: Record<string, any> | null = null;
+  try { cuerpo = JSON.parse(texto); } catch { /* sin cuerpo válido */ }
+  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
+
+  // 1) Firma obligatoria. Sin firma válida no se hace nada más que registrar el intento.
+  const ok = await firmaValida({ xSignature, xRequestId, dataId: idQuery, secreto });
+  if (!ok) {
+    const { data } = await sb.rpc("pasarela_rechazo", { p_proveedor: "mercadopago", p_request_id: xRequestId, p_detalle: "Firma ausente o incorrecta" });
+    console.warn("[pago-webhook] firma inválida");
+    return json({ error: "firma_invalida" }, data?.resultado === "limite" ? 429 : 401);
   }
+
+  // 2) Qué avisaron. Solo el tema «payment» mueve dinero; el resto se registra y se ignora.
+  const tipo = String(url.searchParams.get("type") ?? cuerpo?.type ?? "");
+  const idCuerpo = cuerpo?.data?.id != null ? String(cuerpo.data.id) : null;
+  const id = idQuery ?? idCuerpo;
+  if (idQuery && idCuerpo && idQuery !== idCuerpo) return json({ error: "ids_distintos" }, 400);
+  const modo = await leerModo(sb);
+  const live = cuerpo?.live_mode === true;
+  const idValido = id !== null && /^\d{1,20}$/.test(id);
+  if (tipo !== "payment" || !idValido) {
+    await sb.rpc("pasarela_procesar", { p_proveedor: "mercadopago", p_pago_ref: idValido ? id : null, p_estado_proveedor: ("tema:" + tipo).slice(0, 40),
+      p_request_id: xRequestId, p_orden: null, p_evento: null, p_monto_centimos: null, p_moneda: null, p_live: live, p_modo: modo });
+    return json({ ok: true, resultado: "ignorado" });
+  }
+
+  // 3) Estado real del pago: se pregunta a la API oficial con nuestro token (el cuerpo del aviso no se usa para decidir dinero).
+  const c = await consultarPago(token, id!);
+  if (c.estado === "error") { console.error("[pago-webhook] no se pudo consultar el pago", id, c.http ?? ""); return json({ error: "consulta_fallida" }, 502); } // Mercado Pago reintenta
+  if (c.estado === "no_existe") {
+    // Es lo que ocurre con el «simular notificación» del panel (id de ejemplo). Se registra y se responde 200.
+    await sb.rpc("pasarela_procesar", { p_proveedor: "mercadopago", p_pago_ref: id, p_estado_proveedor: "no_existe", p_request_id: xRequestId, p_orden: null, p_evento: null,
+      p_monto_centimos: null, p_moneda: null, p_live: live, p_modo: modo });
+    return json({ ok: true, resultado: "ignorado" });
+  }
+
+  // 4) A la base: idempotente, con alertas si algo no cuadra.
+  const r = await procesarPagoMP(sb, c.pago, { requestId: xRequestId, live, modo });
+  console.log(JSON.stringify({ evento: "pago-webhook", pago: id, resultado: r.resultado }));
+  if (r.resultado === "limite") return json({ error: "limite" }, 429);
+  if (r.resultado === "error") return json({ error: "no_procesado" }, 500); // Mercado Pago reintenta: el aviso quedó registrado como «error» sin bloquear el reintento
+  return json({ ok: true, resultado: r.resultado });
 });
