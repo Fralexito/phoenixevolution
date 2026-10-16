@@ -294,6 +294,12 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - **Pendiente, necesita OK de Fralex porque podría cambiar cómo se ve:** limpiar las 7 capas de la portada (elite · transmisión · escenario · ventanas · ventanas3d · ventanasplus · sinIconos) y repartir el CSS (564 KB para todas las páginas). Plan: comparar capturas antes/después de las 47 páginas y solo seguir si salen idénticas.
 - Datos duplicados (`ligaResultados.js` y la BD): tema aparte, grande.
 
+### Ronda 350 (cuenta Opus, borrador): Noticias con reacciones, encuestas y comentarios (FX.noticiasSocial, migración 124)
+- Decisiones de FRALEX: 5 emojis (🔥 😂 😮 👏 💀), uno por persona y noticia (tocar el mismo lo quita); encuestas del staff o de la Redacción IA (las de la IA llegan apagadas y se abren al aprobarlas en /bandeja-ia/); comentarios directos, pero también listados en /bandeja-ia/ para eliminarlos.
+- Base (124): tablas noticias_reacciones, noticias_encuestas, noticias_votos, noticias_comentarios, cerradas (todo por RPC security definer, patrón del muro 022). Sancionados no participan (032) y límites de ritmo (031: 120 reacciones/h, 60 votos/h, 5 comentarios/2 min y 40/h). Los % de la encuesta solo se ven tras votar. Eliminar comentario = ocultar (autor o moderador). ia_propuestas suma tipo «encuesta» + encuesta_id; ia_revisar (117) se rehace igual + abre la encuesta al aprobar.
+- Web: core/noticiaSocial.js (+7 pruebas), features/noticias/social.js (dentro del lector, antes de los botones; comentarios plegados), styles/noticiaSocial.css; Bandeja IA: tipo «Encuesta» y caja plegable «Comentarios de noticias» (aislada: si la 124 falta, el resto de la bandeja sigue).
+- Probado: SQL en transacción deshecha (TODO_OK_REVERTIDO, supabase/tests/124_noticias_social_test.sql); visual en PC y celular con datos simulados (0 errores, 0 textos <12 px). 572 pruebas, build 53. PENDIENTE: FRALEX pega el SQL; avisar a la tarea «Redacción IA Phoenix» cómo proponer encuestas (necesita su aprobación).
+
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
 > **Actualización 2026-10-16 (cuenta WEB):** rondas 340–347 (React isla, radar FIFA, orden visual, modo ligero, anti-lag) y pendientes en **`docs/BITACORA-16-OCT-2026-CUENTA-WEB.md`**; siguiente ronda 348.
 > **Actualización 2026-10-16 (cuenta Opus):** esta sección es vieja. Para el estado actual leer **`docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md`** (cómo retomar, qué se hizo 13–16 oct, pendientes de FRALEX, siguiente migración 119 / ronda 347) y la última línea **TRASPASO** de `REGISTRO.md`.

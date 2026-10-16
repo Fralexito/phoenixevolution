@@ -17,6 +17,7 @@ import { hayLienzo, ordenLectura, FILA_PX } from '../core/noticiasLienzo.js';
 import { FX } from '../../data/experimento.js';
 import { departamentoDe, departamentosPresentes } from '../core/departamentos.js';
 import { pintarDiario } from '../features/noticias/diario.js';
+import { montarSocial } from '../features/noticias/social.js';
 
 const $ = (id) => document.getElementById(id);
 const state = { lista: [], cat: 'TODOS', liga: 'TODAS', term: '', dep: 'TODOS', max: 6 };
@@ -96,6 +97,11 @@ function read(slug) {
       <button type="button" data-close class="btn btn-primary">Cerrar</button></div>`;
   const wrap = openModal(lecturaHTML(n, d.estilo, ctx, acciones), { id: 'news-modal', onClose: () => setUrl(null) });
   setUrl(slug);
+  // Reacciones, encuesta y comentarios (ronda 350): solo en noticias reales; si falla, el lector sigue igual.
+  if (FX.noticiasSocial && n.editable) {
+    try { const caja = document.createElement('div'); caja.className = 'ns'; wrap.querySelector('.nl-pie')?.before(caja); if (caja.isConnected) montarSocial(caja, n); }
+    catch (e) { console.error('[noticias] social:', e); }
+  }
   wrap.querySelector('[data-copiar]').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(url(slug)); toast('Enlace copiado.', 'ok'); }
     catch (e) { console.warn('[noticias] copiar:', e); toast('No se pudo copiar; copia la dirección del navegador.', 'warn'); }

@@ -9,6 +9,7 @@ export const PRIORIDAD = Object.freeze({
 export const TIPO = Object.freeze({
   noticia: { etiqueta: 'Noticia para publicar', icono: 'fa-newspaper' },
   aviso: { etiqueta: 'Aviso', icono: 'fa-triangle-exclamation' },
+  encuesta: { etiqueta: 'Encuesta para una noticia', icono: 'fa-square-poll-horizontal' },   // ronda 350: aprobar = abrirla
 });
 
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

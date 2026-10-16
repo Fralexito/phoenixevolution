@@ -33,6 +33,11 @@ import Plegable from '../components/Plegable.astro';
         <div id="bia-lista" class="space-y-3" aria-live="polite"></div>
       </section>
 
+      <Plegable titulo="Comentarios de noticias" icono="fa-comments" resumen="Se publican solos; aquí puedes eliminar los que no van" id="bia-coms-caja">
+        <p class="text-xs text-gray-400 mb-2"><span id="bia-coms-n">…</span> · los 50 más recientes</p>
+        <div id="bia-coms" class="space-y-2"></div>
+      </Plegable>
+
       <Plegable titulo="Historial" icono="fa-clock-rotate-left" resumen="Lo último que se aprobó o rechazó" id="bia-hist-caja">
         <div id="bia-historial" class="space-y-2"></div>
       </Plegable>

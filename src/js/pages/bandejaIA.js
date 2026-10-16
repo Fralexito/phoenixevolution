@@ -5,6 +5,8 @@ import { onSession, can } from '../core/session.js';
 import { toast } from '../core/toast.js';
 import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc } from '../core/dom.js';
+import { href } from '../core/config.js';
+import { mensajeErrorSocial } from '../core/noticiaSocial.js';
 import { haceCuanto } from '../core/notifs.js';
 import { PRIORIDAD, TIPO, textoSeguro, contar, mensajeError } from '../core/bandejaIA.js';
 
@@ -36,8 +38,8 @@ const tarjeta = (p) => {
     ${p.detalle ? `<div class="bia-detalle">${textoSeguro(p.detalle)}</div>` : ''}
     ${noticia}
     <div class="bia-acciones">
-      <button type="button" class="btn btn-primary" data-aprobar="${p.id}"><i class="fa-solid fa-check"></i> ${p.tipo === 'noticia' ? 'Aprobar y publicar' : 'Entendido'}</button>
-      <button type="button" class="btn btn-ghost" data-rechazar="${p.id}"><i class="fa-solid fa-xmark"></i> ${p.tipo === 'noticia' ? 'Rechazar' : 'Descartar'}</button>
+      <button type="button" class="btn btn-primary" data-aprobar="${p.id}"><i class="fa-solid fa-check"></i> ${p.tipo === 'noticia' ? 'Aprobar y publicar' : p.tipo === 'encuesta' ? 'Aprobar y abrir' : 'Entendido'}</button>
+      <button type="button" class="btn btn-ghost" data-rechazar="${p.id}"><i class="fa-solid fa-xmark"></i> ${p.tipo === 'aviso' ? 'Descartar' : 'Rechazar'}</button>
     </div>
   </article>`;
 };
@@ -62,9 +64,33 @@ async function cargarHistorial() {
     : '<p class="text-xs text-gray-500">Aún no se ha revisado nada.</p>';
 }
 
+// Comentarios de las noticias (ronda 350): se publican directo; aquí el staff los revisa y puede eliminarlos.
+async function cargarComentarios() {
+  const { data, error: e } = await supabase.rpc('noticias_comentarios_recientes', { p_limite: 50 });
+  if (e) throw e;
+  const lista = data ?? [];
+  const vivos = lista.filter((c) => !c.oculto).length;
+  $('bia-coms-n').textContent = vivos ? `${vivos} visible${vivos === 1 ? '' : 's'}` : 'Sin comentarios';
+  $('bia-coms').innerHTML = lista.length ? lista.map((c) => `<div class="bia-com" data-oculto="${!!c.oculto}">
+      <div class="bia-com-txt"><small><b>${esc(c.autor ?? 'Cuenta borrada')}</b> · ${esc(haceCuanto(c.created_at))} · en <a href="${esc(href(`noticias/?n=${encodeURIComponent(c.noticia_slug)}`))}">${esc(c.noticia_titulo)}</a></small><p>${esc(c.texto)}</p></div>
+      ${c.oculto ? '<small class="text-gray-500">Eliminado</small>' : `<button type="button" class="btn btn-ghost !min-h-8 !px-3 !text-[12px] !text-rose-400" data-borrar-com="${c.id}">Eliminar</button>`}
+    </div>`).join('')
+    : '<p class="text-xs text-gray-500">Todavía nadie ha comentado una noticia.</p>';
+}
+
+async function borrarComentario(id, boton) {
+  if (!(await confirmar('El comentario dejará de verse para todos.', { titulo: 'Eliminar comentario', aceptar: 'Eliminar', peligro: true }))) return;
+  boton.disabled = true;
+  const { error: e } = await supabase.rpc('noticia_borrar_comentario', { p_id: Number(id) });
+  if (e) { boton.disabled = false; toast(mensajeError(e), 'error'); return; }
+  toast('Comentario eliminado.', 'info'); cargarComentarios().catch((e2) => toast(mensajeErrorSocial(e2), 'error'));
+}
+
 async function todo() {
   $('bia-error').hidden = true;
   try { await Promise.all([cargarResumen(), cargarLista()]); } catch (e) { error(e); }
+  // Aparte: si la migración 124 aún no está en la base, solo esta caja avisa; el resto de la bandeja sigue funcionando.
+  cargarComentarios().catch((e) => { console.error('[bandeja-ia] comentarios:', e); $('bia-coms-n').textContent = 'No disponible'; $('bia-coms').innerHTML = `<p class="text-xs text-gray-500">${esc(mensajeErrorSocial(e))}</p>`; });
 }
 
 async function revisar(id, aprobar, boton) {
@@ -79,14 +105,15 @@ async function revisar(id, aprobar, boton) {
   boton.disabled = true;
   const { error: e } = await supabase.rpc('ia_revisar', { p_id: Number(id), p_aprobar: aprobar, p_motivo: motivo || null });
   if (e) { boton.disabled = false; toast(mensajeError(e), 'error'); return; }
-  toast(aprobar ? (p.tipo === 'noticia' ? '¡Noticia publicada!' : 'Anotado') : (p.tipo === 'noticia' ? 'Rechazada: sigue como borrador' : 'Descartado'), aprobar ? 'ok' : 'info');
+  toast(aprobar ? (p.tipo === 'noticia' ? '¡Noticia publicada!' : p.tipo === 'encuesta' ? '¡Encuesta abierta!' : 'Anotado') : (p.tipo === 'noticia' ? 'Rechazada: sigue como borrador' : 'Descartado'), aprobar ? 'ok' : 'info');
   const card = boton.closest('.bia-card'); card?.classList.add('bia-sale');
   setTimeout(() => { cargarLista().catch(error); if ($('bia-hist-caja')?.open) cargarHistorial().catch(error); }, 220);
 }
 
 document.addEventListener('click', (ev) => {
   const a = ev.target.closest('[data-aprobar]'); if (a) { revisar(a.dataset.aprobar, true, a); return; }
-  const r = ev.target.closest('[data-rechazar]'); if (r) revisar(r.dataset.rechazar, false, r);
+  const r = ev.target.closest('[data-rechazar]'); if (r) { revisar(r.dataset.rechazar, false, r); return; }
+  const c = ev.target.closest('[data-borrar-com]'); if (c) borrarComentario(c.dataset.borrarCom, c);
 });
 $('bia-reintentar')?.addEventListener('click', todo);
 $('bia-hist-caja')?.addEventListener('toggle', (e) => { if (e.currentTarget.open) cargarHistorial().catch(error); });
