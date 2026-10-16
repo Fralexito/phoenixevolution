@@ -1218,3 +1218,21 @@ test('clips: embed y miniatura por plataforma', () => {
   assert.match(miniatura({ id: 'abc' }), /ytimg\.com\/vi\/abc\/hqdefault/);
   assert.equal(etiquetaFuente({ fuente: 'twitch', id: 'x' }), 'Twitch');
 });
+
+import { elegirProximo, cuando } from '../src/js/core/proximoPartido.js';
+test('proximoPartido: elige el más cercano y escribe cuándo', () => {
+  const R = [
+    { id: 1, estado: 'BUSCANDO', retador_id: 'yo' },
+    { id: 2, estado: 'ACEPTADO', retador_id: 'yo', rival_id: 'x', fecha_programada: '2026-10-20T01:00:00Z' },
+    { id: 3, estado: 'ACEPTADO', retador_id: 'y', rival_id: 'yo', fecha_programada: '2026-10-18T01:00:00Z' },
+    { id: 4, estado: 'ACEPTADO', retador_id: 'z', rival_id: 'w' },
+  ];
+  assert.equal(elegirProximo(R, 'yo').id, 3);
+  assert.equal(elegirProximo(R, 'nadie'), null);
+  assert.equal(elegirProximo([...R, { id: 5, estado: 'EN_JUEGO', retador_id: 'yo', rival_id: 'q' }], 'yo').id, 5);
+  const ahora = Date.parse('2026-10-16T12:00:00Z');
+  assert.equal(cuando({ estado: 'EN_JUEGO' }, ahora), 'En juego');
+  assert.equal(cuando({ estado: 'ACEPTADO' }, ahora), 'Ahora');
+  assert.match(cuando({ estado: 'ACEPTADO', fecha_programada: '2026-10-16T20:00:00Z' }, ahora, 'UTC'), /^Hoy /);
+  assert.match(cuando({ estado: 'ACEPTADO', fecha_programada: '2026-10-17T20:00:00Z' }, ahora, 'UTC'), /^Mañana /);
+});
