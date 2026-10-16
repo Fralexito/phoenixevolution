@@ -16,6 +16,7 @@ import { initProf3d } from './features/prof3d.js';
 import { initCarruseles } from './features/carruseles.js';
 import { initCartasEfecto } from './features/cartasEfecto.js';
 import { initPremium } from './features/premium.js';
+import { initSinIconosWeb } from './features/sinIconosWeb.js';
 import { initMarco } from './features/marco.js';
 import { initSitio } from './features/sitioAplicar.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
@@ -39,6 +40,7 @@ initProf3d();
 initCarruseles();
 initCartasEfecto();
 initPremium();
+if (FX.sinIconosWeb) initSinIconosWeb();
 initMarco();
 // Barra lateral izquierda (experimento): solo en pantallas anchas; se descarga solo cuando hace falta.
 if (FX.barraLateral && document.getElementById('barra-lat')) {

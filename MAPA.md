@@ -373,3 +373,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 316 (cuenta WEB, borrador): Panel del sitio VISUAL: la portada se edita como lienzo (ventanas que se arrastran, ojo para ocultar, flechas, clic para editar con dibujitos de cada diseño); menú de arriba y barra lateral como botones que se tocan (se tachan al ocultar). Vista en vivo al cambiar. Probado con sesión admin simulada. moverA() en core/sitio.js + test. Tests 474 OK, build 49.
 
 ### Ronda 317 (cuenta WEB, borrador): Panel más ordenado: 3 pestañas grandes (Portada · Menú de arriba · Barra lateral), ayuda de una línea por pestaña, editor de la ventana en columna lateral fija, botones del menú con su icono y nombre limpio. Tests 474 OK, build 49.
+
+### Ronda 318 (cuenta WEB, borrador): FX.sinIconosWeb: se quitan los iconos decorativos de TODA la web (los pegados a un texto; js/features/sinIconosWeb.js + styles/sinIconosWeb.css). Quedan flechas, chevrones, ✕, ✓, + y botones solo-icono. Barra lateral: monograma de 2 letras en vez de icono. Se apaga con FX.sinIconosWeb=false. Tests 474 OK, build 49.
