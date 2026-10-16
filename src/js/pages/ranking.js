@@ -32,6 +32,14 @@ function pintarLista() {
     : vacioHTML(S.tab === 'competitivo' ? 'Nadie tiene partidos confirmados en esta temporada todavía.' : S.tab === 'elo' ? 'Aún no hay amistosos 1v1 confirmados para calcular el ELO.' : 'Nadie ha cobrado retos en esta temporada todavía.', { icono: 'fa-ranking-star', accion: { texto: 'Ir a la Sala de Duelos', href: href('duelos/') } });
   for (const b of document.querySelectorAll('#rk-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
 }
+function pintarBarrasTop() {
+  const caja = $('rk-barras'); if (!caja) return;
+  const val = (r) => (S.tab === 'elo' ? r.elo : S.tab === 'retos' ? r.retos : r.puntos);
+  const top = S.filas.slice(0, 8).filter((r) => Number(val(r)) > 0);
+  caja.hidden = top.length < 2; if (caja.hidden) return;
+  const max = Math.max(...top.map(val));
+  $('rk-barras-lista').innerHTML = top.map((r) => `<div class="flex items-center gap-2"><span class="w-24 sm:w-32 text-[12px] text-gray-300 truncate">${escapeHTML(r.nombre)}</span><div class="flex-1 h-3 rounded bg-black/40 overflow-hidden"><div class="h-full rounded bg-gradient-to-r from-galaxy-400 to-purple-500" style="width:${Math.max(4, Math.round(val(r) / max * 100))}%"></div></div><b class="w-10 text-right text-[12px] text-galaxy-400 font-display">${val(r)}</b></div>`).join('');
+}
 function pintarRetos() {
   const sec = $('rk-retos'); sec.hidden = !S.yo || !S.retos;
   if (sec.hidden) return;
@@ -48,7 +56,7 @@ async function cargar() {
   try {
     const [filas, retos] = await Promise.all([S.tab === 'competitivo' ? api.rankingCompetitivo(S.mes) : S.tab === 'elo' ? api.rankingElo() : api.rankingRetos(S.mes), S.yo ? api.misRetos() : Promise.resolve(null)]);
     if (mia !== S.req) return;
-    S.filas = filas; S.retos = retos; avisoError(''); pintarLista(); pintarRetos();
+    S.filas = filas; S.retos = retos; avisoError(''); pintarLista(); pintarBarrasTop(); pintarRetos();
   } catch (e) { if (mia !== S.req) return; console.error('[ranking] página:', e); S.filas = []; pintarLista(); avisoError(e?.message || 'Algo salió mal. Inténtalo de nuevo.'); }
 }
 $('rk-mes').innerHTML = mesesDisponibles().map((m) => `<option value="${m.valor}">${escapeHTML(m.etiqueta)}</option>`).join('');

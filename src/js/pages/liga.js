@@ -119,5 +119,5 @@ document.addEventListener('toggle', async (e) => {
   const d = e.target; if (!d.matches?.('[data-evo]') || !d.open) return;
   const c = d.querySelector('[data-grafico]'); if (!c || c.dataset.listo) return;
   c.dataset.listo = '1';
-  try { const { pintarLinea } = await import('../features/grafico.js'); await pintarLinea(c, JSON.parse(c.dataset.grafico)); } catch (err) { console.warn('[liga] gráfico:', err); c.textContent = 'No se pudo cargar el gráfico.'; }
+  try { const g = await import('../features/grafico.js'); const datos = JSON.parse(c.dataset.grafico); await (c.dataset.tipo === 'barras' ? g.pintarBarras(c, datos) : g.pintarLinea(c, datos)); } catch (err) { console.warn('[liga] gráfico:', err); c.textContent = 'No se pudo cargar el gráfico.'; }
 }, true);

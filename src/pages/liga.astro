@@ -8,7 +8,7 @@ import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
 import { escudoDe } from '../js/core/escudos.js';
 import { SISTEMA, SISTEMAS_LIGA } from '../data/temporada.js';
 import { zonasDivision, zonasLiga } from '../js/core/temporada.js';
-import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas, evolucionPuntos } from '../js/core/ligaStats.js';
+import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas, evolucionPuntos, golesPorFecha } from '../js/core/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 // Clases completas (Tailwind solo detecta nombres escritos enteros).
 const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black', P: 'bg-rose-500/90 text-white' };
@@ -32,6 +32,7 @@ const datos = LIGAS.map((l) => ({
     zonas: e.estado === 'en_curso' && SISTEMAS_LIGA[l.id] ? zonasLiga(tablaCompleta(e).map((f) => f.nombre), SISTEMAS_LIGA[l.id]) : e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(tablaCompleta(e).map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
     fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
     evolucion: evolucionPuntos(e.fechas, tablaCompleta(e).slice(0, 4).map((f) => f.nombre)),
+    goles: { ...golesPorFecha(e.fechas), nombre: 'Goles' },
   })).reverse(),   // la más reciente primero
 }));
 ---
@@ -154,6 +155,12 @@ const datos = LIGAS.map((l) => ({
                 <details class="liga-guia" data-evo>
                   <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none">Evolución de puntos (los 4 primeros)</summary>
                   <div class="liga-evo mt-2" data-grafico={JSON.stringify(e.evolucion)}></div>
+                </details>
+              )}
+              {e.goles.x.length >= 2 && (
+                <details class="liga-guia" data-evo>
+                  <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none">Goles por fecha</summary>
+                  <div class="liga-evo mt-2" data-grafico={JSON.stringify(e.goles)} data-tipo="barras"></div>
                 </details>
               )}
               <details class="liga-guia">

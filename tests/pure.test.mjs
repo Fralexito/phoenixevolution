@@ -1200,3 +1200,11 @@ test('compartir: datos de las tarjetas', async () => {
   assert.equal(j.forma.length, 5); assert.ok(j.titulo.length <= 14); assert.equal(c.datosJugador({ nombre: 'x', campana: { fila: null } }), null);
   assert.equal(c.nombreArchivo('Galaxy League · FECHA 4'), 'galaxy-league-fecha-4.png');
 });
+
+test('buscador tolera errores de tipeo (Fuse.js) sin romper la búsqueda exacta', () => {
+  const ix = indicePaginas();
+  assert.equal(buscarPaginas('torneso', ix)[0]?.id, 'torneos');
+  assert.equal(buscarPaginas('palmarse', ix)[0]?.id, 'palmares');
+  assert.equal(buscarPaginas('liga', ix)[0].id, 'liga');
+  assert.deepEqual(buscarPaginas('zzzzqq', ix), []);
+});

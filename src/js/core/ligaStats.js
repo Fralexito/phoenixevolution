@@ -82,3 +82,9 @@ export function evolucionPuntos(fechas, nombres) {
   }
   return { x: lista.map((f) => f.n), series: nombres.map((n) => ({ nombre: n, datos: series[n] })) };
 }
+
+// Goles totales por fecha jugada: { x:[n], datos:[goles] }.
+export function golesPorFecha(fechas) {
+  const lista = [...(fechas ?? [])].filter((f) => (f.partidos ?? []).some(jugado)).sort((a, b) => a.n - b.n);
+  return { x: lista.map((f) => f.n), datos: lista.map((f) => f.partidos.filter(jugado).reduce((t, m) => t + m.gl + m.gv, 0)) };
+}

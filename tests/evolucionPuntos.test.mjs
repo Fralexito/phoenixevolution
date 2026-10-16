@@ -15,3 +15,9 @@ test('acumula por fecha, ordena por n y salta fechas sin partidos jugados', () =
   assert.deepEqual(r.series.find((s) => s.nombre === 'C').datos, [0, 1]);
 });
 test('sin datos no rompe', () => { assert.deepEqual(evolucionPuntos(null, ['A']), { x: [], series: [{ nombre: 'A', datos: [] }] }); });
+
+import { golesPorFecha } from '../src/js/core/ligaStats.js';
+test('golesPorFecha suma goles de partidos jugados', () => {
+  const r = golesPorFecha([{ n: 2, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 1 }] }, { n: 1, partidos: [{ l: 'A', v: 'B', gl: 3, gv: 0 }, { l: 'B', v: 'A', gl: null, gv: null }] }, { n: 3, partidos: [{ l: 'A', v: 'B', gl: null, gv: null }] }]);
+  assert.deepEqual(r, { x: [1, 2], datos: [3, 2] });
+});

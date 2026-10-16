@@ -1,3 +1,4 @@
+import { computePosition, shift } from '@floating-ui/dom';
 import { onSession, can } from '../core/session.js';
 // Pilares del menú de arriba: el desplegable se abre con hover/teclado por CSS; aquí solo el clic (pantallas táctiles),
 // Escape y clic afuera para cerrar, y aria-expanded para lectores de pantalla.
@@ -12,8 +13,9 @@ export function montarPilares() {
   pilares.forEach((p) => {
     const b = p.querySelector('.pilar-btn'); const panel = p.querySelector('.pilar-panel');
     // Si el panel se saldría de la pantalla (ventana angosta), se corre lo justo hacia adentro.
-    const encajar = () => { if (!panel) return; panel.style.setProperty('--desp', '0px'); const r = panel.getBoundingClientRect(); const m = 8; const w = document.documentElement.clientWidth;
-      const dx = r.left < m ? m - r.left : (r.right > w - m ? w - m - r.right : 0); panel.style.setProperty('--desp', `${Math.round(dx)}px`); };
+    const encajar = () => { if (!panel) return; panel.style.setProperty('--desp', '0px');
+      computePosition(p, panel, { placement: 'bottom', middleware: [shift({ padding: 8, boundary: document.documentElement })] })
+        .then((d) => panel.style.setProperty('--desp', `${Math.round(d.middlewareData.shift?.x ?? 0)}px`)).catch(() => {}); };
     ['mouseenter', 'focusin', 'click'].forEach((ev) => p.addEventListener(ev, encajar)); window.addEventListener('resize', encajar);
     // Un clic ALTERNA: si el panel se ve (por hover, foco o clic) lo cierra y suelta el foco; si no, lo abre.
     b?.addEventListener('click', () => {

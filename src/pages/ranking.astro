@@ -28,6 +28,10 @@ import Layout from '../layouts/Layout.astro';
       <label id="rk-mes-wrap" class="ml-auto text-[12px] text-gray-400">Temporada <select id="rk-mes" class="field !py-1 ml-1"></select></label>
     </div>
     <p id="rk-elo-info" hidden class="glass-panel rounded-xl px-3 py-2 text-[12px] text-gray-300 leading-relaxed"><b class="text-white">ELO de amistosos.</b> Solo cuentan los duelos 1v1 con marcador confirmado por los dos líderes (nunca la liga oficial). Todos parten de 1000; ganarle a alguien con más ELO suma más, y las goleadas pesan más. Los rangos: Bronce, Plata (desde 925), Oro (1025), Platino (1100) y Diamante (1175). No es acumulativo por mes: dura toda la historia.</p>
+    <details id="rk-barras" hidden class="glass-panel rounded-xl px-3 py-2">
+      <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none min-h-9 flex items-center">Gráfico de los 8 primeros</summary>
+      <div id="rk-barras-lista" class="space-y-1.5 mt-2"></div>
+    </details>
     <div id="rk-lista" class="space-y-2" aria-live="polite"></div>
   </div>
 </Layout>

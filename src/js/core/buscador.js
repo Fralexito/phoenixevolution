@@ -1,4 +1,5 @@
 // Buscador global — parte PURA: índice de páginas y puntuación (sin DOM → probable). La ventana vive en features/buscadorGlobal.js.
+import Fuse from 'fuse.js';
 import { NAV, NAV_EXTRA, ACCOUNT_NAV } from '../../data/site.js';
 
 const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
@@ -28,9 +29,12 @@ export function indicePaginas() {
 /** Páginas que coinciden con `q`, mejores primero. Consulta vacía → []. Cada palabra de la consulta debe aparecer (en cualquier orden). */
 export function buscarPaginas(q, indice = indicePaginas(), max = 8) {
   const ps = norm(q).split(/\s+/).filter(Boolean); if (!ps.length) return [];
-  return indice.map((p) => {
+  const estricto = indice.map((p) => {
     if (!ps.every((w) => p._t.includes(w))) return null;
     let pts = 0; for (const w of ps) pts += p._l === w ? 10 : p._l.startsWith(w) ? 7 : p._l.includes(w) ? 5 : 2;
     return { p, pts };
   }).filter(Boolean).sort((a, b) => b.pts - a.pts || a.p.label.localeCompare(b.p.label)).slice(0, max).map((x) => x.p);
+  if (estricto.length) return estricto;
+  // Sin coincidencia exacta: búsqueda tolerante a errores de tipeo (Fuse.js), p. ej. «torneso» → Torneos.
+  return new Fuse(indice, { keys: [{ name: '_l', weight: 2 }, { name: '_t', weight: 1 }], threshold: 0.38, ignoreLocation: true, minMatchCharLength: 3 }).search(norm(q)).slice(0, max).map((r) => r.item);
 }
