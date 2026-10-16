@@ -53,6 +53,16 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - La base de datos ya tiene todo aplicado (`supabase/migrations/003`, `003b` y `004`). **No los vuelvas a ejecutar.**
 
 
+### Ronda 349 — Noticias como un diario con departamentos (FX.diario)
+- Fralex: la página de noticias no le gustaba, se bajaba mucho y quedaban huecos; quería algo divertido tipo diario deportivo, con departamentos como una redacción de verdad, orden impredecible y la portada del día descargable para los grupos. Boceto aprobado antes de construir.
+- **Departamentos (`core/departamentos.js`)**: 24 secciones con su color, firma, voz y de qué parte de la web se alimentan (La Crónica, El Analista, La Mesa, La Previa, En Vivo, Duelos, Mercado, El Club, El Vestuario, La Escuela, Competiciones, Sudario, La Agenda, La Vitrina, La Plaza, Clanes, La Cabina, La Tribuna, Dirección, Tribunal, El Taller, La Tienda, El Archivo, Sala de Máquinas, Hosting, Organizadores). `departamentoDe()` lo detecta solo por etiqueta/título/liga; una noticia puede traer su `departamento` fijo. Los filtros de arriba ahora son departamentos.
+- **Orden del día (`core/diario.js`)**: la portada se baraja cada día con semilla de la fecha (mismo día = mismo orden para todos) y cumple 5 reglas: manda lo más fuerte del día · la joda siempre después de lo serio · nada repetido al lado · lo urgente (Tribunal/En vivo) nunca enterrado · si el staff acomodó a mano (orden manual), su orden manda y el azar no lo toca.
+- **Afiche del día (`core/afiche.js` + `features/noticias/afiche.js`)**: portada tipo diario deportivo dibujada sola con la noticia principal (antetítulo, grito corto con una palabra resaltada, marcador, inicial del protagonista, dos titulares más y la web impresa). Un color por día (6 rotan) salvo Tribunal (rojo), Tribuna (naranja) y Dirección (blanco). Se descarga como PNG dibujado en canvas (3:4 para el grupo y 9:16 para el estado) y usa `navigator.share` en celular si existe.
+- **Portada corta a propósito (`features/noticias/diario.js` + `styles/diario.css`)**: una pantalla con afiche + primera plana + «Lo último», y otra con «Lo demás del día» (6 tarjetas parejas y «Ver más») y la banda de la Zona de joda. Sin huecos: el titular del afiche se agranda según el largo de la línea.
+- Se conserva TODO lo de antes: Acomodar (GridStack), el catálogo de diseños, el lienzo libre y el editor. Si hay lienzo guardado, manda el lienzo. Se apaga con `FX.diario = false`.
+- OJO: dentro del afiche se anula `main[data-sia] h2` (ponía los títulos en fila y partía el titular).
+- Probado en PC y celular con la vista previa construida (sin desbordes) y descargando las dos portadas. Pruebas 565 OK, build 53 páginas.
+
 ## Historial antiguo
 - Los cambios iniciales y las rondas 6 a 250 se archivaron en **`docs/MAPA-HISTORIAL.md`** (ronda 295). Aquí quedan la ronda 251 en adelante y «RETOMAR».
 

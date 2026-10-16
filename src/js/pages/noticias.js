@@ -14,9 +14,12 @@ import { abrirCatalogo } from '../features/noticias/catalogo.js';
 import { entrarAcomodar } from '../features/noticias/acomodar.js';
 import { asignarDiseno, plantillaDe } from '../core/noticiasPlantillas.js';
 import { hayLienzo, ordenLectura, FILA_PX } from '../core/noticiasLienzo.js';
+import { FX } from '../../data/experimento.js';
+import { departamentoDe, departamentosPresentes } from '../core/departamentos.js';
+import { pintarDiario } from '../features/noticias/diario.js';
 
 const $ = (id) => document.getElementById(id);
-const state = { lista: [], cat: 'TODOS', liga: 'TODAS', term: '' };
+const state = { lista: [], cat: 'TODOS', liga: 'TODAS', term: '', dep: 'TODOS', max: 6 };
 const nombreLiga = (id) => LIGAS.find((l) => l.id === id)?.titulo.join(' ') ?? id;
 const cuando = (n) => (n.publicadaEn ? fechaRelativa(n.publicadaEn) : (n.fecha ?? ''));
 
@@ -31,11 +34,25 @@ function paintLigas() {
   box.innerHTML = ids.length < 2 ? '' : ['TODAS', ...ids].map((id) => `<button type="button" data-liga="${escapeHTML(id)}" aria-pressed="${String(id === state.liga)}" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">${id === 'TODAS' ? 'Todas las ligas' : escapeHTML(nombreLiga(id))}</button>`).join('');
 }
 
+/** Los departamentos que hay hoy, como filtros (solo con FX.diario; si no, mandan las categorías del HTML). */
+function paintDeps() {
+  if (!FX.diario) return;
+  const box = $('news-filters'); const deps = departamentosPresentes(state.lista);
+  if (state.dep !== 'TODOS' && !deps.some((d) => d.id === state.dep)) state.dep = 'TODOS';
+  box.innerHTML = [{ id: 'TODOS', nombre: 'Todo' }, ...deps]
+    .map((d) => `<button type="button" data-dep="${escapeHTML(d.id)}" aria-pressed="${String(d.id === state.dep)}" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">${escapeHTML(d.nombre)}</button>`).join('');
+}
+const listaFiltrada = () => {
+  const base = filtrar(state.lista, state);
+  return !FX.diario || state.dep === 'TODOS' ? base : base.filter((n) => departamentoDe(n) === state.dep);
+};
+
 let acomodo = null;   // modo «Acomodar» activo
 function paint() {
-  const list = filtrar(state.lista, state);
+  const list = listaFiltrada();
   if (acomodo) return;   // GridStack es dueño de la grilla mientras se acomoda
   if (hayLienzo(state.lista)) return paintLienzo(list);
+  if (FX.diario) return paintDiario(list);
   const dest = elegirDestacada(list); const resto = list.filter((n) => n !== dest);
   const orden = dest ? [dest, ...resto] : resto;
   disenos.clear(); asignarDiseno(orden, { heroIdx: dest ? 0 : -1 }).forEach((d, i) => disenos.set(orden[i].slug, d));
@@ -44,6 +61,12 @@ function paint() {
   $('news-grid').innerHTML = !list.length
     ? `<div class="col-span-full text-center py-16 text-gray-500 text-sm">No hay noticias que coincidan con la búsqueda.</div>`
     : resto.map((n) => tarjetaHTML(n, disenos.get(n.slug).plantilla, disenos.get(n.slug).estilo, ctx)).join('');
+}
+
+/** Portada de diario: afiche del día + primera plana + lo justo del resto (poco scroll). */
+function paintDiario(list) {
+  pintarDiario({ cajaAfiche: $('news-featured'), cajaGrilla: $('news-grid'), lista: list, ctx, max: state.max });
+  $('news-grid').querySelector('.dia-mas')?.addEventListener('click', () => { state.max += 6; paint(); });
 }
 
 const tarjetaDe = (n) => { const d = disenos.get(n.slug); return tarjetaHTML(n, d.plantilla, d.estilo, ctx); };
@@ -104,17 +127,18 @@ async function cargar() {
     filas = (data ?? []).map((f) => normalizar({ ...f, editable: true }));
   } catch (e) { console.error('[noticias] cargar:', e); }
   state.lista = ordenar(filas?.length ? filas : NOTICIAS.map((n) => normalizar({ ...n, slug: `demo-${n.id}`, cuerpo: n.cuerpo.join('\n\n'), publicadaEn: '', editable: false })));
-  paintLigas(); paint();
+  paintLigas(); paintDeps(); paint();
 }
 
-$('news-search').addEventListener('input', (e) => { state.term = e.target.value; paint(); });
+$('news-search').addEventListener('input', (e) => { state.term = e.target.value; state.max = 6; paint(); });
 const pulsar = (cont, attr, clave) => (e) => {
   const b = e.target.closest(`[${attr}]`); if (!b) return;
-  state[clave] = b.getAttribute(attr);
+  state[clave] = b.getAttribute(attr); state.max = 6;
   cont.querySelectorAll(`[${attr}]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   paint();
 };
 $('news-filters').addEventListener('click', pulsar($('news-filters'), 'data-cat', 'cat'));
+$('news-filters').addEventListener('click', pulsar($('news-filters'), 'data-dep', 'dep'));
 $('news-ligas').addEventListener('click', pulsar($('news-ligas'), 'data-liga', 'liga'));
 $('news-root').addEventListener('click', (e) => { if (acomodo) return; const b = e.target.closest('[data-slug]'); if (b) read(b.dataset.slug); });
 $('news-disenos').addEventListener('click', () => abrirDisenos());

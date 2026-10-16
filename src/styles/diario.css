@@ -1,0 +1,101 @@
+/* NOTICIAS COMO DIARIO (ronda 349) · bandera FX.diario
+   Portada corta a propósito: una pantalla para el afiche + la primera plana, otra para el resto.
+   Todo con la paleta de tokens.css; el color del departamento entra por la variable --dp. */
+
+/* ---------- El afiche del día ---------- */
+.af {
+  position: relative; display: flex; flex-direction: column; width: 100%; aspect-ratio: 41 / 50; overflow: hidden; container-type: inline-size;
+  background: linear-gradient(168deg, #16062e 0%, #07030f 62%);
+  border: 1px solid var(--color-galaxy-border); border-radius: .35rem; color: #fff; text-align: left;
+}
+.af::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgb(from var(--af) r g b / .07), transparent 70%); pointer-events: none; }
+.af-cab { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem .85rem; background: #000; }
+.af-marca { font: 700 1.2rem/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
+.af-extra { padding: .15rem .45rem; background: var(--af); color: #07030f; font: 700 12px/1.4 var(--font-display); letter-spacing: .12em; text-transform: uppercase; }
+.af-txt { padding: 1rem 1.15rem .5rem; min-height: 0; overflow: hidden; }
+.af-kicker { margin: 0 0 .45rem; font: 700 12px/1 var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: var(--af); }
+/* el tamaño sale del largo de la línea más larga: el titular ocupa siempre el ancho del afiche */
+.af-grito { margin: 0; font: 700 clamp(1.1rem, calc(118cqw / var(--maxl, 12)), 2.6rem)/.96 var(--font-display); text-transform: uppercase; letter-spacing: .01em; overflow-wrap: anywhere; }
+.af-grito mark { background: var(--af); color: #07030f; padding: 0 .25rem; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+/* el afiche es una pieza cerrada: ningún adorno global de títulos entra aquí (si no, el titular se parte en fila) */
+main[data-sia] .af-grito { display: block; }
+main[data-sia] .af-grito::before { content: none; }
+.af-bajada { margin: .7rem 0 0; font-size: 13px; line-height: 1.45; color: #cbd5e1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.af-pieza { margin-top: auto; display: flex; align-items: center; gap: .8rem; padding: 0 1.15rem .75rem; }
+.af-ini { flex: none; width: 3.6rem; height: 3.6rem; display: grid; place-items: center; border-radius: 999px; background: var(--color-galaxy-card); border: 2px solid rgb(255 255 255 / .3); font: 700 1.7rem/1 var(--font-display); }
+.af-marc { padding: .4rem .85rem; background: #000; border: 2px solid var(--af); font: 700 1.8rem/1 var(--font-display); transform: rotate(-2deg); }
+.af-tambien { margin: 0 1.15rem; border-top: 1px solid rgb(255 255 255 / .18); padding: .55rem 0 .7rem; }
+.af-tambien p { margin: 0 0 .25rem; font: 700 13px/1.12 var(--font-display); text-transform: uppercase; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.af-tambien p:last-child { margin: 0; }
+.af-cinta { display: flex; justify-content: space-between; gap: .6rem; padding: .45rem .85rem; background: #000; font: 700 12px/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: #94a3b8; }
+.af-cinta span:first-child { color: var(--af); }
+
+/* ---------- La parte de arriba: afiche + primera plana + lo último ---------- */
+.dia-top { display: grid; grid-template-columns: 22rem minmax(0, 1fr) 15rem; gap: 1.1rem; align-items: start; }
+.dia-col-afiche { container-type: inline-size; }
+.dia-bajar { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+.dia-bajar .btn { flex: 1 1 auto; }
+.dia-btn-ppal { background: #ffd400; color: #1a1400; }
+.dia-btn-ppal:hover:not(:disabled) { background: #ffe14d; }
+
+.dia-sello { display: inline-flex; align-items: center; padding: .2rem .5rem; border-radius: .3rem; border: 1px solid rgb(from var(--dp) r g b / .45); color: var(--dp); font: 700 12px/1.3 var(--font-display); letter-spacing: .12em; text-transform: uppercase; }
+.dia-meta { font-size: 12px; color: #94a3b8; }
+.dia-borrador { margin-left: .4rem; padding: .1rem .35rem; border-radius: .25rem; background: rgb(251 191 36 / .18); border: 1px solid rgb(251 191 36 / .4); color: #fde9b0; font: 700 12px/1.3 var(--font-display); text-transform: uppercase; }
+
+.dia-hero { display: flex; flex-direction: column; gap: .6rem; width: 100%; padding: 1.2rem 1.35rem; text-align: left; cursor: pointer;
+  background: var(--color-galaxy-card); border: 1px solid var(--color-galaxy-border); border-left: 4px solid var(--dp); border-radius: 1rem;
+  transition: transform .18s cubic-bezier(.22,1,.36,1), border-color .18s ease-out, box-shadow .18s ease-out; }
+.dia-hero-cab { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; }
+.dia-hero-tit { margin: 0; font: 700 clamp(1.5rem, 2.6vw, 2.1rem)/1.04 var(--font-display); text-transform: uppercase; color: #fff; }
+.dia-hero-res { margin: 0; font-size: .95rem; line-height: 1.55; color: #cbd5e1; }
+.dia-leer { margin-top: .2rem; font: 700 13px/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--dp); }
+
+.dia-ultimas { padding: 1rem 1.1rem; background: var(--color-galaxy-panel); border: 1px solid var(--color-galaxy-border); border-radius: .9rem; }
+.dia-ultimas h3 { margin: 0 0 .7rem; font: 700 13px/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #fbbf24; }
+.dia-ultimas ol { margin: 0; padding: 0; list-style: none; }
+.dia-ultimas li + li { border-top: 1px solid var(--color-galaxy-line); }
+.dia-ultimas button { display: flex; gap: .6rem; width: 100%; padding: .5rem 0; text-align: left; cursor: pointer; }
+.dia-ultimas b { font: 700 1.1rem/1 var(--font-display); color: rgb(251 191 36 / .7); }
+.dia-ultimas span { font-size: 13px; line-height: 1.35; color: #e5e7eb; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dia-ultimas button:hover span { color: #fff; }
+
+/* ---------- El resto del día ---------- */
+/* el id gana a la clase: hay que pisar la grilla de 3 columnas de components.css */
+#news-grid.dia-cuerpo { display: flex; flex-direction: column; gap: 1.4rem; }
+.dia-sep { display: flex; align-items: center; gap: .9rem; margin-bottom: .8rem; }
+.dia-sep span { font: 700 1rem/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #fff; }
+.dia-sep::after { content: ''; flex: 1; height: 1px; background: var(--color-galaxy-border); }
+.dia-rejilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.dia-min { display: flex; flex-direction: column; gap: .5rem; width: 100%; min-height: 7rem; padding: .9rem 1rem; text-align: left; cursor: pointer;
+  background: var(--color-galaxy-card); border: 1px solid var(--color-galaxy-border); border-top: 3px solid var(--dp); border-radius: .8rem;
+  transition: transform .18s cubic-bezier(.22,1,.36,1), border-color .18s ease-out; }
+.dia-min-cab { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.dia-min-tit { margin: 0; font: 700 1.05rem/1.12 var(--font-display); text-transform: uppercase; color: #fff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.dia-mas { margin-top: .9rem; width: 100%; }
+.dia-vacio { padding: 3rem 0; text-align: center; font-size: .9rem; color: #6b7280; }
+
+.dia-joda { padding: 1rem 1.1rem; border: 1px solid rgb(249 115 22 / .4); border-left: 4px solid #f97316; border-radius: .9rem; background: rgb(249 115 22 / .06); }
+.dia-joda-cab { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; margin-bottom: .8rem; }
+.dia-joda-tit { font: 700 1.3rem/1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #f97316; }
+
+/* ---------- Movimiento (manda Ajustes → Animaciones) ---------- */
+@media (hover: hover) {
+  @media (prefers-reduced-motion: no-preference) {
+    .dia-hero:hover, .dia-min:hover { transform: translateY(-3px); border-color: rgb(from var(--dp) r g b / .55); }
+    .dia-hero:hover { box-shadow: 0 18px 40px -24px rgb(from var(--dp) r g b / .6); }
+  }
+}
+.dia-hero:focus-visible, .dia-min:focus-visible, .dia-ultimas button:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 3px; }
+
+/* ---------- Pantallas chicas: una columna y sin huecos ---------- */
+@media (max-width: 1100px) {
+  .dia-top { grid-template-columns: 19rem minmax(0, 1fr); }
+  .dia-ultimas { grid-column: 1 / -1; }
+  .dia-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .dia-top { grid-template-columns: minmax(0, 1fr); gap: .9rem; }
+  .dia-col-afiche { max-width: 22rem; margin: 0 auto; width: 100%; }
+  .dia-bajar .btn { flex: 1 1 100%; }
+  .dia-rejilla { grid-template-columns: minmax(0, 1fr); }
+}
