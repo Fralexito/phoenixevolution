@@ -194,7 +194,7 @@ async function rpc(nombre, args) {
 
 async function cargar() {
   const { data, error: err } = await supabase.rpc('sitio_estado');
-  if (err) { error('Falta preparar la base de datos (migración 108). ' + (err.message || '')); $('pn-estado').textContent = 'Sin conexión al panel.'; return; }
+  if (err) { error('Falta preparar la base de datos (migración 114, archivo 114_sitio_ajustes.sql). ' + (err.message || '')); $('pn-estado').textContent = 'Sin conexión al panel.'; return; }
   S.guardada = normalizar(data.config); S.borrador = clone(S.guardada); S.puedeDes = !!data.puede_deshacer; S.puedeReh = !!data.puede_rehacer;
   pintar(); aplicar(S.borrador);
 }
