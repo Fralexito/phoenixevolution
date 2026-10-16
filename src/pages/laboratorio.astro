@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CentroPartido from '../islas/CentroPartido.jsx';
+// DATOS INVENTADOS (prueba de la primera isla de React).
+const partido = {
+  competicion: 'Galaxy League · Fecha 10', duracion: 90,
+  local: { nombre: 'Phoenix FC', alineacion: [
+    { n: 1, nombre: 'Arens', pos: 'POR' }, { n: 4, nombre: 'Marco', pos: 'DEF' }, { n: 5, nombre: 'Lucía', pos: 'DEF' }, { n: 8, nombre: 'Gabo', pos: 'MED' }, { n: 10, nombre: 'Jack', pos: 'MED' }, { n: 9, nombre: 'Tito', pos: 'DEL' } ] },
+  visita: { nombre: 'Sudario United', alineacion: [
+    { n: 1, nombre: 'Diego', pos: 'POR' }, { n: 3, nombre: 'Camilo', pos: 'DEF' }, { n: 6, nombre: 'Roberto', pos: 'DEF' }, { n: 7, nombre: 'Nico', pos: 'MED' }, { n: 11, nombre: 'Sol', pos: 'DEL' }, { n: 9, nombre: 'Ivo', pos: 'DEL' } ] },
+  eventos: [
+    { min: 12, lado: 'local', tipo: 'gol', jugador: 'Tito', texto: 'remate cruzado' },
+    { min: 27, lado: 'visita', tipo: 'amarilla', jugador: 'Roberto', texto: 'falta táctica' },
+    { min: 38, lado: 'visita', tipo: 'gol', jugador: 'Sol', texto: 'contraataque' },
+    { min: 55, lado: 'local', tipo: 'cambio', jugador: 'Jack', texto: 'sale por Marco' },
+    { min: 63, lado: 'local', tipo: 'gol', jugador: 'Gabo', texto: 'tiro libre' },
+    { min: 78, lado: 'visita', tipo: 'roja', jugador: 'Camilo', texto: 'doble amarilla' },
+    { min: 86, lado: 'local', tipo: 'gol', jugador: 'Tito', texto: 'penal' } ],
+  stats: [
+    { id: 'pos', nombre: 'Posesión', local: 54, visita: 46, sufijo: '%' },
+    { id: 'tir', nombre: 'Tiros', local: 14, visita: 9 },
+    { id: 'arc', nombre: 'Tiros al arco', local: 7, visita: 4 },
+    { id: 'fal', nombre: 'Faltas', local: 8, visita: 13 } ],
+};
+---
+<Layout title="Laboratorio" active="">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow">Centro de partido</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Prueba de la primera isla de React. Mueve la barra del minuto y mira cómo cambian marcador, jugadas y estadísticas.</p>
+    </header>
+    <CentroPartido client:load partido={partido} />
+  </div>
+</Layout>

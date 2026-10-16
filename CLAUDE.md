@@ -32,5 +32,11 @@ Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sud
 - La capa vive tras la bandera `FX.dopamina` (`styles/dopamina.css`, `js/features/dopamina.js`); si algo no gusta, se apaga ahí.
 - Capa 3D de toda la web tras `FX.prof3d` (`styles/prof3d.css`, `js/features/prof3d.js`, ronda 242): aparición 3D al bajar, inclinación al salir, tarjetas que se inclinan hacia el mouse (lo grande, menos), presión y cambio de página en 3D. Regla de Fralex: **fuerte pero ordenado — nada se mueve solo, todo responde a la persona**. Solo actúa dentro de `<main>`; para excluir algo, `data-no3d`. Prioridades permanentes: dinamismo, suavidad, animaciones visuales y cero desorden.
 
+## Cuándo React y cuándo JavaScript (ronda 338, regla fija para las dos cuentas)
+- La web sigue siendo JavaScript puro. React SOLO como «isla» (`src/islas/*.jsx`, con `client:load`/`client:visible`) en pantallas MUY interactivas o en vivo (centro de partido, editor de alineación, draft). Páginas de lectura/listas/formularios: JS como siempre.
+- Una pieza es de uno u otro, nunca mezclada por dentro. La lógica (cálculos, reglas) va en `src/js/core/*` SIN React y con test; la isla solo la llama.
+- Mismos colores/tema (Galaxy/Sudario), mismas clases (`glass-panel`, `btn-primary`), texto ≥12 px y las reglas de movimiento de este archivo.
+- No reescribir páginas existentes a React sin que el usuario lo pida. Primera isla de prueba: `src/islas/CentroPartido.jsx` en `/laboratorio/` (datos inventados; sin enlace en el menú).
+
 ## Diferido por el usuario
 Webhook/bot de Discord, pasarela de pago, pruebas de clanes. El cumplimiento legal de monetización y escudos es responsabilidad del usuario.
