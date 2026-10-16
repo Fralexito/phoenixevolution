@@ -1,4 +1,4 @@
-// Tiras de secciones (.pilar-tabs) que se deslizan en celular (ronda 342): marca en `data-mas` si hay más contenido a la izquierda/derecha
+// Tiras de secciones (.pilar-tabs) que se deslizan en celular (ronda 344): marca en `data-mas` si hay más contenido a la izquierda/derecha
 // y deja a la vista la pestaña activa. Solo lee medidas; no mueve nada por su cuenta salvo centrar la activa al cargar.
 export function initTirasDeslizables() {
   document.querySelectorAll('.pilar-tabs').forEach((t) => {

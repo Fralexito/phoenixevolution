@@ -1,6 +1,6 @@
 # Informe del 16-oct-2026: React, herramientas, radar FIFA y orden visual
 
-Para FRALEX y para cualquier IA que continúe. Rondas 340–342 (rama `borrador`).
+Para FRALEX y para cualquier IA que continúe. Rondas 340–344 (rama `borrador`).
 
 ## 1. ¿React sí o no? (decisión)
 - La web es Astro + JavaScript puro. **Decisión: no migrar todo a React.** Se usa React solo como «isla» en pantallas muy interactivas o en vivo. La regla está en `CLAUDE.md` («Cuándo React y cuándo JavaScript»).
@@ -21,7 +21,7 @@ Pendientes elegidos por el usuario: llaves de torneo (brackets-viewer), sonidos 
 - Bug hallado en la prueba y corregido: con mouse el hover marcaba el eje y el clic lo desmarcaba.
 
 ## 4. Revisión visual de las 51 páginas (PC 1280 y celular 390, sin sesión y sin datos reales)
-Sin desbordes horizontales ni texto menor a 12 px. Hallazgos y qué se hizo (ronda 342):
+Sin desbordes horizontales ni texto menor a 12 px. Hallazgos y qué se hizo (ronda 344):
 1. Dos estilos de cabecera mezclados (tarjeta de vidrio vs gran título con degradado y esquinas), incluso dentro de «Competiciones». **Hecho:** Historial, Jugadores, Noticias y Configuración pasan al estilo tarjeta (mismo tamaño 36,8 px). **Regla acordada:** gran título solo para portadas/información (Competiciones, Formatos, Torneos, Temporada, Únete, Quiénes somos, Divisiones); tarjeta para el resto. Pendiente de decidir: Social/Comunidad sin título visible (se dejó así por el scroll), textos legales (30 px).
 2. Celular con demasiado «marco» antes del contenido: **Hecho:** el «Explora» del pie se oculta con la barra inferior (se mantiene si el Panel añadió enlaces propios).
 3. Tiras de secciones cortadas en celular: **Hecho:** desvanecido en el borde con más contenido y la pestaña activa se centra (`features/tirasDeslizables.js`).
