@@ -1,0 +1,35 @@
+/* ESTILO «PRO E-SPORTS» (FX.estiloPro, ronda 301): el rediseño de FORMA elegido por Fralex (lienzo, opción C). NO cambia colores:
+   mismo cian/púrpura (y Sudario). Cambia la forma: esquinas rectas en vez de redondas, botones y pestañas inclinados, barra de acento
+   en el borde izquierdo de las tarjetas y títulos más firmes. Se apaga con FX.estiloPro = false. */
+html[data-fx-pro] { --pro-corte: 9px; --pro-inclina: polygon(var(--pro-corte) 0, 100% 0, calc(100% - var(--pro-corte)) 100%, 0 100%); }
+/* 1 · Esquinas rectas (lo redondeado de Tailwind baja a casi recto; los círculos y avatares NO se tocan) */
+html[data-fx-pro] main :is(.rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl, .glass-panel) { border-radius: 4px; }
+html[data-fx-pro] .field, html[data-fx-pro] select.field, html[data-fx-pro] textarea.field { border-radius: 3px; }
+/* 2 · Tarjetas con barra de acento a la izquierda */
+html[data-fx-pro] main .glass-panel { border-left: 3px solid rgb(var(--pro-acento, 0 229 255) / .55); }
+/* 3 · Botones inclinados, letra de torneo */
+html[data-fx-pro] .btn { border-radius: 0; clip-path: var(--pro-inclina); padding-inline: 1.35rem; letter-spacing: .12em; }
+html[data-fx-pro] .btn.btn-ghost { box-shadow: inset 0 0 0 1px var(--color-galaxy-border); border-color: transparent; }
+html[data-fx-pro] .btn-primary { box-shadow: none; }
+/* 4 · Menú de arriba: la puerta actual es una pestaña inclinada */
+html[data-fx-pro] .nav-link { border-radius: 0; }
+html[data-fx-pro] .nav-link[aria-current='page'] { border-bottom: 0; background: rgb(0 229 255 / .14); clip-path: var(--pro-inclina); padding-inline: 1rem; text-shadow: none; }
+/* 5 · Pestañas «dónde estás» y etiquetas: inclinadas, sin píldora */
+html[data-fx-pro] .pilar-tabs-lista { border-radius: 0; border: 0; border-bottom: 1px solid var(--color-galaxy-border); background: transparent; padding: 0; gap: .15rem; }
+html[data-fx-pro] .pilar-tabs-lista a { border-radius: 0; clip-path: var(--pro-inclina); padding-inline: 1.1rem; }
+html[data-fx-pro] .pilar-tabs-lista a[aria-current='page'] { box-shadow: none; }
+html[data-fx-pro] :is(.liga-sello, .tn-chip, .badge) { border-radius: 0; clip-path: var(--pro-inclina); padding-inline: .8rem; }
+/* 6 · Títulos de página: más firmes */
+html[data-fx-pro] main h1 { letter-spacing: .01em; line-height: .98; }
+html[data-fx-pro] main h2 { letter-spacing: .06em; }
+/* 7 · Botones grandes de portada/hero, etiquetas, podio */
+html[data-fx-pro] .hero-cta { border-radius: 0; clip-path: var(--pro-inclina); padding-inline: 1.6rem; box-shadow: none; }
+html[data-fx-pro] :is(.pc-chip, .adv-chip) { border-radius: 0; clip-path: var(--pro-inclina); padding-inline: .8em; }
+html[data-fx-pro] main :is(a, button).rounded-full:not(.avatar) { border-radius: 0; clip-path: var(--pro-inclina); }
+html[data-fx-pro] .liga-podio { border-radius: 0; clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%); }
+html[data-fx-pro] .liga-podio-fila { border-radius: 0; border-left: 5px solid rgb(255 255 255 / .25); }
+html[data-fx-pro] .liga-podio-1 { border-left-color: #fbbf24; }
+html[data-fx-pro] .liga-podio-2 { border-left-color: #c0c4d0; }
+html[data-fx-pro] .liga-podio-3 { border-left-color: #d9895b; }
+html[data-fx-pro] :is(.hero-cta-s, .btn-ghost) { border-color: transparent; box-shadow: none; background: rgb(255 255 255 / .08); }
+html[data-fx-pro] :is(.hero-cta-s, .btn-ghost):hover { background: rgb(0 229 255 / .16); }

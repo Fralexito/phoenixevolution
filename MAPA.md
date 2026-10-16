@@ -339,3 +339,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 299 (cuenta WEB, borrador): se apagan los colores por mundo (ronda 297) porque a Fralex no le gustaron. styles/mundos.css queda guardado sin importar; para volver a probarlo, re-añadir su @import en global.css.
 
 ### Ronda 300 (cuenta WEB, borrador): menú sin botones repetidos. «Crear» es UN solo botón (staff ve Crear mi liga; el resto, torneos/#crear; data-no-staff). «Ligas activas» → «Todas las ligas». Formatos queda dentro de Torneos (pestaña adoptada). Mi cuenta sin Mi club ni Phoenix Link (ya están en sus puertas). Páginas siguen todas alcanzables. Elegido por Fralex: estilo C «Pro e-sports» (lienzo de 3 estilos) para el rediseño; aún sin aplicar. Tests 466/0, build 48.
+
+### Ronda 301 (cuenta WEB, borrador): rediseño de FORMA «Pro e-sports» (opción C del lienzo; SIN cambiar colores): esquinas rectas, botones/pestañas/etiquetas inclinados, barra de acento izquierda en tarjetas, podio con esquina cortada. styles/estiloPro.css tras FX.estiloPro (data-fx-pro en <html>). Primera capa: faltan Portada (tarjetas), Duelos, Perfil, etc. Tests 466/0, build 48.
