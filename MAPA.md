@@ -278,6 +278,7 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Datos duplicados (`ligaResultados.js` y la BD): tema aparte, grande.
 
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
+> **Actualización 2026-10-16 (cuenta WEB):** rondas 340–347 (React isla, radar FIFA, orden visual, modo ligero, anti-lag) y pendientes en **`docs/BITACORA-16-OCT-2026-CUENTA-WEB.md`**; siguiente ronda 348.
 > **Actualización 2026-10-16 (cuenta Opus):** esta sección es vieja. Para el estado actual leer **`docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md`** (cómo retomar, qué se hizo 13–16 oct, pendientes de FRALEX, siguiente migración 119 / ronda 347) y la última línea **TRASPASO** de `REGISTRO.md`.
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
 

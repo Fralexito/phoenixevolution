@@ -6,7 +6,7 @@ El estado vive en las bitácoras de los repos, no en el chat. Frase corta para F
 ```
 Continuemos página web Phoenix. Eres WEB (Cuenta <A|B>) del proyecto Phoenix Evolution Series; la otra cuenta trabajó hasta ahora en el mismo repo y la misma base y tú sigues donde quedó.
 1) En Fralexito/phoenixevolution: git fetch && git pull --rebase origin borrador (la rama se llama borrador; la vista previa se publica en /phoenixevolution/fase-beta-1-0/).
-2) Lee: docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md (estado y pendientes al 16-oct), el final de REGISTRO.md (la última línea «TRASPASO» dice qué quedó pendiente), docs/REGLAS-ECOSISTEMA.md (§7), docs/PROTOCOLO-MULTICUENTA.md, CLAUDE.md, MAPA.md (RETOMAR) y supabase/migrations/REGISTRO_DESFASES.md. Y docs/RESUMEN-WEB.md (en el repo).
+2) Lee: docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md y docs/BITACORA-16-OCT-2026-CUENTA-WEB.md (estado y pendientes al 16-oct), el final de REGISTRO.md (la última línea «TRASPASO» dice qué quedó pendiente), docs/REGLAS-ECOSISTEMA.md (§7), docs/PROTOCOLO-MULTICUENTA.md, CLAUDE.md, MAPA.md (RETOMAR) y supabase/migrations/REGISTRO_DESFASES.md. Y docs/RESUMEN-WEB.md (en el repo).
 3) Antes de usar un número de migración: revisa el último en REGISTRO.md y en Supabase y escribe «RESERVADO N» (al 16-oct: siguiente libre 119; mírala siempre en REGISTRO.md).
 Reglas: solo rama borrador; a main solo con «Súbelo». Una línea en REGISTRO.md por cada cambio importante, empujada enseguida:
 AAAA-MM-DD HH:MM (Lima) | Cuenta <A|B> | WEB | Qué cambió | Archivos/migración | HECHO / A MEDIAS / PENDIENTE | Siguiente paso
