@@ -32,7 +32,7 @@ import { compartir } from '../features/muro/compartir.js';
 import { clanDeUsuario } from '../features/clanes/api.js';
 import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { xpDe, equipamientoDe } from '../features/economia/api.js';
-import { estiloColor, estiloMarco } from '../core/economia.js';
+import { estiloColor, estiloMarco, estiloBanner } from '../core/economia.js';
 import { reputacionDe } from '../features/valoraciones/api.js';
 import { textoSello } from '../core/reputacion.js';
 import { abrirValoracionesStaff } from '../features/valoraciones/staff.js';
@@ -134,7 +134,7 @@ function cabecera(p) {
     : (S.sesion ? `${botonesCartaReto(p)}${botonesSociales(p)}${botonesModeracion(p)}`
       : `${botonesCartaReto(p)}<span class="text-[12px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Inicia sesión (botón «Entrar», arriba) para escribirle, agregarlo o retarlo.</span>`);
   return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
-    <div class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
+    <div id="pf-banner" class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
       ${p.soy_yo ? `<input type="file" id="bn-file" accept="image/jpeg,image/png,image/webp" hidden><button type="button" data-act="cambiar-banner" aria-label="Cambiar banner" title="Cambiar banner" class="absolute top-2 right-2 z-10 h-9 px-3 rounded-full bg-black/60 hover:bg-black/80 text-white text-[12px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-camera"></i><span class="max-sm:hidden">Cambiar banner</span></button>` : ''}</div>
     <div class="px-4 sm:px-6 pb-5 -mt-10 sm:-mt-12 relative">
       <div class="flex flex-wrap items-end gap-3 sm:gap-4">
@@ -344,6 +344,7 @@ async function cargar() {
     equipamientoDe(p.id).then((q) => {
       if (S.p?.id !== p.id) return;
       const t = document.getElementById('pf-titulo'); if (q.titulo && q.titulo.estilo.texto && t) { t.textContent = q.titulo.estilo.texto; t.style.cssText = estiloColor(q.titulo.estilo); t.hidden = false; }
+      const bn = document.getElementById('pf-banner'); if (q.banner && bn && !safeImg(estiloDe(p).foto)) bn.style.cssText = estiloBanner(q.banner.estilo);   // banner de la tienda (la foto propia manda sobre él)
       const c = document.getElementById('pf-clan'); if (q.color_clan && c) c.style.cssText = estiloColor(q.color_clan.estilo);
       const av = document.querySelector('#pf-clan')?.closest('div')?.parentElement?.querySelector('[data-avatar], img, span.rounded-full'); if (q.marco && av) av.style.cssText += ';' + estiloMarco(q.marco.estilo);
     });

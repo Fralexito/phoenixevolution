@@ -9,7 +9,9 @@ import { openModal, closeModal } from '../core/modal.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/economia/api.js';
 import * as rec from '../features/economia/recargas.js';
-import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin } from '../core/economia.js';
+import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin, EFECTOS_CARTA, PATRONES_BANNER } from '../core/economia.js';
+import { SONIDOS_CHAT } from '../core/sonidosChat.js';
+import { initSonidosChat } from '../features/sonidosChat.js';
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
@@ -89,6 +91,8 @@ function adminHTML() {
     <input id="ai-precio" type="number" min="0" class="field" placeholder="Precio" value="${e.precio}"><input id="ai-nivel" type="number" min="1" max="100" class="field" placeholder="Nivel mínimo" value="${e.nivelMin}"><input id="ai-stock" type="number" min="0" class="field" placeholder="Stock (vacío = ilimitado)" value="${e.stock ?? ''}">
     <input id="ai-color" class="field" placeholder="Color #RRGGBB" value="${escapeHTML(e.color ?? '')}"><input id="ai-color2" class="field" placeholder="Color 2 (opcional)" value="${escapeHTML(e.color2 ?? '')}">
     <input id="ai-texto" class="field" placeholder="Texto (títulos)" value="${escapeHTML(e.texto ?? '')}"><input id="ai-icono" class="field" placeholder="Icono fa-crown (insignias)" value="${escapeHTML(e.icono ?? '')}">
+    <select id="ai-efecto" class="field"><option value="">Efecto (efectos de carta)</option>${Object.entries(EFECTOS_CARTA).map(([k, v]) => `<option value="${k}" ${e.efecto === k ? 'selected' : ''}>${escapeHTML(typeof v === 'string' ? v : v.etiqueta)}</option>`).join('')}</select><select id="ai-patron" class="field"><option value="">Patrón (banners)</option>${Object.entries(PATRONES_BANNER).map(([k, v]) => `<option value="${k}" ${e.patron === k ? 'selected' : ''}>${escapeHTML(typeof v === 'string' ? v : v.etiqueta)}</option>`).join('')}</select>
+    <div class="col-span-2"><select id="ai-sonido" class="field w-full"><option value="">Sonido (sonidos de chat)</option>${Object.entries(SONIDOS_CHAT).map(([k, v]) => `<option value="${k}" ${e.sonido === k ? 'selected' : ''}>${escapeHTML(typeof v === 'string' ? v : v.etiqueta)}</option>`).join('')}</select></div>
     <label class="col-span-2 text-xs text-gray-300 flex items-center gap-2"><input type="checkbox" id="ai-activo" ${e.activo ? 'checked' : ''}> Visible en la tienda</label>
     <p id="ai-error" hidden class="col-span-2 text-xs text-rose-300"></p>
     <div class="col-span-2 flex gap-2"><button class="btn btn-primary !min-h-9 !px-3 !text-xs" type="submit">Guardar</button>${e.id ? '<button type="button" id="ai-nuevo" class="btn btn-ghost !min-h-9 !px-3 !text-xs">Nuevo</button>' : ''}</div></form>`;
@@ -162,6 +166,7 @@ function modalAjuste(usuario, nombre) {
 }
 
 rec.iniciar({ S, hacer, cargar, esAdmin });
+initSonidosChat();   // botones «Escuchar» de los sonidos de chat (solo suenan al pulsarlos)
 
 // ── Eventos ──────────────────────────────────────────────────────────────────────────────────────────────────
 $('ti-contenido').addEventListener('click', (ev) => {
@@ -169,8 +174,8 @@ $('ti-contenido').addEventListener('click', (ev) => {
   if (rec.click(ev)) return; // recargas: paquetes, comprobantes y revisión de pagos
   if (d.cat) { S.cat = d.cat; pintar(); }
   else if (d.comprar) { const i = S.items.find((x) => x.id === Number(d.comprar)); if (i) modalCompra(i, d.moneda === 'gemas' ? 'gemas' : 'ascuas'); }
-  else if (d.equipar) hacer(() => api.equipar(Number(d.equipar), d.valor === 'si'), d.valor === 'si' ? 'Equipado.' : 'Quitado.');
-  else if (d.editarItem) { const i = S.admItems.find((x) => x.id === Number(d.editarItem)); if (i) { S.edit = { id: i.id, clave: i.clave, nombre: i.nombre, descripcion: i.descripcion, categoria: i.categoria, precio: i.precio, nivelMin: i.nivelMin, stock: i.stock, color: i.estilo.color, color2: i.estilo.color2, texto: i.estilo.texto, icono: i.estilo.icono, activo: i.activo }; pintar(); } }
+  else if (d.equipar) hacer(() => api.equipar(Number(d.equipar), d.valor === 'si').then((r) => { import('../features/efectosCarta.js').then((m) => m.olvidarEfectosCarta()); return r; }), d.valor === 'si' ? 'Equipado.' : 'Quitado.');
+  else if (d.editarItem) { const i = S.admItems.find((x) => x.id === Number(d.editarItem)); if (i) { S.edit = { id: i.id, clave: i.clave, nombre: i.nombre, descripcion: i.descripcion, categoria: i.categoria, precio: i.precio, nivelMin: i.nivelMin, stock: i.stock, color: i.estilo.color, color2: i.estilo.color2, texto: i.estilo.texto, icono: i.estilo.icono, efecto: i.estilo.efecto, patron: i.estilo.patron, sonido: i.estilo.sonido, activo: i.activo }; pintar(); } }
   else if (b.id === 'ai-nuevo') { S.edit = null; pintar(); }
   else if (d.ajustar) modalAjuste(d.ajustar, d.ajustar === S.yo ? 'Tú' : (S.encontrados.find((u) => u.id === d.ajustar)?.nombre ?? 'esta persona'));
 });
@@ -180,7 +185,7 @@ $('ti-contenido').addEventListener('submit', async (ev) => {
   if (rec.submit(ev)) return; // recargas: métodos de pago y precios por moneda
   if (f.id === 'ti-terminos') { if (!$('ti-acepto').checked) { toast('Marca la casilla para continuar.', 'error'); return; } hacer(() => api.aceptarTerminos(), 'Términos aceptados.'); }
   else if (f.id === 'ti-item') {
-    const v = validarItemAdmin({ clave: $('ai-clave').value.trim(), nombre: $('ai-nombre').value, descripcion: $('ai-desc').value, categoria: $('ai-cat').value, precio: $('ai-precio').value, nivelMin: $('ai-nivel').value, stock: $('ai-stock').value, color: $('ai-color').value.trim(), color2: $('ai-color2').value.trim(), texto: $('ai-texto').value.trim(), icono: $('ai-icono').value.trim(), activo: $('ai-activo').checked });
+    const v = validarItemAdmin({ clave: $('ai-clave').value.trim(), nombre: $('ai-nombre').value, descripcion: $('ai-desc').value, categoria: $('ai-cat').value, precio: $('ai-precio').value, nivelMin: $('ai-nivel').value, stock: $('ai-stock').value, color: $('ai-color').value.trim(), color2: $('ai-color2').value.trim(), texto: $('ai-texto').value.trim(), icono: $('ai-icono').value.trim(), efecto: $('ai-efecto').value, patron: $('ai-patron').value, sonido: $('ai-sonido').value, activo: $('ai-activo').checked });
     const err = $('ai-error'); if (!v.ok) { err.textContent = v.error; err.hidden = false; return; } err.hidden = true;
     const id = S.edit?.id ?? null; await hacer(() => api.adminGuardarItem(v.valores, id), 'Objeto guardado (queda en la auditoría).'); if (!S.fallo) S.edit = null; pintar();
   } else if (f.dataset.regla) {

@@ -21,9 +21,9 @@ begin
   j := public.paquetes_lista();
   if jsonb_array_length(j->'paquetes') <> 4 or (j->>'bono_primera_pct')::int <> 50 then raise exception 'T5 paquetes: %', j; end if;
   select jsonb_array_length(public.tienda_lista()) into n;
-  if n <> 28 then raise exception 'T6 la tienda tiene % objetos (esperado 28)', n; end if;
+  if n <> 39 then raise exception 'T6 la tienda tiene % objetos (esperado 39: 28 de la Fase A + 11 de la Fase C)', n; end if;
   update tienda_items set limitada_hasta = now() - interval '1 hour' where clave='marco_halloween';
   select jsonb_array_length(public.tienda_lista()) into n;
-  if n <> 27 then raise exception 'T7 una edición terminada debe ocultarse: %', n; end if;
+  if n <> 38 then raise exception 'T7 una edición terminada debe ocultarse: %', n; end if;
   raise exception 'TODO_OK_REVERTIDO';
 end $$;

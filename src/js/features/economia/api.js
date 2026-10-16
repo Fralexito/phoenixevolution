@@ -1,6 +1,6 @@
 // Economía: llama a las RPC (reglas en la BD, migraciones 049-051). Esquema: pages/tienda → features/economia/api → core/economia (puro).
 import { supabase } from '../../core/supabase.js';
-import { normalizarEconomia, normalizarLista, normalizarMovimiento, normalizarRegla, normalizarPaquetes, normalizarEquipamiento, normalizarMetodos, normalizarPagoManual } from '../../core/economia.js';
+import { normalizarEconomia, normalizarLista, normalizarMovimiento, normalizarRegla, normalizarPaquetes, normalizarEquipamiento, normalizarEfectosCarta, normalizarMetodos, normalizarPagoManual } from '../../core/economia.js';
 
 // Modo demostración (SOLO en desarrollo: en la web publicada este código no existe). Se activa con ?demo en la dirección y usa datos de mentira.
 const DEMO = import.meta.env.DEV && typeof location !== 'undefined' && new URLSearchParams(location.search).has('demo');
@@ -72,6 +72,14 @@ export async function urlComprobante(ruta) {
 export async function equipamientoDe(id) {
   try { const { data } = await supabase.rpc('equipamiento_de', { p_usuario: id }); return normalizarEquipamiento(data); }
   catch (e) { console.warn('[economia] equipamiento_de:', e); return {}; }
+}
+/** Efecto de carta equipado de varias personas a la vez (adorno de las cartas): {usuario_id: efecto}; falla en silencio. Sin demo: en ?demo no hay efectos ajenos. */
+export async function efectosCartaDe(ids) {
+  try {
+    const lista = [...new Set((Array.isArray(ids) ? ids : []).filter((x) => /^[0-9a-f-]{36}$/i.test(String(x))))].slice(0, 100);
+    if (!lista.length || DEMO) return {};
+    const { data } = await supabase.rpc('efectos_carta_de', { p_usuarios: lista }); return normalizarEfectosCarta(data);
+  } catch (e) { console.warn('[economia] efectos_carta_de:', e); return {}; }
 }
 /** XP y nivel de otra persona (adorno): null si no se puede ver. */
 export async function xpDe(id) {

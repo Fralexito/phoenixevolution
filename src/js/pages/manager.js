@@ -24,7 +24,7 @@ const LINEAS = [['por', 'Porteros'], ['def', 'Defensas'], ['med', 'Mediocampo'],
 const linea = (pos) => LINEA[String(pos ?? '').toUpperCase()] ?? 'otros';
 const millones = (n) => { const v = Number(n || 0) / 1e6; return v >= 1 ? `€${v.toLocaleString('es-PE', { maximumFractionDigits: 1 })} M` : plata(n); };
 /** Tarjeta de jugador estilo carta: media grande, posición coloreada, nombre, edad y valor. */
-const carta = (j, pie = '', extra = '') => `<article class="mg-carta" data-linea="${linea(j.posicion)}">
+const carta = (j, pie = '', extra = '') => `<article class="mg-carta" data-linea="${linea(j.posicion)}"${clubes.get(j.club_id)?.dueno ? ` data-dueno-carta="${esc(clubes.get(j.club_id).dueno)}"` : ''}>
   <div class="mg-carta-top"><span class="mg-media">${j.media ?? '—'}</span><span class="mg-pos">${esc(j.posicion ?? '—')}</span></div>
   <span class="mg-foto" data-foto="${esc(j.nombre)}" data-pes="${j.pes_id ?? ''}" data-club="${esc(clubes.get(j.club_id)?.nombre ?? '')}" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
   <a class="mg-nombre" title="Ver la ficha de ${esc(j.nombre)}" href="${href(`futbolista/?id=${j.id}`)}">${esc(j.nombre)}</a>

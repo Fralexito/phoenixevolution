@@ -54,7 +54,7 @@ function pintar(movs, comp) {
   const TIPO = { compra: 'Traspaso', libre: 'Fichaje libre', liberado: 'Liberado', staff: 'Staff', juego: 'Desde el juego' };
   const nom = (id) => (id == null ? 'Agente libre' : esc(clubes.get(id)?.nombre ?? 'Club'));
   $('fb-root').innerHTML = `<div class="fb-grid">
-    <section class="fb-carta" data-linea="${LINEA[j.posicion] ?? 'otros'}">
+    <section class="fb-carta" data-linea="${LINEA[j.posicion] ?? 'otros'}"${club?.dueno ? ` data-dueno-carta="${esc(club.dueno)}"` : ''}>
       <div class="fb-carta-top"><b class="fb-media">${esc(j.media ?? '—')}</b><span class="fb-pos">${esc(j.posicion ?? '—')}</span></div>
       <div class="fb-escudo" id="fb-foto">${escudo(club, 88)}</div><p class="fb-credito" id="fb-credito" hidden></p>
       <p class="fb-carta-nombre">${esc(j.nombre)}</p>
