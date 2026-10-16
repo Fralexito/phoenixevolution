@@ -361,3 +361,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 310 (cuenta WEB, borrador): barra lateral izquierda en 4 grupos, lo más usado primero: Comunidad (Noticias · Social · Chat general) · Jugar (Duelos · En vivo · Mi club) · Competir (Galaxy League · Liga Sudario · Torneos · Ranking) · Mi cuenta (Mi muro · Mensajes · Amigos) + amigos en línea. Salen de la barra Phoenix Link, Creadores, Eventos, Jugadores y Mis partidos (siguen en el menú de arriba / Mi cuenta). BarraLateral.astro. Tests 466/0, build 48.
 
 ### Ronda 311 (cuenta WEB, borrador): las 4 ventanas de la portada ya no giran; cada una = vista en vivo + UN botón grande (Ir al muro, Ver tabla, Retar a alguien, Entrar a mi club) + atajos chicos con icono. Social suma Noticias y muestra la última noticia primero. Botón principal editable en PRINCIPAL (index.astro). Tests 466 OK, build 48 páginas.
+
+### Ronda 312 (cuenta WEB, borrador): prueba de 3 diseños en la portada: Social = mosaico de iconos, Competencia = una grande y dos chicas, Duelos y Mi Club = vista en vivo. Se cambia en VISTA (index.astro). Tests 466 OK, build 48.

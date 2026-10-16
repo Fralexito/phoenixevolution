@@ -91,3 +91,19 @@
 .vt-frente { display: flex; flex-direction: column; }
 .vt-frente .vt-acc { margin-top: auto; }
 .vt-atajos { min-height: 4.9rem; align-content: flex-start; }
+
+/* Prueba de 3 diseños (data-vista) */
+.vt-pico { display: none; }
+/* 1 · Mosaico de iconos */
+.vt-v[data-vista='mosaico'] .vt-items { display: none; }
+.vt-v[data-vista='mosaico'] .vt-acc { margin-top: 0; grid-template-columns: 1fr 1fr; flex-grow: 1; gap: .6rem; }
+.vt-v[data-vista='mosaico'] .vt-atajos { display: contents; }
+.vt-v[data-vista='mosaico'] .vt-principal, .vt-v[data-vista='mosaico'] .vt-atajos a { flex-direction: column; justify-content: center; text-align: center; gap: .45rem; min-height: 5rem; padding: .6rem; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .1); color: #fff; font-size: .8rem; letter-spacing: .08em; }
+.vt-v[data-vista='mosaico'] .vt-principal:hover, .vt-v[data-vista='mosaico'] .vt-atajos a:hover { border-color: var(--vt-c); }
+.vt-v[data-vista='mosaico'] .vt-principal i:not(.vt-pico) { display: none; }
+.vt-v[data-vista='mosaico'] .vt-pico, .vt-v[data-vista='mosaico'] .vt-atajos a i { display: block; color: var(--vt-c); font-size: 1.4rem; }
+/* 2 · Una grande y dos chicas */
+.vt-v[data-vista='grande'] .vt-items { display: none; }
+.vt-v[data-vista='grande'] .vt-acc { margin-top: 0; flex-grow: 1; grid-template-rows: 1fr auto; }
+.vt-v[data-vista='grande'] .vt-principal { align-items: flex-end; min-height: 8rem; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .1); border-left: 4px solid var(--vt-c); color: #fff; font-size: 1.5rem; padding: 1rem; }
+.vt-v[data-vista='grande'] .vt-atajos a { flex: 1; justify-content: center; padding: .65rem .5rem; }

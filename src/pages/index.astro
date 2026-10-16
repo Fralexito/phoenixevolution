@@ -86,6 +86,8 @@ const INTER = VENT && FX.ventanas3d && FX.interactivo;
 const accionesDe = (id) => MUNDOS.find((m) => m.id === id)?.acciones ?? [];
 // Ronda 311: cada ventana = vista en vivo + UN botón grande + atajos chicos (pedido de Fralex). Cambia aquí el botón principal de cada una.
 const PRINCIPAL = { social: { href: 'social/', titulo: 'Ir al muro' }, competencia: { href: 'liga/', titulo: 'Ver tabla' }, duelos: { href: 'duelos/', titulo: 'Retar a alguien' }, club: { href: 'manager/', titulo: 'Entrar a mi club' } };
+// Prueba de Fralex: un diseño distinto por ventana (mosaico · grande · vivo). Cambia aquí: 'mosaico' | 'grande' | 'vivo'.
+const VISTA = { social: 'mosaico', competencia: 'grande', duelos: 'vivo', club: 'vivo' };
 const atajosDe = (id) => accionesDe(id).filter((a) => a.href !== PRINCIPAL[id]?.href).slice(0, 3);
 const VENTANAS = [
   { id: 'social', nombre: 'Zona Social', icono: 'fa-users', href: 'social/', color: 'var(--color-galaxy-600)', vacio: { titulo: 'Sé el primero en publicar hoy', meta: 'Historias, fotos y jugadas' } },
@@ -113,7 +115,7 @@ const VENTANAS = [
       <p class="vt-sub">{INTER ? 'Esto está pasando ahora en la comunidad. Entra a lo que te interesa.' : 'Esto está pasando ahora en la comunidad.'}</p>
       <div class="vt-escena"><div class="vt-grid" data-vt-grid>
         {INTER ? VENTANAS.map((v, n) => (
-          <div class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id}>
+          <div class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id} data-vista={VISTA[v.id]}>
             <div class="vt-giro">
               <div class="vt-cara vt-frente">
                 <span class="vt-cab"><span class="vt-ico"><i class={`fa-solid ${v.icono}`}></i></span><b>{v.nombre}</b><a class="vt-ir" href={`${base}${v.href}`} aria-label={`Ir a ${v.nombre}`}><i class="fa-solid fa-arrow-right vt-flecha"></i></a></span>
@@ -126,7 +128,7 @@ const VENTANAS = [
                   ))}
                 </span>
                 <span class="vt-acc">
-                  <a class="vt-principal" href={`${base}${PRINCIPAL[v.id].href}`}><span>{PRINCIPAL[v.id].titulo}</span><i class="fa-solid fa-arrow-right"></i></a>
+                  <a class="vt-principal" href={`${base}${PRINCIPAL[v.id].href}`}><i class={`fa-solid ${v.icono} vt-pico`}></i><span>{PRINCIPAL[v.id].titulo}</span><i class="fa-solid fa-arrow-right"></i></a>
                   <span class="vt-atajos">{atajosDe(v.id).map((a) => (<a href={`${base}${a.href}`}><i class={`fa-solid ${a.icono}`}></i>{a.titulo}</a>))}</span>
                 </span>
               </div>
