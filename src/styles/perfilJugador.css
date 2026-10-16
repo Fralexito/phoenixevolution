@@ -213,3 +213,24 @@ a.mg-nombre { display: block; } a.mg-nombre:hover { color: var(--color-galaxy-40
 .fb-credito { font-size: 12px; color: #6b7280; } .fb-credito a { text-decoration: underline; }
 /* Ronda 338 · cara del juego (miniface Conmegol, fondo transparente) como 1.ª foto de la ficha */
 .fb-car-pista img.es-mini { object-fit: contain; object-position: 50% 100%; background: radial-gradient(circle at 50% 38%, rgb(var(--lc) / .28), rgb(var(--lc) / .06) 62%, rgb(8 6 24 / .9)); }
+
+/* Ronda 341 · radar «estilo FIFA» (features/radarFifa.js, FX.radarFifa) */
+.rf { border: 1px solid rgb(148 163 184 / .16); border-radius: 1rem; background: rgb(255 255 255 / .025); padding: 1rem 1.1rem 1.1rem; }
+.rf-cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+.rf-media { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; } .rf-media b { color: #fff; font-size: 1rem; margin-left: .25rem; }
+.rf-cuerpo { display: grid; gap: 1rem; align-items: center; } @media (min-width: 640px) { .rf-cuerpo { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); } }
+.rf-svg { width: 100%; max-width: 24rem; margin-inline: auto; overflow: visible; }
+.rf-borde { fill: rgb(255 255 255 / .03); stroke: rgb(255 255 255 / .28); stroke-width: 1.5; } .rf-anillo { fill: none; stroke: rgb(255 255 255 / .12); } .rf-rayo { stroke: rgb(255 255 255 / .12); }
+.rf-poly { stroke: #00e5ff; stroke-width: 2.5; stroke-linejoin: round; filter: drop-shadow(0 0 10px rgb(0 229 255 / .35)); transform-origin: 150px 150px; transform-box: view-box; }
+html[data-tema='sudario'] .rf-poly { stroke: #f5c542; filter: drop-shadow(0 0 10px rgb(245 197 66 / .35)); }
+.rf-eje { cursor: pointer; outline: none; } .rf-nom { font: 700 12px Rajdhani, sans-serif; letter-spacing: .08em; fill: #cbd5e1; } .rf-num { font: 800 20px Rajdhani, sans-serif; }
+.rf-punto { stroke: #0a0614; stroke-width: 2; transition: transform .18s cubic-bezier(.22, 1, .36, 1); transform-box: fill-box; transform-origin: center; }
+.rf-eje.on .rf-punto, .rf-eje:focus-visible .rf-punto { transform: scale(1.7); } .rf-eje.on .rf-nom { fill: #fff; }
+.rf-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.rf-fila { width: 100%; display: grid; grid-template-columns: 6.5rem 1fr 2.2rem; align-items: center; gap: .6rem; padding: .45rem .6rem; border-radius: .7rem; border: 1px solid transparent; background: rgb(255 255 255 / .03); color: #e5e7eb; font-size: 13px; text-align: left; transition: transform .16s cubic-bezier(.22, 1, .36, 1), background-color .16s; }
+.rf-fila b { font: 800 1.05rem Rajdhani, sans-serif; text-align: right; } .rf-fila-n { font-weight: 600; }
+.rf-barra { height: .45rem; border-radius: 99px; background: rgb(0 0 0 / .4); overflow: hidden; } .rf-barra i { display: block; height: 100%; border-radius: 99px; }
+.rf-fila.on { background: rgb(0 229 255 / .12); border-color: rgb(0 229 255 / .5); transform: translateX(3px); }
+html[data-tema='sudario'] .rf-fila.on { background: rgb(245 197 66 / .12); border-color: rgb(245 197 66 / .5); }
+.rf-detalle { margin-top: .7rem; font-size: 13px; line-height: 1.45; color: #cbd5e1; min-height: 2.6em; } .rf-detalle b { color: #fff; }
+@media (prefers-reduced-motion: no-preference) { .rf-poly { animation: rf-entra .7s cubic-bezier(.34, 1.56, .64, 1) both; } @keyframes rf-entra { from { transform: scale(.15); opacity: 0; } to { transform: scale(1); opacity: 1; } } }

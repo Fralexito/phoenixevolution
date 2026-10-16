@@ -24,6 +24,7 @@ import { cargarMuro } from '../features/muro/api.js';
 import { muroCompactoHTML, reproductorYT } from '../features/muro/render.js';
 import { href } from '../core/config.js';
 import { hayMovimientoReducido } from '../features/ajustes.js';
+import { radarFifaHTML, montarRadarFifa } from '../features/radarFifa.js';
 
 const $ = (id) => document.getElementById(id);
 const COLOR = { G: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40', E: 'bg-amber-500/20 text-amber-300 border-amber-400/40', P: 'bg-rose-500/20 text-rose-300 border-rose-400/40' };
@@ -377,6 +378,7 @@ function render2(p, filasHistorial, campanas, enCurso, cc) {
         <dl class="pj-ficha">${ficha}</dl>
         ${p.descripcion ? `<p class="pj-desc">${escapeHTML(p.descripcion)}</p>` : ''}
       </header>
+      ${FX.radarFifa ? radarFifaHTML(p) : ''}
       ${FX.perfilJugadorVivo ? scoutingHTML(p, ultForma) : ''}
       <div class="pj-barra">
         <div class="pilar-tabs-lista pj-tabs" role="tablist" aria-label="Secciones del perfil">${PESTANAS.map(([id, ic, n]) => `<button type="button" role="tab" id="pj-tab-${id}" aria-controls="pj-${id}" aria-selected="${id === inicial}" data-pj-tab="${id}"><i class="fa-solid ${ic}"></i>${n}</button>`).join('')}</div>
@@ -418,6 +420,7 @@ function render2(p, filasHistorial, campanas, enCurso, cc) {
   document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target)) menu.open = false; });
   mostrarEditar();
   if (FX.perfilJugadorVivo) animarScout(document.querySelector('.pj-scout'));
+  if (FX.radarFifa) montarRadarFifa($('perfil-contenido'), p);
 }
 
 function mostrarEditar() {
