@@ -531,26 +531,24 @@ const VENTANAS = [
 
     <!-- 5. HIGHLIGHTS (oculto mientras sean clips de ejemplo: FX.highlightsDemo) -->
     {FX.highlightsDemo && <>    <Plegable titulo="Highlights de la jornada" icono="fa-video" resumen="Mejores goles y clips · toca para ver" id="highlights" clase="scroll-mt-40">
-      <p class="mb-3 text-right"><a href="https://youtube.com" target="_blank" rel="noopener" class="text-galaxy-400 hover:text-white text-xs font-display font-bold tracking-wider uppercase inline-flex items-center gap-1.5"><i class="fa-brands fa-youtube"></i> Ver canal</a></p>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-        <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden relative aspect-video w-full flex items-center justify-center group shadow-[0_0_35px_rgba(128,0,255,0.25)]">
-          <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400&auto=format&fit=crop" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" />
-          <div class="absolute inset-0 bg-gradient-to-t from-galaxy-dark via-galaxy-dark/40 to-transparent"></div>
-          <div class="relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-galaxy-600/90 border border-galaxy-400/80 flex items-center justify-center shadow-[0_0_30px_rgba(128,0,255,0.8)] group-hover:scale-110 transition-all duration-300"><i class="fa-solid fa-play text-white text-xl sm:text-2xl pl-1"></i></div>
-          <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 z-10 text-left">
-            <span class="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-[12px] uppercase tracking-wider inline-block mb-1">TOP 5</span>
-            <h3 class="text-xl sm:text-3xl font-display font-bold text-white uppercase tracking-wide text-shadow-glow">Mejores goles: Jornada 3</h3>
-            <p class="text-xs text-gray-300 mt-0.5">Resumen oficial · Galaxy League PES</p>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6" data-highlights>
+        <div class="lg:col-span-2">
+          <div class="hl-visor glass-panel rounded-2xl overflow-hidden relative aspect-video w-full" id="hl-visor">
+            <button type="button" class="hl-poster" data-hl-play aria-label={`Reproducir: ${DEMO_CLIPS[0].titulo}`}>
+              <img src={`https://i.ytimg.com/vi/${DEMO_CLIPS[0].id}/hqdefault.jpg`} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover" id="hl-img" />
+              <span class="hl-play"><i class="fa-solid fa-play"></i></span>
+            </button>
           </div>
+          <div class="mt-3"><span class="clip-tag" id="hl-tag">{DEMO_CLIPS[0].tag}</span><h3 class="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wide" id="hl-titulo">{DEMO_CLIPS[0].titulo}</h3><p class="text-xs text-gray-400 mt-0.5" id="hl-canal">{DEMO_CLIPS[0].canal} · YouTube</p></div>
         </div>
         <div class="space-y-2.5">
           <h3 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Más clips</h3>
-          {DEMO_CLIPS.map((c) => (
-            <a href="https://youtube.com" target="_blank" rel="noopener" class="clip-row group/clip">
-              <span class="clip-thumb"><i class="fa-solid fa-play"></i></span>
+          {DEMO_CLIPS.map((c, i) => (
+            <button type="button" class="clip-row group/clip w-full text-left" data-hl-id={c.id} data-hl-tag={c.tag} data-hl-titulo={c.titulo} data-hl-canal={c.canal} aria-pressed={i === 0 ? 'true' : 'false'}>
+              <span class="clip-thumb"><img src={`https://i.ytimg.com/vi/${c.id}/default.jpg`} alt="" loading="lazy" class="w-full h-full object-cover rounded" /></span>
               <span class="min-w-0 flex-1"><b class="clip-tag">{c.tag}</b><span class="block text-sm text-white font-semibold leading-snug truncate">{c.titulo}</span></span>
-              <span class="text-[12px] text-gray-400 font-display tabular-nums shrink-0">{c.dur}</span>
-            </a>
+              <span class="text-[12px] text-gray-400 font-display shrink-0">{c.canal}</span>
+            </button>
           ))}
         </div>
       </div>
@@ -584,6 +582,7 @@ const VENTANAS = [
 </Layout>
 <script>
   import '../js/pages/central.js';
+  import '../js/features/highlights.js';
   import { montarMundos } from '../js/features/mundos.js';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();

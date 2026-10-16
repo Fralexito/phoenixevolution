@@ -16,9 +16,10 @@ export const DEMO_XI = [
   { pos: 'ED', nombre: 'ARENS', cls: 'bg-cyan-500 text-white' },
   { pos: 'MCD', nombre: 'ROBERTO', cls: 'bg-yellow-500 text-black' },
 ];
-// Clips de ejemplo para «Highlights» (se reemplazarán por los videos reales del canal).
+// Highlights (ronda 307): videos REALES de YouTube de PES 2021 como MODELO del tipo de clip que se pondrá (goles y jugadas de ligas online).
+// Para cambiarlos, pon el id de YouTube (lo que va después de watch?v=). El primero es el grande; el resto, la lista.
 export const DEMO_CLIPS = [
-  { tag: 'TOP 5', titulo: 'Mejores atajadas: Jornada 3', dur: '4:12' },
-  { tag: 'RESUMEN', titulo: 'Fralex 3-2 Axel: el partidazo', dur: '6:40' },
-  { tag: 'TOP 5', titulo: 'Mejores goles: Jornada 2', dur: '3:55' },
+  { id: 'd9815MC-efg', tag: 'TOP GOLES', titulo: 'Mejores goles de la temporada', canal: 'Terry F.C.' },
+  { id: '9fLuppybBQE', tag: 'JUGADAS', titulo: 'Goles y skills · Compilación #1', canal: 'MJ7' },
+  { id: 'Bi-8fdt5bg8', tag: 'JUGADAS', titulo: 'Goles y skills · Compilación #2', canal: 'PES LEGEND' },
 ];

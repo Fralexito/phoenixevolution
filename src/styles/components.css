@@ -1007,3 +1007,7 @@ html[data-sesion='si'] .solo-invitado, html:not([data-sesion='si']) .solo-cuenta
 .pulso-linea b { color: var(--color-galaxy-400); font-family: var(--font-display); font-size: .95rem; }
 /* Ronda 293 · división de la liga al lado del nombre (Liga Sudario = 2da división) */
 .liga-division { display: inline-block; vertical-align: middle; margin-left: .4em; padding: .3em .75em; border-radius: 999px; font: 800 max(12px, .26em) var(--font-display); letter-spacing: .14em; line-height: 1; text-transform: uppercase; color: #fde68a; text-shadow: none; background: linear-gradient(90deg, rgb(245 197 66 / .16), rgb(96 165 250 / .14)); border: 1px solid rgb(245 197 66 / .45); white-space: nowrap; position: relative; top: -.12em; }
+.hl-poster { position: absolute; inset: 0; width: 100%; display: grid; place-items: center; border: 0; padding: 0; cursor: pointer; background: #000; }
+.hl-play { position: relative; z-index: 1; width: 4.5rem; height: 4.5rem; border-radius: 999px; display: grid; place-items: center; background: var(--color-galaxy-600); border: 2px solid var(--color-galaxy-400); color: #fff; font-size: 1.4rem; transition: transform .18s cubic-bezier(.22,1,.36,1); }
+.hl-poster:hover .hl-play { transform: scale(1.08); }
+.clip-row[aria-pressed='true'] { border-color: var(--color-galaxy-400); background: rgb(0 229 255 / .08); }
