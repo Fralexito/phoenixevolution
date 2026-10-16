@@ -1011,3 +1011,6 @@ html[data-sesion='si'] .solo-invitado, html:not([data-sesion='si']) .solo-cuenta
 .hl-play { position: relative; z-index: 1; width: 4.5rem; height: 4.5rem; border-radius: 999px; display: grid; place-items: center; background: var(--color-galaxy-600); border: 2px solid var(--color-galaxy-400); color: #fff; font-size: 1.4rem; transition: transform .18s cubic-bezier(.22,1,.36,1); }
 .hl-poster:hover .hl-play { transform: scale(1.08); }
 .clip-row[aria-pressed='true'] { border-color: var(--color-galaxy-400); background: rgb(0 229 255 / .08); }
+/* Menú con pocos botones (Competiciones: 3 grupos): panel angosto de una columna, sin hueco vacío a la derecha */
+.pilar-panel-chico { width: min(23rem, 90vw); }
+.pilar-panel-chico .pilar-grid { grid-template-columns: 1fr; }

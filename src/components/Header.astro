@@ -25,7 +25,7 @@ const pilarActual = pilarDe(active)?.id;
           ? <a href={`${base}${p.items[0].path}`} class="nav-link" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}</a>
           : <div class="pilar" data-pilar={p.id}>
               <button type="button" class="nav-link pilar-btn" aria-expanded="false" aria-haspopup="true" aria-current={pilarActual === p.id ? 'page' : undefined}><i class={`fa-solid ${p.icon} text-[.8em] mr-1.5 opacity-70`}></i>{p.label}<i class="fa-solid fa-chevron-down text-[.6em] ml-1.5 opacity-60 pilar-flecha"></i></button>
-              <div class="pilar-panel" role="menu">
+              <div class={`pilar-panel${p.bloques?.some((b) => b.compacto) ? ' pilar-panel-chico' : ''}`} role="menu">
                 <p class="pilar-lema"><i class={`fa-solid ${p.icon}`}></i> {p.lema}</p>
                 {(p.bloques ?? [{ titulo: '', items: p.items }]).map((b) => (<Fragment>
                 {b.titulo && !b.compacto && <p class="pilar-bloque">{b.titulo}</p>}

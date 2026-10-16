@@ -355,3 +355,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 307 (cuenta WEB, borrador): vuelven los Highlights en la portada (FX.highlightsDemo=true) con 3 videos REALES de YouTube de PES 2021 como modelo (Terry F.C., MJ7, PES LEGEND; ids comprobados con oEmbed). Visor grande + lista; el video carga solo al tocar (youtube-nocookie). Datos en data/demo.js (DEMO_CLIPS, solo cambiar ids), lógica features/highlights.js. Tests 466/0, build 48.
 
 ### Ronda 308 (cuenta WEB, borrador): el desplegable del menú ya no se sale de la pantalla por la izquierda en ventanas angostas: pilares.js lo corre hacia adentro lo justo (variable --desp, margen 8 px) al abrir y al cambiar el tamaño. components.css. Tests 466/0, build 48.
+
+### Ronda 309 (cuenta WEB, borrador): el desplegable de Competiciones (3 grupos) ya no deja hueco a la derecha: panel angosto de 1 columna (clase pilar-panel-chico en Header + components.css). Tests 466/0, build 48.
