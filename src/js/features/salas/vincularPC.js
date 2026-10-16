@@ -27,7 +27,7 @@ export function montarVincularPC(caja, { esHost, pasos = false }) {
         <div data-vpc-codigo hidden class="rounded-lg border border-galaxy-400/40 bg-galaxy-600/10 p-3 text-center mt-3"></div>
         <ul class="mt-2">${pcs.map((d) => `<li class="flex flex-wrap items-center gap-2 py-2 border-b border-galaxy-border/40">
           <span class="flex-1 min-w-0"><b class="text-white">${escapeHTML(d.nombre)}</b>
-            <span class="text-[11px] text-gray-400 block">v${escapeHTML(d.version_app ?? '?')} · último uso ${fecha(d.ultimo_uso)}${d.suspendido ? ' · <b class="text-rose-300">suspendida por el staff</b>' : ''}</span></span>
+            <span class="text-[12px] text-gray-400 block">v${escapeHTML(d.version_app ?? '?')} · último uso ${fecha(d.ultimo_uso)}${d.suspendido ? ' · <b class="text-rose-300">suspendida por el staff</b>' : ''}</span></span>
           ${btn(`data-vpc="renombrar" data-id="${d.id}" data-nombre="${escapeHTML(d.nombre)}" aria-label="Renombrar"`, '<i class="fa-solid fa-pen"></i>')}
           ${btn(`data-vpc="revocar" data-id="${d.id}"`, '<i class="fa-solid fa-trash"></i> Desvincular')}</li>`).join('') || '<li class="text-xs text-gray-400 py-2">Aún no vinculaste ninguna PC.</li>'}</ul>`;
     } catch (e) { caja.textContent = e.message; }
@@ -53,7 +53,7 @@ export function montarVincularPC(caja, { esHost, pasos = false }) {
     const pinta = () => {
       const s = segundosRestantes(expira);
       c.innerHTML = s ? `<p class="text-xs text-gray-300">${titulo}</p><p class="font-display font-extrabold text-3xl text-white tracking-[.3em] my-1">${escapeHTML(codigo)}</p>
-        <p class="text-[11px] text-gray-400">${ayuda} · vence en ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}</p>` : '<p class="text-xs text-gray-400">El código venció. Genera otro.</p>';
+        <p class="text-[12px] text-gray-400">${ayuda} · vence en ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}</p>` : '<p class="text-xs text-gray-400">El código venció. Genera otro.</p>';
       if (!s) clearInterval(reloj);
     };
     pinta(); reloj = setInterval(pinta, 1000);

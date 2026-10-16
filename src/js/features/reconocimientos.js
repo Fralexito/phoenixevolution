@@ -68,7 +68,7 @@ export function montarReconocimientos(el, jugadores, edicion) {
         <span class="flex-1 min-w-0 flex flex-wrap gap-1.5 ${abierto ? 'invisible' : ''}">${TARJETAS.map((t) => pastilla(t, r[t.k])).join('')}${pVoto}</span>
         <i class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-300 ${abierto ? 'rotate-180' : ''}"></i>
       </button>
-      ${FX.premios ? `<a href="${href('premios/')}" class="flex items-center justify-end gap-1.5 px-3 pb-2 -mt-1 text-[12px] font-semibold text-galaxy-400 hover:text-white">Ver todos los premios<i class="fa-solid fa-arrow-right text-[11px]"></i></a>` : ''}
+      ${FX.premios ? `<a href="${href('premios/')}" class="flex items-center justify-end gap-1.5 px-3 pb-2 -mt-1 text-[12px] font-semibold text-galaxy-400 hover:text-white">Ver todos los premios<i class="fa-solid fa-arrow-right text-[12px]"></i></a>` : ''}
       <div ${abierto ? '' : 'hidden'} class="p-3 pt-1"><div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">${TARJETAS.map((t) => tarjeta(t, r[t.k])).join('')}${panelVoto(jugadores, votos, sesion)}</div></div>
     </div>`;
   };

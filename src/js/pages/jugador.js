@@ -380,7 +380,7 @@ function render2(p, filasHistorial, campanas, enCurso, cc) {
       ${FX.perfilJugadorVivo ? scoutingHTML(p, ultForma) : ''}
       <div class="pj-barra">
         <div class="pilar-tabs-lista pj-tabs" role="tablist" aria-label="Secciones del perfil">${PESTANAS.map(([id, ic, n]) => `<button type="button" role="tab" id="pj-tab-${id}" aria-controls="pj-${id}" aria-selected="${id === inicial}" data-pj-tab="${id}"><i class="fa-solid ${ic}"></i>${n}</button>`).join('')}</div>
-        <details class="pj-editar" id="pj-editar-menu" hidden><summary class="btn btn-ghost"><i class="fa-solid fa-pen"></i> Editar <i class="fa-solid fa-chevron-down text-[11px]"></i></summary>
+        <details class="pj-editar" id="pj-editar-menu" hidden><summary class="btn btn-ghost"><i class="fa-solid fa-pen"></i> Editar <i class="fa-solid fa-chevron-down text-[12px]"></i></summary>
           <div class="pj-editar-lista" role="menu">
             <button type="button" id="perfil-editar" role="menuitem"><i class="fa-solid fa-id-card"></i>Ficha y stats</button>
             <button type="button" id="perfil-editar-bio" role="menuitem"><i class="fa-solid fa-book-open"></i>Biografía y redes</button>

@@ -6,7 +6,7 @@ import { escapeHTML } from '../../core/dom.js';
 import * as staff from './staff.js';
 import { supabase } from '../../core/supabase.js';
 
-const btn = (attrs, html, extra = '') => `<button type="button" class="btn !min-h-8 !px-2.5 !text-[11px] ${extra}" ${attrs}>${html}</button>`;
+const btn = (attrs, html, extra = '') => `<button type="button" class="btn !min-h-8 !px-2.5 !text-[12px] ${extra}" ${attrs}>${html}</button>`;
 const nombre = (p) => escapeHTML(p?.nombre_display || p?.username || 'Jugador');
 
 export function montarPanelHosts(caja) {
@@ -20,7 +20,7 @@ export function montarPanelHosts(caja) {
       caja.querySelector('[data-hp-lista]').innerHTML = lista.map((h) => `<article class="bg-galaxy-panel rounded-xl border border-galaxy-border p-3 space-y-2">
         <div class="flex items-center gap-2"><b class="text-white flex-1 min-w-0 truncate">${nombre(h)}</b>
           ${h.host_aprobado ? btn(`data-hp="quitar" data-id="${h.id}"`, '<i class="fa-solid fa-ban"></i> Quitar host') : btn(`data-hp="aprobar" data-id="${h.id}"`, '<i class="fa-solid fa-check"></i> Aprobar host', 'btn-primary')}</div>
-        <p class="text-[11px] text-gray-400">${h.puede_hostear ? '«Puedo ser host» activado' : '«Puedo ser host» apagado'} · ${pcsDe(h.id).length} PC(s)</p>
+        <p class="text-[12px] text-gray-400">${h.puede_hostear ? '«Puedo ser host» activado' : '«Puedo ser host» apagado'} · ${pcsDe(h.id).length} PC(s)</p>
         ${pcsDe(h.id).map((d) => `<div class="flex flex-wrap items-center gap-2 text-xs border-t border-galaxy-border/40 pt-2">
           <span class="flex-1 min-w-0">${escapeHTML(d.nombre)} <span class="text-gray-500">v${escapeHTML(d.version_app ?? '?')}</span>${d.suspendido ? ` <b class="text-rose-300">suspendida</b>${d.motivo_suspension ? ` · ${escapeHTML(d.motivo_suspension)}` : ''}` : ''}</span>
           ${btn(`data-hp="${d.suspendido ? 'reactivar' : 'suspender'}" data-id="${d.id}"`, d.suspendido ? 'Reactivar' : 'Suspender')}

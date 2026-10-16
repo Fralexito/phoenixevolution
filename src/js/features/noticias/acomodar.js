@@ -55,16 +55,16 @@ export async function entrarAcomodar({ grid, panel, items, alSalir }) {
       <div class="flex items-center gap-2 mb-3">
         <button type="button" data-a="deshacer" class="btn btn-ghost !min-h-8 !text-xs" ${pos ? '' : 'disabled'} title="Deshacer (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
         <button type="button" data-a="rehacer" class="btn btn-ghost !min-h-8 !text-xs" ${pos < historial.length - 1 ? '' : 'disabled'} title="Rehacer (Ctrl+Y)"><i class="fa-solid fa-rotate-right"></i></button>
-        <span class="ml-auto text-[11px] uppercase tracking-wider font-bold ${diag.some((d) => d.nivel === 'mal') ? 'text-rose-300' : diag.length ? 'text-amber-200' : 'text-emerald-300'}">${nota}</span>
+        <span class="ml-auto text-[12px] uppercase tracking-wider font-bold ${diag.some((d) => d.nivel === 'mal') ? 'text-rose-300' : diag.length ? 'text-amber-200' : 'text-emerald-300'}">${nota}</span>
       </div>
       <p class="nt-asis-tit">Corrector</p>
-      ${diag.length ? `<ul class="space-y-2 mb-2">${diag.map((d, i) => `<li class="flex gap-2 items-start text-[12px] text-gray-300"><i class="fa-solid ${ICONO[d.nivel]} mt-0.5"></i><span class="flex-1">${esc(d.texto)}</span>${d.arreglo ? `<button type="button" data-fix="${i}" class="btn !min-h-7 !text-[11px] !px-2 shrink-0">Arreglar</button>` : ''}</li>`).join('')}</ul>
+      ${diag.length ? `<ul class="space-y-2 mb-2">${diag.map((d, i) => `<li class="flex gap-2 items-start text-[12px] text-gray-300"><i class="fa-solid ${ICONO[d.nivel]} mt-0.5"></i><span class="flex-1">${esc(d.texto)}</span>${d.arreglo ? `<button type="button" data-fix="${i}" class="btn !min-h-7 !text-[12px] !px-2 shrink-0">Arreglar</button>` : ''}</li>`).join('')}</ul>
         ${diag.filter((d) => d.arreglo).length > 1 ? '<button type="button" data-a="todo" class="btn btn-primary !min-h-8 !text-xs w-full mb-3"><i class="fa-solid fa-wand-magic-sparkles"></i> Arreglar todo</button>' : ''}`
         : '<p class="text-[12px] text-emerald-200/80 mb-3">Sin huecos, sin cortes y con jerarquía clara.</p>'}
       <p class="nt-asis-tit">Propuestas de acomodo</p>
       <div class="grid grid-cols-2 gap-2">${PROPUESTAS.map((p) => `<button type="button" data-prop="${p.id}" class="nt-prop" title="${esc(p.desc)}">${mini(p.armar(imp), info)}<span><i class="fa-solid ${p.icono}"></i> ${esc(p.nombre)}</span></button>`).join('')}</div>
       <button type="button" data-a="sorpresa" class="btn btn-ghost !min-h-8 !text-xs w-full mt-2"><i class="fa-solid fa-dice"></i> Sorpréndeme</button>
-      <p class="text-[11px] text-gray-500 mt-3">La primera noticia (arriba a la izquierda) es la que se toma como principal. Las propuestas respetan ese orden.</p>`;
+      <p class="text-[12px] text-gray-500 mt-3">La primera noticia (arriba a la izquierda) es la que se toma como principal. Las propuestas respetan ese orden.</p>`;
     panel._diag = diag;
   }
 

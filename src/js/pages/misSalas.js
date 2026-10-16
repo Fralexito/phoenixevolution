@@ -18,7 +18,7 @@ async function pintarParsec() {
     const p = await api.miParsec();
     $('ms-parsec').innerHTML = p
       ? `<p>ID <b class="text-white">${escapeHTML(p.parsec_id)}</b>${p.nombre_parsec ? ` · ${escapeHTML(p.nombre_parsec)}` : ''}
-           <span class="ml-2 text-[11px] font-bold ${p.estado === 'verificada' ? 'text-emerald-300' : 'text-amber-300'}">${p.estado === 'verificada' ? '✔ Verificada' : 'Declarada (se verifica al entrar a una sala de reto)'}</span></p>
+           <span class="ml-2 text-[12px] font-bold ${p.estado === 'verificada' ? 'text-emerald-300' : 'text-amber-300'}">${p.estado === 'verificada' ? '✔ Verificada' : 'Declarada (se verifica al entrar a una sala de reto)'}</span></p>
          <div class="mt-2">${btn('data-acc="parsec-quitar"', '<i class="fa-solid fa-link-slash"></i> Desvincular')}</div>`
       : `<p class="text-xs text-gray-400">Así el host te reconoce y te reserva tu mando. Tu ID está en Parsec → Ajustes → Cuenta.</p>
          <form id="f-parsec" class="flex flex-wrap gap-2 mt-2">
@@ -45,7 +45,7 @@ async function pintarSalas() {
       const mira = (esp ?? []).filter((e) => e.sala_id === s.id);
       return `<article class="rounded-lg border border-galaxy-border p-3">
         <p class="text-white font-bold">${escapeHTML([s.juego, s.parche && `(${s.parche})`].filter(Boolean).join(' ') || 'Sala')}
-          <span class="text-[11px] text-galaxy-400 ml-1">${escapeHTML(SALUD_TXT[saludSala(s)] ?? s.estado)} · ${escapeHTML(s.visibilidad)}</span></p>
+          <span class="text-[12px] text-galaxy-400 ml-1">${escapeHTML(SALUD_TXT[saludSala(s)] ?? s.estado)} · ${escapeHTML(s.visibilidad)}</span></p>
         <p class="text-xs mt-1">Rival: <b class="text-white">${s.rival ? escapeHTML(nom(s.rival)) : 'esperando (sale en el radar si es pública o de amigos)'}</b></p>
         <p class="text-xs">Espectadores: ${s.acepta_espectadores ? `${mira.length}/${s.limite_espectadores}${mira.length ? ' · ' + mira.map((e) => escapeHTML(nom(e.usuario))).join(', ') : ''}` : 'no admite'}</p>
       </article>`;

@@ -84,7 +84,7 @@ async function pintarPlanteles(ids) {
 const fila = (j, acciones) => `<tr class="border-t border-galaxy-border/60"><td class="py-2 pr-2 text-galaxy-400 font-bold">${esc(j.posicion ?? '—')}</td><td class="pr-2 text-white">${esc(j.nombre)}</td>
   <td class="pr-2 text-center">${j.media ?? '—'}</td><td class="pr-2 text-center hidden sm:table-cell">${j.edad ?? '—'}</td><td class="pr-2 hidden md:table-cell text-gray-400">${acciones.club ?? ''}</td>
   <td class="pr-2 text-right">${plata(j.valor)}</td><td class="text-right">${acciones.btn}</td></tr>`;
-const tabla = (filas, conClub = false) => `<div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[11px] text-gray-500 uppercase tracking-wider"><tr><th class="text-left">Pos</th><th class="text-left">Jugador</th><th>Media</th><th class="hidden sm:table-cell">Edad</th><th class="hidden md:table-cell text-left">${conClub ? 'Club' : ''}</th><th class="text-right">Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table></div>`;
+const tabla = (filas, conClub = false) => `<div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[12px] text-gray-500 uppercase tracking-wider"><tr><th class="text-left">Pos</th><th class="text-left">Jugador</th><th>Media</th><th class="hidden sm:table-cell">Edad</th><th class="hidden md:table-cell text-left">${conClub ? 'Club' : ''}</th><th class="text-right">Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table></div>`;
 
 async function pintarPlantilla() {
   const { data, error } = await supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor').eq('club_id', club.id).order('media', { ascending: false });
@@ -158,7 +158,7 @@ async function pintarMercado() {
   $('mg-mercado').innerHTML = !lista.length ? vacio('fa-magnifying-glass', 'Sin resultados', 'Prueba con otro nombre o posición.')
     : `<div class="mg-grid">${lista.map((j) => { const vend = clubes.get(j.club_id); const directo = !vend || !vend.dueno;
       const origen = `<p class="mg-club-chip">${vend ? `${escudo(vend, 'w-4 h-4')} <span>${esc(vend.nombre)}</span>` : '<i class="fa-solid fa-unlock text-emerald-300"></i> <span>Agente libre</span>'}</p>${dtHTML(vend)}`;
-      return carta(j, `<button type="button" class="btn ${directo ? 'btn-primary' : ''} !min-h-8 !text-[11px] w-full" data-ofertar="${j.id}" data-valor="${j.valor}" data-directo="${directo ? 1 : 0}" data-nombre="${esc(j.nombre)}" ${cfg.ventana_abierta ? '' : 'disabled'}>${directo ? '<i class="fa-solid fa-signature"></i> Fichar' : '<i class="fa-solid fa-hand-holding-dollar"></i> Ofertar'}</button>`, origen); }).join('')}</div>`;
+      return carta(j, `<button type="button" class="btn ${directo ? 'btn-primary' : ''} !min-h-8 !text-[12px] w-full" data-ofertar="${j.id}" data-valor="${j.valor}" data-directo="${directo ? 1 : 0}" data-nombre="${esc(j.nombre)}" ${cfg.ventana_abierta ? '' : 'disabled'}>${directo ? '<i class="fa-solid fa-signature"></i> Fichar' : '<i class="fa-solid fa-hand-holding-dollar"></i> Ofertar'}</button>`, origen); }).join('')}</div>`;
   montarFotos($('mg-mercado'));
 }
 
@@ -171,13 +171,13 @@ async function pintarOficina() {
   const item = (o, btns) => `<div class="mg-oferta" data-estado="${esc(o.estado)}"><div class="flex items-start gap-3">
       <span class="mg-oferta-ic"><i class="fa-solid ${o.club_vendedor === club.id ? 'fa-arrow-down' : 'fa-arrow-up'}"></i></span>
       <div class="flex-1 min-w-0"><p class="text-white font-bold truncate">${nj(o.jugador_id)}</p>
-        <p class="text-[11px] text-gray-400">${o.club_vendedor === club.id ? 'Oferta de ' + nomClub(o.club_comprador) : 'Para ' + nomClub(o.club_vendedor)} · ${esc(haceCuanto(o.created_at) ?? '')}</p>
-        ${o.mensaje ? `<p class="text-[11px] text-gray-300 italic mt-1">«${esc(o.mensaje)}»</p>` : ''}</div>
+        <p class="text-[12px] text-gray-400">${o.club_vendedor === club.id ? 'Oferta de ' + nomClub(o.club_comprador) : 'Para ' + nomClub(o.club_vendedor)} · ${esc(haceCuanto(o.created_at) ?? '')}</p>
+        ${o.mensaje ? `<p class="text-[12px] text-gray-300 italic mt-1">«${esc(o.mensaje)}»</p>` : ''}</div>
       <div class="text-right"><p class="mg-monto">${millones(o.monto)}</p><span class="mg-estado">${esc(o.estado)}</span></div></div>
       ${btns ? `<div class="flex gap-2 mt-2 justify-end">${btns}</div>` : ''}</div>`;
   const rec = data.filter((o) => o.club_vendedor === club.id); const env = data.filter((o) => o.club_comprador === club.id);
-  $('mg-recibidas').innerHTML = rec.length ? rec.map((o) => item(o, o.estado === 'pendiente' ? `<button type="button" class="btn btn-primary !min-h-7 !text-[11px]" data-responder="${o.id}" data-si="1">Aceptar</button><button type="button" class="btn !min-h-7 !text-[11px]" data-responder="${o.id}" data-si="0">Rechazar</button>` : '')).join('') : vacio('fa-inbox', 'Sin ofertas recibidas', 'Cuando otro DT quiera a tus jugadores, aparecerá aquí.');
-  $('mg-enviadas').innerHTML = env.length ? env.map((o) => item(o, o.estado === 'pendiente' ? `<button type="button" class="btn !min-h-7 !text-[11px]" data-cancelar="${o.id}">Cancelar</button>` : '')).join('') : vacio('fa-paper-plane', 'Sin ofertas enviadas', 'Busca jugadores de otros DT en el Mercado.');
+  $('mg-recibidas').innerHTML = rec.length ? rec.map((o) => item(o, o.estado === 'pendiente' ? `<button type="button" class="btn btn-primary !min-h-7 !text-[12px]" data-responder="${o.id}" data-si="1">Aceptar</button><button type="button" class="btn !min-h-7 !text-[12px]" data-responder="${o.id}" data-si="0">Rechazar</button>` : '')).join('') : vacio('fa-inbox', 'Sin ofertas recibidas', 'Cuando otro DT quiera a tus jugadores, aparecerá aquí.');
+  $('mg-enviadas').innerHTML = env.length ? env.map((o) => item(o, o.estado === 'pendiente' ? `<button type="button" class="btn !min-h-7 !text-[12px]" data-cancelar="${o.id}">Cancelar</button>` : '')).join('') : vacio('fa-paper-plane', 'Sin ofertas enviadas', 'Busca jugadores de otros DT en el Mercado.');
 }
 
 async function pintarMovimientos() {
@@ -191,9 +191,9 @@ async function pintarMovimientos() {
   $('mg-movs').innerHTML = !data.length ? vacio('fa-right-left', 'Aún no hubo fichajes', 'El primer movimiento de la ventana aparecerá aquí.')
     : `<ol class="mg-timeline">${data.map((m) => { const [ic, t] = TIPO[m.tipo] ?? TIPO.staff; return `<li>
         <span class="mg-tl-ic"><i class="fa-solid ${ic}"></i></span>
-        <div class="flex-1 min-w-0"><p><b class="text-white">${nj(m.jugador_id)}</b> <span class="text-[11px] text-gray-500 uppercase tracking-wider ml-1">${t}</span></p>
-          <p class="text-xs text-gray-400">${nomClub(m.de_club)} <i class="fa-solid fa-arrow-right text-[10px] mx-1 text-galaxy-400"></i> <span class="text-gray-200">${nomClub(m.a_club)}</span></p></div>
-        <div class="text-right shrink-0">${m.revertido_en ? '<p class="text-[12px] text-amber-300"><i class="fa-solid fa-rotate-left"></i> Revertido</p>' : staff && m.tipo !== 'staff' ? `<button type="button" class="mg-mini !static !opacity-100" data-revertir="${m.id}" title="Revertir este movimiento (staff)"><i class="fa-solid fa-rotate-left"></i></button>` : ''}${m.monto ? `<p class="mg-monto">${millones(m.monto)}</p>` : ''}<p class="text-[11px] text-gray-500">${m.aplicado_en ? '<i class="fa-solid fa-gamepad text-emerald-400" title="Ya está en el juego"></i>' : '<i class="fa-regular fa-clock" title="Llega al juego al cerrar la ventana"></i>'} ${esc(haceCuanto(m.created_at) ?? '')}</p></div></li>`; }).join('')}</ol>`;
+        <div class="flex-1 min-w-0"><p><b class="text-white">${nj(m.jugador_id)}</b> <span class="text-[12px] text-gray-500 uppercase tracking-wider ml-1">${t}</span></p>
+          <p class="text-xs text-gray-400">${nomClub(m.de_club)} <i class="fa-solid fa-arrow-right text-[12px] mx-1 text-galaxy-400"></i> <span class="text-gray-200">${nomClub(m.a_club)}</span></p></div>
+        <div class="text-right shrink-0">${m.revertido_en ? '<p class="text-[12px] text-amber-300"><i class="fa-solid fa-rotate-left"></i> Revertido</p>' : staff && m.tipo !== 'staff' ? `<button type="button" class="mg-mini !static !opacity-100" data-revertir="${m.id}" title="Revertir este movimiento (staff)"><i class="fa-solid fa-rotate-left"></i></button>` : ''}${m.monto ? `<p class="mg-monto">${millones(m.monto)}</p>` : ''}<p class="text-[12px] text-gray-500">${m.aplicado_en ? '<i class="fa-solid fa-gamepad text-emerald-400" title="Ya está en el juego"></i>' : '<i class="fa-regular fa-clock" title="Llega al juego al cerrar la ventana"></i>'} ${esc(haceCuanto(m.created_at) ?? '')}</p></div></li>`; }).join('')}</ol>`;
 }
 
 // ── Staff: centro de control (autoguardado) ──

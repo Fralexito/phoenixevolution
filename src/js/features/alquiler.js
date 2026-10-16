@@ -18,8 +18,8 @@ function hostHTML(h) {
   return `<article class="rounded-xl border border-galaxy-border p-3 space-y-2">
     <div class="flex items-center gap-2">${safeUrl(h.avatar_url) ? `<img src="${escapeHTML(h.avatar_url)}" alt="" class="w-9 h-9 rounded-full object-cover">` : '<span class="w-9 h-9 rounded-full bg-galaxy-800"></span>'}
       <div class="min-w-0 flex-1"><b class="text-white">${escapeHTML(h.nombre)} <i class="fa-solid fa-circle-check text-galaxy-400 text-xs" title="Host verificado"></i></b>
-        <p class="text-[11px] text-gray-400 truncate">${escapeHTML(juegos(h) || 'Juegos sin indicar')}${h.ping_ms != null ? ` · ping medio ${Math.round(h.ping_ms)} ms` : ''}${h.completados ? ` · ${h.completados} alquileres` : ''}</p></div></div>
-    <p class="text-xs text-white">${escapeHTML(precios(h))}</p>${h.notas ? `<p class="text-[11px] text-gray-400">${escapeHTML(h.notas)}</p>` : ''}
+        <p class="text-[12px] text-gray-400 truncate">${escapeHTML(juegos(h) || 'Juegos sin indicar')}${h.ping_ms != null ? ` · ping medio ${Math.round(h.ping_ms)} ms` : ''}${h.completados ? ` · ${h.completados} alquileres` : ''}</p></div></div>
+    <p class="text-xs text-white">${escapeHTML(precios(h))}</p>${h.notas ? `<p class="text-[12px] text-gray-400">${escapeHTML(h.notas)}</p>` : ''}
     <form data-alq="${escapeHTML(h.host)}" class="grid grid-cols-2 gap-1.5 text-xs">
       <select name="modo" class="field !py-1.5"><option value="partidos">Partidos</option><option value="horas">Horas</option></select>
       <input name="cant" type="number" min="1" max="24" value="1" class="field !py-1.5" aria-label="Cantidad">
@@ -33,9 +33,9 @@ function alquilerHTML(a) {
   const [t, c] = ESTADO[a.estado] ?? [a.estado, ''];
   const monto = a.pago === 'gemas' ? `💎 ${a.monto_gemas}` : `${formatoPrecio(a.monto_centimos)} por fuera`;
   const acc = [];
-  if (a.soy_host && a.estado === 'SOLICITADO') acc.push(`<button data-r="aceptar" data-id="${a.id}" class="btn btn-primary !min-h-8 !text-[11px]">Aceptar</button>`, `<button data-r="rechazar" data-id="${a.id}" class="btn !min-h-8 !text-[11px]">Rechazar</button>`);
-  if (!a.soy_host && a.estado === 'ACEPTADO') acc.push(`<button data-r="completar" data-id="${a.id}" class="btn btn-primary !min-h-8 !text-[11px]">Confirmar que se cumplió</button>`);
-  if (['SOLICITADO', 'ACEPTADO'].includes(a.estado)) acc.push(`<button data-r="cancelar" data-id="${a.id}" class="btn !min-h-8 !text-[11px]">Cancelar</button>`);
+  if (a.soy_host && a.estado === 'SOLICITADO') acc.push(`<button data-r="aceptar" data-id="${a.id}" class="btn btn-primary !min-h-8 !text-[12px]">Aceptar</button>`, `<button data-r="rechazar" data-id="${a.id}" class="btn !min-h-8 !text-[12px]">Rechazar</button>`);
+  if (!a.soy_host && a.estado === 'ACEPTADO') acc.push(`<button data-r="completar" data-id="${a.id}" class="btn btn-primary !min-h-8 !text-[12px]">Confirmar que se cumplió</button>`);
+  if (['SOLICITADO', 'ACEPTADO'].includes(a.estado)) acc.push(`<button data-r="cancelar" data-id="${a.id}" class="btn !min-h-8 !text-[12px]">Cancelar</button>`);
   return `<li class="py-2 border-b border-galaxy-border/40 text-xs space-y-1">
     <p><b class="text-white">${a.soy_host ? 'Te alquila' : 'Alquilas a'} ${escapeHTML(a.otro)}</b> · ${a.cantidad} ${a.modalidad} · ${new Date(a.fecha).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })} · ${escapeHTML(monto)} <b class="${c}">${t}</b></p>
     ${a.mensaje ? `<p class="text-gray-400">«${escapeHTML(a.mensaje)}»</p>` : ''}${acc.length ? `<div class="flex flex-wrap gap-1.5">${acc.join('')}</div>` : ''}</li>`;

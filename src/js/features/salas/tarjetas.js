@@ -15,7 +15,7 @@ const juegoTxt = (s) => [s.juego, s.parche ? `(${s.parche})` : ''].filter(Boolea
 
 function pildora(sem) {
   const p = pildoraSemaforo(sem);
-  return `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full border ${p.clase}" title="${escapeHTML(p.titulo)}"><i class="fa-solid fa-signal"></i> ${escapeHTML(p.texto)}</span>`;
+  return `<span class="text-[12px] font-bold px-2 py-0.5 rounded-full border ${p.clase}" title="${escapeHTML(p.titulo)}"><i class="fa-solid fa-signal"></i> ${escapeHTML(p.texto)}</span>`;
 }
 function avatar(h) {
   const url = safeUrl(h?.avatar_url);
@@ -24,7 +24,7 @@ function avatar(h) {
 }
 
 const MODO = { amistoso: 'Amistoso', torneo_privado: 'Torneo', oficial: 'Oficial' };
-const chip = (html, cls = 'text-gray-300 border-galaxy-border bg-black/20') => `<span class="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border ${cls}">${html}</span>`;
+const chip = (html, cls = 'text-gray-300 border-galaxy-border bg-black/20') => `<span class="inline-flex items-center gap-1 text-[12px] px-1.5 py-0.5 rounded-md border ${cls}">${html}</span>`;
 const fuenteTxt = { par: 'tu ping real con este host', host: 'promedio histórico del host', diagnostico: 'autodiagnóstico del host', sin_datos: 'sin mediciones aún' };
 
 /** Una sola tarjeta para radar y «En vivo»: chips compactos arriba y los detalles en un desplegable. */
@@ -36,19 +36,19 @@ function tarjeta(s, tipo) {
   const espect = s.acepta_espectadores && s.limite_espectadores > 0 ? chip(`<i class="fa-solid fa-eye"></i> ${Number(s.espectadores) || 0}/${s.limite_espectadores}`) : '';
   const lleno = espect && s.espectadores >= s.limite_espectadores;
   const accion = tipo === 'radar'
-    ? (s.mia ? '<span class="text-[11px] text-gray-400 uppercase font-bold">Tu sala</span>'
+    ? (s.mia ? '<span class="text-[12px] text-gray-400 uppercase font-bold">Tu sala</span>'
              : `<button type="button" class="btn btn-primary !min-h-9 !text-xs" data-aceptar="${escapeHTML(s.sala_id)}"><i class="fa-solid fa-handshake"></i> Aceptar</button>`)
     : `<button type="button" class="btn ${s.soy_espectador ? '' : 'btn-primary'} !min-h-9 !text-xs" data-ver="${escapeHTML(s.sala_id)}" ${lleno && !s.soy_espectador ? 'disabled' : ''}>
         <i class="fa-solid ${s.soy_espectador ? 'fa-arrow-up-right-from-square' : 'fa-eye'}"></i> ${s.soy_espectador ? 'Abrir' : lleno ? 'Lleno' : 'Ver'}</button>`;
   const sem = s.semaforo ?? {}; const dg = sem.diagnostico;
   const titulo = tipo === 'vivo' ? `${escapeHTML(s.host?.nombre ?? 'Host')} <span class="text-galaxy-400 mx-1">vs</span> ${escapeHTML(s.rival?.nombre ?? (s.reto_id ? 'reto' : '—'))}`
-    : `${escapeHTML(s.host?.nombre ?? 'Host')} ${s.host?.amigo ? '<i class="fa-solid fa-user-group text-galaxy-400 text-[11px]" title="Amigo"></i>' : ''}`;
+    : `${escapeHTML(s.host?.nombre ?? 'Host')} ${s.host?.amigo ? '<i class="fa-solid fa-user-group text-galaxy-400 text-[12px]" title="Amigo"></i>' : ''}`;
   return `<article class="bg-galaxy-panel rounded-xl border ${tipo === 'radar' ? 'border-galaxy-400/30' : 'border-galaxy-border'} p-3">
     <div class="flex items-center gap-3">
       ${avatar(s.host)}
       <div class="min-w-0 flex-1">
         <p class="text-sm text-white font-bold truncate">${titulo}
-          <span class="ml-1 text-[10px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">${NOMBRE_APP}</span></p>
+          <span class="ml-1 text-[12px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">${NOMBRE_APP}</span></p>
         <div class="mt-1 flex flex-wrap gap-1">
           ${estado}${pildora(sem)}
           ${s.parche || s.juego ? chip(`<i class="fa-solid fa-futbol"></i> ${escapeHTML(s.parche || s.juego)}`) : ''}
@@ -59,7 +59,7 @@ function tarjeta(s, tipo) {
       ${accion}
     </div>
     <details class="mt-2 group">
-      <summary class="text-[11px] text-gray-400 cursor-pointer select-none list-none flex items-center gap-1"><i class="fa-solid fa-chevron-down text-[9px] transition-transform group-open:rotate-180"></i> Detalles</summary>
+      <summary class="text-[12px] text-gray-400 cursor-pointer select-none list-none flex items-center gap-1"><i class="fa-solid fa-chevron-down text-[12px] transition-transform group-open:rotate-180"></i> Detalles</summary>
       <dl class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[12px]">
         <dt class="text-gray-500">Juego</dt><dd class="text-gray-200">${escapeHTML(juegoTxt(s))}</dd>
         <dt class="text-gray-500">Modo</dt><dd class="text-gray-200">${escapeHTML(MODO[s.modo] ?? s.modo ?? '—')}</dd>

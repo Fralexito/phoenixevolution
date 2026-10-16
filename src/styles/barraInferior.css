@@ -49,3 +49,6 @@
 @keyframes num-sube { 0% { color: #34d399; text-shadow: 0 0 10px rgb(52 211 153 / .5); } 100% { text-shadow: none; } }
 @keyframes num-baja { 0% { color: #f87171; text-shadow: 0 0 10px rgb(248 113 113 / .5); } 100% { text-shadow: none; } }
 @media (prefers-reduced-motion: reduce) { .num-sube, .num-baja { animation: none; } }
+
+/* Texto mínimo 12 px: <small> no baja de ahí (ronda 332) */
+main small, footer small { font-size: max(12px, 80%) !important; }

@@ -168,11 +168,11 @@
   animation: vit-flotar 4s ease-in-out infinite; animation-delay: calc(var(--i) * -1.3s); }
 .vit-oro .vit-copa { font-size: 4.2rem; }
 .vit-placa { position: relative; display: flex; flex-direction: column; align-items: center; padding: .3rem .7rem; border-radius: .4rem; background: rgb(0 0 0 / .55); border: 1px solid color-mix(in oklab, var(--metal) 45%, transparent); }
-.vit-torneo { font: 700 .62rem/1.2 var(--font-display, inherit); letter-spacing: .14em; text-transform: uppercase; color: var(--metal); }
+.vit-torneo { font: 700 .75rem/1.2 var(--font-display, inherit); letter-spacing: .14em; text-transform: uppercase; color: var(--metal); }
 .vit-dt { font: 900 1rem/1.1 var(--font-display, inherit); color: #fff; text-transform: uppercase; letter-spacing: .06em; }
 .vit-oro .vit-dt { font-size: 1.25rem; text-shadow: 0 0 12px rgb(251 191 36 / .6); }
 .vit-plata { --metal: #e5e7eb; } .vit-oro { --metal: #fbbf24; } .vit-bronce { --metal: #cd7f32; }
-.vit-ayuda { text-align: center; margin-top: .6rem; font-size: .72rem; color: #94a3b8; }
+.vit-ayuda { text-align: center; margin-top: .6rem; font-size: .75rem; color: #94a3b8; }
 @keyframes vit-flotar { 50% { transform: translateY(-6px); } }
 
 /* Carta del campeón (en la ventana) */
@@ -309,7 +309,7 @@
 .mg-switch:checked { background: linear-gradient(90deg, #10b981, #22d3ee); } .mg-switch:checked::after { transform: translateX(1.3rem); }
 .mg-switch:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
 .mg-range { width: 100%; accent-color: #22d3ee; margin: .6rem 0 .5rem; }
-.mg-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .7rem; border-radius: 999px; font-size: .72rem; font-weight: 700; color: #cbd5e1; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .25); transition: all .15s; }
+.mg-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 700; color: #cbd5e1; border: 1px solid var(--color-galaxy-border); background: rgb(0 0 0 / .25); transition: all .15s; }
 .mg-chip:hover { color: #fff; border-color: rgb(34 211 238 / .5); } .mg-chip.activo { color: #000; background: var(--color-galaxy-400); border-color: transparent; }
 .mg-stepper { display: flex; align-items: center; border-radius: .7rem; border: 1px solid var(--color-galaxy-border); overflow: hidden; }
 .mg-stepper button { width: 2.2rem; height: 2.2rem; font-size: 1.1rem; color: #cbd5e1; background: rgb(255 255 255 / .03); } .mg-stepper button:hover { background: rgb(34 211 238 / .15); color: #fff; }

@@ -19,7 +19,7 @@ function tarjeta(c) {
     <a href="${href('perfil/')}?u=${encodeURIComponent(c.username ?? '')}" class="flex items-center gap-3">
       ${safeUrl(c.avatar_url) ? `<img src="${escapeHTML(c.avatar_url)}" alt="" class="w-12 h-12 rounded-full object-cover ${c.en_vivo ? 'ring-2 ring-rose-400' : ''}" loading="lazy">` : '<span class="w-12 h-12 rounded-full bg-galaxy-800"></span>'}
       <span class="min-w-0"><b class="text-white block truncate">${escapeHTML(c.nombre)} <i class="fa-solid fa-circle-check text-galaxy-400 text-xs" title="Verificado"></i></b>
-        <span class="text-[11px] text-gray-400">${escapeHTML((c.juegos ?? []).join(' · ') || 'Fútbol')}</span></span></a>
+        <span class="text-[12px] text-gray-400">${escapeHTML((c.juegos ?? []).join(' · ') || 'Fútbol')}</span></span></a>
     ${vivo}${c.descripcion ? `<p class="text-xs text-gray-300">${escapeHTML(c.descripcion)}</p>` : ''}
     <div class="flex flex-wrap gap-1.5">${redes}</div></article>`;
 }

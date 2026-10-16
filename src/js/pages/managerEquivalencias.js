@@ -47,7 +47,7 @@ function fila(r) {
     : `${r.pes_id_local != null ? `<span class="mg-chip">ID ${r.pes_id_local}</span>` : ''}<button type="button" class="mg-chip" data-eq-reabrir="${r.id}">Reabrir</button>`;
   return `<article class="mg-caja !p-3 space-y-2">
     <div class="flex flex-wrap items-baseline gap-2"><b>${esc(ref.nombre ?? '¿?')}</b><span class="text-xs text-gray-400">Phoenix #${r.phoenix_id}${meta ? ' · ' + esc(meta) : ''}</span>
-      ${r.puntaje != null ? `<span class="text-[11px] text-gray-500">${r.puntaje} pts${r.metodo ? ' · ' + esc(r.metodo) : ''}</span>` : ''}</div>
+      ${r.puntaje != null ? `<span class="text-[12px] text-gray-500">${r.puntaje} pts${r.metodo ? ' · ' + esc(r.metodo) : ''}</span>` : ''}</div>
     <div class="flex flex-wrap items-center gap-1.5">${acciones}</div></article>`;
 }
 

@@ -26,8 +26,8 @@ async function cargar() {
     return `<article class="glass-panel rounded-xl p-3 text-sm space-y-1.5">
       <div class="flex flex-wrap gap-2 items-baseline"><b class="text-white">${esc(TIPO[s.tipo] ?? s.tipo)}</b>
         <span class="text-gray-400">${esc(p?.nombre_display ?? 'Usuario')} ${p?.username ? '@' + esc(p.username) : ''}</span>
-        <span class="text-[11px] ${d >= 25 ? 'text-bad' : 'text-gray-500'}">hace ${d} día(s)</span><span class="text-[11px] text-galaxy-400">${s.estado === 'en_proceso' ? 'En proceso' : 'Pendiente'}</span>
-        <code class="text-[10px] text-gray-600 select-all">${esc(s.usuario)}</code></div>
+        <span class="text-[12px] ${d >= 25 ? 'text-bad' : 'text-gray-500'}">hace ${d} día(s)</span><span class="text-[12px] text-galaxy-400">${s.estado === 'en_proceso' ? 'En proceso' : 'Pendiente'}</span>
+        <code class="text-[12px] text-gray-600 select-all">${esc(s.usuario)}</code></div>
       ${s.detalle ? `<p class="text-xs text-gray-300">${esc(s.detalle)}</p>` : ''}
       <div class="flex flex-wrap gap-1.5">${s.estado === 'pendiente' ? `<button type="button" class="btn btn-ghost !min-h-8 !text-xs" data-pv="${s.id}" data-estado="en_proceso">En proceso</button>` : ''}
         <button type="button" class="btn btn-ghost !min-h-8 !text-xs" data-pv="${s.id}" data-estado="resuelta">Resuelta</button>
