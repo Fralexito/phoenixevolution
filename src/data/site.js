@@ -55,6 +55,7 @@ const ACCOUNT_NAV_BASE = [
   { id: 'miclub',   label: 'Mi club',      path: 'mi-club/',       icon: 'fa-shirt', grupo: 'jugar', ...(FX.clubUnificado ? { menu: false } : {}) },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/roles.js); se muestra u oculta al iniciar sesión.
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
+  { id: 'panel', label: 'Panel del sitio', path: 'panel/', icon: 'fa-sliders', staff: 'verAuditoriaCompleta', grupo: 'staff' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
   // `grupo` = bloque del panel «Mi cuenta» (ver GRUPOS_CUENTA). `menu: false` = no sale en el panel (ya está a la vista: la lupa del header), pero sí en el buscador.
   // `abajo: true` = va en el bloque inferior del menú, pegado al fondo del panel.
@@ -66,7 +67,7 @@ const ACCOUNT_NAV_BASE = [
 // Lo público (En vivo, Salas, Chat, Clanes, Eventos, Ranking, Tienda, Torneos, Formatos) ya vive en los 3 grupos del menú
 // (arriba en PC, al inicio del panel en celular): aquí se ocultaba duplicado. Siguen en el buscador (`menu: false`).
 const ORDEN_CUENTA = { perfil: ['tu', 1], muro: ['tu', 2], logros: ['tu', 3], guardados: ['tu', 4], mensajes: ['tu', 5], amigos: ['tu', 6],
-  partidos: ['juego', 1], moderacion: ['staff', 1], auditoria: ['staff', 2] };
+  partidos: ['juego', 1], moderacion: ['staff', 1], auditoria: ['staff', 2], panel: ['staff', 3] };
 const repartirCuenta = (lista) => {
   const pos = (n) => (ORDEN_CUENTA[n.id]?.[1] ?? 99);
   return lista.map((n) => n.abajo ? n : ORDEN_CUENTA[n.id] ? { ...n, grupo: ORDEN_CUENTA[n.id][0] } : { ...n, menu: false })

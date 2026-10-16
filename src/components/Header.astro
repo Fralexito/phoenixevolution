@@ -31,11 +31,11 @@ const pilarActual = pilarDe(active)?.id;
                 {b.titulo && !b.compacto && <p class="pilar-bloque">{b.titulo}</p>}
                 <div class="pilar-grid">
                   {b.compacto ? (
-                    <a href={`${base}${b.items[0].path}`} role="menuitem" class="pilar-item" aria-current={b.items.some((n) => esDe(n, active)) ? 'page' : undefined}>
+                    <a href={`${base}${b.items[0].path}`} role="menuitem" class="pilar-item" data-nav-id={b.items[0].id} aria-current={b.items.some((n) => esDe(n, active)) ? 'page' : undefined}>
                       <i class={`fa-solid ${b.icon}`}></i><span><b>{b.titulo}</b><small>{b.desc}</small></span>
                     </a>
                   ) : b.items.map((n) => (
-                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" data-solo-staff={n.staff} data-no-staff={n.noStaff} hidden={n.staff ? true : undefined} aria-current={esDe(n, active) ? 'page' : undefined}>
+                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" data-nav-id={n.id} data-solo-staff={n.staff} data-no-staff={n.noStaff} hidden={n.staff ? true : undefined} aria-current={esDe(n, active) ? 'page' : undefined}>
                       <i class={`fa-solid ${n.icon}`}></i><span><b>{n.label}</b><small>{n.desc}</small></span>
                     </a>
                   ))}

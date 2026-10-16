@@ -367,3 +367,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 313 (cuenta WEB, borrador): vuelve el giro de las 4 ventanas (toca y gira, atrás = todas las acciones) manteniendo los nuevos diseños al frente. Tests 466 OK, build 48.
 
 ### Ronda 314 (cuenta WEB, borrador): el frente de las 4 ventanas vuelve a ser simple (solo lo en vivo); los diseños nuevos (mosaico, grande, botón+atajos) salen AL GIRAR. Tests 466 OK, build 48.
+
+### Ronda 315 (cuenta WEB, borrador): PANEL DEL SITIO /panel/ (solo admin): portada (mostrar/ocultar y ordenar las 4 ventanas, diseño al girar, botón grande, atajos añadidos, título y frase), menú de arriba y barra lateral (quitar/poner botones), con Guardar · Deshacer · Rehacer · Volver al original. Base: migración 108 (sitio_ajustes + historial, RPC sitio_estado/guardar/mover) — PENDIENTE de pegar en Supabase (el MCP se canceló). core/sitio.js + test, features/sitioAplicar.js (boot). Tests 473 OK, build 49.

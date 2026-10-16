@@ -17,10 +17,12 @@ import { initCarruseles } from './features/carruseles.js';
 import { initCartasEfecto } from './features/cartasEfecto.js';
 import { initPremium } from './features/premium.js';
 import { initMarco } from './features/marco.js';
+import { initSitio } from './features/sitioAplicar.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
 import { FX } from '../data/experimento.js';
 
 initAjustes();
+initSitio();
 initSidebar();
 initNavbar();
 initTicker();
