@@ -53,6 +53,15 @@ function alPulsar(e, enPaginaMensajes, despues) {
 const leerCompacto = () => { try { return localStorage.getItem(CLAVE_COMPACTO) === '1'; } catch { return false; } };
 const guardarCompacto = (v) => { try { localStorage.setItem(CLAVE_COMPACTO, v ? '1' : '0'); } catch { /* no se recuerda */ } };
 
+/** Repinta la lista SIN mover el scroll (y sin tocar el DOM si nada cambió). */
+function repintar(lista) {
+  const html = filasHTML();
+  if (lista.dataset.h === html) return;
+  const top = lista.scrollTop;
+  lista.innerHTML = html; lista.dataset.h = html;
+  lista.scrollTop = top;
+}
+
 /** Columna fija (PC). Se crea siempre; el CSS la muestra solo en ≥ 1280 px y con sesión. */
 export function montarColumna({ enPaginaMensajes }) {
   const col = document.createElement('aside');
@@ -70,8 +79,8 @@ export function montarColumna({ enPaginaMensajes }) {
     if (e.target.closest('[data-cf-plegar]')) { const v = !document.documentElement.hasAttribute('data-cf-compacto'); aplicarCompacto(v); guardarCompacto(v); window.dispatchEvent(new Event('resize')); return; }
     alPulsar(e, enPaginaMensajes);
   });
-  col.querySelector('input').addEventListener('input', (e) => { filtro = e.target.value; lista.innerHTML = filasHTML(); });
-  const pintar = () => { lista.innerHTML = filasHTML(); };
+  col.querySelector('input').addEventListener('input', (e) => { filtro = e.target.value; repintar(lista); });
+  const pintar = () => { repintar(lista); };
   alCambiar((m) => { if (!m.startsWith('mensajes') && !m.startsWith('nuevo')) pintar(); });
   pintar();
   return pintar;
@@ -95,11 +104,11 @@ export function montarHoja({ enPaginaMensajes }) {
     <div class="cf-lista"></div>`;
   document.body.appendChild(hoja);
   const lista = hoja.querySelector('.cf-lista');
-  const abrirHoja = (v) => { hoja.hidden = !v; boton.setAttribute('aria-expanded', String(v)); if (v) { lista.innerHTML = filasHTML(); hoja.querySelector('input').focus({ preventScroll: true }); } };
+  const abrirHoja = (v) => { hoja.hidden = !v; boton.setAttribute('aria-expanded', String(v)); if (v) { repintar(lista); hoja.querySelector('input').focus({ preventScroll: true }); } };
   boton.addEventListener('click', () => abrirHoja(hoja.hidden));
   hoja.addEventListener('click', (e) => { if (e.target.closest('[data-cf-cerrar-hoja]')) { abrirHoja(false); boton.focus(); return; } alPulsar(e, enPaginaMensajes, () => abrirHoja(false)); });
   hoja.addEventListener('keydown', (e) => { if (e.key === 'Escape') { abrirHoja(false); boton.focus(); } });
-  hoja.querySelector('input').addEventListener('input', (e) => { filtro = e.target.value; lista.innerHTML = filasHTML(); });
+  hoja.querySelector('input').addEventListener('input', (e) => { filtro = e.target.value; repintar(lista); });
   document.addEventListener('pointerdown', (e) => { if (!hoja.hidden && !hoja.contains(e.target) && !boton.contains(e.target)) abrirHoja(false); });
 
   const insig = boton.querySelector('.cf-badge');
@@ -107,7 +116,7 @@ export function montarHoja({ enPaginaMensajes }) {
     boton.hidden = !S.yo;
     const n = totalNoLeidos(S.convs); insig.hidden = !n; insig.textContent = insignia(n);
     boton.setAttribute('aria-label', n ? `Chats, ${n} sin leer` : 'Chats');
-    if (!hoja.hidden) lista.innerHTML = filasHTML();
+    if (!hoja.hidden) repintar(lista);
   };
   alCambiar((m) => { if (!m.startsWith('mensajes') && !m.startsWith('nuevo')) pintar(); });
   pintar();
