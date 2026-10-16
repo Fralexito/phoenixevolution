@@ -23,7 +23,7 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" id="pn-guardar" class="btn btn-primary !min-h-9 !px-4 !text-[12px]" disabled>Guardar</button>
       </div>
       <div id="pn-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"></div>
-      <div id="pn-cuerpo" class="space-y-3"></div>
+      <div id="pn-cuerpo"></div>
       <div class="text-center"><button type="button" id="pn-restaurar" class="btn btn-ghost !text-[12px]">Volver al sitio original</button></div>
     </div>
   </div>
@@ -32,6 +32,14 @@ import Layout from '../layouts/Layout.astro';
   import '../js/pages/panel.js';
 </script>
 <style is:global>
+  .pn-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  .pn-tab { display: flex; align-items: center; justify-content: center; gap: .55rem; padding: .8rem .5rem; border-radius: .8rem; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .1); color: #cbd5e1; font-family: var(--font-display); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; transition: transform .12s cubic-bezier(.22,1,.36,1), border-color .12s; }
+  .pn-tab:hover { transform: translateY(-1px); border-color: rgb(255 255 255 / .35); }
+  .pn-tab-on { color: #fff; border-color: #00e5ff; background: rgb(0 229 255 / .12); box-shadow: 0 0 0 1px #00e5ff; }
+  .pn-tab i { color: #00e5ff; }
+  @media (max-width: 40rem) { .pn-tab span { display: none; } .pn-tab { padding: .8rem; } }
+  .pn-ayuda { margin: .75rem .25rem; font-size: .85rem; color: #94a3b8; } .pn-ayuda i { color: #fbbf24; margin-right: .35rem; }
+  .pn-lado { border-radius: 1rem; padding: .9rem; background: rgb(255 255 255 / .04); border: 1px solid rgb(255 255 255 / .1); position: sticky; top: 9rem; }
   .pn-lienzo { border-radius: 1rem; padding: 1.25rem 1rem; text-align: center; background: radial-gradient(120% 90% at 50% 0%, rgb(0 229 255 / .12), transparent 60%), radial-gradient(90% 80% at 100% 100%, rgb(124 58 237 / .18), transparent 60%), #07051a; border: 1px solid rgb(255 255 255 / .08); }
   .pn-tit, .pn-sub { display: block; width: 100%; max-width: 32rem; margin: 0 auto; text-align: center; background: transparent; border: 1px dashed transparent; border-radius: .5rem; color: #fff; }
   .pn-tit { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; padding: .15rem .5rem; }

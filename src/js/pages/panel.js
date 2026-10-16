@@ -10,7 +10,7 @@ import { aplicar, guardarCache } from '../features/sitioAplicar.js';
 const $ = (id) => document.getElementById(id);
 const NOMBRES = { social: 'Zona Social', competencia: 'Competencia', duelos: 'Duelos', club: 'Mi Club' };
 const VISTA_TXT = { '': 'Como está', vivo: 'Botón grande + atajos', mosaico: 'Mosaico de iconos', grande: 'Una grande y dos chicas' };
-const S = { sel: null, arrastra: null, guardada: normalizar({}), borrador: normalizar({}), puedeDes: false, puedeReh: false, ocupado: false, iniciado: false };
+const S = { tab: 'portada', sel: null, arrastra: null, guardada: normalizar({}), borrador: normalizar({}), puedeDes: false, puedeReh: false, ocupado: false, iniciado: false };
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const sucio = () => !iguales(S.borrador, S.guardada);
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -63,7 +63,7 @@ function gruposMenu() {
   document.querySelectorAll('.pilar[data-pilar]').forEach((p) => {
     const rot = (p.querySelector('.pilar-btn')?.textContent || p.dataset.pilar).replace(/\s+/g, ' ').trim();
     const m = new Map();
-    p.querySelectorAll('.pilar-item[data-nav-id]').forEach((a) => { if (!a.dataset.soloStaff && !m.has(a.dataset.navId)) m.set(a.dataset.navId, (a.querySelector('b, .pilar-t, span')?.textContent || a.textContent).replace(/\s+/g, ' ').trim().slice(0, 28)); });
+    p.querySelectorAll('.pilar-item[data-nav-id]').forEach((a) => { if (!a.dataset.soloStaff && !m.has(a.dataset.navId)) m.set(a.dataset.navId, { t: (a.querySelector('b')?.textContent || a.textContent).replace(/\s+/g, ' ').trim().slice(0, 28), ic: a.querySelector('i')?.className || '' }); });
     if (m.size) out.push({ rot, items: [...m] });
   });
   return out;
@@ -72,7 +72,7 @@ const chip = (id, t, ocultos, attr, ico = '') => { const on = !ocultos.includes(
 function menuHTML() {
   const g = gruposMenu(); const o = S.borrador.menu.ocultos;
   if (!g.length) return '<p class="text-xs text-gray-400">Abre esta página en una pantalla ancha para ver el menú.</p>';
-  return `<div class="pn-barra-menu">${g.map((x) => `<div class="pn-pilar"><p>${esc(x.rot)}</p><div class="flex flex-wrap gap-1.5">${x.items.map(([id, t]) => chip(id, t, o, 'data-menu')).join('')}</div></div>`).join('')}</div>`;
+  return `<div class="pn-barra-menu">${g.map((x) => `<div class="pn-pilar"><p>${esc(x.rot)}</p><div class="flex flex-wrap gap-1.5">${x.items.map(([id, v]) => chip(id, v.t, o, 'data-menu', v.ic ? `<i class="${esc(v.ic)}"></i>` : '')).join('')}</div></div>`).join('')}</div>`;
 }
 function lateralHTML() {
   const o = S.borrador.lateral.ocultos; const m = new Map();
@@ -84,18 +84,22 @@ function lateralHTML() {
 function pintar() {
   const b = S.borrador;
   if (S.sel && !VENTANAS.includes(S.sel)) S.sel = null;
-  const sec = (ico, t, res, cont, ab = false) => `<details class="glass-panel rounded-2xl px-4 py-3" ${ab ? 'open' : ''}><summary class="cursor-pointer font-display font-bold text-white uppercase tracking-wider text-sm select-none"><i class="fa-solid ${ico} text-galaxy-400 mr-2"></i>${t} <span class="text-gray-400 normal-case tracking-normal font-normal text-xs">· ${res}</span></summary><div class="mt-3 space-y-3">${cont}</div></details>`;
+  const TABS = [['portada', 'fa-house', 'Portada'], ['menu', 'fa-bars', 'Menú de arriba'], ['lateral', 'fa-table-columns', 'Barra lateral']];
+  const AYUDA = { portada: 'Arrastra las ventanas para ordenarlas. Toca una para editarla.', menu: 'Toca un botón para ocultarlo o mostrarlo.', lateral: 'Toca un acceso para ocultarlo o mostrarlo.' };
   const foco = document.activeElement?.id;
+  const tab = S.tab;
+  const cont = tab === 'portada'
+    ? `<div class="grid lg:grid-cols-[minmax(0,1fr)_21rem] gap-3 items-start">
+        <div class="pn-lienzo">
+          <input type="text" data-titulo class="pn-tit" value="${esc(b.portada.titulo)}" maxlength="40" placeholder="Bienvenido a la" aria-label="Título de arriba">
+          <p class="pn-galaxy">Galaxy</p>
+          <input type="text" data-sub class="pn-sub" value="${esc(b.portada.sub)}" maxlength="120" placeholder="Esto está pasando ahora en la comunidad." aria-label="Frase debajo del título">
+          <div class="pn-tiles">${b.portada.orden.map(tileHTML).join('')}</div></div>
+        <aside class="pn-lado" id="pn-editor">${editorHTML(S.sel)}</aside></div>`
+    : tab === 'menu' ? menuHTML() : lateralHTML();
   $('pn-cuerpo').innerHTML =
-    sec('fa-house', 'Portada', 'arrastra las ventanas y toca una para editarla',
-      `<div class="pn-lienzo">
-        <input type="text" data-titulo class="pn-tit" value="${esc(b.portada.titulo)}" maxlength="40" placeholder="Bienvenido a la" aria-label="Título de arriba">
-        <p class="pn-galaxy">Galaxy</p>
-        <input type="text" data-sub class="pn-sub" value="${esc(b.portada.sub)}" maxlength="120" placeholder="Esto está pasando ahora en la comunidad." aria-label="Frase debajo del título">
-        <div class="pn-tiles">${b.portada.orden.map(tileHTML).join('')}</div></div>
-       <div class="rounded-xl border border-white/10 bg-white/5 p-3" id="pn-editor">${editorHTML(S.sel)}</div>`, true) +
-    sec('fa-bars', 'Menú de arriba', 'toca un botón para ocultarlo o mostrarlo', menuHTML()) +
-    sec('fa-table-columns', 'Barra lateral izquierda', 'toca un acceso para ocultarlo o mostrarlo', lateralHTML());
+    `<nav class="pn-tabs" role="tablist" aria-label="Qué quieres cambiar">${TABS.map(([id, ic, t]) => `<button type="button" role="tab" data-tab="${id}" aria-selected="${tab === id}" class="pn-tab ${tab === id ? 'pn-tab-on' : ''}"><i class="fa-solid ${ic}"></i><span>${t}</span></button>`).join('')}</nav>
+     <p class="pn-ayuda"><i class="fa-solid fa-lightbulb"></i> ${AYUDA[tab]}</p>${cont}`;
   if (foco) $(foco)?.focus();
   const hay = sucio();
   $('pn-estado').textContent = S.ocupado ? 'Guardando…' : hay ? 'Tienes cambios sin guardar.' : 'Todo guardado.';
@@ -111,6 +115,7 @@ function enlazar() {
   const c = $('pn-cuerpo');
   c.addEventListener('click', (e) => {
     const bt = e.target.closest('button'); const tile = e.target.closest('.pn-tile');
+    if (bt?.matches('[data-tab]')) { S.tab = bt.dataset.tab; return pintar(); }
     if (bt?.matches('[data-ojo]')) return cambiar((b) => { const v = b.portada.ventanas[V(bt)]; v.on = !v.on; });
     if (bt?.matches('[data-izq]')) return cambiar((b) => { b.portada.orden = mover(b.portada.orden, V(bt), -1); });
     if (bt?.matches('[data-der]')) return cambiar((b) => { b.portada.orden = mover(b.portada.orden, V(bt), 1); });
