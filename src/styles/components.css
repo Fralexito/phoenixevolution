@@ -440,7 +440,8 @@ button.rx:hover { border-color: var(--acento, var(--color-galaxy-400)); }
 @keyframes brilla { 0%, 100% { box-shadow: 0 0 0 0 rgb(0 229 255 / .0), 0 0 22px rgb(128 0 255 / .35); } 50% { box-shadow: 0 0 0 3px rgb(0 229 255 / .18), 0 0 34px rgb(0 229 255 / .45); } }
 @keyframes respira { 0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(1); } 50% { opacity: .9; transform: translate(-50%, -50%) scale(1.08); } }
 .hero-glow { animation: respira 7s ease-in-out infinite; }
-.escudo { animation: flota 5s ease-in-out infinite; } .escudo.der { animation-delay: -2.5s; }
+.escudo { animation: flota 5s ease-in-out infinite; will-change: transform; } .escudo.der { animation-delay: -2.5s; }
+.escudo[data-fuera] { animation-play-state: paused; will-change: auto; }
 .vs-latido { animation: latido 2.4s ease-in-out infinite; }
 .tu-partido { border: 1px solid rgb(0 229 255 / .55); background: linear-gradient(120deg, rgb(128 0 255 / .22), rgb(0 229 255 / .08)); animation: brilla 3.2s ease-in-out infinite; }
 .cta-pulso { position: relative; } .cta-pulso::after { content: ''; position: absolute; inset: -3px; border-radius: inherit; border: 1px solid rgb(0 229 255 / .6); animation: latido 2s ease-in-out infinite; pointer-events: none; }
@@ -730,9 +731,11 @@ html[data-tema='sudario'] .plegable:hover, html[data-tema='sudario'] .plegable[o
 .estado-liga { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem; padding: .6rem .95rem; border-radius: .8rem; border: 1px solid var(--color-galaxy-border); background: linear-gradient(90deg, rgb(128 0 255 / .18), rgb(0 0 0 / .35)); color: #e5e7eb; font-size: .8rem; transition: border-color .2s, box-shadow .2s; }
 .estado-liga:hover, .estado-liga:focus-visible { border-color: var(--color-galaxy-400); box-shadow: 0 0 16px rgb(0 229 255 / .2); outline: none; }
 .estado-liga b { color: #fff; font-family: var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
-.estado-punto { width: .55rem; height: .55rem; border-radius: 9999px; background: #10b981; box-shadow: 0 0 0 0 rgb(16 185 129 / .6); animation: estado-pulso 1.8s infinite; flex: none; }
-.estado-punto.quieto { background: #9ca3af; animation: none; box-shadow: none; }
-@keyframes estado-pulso { 70% { box-shadow: 0 0 0 .5rem rgb(16 185 129 / 0); } 100% { box-shadow: 0 0 0 0 rgb(16 185 129 / 0); } }
+.estado-punto { position: relative; width: .55rem; height: .55rem; border-radius: 9999px; background: #10b981; flex: none; }
+.estado-punto::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgb(16 185 129 / .6); animation: estado-pulso 1.8s infinite; pointer-events: none; }
+.estado-punto.quieto { background: #9ca3af; }
+.estado-punto.quieto::after { display: none; }
+@keyframes estado-pulso { 0% { transform: scale(1); opacity: .6; } 70%, 100% { transform: scale(3.9); opacity: 0; } }
 .estado-barra { flex: 1 1 7rem; min-width: 6rem; max-width: 14rem; height: .35rem; border-radius: 9999px; background: rgb(255 255 255 / .1); overflow: hidden; }
 .estado-barra > i { display: block; height: 100%; background: linear-gradient(90deg, var(--color-galaxy-600), var(--color-galaxy-400)); border-radius: inherit; }
 html[data-tema='sudario'] .estado-liga { background: linear-gradient(90deg, rgb(29 78 216 / .25), rgb(0 0 0 / .35)); }

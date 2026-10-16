@@ -30,7 +30,7 @@ export function montarEstrellas(canvas = document.querySelector('[data-vt-estrel
   };
   const medir = () => {
     const r = header.getBoundingClientRect();
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(window.matchMedia('(max-width: 767px)').matches ? 1.5 : 2, window.devicePixelRatio || 1);
     w = Math.max(1, r.width); h = Math.max(1, r.height);
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -67,6 +67,7 @@ export function montarEstrellas(canvas = document.querySelector('[data-vt-estrel
 
   const cuadro = (t) => {
     if (!corriendo) return;
+    if (ultimo && t - ultimo < 30) { raf = requestAnimationFrame(cuadro); return; }   // ~30 fps: se ve igual de suave (todo es lento) y gasta la mitad
     const dt = Math.min(.05, (t - (ultimo || t)) / 1000); ultimo = t;
     dibujar(t, dt);
     raf = requestAnimationFrame(cuadro);
