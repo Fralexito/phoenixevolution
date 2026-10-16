@@ -93,3 +93,13 @@ test('gemasPorSol y textos nuevos', () => {
   assert.equal(E.gemasPorSol(5, 0), 0);
   assert.equal(E.textoTipo('compra_dinero'), 'Compra de gemas');
 });
+
+test('resumenMfa: sin factor, con factor y sesión normal, con factor y sesión verificada', () => {
+  assert.equal(E.resumenMfa([], 'aal1').estado, 'sin_activar');
+  assert.equal(E.resumenMfa(null, undefined).estado, 'sin_activar');
+  assert.equal(E.resumenMfa([{ id: 'a', factor_type: 'totp', status: 'unverified' }], 'aal1').estado, 'sin_activar');
+  assert.deepEqual(E.resumenMfa([{ id: 'a', factor_type: 'totp', status: 'unverified' }], 'aal1').pendientes, ['a']);
+  assert.equal(E.resumenMfa([{ id: 'b', factor_type: 'totp', status: 'verified' }], 'aal1').estado, 'falta_codigo');
+  const r = E.resumenMfa([{ id: 'b', factor_type: 'totp', status: 'verified' }], 'aal2');
+  assert.equal(r.estado, 'activa'); assert.equal(r.factorId, 'b');
+});

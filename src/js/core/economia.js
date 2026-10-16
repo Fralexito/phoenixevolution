@@ -132,3 +132,13 @@ export function validarItemAdmin(v) {
   else { if (!HEX.test(String(o.color ?? ''))) return { ok: false, error: 'El color principal debe ser #RRGGBB.' }; e.color = o.color; if (o.categoria !== 'color_clan' && o.color2) { if (!HEX.test(o.color2)) return { ok: false, error: 'El segundo color debe ser #RRGGBB.' }; e.color2 = o.color2; } }
   return { ok: true, valores: { clave: o.clave, nombre, descripcion: String(o.descripcion ?? '').trim().slice(0, 200), categoria: o.categoria, precio, nivelMin: nivel, stock, estilo: e, activo: o.activo !== false } };
 }
+
+/** Estado de la verificación en dos pasos: factores de Supabase (lista) + nivel de la sesión ('aal1'|'aal2'). Puro, para pintar el panel. */
+export function resumenMfa(factores, nivel) {
+  const lista = Array.isArray(factores) ? factores : [];
+  const ok = lista.filter((f) => f && f.factor_type === 'totp' && f.status === 'verified');
+  const pendientes = lista.filter((f) => f && f.factor_type === 'totp' && f.status !== 'verified');
+  const sesionSegura = nivel === 'aal2';
+  const estado = !ok.length ? 'sin_activar' : (sesionSegura ? 'activa' : 'falta_codigo');
+  return { estado, factorId: ok[0]?.id ?? null, pendientes: pendientes.map((f) => f.id) };
+}

@@ -13,7 +13,7 @@ import { CATEGORIAS, ORDEN_CATEGORIAS, formatoPrecio, formatoTokens, motivoNoCom
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
-const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas', metodos: [], pagosManuales: [], admPagos: [], admMetodos: [], alertas: [], auditoria: null };
+const S = { tab: 'tienda', yo: null, listo: false, req: 0, busy: false, eco: null, items: [], reglas: [], pq: null, movs: [], ordenes: [], adm: null, admItems: [], edit: null, encontrados: [], cat: 'todas', metodos: [], pagosManuales: [], admPagos: [], admMetodos: [], alertas: [], mfa: null, auditoria: null };
 const avisoError = (m) => { $('ti-error-txt').textContent = m; $('ti-error').hidden = !m; };
 const vacio = (t) => vacioHTML(t, { icono: 'fa-store' });
 const fecha = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? '' : d.toLocaleString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -125,7 +125,7 @@ async function cargar() {
 async function hacer(fn, ok) {
   if (S.busy) return; S.busy = true;
   try { const r = await fn(); if (ok) toast(typeof ok === 'function' ? ok(r) : ok, 'ok'); await cargar(); }
-  catch (e) { console.error('[tienda] acción:', e); toast(e?.message || 'No se pudo completar la acción.', 'error'); }
+  catch (e) { console.error('[tienda] acción:', e); toast(e?.message || 'No se pudo completar la acción.', 'error'); rec.manejarError(e); }
   finally { S.busy = false; }
 }
 

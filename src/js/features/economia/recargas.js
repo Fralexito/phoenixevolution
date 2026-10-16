@@ -6,10 +6,11 @@ import { toast } from '../../core/toast.js';
 import { openModal, closeModal } from '../../core/modal.js';
 import { vacioHTML } from '../../core/vacio.js';
 import * as api from './api.js';
+import * as mfa from './mfa.js';
 import { formatoPrecio, formatoTokens, gemasPorSol, textoEstadoRecarga } from '../../core/economia.js';
 
 let C = null; // contexto que entrega la página: { S, hacer, cargar, pintar, esAdmin }
-export const iniciar = (ctx) => { C = ctx; };
+export const iniciar = (ctx) => { C = ctx; mfa.iniciar(ctx); };
 const vacio = (t) => vacioHTML(t, { icono: 'fa-gem' });
 const fecha = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? '' : d.toLocaleString('es-PE', { timeZone: 'America/Lima', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
 const TONO = { ok: 'text-emerald-300', espera: 'text-amber-300', falta: 'text-cyan-300', mal: 'text-rose-300' };
@@ -21,12 +22,13 @@ const nombreMetodo = (clave) => C.S.metodos.find((m) => m.clave === clave)?.nomb
 const CAMPO_DATO = { yape: ['yape', 'Número de Yape'], plin: ['plin', 'Número de Plin'], banco: ['cuenta', 'Cuenta o CCI'] };
 
 export async function cargarDatos(sesion, admin, pedir) {
-  const [metodos, pagosManuales, admPagos, admMetodos, alertas] = await Promise.all([
+  const [metodos, pagosManuales, admPagos, admMetodos, alertas, seguridad] = await Promise.all([
     sesion ? pedir(api.metodosPago(), []) : [], sesion ? pedir(api.misPagosManuales(), []) : [],
     sesion && admin ? pedir(api.adminPagosManuales('en_revision'), []) : [], sesion && admin ? pedir(api.adminMetodos(), []) : [],
     sesion && admin ? pedir(api.adminAlertas(false), []) : [],
+    sesion && admin ? mfa.estado() : null,
   ]);
-  return { metodos, pagosManuales, admPagos: Array.isArray(admPagos) ? admPagos : [], admMetodos: Array.isArray(admMetodos) ? admMetodos : [], alertas: Array.isArray(alertas) ? alertas : [] };
+  return { metodos, pagosManuales, admPagos: Array.isArray(admPagos) ? admPagos : [], admMetodos: Array.isArray(admMetodos) ? admMetodos : [], alertas: Array.isArray(alertas) ? alertas : [], mfa: seguridad };
 }
 
 // ── Pestaña del jugador ────────────────────────────────────────────────────────────────────────────────────
@@ -147,7 +149,7 @@ export function adminRecargasHTML() {
   const aud = S.auditoria ? (S.auditoria.ok ? `<p class="text-xs text-emerald-300 mt-2"><i class="fa-solid fa-circle-check"></i> Todo cuadra: 0 diferencias. En circulación: ${formatoTokens(S.auditoria.ascuas_en_circulacion)} ascuas y ${formatoTokens(S.auditoria.gemas_en_circulacion)} gemas.</p>` : `<p class="text-xs text-rose-300 mt-2"><i class="fa-solid fa-triangle-exclamation"></i> Hay ${S.auditoria.diferencias} diferencias entre el libro y las billeteras. No actives pagos hasta revisarlo.</p>`) : '';
   const auditoria = `<section class="glass-panel rounded-2xl p-4"><h3 class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-scale-balanced text-cyan-300"></i> Auditoría</h3>
     <p class="text-[12px] text-gray-400 mt-1">Comprueba que la suma de movimientos coincide con cada billetera.</p><button type="button" data-auditar class="btn btn-primary !min-h-9 !px-3 !text-xs mt-2">Revisar que las cuentas cuadran</button>${aud}</section>`;
-  return alertasHTML() + pagos + metodos + precios + auditoria;
+  return mfa.mfaHTML(S.mfa) + alertasHTML() + pagos + metodos + precios + auditoria;
 }
 const NIVEL = { critica: ['text-rose-300', 'Crítica'], alta: ['text-amber-300', 'Alta'], media: ['text-amber-200', 'Media'], info: ['text-cyan-300', 'Info'] };
 function alertasHTML() {
@@ -197,6 +199,7 @@ function modalRechazo(orden) {
 /** Devuelve true si el clic era de una recarga. */
 export function click(ev) {
   const b = ev.target.closest('button'); if (!b) return false; const d = b.dataset, S = C.S;
+  if (d.mfa) return mfa.click(ev);
   if (d.paquete) { const k = S.pq?.paquetes.find((x) => x.id === Number(d.paquete)); if (k && !motivoBloqueo()) modalMetodo(k); return true; }
   if (d.subir) { const x = S.pagosManuales.find((p) => p.orden === d.subir), m = S.metodos.find((y) => y.clave === x?.metodo);
     if (x) modalComprobante({ orden: x.orden, montoCentimos: x.montoCentimos, gemas: x.gemas, metodo: x.metodo, expiraAt: x.expiraAt, instrucciones: m?.instrucciones ?? '', datos: m?.datos ?? {} }); return true; }
@@ -225,4 +228,9 @@ export function submit(ev) {
     return true;
   }
   return false;
+}
+
+/** Si la base pide la verificación en dos pasos y la persona ya la tiene, abre la ventana del código. */
+export function manejarError(e) {
+  if (/verificación en dos pasos/i.test(e?.message ?? '') && C?.S.mfa?.factorId) mfa.pedirCodigo(C.S.mfa.factorId);
 }

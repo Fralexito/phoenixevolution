@@ -24,7 +24,7 @@ Migraciones 111 (integridad), 112 (controles de riesgo) y 113 (vigilancia). Los 
 4. Resuelve la alerta con una nota de lo que comprobaste (queda en la auditoría).
 
 ## Lista antes de activar pagos reales
-- [ ] Activar MFA en la cuenta de administrador y poner `admin_exige_mfa = true`.
+- [ ] Activar MFA en la cuenta de administrador desde Tienda → Administrar → «Seguridad de tu cuenta» (QR + código) y, solo después, poner `admin_exige_mfa = true`.
 - [ ] Activar «Leaked password protection» y MFA en Supabase Auth.
 - [ ] Repos públicos de Link/overlay en privado (acción de Fralex).
 - [ ] Datos reales de Yape/Plin/banco cargados en el panel (nunca en el código).
