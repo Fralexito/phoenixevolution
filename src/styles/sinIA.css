@@ -9,5 +9,24 @@ main[data-activa='liga'] .bg-clip-text { background: none !important; -webkit-te
 /* 3 · Tarjetas planas: sin desenfoque ni sombra interior, fondo liso */
 main[data-activa='liga'] :is(.glass-panel, .premium-glass, .liga-podio, .hero-cta-s) { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #0e0b1f; }
 /* 4 · Sin manchas de luz ni capas de adorno detrás del titular */
-main[data-activa='liga'] > header > .absolute { display: none; }
-main[data-activa='liga'] > header * { box-shadow: none !important; }
+main[data-activa='liga'] section > header > .absolute { display: none; }
+main[data-activa='liga'] section > header * { box-shadow: none !important; }
+/* 5 · Toque gaming / e-sports (ronda 304, solo Liga): bordes duros, rayas diagonales y marcador de torneo. Sin brillos. */
+main[data-activa='liga'] section > header { position: relative; border-bottom: 2px solid var(--color-galaxy-400); background: repeating-linear-gradient(135deg, rgb(255 255 255 / .025) 0 2px, transparent 2px 14px), #0a0818; }
+/* esquinas tipo «mira» en el titular */
+main[data-activa='liga'] section > header::after { content: ''; position: absolute; inset: 14px 18px; pointer-events: none;
+  background:
+    linear-gradient(var(--color-galaxy-400), var(--color-galaxy-400)) top left / 26px 2px no-repeat,
+    linear-gradient(var(--color-galaxy-400), var(--color-galaxy-400)) top left / 2px 26px no-repeat,
+    linear-gradient(var(--color-galaxy-400), var(--color-galaxy-400)) bottom right / 26px 2px no-repeat,
+    linear-gradient(var(--color-galaxy-400), var(--color-galaxy-400)) bottom right / 2px 26px no-repeat; }
+/* títulos de sección con bloque inclinado delante, como los paneles de torneo */
+main[data-activa='liga'] h2 { display: flex; align-items: center; gap: .6rem; }
+main[data-activa='liga'] h2::before { content: ''; width: .55rem; height: 1.1em; background: var(--color-galaxy-400); transform: skewX(-18deg); flex: none; }
+/* marcador: cifras anchas y firmes */
+main[data-activa='liga'] :is(.liga-podio-pts, .tabular-nums, td, th) { font-variant-numeric: tabular-nums; }
+main[data-activa='liga'] .liga-podio-pts, main[data-activa='liga'] .liga-podio-pos { font-weight: 800; }
+main[data-activa='liga'] .liga-podio-tit { letter-spacing: .2em; border-bottom: 2px solid var(--color-galaxy-400); padding-bottom: .4rem; }
+/* tabla: cabecera con raya fuerte y filas con filo izquierdo */
+main[data-activa='liga'] table thead { border-bottom: 2px solid var(--color-galaxy-400); }
+main[data-activa='liga'] table tbody tr:nth-child(odd) { background: rgb(255 255 255 / .03); }
