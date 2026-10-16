@@ -594,6 +594,7 @@ const VENTANAS = [
   import { montarMundos } from '../js/features/mundos.js';
   import { openAuthModal } from '../js/features/auth.js';
   montarMundos();
+  import('../js/features/primerosPasos.js').then((m) => m.montarPrimerosPasos()).catch((e) => console.warn('[central] primeros pasos:', e));
   import('../js/features/elite.js').then((m) => m.montarElite()).catch((e) => console.warn('[central] elite:', e));
   import('../js/features/estrellas.js').then((m) => m.montarEstrellas()).catch((e) => console.warn('[central] estrellas:', e));
   import('../js/features/ventanas.js').then((m) => m.montarVentanas()).catch((e) => console.warn('[central] ventanas:', e));
