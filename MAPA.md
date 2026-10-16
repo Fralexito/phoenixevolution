@@ -387,3 +387,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 323 (cuenta WEB, borrador): iconos Phosphor pasan de Bold a Fill (rellenos). Para volver: cambiar 'fill' por 'bold' en styles/global.css y 'ph-fill' por 'ph-bold' en features/sinIconosWeb.js.
 
 ### Ronda 324 (cuenta WEB, borrador): iconos vuelven a Bold y ganan presencia (tamaño 1.2em + trazo extra .35px en styles/sinIconosWeb.css).
+
+### Ronda 325 (cuenta WEB, borrador): el estilo «sin huella de IA» ahora cubre también database, tienda, palmares, premios, logros, envivo y ahora (solo quedan fuera la portada y Duelos, que tienen diseño propio). Revisado: perfil de jugador ya tenía gráficos (barra G/E/P, goles, tendencia) y el menú ya está agrupado (Competiciones/Jugar/Comunidad).
