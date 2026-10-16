@@ -365,3 +365,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 312 (cuenta WEB, borrador): prueba de 3 diseños en la portada: Social = mosaico de iconos, Competencia = una grande y dos chicas, Duelos y Mi Club = vista en vivo. Se cambia en VISTA (index.astro). Tests 466 OK, build 48.
 
 ### Ronda 313 (cuenta WEB, borrador): vuelve el giro de las 4 ventanas (toca y gira, atrás = todas las acciones) manteniendo los nuevos diseños al frente. Tests 466 OK, build 48.
+
+### Ronda 314 (cuenta WEB, borrador): el frente de las 4 ventanas vuelve a ser simple (solo lo en vivo); los diseños nuevos (mosaico, grande, botón+atajos) salen AL GIRAR. Tests 466 OK, build 48.
