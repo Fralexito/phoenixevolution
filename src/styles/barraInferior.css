@@ -1,0 +1,19 @@
+/* Barra fija inferior (solo celular). Ronda 328. Movimiento corto; sin transition:all. */
+.barra-inf { display: none; }
+@media (max-width: 767.98px) {
+  .barra-inf {
+    display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 58;
+    padding: .3rem .4rem calc(.3rem + env(safe-area-inset-bottom)); background: rgb(8 8 20 / .92); backdrop-filter: blur(14px);
+    border-top: 1px solid var(--color-galaxy-border, #2a2a4a);
+  }
+  .bi-item { display: flex; flex-direction: column; align-items: center; gap: .15rem; min-height: 3rem; justify-content: center; border-radius: .6rem; color: #9ca3af; font: 700 12px/1 var(--font-display, inherit); text-transform: uppercase; letter-spacing: .05em; position: relative; transition: transform .15s cubic-bezier(.22,1,.36,1), color .15s cubic-bezier(.22,1,.36,1); -webkit-tap-highlight-color: transparent; }
+  .bi-item i { font-size: 1.5rem; line-height: 1; }
+  .bi-item:active { transform: scale(.92); }
+  .bi-item[aria-current='page'] { color: var(--color-galaxy-400, #00e5ff); }
+  .bi-item[aria-current='page']::before { content: ''; position: absolute; top: -.32rem; left: 28%; right: 28%; height: 3px; border-radius: 3px; background: var(--color-galaxy-400, #00e5ff); }
+  /* sube lo que flotaba abajo para que no quede tapado */
+  html[data-barra-inf] #live-wrap { bottom: 4.6rem; }
+  html[data-barra-inf] .cf-burbujas { bottom: 5.4rem; }
+  html[data-barra-inf] .cf-hoja { bottom: 5.4rem; }
+  html[data-barra-inf] body { padding-bottom: 3.6rem; }
+}

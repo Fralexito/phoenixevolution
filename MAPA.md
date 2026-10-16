@@ -393,3 +393,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 326 (cuenta WEB, borrador): clips de portada aceptan Twitch (slug del clip) y Kick (canal) además de YouTube: core/clips.js (+test), highlights.js e index.astro. Los clips de YouTube de ejemplo siguen y la sección sigue oculta (FX.highlightsDemo) hasta que Fralex dé sus clips reales.
 
 ### Ronda 327 (cuenta WEB, borrador): Panel con 2 pestañas nuevas: «Textos» (cambia el título h1 de cada página; vacío = original) y «Enlaces» (hasta 4 botones nuevos en la barra lateral y el pie). core/sitio.js (textos, enlaces + test), sitioAplicar.js, panel.js. No hace falta migración (la config es jsonb). Nota: del h1 solo se cambia el último trozo de texto, así palabras con degradado anteriores (p. ej. «Galaxy») se mantienen.
+
+### Ronda 328 (cuenta WEB, borrador): barra fija inferior SOLO en celular (Inicio, Liga, Duelos, Mi club, Yo), patrón de apps de apuestas. components/BarraInferior.astro + styles/barraInferior.css + FX.barraInferior. El botón «En vivo» y el chat suben para no taparse.

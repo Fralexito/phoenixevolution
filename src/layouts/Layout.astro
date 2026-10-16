@@ -21,6 +21,7 @@ import Ticker from '../components/Ticker.astro';
 import Sidebar from '../components/Sidebar.astro';
 import Footer from '../components/Footer.astro';
 import BarraLateral from '../components/BarraLateral.astro';
+import BarraInferior from '../components/BarraInferior.astro';
 import PilarTabs from '../components/PilarTabs.astro';
 import { FX } from '../data/experimento.js';
 import { pilarDe } from '../data/site.js';
@@ -32,7 +33,7 @@ const base = import.meta.env.BASE_URL;
 const canonica = new URL(Astro.url.pathname, Astro.site).href;
 ---
 <!doctype html>
-<html lang="es" data-fx-reveal={FX.reveal ? '' : undefined} data-fx-esqueletos={FX.esqueletos ? '' : undefined} data-fx-barra={FX.barraLateral ? '' : undefined} data-fx-dopamina={FX.dopamina ? '' : undefined} data-fx-3d={FX.prof3d ? '' : undefined} data-fx-premium={FX.premium ? '' : undefined} data-fx-ordenado={FX.ordenado ? '' : undefined} data-fx-marco={FX.marco ? '' : undefined} data-fx-duelos-pro={FX.duelosPro ? '' : undefined} data-fx-jbarra={FX.jugadoresBarra ? '' : undefined} data-fx-contactos={FX.contactos ? '' : undefined} data-fx-vitrina={FX.vitrina ? '' : undefined} data-fx-pro={FX.estiloPro ? '' : undefined} data-sin-ico={FX.sinIconosWeb ? '' : undefined}>
+<html lang="es" data-barra-inf={FX.barraInferior ? '' : undefined} data-fx-reveal={FX.reveal ? '' : undefined} data-fx-esqueletos={FX.esqueletos ? '' : undefined} data-fx-barra={FX.barraLateral ? '' : undefined} data-fx-dopamina={FX.dopamina ? '' : undefined} data-fx-3d={FX.prof3d ? '' : undefined} data-fx-premium={FX.premium ? '' : undefined} data-fx-ordenado={FX.ordenado ? '' : undefined} data-fx-marco={FX.marco ? '' : undefined} data-fx-duelos-pro={FX.duelosPro ? '' : undefined} data-fx-jbarra={FX.jugadoresBarra ? '' : undefined} data-fx-contactos={FX.contactos ? '' : undefined} data-fx-vitrina={FX.vitrina ? '' : undefined} data-fx-pro={FX.estiloPro ? '' : undefined} data-sin-ico={FX.sinIconosWeb ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -72,6 +73,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     {FX.barraLateral && <BarraLateral active={active} />}
     <main class="flex-grow w-full" data-mundo={FX.pilares ? pilarDe(active)?.id : undefined} data-activa={active} data-sia={SIN_IA_NO.includes(active ?? '') ? undefined : ''}>{FX.pilares && <PilarTabs active={active} />}<slot /></main>
     <Footer />
+    {FX.barraInferior && <BarraInferior active={active} />}
     <!-- Pulso en vivo (features/liveFeed.js): mensajes con hora exacta. El historial del día se abre en otra pestaña (/historial-en-vivo/). El botón «En vivo» se mueve manteniéndolo pulsado. -->
     <div id="live-wrap" class="fixed left-3 right-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:w-[22rem] z-[60] flex flex-col items-start md:items-end gap-2 pointer-events-none">
       <div id="live-feed" aria-hidden="true" class="flex flex-col items-start md:items-end gap-1.5 max-w-full"></div>
