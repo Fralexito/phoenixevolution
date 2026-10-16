@@ -1,5 +1,6 @@
 // Página «Crear mi liga» (ronda 276). Solo staff por ahora. Crea un torneo propio (RPC torneo_crear, igual que /torneos/) y lleva a su ficha.
-import { onSession, tieneRolStaff } from '../core/session.js';
+import { onSession, rolReal } from '../core/session.js';
+import { puede } from '../core/roles.js';
 import { toast } from '../core/toast.js';
 import { escapeHTML as esc } from '../core/dom.js';
 import { href } from '../core/config.js';
@@ -70,6 +71,6 @@ form.addEventListener('submit', crear);
 
 onSession((s) => {
   const hayUsuario = !!s.session?.user?.id;
-  const staff = hayUsuario && tieneRolStaff();
+  const staff = hayUsuario && puede(rolReal(), 'editarLiga');   // moderador o admin: lo mismo que exige el servidor (migración 107)
   $('cl-sin-sesion').hidden = hayUsuario; $('cl-no-staff').hidden = !hayUsuario || staff; form.hidden = !staff;
 });

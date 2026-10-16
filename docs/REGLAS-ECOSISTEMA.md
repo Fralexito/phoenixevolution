@@ -39,6 +39,7 @@ Un chat que no es dueño **no cambia** la pieza: entrega un prompt al dueño.
 ## 7. Protocolo de dos cuentas (A y B trabajan a la vez)
 - Al empezar: `git fetch` + `git pull --rebase origin borrador` y leer el final de `REGISTRO.md`.
 - Antes de usar un número de migración o de ronda: revisar el último en `REGISTRO.md`, `MAPA.md` y Supabase (`list_migrations` **y** existencia de tablas, porque lo pegado a mano no aparece en la lista). Escribir primero una línea «RESERVADO N» en `REGISTRO.md` y empujarla.
+- **Número de ronda (regla ronda 295):** el siguiente es el MAYOR número que aparezca en `MAPA.md` **o** `REGISTRO.md`, más 1. Se saca así: `grep -oh "Ronda [0-9]*" MAPA.md REGISTRO.md | sed 's/Ronda //' | sort -n | tail -1`. No te fíes de «la última línea» de un solo archivo (las dos cuentas no escriben en orden y así se repitieron los números 273–275).
 - Toda migración aplicada (por MCP o a mano) debe tener su archivo en `supabase/migrations/` en el mismo commit. Nada de cambios solo en la base.
 - Después de cada cambio: UNA línea en `REGISTRO.md` (formato al inicio del archivo). Solo se añade; nunca se edita ni se borra.
 - Si algo queda a medias, escribir exactamente en qué punto y qué falta.

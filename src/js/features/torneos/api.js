@@ -4,6 +4,7 @@ import { supabase } from '../../core/supabase.js';
 const MENSAJES = {
   NO_AUTORIZADO: 'No tienes permiso para hacer eso en este torneo.',
   CUENTA_SANCIONADA: 'Tu cuenta está sancionada y no puede hacer esto ahora.',
+  SOLO_STAFF: 'Por ahora solo el staff crea ligas desde «Crear mi liga».',
   TORNEOS_PAUSADOS: 'El staff pausó la creación de torneos por ahora.',
   DEMASIADOS_TORNEOS: 'Ya tienes demasiados torneos activos. Termina o cancela alguno.',
   CUPO_INVALIDO: 'Ese cupo supera el máximo permitido.',
