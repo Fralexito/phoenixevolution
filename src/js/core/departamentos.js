@@ -76,16 +76,22 @@ const DETECTA = [
   ['vestuario', /\b(jugador|carta|media \d|plantel|vestuario)\b/i],
   ['club', /\b(club|plantilla|escudo|presupuesto)\b/i],
   ['duelos', /\b(duelo|reto|sala)\b/i],
-  ['plaza', /\b(comunidad|muro|chat general|bienvenida)\b/i],
+  ['plaza', /\b(la plaza|comunidad|muro social|chat general|bienvenida)\b/i],
   ['cronica', /\b(cr[oó]nica|fecha \d+|goleada|racha|remontada|matagigantes|susto)\b/i],
 ];
 const PORCATEGORIA = { OFICIAL: 'direccion', TRIBUNAL: 'tribunal', TRIBUNA: 'tribuna', JORNADA: 'cronica' };
 
-/** Departamento de una noticia: manda su `departamento` guardado; si no, se detecta por etiqueta y título. */
+/**
+ * Departamento de una noticia. Manda su `departamento` guardado; si no, se detecta en dos pasadas:
+ * PRIMERO la etiqueta sola (es la pista que pone el staff) y recién después el título,
+ * para que una frase del titular («el muro aguantó») no se lleve la noticia a otra sección.
+ */
 export function departamentoDe(n) {
   if (n?.departamento && MAPA.has(n.departamento)) return n.departamento;
   if (n?.liga === 'sudario') return 'sudario';
-  const texto = `${n?.tag ?? ''} ${n?.titulo ?? ''}`;
+  const tag = String(n?.tag ?? '');
+  if (tag.trim()) for (const [id, re] of DETECTA) if (re.test(tag)) return id;
+  const texto = `${tag} ${n?.titulo ?? ''}`;
   for (const [id, re] of DETECTA) if (re.test(texto)) return id;
   return PORCATEGORIA[n?.categoria] ?? 'cronica';
 }

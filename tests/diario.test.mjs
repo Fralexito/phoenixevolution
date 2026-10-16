@@ -38,6 +38,9 @@ test('departamentoDe: detecta por etiqueta, categoría y liga', () => {
   assert.equal(departamentoDe(n({ titulo: 'Fecha 3 de la Sudario', liga: 'sudario' })), 'sudario');
   assert.equal(departamentoDe({ ...LISTA[0], departamento: 'clanes' }), 'clanes');
   assert.equal(departamentoDe({ titulo: 'Algo sin pistas', categoria: 'OFICIAL' }), 'direccion');
+  // la etiqueta manda sobre el título: «el muro aguantó» no debe llevarse la crónica a La Plaza
+  assert.equal(departamentoDe(n({ titulo: '¡El muro aguantó! Degox le sacó un 0-0 a Victor', tag: 'Fecha 10 · Crónica' })), 'cronica');
+  assert.equal(departamentoDe(n({ titulo: 'Se abre el chat general de la comunidad', tag: '' , categoria: 'OFICIAL' })), 'plaza');
   assert.ok(departamentosPresentes(LISTA).length >= 6);
   assert.ok(esJoda('tribuna') && !esJoda('cronica'));
   assert.equal(departamento('no-existe').id, 'cronica');
