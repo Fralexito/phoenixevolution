@@ -66,7 +66,7 @@ const ACCOUNT_NAV_BASE = [
 // Lo público (En vivo, Salas, Chat, Clanes, Eventos, Ranking, Tienda, Torneos, Formatos) ya vive en los 3 grupos del menú
 // (arriba en PC, al inicio del panel en celular): aquí se ocultaba duplicado. Siguen en el buscador (`menu: false`).
 const ORDEN_CUENTA = { perfil: ['tu', 1], muro: ['tu', 2], logros: ['tu', 3], guardados: ['tu', 4], mensajes: ['tu', 5], amigos: ['tu', 6],
-  partidos: ['juego', 1], missalas: ['juego', 2], manager: ['juego', 3], ...(FX.clubUnificado ? {} : { miclub: ['juego', 4] }), moderacion: ['staff', 1], auditoria: ['staff', 2] };
+  partidos: ['juego', 1], moderacion: ['staff', 1], auditoria: ['staff', 2] };
 const repartirCuenta = (lista) => {
   const pos = (n) => (ORDEN_CUENTA[n.id]?.[1] ?? 99);
   return lista.map((n) => n.abajo ? n : ORDEN_CUENTA[n.id] ? { ...n, grupo: ORDEN_CUENTA[n.id][0] } : { ...n, menu: false })
@@ -116,7 +116,7 @@ const DESC = {
   tienda: 'Estética y mejoras para tu perfil',
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
-const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas', competiciones: 'Ligas activas' } : {}) };
+const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas', competiciones: 'Todas las ligas' } : {}) };
 const pilar = (id, label, icon, ids, extra = {}) => ({ id, label, icon, ...extra,
   items: ids.map((spec) => { if (typeof spec === 'object') return { tambien: [], ...spec }; const [i, otras] = spec.split('>'); const n = TODAS().find((x) => x.id === i && x.path != null);
     return n && { ...n, label: RENOMBRE[i] ?? n.label, desc: DESC[i] ?? '', tambien: otras ? otras.split(',') : [] }; }).filter(Boolean) });
@@ -132,9 +132,9 @@ const PILARES_REPARTO = [
   // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
   // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
   conBloques('competir', 'Competiciones', 'fa-trophy', [
-    ['Compite', ['liga', 'competiciones', 'unirme', 'torneos', 'palmares', ...(FX.premios ? ['premios'] : []), 'formatos',
-      { id: 'crearliga', label: 'Crear mi liga', path: 'crear-liga/', icon: 'fa-wand-magic-sparkles', desc: 'Tu liga lista en 30 segundos (staff)', staff: 'editarLiga' },
-      { id: 'crear', label: 'Crear liga o torneo', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos' }]],
+    ['Compite', ['liga', 'competiciones', 'unirme', 'torneos>formatos', 'palmares', ...(FX.premios ? ['premios'] : []),
+      { id: 'crearliga', label: 'Crear', path: 'crear-liga/', icon: 'fa-circle-plus', desc: 'Tu liga lista en 30 segundos', staff: 'editarLiga' },
+      { id: 'crear', label: 'Crear', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos', noStaff: 'editarLiga' }]],
     ['Estadísticas', ['historial', 'ranking', ...(FX.carruseles ? [] : ['database'])]],
   ], { lema: 'Ligas, torneos y campeones' }),
   // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.

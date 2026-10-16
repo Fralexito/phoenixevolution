@@ -31,7 +31,7 @@ const pilarActual = pilarDe(active)?.id;
                 {b.titulo && <p class="pilar-bloque">{b.titulo}</p>}
                 <div class="pilar-grid">
                   {b.items.map((n) => (
-                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" data-solo-staff={n.staff} hidden={n.staff ? true : undefined} aria-current={esDe(n, active) ? 'page' : undefined}>
+                    <a href={`${base}${n.path}`} role="menuitem" class="pilar-item" data-solo-staff={n.staff} data-no-staff={n.noStaff} hidden={n.staff ? true : undefined} aria-current={esDe(n, active) ? 'page' : undefined}>
                       <i class={`fa-solid ${n.icon}`}></i><span><b>{n.label}</b><small>{n.desc}</small></span>
                     </a>
                   ))}
