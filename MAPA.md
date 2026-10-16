@@ -63,6 +63,13 @@ Radar (Presence): solo muestra quién está libre/ocupado; es cosmético, no da 
 - OJO: dentro del afiche se anula `main[data-sia] h2` (ponía los títulos en fila y partía el titular).
 - Probado en PC y celular con la vista previa construida (sin desbordes) y descargando las dos portadas. Pruebas 565 OK, build 53 páginas.
 
+### Ronda 350 — Galaxy League: la tabla de la Fase 1 ya coincide con la tabla oficial que mandó Fralex
+- Fralex mandó una foto de cómo debe quedar la tabla de la Galaxy League (puntos, partidos ganados/empatados/perdidos, goles y diferencia) y pidió que la página quede exactamente así, calculando qué resultados lo explican (él no lleva el conteo oficial).
+- Encontré los cambios que hacían falta: 4 partidos que se dieron por jugados en realidad se anulan (no suman nada) y 6 partidos pendientes en realidad fueron empates 0-0. Aplicado primero en Supabase (`liga_partidos`, tabla real que valida el staff) y luego reflejado en `src/data/ligaResultados.js` (la web construye la tabla desde este archivo; Supabase solo la actualiza EN VIVO si el partido ya existe ahí con el mismo nombre).
+- De paso quedó al día el cambio de nombre **Roberto → Maurisgame** (pedido en una sesión anterior) en este mismo archivo: no se había copiado todavía y sin eso la tabla en vivo no iba a casar los nombres.
+- Verificado corriendo la función real de la tabla (`core/tabla.js`) contra el archivo editado: puntos, ganados, empatados, perdidos, goles a favor/contra y diferencia quedan IGUAL a la foto de Fralex, en los 12 equipos.
+- Única diferencia que queda: la columna «partidos jugados (J)» no calza para 3 equipos (Degox, Maurisgame, Jeremi) porque la foto original ya tenía ese número inconsistente con sus propios G+E+P — no es algo que este cambio rompió, es un dato que ya venía raro en la imagen.
+
 ## Historial antiguo
 - Los cambios iniciales y las rondas 6 a 250 se archivaron en **`docs/MAPA-HISTORIAL.md`** (ronda 295). Aquí quedan la ronda 251 en adelante y «RETOMAR».
 
