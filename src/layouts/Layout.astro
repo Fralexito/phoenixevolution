@@ -23,6 +23,7 @@ import Footer from '../components/Footer.astro';
 import BarraLateral from '../components/BarraLateral.astro';
 import PilarTabs from '../components/PilarTabs.astro';
 import { FX } from '../data/experimento.js';
+import { pilarDe } from '../data/site.js';
 
 const { title, active = '', description = 'Phoenix Evolution Series — la liga competitiva de PES 2021 y SP Football Life 2026.' } = Astro.props;
 const base = import.meta.env.BASE_URL;
@@ -67,7 +68,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     </div>
     <Sidebar active={active} />
     {FX.barraLateral && <BarraLateral active={active} />}
-    <main class="flex-grow w-full">{FX.pilares && <PilarTabs active={active} />}<slot /></main>
+    <main class="flex-grow w-full" data-mundo={FX.pilares ? pilarDe(active)?.id : undefined}>{FX.pilares && <PilarTabs active={active} />}<slot /></main>
     <Footer />
     <!-- Pulso en vivo (features/liveFeed.js): mensajes con hora exacta. El historial del día se abre en otra pestaña (/historial-en-vivo/). El botón «En vivo» se mueve manteniéndolo pulsado. -->
     <div id="live-wrap" class="fixed left-3 right-3 bottom-3 md:left-auto md:right-4 md:bottom-4 md:w-[22rem] z-[60] flex flex-col items-start md:items-end gap-2 pointer-events-none">

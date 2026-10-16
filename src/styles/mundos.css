@@ -1,0 +1,23 @@
+/* MUNDOS (ronda 297): cada puerta del menú tiene su propio ambiente. Competiciones conserva el cian de Galaxy;
+   Jugadores, Jugar, Mi club y Comunidad cambian de color (brillo de fondo, pestañas, acentos). Se apaga con Sudario o con un acento elegido en Ajustes. */
+main[data-mundo] { position: relative; isolation: isolate; --mundo: 0 229 255; }
+main[data-mundo='competir'] { --mundo: 0 229 255; --mundo-2: 251 191 36; }
+main[data-mundo='jugadores'] { --mundo: 167 139 250; --mundo-2: 244 114 182; }
+main[data-mundo='jugar'] { --mundo: 255 61 139; --mundo-2: 255 159 28; }
+main[data-mundo='miclub'] { --mundo: 52 211 153; --mundo-2: 163 230 53; }
+main[data-mundo='comunidad'] { --mundo: 251 146 60; --mundo-2: 250 204 21; }
+/* Brillo de ambiente arriba de la página (no recibe clics, queda detrás del contenido). */
+main[data-mundo]::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 26rem; z-index: -1; pointer-events: none;
+  background: radial-gradient(60rem 18rem at 18% 0%, rgb(var(--mundo) / .16), transparent 70%), radial-gradient(40rem 14rem at 88% 0%, rgb(var(--mundo-2, var(--mundo)) / .10), transparent 70%); }
+main[data-mundo] .pilar-tabs-tit { color: rgb(var(--mundo)); }
+main[data-mundo] .pilar-tabs-lista { border-color: rgb(var(--mundo) / .35); }
+main[data-mundo] .pilar-tabs-lista a[aria-current='page'] { background: rgb(var(--mundo)); box-shadow: 0 0 16px rgb(var(--mundo) / .5); }
+main[data-mundo='competir'] .pilar-tabs-lista a[aria-current='page'] { background: var(--color-galaxy-400); }
+/* Los mundos con color propio también tiñen los acentos cian de sus páginas. */
+html:not([data-tema='sudario']):not([data-aj-acento='violeta']):not([data-aj-acento='dorado']):not([data-aj-acento='verde']):not([data-aj-acento='rojo']) {
+  & main[data-mundo='jugadores'] { --color-galaxy-400: #a78bfa; --color-galaxy-500: #8b5cf6; --color-galaxy-50: #ede9fe; }
+  & main[data-mundo='jugar'] { --color-galaxy-400: #ff3d8b; --color-galaxy-500: #e11d74; --color-galaxy-50: #ffe4f0; }
+  & main[data-mundo='miclub'] { --color-galaxy-400: #34d399; --color-galaxy-500: #10b981; --color-galaxy-50: #d1fae5; }
+  & main[data-mundo='comunidad'] { --color-galaxy-400: #fb923c; --color-galaxy-500: #f97316; --color-galaxy-50: #ffedd5; }
+}
+html[data-tema='sudario'] main[data-mundo]::before { opacity: .5; }

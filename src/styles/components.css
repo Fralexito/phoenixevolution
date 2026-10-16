@@ -11,7 +11,7 @@
 }
 .text-shadow-glow { text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); }
 
-.nav-link { color: #cbd5e1; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; padding: 0.5rem; transition: color .2s ease; }
+.nav-link { color: #cbd5e1; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; padding: 0.5rem; white-space: nowrap; transition: color .2s ease; }
 .nav-link:hover { color: var(--color-galaxy-400); }
 .nav-link[aria-current='page'] { color: var(--color-galaxy-400); border-bottom: 2px solid var(--color-galaxy-400); text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
 
