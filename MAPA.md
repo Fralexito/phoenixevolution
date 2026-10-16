@@ -381,3 +381,5 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 320 (cuenta WEB, borrador): (1) Gráfico «Evolución de puntos (los 4 primeros)» en Liga (uPlot, plegable cerrado; core/ligaStats.evolucionPuntos + 2 tests; estilos en styles/uplot.css). (2) Iconos: se cambian los iconos genéricos Font Awesome por Phosphor LIGHT (trazo fino) con la tabla data/iconosFinos.js (~190 equivalencias); los sin equivalencia pegados a texto se ocultan; arrows/✕/✓ se quedan. Barra lateral con iconos finos otra vez (monograma solo de respaldo). Tests 476 OK, build 49.
 
 ### Ronda 321 (cuenta WEB, borrador): librerías Fuse.js (buscador tolera errores de escritura) y Floating UI (el menú de pilares no se sale de la pantalla). Gráficos nuevos: «Goles por fecha» en Liga (uPlot barras, plegable cerrado; core/ligaStats.golesPorFecha + test) y «Gráfico de los 8 primeros» en Ranking (barras, plegable). Pendiente: gráfico en perfil de jugador.
+
+### Ronda 322 (cuenta WEB, borrador): iconos Phosphor pasan de Light a Bold (más presencia); cambio en styles/global.css y features/sinIconosWeb.js. Si aún se ven suaves: probar 'fill'.
