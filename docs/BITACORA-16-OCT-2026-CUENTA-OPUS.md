@@ -54,7 +54,7 @@ Principio: **la IA prepara, FRALEX o un moderador aprueba**. La IA nunca toca di
 ## 3. Pendientes de FRALEX (lo que él tiene que hacer)
 | # | Qué | Dónde | Estado |
 |---|---|---|---|
-| 1 | Pegar el SQL de las migraciones **116 + 117 + 118** (sin comentarios) | Supabase → SQL Editor → Run | Se le entregó el 16-oct; verificar con la consulta de la sección 0 |
+| 1 | Pegar el SQL de las migraciones **116 + 117 + 118** (sin comentarios) | Supabase → SQL Editor → Run | ✅ **HECHO 16-oct 08:46** (verificado: tablas, 3 funciones y 2 tareas nuevas; registro de cron bajó de 67.252 a 42.802 filas) |
 | 2 | **Paso B:** clave del chat (`ANTHROPIC_API_KEY`) con límite de gasto mensual | console.anthropic.com → Supabase → Edge Functions → Secrets | Pidió que se le recuerde: tarea programada `trig_01U25BkMjL7LVdWejUJhYgSg` el **lunes 19-oct 10:00 Lima** |
 | 3 | Activar «leaked password protection» | Supabase → Authentication | Pendiente desde antes |
 | 4 | Pegar el prompt `docs/PROMPT-SISTEMA-DATOS-WEB-PES.md` en el chat de Phoenix Sync | Claude Code del programa | Lo iba a hacer |
