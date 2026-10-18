@@ -7,6 +7,8 @@ import { escapeHTML as esc } from '../core/dom.js';
 import { DESTINOS, tiposDisponibles, tipoRegistrado, ESTADO_LADO, resumenResultados, resumenFichaje, mensajeError } from '../core/cambiosOficiales.js';
 import * as api from '../features/cambios/api.js';
 import '../features/cambios/fichaje.js';
+import '../features/cambios/fichas.js';   // 126: stats e info
+import { montarHistorialFichas } from '../features/cambios/historialFichas.js';
 // ← enchufes: aquí importan sus tipos las sesiones 126 (stats/info) y 127 (dinero/valor).
 
 const $ = (id) => document.getElementById(id);
@@ -102,6 +104,7 @@ async function iniciar() {
     try { await api.anularCambio(b.dataset.id, motivo); toast('Cambio anulado.', 'success'); await cargarHistorial(); } catch (e) { toast(e.message, 'error'); }
   });
   await cargarHistorial();
+  try { await montarHistorialFichas($('cf-historial-fichas')); } catch { /* sin la 126 en la base: el resto de la página sigue */ }
 }
 
 onSession(() => {
