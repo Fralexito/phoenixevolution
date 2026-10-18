@@ -58,3 +58,11 @@ html[data-fx-pasada] main .glass-panel.text-center:is(.text-gray-500, .text-gray
 @media (hover: none) {
   html[data-fx-pasada] :is(a, button, [role='button'], [tabindex='0']).glass-panel:hover { translate: 0 0; box-shadow: none; }
 }
+
+/* ---------- 6 · Menos ruido arriba (ronda 360, 2.ª tanda) ---------- */
+/* Paneles que aún no tienen nada dentro (p. ej. la cartera de la Tienda sin sesión) no dibujan una franja vacía; reaparecen solos al llenarse. */
+html[data-fx-pasada] main :is(section, div).glass-panel:empty { display: none; }
+/* «Última hora»: la etiqueta deja de ser un bloque morado sólido con sombra dura y el rayo ya no late; la franja se funde con el fondo. */
+html[data-fx-pasada] #ticker { background: color-mix(in srgb, var(--color-galaxy-dark) 80%, transparent); border-bottom-color: color-mix(in srgb, var(--color-galaxy-400) 14%, transparent); }
+html[data-fx-pasada] #ticker > :first-child { background: color-mix(in srgb, var(--color-galaxy-600) 24%, transparent); box-shadow: none; border-right: 1px solid color-mix(in srgb, var(--color-galaxy-400) 22%, transparent); }
+html[data-fx-pasada] #ticker .animate-pulse { animation: none; }
