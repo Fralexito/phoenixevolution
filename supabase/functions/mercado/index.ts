@@ -10,7 +10,8 @@ const URL_FIRMADA_SEG = 300;
 
 class ErrorApi extends Error { constructor(public codigo: string, public http = 400, public extra: Record<string, unknown> = {}) { super(codigo); } }
 const HTTP: Record<string, number> = { TOKEN_FALTANTE: 401, TOKEN_INVALIDO: 401, TOKEN_REVOCADO: 401, CODIGO_NO_ENCONTRADO: 404, CODIGO_USADO: 409,
-  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, CLUB_NO_ENCONTRADO: 404, NO_AUTORIZADO: 403, ERROR_INTERNO: 500 };
+  CODIGO_VENCIDO: 410, DISPOSITIVO_SUSPENDIDO: 403, CODIGO_MANAGER_REQUERIDO: 403, SIN_OPTION_FILE: 404, DEMASIADOS_INTENTOS: 429, RUTA_NO_EXISTE: 404, METODO_NO_PERMITIDO: 405, DATOS_INVALIDOS: 422, CLUB_NO_ENCONTRADO: 404, NO_AUTORIZADO: 403, ERROR_INTERNO: 500,
+  VERSION_YA_PUBLICADA: 409, VERSION_NO_EXISTE: 404, ZIP_NO_SUBIDO: 409, ZIP_DISTINTO: 409 };
 const err = (codigo: string, extra: Record<string, unknown> = {}) => new ErrorApi(codigo, HTTP[codigo] ?? 400, extra);
 const log = (nivel: string, evento: string, datos: Record<string, unknown> = {}) => console.log(JSON.stringify({ nivel, evento, ...datos, t: new Date().toISOString() }));
 
@@ -431,7 +432,90 @@ async function vestuarioAplicado(req: Request) {
   return data;
 }
 
+// ───────── Auto-actualización de Phoenix Link (128) ─────────
+// Link pregunta con su token de PC; recibe un sobre firmado (misma clave Ed25519 de la 085) con versión, sha256 y tamaño
+// del zip, más una URL firmada de 10 min. Link solo instala si la firma, el sha256 y el tamaño cuadran.
+const BUCKET_LINK = "link-versiones";
+const URL_LINK_SEG = 600;
+const FORMATO_LINK = "phoenix-link/actualizacion-1";
+const versionLink = (x: unknown, campo = "version") => {
+  if (typeof x !== "string" || !/^[0-9]{1,4}\.[0-9]{1,4}\.[0-9]{1,4}$/.test(x)) throw err("DATOS_INVALIDOS", { campo }); return x;
+};
+const errorRpc = (evento: string, e: { message: string }) => {
+  for (const c of ["NO_AUTORIZADO", "VERSION_YA_PUBLICADA", "VERSION_NO_EXISTE", "DATOS_INVALIDOS"]) if (e.message.includes(c)) return err(c);
+  log("error", evento, { m: e.message }); return err("ERROR_INTERNO");
+};
+
+/** GET /v1/link/actualizacion?version=0.3.16 → { hay:false } | { hay:true, sobre:{contenido,firma,clave_id,algoritmo}, url, expira_en_seg }
+ *  «contenido» (texto JSON firmado): { formato, version, etapa, sha256, tamano, notas, obligatoria, generado }. */
+async function linkActualizacion(req: Request) {
+  const d = await autenticar(req);
+  if (d.origen !== "link") throw err("NO_AUTORIZADO");
+  const version = versionLink(new URL(req.url).searchParams.get("version"));
+  const { data, error } = await sb.rpc("sistema_link_ultima", { p_dispositivo: d.id, p_usuario: d.usuario, p_version: version });
+  if (error) throw errorRpc("link.ultima", error);
+  if (!data) return { hay: false };
+  const v = data as { version: string; etapa: string; archivo: string; sha256: string; tamano: number; notas: string; obligatoria: boolean };
+  const { data: f, error: e2 } = await sb.storage.from(BUCKET_LINK).createSignedUrl(v.archivo, URL_LINK_SEG, { download: `PhoenixLink-${v.version}.zip` });
+  if (e2 || !f?.signedUrl) { log("error", "link.url", { m: e2?.message }); throw err("ERROR_INTERNO"); }
+  const sobre = await firmar(JSON.stringify({ formato: FORMATO_LINK, version: v.version, etapa: v.etapa, sha256: v.sha256, tamano: v.tamano,
+    notas: v.notas, obligatoria: v.obligatoria, generado: new Date().toISOString() }));
+  return { hay: true, sobre, url: f.signedUrl, expira_en_seg: URL_LINK_SEG };
+}
+
+/** POST /v1/link/actualizacion/informe { version, estado: descargando|instalando|instalada|fallo|restaurada, detalle? } → { ok } */
+async function linkInforme(req: Request) {
+  const d = await autenticar(req); if (d.origen !== "link") throw err("NO_AUTORIZADO");
+  frenar(`linf:${d.id}`, 30, 60 * 60_000);
+  const b = await leerJson(req, 4000);
+  if (!["descargando", "instalando", "instalada", "fallo", "restaurada"].includes(b.estado as string)) throw err("DATOS_INVALIDOS", { campo: "estado" });
+  const { error } = await sb.rpc("sistema_link_informe", { p_dispositivo: d.id, p_usuario: d.usuario, p_version: versionLink(b.version),
+    p_estado: b.estado, p_detalle: texto(b.detalle, "detalle", 300) ?? "" });
+  if (error) throw errorRpc("link.informe", error);
+  return { ok: true };
+}
+
+/** (admin) POST /v1/link/versiones { version, etapa, sha256, tamano, notas, obligatoria } → { id, version, archivo, subir_url }
+ *  La deja NO publicada. Después: PUT del zip a subir_url y POST /v1/link/versiones/subida { id }. Lo usa tools/EMPAQUETAR-RELEASE.ps1. */
+async function linkVersionNueva(req: Request) {
+  const d = await autenticar(req); frenar(`lver:${d.usuario}`, 20, 60 * 60_000);
+  const b = await leerJson(req, 8000);
+  const tamano = Number(b.tamano);
+  if (!Number.isInteger(tamano) || tamano < 1 || tamano > 52_428_800) throw err("DATOS_INVALIDOS", { campo: "tamano" });
+  const sha = hash(b.sha256, "sha256"); if (!sha) throw err("DATOS_INVALIDOS", { campo: "sha256" });
+  const { data, error } = await sb.rpc("sistema_link_version_registrar", { p_usuario: d.usuario, p_version: versionLink(b.version),
+    p_etapa: texto(b.etapa, "etapa", 20) ?? "", p_sha256: sha, p_tamano: tamano, p_notas: texto(b.notas, "notas", 2000) ?? "",
+    p_obligatoria: b.obligatoria === true });
+  if (error) throw errorRpc("link.registrar", error);
+  const v = data as { id: number; version: string; archivo: string };
+  const { data: u, error: e2 } = await sb.storage.from(BUCKET_LINK).createSignedUploadUrl(v.archivo, { upsert: true });
+  if (e2 || !u?.signedUrl) { log("error", "link.subir_url", { m: e2?.message }); throw err("ERROR_INTERNO"); }
+  log("info", "link.version_registrada", { version: v.version, por: d.usuario });
+  return { ...v, subir_url: u.signedUrl };
+}
+
+/** (admin) POST /v1/link/versiones/subida { id } → el servidor baja el zip del bucket, comprueba tamaño y sha256 y la marca «subida». */
+async function linkVersionSubida(req: Request) {
+  const d = await autenticar(req);
+  const b = await leerJson(req, 1000); const id = Number(b.id);
+  if (!Number.isInteger(id) || id < 1) throw err("DATOS_INVALIDOS", { campo: "id" });
+  const { data: p } = await sb.from("perfiles").select("rol").eq("id", d.usuario).maybeSingle();
+  if (p?.rol !== "admin") throw err("NO_AUTORIZADO");
+  const { data: v } = await sb.from("link_versiones").select("id, archivo, sha256, tamano").eq("id", id).maybeSingle();
+  if (!v) throw err("VERSION_NO_EXISTE");
+  const { data: blob, error } = await sb.storage.from(BUCKET_LINK).download(v.archivo);
+  if (error || !blob) throw err("ZIP_NO_SUBIDO");
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const sha = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map((x) => x.toString(16).padStart(2, "0")).join("");
+  if (bytes.length !== Number(v.tamano) || sha !== v.sha256) throw err("ZIP_DISTINTO", { tamano: bytes.length, sha256: sha });
+  const r = await sb.rpc("sistema_link_version_subida", { p_usuario: d.usuario, p_id: id });
+  if (r.error) throw errorRpc("link.subida", r.error);
+  return r.data;
+}
+
 const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = {
+  "/v1/link/actualizacion": { GET: linkActualizacion }, "/v1/link/actualizacion/informe": { POST: linkInforme },
+  "/v1/link/versiones": { POST: linkVersionNueva }, "/v1/link/versiones/subida": { POST: linkVersionSubida },
   "/v1/vincular": { POST: vincular }, "/v1/yo": { GET: yo }, "/v1/option/actual": { GET: optionActual },
   "/v1/reportes": { POST: crearReporte, GET: misReportes },
   "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella },
