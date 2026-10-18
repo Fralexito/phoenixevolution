@@ -9,6 +9,8 @@
 //   POST /v1/traspasos/seguir     → (amigo) {codigo, prueba?}: pasa a seguir a ese anfitrión.
 //   POST /v1/traspasos/dejar      → (amigo) {anfitrion_id}.
 //   GET  /v1/traspasos/siguiendo  → {sigo, me_siguen}.
+//   (1.1.0, migración 125) GET /v1/traspasos también trae los lotes OFICIALES de Phoenix a todo PC vinculado (&solo_oficial=1: solo esos);
+//   GET /v1/cambios?desde=&destino=base|lm → cambios oficiales; POST /v1/pc/informe → registro de cada PC. Contrato: docs/CONTRATO-WEB-PES.md.
 // Solo viajan ids y nombres de jugador/equipo: ningún dato personal ni ninguna base de datos. Tablas con RLS y sin permisos para anon/authenticated.
 // Hecho por el chat LINK (Claude) con autorización de Fralex (12-oct-2026). Documento: docs/TRASPASOS-EN-VIVO.md.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -107,6 +109,9 @@ const ALFABETO_CODIGO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const MAX_SEGUIDORES = 100;
 const RETENCION_DIAS = 30;
 const MAX_LOTES_POR_ANFITRION = 200;
+// Canal OFICIAL de Phoenix (migración 125, docs/CONTRATO-WEB-PES.md): anfitrión fijo que no es ningún usuario.
+const OFICIAL_ID = "00000000-0000-4000-8000-0000000f0e11";
+const OFICIAL_NOMBRE = "Phoenix (oficial)";
 
 /** Token → dispositivo vinculado de CUALQUIER usuario (no hace falta ser host): es lo que necesita un amigo que solo recibe. */
 async function autenticarBasico(req: Request): Promise<Dispositivo> {
@@ -171,8 +176,9 @@ async function traspasosPublicar(req: Request) {
   // Limpieza barata: de vez en cuando se borra lo viejo (más de 30 días o por encima de los últimos 200 de este anfitrión).
   if (Math.random() < 0.1) {
     await sb.from("liga_traspasos").delete().lt("recibido", new Date(Date.now() - RETENCION_DIAS * 86_400_000).toISOString());
-    const { data: tope } = await sb.from("liga_traspasos").select("seq").eq("anfitrion", d.usuario).order("seq", { ascending: false }).range(MAX_LOTES_POR_ANFITRION, MAX_LOTES_POR_ANFITRION);
-    if (tope && tope[0]) await sb.from("liga_traspasos").delete().eq("anfitrion", d.usuario).lte("seq", tope[0].seq);
+    // los lotes OFICIALES (migración 125) no cuentan para el tope del anfitrión: solo caducan a los 30 días
+    const { data: tope } = await sb.from("liga_traspasos").select("seq").eq("anfitrion", d.usuario).eq("oficial", false).order("seq", { ascending: false }).range(MAX_LOTES_POR_ANFITRION, MAX_LOTES_POR_ANFITRION);
+    if (tope && tope[0]) await sb.from("liga_traspasos").delete().eq("anfitrion", d.usuario).eq("oficial", false).lte("seq", tope[0].seq);
   }
   log("info", "traspasos.publicar", { dispositivo: d.id, lote, cambios: cambios.length });
   return { seq: data!.seq as number, repetido: false };
@@ -180,32 +186,47 @@ async function traspasosPublicar(req: Request) {
 
 // ── GET /v1/traspasos?desde=<seq>&limite=<1-50> ─────────────────────────────────────────
 // Un amigo (o el propio anfitrión en «prueba») recoge los lotes nuevos de los anfitriones que SIGUE, en orden de seq.
+// Además, TODO PC vinculado recibe los lotes OFICIALES de Phoenix (migración 125, docs/CONTRATO-WEB-PES.md §3a) sin código;
+// con «solo_oficial=1» recibe solo esos (Link con «Recibir de amigos» apagado).
 async function traspasosLeer(req: Request) {
   const d = await autenticarBasico(req);
   frenar(`trl:${d.id}`, 40, 60_000);
   const q = new URL(req.url).searchParams;
   const desde = Math.max(0, Number.parseInt(q.get("desde") ?? "0", 10) || 0);
   const limite = Math.min(50, Math.max(1, Number.parseInt(q.get("limite") ?? "30", 10) || 30));
-  const { data: sig, error: e1 } = await sb.from("liga_traspasos_seguidores").select("anfitrion").eq("seguidor", d.usuario);
-  db(e1, "traspasos.siguiendo");
-  const anfitriones = [...new Set([...(sig ?? []).map((x) => x.anfitrion as string), d.usuario])];
-  const { data, error } = await sb.from("liga_traspasos")
-    .select("seq, anfitrion, lote, huella, creado, autor, parche, base_huella, cambios")
-    .in("anfitrion", anfitriones).gt("seq", desde).order("seq", { ascending: true }).limit(limite);
+  const soloOficial = q.get("solo_oficial") === "1";
+  let consulta = sb.from("liga_traspasos")
+    .select("seq, anfitrion, lote, huella, creado, autor, parche, base_huella, cambios, oficial, cambio")
+    .gt("seq", desde).order("seq", { ascending: true }).limit(limite);
+  if (soloOficial) consulta = consulta.eq("oficial", true);
+  else {
+    const { data: sig, error: e1 } = await sb.from("liga_traspasos_seguidores").select("anfitrion").eq("seguidor", d.usuario);
+    db(e1, "traspasos.siguiendo");
+    const anfitriones = [...new Set([...(sig ?? []).map((x) => x.anfitrion as string), d.usuario])].filter((x) => uuid(x));
+    consulta = consulta.or(`anfitrion.in.(${anfitriones.join(",")}),oficial.eq.true`);
+  }
+  const { data, error } = await consulta;
   db(error, "traspasos.leer");
   const filas = data ?? [];
-  const ids = [...new Set(filas.map((f) => f.anfitrion as string))];
+  const ids = [...new Set(filas.filter((f) => !f.oficial).map((f) => f.anfitrion as string))];
   const nombres = new Map<string, string>();
   if (ids.length) {
     const { data: ps, error: e2 } = await sb.from("perfiles").select("id, nombre_display").in("id", ids);
     db(e2, "traspasos.nombres");
     for (const p of ps ?? []) nombres.set(p.id as string, texto(p.nombre_display, 40) || "Anfitrión");
   }
-  const lotes = filas.map((f) => ({
-    seq: f.seq as number, id: f.lote as string, anfitrion: nombres.get(f.anfitrion as string) ?? "Anfitrión", anfitrion_id: f.anfitrion as string,
-    huella: f.huella as string, creado: f.creado as string, autor: f.autor as string, parche: f.parche as string, base_huella: f.base_huella as string,
-    cambios: f.cambios,
-  }));
+  const lotes = filas.map((f) => f.oficial
+    ? {
+      // anfitrión FIJO: así el PC del propio admin también lo aplica (no lo toma por «propio»)
+      seq: f.seq as number, id: f.lote as string, anfitrion: OFICIAL_NOMBRE, anfitrion_id: OFICIAL_ID,
+      huella: f.huella as string, creado: f.creado as string, autor: f.autor as string, parche: f.parche as string, base_huella: f.base_huella as string,
+      oficial: true, cambio_id: (f.cambio as string | null) ?? null, cambios: f.cambios,
+    }
+    : {
+      seq: f.seq as number, id: f.lote as string, anfitrion: nombres.get(f.anfitrion as string) ?? "Anfitrión", anfitrion_id: f.anfitrion as string,
+      huella: f.huella as string, creado: f.creado as string, autor: f.autor as string, parche: f.parche as string, base_huella: f.base_huella as string,
+      cambios: f.cambios,
+    });
   return { lotes, ultimo_seq: filas.length ? (filas[filas.length - 1].seq as number) : desde };
 }
 
@@ -300,6 +321,46 @@ async function traspasosSiguiendo(req: Request) {
   };
 }
 
+// ═══ CAMBIOS OFICIALES Y REGISTRO DE PCs (migración 125, docs/CONTRATO-WEB-PES.md §3c y §4) ═══════════════════════
+// ── GET /v1/cambios?desde=<seq>&destino=base|lm&limite=<1-100> ─────────────────────────────────
+// Lista genérica de cambios oficiales activos (para los motores de Liga Máster / estadísticas o un Link futuro).
+async function cambiosLeer(req: Request) {
+  const d = await autenticarBasico(req);
+  frenar(`cml:${d.id}`, 30, 60_000);
+  const q = new URL(req.url).searchParams;
+  const desde = Math.max(0, Number.parseInt(q.get("desde") ?? "0", 10) || 0);
+  const limite = Math.min(100, Math.max(1, Number.parseInt(q.get("limite") ?? "50", 10) || 50));
+  const destino = q.get("destino") ?? "base";
+  if (destino !== "base" && destino !== "lm") throw new ErrorApi("CAMPO_INVALIDO", { campo: "destino" });
+  const { data, error } = await sb.from("pes_cambios")
+    .select("seq, id, version, tipo, destino, datos, creado, firma, estado")
+    .eq("estado", "activo").in("destino", [destino, "ambos"]).gt("seq", desde).order("seq", { ascending: true }).limit(limite);
+  db(error, "cambios.leer");
+  const filas = data ?? [];
+  return { cambios: filas, ultimo_seq: filas.length ? (filas[filas.length - 1].seq as number) : desde };
+}
+
+// ── POST /v1/pc/informe ────────────────────────────────────────────────────────────────────
+// Cada Link cuenta su versión, parche, huella de su base y qué pasó con cada cambio oficial. Ningún dato personal ni rutas.
+async function pcInforme(req: Request) {
+  const d = await autenticarBasico(req);
+  frenar(`pci:${d.id}`, 10, 60_000);
+  const j = await leerJson(req);
+  if (j.resultados !== undefined && (!Array.isArray(j.resultados) || j.resultados.length > 50)) throw new ErrorApi("CAMPO_INVALIDO", { campo: "resultados" });
+  const informe = {
+    link_version: texto(j.link_version ?? req.headers.get("x-phoenix-version"), 20),
+    link_build: typeof j.link_build === "number" && Number.isInteger(j.link_build) && j.link_build >= 0 ? j.link_build : Number.parseInt(req.headers.get("x-phoenix-build") ?? "0", 10) || 0,
+    parche: nombreCorto(j.parche, 60), base_huella: texto(j.base_huella, 64),
+    juego: j.juego === true, pes_abierto: j.pes_abierto === true, oficial: j.oficial !== false, recibir: j.recibir === true, publicar: j.publicar === true,
+    resultados: Array.isArray(j.resultados) ? j.resultados : [],
+  };
+  const { data, error } = await sb.rpc("pes_registrar_informe", { p_dispositivo: d.id, p_usuario: d.usuario, p_informe: informe });
+  db(error, "pc.informe");
+  const r = (data ?? {}) as { guardados?: number; ignorados?: number };
+  log("info", "pc.informe", { dispositivo: d.id, guardados: r.guardados ?? 0, ignorados: r.ignorados ?? 0 });
+  return { guardados: r.guardados ?? 0, ignorados: r.ignorados ?? 0 };
+}
+
 const RUTAS: Record<string, { metodo: string; fn: (r: Request) => Promise<Record<string, unknown>> }> = {
   "POST /v1/traspasos": { metodo: "POST", fn: traspasosPublicar },
   "GET /v1/traspasos": { metodo: "GET", fn: traspasosLeer },
@@ -307,6 +368,8 @@ const RUTAS: Record<string, { metodo: string; fn: (r: Request) => Promise<Record
   "POST /v1/traspasos/seguir": { metodo: "POST", fn: traspasosSeguir },
   "POST /v1/traspasos/dejar": { metodo: "POST", fn: traspasosDejar },
   "GET /v1/traspasos/siguiendo": { metodo: "GET", fn: traspasosSiguiendo },
+  "GET /v1/cambios": { metodo: "GET", fn: cambiosLeer },
+  "POST /v1/pc/informe": { metodo: "POST", fn: pcInforme },
 };
 
 Deno.serve(async (req) => {

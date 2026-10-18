@@ -1,0 +1,35 @@
+---
+// USUARIOS EN PES (migración 125): cada PC con Phoenix Link — usuario, versión, parche, último contacto — y su historial de cambios oficiales.
+// Staff ve todos; un usuario normal ve solo sus PCs. Contrato: docs/CONTRATO-WEB-PES.md §4 · Lógica: js/pages/usuariosPes.js
+import Layout from '../layouts/Layout.astro';
+import { href } from '../js/core/config.js';
+---
+<Layout title="Usuarios en PES" active="mercado" description="Registro de las PCs que usan Phoenix Link y qué cambios aplicó cada una.">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-20 space-y-5">
+    <header class="glass-panel rounded-2xl px-5 py-4 space-y-1">
+      <span class="sy-sello">Registro</span>
+      <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-desktop text-galaxy-400 mr-2"></i>Usuarios <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">en PES</span></h1>
+      <p class="text-sm text-gray-300 max-w-3xl">Cada PC con Phoenix Link avisa aquí su versión, su parche y qué pasó con cada <a class="text-galaxy-400 underline" href={href('cambios-oficiales/')}>cambio oficial</a>. Pulsa una PC para ver su historial.</p>
+    </header>
+    <p id="up-sin-sesion" class="sy-aviso" hidden>Inicia sesión para ver tus PCs.</p>
+    <section id="up-panel" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" hidden>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="sy-titulo"><i class="fa-solid fa-list"></i> PCs <span id="up-cuenta" class="sy-ayuda"></span></h2>
+        <div class="flex flex-wrap gap-2">
+          <input id="up-filtro" class="field" placeholder="Buscar usuario, PC o parche" maxlength="40" aria-label="Buscar">
+          <button type="button" id="up-recargar" class="btn btn-ghost"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+        </div>
+      </div>
+      <p id="up-resumen" class="sy-ayuda"></p>
+      <div class="up-tabla-caja"><table class="up-tabla">
+        <thead><tr><th scope="col">Usuario</th><th scope="col">PC</th><th scope="col">Link</th><th scope="col">Parche</th><th scope="col">Último contacto</th><th scope="col">Aplicados</th><th scope="col">Saltados</th><th scope="col">Errores</th></tr></thead>
+        <tbody id="up-filas"><tr><td colspan="8"><div class="esqueleto h-10"></div></td></tr></tbody>
+      </table></div>
+    </section>
+    <section id="up-detalle" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" aria-live="polite" hidden>
+      <h2 class="sy-titulo"><i class="fa-solid fa-clock-rotate-left"></i> Historial de <span id="up-detalle-nombre"></span></h2>
+      <div id="up-eventos"></div>
+    </section>
+  </div>
+  <script>import '../js/pages/usuariosPes.js';</script>
+</Layout>
