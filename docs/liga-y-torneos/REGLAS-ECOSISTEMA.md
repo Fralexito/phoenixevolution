@@ -7,8 +7,8 @@ Principio del dueño: **«Si algo se rompe o deja de funcionar por un cambio, me
 | Pieza | Dueño | Fuente de verdad |
 |---|---|---|
 | Web (Astro) y base de datos (Supabase: tablas, RPC, RLS, Edge Functions) | chat «Pagina WEB» | `supabase/migrations/`, este repo |
-| Phoenix Link (C++, salas, host) | chat de Smash Soda / Phoenix Link | `docs/contrato-v1.md` |
-| Phoenix Mercado (option file, Liga Máster en el juego) | chat de Mercado (se integrará a Phoenix Link) | `docs/mercado-api.md` |
+| Phoenix Link (C++, salas, host) | chat de Smash Soda / Phoenix Link | `docs/web-pes-link/contrato-v1.md` |
+| Phoenix Mercado (option file, Liga Máster en el juego) | chat de Mercado (se integrará a Phoenix Link) | `docs/web-pes-link/mercado-api.md` |
 
 Un chat que no es dueño **no cambia** la pieza: entrega un prompt al dueño.
 
@@ -48,6 +48,6 @@ Un chat que no es dueño **no cambia** la pieza: entrega un prompt al dueño.
 ## 6. Registro de cambios importantes
 Añadir aquí una línea por cambio que afecte a otra pieza:
 - 2026-10-08 · `lm_club_libro` (088): historial del dinero de cada club. No cambia ningún endpoint.
-- 2026-10-08 · `/mercado/v1/liga/cambios` (094): cada cambio añade `monto, sueldo, clausula, fin_contrato, dorsal` (opcionales, `null` si no hay dato). No cambia nada existente. Contrato en `docs/mercado-api.md`.
-- 2026-10-08 · Mi club / vestuario (095): endpoints nuevos `POST /mercado/v1/vestuario/subir`, `GET /mercado/v1/vestuario/cambios` (firmado, misma clave) y `POST /mercado/v1/vestuario/aplicado`. No cambia nada existente. Contrato en `docs/mercado-api.md`.
-- 2026-10-08 · Equivalencias (089): `mercado_equivalencias(_clubes)` + `POST/GET /mercado/v1/equivalencias` (nuevos, no cambian nada existente). Contrato en `docs/mercado-api.md`.
+- 2026-10-08 · `/mercado/v1/liga/cambios` (094): cada cambio añade `monto, sueldo, clausula, fin_contrato, dorsal` (opcionales, `null` si no hay dato). No cambia nada existente. Contrato en `docs/web-pes-link/mercado-api.md`.
+- 2026-10-08 · Mi club / vestuario (095): endpoints nuevos `POST /mercado/v1/vestuario/subir`, `GET /mercado/v1/vestuario/cambios` (firmado, misma clave) y `POST /mercado/v1/vestuario/aplicado`. No cambia nada existente. Contrato en `docs/web-pes-link/mercado-api.md`.
+- 2026-10-08 · Equivalencias (089): `mercado_equivalencias(_clubes)` + `POST/GET /mercado/v1/equivalencias` (nuevos, no cambian nada existente). Contrato en `docs/web-pes-link/mercado-api.md`.

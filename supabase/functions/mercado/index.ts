@@ -1,7 +1,7 @@
 // Edge Function «mercado» — API del programa de PC «Phoenix Mercado» (pruebas; luego se integra a Phoenix Link).
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/mercado/v1/<ruta>
 // Desplegar con verify_jwt = false: el programa NO usa sesión de Supabase, usa su token (Authorization: Bearer pml_…).
-// Contrato completo: docs/mercado-api.md
+// Contrato completo: docs/web-pes-link/mercado-api.md
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
@@ -171,7 +171,7 @@ async function marcarAplicados(req: Request) {
 }
 
 /** GET /v1/huella?liga=galaxy[&texto=1] → { liga, algoritmo, huella, clubes, jugadores, calculada[, texto] }
- *  Huella esperada de las plantillas (SHA-256 del texto canónico club→phoenix_ids; formato en docs/mercado-api.md). */
+ *  Huella esperada de las plantillas (SHA-256 del texto canónico club→phoenix_ids; formato en docs/web-pes-link/mercado-api.md). */
 async function huella(req: Request) {
   await autenticar(req);
   const u = new URL(req.url); const liga = (u.searchParams.get("liga") || LIGA).slice(0, 40);
@@ -308,7 +308,7 @@ async function ligaCambios(req: Request) {
   return firmar(JSON.stringify({ ...(data as object), generado: new Date().toISOString() }));
 }
 
-// ───────── Liga Máster de cada PC (127, contrato docs/CONTRATO-WEB-PES.md §3b) ─────────
+// ───────── Liga Máster de cada PC (127, contrato docs/web-pes-link/CONTRATO-WEB-PES.md §3b) ─────────
 /** GET /v1/liga/cambios?ambito=pc&desde=<version> → firmado. contenido = { formato:"phoenix-lm/cambios-1", desde, version_actual,
  *  cambios:[{ version, tipo:"traspaso"|"dinero"|"valor"|"stat"|"deshacer", partida, cambio_id, … }] } — lo de todos + lo de este usuario.
  *  Máx. 500 por respuesta: si version_actual > último recibido, volver a pedir con desde=<último>. PhoenixSync/core/CambiosLM.h lo aplica. */

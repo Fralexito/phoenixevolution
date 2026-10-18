@@ -1,5 +1,5 @@
 // Vista previa de los sonidos de chat de la tienda (Fase C). SOLO suena cuando la persona pulsa «Escuchar» (nunca solo): el navegador lo exige y es lo correcto.
-// Sintetiza la partitura de core/sonidosChat.js con WebAudio (sin archivos). Contrato: docs/CONTRATO-SONIDOS-CHAT.md.
+// Sintetiza la partitura de core/sonidosChat.js con WebAudio (sin archivos). Contrato: docs/comunidad/CONTRATO-SONIDOS-CHAT.md.
 import { esSonidoChat, partituraDe } from '../core/sonidosChat.js';
 
 let ctx = null, sonando = null;

@@ -1,4 +1,4 @@
-// Lógica pura del CHAT GENERAL (sin red ni DOM: se prueba con npm test). Datos: migración 099. Contrato: docs/contrato-v1.md §27.
+// Lógica pura del CHAT GENERAL (sin red ni DOM: se prueba con npm test). Datos: migración 099. Contrato: docs/web-pes-link/contrato-v1.md §27.
 export const MAX_TEXTO = 300;
 export const ESPERA_DEFECTO = 3;   // segundos entre mensajes si el servidor aún no dijo otra cosa
 export const VENTANA = 200;   // cuántos mensajes se guardan en pantalla (los más viejos se sueltan)

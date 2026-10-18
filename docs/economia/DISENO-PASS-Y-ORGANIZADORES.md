@@ -1,13 +1,13 @@
 # Diseño · Phoenix Pass y herramientas para organizadores y creadores (Fase E, migración 123)
 
-Autor: cuenta ECONOMÍA, hilo `economia-fase-e` · 16-oct-2026 · Parte del plan `docs/DISENO-ECONOMIA-COMPLETA.md` (§C y §D).
+Autor: cuenta ECONOMÍA, hilo `economia-fase-e` · 16-oct-2026 · Parte del plan `docs/economia/DISENO-ECONOMIA-COMPLETA.md` (§C y §D).
 Reglas que no se tocan: **solo cosmético y comodidad**, nada de ventaja ni azar de pago, **las gemas no se retiran ni se cambian por ascuas**, el libro de movimientos es de solo lectura. Los pagos reales siguen **apagados** (`pagos_activos = false`).
 
 ## Respuesta corta (SÍ / NO)
 - ¿El pase es una suscripción que cobra sola? **NO.** Se compra **una vez por temporada**, con gemas. Si no lo compras, no pasa nada.
 - ¿El pase da ventaja en el juego? **NO.** Solo marcos, fondos, insignias, títulos, ascuas y algunas gemas.
 - ¿Se puede jugar sin pagar? **SÍ.** La pista gratis siempre existe.
-- ¿Ya está construido? **SÍ** en el código (pestaña «Pase» en la tienda y botón «Hacer premium» en el torneo). La migración 123 está aplicada y probada (ver docs/ECONOMIA-FASE-E.md). Lo de propinas y overlay para TikTok es **solo papel** (abajo).
+- ¿Ya está construido? **SÍ** en el código (pestaña «Pase» en la tienda y botón «Hacer premium» en el torneo). La migración 123 está aplicada y probada (ver docs/economia/ECONOMIA-FASE-E.md). Lo de propinas y overlay para TikTok es **solo papel** (abajo).
 
 ---
 

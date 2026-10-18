@@ -11,7 +11,7 @@
 | Efectos de carta (CSS puro) | `src/styles/efectosCarta.css`, `src/js/features/efectosCarta.js` |
 | Banner en el perfil | `src/js/pages/perfil.js` (`#pf-banner`) |
 | Sonidos: vista previa con botón | `src/js/features/sonidosChat.js` |
-| Contrato para Link | `docs/CONTRATO-SONIDOS-CHAT.md` |
+| Contrato para Link | `docs/comunidad/CONTRATO-SONIDOS-CHAT.md` |
 
 ## Objetos nuevos (precios del diseño §5; ascuas = gemas × 5 salvo legendarios)
 | Objeto | Rareza | Gemas | Ascuas |
@@ -48,6 +48,6 @@
 `node --test tests/*.test.mjs` → 518 pruebas, 0 fallos (incluye `tests/economiaFaseC.test.mjs`). `npm run build` → 53 páginas. Prueba SQL 121 → `TODO_OK_REVERTIDO`.
 
 ## Pendientes
-- El lado de Link (función `sonidos_chat_de`, archivos `.wav`, filtro) está solo **diseñado**: ver `docs/CONTRATO-SONIDOS-CHAT.md` §4 y §9.
+- El lado de Link (función `sonidos_chat_de`, archivos `.wav`, filtro) está solo **diseñado**: ver `docs/comunidad/CONTRATO-SONIDOS-CHAT.md` §4 y §9.
 - El formulario de administración antiguo (`admin_guardar_item`) no sabe poner precio en gemas ni rareza: los objetos nuevos se crean por migración, como los de la Fase A.
 - **Pendiente copiar a Drive** (este informe y el contrato) cuando Fralex tenga Drive.

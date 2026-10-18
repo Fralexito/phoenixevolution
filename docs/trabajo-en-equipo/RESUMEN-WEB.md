@@ -2,7 +2,7 @@
 
 > Lo más reciente siempre está al final de `REGISTRO.md`. Este resumen es la foto general.
 
-Pegar al inicio de cualquier chat que toque la web, la base o los programas. **Antes de cambiar algo: leer `docs/REGLAS-ECOSISTEMA.md`.**
+Pegar al inicio de cualquier chat que toque la web, la base o los programas. **Antes de cambiar algo: leer `docs/liga-y-torneos/REGLAS-ECOSISTEMA.md`.**
 
 ## Básico
 - Repo `Fralexito/phoenixevolution`, rama de trabajo **`borrador`**, publicada en la vista previa privada **`/phoenixevolution/fase-beta-1-0/`** (la URL `/borrador/` se retiró porque se compartía sin permiso). A `main` solo cuando Fralex dice **«Súbelo»** (aún no se ha subido lo de abajo).
@@ -15,8 +15,8 @@ Pegar al inicio de cualquier chat que toque la web, la base o los programas. **A
 | Pieza | Chat dueño | Contrato |
 |---|---|---|
 | Web + base de datos | chat «Pagina WEB» | este repo |
-| Phoenix Link (C++, salas) | chat Smash Soda / Phoenix Link | `docs/contrato-v1.md` |
-| Phoenix Mercado (option file) | chat Mercado (se integrará a Phoenix Link) | `docs/mercado-api.md` |
+| Phoenix Link (C++, salas) | chat Smash Soda / Phoenix Link | `docs/web-pes-link/contrato-v1.md` |
+| Phoenix Mercado (option file) | chat Mercado (se integrará a Phoenix Link) | `docs/web-pes-link/mercado-api.md` |
 Un chat no toca la pieza de otro: le pasa un prompt. Endpoints publicados no se borran ni cambian; solo se añaden campos.
 
 ## Hecho en esta etapa

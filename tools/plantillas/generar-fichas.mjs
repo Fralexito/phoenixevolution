@@ -3,7 +3,7 @@
 // (hay una copia en tools/plantillas/ids-liga-master.txt; si el staff importa jugadores nuevos, vuelve a sacar la lista y ejecuta esto).
 //   node tools/plantillas/generar-fichas.mjs "D:/Frank/Games_/Conmegol Patch/download/CGP_database.cpk" tools/plantillas/ids-liga-master.txt
 // Cada jugador queda como texto hexadecimal: por cada campo de BITS_PLAYER (en el orden de CAMPOS) 2 cifras con el valor crudo, y al final 13 cifras con los
-// 52 bits de habilidades (480–531). core/fichaJuego.js lo decodifica. Formato del registro: docs/MINIFACES.md §3 y base-conocimiento/16-PLAYER-BIN-FICHA-COMPLETA.md.
+// 52 bits de habilidades (480–531). core/fichaJuego.js lo decodifica. Formato del registro: docs/web-pes-link/MINIFACES.md §3 y base-conocimiento/16-PLAYER-BIN-FICHA-COMPLETA.md.
 import fs from 'node:fs';
 import { abrirBase } from './lectorCpk.mjs';
 import { CAMPOS, BITS_PLAYER, BITS_HABILIDADES } from '../../src/js/core/fichasCampos.js';

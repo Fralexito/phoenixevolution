@@ -1,7 +1,7 @@
 # Contrato WEB ↔ PES · «Cambios oficiales» (v1)
 
 Estado: **v1 publicado el 17-oct-2026** (sesión BASE, migración 125). Copia idéntica en los dos repos:
-`smash-soda-fork/docs/CONTRATO-WEB-PES.md` (rama `rediseño-phoenix-portal`) y `phoenixevolution/docs/CONTRATO-WEB-PES.md` (rama `borrador`).
+`smash-soda-fork/docs/web-pes-link/CONTRATO-WEB-PES.md` (rama `rediseño-phoenix-portal`) y `phoenixevolution/docs/web-pes-link/CONTRATO-WEB-PES.md` (rama `borrador`).
 Si cambias algo, cambia **las dos copias** y sube `version` si un PC viejo dejaría de entenderlo.
 
 Pedido de Fralex: «que cualquier cambio que haga en mi web se refleje en el PES y que tenga todo el registro e historial de todos los
@@ -97,7 +97,7 @@ Los define cada sesión en este mismo archivo (añadir una sección `### <tipo> 
 
 ### 3a. Destino `base` de un `fichaje` (amistosos) → canal OFICIAL de traspasos
 Al crear el cambio, la web mete **un lote** en `public.liga_traspasos` con `oficial = true` y `cambio = <id del cambio>`. El lote tiene
-el **formato de Link** (ver `docs/TRASPASOS-EN-VIVO.md` §3):
+el **formato de Link** (ver `docs/web-pes-link/TRASPASOS-EN-VIVO.md` §3):
 ```json
 { "seq": 812, "id": "<24 hex>", "huella": "<sha256>", "creado": "2026-10-17T20:00:00Z", "autor": "Phoenix (oficial)",
   "parche": "", "base_huella": "",
@@ -160,7 +160,7 @@ Las casillas Base normal / Liga Máster / Las dos son comunes; `ctx.destino` dic
 - `liga_traspasos` sigue con su retención de 30 días: un PC que pase más de 30 días sin abrir Link no recibe los oficiales viejos por el canal
   de traspasos (sí los ve en `GET /v1/cambios`). Los oficiales **no** cuentan para el tope de 200 lotes por anfitrión.
 - 1 fichaje por cambio (el formulario puede crear varios seguidos).
-- Lo que el PC hace en el juego (recargar Phoenix-DB) es igual que en traspasos en vivo: ver `docs/TRASPASOS-EN-VIVO.md` §4.
+- Lo que el PC hace en el juego (recargar Phoenix-DB) es igual que en traspasos en vivo: ver `docs/web-pes-link/TRASPASOS-EN-VIVO.md` §4.
 
 ## 8. Historial del contrato
 - v1 (17-oct-2026, sesión BASE): primera versión.

@@ -1,7 +1,7 @@
 # Bitácora e informe · Cuenta ECONOMÍA (chat «D:\Frank\IA\CLAUDE») · 14 al 16 de octubre de 2026
 
 Para la **otra cuenta** (o cualquier IA) que continúe. Escrito para entender el contexto sin haber visto el chat.
-Complementa `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` (caras, IA en la web, migraciones 116–118). Lo más nuevo siempre está al final de `REGISTRO.md`.
+Complementa `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-OPUS.md` (caras, IA en la web, migraciones 116–118). Lo más nuevo siempre está al final de `REGISTRO.md`.
 
 > **Norma de Fralex (16-oct):** todo se anota en GitHub. **No tiene acceso a Drive por ahora**; cuando lo recupere hay que **copiar también a Drive** lo de la sección 7. No olvidar.
 
@@ -30,7 +30,7 @@ Complementa `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` (caras, IA en la web, mig
 - Todo debe funcionar en **cualquier PC y parche**, no solo el de Fralex (regla 5c de COORDINACION.md).
 
 ## 2. Sistema de monedas virtuales (lo principal de hoy)
-Plan de fases: `docs/PLAN-MONEDAS-VIRTUALES.md`. Diseño de recargas: `docs/DISENO-RECARGAS.md`. **Seguridad: `docs/SEGURIDAD-ECONOMIA.md`** (modelo de amenazas, runbook, lista antes de activar pagos).
+Plan de fases: `docs/economia/PLAN-MONEDAS-VIRTUALES.md`. Diseño de recargas: `docs/economia/DISENO-RECARGAS.md`. **Seguridad: `docs/economia/SEGURIDAD-ECONOMIA.md`** (modelo de amenazas, runbook, lista antes de activar pagos).
 
 ### Decisiones de Fralex
 - Dos monedas **separadas** que no se cambian entre sí: **ascuas** (se ganan jugando; las apuestas son solo en ascuas) y **gemas** (se compran con dinero; 1 gema = S/ 0,10; referencia 1 gema = 5 ascuas).
@@ -72,7 +72,7 @@ Archivos: `src/pages/tienda.astro`, `src/js/pages/tienda.js`, `src/js/features/e
 
 **De la IA:**
 1. Escribir `supabase/tests/112_riesgo_test.sql` (límites, banderas, nombre de pagador, doble confirmación, captura única) y reescribir o borrar la 109.
-2. Fase siguiente del plan: pasarela (Mercado Pago/otras) con `pago-webhook` firmado (HMAC) — ver `docs/DISENO-RECARGAS.md`. El esqueleto `interpretar()` lanza «no implementado» a propósito.
+2. Fase siguiente del plan: pasarela (Mercado Pago/otras) con `pago-webhook` firmado (HMAC) — ver `docs/economia/DISENO-RECARGAS.md`. El esqueleto `interpretar()` lanza «no implementado» a propósito.
 3. Retos con pozo/apuestas con gemas: **no abrir** sin revisión legal (Perú). Los regalos de TikTok no se mezclan con gemas.
 
 ## 4. Gotchas técnicos (ahorran horas)
@@ -102,11 +102,11 @@ Archivos: `src/pages/tienda.astro`, `src/js/pages/tienda.js`, `src/js/features/e
 - Los avances del 15-16 oct (rojas, regla de 7, pausa, economía) están en `LIBRO_PERSONAL` local (`00_BITACORA_VIVA.md` y `cap_13_diario_15_a_16_oct.md`).
 
 ## 6. Estado de los demás hilos (otras sesiones de este chat)
-- «Caras de jugadores PES: continuar»: se buscó rastro de un trabajo de caras previo y **no existe** (último cambio de `Faces` el 28-ago-2026, jugador 1631). El trabajo real de caras lo hizo la cuenta Opus (ver su bitácora y `docs/MINIFACES.md`). Falta que Fralex diga qué quiere hacer con las caras.
+- «Caras de jugadores PES: continuar»: se buscó rastro de un trabajo de caras previo y **no existe** (último cambio de `Faces` el 28-ago-2026, jugador 1631). El trabajo real de caras lo hizo la cuenta Opus (ver su bitácora y `docs/web-pes-link/MINIFACES.md`). Falta que Fralex diga qué quiere hacer con las caras.
 
 ## 7. Pendiente de copiar a Drive (cuando Fralex vuelva a tener acceso)
 Carpeta «Phoenix Link — Guías y logros» (y la del libro, id `1t5Cg5sc1gdP7ege8nVc07Oyma0lJqmwJ`):
-- `docs/PLAN-MONEDAS-VIRTUALES.md`, `docs/DISENO-RECARGAS.md`, `docs/SEGURIDAD-ECONOMIA.md`, este archivo.
+- `docs/economia/PLAN-MONEDAS-VIRTUALES.md`, `docs/economia/DISENO-RECARGAS.md`, `docs/economia/SEGURIDAD-ECONOMIA.md`, este archivo.
 - Libro personal local: `D:\Frank\Games_\PRUEBA_CANCHA\informes\LIBRO_PERSONAL\` (`00_BITACORA_VIVA.md` actualizada y `cap_13_diario_15_a_16_oct.md` nuevo). Estado de la subida anterior: `_estado_subida_drive.md` (unidad `H:` no montada).
 - Borrar a mano en Drive los 4 documentos «[TRUNCADO — NO USAR]» (ver `_estado_subida_drive.md`).
 
@@ -116,13 +116,13 @@ Carpeta «Phoenix Link — Guías y logros» (y la del libro, id `1t5Cg5sc1gdP7e
 
 ### Hecho desde la sección 7
 - **Economía Fase A** (migración 119): rarezas, 16 objetos, paquetes Chispa 50/S5 · Brasa 110/S10 · Llama 300/S25 · Fénix 650/S50, bono de primera compra +50 %.
-- **Fase B** (120): racha diaria, primer partido, misiones semanales, logros (todo en ascuas). Informe: `docs/ECONOMIA-FASE-B.md`.
-- **Fase C** (121): efectos de carta, banners, sonidos de chat. Informe: `docs/ECONOMIA-FASE-C.md`.
-- **Fase D** (122): pasarela Mercado Pago (webhook firmado, `pago-crear`, `pago-conciliar`), método `mercadopago` INACTIVO. Informe: `docs/ECONOMIA-FASE-D.md`; guía simple para Fralex: `docs/GUIA-PASARELA.md`.
-- **Fase E** (123): Phoenix Pass (Temporada 1 «Despegue», empieza el 17-oct) y marca «torneo premium». Informe: `docs/ECONOMIA-FASE-E.md`; diseño y 7 preguntas: `docs/DISENO-PASS-Y-ORGANIZADORES.md`.
+- **Fase B** (120): racha diaria, primer partido, misiones semanales, logros (todo en ascuas). Informe: `docs/economia/ECONOMIA-FASE-B.md`.
+- **Fase C** (121): efectos de carta, banners, sonidos de chat. Informe: `docs/economia/ECONOMIA-FASE-C.md`.
+- **Fase D** (122): pasarela Mercado Pago (webhook firmado, `pago-crear`, `pago-conciliar`), método `mercadopago` INACTIVO. Informe: `docs/economia/ECONOMIA-FASE-D.md`; guía simple para Fralex: `docs/economia/GUIA-PASARELA.md`.
+- **Fase E** (123): Phoenix Pass (Temporada 1 «Despegue», empieza el 17-oct) y marca «torneo premium». Informe: `docs/economia/ECONOMIA-FASE-E.md`; diseño y 7 preguntas: `docs/economia/DISENO-PASS-Y-ORGANIZADORES.md`.
 - **MFA:** pantalla en Tienda → Administrar → «Seguridad de tu cuenta». Fralex pidió quitar la exigencia: `admin_exige_mfa` debe quedar en `false` (verificar con una consulta; la pantalla sigue disponible).
 - Estado verificado: `pagos_activos=false`, 0 alertas, 0 diferencias, 550 pruebas, 53 páginas.
-- Plan completo y precios propuestos: `docs/DISENO-ECONOMIA-COMPLETA.md`.
+- Plan completo y precios propuestos: `docs/economia/DISENO-ECONOMIA-COMPLETA.md`.
 
 ### Decisiones de Fralex (16-oct)
 - Solo cosmético y comodidad; sin ventaja en el juego ni azar de pago. Las gemas NO se retiran ni se cambian por ascuas.
@@ -143,7 +143,7 @@ Carpeta «Phoenix Link — Guías y logros» (y la del libro, id `1t5Cg5sc1gdP7e
 Los cambios 2, 3, 4, 5 y 6 se pueden construir ya en la web.
 
 ### Pendiente (para la cuenta que continúe)
-- Fralex debe responder las 7 preguntas de `docs/DISENO-PASS-Y-ORGANIZADORES.md` (pase 150 gemas, temporada 60 días/30 niveles, torneo premium 300 gemas, propinas solo en ascuas, patrocinios, overlay TikTok, 7 días de gracia). Si no responde, queda lo propuesto.
+- Fralex debe responder las 7 preguntas de `docs/economia/DISENO-PASS-Y-ORGANIZADORES.md` (pase 150 gemas, temporada 60 días/30 niveles, torneo premium 300 gemas, propinas solo en ascuas, patrocinios, overlay TikTok, 7 días de gracia). Si no responde, queda lo propuesto.
 - Construir los cambios legales de la web (puntos 2–6 de arriba) y revisar imágenes de clubes.
 - Pruebas SQL de la migración 112 (`supabase/tests/112_riesgo_test.sql`) y reescribir/borrar la 109.
 - Diseñar el «torneo con inscripción» (cuota fija, premio prefijado) para llevar al abogado.

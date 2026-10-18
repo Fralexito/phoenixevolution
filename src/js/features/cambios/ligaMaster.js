@@ -1,4 +1,4 @@
-// Formulario único (/cambios-oficiales/, contrato docs/CONTRATO-WEB-PES.md §6) · parte LIGA MÁSTER (migración 127).
+// Formulario único (/cambios-oficiales/, contrato docs/web-pes-link/CONTRATO-WEB-PES.md §6) · parte LIGA MÁSTER (migración 127).
 //  · Registra los tipos «dinero» y «valor» (solo destino Liga Máster).
 //  · camposLmFichaje: campos extra del fichaje cuando la casilla Liga Máster está marcada (a quién, monto, sueldo…).
 //    El formulario de fichaje (125) los pinta con camposLmFichaje.pintar(cont) y añade datos.lm = camposLmFichaje.leer().

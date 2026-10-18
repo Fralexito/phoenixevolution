@@ -8,7 +8,7 @@ Página `/formatos/` (menú Competir → Formatos). Todo se calcula en el navega
 | Retos, ruleta, noche de la semana (puro) | `src/js/core/retos.js` · `tests/retos.test.mjs` |
 | Textos editables (modalidades, reglas, retos, noches) | `src/data/modalidades.js` |
 | Página y pantalla | `src/pages/formatos.astro` · `src/js/pages/formatos.js` · `src/styles/formatos.css` |
-| Guía en PDF con la identidad de la liga | `docs/Formatos-Phoenix-Evolution.pdf` |
+| Guía en PDF con la identidad de la liga | `docs/liga-y-torneos/Formatos-Phoenix-Evolution.pdf` |
 
 ## Formatos
 `eliminacion`, `doble` (4/8/16/32), `liguilla`, `idavuelta`, `grupos`, `suizo`, `colina`, `escalera`, `circuito`.

@@ -5,7 +5,7 @@ Las 4 sesiones de trabajo se cortaron por el **límite de uso** (vuelve a las 9:
 
 ## Qué es cada frente
 Un solo formulario en la web («Cambios oficiales»): cada cambio va a **base normal (amistosos)**, **Liga Máster** o **las dos**, llega solo a cada PC y cada PC informa el resultado al **registro de usuarios**.
-Contrato: `docs/CONTRATO-WEB-PES.md` v1 (en este repo, rama `rediseño-phoenix-portal`, y en la web `docs/`, rama `borrador`).
+Contrato: `docs/web-pes-link/CONTRATO-WEB-PES.md` v1 (en este repo, rama `rediseño-phoenix-portal`, y en la web `docs/`, rama `borrador`).
 
 | Frente | Migración | Estado | Dónde está |
 |---|---|---|---|

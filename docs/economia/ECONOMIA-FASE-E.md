@@ -1,6 +1,6 @@
 # Economía · Fase E (migración 123) — informe
 
-Hilo `economia-fase-e` · 16-oct-2026. Diseño completo y preguntas para Fralex: `docs/DISENO-PASS-Y-ORGANIZADORES.md`.
+Hilo `economia-fase-e` · 16-oct-2026. Diseño completo y preguntas para Fralex: `docs/economia/DISENO-PASS-Y-ORGANIZADORES.md`.
 
 ## Estado en una línea
 **Hecho y probado:** la migración 123 está aplicada en la base (la aplicó Fralex pegándola en el SQL Editor) y la prueba SQL terminó en `TODO_OK_REVERTIDO` (11 pruebas, 16-oct-2026). Código publicado en `borrador`.
@@ -8,7 +8,7 @@ Hilo `economia-fase-e` · 16-oct-2026. Diseño completo y preguntas para Fralex:
 ## Qué hay
 | Pieza | Dónde |
 |---|---|
-| Diseño, reglas, propinas (solo riesgos), overlay TikTok (solo contrato) | `docs/DISENO-PASS-Y-ORGANIZADORES.md` |
+| Diseño, reglas, propinas (solo riesgos), overlay TikTok (solo contrato) | `docs/economia/DISENO-PASS-Y-ORGANIZADORES.md` |
 | Migración 123 | `supabase/migrations/123_economia_fase_e_pase_y_torneo_premium.sql` |
 | Prueba SQL (se deshace sola; termina en `TODO_OK_REVERTIDO`) | `supabase/tests/123_fase_e_test.sql` |
 | Lógica pura + 12 pruebas | `src/js/core/phoenix-pass.js`, `tests/phoenix-pass.test.mjs` |

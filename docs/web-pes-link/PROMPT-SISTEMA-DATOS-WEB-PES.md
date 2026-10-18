@@ -16,11 +16,11 @@ Hoy solo los FICHAJES viajan de la web al juego. Quiero que también viajen los 
 2. Web → juego: si el staff aprueba un cambio en la web, se aplica en el PES de TODAS las PCs de la liga.
 
 ## Contexto (ya verificado, no lo reinventes)
-- Repos: web `Fralexito/phoenixevolution` (rama `borrador`; lee MAPA.md «RETOMAR», el final de REGISTRO.md y docs/REGLAS-ECOSISTEMA.md §7: dos cuentas trabajan a la vez). Programa: `Fralexito/smash-soda-fork`, módulo `PhoenixSync/` (lee `PhoenixSync/base-conocimiento/16-PLAYER-BIN-FICHA-COMPLETA.md`).
+- Repos: web `Fralexito/phoenixevolution` (rama `borrador`; lee MAPA.md «RETOMAR», el final de REGISTRO.md y docs/liga-y-torneos/REGLAS-ECOSISTEMA.md §7: dos cuentas trabajan a la vez). Programa: `Fralexito/smash-soda-fork`, módulo `PhoenixSync/` (lee `PhoenixSync/base-conocimiento/16-PLAYER-BIN-FICHA-COMPLETA.md`).
 - Supabase `fiibiyijojkxqlsrhcil` (plan FREE). Tablas: `lm_jugadores` (ya tiene `pes_id` en 308 jugadores, cruzados el 16-oct con el Player.bin real), `lm_clubes` (12 clubes, sin `pes_team_id` aún), `lm_movimientos`, `lm_config`, `mercado_reportes`. Funciones: `sistema_lm_importar(liga, datos)` (actualiza por (liga, pes_id) SIN cambiar el club: respeta los fichajes de la Liga Máster), `private.lm_aplicar_reporte`, `lm_staff_revertir`.
 - Endpoints que ya existen: `GET /mercado/v1/liga/cambios?desde=<version>` (firmado Ed25519), `POST /mercado/v1/catalogo` (solo token de staff), `POST /mercado/v1/reportes` y `/reportes/lote`.
 - Juego: `D:\Frank\Games_\Conmegol Patch\`. Base de datos en `download\CGP_database.cpk` → `common/etc/pesdb/{Player,Team,PlayerAssignment}.bin`. Phoenix Link escribe una base propia en `SiderAddons\livecpk\Phoenix-DB\common\etc\pesdb\` (tapa a la del .cpk). `SiderAddons\_apartado-parche26-20261013\` es la base vieja del 26: NO usarla.
-- Lector de .cpk de solo lectura ya hecho: `phoenixevolution/tools/minifaces/cpk.py` (tablas @UTF, XOR, CRILAYLA). Guía: `docs/MINIFACES.md`.
+- Lector de .cpk de solo lectura ya hecho: `phoenixevolution/tools/minifaces/cpk.py` (tablas @UTF, XOR, CRILAYLA). Guía: `docs/web-pes-link/MINIFACES.md`.
 - Formato (confirmado en Conmegol 27):
   - `.bin` = cabecera WESYS de 16 B + zlib.
   - Player.bin: 29.997 registros × 312 B; pid u32 en +8; nombre UTF-8 en +251.

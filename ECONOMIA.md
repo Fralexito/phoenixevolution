@@ -42,7 +42,7 @@ Mayoría de edad para comprar; términos y reembolsos; comprobantes y tributaci�
 > ⚠️ **Antes de activar dinero real o los retos con pozo: revisar con un abogado en Perú** (juegos y apuestas, protección al consumidor, comprobantes y tributación, menores de edad).
 
 ## Actualización (2026-10-16)
-- Plan completo de monedas en `docs/PLAN-MONEDAS-VIRTUALES.md` y diseño de recargas con varios métodos de pago en `docs/DISENO-RECARGAS.md`.
+- Plan completo de monedas en `docs/economia/PLAN-MONEDAS-VIRTUALES.md` y diseño de recargas con varios métodos de pago en `docs/economia/DISENO-RECARGAS.md`.
 - **Migración 108 aplicada:** precio por moneda (1 gema = 5 ascuas por defecto), moneda pagada en el inventario, auditoría del libro (`economia_auditar`). La interfaz de la tienda todavía no muestra las gemas (Fase 2).
 
 - **Migración 109 aplicada (recargas R1):** pago manual por Yape/Plin/transferencia con revisión del administrador. Métodos creados pero **inactivos** y `pagos_activos` sigue en `false`. Falta la interfaz.
@@ -50,4 +50,4 @@ Mayoría de edad para comprar; términos y reembolsos; comprobantes y tributaci�
 - **Migración 110 y tienda con dos monedas (2026-10-16):** paquetes nuevos de gemas (S/ 10, 27 y 55), cartera con ascuas y gemas, compra con cualquiera de las dos y pestaña «Comprar gemas» con el flujo manual (pago, código de operación y captura). El administrador revisa los pagos en Administrar. Los pagos siguen apagados.
 
 
-Seguridad del dinero real (migraciones 111-113): ver docs/SEGURIDAD-ECONOMIA.md.
+Seguridad del dinero real (migraciones 111-113): ver docs/economia/SEGURIDAD-ECONOMIA.md.

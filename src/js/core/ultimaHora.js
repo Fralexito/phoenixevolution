@@ -1,4 +1,4 @@
-// Lógica pura de «Última hora» (sin red ni DOM: se prueba con npm test). Datos: migración 100. Contrato: docs/contrato-v1.md §28.
+// Lógica pura de «Última hora» (sin red ni DOM: se prueba con npm test). Datos: migración 100. Contrato: docs/web-pes-link/contrato-v1.md §28.
 export const MAX_TEXTO = 200;
 export const MAX_VIGENTES = 5;
 export const NIVELES = Object.freeze([

@@ -1,4 +1,4 @@
-// «Buzón del juego» (puro, sin DOM → con test). Avisos web → PES 2021 vía Phoenix Link. BD: migración 096; API: docs/contrato-v1.md §25.
+// «Buzón del juego» (puro, sin DOM → con test). Avisos web → PES 2021 vía Phoenix Link. BD: migración 096; API: docs/web-pes-link/contrato-v1.md §25.
 export const MAX_TEXTO = 600;
 export const MAX_LINEAS = 8;
 export const TIPOS = Object.freeze(['aviso', 'partido', 'liga', 'sistema']);

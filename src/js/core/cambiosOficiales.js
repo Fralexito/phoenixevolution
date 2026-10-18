@@ -1,4 +1,4 @@
-// CAMBIOS OFICIALES web → PES (migración 125, docs/CONTRATO-WEB-PES.md). Lógica pura: sin DOM ni red (se prueba en tests/cambiosOficiales.test.mjs).
+// CAMBIOS OFICIALES web → PES (migración 125, docs/web-pes-link/CONTRATO-WEB-PES.md). Lógica pura: sin DOM ni red (se prueba en tests/cambiosOficiales.test.mjs).
 // Enchufes (contrato §6): cada tipo (fichaje, stats, info, dinero, valor…) se registra con registrarTipo() desde src/js/features/cambios/<tipo>.js.
 
 /** Las tres casillas del formulario único. */

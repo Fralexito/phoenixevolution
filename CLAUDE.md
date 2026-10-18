@@ -1,6 +1,6 @@
 # Phoenix Evolution Series — guía para Claude
 
-Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Football Life 2026. Estado detallado, historial de rondas y pendientes: **`MAPA.md`** (léelo primero; la sección «RETOMAR» resume el estado). **Dos cuentas trabajan a la vez:** lee también el final de `REGISTRO.md` y `docs/REGLAS-ECOSISTEMA.md` §7 antes de tocar nada.
+Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Football Life 2026. Estado detallado, historial de rondas y pendientes: **`MAPA.md`** (léelo primero; la sección «RETOMAR» resume el estado). **Dos cuentas trabajan a la vez:** lee también el final de `REGISTRO.md` y `docs/liga-y-torneos/REGLAS-ECOSISTEMA.md` §7 antes de tocar nada.
 
 ## Entorno
 - Astro (estático) + Tailwind 4 + JS vanilla + Supabase JS v2. Node 22.
@@ -40,7 +40,9 @@ Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sud
 
 ## Anotaciones e informes (norma desde 16-oct-2026)
 - Subir las anotaciones y avances importantes SOLO a GitHub (`docs/`, `MAPA.md`, `REGISTRO.md`): el usuario no tiene Drive disponible por ahora. No escribir docs nuevos en el proyecto de claude.ai.
-- Cuando el usuario vuelva a tener Drive, subir TAMBIÉN todo a Drive (incluidos los informes de `docs/`). Ver `docs/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`.
+- Cuando el usuario vuelva a tener Drive, subir TAMBIÉN todo a Drive (incluidos los informes de `docs/`). Ver `docs/bitacoras/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`.
 
 ## Diferido por el usuario
 Webhook/bot de Discord, pasarela de pago, pruebas de clanes. El cumplimiento legal de monetización y escudos es responsabilidad del usuario.
+
+- **Documentos:** están agrupados por tema en `docs/<carpeta>/`; el índice con el «antes estaba en» es `docs/INDICE.md`. Si tu rama usa rutas viejas: `node tools/reorganizar/actualizar-rutas-docs.mjs`.

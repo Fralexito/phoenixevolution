@@ -512,7 +512,7 @@ Para que la app muestre nombre, avatar y carta de quien está en la sala. Mismo 
 **Errores:** `401` (`TOKEN_FALTANTE` / `TOKEN_INVALIDO` / `TOKEN_REVOCADO`), `422 CAMPO_INVALIDO` (no es lista, más de 16 o un id no numérico), `429 DEMASIADOS_INTENTOS` si se llama más de **1 vez cada 5 s** por PC (`retry-after` indica cuánto esperar).
 
 ## §24 · version_liga en latidos (aditivo)
-Las respuestas de `POST /v1/presencia` y `POST /v1/sala/latido` incluyen `version_liga` (entero o `null` si no se pudo leer): versión actual de la Liga Máster de la Galaxy League. Si es mayor que la última que la PC aplicó, pedir `GET /mercado/v1/liga/cambios?desde=<última>` (ver docs/mercado-api.md). Ningún otro campo cambió.
+Las respuestas de `POST /v1/presencia` y `POST /v1/sala/latido` incluyen `version_liga` (entero o `null` si no se pudo leer): versión actual de la Liga Máster de la Galaxy League. Si es mayor que la última que la PC aplicó, pedir `GET /mercado/v1/liga/cambios?desde=<última>` (ver docs/web-pes-link/mercado-api.md). Ningún otro campo cambió.
 
 ## 25. Buzón del juego — avisos web → PES 2021 en vivo (1.7.0 · migración 096, aditivo)
 La web deja avisos; **Phoenix Link** los consulta y los escribe en `<juego>\SiderAddons\content\phoenix\avisos.txt` (lo lee el módulo `phoenix.lua` de Sider cada 2 s). Mismo token `phx_…` y cabeceras que `sala/latido`.

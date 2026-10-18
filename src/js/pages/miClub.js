@@ -1,5 +1,5 @@
 // «Mi club» (vestuario). Lee vestuario_* (RLS: cada uno ve lo suyo, el staff todo) y guarda con el RPC vestuario_guardar_cambios.
-// Phoenix Sync sube el club y recoge los cambios «pendientes»; ver docs/mercado-api.md.
+// Phoenix Sync sube el club y recoge los cambios «pendientes»; ver docs/web-pes-link/mercado-api.md.
 import { supabase } from '../core/supabase.js';
 import { onSession } from '../core/session.js';
 import { toast } from '../core/toast.js';

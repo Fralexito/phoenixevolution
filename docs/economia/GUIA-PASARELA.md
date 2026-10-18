@@ -65,7 +65,7 @@ El jugador elige «Tarjeta, Yape y más», paga en la página de Mercado Pago, M
    ```sql
    update public.economia_config set valor = 'produccion' where clave = 'pasarela_modo';
    ```
-4. Revisa la lista de «Seguridad de la economía» (`docs/SEGURIDAD-ECONOMIA.md`) y haz **un pago real pequeño** contigo mismo antes de abrir.
+4. Revisa la lista de «Seguridad de la economía» (`docs/economia/SEGURIDAD-ECONOMIA.md`) y haz **un pago real pequeño** contigo mismo antes de abrir.
 5. Cada día (o cuando quieras), la **revisión diaria** compara lo que dice Mercado Pago con tus órdenes. Desde PowerShell (pon tu frase en una variable, no en el chat):
    ```powershell
    $env:CRON="tu-frase-larga"; Invoke-RestMethod -Method Post -Uri "https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/pago-conciliar" -Headers @{ "x-cron-secret" = $env:CRON }
@@ -83,4 +83,4 @@ El jugador elige «Tarjeta, Yape y más», paga en la página de Mercado Pago, M
 
 ## Dónde está cada cosa
 - Código: `supabase/functions/pago-webhook`, `pago-crear`, `pago-conciliar` y `supabase/functions/_shared/` (lógica de firma y estados, con pruebas en `tests/pasarelaMercadoPago.test.mjs`).
-- Base de datos: migración 122 (`pagos_eventos`, `pagos_conciliaciones`, funciones `pasarela_*`). Informe técnico: `docs/ECONOMIA-FASE-D.md`.
+- Base de datos: migración 122 (`pagos_eventos`, `pagos_conciliaciones`, funciones `pasarela_*`). Informe técnico: `docs/economia/ECONOMIA-FASE-D.md`.

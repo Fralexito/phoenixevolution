@@ -110,7 +110,7 @@ Pruebas SQL (Fase 1), pruebas de interfaz con el simulador, ensayo de la pasarel
 ## Registro
 - 2026-10-16: plan creado tras verificar la base en vivo y el código (hallazgos de la sección 1).
 
-- 2026-10-16: **Fase 1 HECHA** (migración 108 aplicada y probada; ver `supabase/tests/108_economia_fase1_test.sql`). Siguiente: Fase 2 (interfaz con las dos monedas) y recargas (`DISENO-RECARGAS.md`). Pendiente de Fralex: aprobar D1–D8 por escrito y elegir pasarela.
+- 2026-10-16: **Fase 1 HECHA** (migración 108 aplicada y probada; ver `supabase/tests/108_economia_fase1_test.sql`). Siguiente: Fase 2 (interfaz con las dos monedas) y recargas (`docs/economia/DISENO-RECARGAS.md`). Pendiente de Fralex: aprobar D1–D8 por escrito y elegir pasarela.
 
 - 2026-10-16: **R1 (base) HECHA** — migración 109 aplicada y probada. Siguiente: interfaz (Tienda → «Comprar gemas», cola de pagos en el panel admin) y beta cerrada solo con ascuas.
 

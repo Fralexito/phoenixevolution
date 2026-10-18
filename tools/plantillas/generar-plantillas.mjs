@@ -1,7 +1,7 @@
 // Genera src/data/plantillasPes.js: la plantilla de cada club del catálogo (src/data/clubesPes.js) según la base de datos REAL del parche.
 // SOLO LECTURA sobre el parche: abre CGP_database.cpk, saca Player.bin y PlayerAssignment.bin en memoria y no escribe nada allí.
 //   node tools/plantillas/generar-plantillas.mjs "D:/Frank/Games_/Conmegol Patch/ConmeGOL Extras/ConmeGOL Patch 27/download/CGP_database.cpk"
-// Formato (docs/MINIFACES.md §3): Player.bin 312 B/registro (pid u32 en +8, nombre UTF-8 en +251, posición registrada = 4 bits desde el bit 434);
+// Formato (docs/web-pes-link/MINIFACES.md §3): Player.bin 312 B/registro (pid u32 en +8, nombre UTF-8 en +251, posición registrada = 4 bits desde el bit 434);
 // PlayerAssignment.bin 16 B/fila = (id, pid, equipo, flags). Los .bin llevan cabecera WESYS de 16 B + zlib. Los .cpk: tablas @UTF cifradas con XOR.
 import fs from 'node:fs';
 import { abrirBase } from './lectorCpk.mjs';

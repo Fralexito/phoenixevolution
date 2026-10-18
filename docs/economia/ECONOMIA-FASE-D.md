@@ -1,6 +1,6 @@
 # Economía · Fase D · Pasarela de pago (Mercado Pago) — informe
 
-> 16-oct-2026 · hilo `economia-fase-d` · migración **122** (aplicada y probada). Guía para Fralex: `docs/GUIA-PASARELA.md`. **`pagos_activos` sigue en `false`; el método nuevo está inactivo.**
+> 16-oct-2026 · hilo `economia-fase-d` · migración **122** (aplicada y probada). Guía para Fralex: `docs/economia/GUIA-PASARELA.md`. **`pagos_activos` sigue en `false`; el método nuevo está inactivo.**
 
 ## Resumen (SÍ / NO)
 - ¿Hecho y desplegado? **SÍ**: migración 122, Edge Functions `pago-webhook`, `pago-crear`, `pago-conciliar` (publicadas), pruebas y guía.
@@ -42,8 +42,8 @@
 - **No probado** (requiere cuenta real de Mercado Pago): el viaje completo con tarjeta de prueba. Se hace con la guía, paso 5. La firma real de Mercado Pago solo se pudo contrastar con el formato oficial, no con su clave.
 
 ## Pendiente / siguientes pasos
-1. Fralex: crear cuenta y aplicación, poner los 3 secretos y probar (docs/GUIA-PASARELA.md).
+1. Fralex: crear cuenta y aplicación, poner los 3 secretos y probar (docs/economia/GUIA-PASARELA.md).
 2. Programar `pago-conciliar` una vez al día (hoy se lanza a mano).
 3. Mensaje en la tienda al volver de Mercado Pago (`?pago=ok|pendiente|error` ya llega en la URL; solo falta mostrarlo).
-4. Decidir si migrar a la API de Orders; comprobantes electrónicos y asuntos fiscales (ver `DISENO-RECARGAS.md` §9).
+4. Decidir si migrar a la API de Orders; comprobantes electrónicos y asuntos fiscales (ver `docs/economia/DISENO-RECARGAS.md` §9).
 5. Pendiente copiar a Drive (no hay Drive por ahora).

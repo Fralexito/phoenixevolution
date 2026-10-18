@@ -10,7 +10,7 @@
 
 **Pendiente de aviso:** no existe filtro de groserías (ni en la web antes de esto). Si quieres uno, se agrega en el servidor y vale para web y Link.
 
-**API:** `docs/contrato-v1.md` §27. **Estado:** BD lista y probada; la Edge Function está en el repo pero NO desplegada (PENDIENTE-DEPLOY; se despliega junto con las rutas de Phoenix Sync).
+**API:** `docs/web-pes-link/contrato-v1.md` §27. **Estado:** BD lista y probada; la Edge Function está en el repo pero NO desplegada (PENDIENTE-DEPLOY; se despliega junto con las rutas de Phoenix Sync).
 
 
 **Ajuste anti-spam (ronda 219):** tabla `chat_ajustes` (una fila, `espera_seg`). Solo el admin la cambia (botón «Ajustes del chat» en /chat-general/, RPC `chat_global_ajustar`; queda en auditoría). Vale para web y Link. 0 = sin espera.

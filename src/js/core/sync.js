@@ -1,4 +1,4 @@
-// Lógica pura de la pantalla «Phoenix Sync» (sin red ni DOM: se prueba con npm test). Datos: migración 098. Contrato: docs/contrato-v1.md §26.
+// Lógica pura de la pantalla «Phoenix Sync» (sin red ni DOM: se prueba con npm test). Datos: migración 098. Contrato: docs/web-pes-link/contrato-v1.md §26.
 export const MODOS = {
   autorizacion: { id: 'autorizacion', nombre: 'Con autorización', icono: 'fa-shield-halved', corto: 'Cada PC debe pulsar Aplicar' },
   automatico: { id: 'automatico', nombre: 'Automático', icono: 'fa-bolt', corto: 'Los fichajes se aplican solos' },

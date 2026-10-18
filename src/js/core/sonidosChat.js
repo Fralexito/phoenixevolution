@@ -1,4 +1,4 @@
-// SONIDOS DE CHAT — catálogo PURO (sin navegador ni audio; se prueba en Node). Contrato completo: docs/CONTRATO-SONIDOS-CHAT.md.
+// SONIDOS DE CHAT — catálogo PURO (sin navegador ni audio; se prueba en Node). Contrato completo: docs/comunidad/CONTRATO-SONIDOS-CHAT.md.
 // La clave del catálogo es la MISMA que guarda la tienda en tienda_items.estilo.sonido (migración 121) y la que Link usará para elegir el archivo.
 // Cada sonido se describe como una «partitura» corta (tonos): la web la sintetiza con WebAudio (sin archivos) y Link podrá generarla como .wav idéntico.
 // tipo: 'sine' | 'triangle' | 'square' | 'ruido' · t = inicio (ms) · dur = duración (ms) · f/f2 = frecuencia inicial/final (Hz; en 'ruido' f es el centro del filtro) · vol = 0..1

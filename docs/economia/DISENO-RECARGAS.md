@@ -1,6 +1,6 @@
 # Diseño del sistema de recargas con varios métodos de pago — Phoenix Evolution Series
 
-> Fecha: 16-oct-2026. Es el detalle de la **Fase 4** de `PLAN-MONEDAS-VIRTUALES.md`. Una «recarga» = comprar **gemas** con dinero real. No es asesoría legal ni tributaria. Las cifras de comisiones salen de blogs y comparativas (no de documentación oficial) y **se contradicen entre sí**: hay que confirmarlas con cada proveedor antes de decidir.
+> Fecha: 16-oct-2026. Es el detalle de la **Fase 4** de `docs/economia/PLAN-MONEDAS-VIRTUALES.md`. Una «recarga» = comprar **gemas** con dinero real. No es asesoría legal ni tributaria. Las cifras de comisiones salen de blogs y comparativas (no de documentación oficial) y **se contradicen entre sí**: hay que confirmarlas con cada proveedor antes de decidir.
 
 ## 1. Qué hay hoy
 - Base lista: `paquetes_tokens` (3 paquetes), `ordenes_pago`, `crear_orden`, `procesar_pago_evento` (acredita gemas de forma idempotente, maneja reembolso y disputa), `aceptaciones_legales` y el interruptor `pagos_activos` (apagado).
@@ -91,4 +91,4 @@ Vender gemas con dinero real suele requerir **RUC y comprobante de pago electró
 
 - **2026-10-16 · Interfaz hecha:** el jugador compra desde la pestaña «Comprar gemas» y el administrador revisa en Administrar › Pagos por revisar. Para abrir el método: Administrar › Métodos de pago → poner el número de Yape, marcar «Activo» y activar «Compras con dinero real». Mientras no lo actives, todo sigue cerrado.
 
-- **2026-10-16 · R2 (Mercado Pago) HECHA en migración 122:** adaptador, webhook firmado, `pagos_eventos`, `pagos_conciliaciones` y conciliación listos y desplegados, apagados hasta que Fralex ponga los secretos. Ver `docs/GUIA-PASARELA.md` y `docs/ECONOMIA-FASE-D.md`. Culqi/PagoEfectivo siguen sin hacer.
+- **2026-10-16 · R2 (Mercado Pago) HECHA en migración 122:** adaptador, webhook firmado, `pagos_eventos`, `pagos_conciliaciones` y conciliación listos y desplegados, apagados hasta que Fralex ponga los secretos. Ver `docs/economia/GUIA-PASARELA.md` y `docs/economia/ECONOMIA-FASE-D.md`. Culqi/PagoEfectivo siguen sin hacer.

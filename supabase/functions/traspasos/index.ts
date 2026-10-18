@@ -10,9 +10,9 @@
 //   POST /v1/traspasos/dejar      → (amigo) {anfitrion_id}.
 //   GET  /v1/traspasos/siguiendo  → {sigo, me_siguen}.
 //   (1.1.0, migración 125) GET /v1/traspasos también trae los lotes OFICIALES de Phoenix a todo PC vinculado (&solo_oficial=1: solo esos);
-//   GET /v1/cambios?desde=&destino=base|lm → cambios oficiales; POST /v1/pc/informe → registro de cada PC. Contrato: docs/CONTRATO-WEB-PES.md.
+//   GET /v1/cambios?desde=&destino=base|lm → cambios oficiales; POST /v1/pc/informe → registro de cada PC. Contrato: docs/web-pes-link/CONTRATO-WEB-PES.md.
 // Solo viajan ids y nombres de jugador/equipo: ningún dato personal ni ninguna base de datos. Tablas con RLS y sin permisos para anon/authenticated.
-// Hecho por el chat LINK (Claude) con autorización de Fralex (12-oct-2026). Documento: docs/TRASPASOS-EN-VIVO.md.
+// Hecho por el chat LINK (Claude) con autorización de Fralex (12-oct-2026). Documento: docs/web-pes-link/TRASPASOS-EN-VIVO.md.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
@@ -109,7 +109,7 @@ const ALFABETO_CODIGO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const MAX_SEGUIDORES = 100;
 const RETENCION_DIAS = 30;
 const MAX_LOTES_POR_ANFITRION = 200;
-// Canal OFICIAL de Phoenix (migración 125, docs/CONTRATO-WEB-PES.md): anfitrión fijo que no es ningún usuario.
+// Canal OFICIAL de Phoenix (migración 125, docs/web-pes-link/CONTRATO-WEB-PES.md): anfitrión fijo que no es ningún usuario.
 const OFICIAL_ID = "00000000-0000-4000-8000-0000000f0e11";
 const OFICIAL_NOMBRE = "Phoenix (oficial)";
 
@@ -186,7 +186,7 @@ async function traspasosPublicar(req: Request) {
 
 // ── GET /v1/traspasos?desde=<seq>&limite=<1-50> ─────────────────────────────────────────
 // Un amigo (o el propio anfitrión en «prueba») recoge los lotes nuevos de los anfitriones que SIGUE, en orden de seq.
-// Además, TODO PC vinculado recibe los lotes OFICIALES de Phoenix (migración 125, docs/CONTRATO-WEB-PES.md §3a) sin código;
+// Además, TODO PC vinculado recibe los lotes OFICIALES de Phoenix (migración 125, docs/web-pes-link/CONTRATO-WEB-PES.md §3a) sin código;
 // con «solo_oficial=1» recibe solo esos (Link con «Recibir de amigos» apagado).
 async function traspasosLeer(req: Request) {
   const d = await autenticarBasico(req);
@@ -321,7 +321,7 @@ async function traspasosSiguiendo(req: Request) {
   };
 }
 
-// ═══ CAMBIOS OFICIALES Y REGISTRO DE PCs (migración 125, docs/CONTRATO-WEB-PES.md §3c y §4) ═══════════════════════
+// ═══ CAMBIOS OFICIALES Y REGISTRO DE PCs (migración 125, docs/web-pes-link/CONTRATO-WEB-PES.md §3c y §4) ═══════════════════════
 // ── GET /v1/cambios?desde=<seq>&destino=base|lm&limite=<1-100> ─────────────────────────────────
 // Lista genérica de cambios oficiales activos (para los motores de Liga Máster / estadísticas o un Link futuro).
 async function cambiosLeer(req: Request) {

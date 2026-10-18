@@ -48,4 +48,4 @@ Base de datos del juego: `download\CGP_database.cpk` → `common/etc/pesdb/`.
 ## 7. Pendiente
 - 56 jugadores sin cara (canteranos y fichajes nuevos que el parche no trae): siguen con foto de Wikipedia.
 - Copia de trabajo en la PC: `Conmegol Patch\_phoenix_web_minifaces\minifaces.zip` (se puede borrar).
-- Cuando Fralex vuelva a tener Drive: copiar esta guía y el prompt `docs/PROMPT-SISTEMA-DATOS-WEB-PES.md` a Drive.
+- Cuando Fralex vuelva a tener Drive: copiar esta guía y el prompt `docs/web-pes-link/PROMPT-SISTEMA-DATOS-WEB-PES.md` a Drive.

@@ -1,6 +1,6 @@
 // Liga automática (ronda 224): lógica pura del marcador EN VIVO (tabla liga_vivo, por Realtime) y de la
 // validación de resultados (liga_partidos). Sin DOM ni Supabase: todo con test en tests/ligaVivo.test.mjs.
-// Origen de los datos: Phoenix Link → Edge Function «liga» (docs/LIGA-AUTOMATICA.md).
+// Origen de los datos: Phoenix Link → Edge Function «liga» (docs/liga-y-torneos/LIGA-AUTOMATICA.md).
 
 /** Segundos que una tarjeta se queda con «FINAL» después de que Link borra el partido en vivo. */
 export const FINAL_MS = 30_000;

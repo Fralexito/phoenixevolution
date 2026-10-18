@@ -1,6 +1,6 @@
 # Contrato de sonidos de chat (web ⇄ Phoenix Link) — versión 1
 
-Estado: **la web ya lo cumple** (migración 121, Fase C de la economía). **Link todavía no lo usa**: este documento dice cómo lo hará «algún día», sin tocar el código de Link (los repos de Link y overlay son públicos y no se empujan). El contrato general de la API de Link está en `docs/contrato-v1.md`; este es aparte y solo habla de sonidos.
+Estado: **la web ya lo cumple** (migración 121, Fase C de la economía). **Link todavía no lo usa**: este documento dice cómo lo hará «algún día», sin tocar el código de Link (los repos de Link y overlay son públicos y no se empujan). El contrato general de la API de Link está en `docs/web-pes-link/contrato-v1.md`; este es aparte y solo habla de sonidos.
 
 ## 1. Qué hay hoy en Link (solo lectura, `C:\dev\smash-soda-fork\_phoenix-link`)
 - No existe una pestaña con el nombre literal «SONIDOS CHAT». Lo más parecido: **Ajustes › Sonidos** (`I18nOriginal.cpp`: «SFX» = «Sonidos») y el aviso de mensaje nuevo.
@@ -48,7 +48,7 @@ Cada sonido es una **partitura** (lista de tonos: tipo, frecuencia, duración, v
 
 ## 8. Cómo añadir un sonido nuevo (receta)
 1. Añadir la clave y su partitura en `SONIDOS_CHAT` (`src/js/core/sonidosChat.js`).
-2. Nueva migración: añadir la clave a la lista de `private.estilo_valido` (caso `sonido`) e insertar el objeto en `tienda_items` con su rareza y precio (`docs/DISENO-ECONOMIA-COMPLETA.md` §5).
+2. Nueva migración: añadir la clave a la lista de `private.estilo_valido` (caso `sonido`) e insertar el objeto en `tienda_items` con su rareza y precio (`docs/economia/DISENO-ECONOMIA-COMPLETA.md` §5).
 3. Ejecutar `node --test tests/*.test.mjs`: la prueba «la lista blanca de la web coincide con la de la migración 121» avisa si algo quedó a medias (si la nueva migración redefine la función, actualizar esa prueba para leer la última).
 4. (Cuando Link los use) generar `<clave>.wav` y subir `version` del catálogo.
 

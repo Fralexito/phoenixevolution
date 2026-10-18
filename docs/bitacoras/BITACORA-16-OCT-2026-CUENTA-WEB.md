@@ -1,6 +1,6 @@
 # Bitácora del 16-oct-2026 · cuenta WEB (Sonnet) — para que la otra cuenta retome
 
-Complementa `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` (migraciones 116–118, IA, caras). Aquí: rondas 340–347 de la cuenta WEB. Rama `borrador` = vista previa privada «FASE BETA 1.0» (`/phoenixevolution/fase-beta-1-0/`); son lo mismo, solo cambia el nombre. `main` (web oficial) NO tiene nada de esto; sale solo con «Súbelo»/«Publícalo».
+Complementa `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-OPUS.md` (migraciones 116–118, IA, caras). Aquí: rondas 340–347 de la cuenta WEB. Rama `borrador` = vista previa privada «FASE BETA 1.0» (`/phoenixevolution/fase-beta-1-0/`); son lo mismo, solo cambia el nombre. `main` (web oficial) NO tiene nada de esto; sale solo con «Súbelo»/«Publícalo».
 
 ## Cómo retomar (3 pasos)
 1. `git pull --rebase origin borrador`, leer el final de `REGISTRO.md` y `CLAUDE.md`.
@@ -13,7 +13,7 @@ Complementa `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` (migraciones 116–118, I
 - **R344 · Orden visual** (51 páginas revisadas en PC y celular): cabeceras en tarjeta `glass-panel` en Historial, Jugadores, Noticias y Configuración; en celular se oculta el «Explora» del pie si hay barra inferior; tiras de pestañas con desvanecido y pestaña activa centrada (`features/tirasDeslizables.js`).
 - **R346 · Modo ligero automático** para celulares lentos (`core/rendimiento.js`, `features/modoLigero.js`, `styles/modoLigero.css`): detecta por señales o midiendo tirones; apaga 3D/efectos/blur; dura 14 días; «Ajustes → Animaciones → Siempre activas» lo anula. **No probado en un celular real**: si no se activa, afinar la sensibilidad.
 - **R347 · Anti-lag** (pedido: «revisa residuos que causan lag, optimiza sin perder nada»): escudos `.escudo` pausados fuera de pantalla (`features/pausaFueraDePantalla.js`, atributo `data-fuera`); pulso del `.estado-punto` con transform/opacity en `::after` (antes box-shadow); estrellas de la portada ~30 fps y dpr máx 1,5 en celular. Mediciones en el sandbox muy ruidosas (no hay antes/después fiable).
-- **Informes:** `docs/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`, `docs/INVESTIGACION-DISENO-APUESTAS-Y-GAMING.md`.
+- **Informes:** `docs/bitacoras/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`, `docs/economia/INVESTIGACION-DISENO-APUESTAS-Y-GAMING.md`.
 
 ## Diagnóstico de rendimiento (para seguir con R348+)
 - CSS ≈ 657 KB, solo 22–25 % usado por página. Fuentes de iconos: Phosphor 147 KB + FontAwesome 136 KB, ambas cargadas.

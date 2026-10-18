@@ -1,6 +1,6 @@
 # Diseño completo de la economía de Phoenix Evolution (propuesta para decidir)
 
-Estado: **PROPUESTA** (16-oct-2026, cuenta ECONOMÍA). Nada de esto está aplicado salvo lo que dice «YA EXISTE». Complementa `docs/PLAN-MONEDAS-VIRTUALES.md` (plan técnico), `docs/DISENO-RECARGAS.md` (pagos) y `docs/SEGURIDAD-ECONOMIA.md` (seguridad).
+Estado: **PROPUESTA** (16-oct-2026, cuenta ECONOMÍA). Nada de esto está aplicado salvo lo que dice «YA EXISTE». Complementa `docs/economia/PLAN-MONEDAS-VIRTUALES.md` (plan técnico), `docs/economia/DISENO-RECARGAS.md` (pagos) y `docs/economia/SEGURIDAD-ECONOMIA.md` (seguridad).
 Las cifras de precios son una **propuesta para probar**, no verdades: se ajustan con datos reales. Lo legal y lo tributario es orientación general: confirmarlo con abogado y contador.
 
 ---
