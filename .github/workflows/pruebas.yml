@@ -1,0 +1,28 @@
+name: Pruebas
+# Red de seguridad (18-oct-2026): en CADA subida a cualquier rama y en cada PR pasa las pruebas y la compilación.
+# Si algo se rompe, GitHub marca el commit con una X roja y avisa por correo. No publica nada (eso lo hace deploy.yml).
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pruebas-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar
+        run: npm ci
+      - name: Pruebas (node --test)
+        run: npm test
+      - name: Compilar la web
+        run: npm run build

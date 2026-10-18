@@ -1,4 +1,4 @@
-// Isla de React (ronda 340, PRUEBA). Datos inventados. La lógica (marcador al minuto N) vive en core/centroPartido.js (sin React, con test).
+// Isla de React (ronda 340, PRUEBA). Datos inventados. La lógica (marcador al minuto N) vive en core/competicion/centroPartido.js (sin React, con test).
 import { useMemo, useState } from 'react';
 import { marcadorAl, eventosHasta, estadisticasAl } from '../js/core/competicion/centroPartido.js';
 

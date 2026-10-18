@@ -49,7 +49,7 @@ const menciones = Object.entries(mapa).map(([de, a]) => {
   return [new RegExp(`(?<![A-Za-z0-9_.-])${corto.split('.').join('[.]')}`, 'g'), cortoNuevo];
 });
 let textos = 0;
-for (const f of archivos.filter((x) => /\.(md|js|mjs|astro|ts|css|sql|json|txt)$/.test(x) && !SALTAR(x))) {
+for (const f of archivos.filter((x) => /\.(md|js|mjs|jsx|tsx|astro|ts|css|sql|json|txt|yml|yaml|ps1|bat|html)$/.test(x) && !SALTAR(x))) {
   const t = nuevos.get(f) ?? fs.readFileSync(f, 'utf8');
   let r = t; for (const [re, a] of menciones) r = r.replace(re, a);
   if (r !== t) { textos++; nuevos.set(f, r); }

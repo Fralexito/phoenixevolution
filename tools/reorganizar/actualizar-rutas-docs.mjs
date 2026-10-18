@@ -10,7 +10,7 @@ const esc = (s) => s.split('.').join('[.]');
 const reA = new RegExp('docs/(' + nombres.map(esc).join('|') + ')', 'g');
 const reB = new RegExp('(?<![A-Za-z0-9_/.-])(' + nombres.map(esc).join('|') + ')', 'g');
 const archivos = execSync('git ls-files', { encoding: 'utf8' }).split('\n')
-  .filter((f) => /\.(md|js|mjs|astro|json|cjs|ts|txt|sql|css)$/.test(f) && !f.startsWith('supabase/migrations/') && f !== 'REGISTRO.md' && !f.startsWith('tools/reorganizar/') && f !== 'docs/INDICE.md');
+  .filter((f) => /\.(md|js|mjs|jsx|tsx|astro|json|cjs|ts|txt|sql|css|yml|yaml|ps1|bat|html)$/.test(f) && !f.startsWith('supabase/migrations/') && f !== 'REGISTRO.md' && !f.startsWith('tools/reorganizar/') && f !== 'docs/INDICE.md');
 let n = 0;
 for (const f of archivos) {
   const a = fs.readFileSync(f, 'utf8');

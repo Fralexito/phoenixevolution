@@ -39,7 +39,8 @@ jobs:
         env:
           PES_BASE: /phoenixevolution/fase-beta-1-0
           PUBLIC_PREVIEW: "1"
-        run: npm ci && npm run build
+        # Red de seguridad (18-oct-2026): si alguna prueba falla, NO se publica nada y la web se queda con la última versión buena.
+        run: npm ci && npm test && npm run build
       - name: Juntar ambas
         run: |
           mkdir site
