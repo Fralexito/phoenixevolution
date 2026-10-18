@@ -1,5 +1,5 @@
 // Pestaña «Cómo ganar» (Fase B, migración 120): recompensa diaria con racha, primer partido del día, misiones semanales y premios de logros.
-// Esquema: pages/tienda → features/economia/ganar → features/economia/api → core/ganarAscuas (puro). La base decide de verdad al reclamar.
+// Esquema: pages/tienda → features/economia/ganar → features/economia/api → core/economia/ganarAscuas (puro). La base decide de verdad al reclamar.
 import { escapeHTML } from '../../core/sistema/dom.js';
 import { vacioHTML } from '../../core/sistema/vacio.js';
 import { rafaga } from '../dopamina.js';
