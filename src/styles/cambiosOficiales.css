@@ -152,3 +152,78 @@ html[data-tema='sudario'] .cfx { --a: #f5c542; }
 .cfx-esc { flex: none; object-fit: contain; }
 .cfx-tk-esc { height: 36px; }
 .cfx-tk-club small { line-height: 1.35; }
+
+/* ── ESTADÍSTICAS e INFORMACIÓN del jugador (ft-): pestañas, barras, puntos, campo de fútbol y resumen en vivo ── */
+.ft-avatar { flex: none; width: 2.1rem; height: 2.1rem; border-radius: 50%; overflow: hidden; display: grid; place-items: center; color: #5d6380; background: rgba(255,255,255,.05); border: 1px solid var(--linea, rgba(255,255,255,.1)); }
+.ft-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.ft-tabs { margin-top: .4rem; }
+.ft-contador { display: inline-grid; place-items: center; min-width: 1.25rem; height: 1.25rem; margin-left: .45rem; padding: 0 .3rem; border-radius: 999px; font-style: normal; font-size: 11px; font-weight: 700; color: #05060f; background: var(--a); }
+.ft-contador[hidden] { display: none; }
+.ft-paneles { margin-top: 1rem; }
+.ft-panel { display: grid; gap: .1rem; animation: cfx-entra .35s var(--curva); }
+.ft-panel[hidden] { display: none; }
+.ft-fila { --tono: var(--a); display: grid; grid-template-columns: 11.5rem minmax(8rem, 1fr) 4.6rem 2.6rem 1.8rem; grid-template-areas: 'etq barra num delta quitar' 'ahora barra num delta quitar'; column-gap: .9rem; align-items: center; padding: .55rem .2rem; border-bottom: 1px solid rgba(255,255,255,.05); }
+.ft-etq { grid-area: etq; font-size: 14px; font-weight: 600; color: #e3e6f2; }
+.ft-ahora { grid-area: ahora; font-size: 12px; color: var(--tx2); }
+.ft-fila[data-nivel='elite'] { --tono: #22d3ee; } .ft-fila[data-nivel='alto'] { --tono: #34d399; } .ft-fila[data-nivel='medio'] { --tono: #fbbf24; }
+.ft-fila[data-nivel='bajo'] { --tono: #fb923c; } .ft-fila[data-nivel='flojo'] { --tono: #8b92a8; }
+.ft-rango { grid-area: barra; grid-row: 1 / span 2; appearance: none; -webkit-appearance: none; width: 100%; height: 2rem; margin: 0; cursor: pointer; --pn: .5; --vn: -1;
+  background: linear-gradient(90deg, transparent calc(10px + (100% - 20px) * var(--vn) - 1px), rgba(255,255,255,.6) calc(10px + (100% - 20px) * var(--vn) - 1px), rgba(255,255,255,.6) calc(10px + (100% - 20px) * var(--vn) + 1px), transparent calc(10px + (100% - 20px) * var(--vn) + 1px)) center / 100% 18px no-repeat; }
+.ft-rango:focus { outline: none; }
+.ft-rango::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--tono) calc(10px + (100% - 20px) * var(--pn)), rgba(255,255,255,.1) calc(10px + (100% - 20px) * var(--pn))); opacity: .95; }
+.ft-rango::-moz-range-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.1); }
+.ft-rango::-moz-range-progress { height: 8px; border-radius: 999px; background: var(--tono); }
+.ft-rango::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -6px; border-radius: 50%; background: #fff; border: 3px solid var(--tono); transition: transform .2s var(--curva); }
+.ft-rango::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--tono); }
+.ft-rango:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--a); outline-offset: 2px; }
+@media (hover: hover) { .ft-rango:hover::-webkit-slider-thumb { transform: scale(1.15); } }
+.ft-fila[data-tocado='0'] .ft-rango::-webkit-slider-runnable-track { opacity: .38; }
+.ft-fila[data-tocado='0'] .ft-rango::-webkit-slider-thumb { background: #9ca3b8; border-color: #5d6380; }
+.ft-num { grid-area: num; width: 100%; min-height: 2.4rem; text-align: center; font: 700 15px/1 var(--font-display, inherit); font-variant-numeric: tabular-nums; color: #fff; background: var(--fondo-in); border: 1px solid var(--linea); border-radius: 10px; caret-color: var(--a); -moz-appearance: textfield; appearance: textfield; transition: border-color .2s, color .2s; }
+.ft-num::-webkit-outer-spin-button, .ft-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ft-num::placeholder { color: #6b7088; font-weight: 500; }
+.ft-num:focus { outline: none; border-color: var(--a); }
+.ft-fila[data-tocado='1'] .ft-num { border-color: color-mix(in srgb, var(--tono) 65%, transparent); color: var(--tono); }
+.ft-delta { grid-area: delta; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; }
+.ft-delta[data-signo='mas'] { color: #6ee7b7; } .ft-delta[data-signo='menos'] { color: #fca5a5; }
+.ft-quitar { grid-area: quitar; width: 1.7rem; height: 1.7rem; border-radius: 50%; font-size: 16px; line-height: 1; color: var(--tx2); border: 1px solid var(--linea); transition: color .2s, border-color .2s; }
+.ft-quitar[hidden] { display: none; }
+@media (hover: hover) { .ft-quitar:hover { color: #fff; border-color: #f87171; } }
+.ft-fila-pips, .ft-fila-chips { grid-template-columns: 11.5rem 1fr; grid-template-areas: 'etq pips' 'ahora pips'; }
+.ft-pips, .ft-chips { grid-area: pips; display: flex; flex-wrap: wrap; gap: .4rem; }
+.ft-pip, .ft-chip { min-width: 2.5rem; height: 2.5rem; padding: 0 .5rem; border-radius: 12px; font-size: 14px; font-weight: 700; color: var(--tx2); background: var(--fondo-in); border: 1px solid var(--linea); transition: background-color .2s, color .2s, border-color .2s, transform .2s var(--curva); }
+.ft-chip { height: 2.2rem; border-radius: 999px; font-size: 13px; }
+.ft-pip[aria-checked='true'], .ft-chip[aria-checked='true'] { color: #05060f; background: var(--a); border-color: var(--a); }
+.ft-pip-ahora, .ft-chip-ahora { outline: 1px dashed rgba(255,255,255,.45); outline-offset: 2px; }
+@media (hover: hover) { .ft-pip:hover, .ft-chip:hover { color: #fff; border-color: color-mix(in srgb, var(--a) 60%, transparent); transform: translateY(-1px); } .ft-pip[aria-checked='true']:hover, .ft-chip[aria-checked='true']:hover { color: #05060f; } }
+/* Campo de fútbol para las posiciones: A / B / C por puesto. */
+.ft-juego { position: relative; width: min(100%, 25rem); aspect-ratio: 100 / 130; margin: .6rem auto 0; border-radius: 14px; border: 1px solid var(--linea); overflow: hidden;
+  background: repeating-linear-gradient(180deg, #0d3a2c 0 9.09%, #0b3226 9.09% 18.18%); }
+.ft-cancha { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: rgba(255,255,255,.2); stroke-width: .5; }
+.ft-punto { position: absolute; transform: translate(-50%, -50%); width: 2.9rem; height: 2.9rem; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff;
+  background: rgba(8,10,24,.55); border: 2px dashed rgba(255,255,255,.35); transition: transform .25s var(--curva), background-color .2s, border-color .2s, box-shadow .2s; }
+.ft-punto b { font-weight: 700; letter-spacing: .02em; }
+.ft-punto i { position: absolute; right: -.15rem; bottom: -.15rem; min-width: 1.15rem; height: 1.15rem; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 10px; font-weight: 800; color: #05060f; background: #fff; }
+.ft-punto i:empty { display: none; }
+.ft-punto[data-nivel='2'] { background: #0891b2; border: 2px solid #67e8f9; } .ft-punto[data-nivel='2'] i { background: #67e8f9; }
+.ft-punto[data-nivel='1'] { background: #b45309; border: 2px solid #fcd34d; } .ft-punto[data-nivel='1'] i { background: #fcd34d; }
+.ft-punto[data-nivel='0'] { background: rgba(30,34,52,.85); border: 2px solid #6b7088; color: #aab0c6; } .ft-punto[data-nivel='0'] i { background: #6b7088; color: #fff; }
+.ft-punto[data-cambio='1'] { box-shadow: 0 0 0 4px color-mix(in srgb, var(--a) 40%, transparent); }
+@media (hover: hover) { .ft-punto:hover { transform: translate(-50%, -50%) scale(1.1); } }
+.ft-punto:active { transform: translate(-50%, -50%) scale(.95); }
+.ft-leyenda { margin-top: .8rem; text-align: center; margin-inline: auto; }
+.ft-ley { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: 50%; font-size: 10px; font-weight: 800; color: #05060f; }
+.ft-ley[data-n='2'] { background: #67e8f9; } .ft-ley[data-n='1'] { background: #fcd34d; } .ft-ley[data-n='0'] { background: #8b92a8; }
+/* Resumen en vivo (columna «Así llegará»). */
+.ft-vista { display: grid; gap: 1.1rem; }
+.ft-cambios { list-style: none; margin: 0; padding: 0; max-height: 18rem; overflow-y: auto; scrollbar-width: thin; }
+.ft-cambios li { display: flex; align-items: baseline; gap: .6rem; font-size: 13px; padding: .4rem 0; border-bottom: 1px solid rgba(255,255,255,.06); animation: cfx-entra .3s var(--curva); }
+.ft-cambios li span { color: var(--tx2); flex: 1; min-width: 0; }
+.ft-cambios li b { color: #fff; font-variant-numeric: tabular-nums; }
+.ft-cambios li em { font-style: normal; font-weight: 700; font-size: 12px; min-width: 2rem; text-align: right; }
+.ft-cambios li em[data-signo='mas'] { color: #6ee7b7; } .ft-cambios li em[data-signo='menos'] { color: #fca5a5; }
+@media (max-width: 640px) {
+  .ft-fila { grid-template-columns: minmax(0, 1fr) 4.4rem 1.8rem; grid-template-areas: 'etq num quitar' 'ahora num quitar' 'barra delta delta'; row-gap: .1rem; }
+  .ft-rango { grid-row: auto; }
+  .ft-fila-pips, .ft-fila-chips { grid-template-columns: 1fr; grid-template-areas: 'etq' 'ahora' 'pips'; row-gap: .4rem; }
+}

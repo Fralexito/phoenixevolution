@@ -107,3 +107,16 @@ export function resumenPcs(pcs = []) {
   for (const p of pcs) r[p.resultado] = (r[p.resultado] ?? 0) + 1;
   return r;
 }
+
+// ── Para la pantalla de edición (features/cambios/fichasUI.js): sin DOM, se prueba en tests/fichasCampos.test.mjs ──
+/** Nivel de una estadística (40–99) para el color: flojo < 60 ≤ bajo < 70 ≤ medio < 80 ≤ alto < 90 ≤ elite. */
+export const nivelStat = (v) => (v >= 90 ? 'elite' : v >= 80 ? 'alto' : v >= 70 ? 'medio' : v >= 60 ? 'bajo' : 'flojo');
+/** Posición de cada puesto en el campo dibujado (en %: [izquierda, arriba]; la portería abajo). */
+export const POS_CAMPO = {
+  pos_pt: [50, 91], pos_dfc: [50, 76], pos_li: [14, 70], pos_ld: [86, 70], pos_mcd: [50, 61], pos_mc: [50, 49],
+  pos_mi: [12, 46], pos_md: [88, 46], pos_mo: [50, 36], pos_ei: [16, 20], pos_ed: [84, 20], pos_sd: [32, 20], pos_dc: [50, 10],
+};
+/** Siguiente nivel al pulsar un puesto: sin cambio → A → B → C → sin cambio. Devuelve '' o '2' | '1' | '0'. */
+export const siguienteNivelPos = (actual) => ({ '': '2', 2: '1', 1: '0', 0: '' }[actual === '' || actual == null ? '' : Number(actual)] ?? '');
+/** Diferencia «nuevo − anterior» con signo, o '' si no hay con qué comparar. */
+export const deltaTexto = (antes, despues) => (Number.isFinite(antes) && Number.isFinite(despues) && antes !== despues ? `${despues > antes ? '+' : '−'}${Math.abs(despues - antes)}` : '');

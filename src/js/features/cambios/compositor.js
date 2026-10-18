@@ -22,7 +22,7 @@ const valor = (id) => document.getElementById(`cf-${id}`)?.value.trim() ?? '';
 let relojCara = null;
 /** Cara del jugador: la del juego si tiene id de PES con minicara; si no, foto libre de Wikipedia. Con id elegido se busca ya; si solo hay nombre escrito, se espera a que deje de teclear.
  *  Cada cambio crea un elemento nuevo, así una respuesta tardía del jugador anterior no pisa al actual. */
-function caraJugador(el, nombre, pes, club) {
+export function caraJugador(el, nombre, pes, club) {
   const clave = pes ? `p:${pes}` : nombre.length >= 4 ? `n:${nombre}` : '';
   if (el.dataset.k === clave) return;
   clearTimeout(relojCara);
@@ -40,6 +40,7 @@ export function pintarVista(caja, st) {
   if (!caja) return;
   const t = tipoRegistrado(st.tipo);
   if (!t) { caja.innerHTML = ''; return; }
+  if (typeof t.vista === 'function') { t.vista(caja, st); return; }   // el tipo dibuja su propia vista previa (estadísticas, información)
   if (!caja.querySelector('.cfx-ticket')) {
     caja.innerHTML = `<div class="cfx-ticket">
       <div class="cfx-tk-cabeza">

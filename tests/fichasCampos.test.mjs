@@ -47,3 +47,23 @@ test('vigentes y resumen de PCs', () => {
   assert.deepEqual(vigentesPlanos(v, 'lm'), { altura: 181 });
   assert.deepEqual(resumenPcs([{ resultado: 'aplicado' }, { resultado: 'aplicado' }, { resultado: 'saltado' }]), { aplicado: 2, saltado: 1 });
 });
+
+import { nivelStat, POS_CAMPO, siguienteNivelPos, deltaTexto } from '../src/js/core/fichasCampos.js';
+test('nivelStat: colores por tramo', () => {
+  assert.equal(nivelStat(99), 'elite'); assert.equal(nivelStat(90), 'elite'); assert.equal(nivelStat(89), 'alto');
+  assert.equal(nivelStat(70), 'medio'); assert.equal(nivelStat(60), 'bajo'); assert.equal(nivelStat(40), 'flojo');
+});
+test('POS_CAMPO tiene las 13 posiciones del catálogo', () => {
+  const claves = CAMPOS.filter((c) => c.grupo === 'posicion').map((c) => c.clave).sort();
+  assert.deepEqual(Object.keys(POS_CAMPO).sort(), claves);
+});
+test('siguienteNivelPos recorre sin cambio → A → B → C → sin cambio', () => {
+  let n = ''; const vistos = [];
+  for (let i = 0; i < 4; i++) { n = siguienteNivelPos(n); vistos.push(n); }
+  assert.deepEqual(vistos, ['2', '1', '0', '']);
+  assert.equal(siguienteNivelPos('2'), '1'); assert.equal(siguienteNivelPos(0), '');
+});
+test('deltaTexto', () => {
+  assert.equal(deltaTexto(80, 85), '+5'); assert.equal(deltaTexto(85, 80), '−5');
+  assert.equal(deltaTexto(80, 80), ''); assert.equal(deltaTexto(undefined, 80), '');
+});
