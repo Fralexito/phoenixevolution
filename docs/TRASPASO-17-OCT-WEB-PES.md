@@ -40,3 +40,21 @@ Orden obligatorio: **125 → 126 → 127**; la **128** va aparte, en cualquier m
 - Web: 592 pruebas pasan y compila (55 páginas). Toda función `pes_*` que llama la web existe en la base.
 - **Siguen SIN aplicar:** 127 (Liga Máster) y 128 (botón ACTUALIZAR): a medias en sus ramas `respaldo/*`.
 - **Falta probar en un PES real** (Fralex): un fichaje oficial desde la web hasta el PC de un amigo (Link 0.3.19 con «Recibir los cambios oficiales») y que el resultado aparezca en «Usuarios en PES».
+
+---
+
+## ACTUALIZACIÓN 18-oct (tarde): los 4 frentes están TERMINADOS y verificados
+| Frente | Base de datos | Web | Link / Sync |
+|---|---|---|---|
+| 125 amistosos + registro + formulario | aplicada, prueba pasa | subida | Link 0.3.19 → incluido en 0.3.20 |
+| 126 estadísticas e información | aplicada, prueba pasa | subida | Link 0.3.18 → incluido en 0.3.20 |
+| 127 Liga Máster | aplicada, prueba pasa (+ permisos corregidos) | subida | Sync `mercado-fase0` (864acd0): lm127 68/68 con partida real, regresión 211/211 y 246/246 |
+| 128 botón ACTUALIZAR | aplicada, prueba pasa | subida (`/link-versiones/`) | Link 0.3.20 (91f6635): actualizacion_test 42/42, compilado |
+
+- **Edge Functions desplegadas:** `traspasos` v2 y `mercado` v12 (rutas nuevas vivas; las viejas intactas).
+- **Seguridad:** `pes_registrar_informe`, `lm_pc_cambios_desde`, `lm_pc_informe` y las funciones `sistema_link_*` solo las ejecuta el servidor (los permisos por defecto de Supabase dejaban EXECUTE a cualquier usuario con sesión: corregido y comprobado).
+- **Para repartir una versión nueva de Link:** `powershell -ExecutionPolicy Bypass -File tools\EMPAQUETAR-RELEASE.ps1 -Subir -Notas "…"` (en el repo Link) y publicarla en `/link-versiones/`. Cada Link la ve en menos de 1 hora.
+- **Los Link ya repartidos (0.2.x–0.3.19) no tienen el actualizador:** instalar `PhoenixLink-Setup-0.3.20.exe` a mano UNA vez.
+- **Sigue sin probarse en un PES real (solo Fralex):** un fichaje oficial de la web al PC de un amigo; una actualización real de Link; un cambio de Liga Máster en una partida real (probado solo con COPIA de una ranura).
+- Los «stat» de Liga Máster quedan PENDIENTES hasta conectar el motor de estadísticas de LM.
+- Las ramas `respaldo/*` ya no hacen falta (todo su trabajo está en las ramas principales); no se borraron.
