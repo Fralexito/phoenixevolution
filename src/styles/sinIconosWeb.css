@@ -5,3 +5,8 @@ html[data-sin-ico] .barra-item[data-mono][aria-current='page']::before { backgro
 
 /* Iconos finos (Phosphor Light) */
 html[data-sin-ico] .ico-fino { font-style: normal; line-height: 1; font-size: 1.2em; vertical-align: -.17em; -webkit-text-stroke: .35px currentColor; }
+
+/* Sin parpadeo al cambiar de página: los iconos aún sin procesar (js/features/sinIconosWeb.js les pone data-ico) se esconden —ocupan su sitio—
+   hasta que el script los cambia por el fino o los quita. Red de seguridad: a 1,2 s se muestran pase lo que pase (por si el script falla). */
+@keyframes sico-ok { to { visibility: visible; } }
+html[data-sin-ico].js :is(i.fa-solid, i.fa-regular):not([data-ico]) { visibility: hidden; animation: sico-ok 0s 1.2s forwards; }
