@@ -1,8 +1,8 @@
 // HTML compartido del muro (lo usan /perfil/ y la pestaña «Muro» de la ficha del jugador): fotos, video y tarjeta de duelo.
 // Todo dato del usuario o de la BD pasa por escapeHTML / safeImg / analizarVideo. Sin acceso a red.
-import { escapeHTML, safeImg } from '../../core/dom.js';
-import { href } from '../../core/config.js';
-import { analizarVideo, PROVEEDOR_ETIQUETA, resumenReto, tiempoRelativo, textoAHTML, etiquetaSegmento } from '../../core/muro.js';
+import { escapeHTML, safeImg } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
+import { analizarVideo, PROVEEDOR_ETIQUETA, resumenReto, tiempoRelativo, textoAHTML, etiquetaSegmento } from '../../core/comunidad/muro.js';
 
 /** Etiqueta pequeña del segmento (juego) de una publicación o clip; '' si es general. */
 export const segmentoChipHTML = (id) => (etiquetaSegmento(id) ? `<span class="inline-block text-[12px] leading-none rounded-full border border-galaxy-border/80 text-gray-400 px-2 py-1">${escapeHTML(etiquetaSegmento(id))}</span>` : '');

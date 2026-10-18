@@ -1,12 +1,12 @@
 // Página /buscar/: personas y publicaciones; si no hay texto, «A quién seguir». Requiere sesión (la BD lo exige).
 // Esquema: pages/buscar → features/social/{api, guardados} + features/amigos/api (seguir) + features/muro/tarjeta → core/social (lógica pura).
-import { vacioHTML } from '../core/vacio.js';
-import { onSession, can } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { avatarHTML } from '../core/avatar.js';
-import { toast } from '../core/toast.js';
-import { TIPOS_BUSQUEDA, esTipoBusqueda, validarBusqueda } from '../core/social.js';
+import { vacioHTML } from '../core/sistema/vacio.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { toast } from '../core/sistema/toast.js';
+import { TIPOS_BUSQUEDA, esTipoBusqueda, validarBusqueda } from '../core/comunidad/social.js';
 import * as api from '../features/social/api.js';
 import * as amigosApi from '../features/amigos/api.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';

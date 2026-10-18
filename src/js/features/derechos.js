@@ -1,10 +1,10 @@
 // «Tus datos y derechos» (Configuración → Cuenta). Usa RPC ya existentes en la base:
 // exportar_mis_datos(), solicitar_derecho(p_tipo, p_detalle), mis_solicitudes_privacidad().
-import { supabase } from '../core/supabase.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { href } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
 
 const TIPOS = {
   rectificacion: ['fa-pen', 'Corregir un dato', '¿Qué dato está mal y cuál es el correcto?'],

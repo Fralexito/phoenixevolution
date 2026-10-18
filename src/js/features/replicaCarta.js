@@ -1,7 +1,7 @@
 // Réplica ampliada de una carta de jugador: capa fija que viaja de la carta original al centro de la pantalla, con el aura de su posición y, con mouse,
 // inclinación 3D. La comparten «Jugadores» (core: pages/database.js) y el podio de «Destacados» (pages/central.js).
-// Si la carta original es muy angosta, la réplica se construye más ancha (core/replica.js) para que se vean TODAS las estadísticas.
-import { anchoBase, escalaInicial, rectBase, destino, regreso } from '../core/replica.js';
+// Si la carta original es muy angosta, la réplica se construye más ancha (core/jugadores/replica.js) para que se vean TODAS las estadísticas.
+import { anchoBase, escalaInicial, rectBase, destino, regreso } from '../core/jugadores/replica.js';
 
 /**
  * @param {{esMovil:()=>boolean, sinMovimiento:()=>boolean, inclinacion?:()=>boolean, alClicCapa?:()=>void}} o

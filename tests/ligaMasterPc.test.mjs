@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { eurosDe, textoEuros, destinoLm, datosDinero, datosValor, lmDeFichaje, textoResultado, PARTIDA_RE } from '../src/js/core/ligaMasterPc.js';
+import { eurosDe, textoEuros, destinoLm, datosDinero, datosValor, lmDeFichaje, textoResultado, PARTIDA_RE } from '../src/js/core/pes/ligaMasterPc.js';
 
 const U = '00000000-0000-0000-0000-00000000000b';
 

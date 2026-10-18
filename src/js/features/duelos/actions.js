@@ -1,7 +1,7 @@
 // Acciones del usuario sobre retos. Cada una es una llamada RPC: la base de datos valida TODO;
 // aquí solo se envía y se muestra el resultado con un mensaje claro.
-import { supabase } from '../../core/supabase.js';
-import { toast } from '../../core/toast.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { toast } from '../../core/sistema/toast.js';
 import { openAuthModal } from '../auth.js';
 import { me } from './data.js';
 

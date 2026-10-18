@@ -1,4 +1,4 @@
-// Aspecto de cada club en Central (escudo-monograma): sigla y dos colores. Si un club no está aquí se usa uno neutro (core/central.js → visualClub).
+// Aspecto de cada club en Central (escudo-monograma): sigla y dos colores. Si un club no está aquí se usa uno neutro (core/competicion/central.js → visualClub).
 export const CLUBES_VISUAL = {
   'Arsenal': { sigla: 'ARS', a: '#dc2626', b: '#7f1d1d' }, 'Manchester City': { sigla: 'MCI', a: '#7dd3fc', b: '#1d4ed8' },
   'Atlético de Madrid': { sigla: 'ATM', a: '#ef4444', b: '#1e3a8a' }, 'Liverpool': { sigla: 'LIV', a: '#dc2626', b: '#991b1b' },

@@ -1,12 +1,12 @@
 // Página «Historial de hoy»: pinta lo que el pulso en vivo guardó en el navegador SOLO del día actual, con búsqueda y filtros.
 // Esquema: este archivo (DOM) → core/liveFiltro (búsqueda y filtros, puro) + core/live (texto de cada aviso, puro).
 // Se refresca sola: cuando otra pestaña guarda un aviso (evento `storage`) y cada 30 s (para vaciarse al cambiar de día).
-import { formatEvento, horaExacta, diaClave } from '../core/live.js';
-import { filtrarEventos, facetas, hayFiltros, CRITERIOS_VACIOS, TIPOS } from '../core/liveFiltro.js';
+import { formatEvento, horaExacta, diaClave } from '../core/competicion/live.js';
+import { filtrarEventos, facetas, hayFiltros, CRITERIOS_VACIOS, TIPOS } from '../core/competicion/liveFiltro.js';
 import { leerHistorialHoy, KEY_HIST } from '../features/liveFeed.js';
 import { leerAjustes, regionAhora } from '../features/ajustes.js';
-import { href } from '../core/config.js';
-import { escapeHTML } from '../core/dom.js';
+import { href } from '../core/sistema/config.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 
 const $ = (id) => document.getElementById(id);
 const lista = $('hv-lista');

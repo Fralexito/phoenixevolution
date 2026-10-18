@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 test('menciones: @usuario se enlaza al perfil, con el formato del servidor', async () => {
-  const { textoAHTML } = await import('../src/js/core/muro.js');
+  const { textoAHTML } = await import('../src/js/core/comunidad/muro.js');
   const url = (u) => `/p/?u=${u}`;
   const h = (t) => textoAHTML(t, { urlPerfil: url });
   assert.match(h('hola @jug2 mira'), /^hola <a href="\/p\/\?u=jug2" class="[^"]*">@jug2<\/a> mira$/);
@@ -14,7 +14,7 @@ test('menciones: @usuario se enlaza al perfil, con el formato del servidor', asy
 });
 
 test('menciones: lo que NO es una mención no se enlaza', async () => {
-  const { textoAHTML } = await import('../src/js/core/muro.js');
+  const { textoAHTML } = await import('../src/js/core/comunidad/muro.js');
   assert.equal(textoAHTML('escríbeme a ana@correo.com'), 'escríbeme a ana@correo.com');   // correo: el @ va pegado a una letra
   assert.equal(textoAHTML('@@ana'), '@@ana');                                              // doble @
   assert.equal(textoAHTML('solo @'), 'solo @');
@@ -23,7 +23,7 @@ test('menciones: lo que NO es una mención no se enlaza', async () => {
 });
 
 test('menciones: una @ dentro de una URL es parte de la URL, no una mención', async () => {
-  const { textoAHTML } = await import('../src/js/core/muro.js');
+  const { textoAHTML } = await import('../src/js/core/comunidad/muro.js');
   const h = textoAHTML('mira https://www.youtube.com/@canal y a @ana');
   assert.equal((h.match(/<a /g) ?? []).length, 2);                                         // 1 enlace externo + 1 mención
   assert.match(h, /href="https:\/\/www\.youtube\.com\/@canal"/);
@@ -31,7 +31,7 @@ test('menciones: una @ dentro de una URL es parte de la URL, no una mención', a
 });
 
 test('menciones: nada del usuario se convierte en HTML (XSS)', async () => {
-  const { textoAHTML } = await import('../src/js/core/muro.js');
+  const { textoAHTML } = await import('../src/js/core/comunidad/muro.js');
   const h = textoAHTML('<img src=x onerror=alert(1)> @ana"onmouseover="x <script>@bob</script>', { urlPerfil: (u) => `/p/?u=${u}` });
   assert.doesNotMatch(h, /<img|<script/i);
   assert.doesNotMatch(h, /\sonmouseover=/);
@@ -41,7 +41,7 @@ test('menciones: nada del usuario se convierte en HTML (XSS)', async () => {
 });
 
 test('avisos: categorías y normalización (lo desconocido cuenta como activado)', async () => {
-  const { CATEGORIAS_AVISO, normalizarPreferencias, esCategoriaAviso } = await import('../src/js/core/avisos.js');
+  const { CATEGORIAS_AVISO, normalizarPreferencias, esCategoriaAviso } = await import('../src/js/core/sistema/avisos.js');
   assert.deepEqual(CATEGORIAS_AVISO.map((c) => c.id), ['duelos', 'social', 'muro', 'menciones', 'logros', 'eventos', 'salas']);
   assert.deepEqual(normalizarPreferencias(null), { duelos: true, social: true, muro: true, menciones: true, logros: true, eventos: true, salas: true });
   assert.deepEqual(normalizarPreferencias({ muro: false, basura: false, social: 'no' }), { duelos: true, social: true, muro: false, menciones: true, logros: true, eventos: true, salas: true });
@@ -51,7 +51,7 @@ test('avisos: categorías y normalización (lo desconocido cuenta como activado)
 });
 
 test('avisos: enlace seguro (solo rutas relativas de la propia web)', async () => {
-  const { enlaceAvisoSeguro } = await import('../src/js/core/avisos.js');
+  const { enlaceAvisoSeguro } = await import('../src/js/core/sistema/avisos.js');
   assert.equal(enlaceAvisoSeguro('perfil/?u=ana#p-5'), 'perfil/?u=ana#p-5');
   assert.equal(enlaceAvisoSeguro('duelos/'), 'duelos/');
   for (const mal of ['https://evil.com', 'http://x', '//evil.com', 'javascript:alert(1)', '/perfil/', '../x', 'perfil/?u=<b>', 'perfil/ ?u=a', null, undefined, 5, '', 'a'.repeat(201)])

@@ -4,11 +4,11 @@
 import Layout from '../layouts/Layout.astro';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
-import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
-import { escudoDe } from '../js/core/escudos.js';
+import { calcularTabla, tablaEdicion } from '../js/core/competicion/tabla.js';
+import { escudoDe } from '../js/core/sistema/escudos.js';
 import { SISTEMA, SISTEMAS_LIGA } from '../data/temporada.js';
-import { zonasDivision, zonasLiga } from '../js/core/temporada.js';
-import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas, evolucionPuntos, golesPorFecha } from '../js/core/ligaStats.js';
+import { zonasDivision, zonasLiga } from '../js/core/competicion/temporada.js';
+import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas, evolucionPuntos, golesPorFecha } from '../js/core/competicion/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 // Clases completas (Tailwind solo detecta nombres escritos enteros).
 const CHIP = { G: 'bg-emerald-500/90 text-black', E: 'bg-amber-400/90 text-black', P: 'bg-rose-500/90 text-white' };

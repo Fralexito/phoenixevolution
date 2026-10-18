@@ -1,10 +1,10 @@
 // Página /link-versiones/: publicar o retirar versiones de Phoenix Link y ver qué versión tiene cada PC (migración 128).
 // Las reglas viven en la BD: link_versiones_panel (staff), link_version_publicar / _obligatoria / _notas (solo admin).
-import { onSession, can } from '../core/session.js';
-import { supabase } from '../core/supabase.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML as e } from '../core/dom.js';
-import { estadoVersion, normalizarPanel, tamanoTexto } from '../core/linkVersiones.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML as e } from '../core/sistema/dom.js';
+import { estadoVersion, normalizarPanel, tamanoTexto } from '../core/pes/linkVersiones.js';
 
 const $ = (id) => document.getElementById(id);
 const S = { panel: normalizarPanel(null), confirmar: null, iniciado: false };

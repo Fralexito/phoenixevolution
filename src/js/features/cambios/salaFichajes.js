@@ -3,8 +3,8 @@
 // Liga Máster: quien pierde al jugador y quien lo recibe. No guarda nada: devuelve la elección y el formulario rellena sus campos.
 // Datos: src/data/clubesPes.js (clubes) · plantillasPes.js (plantillas, del parche) · datosSala.js (Liga Máster de la web).
 import { CLUBES_PES } from '../../../data/clubesPes.js';
-import { buscarClubes, escudoImg, escudoUrl, paisDe, agruparPlantilla, buscarJugadoresPes, lineaDe } from '../../core/clubesPes.js';
-import { escapeHTML as esc } from '../../core/dom.js';
+import { buscarClubes, escudoImg, escudoUrl, paisDe, agruparPlantilla, buscarJugadoresPes, lineaDe } from '../../core/pes/clubesPes.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
 import { minifaceUrl, montarFotos } from '../fotoFutbolista.js';
 import { cargarPlantillas, cargarLm } from './datosSala.js';
 

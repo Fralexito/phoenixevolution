@@ -1,9 +1,9 @@
-// Página «Phoenix Sync»: interruptor (solo admin del grupo), fichajes con estado por miembro y permisos. Datos: features/sync/api.js. Lógica: core/sync.js.
-import { onSession, isAdmin } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto, elegir } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { MODOS, ESTADOS, ROLES, LEYENDA_MODO, AVISO_AUTOMATICO, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, terminoValido } from '../core/sync.js';
+// Página «Phoenix Sync»: interruptor (solo admin del grupo), fichajes con estado por miembro y permisos. Datos: features/sync/api.js. Lógica: core/pes/sync.js.
+import { onSession, isAdmin } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto, elegir } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { MODOS, ESTADOS, ROLES, LEYENDA_MODO, AVISO_AUTOMATICO, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, terminoValido } from '../core/pes/sync.js';
 import * as api from '../features/sync/api.js';
 
 const $ = (id) => document.getElementById(id);

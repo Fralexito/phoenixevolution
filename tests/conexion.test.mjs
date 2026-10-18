@@ -1,7 +1,7 @@
-// Pruebas de core/conexion.js (estadísticas del pre-chequeo y semáforo; misma regla que private.semaforo de la 061).
+// Pruebas de core/competicion/conexion.js (estadísticas del pre-chequeo y semáforo; misma regla que private.semaforo de la 061).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { estadisticas, percentil, umbralesDe, semaforo, UMBRALES_DEFECTO } from '../src/js/core/conexion.js';
+import { estadisticas, percentil, umbralesDe, semaforo, UMBRALES_DEFECTO } from '../src/js/core/competicion/conexion.js';
 
 test('percentil como percentile_cont', () => {
   assert.equal(percentil([10, 20, 30, 40], 0.5), 25);

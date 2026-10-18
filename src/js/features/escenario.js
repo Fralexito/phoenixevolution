@@ -5,9 +5,9 @@
 //  · los 4 mundos se despliegan en el mismo lugar (un «cajón» que se abre suave);
 //  · con sesión, la bienvenida dice «Hola de nuevo, <nombre>»;
 //  · con «menos movimiento» nada rota solo.
-import { onSession } from '../core/session.js';
+import { onSession } from '../core/sistema/session.js';
 import { hayMovimientoReducido } from './ajustes.js';
-import { pestanaSegunTecla } from '../core/pestanas.js';
+import { pestanaSegunTecla } from '../core/sistema/pestanas.js';
 
 function palabrasHTML(contenedor, texto, desde) {
   contenedor.replaceChildren();

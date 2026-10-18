@@ -1,6 +1,6 @@
 // Acceso al chat privado: RPC (reglas en la base, migración 018) + lecturas protegidas por RLS.
-import { supabase } from '../../core/supabase.js';
-import { normalizarConversaciones } from '../../core/chat.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarConversaciones } from '../../core/comunidad/chat.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

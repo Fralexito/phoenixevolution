@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CAMPOS, camposDe, construirDatos, textoCambio, mostrarValor, vigentesPlanos, resumenPcs } from '../src/js/core/fichasCampos.js';
+import { CAMPOS, camposDe, construirDatos, textoCambio, mostrarValor, vigentesPlanos, resumenPcs } from '../src/js/core/pes/fichasCampos.js';
 
 test('catálogo: 46 campos, 25 stats y 21 info, claves únicas', () => {
   assert.equal(CAMPOS.length, 46);
@@ -48,7 +48,7 @@ test('vigentes y resumen de PCs', () => {
   assert.deepEqual(resumenPcs([{ resultado: 'aplicado' }, { resultado: 'aplicado' }, { resultado: 'saltado' }]), { aplicado: 2, saltado: 1 });
 });
 
-import { nivelStat, POS_CAMPO, siguienteNivelPos, deltaTexto } from '../src/js/core/fichasCampos.js';
+import { nivelStat, POS_CAMPO, siguienteNivelPos, deltaTexto } from '../src/js/core/pes/fichasCampos.js';
 test('nivelStat: colores por tramo', () => {
   assert.equal(nivelStat(99), 'elite'); assert.equal(nivelStat(90), 'elite'); assert.equal(nivelStat(89), 'alto');
   assert.equal(nivelStat(70), 'medio'); assert.equal(nivelStat(60), 'bajo'); assert.equal(nivelStat(40), 'flojo');
@@ -68,7 +68,7 @@ test('deltaTexto', () => {
   assert.equal(deltaTexto(80, 80), ''); assert.equal(deltaTexto(undefined, 80), '');
 });
 
-import { BITS_PLAYER, BITS_HABILIDADES } from '../src/js/core/fichasCampos.js';
+import { BITS_PLAYER, BITS_HABILIDADES } from '../src/js/core/pes/fichasCampos.js';
 test('BITS_PLAYER cubre todos los campos del catálogo y cada uno cabe en el registro de 312 bytes', () => {
   assert.deepEqual(Object.keys(BITS_PLAYER).sort(), CAMPOS.map((c) => c.clave).sort());
   for (const [k, [bit, ancho]] of Object.entries(BITS_PLAYER)) assert.ok(bit + ancho <= 312 * 8, k);

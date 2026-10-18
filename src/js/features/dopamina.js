@@ -2,10 +2,10 @@
 //   · initDopamina()  → luz que sigue al cursor en tarjetas ([data-spot]) y ondulación al pulsar el botón principal.
 //   · rafaga(origen, emojis, {n}) → pequeñas partículas que salen de un elemento (reaccionar, publicar).
 //   · salto(el)       → el emoji «salta» una vez.
-//   · contarHasta(el, n) → el número sube de 0 a n (count-up; lógica en core/contador.js). Sin efecto, escribe el valor directo.
+//   · contarHasta(el, n) → el número sube de 0 a n (count-up; lógica en core/sistema/contador.js). Sin efecto, escribe el valor directo.
 // Solo se anima transform/opacity con WAAPI (acelerado por GPU, interrumpible). Si algo falla, la web sigue funcionando sin el efecto.
 import { FX } from '../../data/experimento.js';
-import { valorEn, duracionPara } from '../core/contador.js';
+import { valorEn, duracionPara } from '../core/sistema/contador.js';
 
 // Ronda 243: obedece a «Ajustes → Animaciones» (que ya incluye lo que diga el sistema si está en «Según el sistema»).
 const reducido = () => document.documentElement.getAttribute('data-aj-mov-efectivo') === 'reducido';

@@ -1,12 +1,12 @@
 // Pestaña «Pase» de la tienda: Phoenix Pass (pase de temporada). Pista gratis y pista premium, progreso por XP, compra única con gemas y reclamo de premios.
 // Esquema: pages/tienda → features/economia/pase → features/economia/api → core/phoenix-pass (puro). Las reglas reales viven en la base (migración 123).
-import { escapeHTML } from '../../core/dom.js';
-import { openModal, closeModal } from '../../core/modal.js';
-import { vacioHTML } from '../../core/vacio.js';
-import { href } from '../../core/config.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { vacioHTML } from '../../core/sistema/vacio.js';
+import { href } from '../../core/sistema/config.js';
 import * as api from './api.js';
-import { vistaPrevia, formatoTokens, RAREZAS } from '../../core/economia.js';
-import { estadoPremio, resumenPase, costeNeto, reclamablesYa, textoPremio, textoTiempo, solesAprox } from '../../core/phoenix-pass.js';
+import { vistaPrevia, formatoTokens, RAREZAS } from '../../core/economia/economia.js';
+import { estadoPremio, resumenPase, costeNeto, reclamablesYa, textoPremio, textoTiempo, solesAprox } from '../../core/economia/phoenix-pass.js';
 
 let C = null; // contexto que entrega la página: { S, hacer, cargar }
 export const iniciar = (ctx) => { C = ctx; };

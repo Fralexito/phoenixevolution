@@ -3,15 +3,15 @@
 //  · con sesión: saluda por el nombre y cambia la vitrina por el «pase de miembro» (número, puesto, puntos, próximo partido);
 //  · efecto 3D + brillo holográfico del pase (solo con mouse y si no se pidió menos movimiento);
 //  · entrada tipo transmisión, una vez al día.
-// La lógica pura está en core/pase.js (con pruebas). Si algo falla, el pase del líder que viene en el HTML se queda tal cual.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { escudoHTML } from '../core/escudos.js';
-import { onSession } from '../core/session.js';
+// La lógica pura está en core/portada/pase.js (con pruebas). Si algo falla, el pase del líder que viene en el HTML se queda tal cual.
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
+import { onSession } from '../core/sistema/session.js';
 import { hayMovimientoReducido } from './ajustes.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
-import { calcularTabla } from '../core/tabla.js';
-import { liderDe, puestoDe, proximoPartido, nombreEnLiga, numeroMiembro, tocaIntro } from '../core/pase.js';
+import { calcularTabla } from '../core/competicion/tabla.js';
+import { liderDe, puestoDe, proximoPartido, nombreEnLiga, numeroMiembro, tocaIntro } from '../core/portada/pase.js';
 
 const CLAVE_INTRO = 'pes-intro-dia';
 const ed = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarEncuesta, porcentajes, textoCierre, normalizarEncuestas } from '../src/js/core/encuesta.js';
+import { validarEncuesta, porcentajes, textoCierre, normalizarEncuestas } from '../src/js/core/comunidad/encuesta.js';
 
 test('formulario: casos válidos y espacios', () => {
   const v = validarEncuesta({ pregunta: '  ¿Qué   parche usamos? ', opciones: [' PES 21 ', 'SP  2026', '', '   '], dias: '3' });

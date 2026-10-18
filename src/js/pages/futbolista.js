@@ -1,11 +1,11 @@
 // Ficha de un futbolista de la Liga Máster (ronda 283). Lee lm_jugadores, lm_clubes y lm_movimientos; fichar/ofertar con los mismos RPC de manager.js.
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc, safeUrl } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { haceCuanto } from '../core/notifs.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc, safeUrl } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { haceCuanto } from '../core/sistema/notifs.js';
 import * as Fotos from '../features/fotoFutbolista.js';
 const { fotoFutbolista, tamano, esWikimedia, fotosExtra, minifaceUrl } = Fotos;
 import { hayMovimientoReducido } from '../features/ajustes.js';

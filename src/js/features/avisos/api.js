@@ -1,7 +1,7 @@
 // Preferencias de avisos (qué categorías de notificación quiero recibir). Reglas en la BD (migración 033); aquí solo se llama a las RPC.
 // Esquema: pages/amigos (pestaña «Avisos») → features/avisos/api → core/avisos (lógica pura).
-import { supabase } from '../../core/supabase.js';
-import { normalizarPreferencias, esCategoriaAviso } from '../../core/avisos.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarPreferencias, esCategoriaAviso } from '../../core/sistema/avisos.js';
 
 function error(nombre, e) {
   console.error(`[avisos] ${nombre}:`, e.code, e.message);

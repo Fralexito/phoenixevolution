@@ -1,18 +1,18 @@
 // Editor de noticias (administradores y moderadores; borrar solo el admin. La base de datos lo refuerza con RLS) + aviso a Discord.
 // Flujo: abrirEditor() → validar() → (subir portada) → insert/update → (avisar a Discord) → onGuardada().
-import { supabase } from '../core/supabase.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { toast } from '../core/toast.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
 import { borrarFilas } from './escritura.js';
-import { getState } from '../core/session.js';
-import { redimensionarJpeg } from '../core/image.js';
-import { CATEGORIAS, slugify, slugUnico, validar } from '../core/noticias.js';
-import { generarCronica } from '../core/cronica.js';
-import { resumenFecha } from '../core/ligaStats.js';
+import { getState } from '../core/sistema/session.js';
+import { redimensionarJpeg } from '../core/sistema/image.js';
+import { CATEGORIAS, slugify, slugUnico, validar } from '../core/portada/noticias.js';
+import { generarCronica } from '../core/portada/cronica.js';
+import { resumenFecha } from '../core/competicion/ligaStats.js';
 import { abrirCatalogo } from './noticias/catalogo.js';
-import { plantillaDe } from '../core/noticiasPlantillas.js';
-import { fechaRelativa } from '../core/noticias.js';
+import { plantillaDe } from '../core/portada/noticiasPlantillas.js';
+import { fechaRelativa } from '../core/portada/noticias.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 

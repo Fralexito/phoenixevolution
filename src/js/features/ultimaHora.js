@@ -1,10 +1,10 @@
 // Tarjeta del staff «Última hora» (Moderación): crea, expira y retira las noticias de la línea de Phoenix Link. Migración 100.
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { NIVELES, DURACIONES, MAX_TEXTO, MAX_VIGENTES, validarNoticia, estadoNoticia, venceEn, contarVigentes, mensajeError } from '../core/ultimaHora.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { NIVELES, DURACIONES, MAX_TEXTO, MAX_VIGENTES, validarNoticia, estadoNoticia, venceEn, contarVigentes, mensajeError } from '../core/portada/ultimaHora.js';
 
 const $ = (s) => document.querySelector(s);
 let lista = [];

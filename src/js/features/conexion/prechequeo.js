@@ -1,12 +1,12 @@
 // Pre-chequeo del jugador en el navegador + historial del par host↔jugador (módulo 2 · justicia).
-// Esquema: este archivo (red) → core/conexion.js (cálculos puros). SIN interfaz a propósito: la pantalla se conecta tras el rediseño.
+// Esquema: este archivo (red) → core/competicion/conexion.js (cálculos puros). SIN interfaz a propósito: la pantalla se conecta tras el rediseño.
 //
 // Por qué es una ESTIMACIÓN: un navegador no puede hacer ping a la PC del host (no hay ICMP ni UDP crudo). Medimos ida y vuelta
 // HTTP contra GET /v1/eco (Edge Function de Supabase): refleja la calidad de TU internet (latencia base y estabilidad), no el
 // camino exacto hasta el host. Lo exacto llega después con la «prueba en sala» que hace la app por Parsec.
-import { supabase } from '../../core/supabase.js';
-import { SUPABASE_URL } from '../../core/config.js';
-import { estadisticas, semaforo, umbralesDe } from '../../core/conexion.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { SUPABASE_URL } from '../../core/sistema/config.js';
+import { estadisticas, semaforo, umbralesDe } from '../../core/competicion/conexion.js';
 
 export const URL_ECO = `${SUPABASE_URL}/functions/v1/phoenix/v1/eco`;
 const REFERENCIA = 'supabase-edge:/v1/eco';

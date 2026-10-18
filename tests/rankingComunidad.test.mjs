@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mesesDisponibles, mesValido, normalizarCompetitivo, normalizarRetosRank, normalizarMisRetos, diferencia, textoFinSemana } from '../src/js/core/rankingComunidad.js';
+import { mesesDisponibles, mesValido, normalizarCompetitivo, normalizarRetosRank, normalizarMisRetos, diferencia, textoFinSemana } from '../src/js/core/competicion/rankingComunidad.js';
 
 test('mesesDisponibles: usa la hora de Lima (el 1.º a las 02:00 UTC aún es el mes anterior) y cruza de año', () => {
   assert.deepEqual(mesesDisponibles(Date.parse('2026-10-15T12:00:00Z'), 3).map((m) => m.valor), ['2026-10-01', '2026-09-01', '2026-08-01']);

@@ -1,11 +1,11 @@
 // Página /ayuda-ia/ (ronda 345): chat de ayuda. Habla con la función de servidor «ayuda-ia» (la clave de la API vive allí).
 // La conversación se guarda solo en esta pestaña (memoria), no en la base.
-import { supabase } from '../core/supabase.js';
-import { SUPABASE_URL, SUPABASE_KEY } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { SUPABASE_URL, SUPABASE_KEY } from '../core/sistema/config.js';
 import { openAuthModal } from '../features/auth.js';
-import { onSession } from '../core/session.js';
-import { textoSeguro } from '../core/bandejaIA.js';
-import { SUGERENCIAS, prepararMensajes, mensajeError, MAX_PREGUNTA } from '../core/ayudaIA.js';
+import { onSession } from '../core/sistema/session.js';
+import { textoSeguro } from '../core/comunidad/bandejaIA.js';
+import { SUGERENCIAS, prepararMensajes, mensajeError, MAX_PREGUNTA } from '../core/comunidad/ayudaIA.js';
 
 const $ = (id) => document.getElementById(id);
 const lista = $('aia-mensajes'); const form = $('aia-form'); const input = $('aia-input'); const boton = $('aia-enviar');

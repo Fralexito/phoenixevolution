@@ -52,7 +52,7 @@ Plan de fases: `docs/economia/PLAN-MONEDAS-VIRTUALES.md`. Diseño de recargas: `
 Tope diario por persona S/ 200 · global S/ 2000 · cuenta nueva (7 días) ≤ S/ 30 por orden · ≤ 3 pendientes · ≥ 3 rechazos/semana bloquea · desde S/ 100 el admin escribe el monto recibido · vencimiento manual 24 h · `alerta_ascuas_dia` 400 · `alerta_ordenes_dia` 6 · `pagos_activos=false` · `admin_exige_mfa=false`.
 
 ### Interfaz (tienda)
-Archivos: `src/pages/tienda.astro`, `src/js/pages/tienda.js`, `src/js/features/economia/{api,demo,recargas}.js`, `src/js/core/economia.js`.
+Archivos: `src/pages/tienda.astro`, `src/js/pages/tienda.js`, `src/js/features/economia/{api,demo,recargas}.js`, `src/js/core/economia/economia.js`.
 - Jugador: precios en dos monedas, pestaña **Comprar gemas** (método → orden → pagar → subir captura + código + **nombre de quien pagó**).
 - Administrador (pestaña **Administrar**, visible con el permiso `administrarTienda`; el rol `admin` en `perfiles`): Vigilancia del dinero (alertas, «Revisar ahora»), Pagos por revisar (con banderas y doble confirmación de monto), Métodos de pago, Precios por moneda, Auditoría.
 - Modo demostración (solo desarrollo): `api.esDemo()`; los contratos del demo están en `demo.js`.

@@ -1,11 +1,11 @@
 // Barrera de edad: a toda cuenta sin fecha de nacimiento se le pide una ventana que NO se puede cerrar (migración 037).
 // Si la BD aún no tiene la función (migración sin aplicar) o falla la red, NO se bloquea a nadie: solo se deja un aviso en consola.
-import { supabase } from '../core/supabase.js';
-import { onSession, refreshProfile } from '../core/session.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML } from '../core/dom.js';
-import { validarNacimiento, debePedirFecha, EDAD_MINIMA } from '../core/edad.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, refreshProfile } from '../core/sistema/session.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { validarNacimiento, debePedirFecha, EDAD_MINIMA } from '../core/sistema/edad.js';
 
 const ID = 'edad-modal';
 let comprobado = null;      // id de usuario ya comprobado en esta página

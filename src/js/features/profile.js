@@ -1,20 +1,20 @@
 // Modal de perfil con 4 pestañas (Identidad / Social / Sistema Host / Phoenix Soda) sobre la tabla `perfiles`.
 // Identidad = foto + apodo (nombre visible) + @usuario (único y público, como en TikTok).
-import { supabase } from '../core/supabase.js';
-import { getState, refreshProfile } from '../core/session.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML, safeUrl, toUsername } from '../core/dom.js';
-import { cooldownInfo, USERNAME_COOLDOWN_DAYS, SPEED_BUCKETS, speedBucket } from '../core/rules.js';
-import { href } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { getState, refreshProfile } from '../core/sistema/session.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML, safeUrl, toUsername } from '../core/sistema/dom.js';
+import { cooldownInfo, USERNAME_COOLDOWN_DAYS, SPEED_BUCKETS, speedBucket } from '../core/sistema/rules.js';
+import { href } from '../core/sistema/config.js';
 import { PAISES } from '../../data/paises.js';
 import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from './avatarPicker.js';
-import { toast } from '../core/toast.js';
+import { toast } from '../core/sistema/toast.js';
 import { switchHTML, segHTML, bindSeg } from './formControls.js';
 import { bindHandle } from './handleCheck.js';
 import { montarEditorJuegos } from './hosting/editorJuegos.js';
 import { montarVincularPC } from './salas/vincularPC.js';
 import { NOMBRE_APP } from '../../data/site.js';
-import { catalogoDe } from '../core/hostCatalogo.js';
+import { catalogoDe } from '../core/competicion/hostCatalogo.js';
 import { guardarHost } from './muro/api.js';
 import { FX } from '../../data/experimento.js';
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../src/js/core/feed.js';
+import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../src/js/core/comunidad/feed.js';
 
 test('vistas: ids y valor por defecto', () => {
   assert.deepEqual(VISTAS.map((v) => v.id), ['recientes', 'siguiendo', 'destacado']);

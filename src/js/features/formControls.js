@@ -1,5 +1,5 @@
 // Controles de formulario reutilizables (interruptor y selector segmentado) para no repetir HTML ni lógica.
-import { escapeHTML } from '../core/dom.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 
 /** Interruptor accesible (checkbox real oculto + pista visual). Lee/escribe con el <input id>. */
 export function switchHTML({ id, checked = false, title, hint = '' }) {

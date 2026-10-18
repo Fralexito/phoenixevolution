@@ -1,7 +1,7 @@
-// Pruebas de la lógica pura del chat general (src/js/core/chatGeneral.js).
+// Pruebas de la lógica pura del chat general (src/js/core/comunidad/chatGeneral.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MAX_TEXTO, limpiarTexto, estadoEscritura, insignia, fusionar, horaCorta, mensajeError, esperaValida } from '../src/js/core/chatGeneral.js';
+import { MAX_TEXTO, limpiarTexto, estadoEscritura, insignia, fusionar, horaCorta, mensajeError, esperaValida } from '../src/js/core/comunidad/chatGeneral.js';
 
 test('limpiarTexto y estadoEscritura: juntan espacios y cuentan el máximo', () => {
   assert.equal(limpiarTexto('  hola \n  mundo\t '), 'hola mundo');

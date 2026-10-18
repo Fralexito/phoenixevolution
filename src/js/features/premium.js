@@ -2,7 +2,7 @@
 // con candado y dos botones (Entrar · Crear cuenta). No cambia la lógica de cada página: si la página vuelve a escribir el aviso,
 // se vuelve a armar. Solo actúa sobre avisos «de bloque» (un panel cuyo único contenido es esa frase), nunca sobre botones ni toasts.
 import { FX } from '../../data/experimento.js';
-import { escapeHTML } from '../core/dom.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 
 const FRASE = /^Inicia sesión para\s/i;
 

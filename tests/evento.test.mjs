@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { limaAISO, isoALima, formatoLima, estadoEvento, cuentaRegresiva, normalizarEventos, validarFormulario, nombreJuego, textoVacio, JUEGOS_EVENTO, LIMITES } from '../src/js/core/evento.js';
-import { puede } from '../src/js/core/roles.js';
+import { limaAISO, isoALima, formatoLima, estadoEvento, cuentaRegresiva, normalizarEventos, validarFormulario, nombreJuego, textoVacio, JUEGOS_EVENTO, LIMITES } from '../src/js/core/comunidad/evento.js';
+import { puede } from '../src/js/core/sistema/roles.js';
 
 const T0 = Date.parse('2026-10-05T12:00:00-05:00');          // lunes 5 oct 2026, 12:00 Lima
 const ev = (o = {}) => ({ id: 1, titulo: 'Copa', descripcion: '', juego: 'pes', inicia_at: '2026-10-05T19:00:00-05:00', cancelado: false, interesados: 0, mi_interes: false, mi_recordar: false, ...o });

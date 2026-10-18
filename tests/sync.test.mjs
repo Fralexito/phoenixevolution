@@ -1,7 +1,7 @@
-// Pruebas de la lógica pura de la pantalla Phoenix Sync (src/js/core/sync.js).
+// Pruebas de la lógica pura de la pantalla Phoenix Sync (src/js/core/pes/sync.js).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { MODOS, ESTADOS, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, terminoValido, LEYENDA_MODO, AVISO_AUTOMATICO } from '../src/js/core/sync.js';
+import { MODOS, ESTADOS, modoSeguro, estadoDe, estadosDeOperacion, hace, lineaHistorial, terminoValido, LEYENDA_MODO, AVISO_AUTOMATICO } from '../src/js/core/pes/sync.js';
 
 test('modoSeguro: cualquier valor raro es «autorizacion»', () => {
   assert.equal(modoSeguro('automatico'), 'automatico');

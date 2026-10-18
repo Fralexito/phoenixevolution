@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PLANTILLAS, plantillaPorId, formatoDe, limitesDe, ajustarJugadores, resumenPartidos, construirTorneo } from '../src/js/core/crearLiga.js';
-import { formatoPorId } from '../src/js/core/formatos.js';
+import { PLANTILLAS, plantillaPorId, formatoDe, limitesDe, ajustarJugadores, resumenPartidos, construirTorneo } from '../src/js/core/competicion/crearLiga.js';
+import { formatoPorId } from '../src/js/core/competicion/formatos.js';
 
 test('las 4 plantillas apuntan a formatos que existen y sus límites son coherentes', () => {
   assert.equal(PLANTILLAS.length, 4);

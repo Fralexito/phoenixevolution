@@ -1,8 +1,8 @@
 // Ventanas (modales) de moderación: reportar, ocultar/mostrar, sancionar y pedir una nota. Reutilizadas por el muro, el chat, el perfil y /moderacion/.
 // Esquema: este archivo (DOM + eventos) → api (RPC) + vista (HTML) → core/moderacion (validación pura). La base de datos repite TODAS las reglas.
-import { openModal, closeModal } from '../../core/modal.js';
-import { toast } from '../../core/toast.js';
-import { validarReporte, validarNota, validarSancion, NOTA_OCULTAR_MAX, NOTA_SANCION_MAX } from '../../core/moderacion.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { toast } from '../../core/sistema/toast.js';
+import { validarReporte, validarNota, validarSancion, NOTA_OCULTAR_MAX, NOTA_SANCION_MAX } from '../../core/comunidad/moderacion.js';
 import * as api from './api.js';
 import { reportarHTML, ocultarHTML, sancionarHTML, notaHTML } from './vista.js';
 

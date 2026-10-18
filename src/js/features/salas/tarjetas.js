@@ -1,12 +1,12 @@
 // Tarjetas de salas Smash Soda (migración 067): «Retos en el radar» (aceptar = rival, mando 2) y «Salas en vivo» (Ver = espectador).
 // Se recarga sola: al cambiar cualquier sala (Realtime, con espera de 1 s para agrupar) y cada 25 s mientras la pestaña está visible.
 // Si la migración 067 no está aplicada, el bloque se queda oculto sin romper la página.
-import { supabase } from '../../core/supabase.js';
-import { onSession } from '../../core/session.js';
-import { toast } from '../../core/toast.js';
-import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/dom.js';
-import { pildoraSemaforo, textoErrorUnirse } from '../../core/salas.js';
-import { haceCuanto } from '../../core/notifs.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { onSession } from '../../core/sistema/session.js';
+import { toast } from '../../core/sistema/toast.js';
+import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/sistema/dom.js';
+import { pildoraSemaforo, textoErrorUnirse } from '../../core/competicion/salas.js';
+import { haceCuanto } from '../../core/sistema/notifs.js';
 import { NOMBRE_APP } from '../../../data/site.js';
 import { radarSalas, salasEnVivo, aceptarSala, verSala } from './api.js';
 

@@ -1,6 +1,6 @@
 // Datos del CHAT GENERAL (migración 099). Todo por RPC: el servidor decide quién puede escribir y qué ve cada quien.
-import { supabase } from '../../core/supabase.js';
-import { mensajeError } from '../../core/chatGeneral.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { mensajeError } from '../../core/comunidad/chatGeneral.js';
 
 async function rpc(nombre, args) {
   const { data, error } = await supabase.rpc(nombre, args);

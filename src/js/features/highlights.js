@@ -1,6 +1,6 @@
 // Highlights de la portada (ronda 307): un visor grande + lista. El video de YouTube NO se carga hasta que la persona lo toca
 // (mejor velocidad y privacidad: youtube-nocookie). Tocar un clip de la lista lo pone en el visor.
-import { urlEmbed, miniatura, etiquetaFuente } from '../core/clips.js';
+import { urlEmbed, miniatura, etiquetaFuente } from '../core/comunidad/clips.js';
 const raiz = document.querySelector('[data-highlights]');
 if (raiz) {
   const visor = raiz.querySelector('#hl-visor');

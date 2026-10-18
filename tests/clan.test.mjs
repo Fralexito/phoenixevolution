@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarClan, votosNecesarios, normalizarMiClan, normalizarClanLista, puede, restante, textoMotivo, LIMITES } from '../src/js/core/clan.js';
+import { validarClan, votosNecesarios, normalizarMiClan, normalizarClanLista, puede, restante, textoMotivo, LIMITES } from '../src/js/core/comunidad/clan.js';
 
 test('validarClan: acepta datos correctos y pasa la etiqueta a mayúsculas', () => {
   const r = validarClan({ nombre: ' Phoenix ', etiqueta: 'phx', descripcion: 'hola' });

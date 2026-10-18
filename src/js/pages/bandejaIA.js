@@ -1,14 +1,14 @@
 // Página /bandeja-ia/ (ronda 345): propuestas de la IA esperando ✅/❌ de un moderador o admin.
 // La base lo vuelve a comprobar en cada llamada (ia_bandeja e ia_revisar exigen private.es_moderador()).
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { mensajeErrorSocial } from '../core/noticiaSocial.js';
-import { haceCuanto } from '../core/notifs.js';
-import { PRIORIDAD, TIPO, textoSeguro, contar, mensajeError } from '../core/bandejaIA.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { mensajeErrorSocial } from '../core/portada/noticiaSocial.js';
+import { haceCuanto } from '../core/sistema/notifs.js';
+import { PRIORIDAD, TIPO, textoSeguro, contar, mensajeError } from '../core/comunidad/bandejaIA.js';
 
 const $ = (id) => document.getElementById(id);
 let iniciado = false; let pendientes = [];

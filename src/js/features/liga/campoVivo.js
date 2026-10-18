@@ -2,12 +2,12 @@
 // Se suscribe al canal público de solo lectura «campo:<sala_id>» (Realtime Broadcast; lo manda la Edge Function «liga» ruta
 // /v1/liga/campo cuando Phoenix Link tiene encendido «Campo en vivo en la web»). Solo hay suscripción mientras el tablero está
 // desplegado. Un único requestAnimationFrame interpola ~1 mensaje/s para que las fichitas se muevan suaves.
-// Lógica pura y pruebas: core/campoVivo.js · tests/campoVivo.test.mjs.
-import { supabase } from '../../core/supabase.js';
-import { escapeHTML, safeUrl } from '../../core/dom.js';
-import { getState } from '../../core/session.js';
-import { toast } from '../../core/toast.js';
-import { LARGO, ANCHO, COLORES, colorEquipo, tauSegunIntervalo, FILAS_EST, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/campoVivo.js';
+// Lógica pura y pruebas: core/competicion/campoVivo.js · tests/campoVivo.test.mjs.
+import { supabase } from '../../core/sistema/supabase.js';
+import { escapeHTML, safeUrl } from '../../core/sistema/dom.js';
+import { getState } from '../../core/sistema/session.js';
+import { toast } from '../../core/sistema/toast.js';
+import { LARGO, ANCHO, COLORES, colorEquipo, tauSegunIntervalo, FILAS_EST, normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado } from '../../core/competicion/campoVivo.js';
 
 const MX = 3, MZ = 3;
 const SVG_NS = 'http://www.w3.org/2000/svg';

@@ -1,8 +1,8 @@
 // Página /logros/: mi catálogo de insignias con progreso. Esquema: pages/logros → features/logros/api → core/logros (puro).
-import { onSession } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
+import { onSession } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 import { misLogros } from '../features/logros/api.js';
-import { nivelDe, CATEGORIAS_LOGRO } from '../core/logros.js';
+import { nivelDe, CATEGORIAS_LOGRO } from '../core/jugadores/logros.js';
 
 const $ = (id) => document.getElementById(id);
 const S = { yo: null, cargando: false };

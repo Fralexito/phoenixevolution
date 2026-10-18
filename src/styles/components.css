@@ -848,7 +848,7 @@ html[data-tema='sudario'] .barra-item[aria-current='page'] { background: rgb(245
 
 /* ───────── Ronda 182 · estados vacíos, podio de Liga y aurora del hero ───────── */
 
-/* Estado vacío con personalidad (HTML en core/vacio.js) */
+/* Estado vacío con personalidad (HTML en core/sistema/vacio.js) */
 .vacio-vivo { display: flex; flex-direction: column; align-items: center; gap: .6rem; padding: 2rem 1.25rem; border-radius: 1rem; text-align: center; }
 .vacio-ico { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border-radius: 9999px; font-size: 1.25rem; color: var(--color-galaxy-400);
   background: color-mix(in srgb, var(--color-galaxy-400) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 35%, transparent);

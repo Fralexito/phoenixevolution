@@ -3,7 +3,7 @@
 // Fuente de eventos: cualquier parte de la web puede avisar con  window.dispatchEvent(new CustomEvent('live:evento', { detail: {...} })).
 // Mientras LIVE_DEMO sea true, además se SIMULAN eventos con nombres reales de los jugadores de la liga (y se rotula «demo» porque los eventos son inventados).
 // PC: hasta 5 mensajes a la vez abajo a la derecha. Móvil: hasta 2. Botón «En vivo» = silenciar (y se mueve manteniéndolo pulsado, ver liveDock.js); «Historial» = abre la otra pestaña.
-import { formatEvento, demoDelay, horaExacta, podarHistorialHoy } from '../core/live.js';
+import { formatEvento, demoDelay, horaExacta, podarHistorialHoy } from '../core/competicion/live.js';
 import { leerAjustes, regionAhora } from './ajustes.js';
 import { DEMO_NOMBRES, DEMO_FORMATOS, DEMO_JUEGOS } from '../../data/liveDemo.js';
 

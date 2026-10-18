@@ -1,15 +1,15 @@
 // Página /clanes/: mi clan (miembros, solicitudes, votación de capitán) y exploración. Esquema: pages/clanes → features/clanes/api → core/clan (puro).
 // Las reglas (adultos, edades, 70 %, 5 días…) viven en la BD (migración 043); aquí solo se muestran y se piden.
-import { vacioHTML } from '../core/vacio.js';
-import { onSession, can } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { avatarHTML } from '../core/avatar.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
+import { vacioHTML } from '../core/sistema/vacio.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/clanes/api.js';
-import { LIMITES, ROLES, validarClan, puede, restante, textoMotivo } from '../core/clan.js';
+import { LIMITES, ROLES, validarClan, puede, restante, textoMotivo } from '../core/comunidad/clan.js';
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).

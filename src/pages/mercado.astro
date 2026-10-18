@@ -5,7 +5,7 @@
 import Layout from '../layouts/Layout.astro';
 import MercadoProximamente from '../components/MercadoProximamente.astro';
 import { FX } from '../data/experimento.js';
-import { href } from '../js/core/config.js';
+import { href } from '../js/core/sistema/config.js';
 ---
 <Layout title="Mercado" active="mercado">
   {!FX.mercadoLink ? <MercadoProximamente /> : (

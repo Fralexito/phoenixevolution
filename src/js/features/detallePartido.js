@@ -1,15 +1,15 @@
 // Detalle de un partido: goles con minuto, goleador y asistente (tabla `partido_goles`, migración 054).
-// Lo ve cualquiera; el staff (permiso `editarLiga`) puede cargar y borrar goles. La lógica pura está en core/golesPartido.js.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { escudoHTML } from '../core/escudos.js';
-import { openModal } from '../core/modal.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { can } from '../core/session.js';
+// Lo ve cualquiera; el staff (permiso `editarLiga`) puede cargar y borrar goles. La lógica pura está en core/competicion/golesPartido.js.
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
+import { openModal } from '../core/sistema/modal.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { can } from '../core/sistema/session.js';
 import { borrarFilas } from './escritura.js';
-import { selloPartido } from '../core/pulso.js';
-import { ordenarGoles, validarGol, revisarMarcador, TIPOS_GOL } from '../core/golesPartido.js';
+import { selloPartido } from '../core/competicion/pulso.js';
+import { ordenarGoles, validarGol, revisarMarcador, TIPOS_GOL } from '../core/competicion/golesPartido.js';
 
 const ID = 'detalle-partido';
 const NOMBRE_SELLO = { oficial: 'Oficial', pendiente: 'Pendiente', aplazado: 'Aplazado', wo: 'WO', incidencia: 'En revisión' };

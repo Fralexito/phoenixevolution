@@ -1,6 +1,6 @@
 // Isla de React (ronda 340, PRUEBA). Datos inventados. La lógica (marcador al minuto N) vive en core/centroPartido.js (sin React, con test).
 import { useMemo, useState } from 'react';
-import { marcadorAl, eventosHasta, estadisticasAl } from '../js/core/centroPartido.js';
+import { marcadorAl, eventosHasta, estadisticasAl } from '../js/core/competicion/centroPartido.js';
 
 const PESTANAS = [['resumen', 'Resumen'], ['stats', 'Estadísticas'], ['alin', 'Alineaciones']];
 const ICONO = { gol: 'ph-soccer-ball', amarilla: 'ph-cards', roja: 'ph-cards', cambio: 'ph-arrows-left-right' };

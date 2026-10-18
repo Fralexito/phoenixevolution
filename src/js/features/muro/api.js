@@ -1,8 +1,8 @@
 // Acceso al muro: cada función llama a una RPC de Supabase (las reglas viven en la base de datos, migración 021).
-import { supabase } from '../../core/supabase.js';
-import { redimensionarJpeg } from '../../core/image.js';
-import { rutaImagen, rutaVideo, archivoDeUrl } from '../../core/muro.js';
-import { VIDEO_WORKER_URL } from '../../core/config.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { redimensionarJpeg } from '../../core/sistema/image.js';
+import { rutaImagen, rutaVideo, archivoDeUrl } from '../../core/comunidad/muro.js';
+import { VIDEO_WORKER_URL } from '../../core/sistema/config.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

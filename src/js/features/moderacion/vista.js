@@ -1,9 +1,9 @@
 // HTML de reportes y moderación (funciones puras: datos → texto, sin DOM → se pueden probar). TODO dato de la BD o del usuario pasa por escapeHTML.
-import { escapeHTML, safeImg } from '../../core/dom.js';
-import { tiempoRelativo } from '../../core/muro.js';
+import { escapeHTML, safeImg } from '../../core/sistema/dom.js';
+import { tiempoRelativo } from '../../core/comunidad/muro.js';
 import {
   MOTIVOS, SANCIONES, DIAS_SUSPENSION, DETALLE_MAX, NOTA_SANCION_MAX, NOTA_OCULTAR_MAX, tipoInfo, etiquetaMotivo, esOcultable, puedeActuar, puedeLevantar, quedaTiempo,
-} from '../../core/moderacion.js';
+} from '../../core/comunidad/moderacion.js';
 import { avatarMini, rolBadge, TONOS } from '../auditoria/vista.js';
 
 const e = escapeHTML;

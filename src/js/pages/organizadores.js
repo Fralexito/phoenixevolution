@@ -1,9 +1,9 @@
 // Página Organizadores: enlaza a cada impulsor con su perfil de jugador (si existe en la base) y usa SU FOTO de la sección Jugadores cuando la tiene
 // (si aún no la subió, se queda la inicial). Es un extra: si falla, la página se ve igual.
-import { supabase } from '../core/supabase.js';
-import { coincide } from '../core/perfil.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { href } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { coincide } from '../core/jugadores/perfil.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
 
 (async () => {
   const tarjetas = [...document.querySelectorAll('[data-org-nombre]')]; if (!tarjetas.length) return;

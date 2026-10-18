@@ -3,7 +3,7 @@
 // Privacidad: si el jugador apagó «Mostrar mi conexión» (Amigos → Privacidad), NO se anuncia: solo mira. Es información
 // COSMÉTICA (cada navegador declara su propia presencia): nunca se usa para permisos.
 // Coste: 1 conexión Realtime por pestaña abierta (plan FREE: 200 simultáneas). Si se acerca al límite, apagar FX.contactos.
-import { supabase } from '../core/supabase.js';
+import { supabase } from '../core/sistema/supabase.js';
 
 let canal = null; let yo = null; let anunciado = false;
 const enLinea = new Set();

@@ -1,13 +1,13 @@
 // Página /ajustes/: pinta el valor guardado en cada control, guarda cada cambio al instante y ejecuta las acciones (borrar, exportar, importar…).
 import { leerAjustes, cambiarAjuste, reemplazarAjustes, borrarDatosLocales } from '../features/ajustes.js';
-import { exportarAjustes, importarAjustes, AJUSTES_DEFECTO } from '../core/ajustes.js';
-import { onSession } from '../core/session.js';
+import { exportarAjustes, importarAjustes, AJUSTES_DEFECTO } from '../core/sistema/ajustes.js';
+import { onSession } from '../core/sistema/session.js';
 import { openProfileModal } from '../features/profile.js';
 import { logout } from '../features/auth.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { iniciarVistas } from '../features/ajustesVista.js';
 import { pintarDerechos } from '../features/derechos.js';
 

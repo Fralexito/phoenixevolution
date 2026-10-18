@@ -1,7 +1,7 @@
-// Ventana «Crear encuesta». Validación en core/encuesta.js (la BD repite todas las reglas).
-import { openModal, closeModal } from '../../core/modal.js';
-import { toast } from '../../core/toast.js';
-import { validarEncuesta, PREGUNTA_MAX, OPCION_MAX } from '../../core/encuesta.js';
+// Ventana «Crear encuesta». Validación en core/comunidad/encuesta.js (la BD repite todas las reglas).
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { toast } from '../../core/sistema/toast.js';
+import { validarEncuesta, PREGUNTA_MAX, OPCION_MAX } from '../../core/comunidad/encuesta.js';
 import * as api from './api.js';
 
 const ID = 'encuesta-modal';

@@ -1,5 +1,5 @@
 import { test } from 'node:test'; import assert from 'node:assert/strict';
-import { PROPUESTAS, diagnosticar, arreglar, huecos } from '../src/js/core/noticiasLienzo.js';
+import { PROPUESTAS, diagnosticar, arreglar, huecos } from '../src/js/core/portada/noticiasLienzo.js';
 const items = Array.from({ length: 7 }, (_, i) => ({ id: String(i), joda: i > 4, imagen: true, titulo: `N${i}` }));
 const info = new Map(items.map((i) => [i.id, i]));
 const choca = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -25,7 +25,7 @@ test('corrector: portada de joda → subirSerio la cambia', () => {
 test('propuestas: salen limpias en el corrector (sin errores graves)', () => {
   for (const p of PROPUESTAS) assert.ok(!diagnosticar(arreglar(p.armar(items), 'compactar'), info).some((d) => d.nivel === 'mal'), p.id);
 });
-import { arreglarTodo } from '../src/js/core/noticiasLienzo.js';
+import { arreglarTodo } from '../src/js/core/portada/noticiasLienzo.js';
 test('arreglarTodo deja el caso feo sin errores graves', () => {
   const feo = [{ id: '1', x: 0, y: 12, w: 2, h: 2 }, ...['6', '5', '4', '3', '2', '0'].map((id, i) => ({ id, x: 0, y: 14 + i * 4, w: 4, h: 4 }))];
   const r = arreglarTodo(feo, info);

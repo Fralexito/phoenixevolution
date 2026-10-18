@@ -2,7 +2,7 @@
 // Táctil/lápiz: hay que mantener ~0,35 s quieto (así un dedo que solo hace scroll no lo mueve). Ratón: basta mantener y mover unos píxeles.
 // Un clic corto sigue siendo «silenciar». Teclado: con el botón enfocado, Alt+flechas lo mueve y Alt+Home lo devuelve. Restablecer: Ajustes → Privacidad.
 // Los mensajes crecen hacia el lado con más espacio.
-import { dockDesdeRect, dockAjustado, dockLeer, MARGEN } from '../core/dock.js';
+import { dockDesdeRect, dockAjustado, dockLeer, MARGEN } from '../core/sistema/dock.js';
 
 const KEY = 'pes-live-dock';
 const leer = () => { try { return localStorage.getItem(KEY); } catch { return null; } };

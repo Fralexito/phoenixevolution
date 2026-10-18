@@ -1,7 +1,7 @@
 // Estado de los marcadores en la página actual: qué publicaciones/clips tengo guardados y cómo alternar uno.
 // Las páginas pintan el botón con `botonGuardarHTML` y delegan el clic en `alternar`; este módulo no toca el DOM salvo el propio botón.
 import * as api from './api.js';
-import { toast } from '../../core/toast.js';
+import { toast } from '../../core/sistema/toast.js';
 
 const marcados = { publicacion: new Set(), clip: new Set() };
 export const estaGuardado = (tipo, id) => !!marcados[tipo]?.has(Number(id));

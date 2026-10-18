@@ -11,7 +11,7 @@ Hilo `economia-fase-e` · 16-oct-2026. Diseño completo y preguntas para Fralex:
 | Diseño, reglas, propinas (solo riesgos), overlay TikTok (solo contrato) | `docs/economia/DISENO-PASS-Y-ORGANIZADORES.md` |
 | Migración 123 | `supabase/migrations/123_economia_fase_e_pase_y_torneo_premium.sql` |
 | Prueba SQL (se deshace sola; termina en `TODO_OK_REVERTIDO`) | `supabase/tests/123_fase_e_test.sql` |
-| Lógica pura + 12 pruebas | `src/js/core/phoenix-pass.js`, `tests/phoenix-pass.test.mjs` |
+| Lógica pura + 12 pruebas | `src/js/core/economia/phoenix-pass.js`, `tests/phoenix-pass.test.mjs` |
 | Pestaña «Pase» (demo: `/tienda/?demo`) | `src/js/features/economia/pase.js`, `pase-demo.js`, enganche en `pages/tienda.js` y `tienda.astro` |
 | Botón «Hacer premium» (panel «Opciones del organizador») | `src/js/pages/torneo.js`, `features/torneos/api.js`, `styles/torneos.css` |
 

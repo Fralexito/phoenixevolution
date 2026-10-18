@@ -1,10 +1,10 @@
 // Panel staff «Hosts Phoenix Soda» (en Moderación): aprobar/quitar hosts (host_aprobado) y suspender/reactivar/revocar PCs.
 // Las reglas viven en la BD (staff_aprobar_host, staff_suspender_dispositivo): si el rol no alcanza, la RPC lo rechaza.
-import { toast } from '../../core/toast.js';
-import { confirmar, pedirTexto } from '../../core/dialogo.js';
-import { escapeHTML } from '../../core/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../../core/sistema/dialogo.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
 import * as staff from './staff.js';
-import { supabase } from '../../core/supabase.js';
+import { supabase } from '../../core/sistema/supabase.js';
 
 const btn = (attrs, html, extra = '') => `<button type="button" class="btn !min-h-8 !px-2.5 !text-[12px] ${extra}" ${attrs}>${html}</button>`;
 const nombre = (p) => escapeHTML(p?.nombre_display || p?.username || 'Jugador');

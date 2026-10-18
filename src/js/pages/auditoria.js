@@ -1,9 +1,9 @@
 // Página /auditoria/: qué hace cada persona del staff (solo moderador y admin; la BD lo vuelve a comprobar en cada consulta).
 // Esquema: pages/auditoria → features/auditoria/{api (RPC), vista (HTML)} → core/{auditoria, roles} (lógica pura).
-import { onSession, can, getState } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { desdeRango, normalizarResumen } from '../core/auditoria.js';
+import { onSession, can, getState } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { desdeRango, normalizarResumen } from '../core/sistema/auditoria.js';
 import * as api from '../features/auditoria/api.js';
 import { ayudaHTML, resumenHTML, filtrosHTML, lineaHTML, equipoHTML, resultadosHTML, modalRolHTML } from '../features/auditoria/vista.js';
 

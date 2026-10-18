@@ -1,9 +1,9 @@
-// Página «Chat general»: lee y escribe el chat global (el mismo de Phoenix Link). Lógica: core/chatGeneral.js · datos: features/chatGeneral/api.js.
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { estadoEscritura, fusionar, insignia, horaCorta, esperaValida, ESPERA_DEFECTO, MAX_TEXTO } from '../core/chatGeneral.js';
+// Página «Chat general»: lee y escribe el chat global (el mismo de Phoenix Link). Lógica: core/comunidad/chatGeneral.js · datos: features/chatGeneral/api.js.
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { estadoEscritura, fusionar, insignia, horaCorta, esperaValida, ESPERA_DEFECTO, MAX_TEXTO } from '../core/comunidad/chatGeneral.js';
 import * as api from '../features/chatGeneral/api.js';
 
 const $ = (id) => document.getElementById(id);

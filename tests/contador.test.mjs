@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { suavizar, duracionPara, valorEn } from '../src/js/core/contador.js';
+import { suavizar, duracionPara, valorEn } from '../src/js/core/sistema/contador.js';
 
 test('contador: la curva va de 0 a 1 y solo crece', () => {
   assert.equal(suavizar(0), 0);

@@ -27,7 +27,7 @@ Se leyeron los avisos de seguridad y de rendimiento de Supabase (`get_advisors`)
 ## 2. Repositorio web (Astro + Tailwind + JS)
 
 - 371 archivos JS, 72 páginas, 53 hojas de estilo. `npm audit` (producción): 0 vulnerabilidades. Pruebas: 624 pasan. `npm run build`: sin errores.
-- **Archivos que parecían sin uso y NO se borran:** `core/centroPartido.js` (lo prueba `tests/centroPartido.test.mjs`), `features/carrusel.js` y `styles/mundos.css` (se cargan según `data/experimento.js`), `core/inicio.js` y `features/conexion/prechequeo.js` (apagados por interruptor). Borrar sin saberlo habría roto pruebas o funciones apagadas.
+- **Archivos que parecían sin uso y NO se borran:** `core/competicion/centroPartido.js` (lo prueba `tests/centroPartido.test.mjs`), `features/carrusel.js` y `styles/mundos.css` (se cargan según `data/experimento.js`), `core/portada/inicio.js` y `features/conexion/prechequeo.js` (apagados por interruptor). Borrar sin saberlo habría roto pruebas o funciones apagadas.
 - **Dependencias que parecen sin uso y se quedan:** `@phosphor-icons/web` (lo carga `global.css` para los iconos finos) y `react-dom` (lo exige `@astrojs/react`).
 - **Peso:** hoja de estilos principal 760 KB (137 KB comprimida) y supabase 212 KB (53 KB). Es aceptable y se guarda en caché; reducirla pide una auditoría visual página por página (la hace la sesión «Pasada visual premium»), no un borrado a ciegas.
 - Sin `console.log` olvidados. 39 marcas TODO/FIXME (pendientes anotados, ninguno bloquea).

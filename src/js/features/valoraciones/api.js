@@ -1,6 +1,6 @@
 // Valoraciones y reputación: llama a las RPC de la migración 044 (las reglas viven en la BD).
-import { supabase } from '../../core/supabase.js';
-import { normalizarPendientes, normalizarReputacion } from '../../core/reputacion.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarPendientes, normalizarReputacion } from '../../core/jugadores/reputacion.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

@@ -1,9 +1,9 @@
 // Login, registro y OAuth (Discord / Google).
-import { supabase } from '../core/supabase.js';
-import { siteHome, href } from '../core/config.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { siteHome, href } from '../core/sistema/config.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
 import { bindHandle, MIN_HANDLE } from './handleCheck.js';
 
 const ERRORS = {

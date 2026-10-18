@@ -3,26 +3,26 @@ import Layout from '../layouts/Layout.astro';
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
-import { miniatura, etiquetaFuente } from '../js/core/clips.js';
+import { miniatura, etiquetaFuente } from '../js/core/comunidad/clips.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import MarcadorVivo from '../components/MarcadorVivo.astro';
 import { EDICIONES } from '../data/ligaResultados.js';
 import { PODIO } from '../data/palmares.js';
-import { calcularTabla } from '../js/core/tabla.js';
-import { liderDe } from '../js/core/pase.js';
-import { escudoHTML } from '../js/core/escudos.js';
-import { titularesPortada, lineaEstado } from '../js/core/titulares.js';
-import { estadoLiga } from '../js/core/pulso.js';
+import { calcularTabla } from '../js/core/competicion/tabla.js';
+import { liderDe } from '../js/core/portada/pase.js';
+import { escudoHTML } from '../js/core/sistema/escudos.js';
+import { titularesPortada, lineaEstado } from '../js/core/portada/titulares.js';
+import { estadoLiga } from '../js/core/competicion/pulso.js';
 import { PORTADA } from '../data/portada.js';
 import { CLUBES_VISUAL } from '../data/clubesVisual.js';
-import { itemsCompetencia } from '../js/core/ventanas.js';
+import { itemsCompetencia } from '../js/core/portada/ventanas.js';
 const base = import.meta.env.BASE_URL;
 // PRUEBA (FX.elite, ronda 228): portada «palco VIP». Va encima de FX.portada; si se apaga, vuelve la portada de la ronda 227.
 const ELITE = FX.limpio && FX.portada && FX.elite;
 const edGalaxy = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;
 const lider = liderDe(calcularTabla((edGalaxy?.fechas ?? []).flatMap((f) => f.partidos)).tabla);
 const liderClub = lider ? (edGalaxy?.clubes?.[lider.nombre] ?? '') : '';
-// PRUEBA (FX.transmision, ronda 229): portada tipo transmisión. Titulares REALES que rotan (core/titulares.js) + el marcador que los respalda.
+// PRUEBA (FX.transmision, ronda 229): portada tipo transmisión. Titulares REALES que rotan (core/portada/titulares.js) + el marcador que los respalda.
 // Encima de FX.elite: si se apaga, vuelve la portada de la ronda 228.
 const TRANS = ELITE && FX.transmision;
 // PRUEBA (FX.estiloFC, ronda 230): menos «factor IA», estilo EA FC. Solo cambia estilos (styles/estilofc.css) y la marca del degradado.

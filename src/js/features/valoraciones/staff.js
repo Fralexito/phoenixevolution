@@ -1,8 +1,8 @@
 // Moderación de valoraciones: lista las recibidas por una persona (con su autor) y permite anular una con motivo (queda en la auditoría).
-import { openModal } from '../../core/modal.js';
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { nombreEtiqueta } from '../../core/reputacion.js';
+import { openModal } from '../../core/sistema/modal.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { nombreEtiqueta } from '../../core/jugadores/reputacion.js';
 import { abrirNota } from '../moderacion/acciones.js';
 import * as api from './api.js';
 

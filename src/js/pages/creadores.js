@@ -1,9 +1,9 @@
 // Panel de creadores (migración 071): lista pública de verificados (en vivo primero), solicitud y botón «Estoy en vivo».
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML, safeUrl } from '../core/dom.js';
-import { href } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML, safeUrl } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
 
 const $ = (id) => document.getElementById(id);
 const RED = { twitch: ['fa-twitch', 'Twitch'], youtube: ['fa-youtube', 'YouTube'], kick: ['fa-kickstarter-k', 'Kick'], tiktok: ['fa-tiktok', 'TikTok'], facebook: ['fa-facebook', 'Facebook'] };

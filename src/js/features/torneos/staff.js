@@ -1,9 +1,9 @@
 // Sección «Torneos propios» de Moderación: topes globales y ocultar/mostrar/cancelar torneos (migración 097).
-import { onSession, can } from '../../core/session.js';
-import { toast } from '../../core/toast.js';
-import { pedirTexto, confirmar } from '../../core/dialogo.js';
-import { escapeHTML as esc } from '../../core/dom.js';
-import { href } from '../../core/config.js';
+import { onSession, can } from '../../core/sistema/session.js';
+import { toast } from '../../core/sistema/toast.js';
+import { pedirTexto, confirmar } from '../../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
 import * as api from './api.js';
 import { ESTADO_TXT } from './guia.js';
 

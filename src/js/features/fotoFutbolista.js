@@ -64,7 +64,7 @@ const seguro = (u) => (esWikimedia(u) ? u : null);
 // MINIFACES DEL JUEGO (ronda 338, pedido de Fralex): la carita que tiene cada jugador en el parche Conmegol, mejorada con
 // Real-ESRGAN (tools/minifaces/). Se guardan en public/minifaces/<pes_id>.webp. Si el jugador la tiene, MANDA sobre Wikipedia.
 /** URL de la miniface del juego para ese pes_id, o null si no hay. */
-const BASE_MINI = `${import.meta.env?.BASE_URL ?? '/'}minifaces/`;   // igual que core/escudos.js: funciona en el navegador y en los tests
+const BASE_MINI = `${import.meta.env?.BASE_URL ?? '/'}minifaces/`;   // igual que core/sistema/escudos.js: funciona en el navegador y en los tests
 export const minifaceUrl = (pesId) => (pesId != null && pesId !== '' && MINIFACES.has(Number(pesId)) ? `${BASE_MINI}${Number(pesId)}.webp` : null);
 /** Pone las fotos en los elementos [data-foto] dentro de root cuando aparecen en pantalla. */
 export function montarFotos(root) {

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { prepararMensajes, mensajeError, MAX_HISTORIAL, MAX_PREGUNTA } from '../src/js/core/ayudaIA.js';
+import { prepararMensajes, mensajeError, MAX_HISTORIAL, MAX_PREGUNTA } from '../src/js/core/comunidad/ayudaIA.js';
 
 test('ayuda IA: solo se mandan los últimos mensajes válidos, empezando por el usuario', () => {
   const h = [{ rol: 'assistant', texto: '¡Hola!' }, { rol: 'user', texto: ' hola ' }, { rol: 'sistema', texto: 'x' }, { rol: 'user', texto: '' }];

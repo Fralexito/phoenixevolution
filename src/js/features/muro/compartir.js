@@ -1,6 +1,6 @@
 // Compartir un enlace: menú nativo del sistema si existe (celular: WhatsApp, Telegram, Instagram, X…), si no, copiar al portapapeles; último recurso: mostrarlo para copiarlo a mano.
-import { toast } from '../../core/toast.js';
-import { confirmar, pedirTexto } from '../../core/dialogo.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../../core/sistema/dialogo.js';
 
 export async function compartir({ url, titulo = 'Phoenix Evolution Series', texto = '' }) {
   try {

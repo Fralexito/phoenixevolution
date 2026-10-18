@@ -1,6 +1,6 @@
 // Eventos: llama a las RPC (reglas en la BD, migración 042). Esquema: pages/eventos → features/eventos/api → core/evento (puro).
-import { supabase } from '../../core/supabase.js';
-import { normalizarEventos } from '../../core/evento.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarEventos } from '../../core/comunidad/evento.js';
 
 const FALTA_042 = 'La base de datos todavía no tiene activados los eventos (falta aplicar la migración 042).';
 /** Ejecuta una RPC; ante error deja un log descriptivo y lanza un Error con mensaje legible para la persona. */

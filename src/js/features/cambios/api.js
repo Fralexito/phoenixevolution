@@ -1,6 +1,6 @@
 // Acceso a datos de CAMBIOS OFICIALES y REGISTRO DE PCs (migración 125). Escribe solo por RPC: la base decide quién puede.
-import { supabase } from '../../core/supabase.js';
-import { mensajeError } from '../../core/cambiosOficiales.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { mensajeError } from '../../core/pes/cambiosOficiales.js';
 
 async function rpc(nombre, args) {
   const { data, error } = await supabase.rpc(nombre, args);

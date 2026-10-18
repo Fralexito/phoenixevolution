@@ -1,10 +1,10 @@
 // Historial global de partidos: filtros (liga, estado, texto) y paginación. Los filtros viven en la URL (?liga=&estado=&q=&p=) para poder compartir o recargar.
-import { escapeHTML } from '../core/dom.js';
-import { escudoHTML } from '../core/escudos.js';
-import { toast } from '../core/toast.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
+import { toast } from '../core/sistema/toast.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
-import { aplanarPartidos, filtrarPartidos, paginar, leerFiltros } from '../core/partidosGlobal.js';
+import { aplanarPartidos, filtrarPartidos, paginar, leerFiltros } from '../core/competicion/partidosGlobal.js';
 
 const $ = (id) => document.getElementById(id);
 const TAM = 15;

@@ -2,10 +2,10 @@
 // secciones (5 bloques), el resto de la semana y La Tribuna (joda) al final.
 // Solo pinta HTML a partir de datos; los clics los maneja pages/noticiasV2.js (data-slug, data-bloque, data-liga).
 import { EDICIONES } from '../../../data/ligaResultados.js';
-import { tablaEdicion } from '../../core/tabla.js';
-import { resumenFecha } from '../../core/ligaStats.js';
-import { departamento, BLOQUES, esJoda } from '../../core/departamentos.js';
-import { escapeHTML as esc } from '../../core/dom.js';
+import { tablaEdicion } from '../../core/competicion/tabla.js';
+import { resumenFecha } from '../../core/competicion/ligaStats.js';
+import { departamento, BLOQUES, esJoda } from '../../core/portada/departamentos.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
 
 const jugado = (m) => Number.isInteger(m?.gl) && Number.isInteger(m?.gv);
 
@@ -50,7 +50,7 @@ const tarjeta = (it, cuando, cls = '') => `<button type="button" data-slug="${es
 </button>`;
 
 /**
- * @param {{ portada: ReturnType<import('../../core/diario.js').armarPortada>, bloque: string, conteos: Record<string,number>, total: number,
+ * @param {{ portada: ReturnType<import('../../core/portada/diario.js').armarPortada>, bloque: string, conteos: Record<string,number>, total: number,
  *           cuando: (n)=>string, ligaId: string, borrador: (n)=>string }} d
  */
 export function zonaSeriaHTML(d) {

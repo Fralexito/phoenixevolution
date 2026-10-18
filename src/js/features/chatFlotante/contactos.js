@@ -1,13 +1,13 @@
 // Chat flotante · COLUMNA DE CONTACTOS (PC ≥ 1280 px, fija a la derecha) y HOJA DE CHATS (pantallas menores, botón «Chats»).
 // Las dos pintan la misma lista: amigos (en línea primero) + grupos. Pulsar un contacto abre su ventanita (o, en /mensajes/,
 // navega a esa conversación de la página completa). Solo pinta: los datos vienen de datos.js.
-import { escapeHTML } from '../../core/dom.js';
-import { href } from '../../core/config.js';
-import { avatarHTML } from '../../core/avatar.js';
-import { toast } from '../../core/toast.js';
-import { norm } from '../../core/search.js';
-import { ordenarContactos, insignia } from '../../core/chatFlotante.js';
-import { tituloConv, totalNoLeidos } from '../../core/chat.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
+import { avatarHTML } from '../../core/sistema/avatar.js';
+import { toast } from '../../core/sistema/toast.js';
+import { norm } from '../../core/jugadores/search.js';
+import { ordenarContactos, insignia } from '../../core/comunidad/chatFlotante.js';
+import { tituloConv, totalNoLeidos } from '../../core/comunidad/chat.js';
 import { S, alCambiar, abrirConUsuario, abrirConv, noLeidosPor, nombre } from './datos.js';
 
 const CLAVE_COMPACTO = 'pes-contactos-compacto';

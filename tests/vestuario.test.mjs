@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarValor, cambiosDe, fijar, siguientePosicion, agruparPlantilla, bloqueado, leer, valorActual, mensajeError } from '../src/js/core/vestuario.js';
+import { validarValor, cambiosDe, fijar, siguientePosicion, agruparPlantilla, bloqueado, leer, valorActual, mensajeError } from '../src/js/core/pes/vestuario.js';
 
 const ficha = { posicion: 'MO', dorsal: 10, habilidades: { velocidad: 80 }, posiciones: { MO: 2 }, liga_master: { sueldo: 500 }, bloqueados: ['habilidades.potencia_tiro'] };
 

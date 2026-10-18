@@ -1,8 +1,8 @@
-// Página «Formatos»: genera cruces con core/formatos.js y muestra retos/ruleta de core/retos.js. Sin red ni base de datos.
-import { escapeHTML as esc } from '../core/dom.js';
-import { FORMATOS, formatoPorId, generar, limpiarJugadores, mezclar, etiquetaSlot, jugarColina, retarEscalera } from '../core/formatos.js';
+// Página «Formatos»: genera cruces con core/competicion/formatos.js y muestra retos/ruleta de core/competicion/retos.js. Sin red ni base de datos.
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { FORMATOS, formatoPorId, generar, limpiarJugadores, mezclar, etiquetaSlot, jugarColina, retarEscalera } from '../core/competicion/formatos.js';
 import { RETOS_DIARIOS, REGLAS_RULETA, NOCHES_TEMATICAS } from '../../data/modalidades.js';
-import { retoDelDia, retoSemanal, girarRuleta, nocheTematica } from '../core/retos.js';
+import { retoDelDia, retoSemanal, girarRuleta, nocheTematica } from '../core/competicion/retos.js';
 
 const $ = (id) => document.getElementById(id);
 const st = { formato: 'eliminacion', res: null };

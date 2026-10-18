@@ -1,28 +1,28 @@
 // Perfil público de un jugador: ?id=<id de la ficha>. Carta + datos + campaña en cada edición de liga donde participa + títulos.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { escudoHTML } from '../core/escudos.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { LIGAS } from '../../data/ligas.js';
 import { SISTEMAS_LIGA } from '../../data/temporada.js';
 import { FX } from '../../data/experimento.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
-import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/perfil.js';
-import { forma } from '../core/ligaStats.js';
-import { onSession, can } from '../core/session.js';
+import { nombreEnEdicion, campana, contraRivales, REDES, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../core/jugadores/perfil.js';
+import { forma } from '../core/competicion/ligaStats.js';
+import { onSession, can } from '../core/sistema/session.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { abrirEditorPerfil } from '../features/perfilEditor.js';
 import { abrirEditorHistorial } from '../features/historialEditor.js';
-import { ordenarHistorial, periodoCorto, medalla, resumenHistorial, partirPremios } from '../core/historial.js';
-import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../core/estilo.js';
-import { radarPoints, axisPoint } from '../core/compare.js';
+import { ordenarHistorial, periodoCorto, medalla, resumenHistorial, partirPremios } from '../core/jugadores/historial.js';
+import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../core/jugadores/estilo.js';
+import { radarPoints, axisPoint } from '../core/jugadores/compare.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from '../features/playerCard.js';
-import { puntosAcumulados, rendimiento } from '../core/perfil.js';
+import { puntosAcumulados, rendimiento } from '../core/jugadores/perfil.js';
 import { posInfo } from '../../data/posiciones.js';
 import { cargarMuro } from '../features/muro/api.js';
 import { muroCompactoHTML, reproductorYT } from '../features/muro/render.js';
-import { href } from '../core/config.js';
+import { href } from '../core/sistema/config.js';
 import { hayMovimientoReducido } from '../features/ajustes.js';
 import { radarFifaHTML, montarRadarFifa } from '../features/radarFifa.js';
 
@@ -91,7 +91,7 @@ document.addEventListener('click', async (e) => {   // «Compartir mi campaña»
   const b = e.target.closest('[data-compartir-camp]'); if (!b || !actual) return;
   const [lid, eid] = b.dataset.compartirCamp.split('|'); const liga = LIGAS.find((l) => l.id === lid); const ed = (EDICIONES[lid] ?? []).find((x) => x.id === eid); if (!liga || !ed) return;
   try {
-    const nombre = nombreEnEdicion(actual, ed); const [{ datosJugador }, { abrirTarjeta }] = await Promise.all([import('../core/compartir.js'), import('../features/compartir.js')]);
+    const nombre = nombreEnEdicion(actual, ed); const [{ datosJugador }, { abrirTarjeta }] = await Promise.all([import('../core/comunidad/compartir.js'), import('../features/compartir.js')]);
     abrirTarjeta(datosJugador({ liga: liga.titulo.join(' '), edicion: ed.nombre, nombre: actual.apodo || actual.nombre, campana: campana(ed, nombre), forma: forma(ed.fechas, nombre, 5) }), lid === 'sudario' ? 'sudario' : 'galaxy');
   } catch (err) { console.error('[perfil] compartir:', err); }
 });

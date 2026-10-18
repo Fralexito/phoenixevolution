@@ -1,13 +1,13 @@
 // FICHA RÁPIDA DE UN JUGADOR (cuadro por encima, al pulsar su carta en «Mi club» y en el mercado): su cara, sus datos y TODO lo que dice el juego
 // de él (Player.bin del parche): 25 estadísticas, posiciones A/B/C en un campo, pie malo, forma, lesiones, habilidades y estilos COM.
-// Se mueve con las flechas ← → entre los jugadores de la lista que se está viendo. No escribe nada. Lógica: core/fichaJuego.js · datos: src/data/fichasJuego.js.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML as esc, safeUrl } from '../core/dom.js';
-import { href } from '../core/config.js';
+// Se mueve con las flechas ← → entre los jugadores de la lista que se está viendo. No escribe nada. Lógica: core/pes/fichaJuego.js · datos: src/data/fichasJuego.js.
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML as esc, safeUrl } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
 import { CLUBES_PES } from '../../data/clubesPes.js';
-import { emparejarClubesLm, escudoImg } from '../core/clubesPes.js';
-import { nivelStat, POS_CAMPO } from '../core/fichasCampos.js';
-import { decodificarFicha, esPortero, posicionRegistrada, nivelesPosicion, perfilEjes, puntosRadar, GRUPOS_STATS, CLAVES_PORTERO, nombreDeCampo, NOMBRE_POSICION, TEXTO_NIVEL } from '../core/fichaJuego.js';
+import { emparejarClubesLm, escudoImg } from '../core/pes/clubesPes.js';
+import { nivelStat, POS_CAMPO } from '../core/pes/fichasCampos.js';
+import { decodificarFicha, esPortero, posicionRegistrada, nivelesPosicion, perfilEjes, puntosRadar, GRUPOS_STATS, CLAVES_PORTERO, nombreDeCampo, NOMBRE_POSICION, TEXTO_NIVEL } from '../core/pes/fichaJuego.js';
 import { minifaceUrl, montarFotos } from './fotoFutbolista.js';
 
 let datos = null;

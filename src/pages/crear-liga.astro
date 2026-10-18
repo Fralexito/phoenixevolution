@@ -1,9 +1,9 @@
 ---
 // CREAR MI LIGA (ronda 276): creación rápida (nombre · tipo · jugadores) y, plegado, todo lo demás. Solo staff por ahora.
-// Usa los mismos torneos propios de /torneos/ (migración 097): ningún dato nuevo. Lógica: js/core/crearLiga.js · pantalla: js/pages/crearLiga.js
+// Usa los mismos torneos propios de /torneos/ (migración 097): ningún dato nuevo. Lógica: js/core/competicion/crearLiga.js · pantalla: js/pages/crearLiga.js
 import Layout from '../layouts/Layout.astro';
 import Plegable from '../components/Plegable.astro';
-import { href } from '../js/core/config.js';
+import { href } from '../js/core/sistema/config.js';
 ---
 <Layout title="Crear mi liga" active="torneos" description="Crea tu liga en 30 segundos: ponle nombre, elige el tipo y cuántos juegan.">
   <header class="relative overflow-hidden border-b border-galaxy-border/40">

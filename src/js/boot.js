@@ -1,5 +1,5 @@
 // Arranque común a TODAS las páginas (lo carga Layout.astro una sola vez).
-import { initSession } from './core/session.js';
+import { initSession } from './core/sistema/session.js';
 import { initSidebar } from './features/sidebar.js';
 import { initNavbar } from './features/navbar.js';
 import { initTicker } from './features/ticker.js';
@@ -9,7 +9,7 @@ import { initWelcome } from './features/welcome.js';
 import { initEdad } from './features/edad.js';
 import { initAjustes } from './features/ajustes.js';
 import { initModoLigero } from './features/modoLigero.js';
-import { initAvatarFallback } from './core/avatar.js';
+import { initAvatarFallback } from './core/sistema/avatar.js';
 import { initBuscadorGlobal } from './features/buscadorGlobal.js';
 import { initReveal } from './features/reveal.js';
 import { initDopamina } from './features/dopamina.js';

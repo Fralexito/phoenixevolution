@@ -1,12 +1,12 @@
 ---
 // Página «Temporada» (BETA): el sistema de dos divisiones (ascensos/descensos) y la Copa Interdivisional. Todo se calcula en el navegador
-// con js/core/temporada.js a partir de la tabla REAL de Primera y la de Segunda (real si existe; si no, una de EJEMPLO claramente marcada).
+// con js/core/competicion/temporada.js a partir de la tabla REAL de Primera y la de Segunda (real si existe; si no, una de EJEMPLO claramente marcada).
 import Layout from '../layouts/Layout.astro';
 import Plegable from '../components/Plegable.astro';
 import SelectorDivisiones from '../components/SelectorDivisiones.astro';
 import { SISTEMA, DEMO_SEGUNDA } from '../data/temporada.js';
 import { EDICIONES } from '../data/ligaResultados.js';
-import { calcularTabla, tablaEdicion } from '../js/core/tabla.js';
+import { calcularTabla, tablaEdicion } from '../js/core/competicion/tabla.js';
 const base = import.meta.env.BASE_URL;
 const [d1cfg, d2cfg] = SISTEMA.divisiones;
 const ultima = (id) => (EDICIONES[id] ?? []).at(-1) ?? null;

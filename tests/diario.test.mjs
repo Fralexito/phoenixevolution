@@ -1,7 +1,7 @@
 import { test } from 'node:test'; import assert from 'node:assert/strict';
-import { DEPARTAMENTOS, departamentoDe, departamento, departamentosPresentes, esJoda } from '../src/js/core/departamentos.js';
-import { ordenDelDia, armarPortada, frescura, claveDia } from '../src/js/core/diario.js';
-import { marcadorDe, tipoAfiche, grito, lineas, datosAfiche } from '../src/js/core/afiche.js';
+import { DEPARTAMENTOS, departamentoDe, departamento, departamentosPresentes, esJoda } from '../src/js/core/portada/departamentos.js';
+import { ordenDelDia, armarPortada, frescura, claveDia } from '../src/js/core/portada/diario.js';
+import { marcadorDe, tipoAfiche, grito, lineas, datosAfiche } from '../src/js/core/portada/afiche.js';
 
 const HOY = new Date('2026-10-16T12:00:00');
 const n = (o) => ({ slug: o.slug ?? o.titulo.toLowerCase().replace(/\W+/g, '-'), titulo: o.titulo, resumen: o.resumen ?? 'Resumen de prueba.', categoria: o.categoria ?? 'JORNADA', tag: o.tag ?? '', liga: o.liga ?? 'galaxy', publicadaEn: o.publicadaEn ?? '2026-10-16T10:00:00Z', destacada: !!o.destacada, orden: o.orden ?? null, cuerpo: [], estilo: {}, plantilla: 'auto' });

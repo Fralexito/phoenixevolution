@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { vacioHTML } from '../src/js/core/vacio.js';
+import { vacioHTML } from '../src/js/core/sistema/vacio.js';
 
 test('vacío: escapa el texto y usa icono por defecto', () => {
   const h = vacioHTML('<img src=x onerror=1>');

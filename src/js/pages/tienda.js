@@ -1,17 +1,17 @@
 // Página /tienda/: cartera (nivel + tokens), catálogo, inventario, cómo ganar, compra de tokens, historial y panel de admin.
 // Esquema: pages/tienda → features/economia/api → core/economia (puro). Las reglas (precios, niveles, stock, edad) viven en la BD (049-051).
-import { vacioHTML } from '../core/vacio.js';
+import { vacioHTML } from '../core/sistema/vacio.js';
 import { rafaga } from '../features/dopamina.js';
-import { onSession, can } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
-import { openModal, closeModal } from '../core/modal.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/economia/api.js';
 import * as rec from '../features/economia/recargas.js';
 import * as pase from '../features/economia/pase.js';
-import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin, EFECTOS_CARTA, PATRONES_BANNER } from '../core/economia.js';
-import { SONIDOS_CHAT } from '../core/sonidosChat.js';
+import { CATEGORIAS, ORDEN_CATEGORIAS, RAREZAS, formatoPrecio, formatoTokens, motivoNoComprable, vistaPrevia, textoTipo, textoLimitada, validarItemAdmin, EFECTOS_CARTA, PATRONES_BANNER } from '../core/economia/economia.js';
+import { SONIDOS_CHAT } from '../core/comunidad/sonidosChat.js';
 import { initSonidosChat } from '../features/sonidosChat.js';
 import * as gan from '../features/economia/ganar.js';
 

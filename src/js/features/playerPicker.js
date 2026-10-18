@@ -1,7 +1,7 @@
 // Selector de jugador con BÚSQUEDA por nombre: un campo de texto con lista desplegable que se filtra al escribir.
 // Se usa en los comparadores. Teclado: ↑ ↓ Enter Esc. `exclude()` devuelve ids que no deben ofrecerse.
-import { escapeHTML } from '../core/dom.js';
-import { filterPlayers } from '../core/search.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { filterPlayers } from '../core/jugadores/search.js';
 
 export function mountPicker(root, { players, selected = null, exclude = () => [], onPick, placeholder = 'Buscar jugador…', clearOnPick = false, color = null }) {
   const id = `${root.id}-in`;

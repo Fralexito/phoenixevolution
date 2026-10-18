@@ -1,8 +1,8 @@
 // Datos de la sala de fichajes: plantillas de los clubes (import dinámico, ~67 KB) + lo de la Liga Máster de la web
 // (clubes, quién es el DT —el usuario— de cada uno y los jugadores con su id de la Liga Máster). Todo se pide una sola vez.
-import { supabase } from '../../core/supabase.js';
+import { supabase } from '../../core/sistema/supabase.js';
 import { CLUBES_PES } from '../../../data/clubesPes.js';
-import { emparejarClubesLm } from '../../core/clubesPes.js';
+import { emparejarClubesLm } from '../../core/pes/clubesPes.js';
 
 let plantillas = null;
 export function cargarPlantillas() {

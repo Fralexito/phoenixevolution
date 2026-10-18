@@ -49,7 +49,7 @@ Hoy solo los FICHAJES viajan de la web al juego. Quiero que también viajen los 
 
 **F2 · Prueba segura de escritura.** En una COPIA: cambiar 1 valor de 1 jugador (por ejemplo, velocidad de un suplente +1), reempaquetar el .bin (WESYS + zlib), ponerlo en la Phoenix-DB de prueba y que yo lo vea en el PES. Luego restaurar. Documenta exactamente qué pasó.
 
-**F3 · Web: cambios con aprobación.** Tabla nueva (por ejemplo `lm_cambios_datos`: jugador, campo, antes, después, propuesto_por, estado, aprobado_por, version) con RLS: solo el staff propone y aprueba. Panel simple en Mi club/Staff, sin ventanas nativas (usar `core/dialogo.js`), texto mínimo 12 px. Cada aprobación sube la versión de la liga.
+**F3 · Web: cambios con aprobación.** Tabla nueva (por ejemplo `lm_cambios_datos`: jugador, campo, antes, después, propuesto_por, estado, aprobado_por, version) con RLS: solo el staff propone y aprueba. Panel simple en Mi club/Staff, sin ventanas nativas (usar `core/sistema/dialogo.js`), texto mínimo 12 px. Cada aprobación sube la versión de la liga.
 
 **F4 · Web → juego en todas las PCs.** Phoenix Sync baja los cambios aprobados (endpoint firmado, por versión), reconstruye la Phoenix-DB desde la base original + TODOS los cambios en orden (idempotente: si se aplica dos veces, queda igual), verifica el hash, guarda respaldo y muestra «Datos actualizados ✓ (versión N)». Botón para volver a la versión anterior.
 

@@ -1,5 +1,5 @@
 // Menú lateral: abrir/cerrar, Escape, clic en el fondo, foco accesible (inert) y grupo «Mi cuenta» según la sesión.
-import { onSession, can } from '../core/session.js';
+import { onSession, can } from '../core/sistema/session.js';
 import { openProfileModal } from './profile.js';
 import { logout } from './auth.js';
 

@@ -1,10 +1,10 @@
 // «Tu próximo partido»: tarjeta fija (como el cupón de las apps de apuestas). Solo con sesión y si hay un partido agendado.
 // Se oculta en Duelos y Mis partidos (ahí ya está todo). Refresca cada 2 min.
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { elegirProximo, cuando } from '../core/proximoPartido.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { elegirProximo, cuando } from '../core/competicion/proximoPartido.js';
 
 let caja = null, timer = null;
 const quitar = () => { caja?.remove(); caja = null; };

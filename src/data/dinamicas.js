@@ -1,5 +1,5 @@
 // Catálogo de DINÁMICAS divertidas para torneos propios, castigos, títulos de broma y piezas para nombres épicos.
-// Todo es texto editable: Fralex puede quitar o cambiar cualquier línea sin tocar la lógica (js/core/diversion.js).
+// Todo es texto editable: Fralex puede quitar o cambiar cualquier línea sin tocar la lógica (js/core/competicion/diversion.js).
 // tono: 'serio' | 'casual' | 'divertido' · grupo: reglas | equipos | locuras | transmision | economia
 // `guia` = cómo se explica a los jugadores (se muestra en la ficha de creación y en el torneo).
 

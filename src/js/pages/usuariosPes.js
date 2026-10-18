@@ -1,8 +1,8 @@
 // Página «Usuarios en PES» (migración 125): lista de PCs con Phoenix Link y el historial de cada una.
-// Lógica pura: core/cambiosOficiales.js · Datos: features/cambios/api.js
-import { onSession, isStaff } from '../core/session.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { frescura, versionMasNueva, compararVersion, lineaEvento, RESULTADO } from '../core/cambiosOficiales.js';
+// Lógica pura: core/pes/cambiosOficiales.js · Datos: features/cambios/api.js
+import { onSession, isStaff } from '../core/sistema/session.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { frescura, versionMasNueva, compararVersion, lineaEvento, RESULTADO } from '../core/pes/cambiosOficiales.js';
 import * as api from '../features/cambios/api.js';
 
 const $ = (id) => document.getElementById(id);

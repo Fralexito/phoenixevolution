@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ordenSemillas, limpiarJugadores, mezclar, eliminacionSimple, dobleEliminacion, liguilla, repartirGrupos, gruposPlayoffs, emparejarSuizo, primeraRondaSuizo, rondasSuizo, crearColina, jugarColina, retarEscalera, acumularCircuito, validarFormato, generar, etiquetaSlot } from '../src/js/core/formatos.js';
+import { ordenSemillas, limpiarJugadores, mezclar, eliminacionSimple, dobleEliminacion, liguilla, repartirGrupos, gruposPlayoffs, emparejarSuizo, primeraRondaSuizo, rondasSuizo, crearColina, jugarColina, retarEscalera, acumularCircuito, validarFormato, generar, etiquetaSlot } from '../src/js/core/competicion/formatos.js';
 
 const nombres = (n) => Array.from({ length: n }, (_, i) => `J${i + 1}`);
 const jugables = (rondas) => rondas.flatMap((r) => r.partidos).filter((m) => !m.bye);

@@ -1,13 +1,13 @@
 // Barra lateral izquierda: fijar abierta + lista de amigos con indicador «en el radar». Experimento reversible (FX.barraLateral en data/experimento.js).
-// Esquema: este archivo (DOM + red) → core/barraLateral.js (lógica pura). Si algo falla, la barra sigue siendo útil (atajos y ligas son estáticos).
-import { onSession } from '../core/session.js';
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { avatarHTML } from '../core/avatar.js';
+// Esquema: este archivo (DOM + red) → core/sistema/barraLateral.js (lógica pura). Si algo falla, la barra sigue siendo útil (atajos y ligas son estáticos).
+import { onSession } from '../core/sistema/session.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
 import { cargarRed } from './amigos/api.js';
 import { observarPresence, onPresence } from './presence.js';
-import { resumenAmigos, unirPerfiles } from '../core/barraLateral.js';
+import { resumenAmigos, unirPerfiles } from '../core/sistema/barraLateral.js';
 
 const KEY = 'pes-barra-fijada';
 const MAX = 8;

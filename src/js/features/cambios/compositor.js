@@ -1,8 +1,8 @@
 // Piezas visuales del compositor de Cambios oficiales (control segmentado + vista previa en vivo). Solo tocan el DOM que se les pasa.
-import { tipoRegistrado, incluyeBase, incluyeLm } from '../../core/cambiosOficiales.js';
-import { clubExacto, escudoImg, paisDe } from '../../core/clubesPes.js';
-import { escapeHTML as esc } from '../../core/dom.js';
-import { escudoHTML } from '../../core/escudos.js';
+import { tipoRegistrado, incluyeBase, incluyeLm } from '../../core/pes/cambiosOficiales.js';
+import { clubExacto, escudoImg, paisDe } from '../../core/pes/clubesPes.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { escudoHTML } from '../../core/sistema/escudos.js';
 import { montarFotos } from '../fotoFutbolista.js';
 import { lmDeClubPorNombre } from './datosSala.js';
 

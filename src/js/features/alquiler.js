@@ -1,10 +1,10 @@
 // Alquiler de host verificado (migración 071): buscar host, solicitar (pago por fuera o con gemas en garantía) y gestionar mis alquileres.
-import { supabase } from '../core/supabase.js';
-import { openModal } from '../core/modal.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { escapeHTML, safeUrl } from '../core/dom.js';
-import { formatoPrecio } from '../core/economia.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { openModal } from '../core/sistema/modal.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { escapeHTML, safeUrl } from '../core/sistema/dom.js';
+import { formatoPrecio } from '../core/economia/economia.js';
 
 export const rpc = async (n, a) => { const { data, error } = await supabase.rpc(n, a); if (error) throw new Error(error.message); return data; };
 const ESTADO = { SOLICITADO: ['Pendiente', 'text-amber-300'], ACEPTADO: ['Aceptado', 'text-emerald-300'], RECHAZADO: ['Rechazado', 'text-gray-400'], CANCELADO: ['Cancelado', 'text-gray-400'], COMPLETADO: ['Completado', 'text-galaxy-300'] };

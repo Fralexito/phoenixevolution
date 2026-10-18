@@ -1,11 +1,11 @@
 // Compositor de /social/: caja «¿Qué quieres compartir?» con texto + foto o video (archivo o enlace) + juego. Se pliega hasta que la persona toca.
-// Capa DOM: valida con core/muro.js y core/videoSubida.js (vía prepararVideo), sube archivos con api.js y avisa con `onPublicado()`.
+// Capa DOM: valida con core/comunidad/muro.js y core/comunidad/videoSubida.js (vía prepararVideo), sube archivos con api.js y avisa con `onPublicado()`.
 // Sin sesión muestra una invitación a entrar (la BD igual rechaza cualquier intento: las reglas viven en muro_publicar).
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { avatarHTML } from '../../core/avatar.js';
-import { validarTexto, analizarVideo, segmentoParaGuardar } from '../../core/muro.js';
-import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../../core/videoSubida.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { avatarHTML } from '../../core/sistema/avatar.js';
+import { validarTexto, analizarVideo, segmentoParaGuardar } from '../../core/comunidad/muro.js';
+import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../../core/comunidad/videoSubida.js';
 import { MURO_MAX, SEGMENTOS } from '../../../data/muroEstilo.js';
 import * as api from './api.js';
 import { prepararVideo } from './media.js';

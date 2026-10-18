@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { pestanaSegunTecla } from '../src/js/core/pestanas.js';
+import { pestanaSegunTecla } from '../src/js/core/sistema/pestanas.js';
 
 test('pestañas: flechas avanzan y retroceden dando la vuelta', () => {
   assert.equal(pestanaSegunTecla(0, 4, 'ArrowRight'), 1);

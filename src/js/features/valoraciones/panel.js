@@ -1,9 +1,9 @@
 // Panel «Valora a tus rivales» de /mis-partidos/: rivales de duelos con marcador confirmado a quienes aún no has valorado.
 // Esquema: pages/misPartidos → este panel → features/valoraciones/api → core/reputacion (puro).
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { avatarHTML } from '../../core/avatar.js';
-import { validarValoracion, etiquetasPara } from '../../core/reputacion.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { avatarHTML } from '../../core/sistema/avatar.js';
+import { validarValoracion, etiquetasPara } from '../../core/jugadores/reputacion.js';
 import * as api from './api.js';
 
 export function crearPanelValoraciones(el) {

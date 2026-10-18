@@ -1,7 +1,7 @@
 // Radar de jugadores en línea con Supabase Realtime PRESENCE.
 // Aviso de diseño: Presence lo declara cada cliente, así que es información COSMÉTICA
 // (quién aparece libre/ocupado). Nunca se usa para decidir permisos: eso lo hace la BD.
-import { supabase } from '../core/supabase.js';
+import { supabase } from '../core/sistema/supabase.js';
 
 export const ESTADOS = {
   libre: { label: 'Libre', dot: 'bg-emerald-400' },

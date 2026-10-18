@@ -16,7 +16,7 @@ Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Footb
 ## Reglas del usuario
 - Idioma: español. Respuestas cortas («modo ligero»). Usuario con poca experiencia en programación: explicar claro, sin asumir nada, y cerrar con una pregunta para confirmar que se entendió.
 - Nunca pedir secretos en el chat.
-- Cero ventanas nativas (`confirm`/`prompt`/`alert`): usar `core/dialogo.js`.
+- Cero ventanas nativas (`confirm`/`prompt`/`alert`): usar `core/sistema/dialogo.js`.
 - Evitar scroll excesivo: lo largo o secundario va en `Plegable` cerrado.
 - El parche se llama **«Conmegol»**; nunca «corregirlo».
 - Texto mínimo 12 px en todo el sitio.

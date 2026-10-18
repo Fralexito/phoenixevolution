@@ -1,17 +1,17 @@
 // Página /social/: la «portada social» de la comunidad. Esquema:
 //   fila de historias (RPC historias_recientes, 056) → compositor (features/muro/compositor.js) → feed (muro_comunidad / siguiendo / destacado, ya existentes)
-//   → pie de acciones (features/muro/pieSocial.js; reacciones con mis_reacciones, 057). La lógica pura vive en core/feedSocial.js y core/feed.js.
+//   → pie de acciones (features/muro/pieSocial.js; reacciones con mis_reacciones, 057). La lógica pura vive en core/comunidad/feedSocial.js y core/comunidad/feed.js.
 // Todo lo que se pinta de otros usuarios pasa por escapeHTML en los módulos que generan el HTML (tarjeta.js, render.js, pieSocial.js).
-import { vacioHTML } from '../core/vacio.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
-import { onSession, can, getState } from '../core/session.js';
-import { avatarHTML } from '../core/avatar.js';
-import { href } from '../core/config.js';
-import { segmentoParaGuardar, urlCompartir, aplicarReaccion } from '../core/muro.js';
-import { marcarVistas, indiceInicial } from '../core/historias.js';
-import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../core/feed.js';
-import { REACCION_RAPIDA, circulosHistorias, mapaMisReacciones, conMisReacciones } from '../core/feedSocial.js';
+import { vacioHTML } from '../core/sistema/vacio.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
+import { onSession, can, getState } from '../core/sistema/session.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { href } from '../core/sistema/config.js';
+import { segmentoParaGuardar, urlCompartir, aplicarReaccion } from '../core/comunidad/muro.js';
+import { marcarVistas, indiceInicial } from '../core/comunidad/historias.js';
+import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../core/comunidad/feed.js';
+import { REACCION_RAPIDA, circulosHistorias, mapaMisReacciones, conMisReacciones } from '../core/comunidad/feedSocial.js';
 import { SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { reproductorYT } from '../features/muro/render.js';

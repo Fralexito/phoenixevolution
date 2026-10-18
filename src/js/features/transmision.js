@@ -5,11 +5,11 @@
 //  · Con «menos movimiento» las barritas no se llenan solas: no rota (se puede elegir a mano).
 //  · Con sesión, la línea de estado saluda: «Hola, Fralex · 10.º · próximo: Morgado».
 //  · Si hay video de fondo (data/portada.js), solo se reproduce en pantallas medianas o grandes y sin «menos movimiento».
-import { onSession } from '../core/session.js';
+import { onSession } from '../core/sistema/session.js';
 import { hayMovimientoReducido } from './ajustes.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
-import { calcularTabla } from '../core/tabla.js';
-import { puestoDe, proximoPartido, nombreEnLiga } from '../core/pase.js';
+import { calcularTabla } from '../core/competicion/tabla.js';
+import { puestoDe, proximoPartido, nombreEnLiga } from '../core/portada/pase.js';
 
 const ed = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? null;
 const fechas = ed?.fechas ?? [];

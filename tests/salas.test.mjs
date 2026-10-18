@@ -1,7 +1,7 @@
-// Pruebas de core/salas.js (reglas puras de «Salas en vivo»).
+// Pruebas de core/competicion/salas.js (reglas puras de «Salas en vivo»).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { saludSala, ordenarSalas, aplicarCambioSala, mostrarCodigoPC, limpiarParsecId, segundosRestantes } from '../src/js/core/salas.js';
+import { saludSala, ordenarSalas, aplicarCambioSala, mostrarCodigoPC, limpiarParsecId, segundosRestantes } from '../src/js/core/competicion/salas.js';
 
 const AHORA = Date.parse('2026-10-06T20:00:00Z');
 const hace = (s) => new Date(AHORA - s * 1000).toISOString();
@@ -43,7 +43,7 @@ test('utilidades de códigos y Parsec', () => {
   assert.equal(segundosRestantes(hace(10), AHORA), 0);
 });
 
-import { pildoraSemaforo, textoErrorUnirse } from '../src/js/core/salas.js';
+import { pildoraSemaforo, textoErrorUnirse } from '../src/js/core/competicion/salas.js';
 test('pildoraSemaforo y textoErrorUnirse (067)', () => {
   assert.equal(pildoraSemaforo({ color: 'verde', ping_ms: 41.6, fuente: 'par' }).texto, '42 ms');
   assert.match(pildoraSemaforo({ color: 'rojo', ping_ms: 140 }).clase, /rose/);

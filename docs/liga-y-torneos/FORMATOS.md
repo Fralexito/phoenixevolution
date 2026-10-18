@@ -4,8 +4,8 @@ Página `/formatos/` (menú Competir → Formatos). Todo se calcula en el navega
 
 | Pieza | Archivo |
 |---|---|
-| Motor de formatos (puro, con tests) | `src/js/core/formatos.js` · `tests/formatos.test.mjs` |
-| Retos, ruleta, noche de la semana (puro) | `src/js/core/retos.js` · `tests/retos.test.mjs` |
+| Motor de formatos (puro, con tests) | `src/js/core/competicion/formatos.js` · `tests/formatos.test.mjs` |
+| Retos, ruleta, noche de la semana (puro) | `src/js/core/competicion/retos.js` · `tests/retos.test.mjs` |
 | Textos editables (modalidades, reglas, retos, noches) | `src/data/modalidades.js` |
 | Página y pantalla | `src/pages/formatos.astro` · `src/js/pages/formatos.js` · `src/styles/formatos.css` |
 | Guía en PDF con la identidad de la liga | `docs/liga-y-torneos/Formatos-Phoenix-Evolution.pdf` |

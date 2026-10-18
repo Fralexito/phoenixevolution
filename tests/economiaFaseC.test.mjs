@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as E from '../src/js/core/economia.js';
-import * as S from '../src/js/core/sonidosChat.js';
+import * as E from '../src/js/core/economia/economia.js';
+import * as S from '../src/js/core/comunidad/sonidosChat.js';
 
 test('Fase C: las tres categorías nuevas existen y las de antes siguen primero', () => {
   assert.deepEqual(E.ORDEN_CATEGORIAS.slice(0, 5), ['marco', 'titulo', 'fondo', 'color_clan', 'insignia']);

@@ -79,3 +79,7 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 - `MAPA.md` — mapa del código por rondas. `CLAUDE.md` — reglas del proyecto.
 - `ECONOMIA.md`, `GUIA_PASO_A_PASO.md`, `RESPALDOS.md` — guías en la raíz.
 - `supabase/migrations/` — migraciones numeradas (no se editan una vez aplicadas; sus comentarios pueden nombrar rutas viejas: usa la columna «Antes estaba en»).
+
+## Código
+
+La reorganización de `src/js/core/` en carpetas por tema (y cómo adaptar una rama vieja) está en [`trabajo-en-equipo/REORGANIZACION-CODIGO-18-OCT.md`](trabajo-en-equipo/REORGANIZACION-CODIGO-18-OCT.md).

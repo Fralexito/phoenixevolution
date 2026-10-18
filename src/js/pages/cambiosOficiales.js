@@ -1,10 +1,10 @@
 // Página «Cambios oficiales» (migración 125): formulario único (tipo + Base normal / Liga Máster / Las dos + datos) e historial.
-// Lógica pura: core/cambiosOficiales.js · Datos: features/cambios/api.js · Tipos: features/cambios/<tipo>.js (126 y 127 añaden los suyos aquí).
-import { onSession, isAdmin, isStaff } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { DESTINOS, tiposDisponibles, tipoRegistrado, ESTADO_LADO, resumenResultados, resumenFichaje, mensajeError } from '../core/cambiosOficiales.js';
+// Lógica pura: core/pes/cambiosOficiales.js · Datos: features/cambios/api.js · Tipos: features/cambios/<tipo>.js (126 y 127 añaden los suyos aquí).
+import { onSession, isAdmin, isStaff } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { DESTINOS, tiposDisponibles, tipoRegistrado, ESTADO_LADO, resumenResultados, resumenFichaje, mensajeError } from '../core/pes/cambiosOficiales.js';
 import { segmentado, pintarVista } from '../features/cambios/compositor.js';
 import * as api from '../features/cambios/api.js';
 import '../features/cambios/fichaje.js';

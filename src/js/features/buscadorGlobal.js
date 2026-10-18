@@ -1,12 +1,12 @@
 // Buscador global (lupa de la cabecera, tecla «/» o Ctrl+K): páginas al instante y personas al escribir 2+ letras.
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { can } from '../core/session.js';
-import { indicePaginas, buscarPaginas } from '../core/buscador.js';
-import { indiceLiga, buscarEnLiga } from '../core/pulso.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { can } from '../core/sistema/session.js';
+import { indicePaginas, buscarPaginas } from '../core/sistema/buscador.js';
+import { indiceLiga, buscarEnLiga } from '../core/competicion/pulso.js';
 import { buscarPersonas } from './social/api.js';
-import { avatarHTML } from '../core/avatar.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
 
 const ID = 'buscador-global';
 let indice = null, indiceL = null, req = 0, timer = 0;   // indiceL (ligas, fechas, DT y clubes) se carga solo al abrir el buscador, para no pesar en cada página

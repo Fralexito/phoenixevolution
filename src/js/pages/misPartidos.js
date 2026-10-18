@@ -1,18 +1,18 @@
 // «Mis partidos» — página propia: agendados, historial y récord contra cada rival (duelos + liga).
 // Esquema: pages → features → core. Reutiliza las tarjetas y acciones de Duelos (nada se duplica).
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 import { data, me, myProfile, isMine, partsOf, nm, loadPerfiles, loadRetos, visibleRetos } from '../features/duelos/data.js';
 import { card, cardHistorial } from '../features/duelos/cards.js';
-import { ordenarAgendados, ordenarPartidosJugados, rivalesDeDuelos } from '../core/misPartidos.js';
-import { coincide, campana, contraRivales } from '../core/perfil.js';
+import { ordenarAgendados, ordenarPartidosJugados, rivalesDeDuelos } from '../core/competicion/misPartidos.js';
+import { coincide, campana, contraRivales } from '../core/jugadores/perfil.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import * as act from '../features/duelos/actions.js';
 import { openInviteModal } from '../features/duelos/invite.js';
 import { crearPanelMarcadores } from '../features/resultados/panel.js';
 import { resultadoDe } from '../features/resultados/api.js';
-import { datosTarjeta } from '../core/tarjetaResultado.js';
+import { datosTarjeta } from '../core/competicion/tarjetaResultado.js';
 import { compartirTarjeta } from '../features/resultados/tarjeta.js';
 import { crearPanelValoraciones } from '../features/valoraciones/panel.js';
 

@@ -1,13 +1,13 @@
 // Modal para crear/editar una ficha de jugador (solo admin; la BD lo refuerza con RLS).
 // Cada estadística es una «ficha» con − / + (mantén pulsado para repetir), deslizador y número en color.
 // La media (OVR) se calcula sola mientras no la toques; si la mueves queda manual hasta «Volver a automático».
-import { supabase } from '../core/supabase.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML, safeImg, statColor } from '../core/dom.js';
-import { ALTURA, PIES, leerMedida, pieValido } from '../core/fisico.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML, safeImg, statColor } from '../core/sistema/dom.js';
+import { ALTURA, PIES, leerMedida, pieValido } from '../core/sistema/fisico.js';
 import { openPhotoCropper } from './photoCropper.js';
-import { clampStat, calcOvr, distribuirMedia, aleatorias } from '../core/stats.js';
-import { toast } from '../core/toast.js';
+import { clampStat, calcOvr, distribuirMedia, aleatorias } from '../core/jugadores/stats.js';
+import { toast } from '../core/sistema/toast.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { POSICIONES, posInfo } from '../../data/posiciones.js';
 import { STAT_KEYS } from './playerCard.js';

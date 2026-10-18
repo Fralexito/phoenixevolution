@@ -1,12 +1,12 @@
 // Mercado (beta): vincular el programa Phoenix Sync, ver mis reportes; staff: option file oficial + revisar cambios.
 // BD: migración 078 (mercado_*). Todas las escrituras por RPC o con RLS de staff; el programa usa la Edge Function «mercado».
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { pedirTexto } from '../core/dialogo.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { haceCuanto } from '../core/notifs.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { pedirTexto } from '../core/sistema/dialogo.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { haceCuanto } from '../core/sistema/notifs.js';
 
 const $ = (id) => document.getElementById(id);
 const ESTADO = { pendiente: ['En revisión', 'text-amber-200 border-amber-400/40 bg-amber-500/10'], aprobado: ['Aprobado', 'text-emerald-200 border-emerald-400/40 bg-emerald-500/10'], rechazado: ['Rechazado', 'text-rose-200 border-rose-400/40 bg-rose-500/10'] };

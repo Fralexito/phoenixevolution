@@ -1,6 +1,6 @@
 // Clanes: llama a las RPC (reglas en la BD, migración 043). Esquema: pages/clanes → features/clanes/api → core/clan (puro).
-import { supabase } from '../../core/supabase.js';
-import { normalizarClanLista, normalizarMiClan } from '../../core/clan.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarClanLista, normalizarMiClan } from '../../core/comunidad/clan.js';
 
 const FALTA = 'La base de datos todavía no tiene activados los clanes (falta aplicar la migración 043).';
 async function rpc(nombre, args = {}) {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarBusqueda, mencionEnCursor, insertarMencion, normalizarPersona, esTipoBusqueda } from '../src/js/core/social.js';
+import { validarBusqueda, mencionEnCursor, insertarMencion, normalizarPersona, esTipoBusqueda } from '../src/js/core/comunidad/social.js';
 
 test('búsqueda: validación por tipo', () => {
   assert.deepEqual(validarBusqueda('  ana  ', 'personas'), { ok: true, q: 'ana', error: '' });

@@ -1,9 +1,9 @@
 // Barra "Última hora": (1) solo se ve en la parte superior de la página (al bajar se esconde y NO reaparece hasta volver arriba;
 // en celular, al bajar queda una versión sutil y compacta justo debajo de la cabecera),
 // (2) las noticias fluyen a velocidad fija en px/s (más lenta en celular) con un hueco IRREGULAR entre ellas (no simétrico); pueden coincidir varias.
-import { factorTicker } from '../core/ajustes.js';
+import { factorTicker } from '../core/sistema/ajustes.js';
 import { FX } from '../../data/experimento.js';
-import { piezasTicker, piezasCreadores } from '../core/tickerVivo.js';
+import { piezasTicker, piezasCreadores } from '../core/portada/tickerVivo.js';
 
 const EL_ID = 'ticker';
 const ARRIBA = 80;   // por encima de esta posición (px) se ve completa; por debajo se esconde (PC) o pasa a versión sutil (celular)
@@ -34,7 +34,7 @@ function initMarquee() {
     const vivo = async () => {
       if (document.hidden) return;
       try {
-        const { supabase } = await import('../core/supabase.js');   // import diferido: este módulo también se prueba en Node
+        const { supabase } = await import('../core/sistema/supabase.js');   // import diferido: este módulo también se prueba en Node
         const { data, error } = await supabase.rpc('ticker_comunidad'); if (error) throw error;
         const extra = [...piezasCreadores(data?.creadores_en_vivo).map((p) => ({ texto: p.texto, url: p.url })),
           ...piezasTicker(data).map((p) => (p.tipo === 'vivo' ? `🔴 EN VIVO · ${p.texto}` : `⚽ ${p.texto}`))];

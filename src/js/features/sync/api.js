@@ -1,5 +1,5 @@
 // Acceso a datos de PHOENIX SYNC (migración 098). Lee por RLS; escribe solo por RPC (el servidor decide quién puede).
-import { supabase } from '../../core/supabase.js';
+import { supabase } from '../../core/sistema/supabase.js';
 
 const MENSAJES = {
   NO_AUTORIZADO: 'Solo el admin del grupo puede hacer eso.',

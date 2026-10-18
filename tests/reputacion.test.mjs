@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarValoracion, etiquetasPara, normalizarReputacion, normalizarPendientes, textoSello } from '../src/js/core/reputacion.js';
+import { validarValoracion, etiquetasPara, normalizarReputacion, normalizarPendientes, textoSello } from '../src/js/core/jugadores/reputacion.js';
 
 test('validarValoracion: reglas de estrellas y etiquetas (igual que la BD)', () => {
   assert.equal(validarValoracion({ estrellas: 5, etiquetas: ['puntual', 'deportivo'] }).ok, true);

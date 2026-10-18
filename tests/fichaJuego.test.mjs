@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { FICHAS_JUEGO } from '../src/data/fichasJuego.js';
-import { decodificarFicha, esPortero, posicionRegistrada, nivelesPosicion, perfilEjes, puntosRadar, HABILIDADES, GRUPOS_STATS, CLAVES_PORTERO } from '../src/js/core/fichaJuego.js';
-import { CAMPOS } from '../src/js/core/fichasCampos.js';
+import { decodificarFicha, esPortero, posicionRegistrada, nivelesPosicion, perfilEjes, puntosRadar, HABILIDADES, GRUPOS_STATS, CLAVES_PORTERO } from '../src/js/core/pes/fichaJuego.js';
+import { CAMPOS } from '../src/js/core/pes/fichasCampos.js';
 
 test('todas las fichas del juego se pueden decodificar y sus valores están en rango', () => {
   const rangos = Object.fromEntries(CAMPOS.map((c) => [c.clave, c]));
@@ -40,8 +40,8 @@ test('tablas: cada habilidad tiene nombre y los grupos de estadísticas existen 
   for (const g of GRUPOS_STATS) for (const k of g.claves) assert.ok(claves.has(k), k);
 });
 
-import { NOMBRE_POSICION, TEXTO_NIVEL } from '../src/js/core/fichaJuego.js';
-import { POS_CAMPO } from '../src/js/core/fichasCampos.js';
+import { NOMBRE_POSICION, TEXTO_NIVEL } from '../src/js/core/pes/fichaJuego.js';
+import { POS_CAMPO } from '../src/js/core/pes/fichasCampos.js';
 test('cada posición del campo tiene nombre y el campo las coloca como en el juego (centrales al centro, bandas a los lados, sin amontonarse)', () => {
   const letras = Object.keys(POS_CAMPO).map((k) => k.slice(4).toUpperCase()).sort();
   assert.deepEqual(Object.keys(NOMBRE_POSICION).sort(), letras);

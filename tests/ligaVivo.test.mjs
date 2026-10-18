@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   golesVivo, textoGol, normalizarVivo, aplicarCambioVivo, limpiarVivos, ordenarVivos, huboGol,
   validarMarcador, colaValidacion, puedeReclamar, resumenDoctor, FINAL_MS,
-} from '../src/js/core/ligaVivo.js';
+} from '../src/js/core/competicion/ligaVivo.js';
 
 const fila = (x = {}) => ({ sala_id: 's1', partido_id: null, local: 'Fralex', visitante: 'Mirko', goles_local: 0, goles_visita: 0,
   minuto: 10, periodo: 1, fase: 'en_juego', goles: [], actualizado: '2026-10-11T10:00:00Z', ...x });
@@ -97,8 +97,8 @@ test('ligaVivo: cola del staff, reclamar y doctor', () => {
 });
 
 test('ligaVivo: resultados confirmados de la base sobre las fechas de la web', async () => {
-  const { fusionarConfirmados } = await import('../src/js/core/ligaVivo.js');
-  const { calcularTabla } = await import('../src/js/core/tabla.js');
+  const { fusionarConfirmados } = await import('../src/js/core/competicion/ligaVivo.js');
+  const { calcularTabla } = await import('../src/js/core/competicion/tabla.js');
   const { EDICIONES } = await import('../src/data/ligaResultados.js');
   const fechas = [
     { n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }, { l: 'C', v: 'D', gl: null, gv: null, estado: 'aplazado' }] },
@@ -125,7 +125,7 @@ test('ligaVivo: resultados confirmados de la base sobre las fechas de la web', a
 });
 
 test('ligaVivo: pantalla del juego y texto del estado (Phoenix Referee v1.2)', async () => {
-  const { textoEstado, normalizarVivo, PANTALLAS } = await import('../src/js/core/ligaVivo.js');
+  const { textoEstado, normalizarVivo, PANTALLAS } = await import('../src/js/core/competicion/ligaVivo.js');
   const base = { sala_id: 's', local: 'A', visitante: 'B', goles_local: 0, goles_visita: 0, minuto: 0, periodo: 0 };
   assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'previa', pantalla: 'equipos' })), 'Eligiendo equipos');
   assert.equal(textoEstado(normalizarVivo({ ...base, fase: 'previa', pantalla: 'saliendo' })), 'Saliendo al campo');

@@ -1,12 +1,12 @@
 // Página /en-vivo/ («Salas en vivo»): (1) partidos abiertos a espectadores → pedir/entrar/ver enlace; (2) mis partidos → elegir quién puede mirar y responder solicitudes.
 // Esquema: pages → features/espectadores/api (RPC) → core/espectadores (lógica pura).
-import { onSession, getState } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML, safeUrl } from '../core/dom.js';
-import { supabase } from '../core/supabase.js';
+import { onSession, getState } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML, safeUrl } from '../core/sistema/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
 import { data, loadPerfiles } from '../features/duelos/data.js';
-import { MODOS, modoDe, accionPara, clampMax } from '../core/espectadores.js';
+import { MODOS, modoDe, accionPara, clampMax } from '../core/competicion/espectadores.js';
 import * as api from '../features/espectadores/api.js';
 import { regionAhora } from '../features/ajustes.js';
 import { montarTarjetasSalas } from '../features/salas/tarjetas.js';

@@ -80,7 +80,7 @@ Los define cada sesión en este mismo archivo (añadir una sección `### <tipo> 
 ```
 - `jugador` obligatorio (1–48 bytes). `jugador_id` opcional (id de PES, entero 1–99.999.999; ≥ 90.000.000 = sintético → por nombre).
   Cada PC usa el id **solo si en su base ese id tiene ese nombre**; si no, busca el nombre (único). Nunca toca a un jugador distinto.
-- `valores`: 1–46 campos; claves y rangos en `public.pes_fichas_campos` (copia en Link `link/Fichas.cpp` y en la web `core/fichasCampos.js`).
+- `valores`: 1–46 campos; claves y rangos en `public.pes_fichas_campos` (copia en Link `link/Fichas.cpp` y en la web `core/pes/fichasCampos.js`).
   `stats` = 20 de campo + 5 de portero (40–99). `info` = pie malo uso/precisión (1–4), forma (1–8), resistencia a lesiones (1–3),
   13 posiciones `pos_*` (0 = C, 1 = B, 2 = A), `altura` (150–210), `peso` (45–110), `edad` (15–45), `posicion_registrada` (0–12: PT DFC LI LD MCD MC MI MD MO EI ED SD DC).
   Valor `null` = «vuelve al valor de la base del parche» (lo usa el deshacer).
@@ -152,7 +152,7 @@ Escribir: solo por las funciones (`pes_cambio_crear`, `pes_cambio_anular`, `pes_
 Páginas web: **/cambios-oficiales/** (formulario único + historial) y **/usuarios-pes/** (PCs, versión, último contacto, historial por usuario y PC).
 
 ## 6. Enchufes del formulario (para 126 y 127)
-`src/js/core/cambiosOficiales.js` exporta `registrarTipo({ tipo, etiqueta, destinos, pintar(contenedor, ctx), leer() → datos | lanza Error })`.
+`src/js/core/pes/cambiosOficiales.js` exporta `registrarTipo({ tipo, etiqueta, destinos, pintar(contenedor, ctx), leer() → datos | lanza Error })`.
 Cada sesión añade su archivo `src/js/features/cambios/<tipo>.js` que llama a `registrarTipo(...)` y lo importa en `src/js/pages/cambiosOficiales.js`.
 Las casillas Base normal / Liga Máster / Las dos son comunes; `ctx.destino` dice cuál está marcada para pintar los campos extra (p. ej. club de LM).
 

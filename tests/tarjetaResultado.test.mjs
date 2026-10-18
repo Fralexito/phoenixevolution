@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { datosTarjeta, lineaBando, recortar } from '../src/js/core/tarjetaResultado.js';
+import { datosTarjeta, lineaBando, recortar } from '../src/js/core/competicion/tarjetaResultado.js';
 
 test('lineaBando: 1, 2 y varios jugadores; recorta y limpia', () => {
   assert.equal(lineaBando(['Ana']), 'Ana'); assert.equal(lineaBando(['Ana', 'Luis']), 'Ana y Luis'); assert.equal(lineaBando(['A', 'B', 'C', 'D']), 'A, B y 2 más');

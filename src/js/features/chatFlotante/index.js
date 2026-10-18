@@ -1,11 +1,11 @@
 // Chat flotante estilo red social: columna de contactos (PC) + botón «Chats» (pantallas menores) + ventanitas abajo.
 // Interruptor: FX.contactos en data/experimento.js (false = desaparece todo; la sección /mensajes/ no cambia).
 // En /mensajes/ no se abren ventanitas (sería duplicar la página): los contactos llevan a la conversación de la página completa.
-import { onSession } from '../../core/session.js';
+import { onSession } from '../../core/sistema/session.js';
 import { montarColumna, montarHoja } from './contactos.js';
 import { montarVentanas } from './ventanas.js';
 import { iniciarDatos, reiniciarDatos, abrirConUsuario, S } from './datos.js';
-import { toast } from '../../core/toast.js';
+import { toast } from '../../core/sistema/toast.js';
 
 export function initChatFlotante() {
   try {

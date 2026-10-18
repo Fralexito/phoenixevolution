@@ -1,10 +1,10 @@
 // Selector de foto de perfil COMPARTIDO por «Mi perfil» y el formulario de bienvenida:
 // subir foto · galería de avatares · usar la de Discord/Google. Guarda la elección en un objeto
 // { kind: 'keep'|'preset'|'provider'|'file', ... } que luego se convierte en `avatar_url` con resolveAvatar().
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { cropSquareJpeg } from '../core/image.js';
-import { PRESETS, presetId, presetValue, avatarHTML, providerAvatar, providerName } from '../core/avatar.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { cropSquareJpeg } from '../core/sistema/image.js';
+import { PRESETS, presetId, presetValue, avatarHTML, providerAvatar, providerName } from '../core/sistema/avatar.js';
 
 /** HTML del selector. `ns` evita ids repetidos si hubiera dos a la vez. */
 export function avatarPickerHTML({ avatarUrl, name, user, ns = 'p', cabecera = '' }) {

@@ -1,6 +1,6 @@
 // Acceso a la red social: cada función llama a una RPC de Supabase (las reglas viven en la base de datos, migración 017).
-import { supabase } from '../../core/supabase.js';
-import { normalizarRed } from '../../core/red.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarRed } from '../../core/comunidad/red.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

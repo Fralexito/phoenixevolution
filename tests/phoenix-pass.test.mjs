@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as P from '../src/js/core/phoenix-pass.js';
+import * as P from '../src/js/core/economia/phoenix-pass.js';
 
 const crudo = (extra = {}) => ({
   temporada: { id: 't1', clave: 'despegue', nombre: 'Temporada 1', inicia: '2026-10-17T05:00:00Z', termina: '2026-12-16T05:00:00Z', niveles: 4, xp_por_nivel: 100, precio_gemas: 150, en_gracia: false, gracia_dias: 7 },

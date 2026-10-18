@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { leerStaffVisible, guardarStaffVisible, CLAVE_STAFF_UI } from '../src/js/core/staffUi.js';
+import { leerStaffVisible, guardarStaffVisible, CLAVE_STAFF_UI } from '../src/js/core/sistema/staffUi.js';
 
 const almacen = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), m }; };
 test('por defecto las opciones de staff son visibles', () => { assert.equal(leerStaffVisible(almacen()), true); assert.equal(leerStaffVisible(null), true); });

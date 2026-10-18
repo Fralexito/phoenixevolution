@@ -1,12 +1,12 @@
-// Página Temporada (beta): lee las tablas que Astro dejó en data-temporada, y con js/core/temporada.js calcula y pinta zonas, ascensos y copa.
+// Página Temporada (beta): lee las tablas que Astro dejó en data-temporada, y con js/core/competicion/temporada.js calcula y pinta zonas, ascensos y copa.
 // Cada cambio en un control vuelve a calcular TODO desde cero (sin estado oculto): es más simple de razonar y no puede quedar a medias.
-import { zonasDivision, resolverAscensos, clasificadosCopa, construirCopa, normalizarConfig, validarResultadoCopa, resultadosDesdeFilas } from '../core/temporada.js';
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
+import { zonasDivision, resolverAscensos, clasificadosCopa, construirCopa, normalizarConfig, validarResultadoCopa, resultadosDesdeFilas } from '../core/competicion/temporada.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
 import { borrarFilas } from '../features/escritura.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML } from '../core/dom.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 
 const $ = (id) => document.getElementById(id);
 const raiz = $('temporada');

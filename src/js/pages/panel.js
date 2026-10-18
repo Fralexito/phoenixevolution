@@ -1,10 +1,10 @@
 // Página /panel/ (solo admin): edita la configuración del sitio con Guardar · Deshacer · Rehacer.
 // Esquema: pages/panel → core/sitio (lógica pura) · features/sitioAplicar (aplica en la web) · RPC sitio_estado / sitio_guardar / sitio_mover.
-import { onSession, can } from '../core/session.js';
-import { supabase } from '../core/supabase.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { normalizar, mover, moverA, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA, MAX_ENLACES } from '../core/sitio.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { normalizar, mover, moverA, alternar, iguales, esBase, hrefValido, VENTANAS, VISTAS, MAX_EXTRA, MAX_ENLACES } from '../core/sistema/sitio.js';
 import { aplicar, guardarCache } from '../features/sitioAplicar.js';
 import Sortable from 'sortablejs';
 import { animate } from 'motion';

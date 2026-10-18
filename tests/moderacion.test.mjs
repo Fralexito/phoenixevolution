@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   MOTIVOS, TIPOS, validarReporte, validarNota, validarSancion, puedeActuar, puedeLevantar, quedaTiempo, describirMiSancion, normalizarReporte, normalizarSancion, esOcultable, DETALLE_MAX,
-} from '../src/js/core/moderacion.js';
+} from '../src/js/core/comunidad/moderacion.js';
 import { reportarHTML, ocultarHTML, sancionarHTML, notaHTML, avisoSancionHTML, reporteHTML, listaReportesHTML, historialHTML } from '../src/js/features/moderacion/vista.js';
 
 const MALO = '<img src=x onerror=window.__xss=1>';

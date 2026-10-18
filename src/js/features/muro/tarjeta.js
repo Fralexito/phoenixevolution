@@ -1,10 +1,10 @@
 // Tarjeta de publicación «de comunidad» (autor + contenido + reacciones + enlace a su muro). La usan /comunidad/, /guardados/ y /buscar/.
 // Recibe un ítem con el formato de `muro_comunidad` (también lo devuelven `guardados_listar` y `buscar_publicaciones`).
 // Los botones llevan data-atributos; cada página reparte los clics (guardar → features/social/guardados.js, reportar/ocultar → features/moderacion/acciones.js).
-import { escapeHTML } from '../../core/dom.js';
-import { href } from '../../core/config.js';
-import { avatarHTML } from '../../core/avatar.js';
-import { tiempoRelativo, resumenReacciones } from '../../core/muro.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
+import { avatarHTML } from '../../core/sistema/avatar.js';
+import { tiempoRelativo, resumenReacciones } from '../../core/comunidad/muro.js';
 import { contenidoHTML, segmentoChipHTML } from './render.js';
 import { botonGuardarHTML } from '../social/guardados.js';
 import { encuestaHTML } from '../encuestas/estado.js';

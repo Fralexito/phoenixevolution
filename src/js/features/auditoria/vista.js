@@ -1,8 +1,8 @@
 // HTML de la página de Auditoría (funciones puras: datos → texto, sin DOM → se pueden probar). TODO dato de la BD pasa por escapeHTML.
-import { escapeHTML, safeImg } from '../../core/dom.js';
-import { tiempoRelativo } from '../../core/muro.js';
-import { ACCIONES, FILTRO_ACCIONES, FILTRO_SECCIONES, agruparPorDia } from '../../core/auditoria.js';
-import { ROLES, ROL_INFO, normalizarRol } from '../../core/roles.js';
+import { escapeHTML, safeImg } from '../../core/sistema/dom.js';
+import { tiempoRelativo } from '../../core/comunidad/muro.js';
+import { ACCIONES, FILTRO_ACCIONES, FILTRO_SECCIONES, agruparPorDia } from '../../core/sistema/auditoria.js';
+import { ROLES, ROL_INFO, normalizarRol } from '../../core/sistema/roles.js';
 
 /** Colores por tono. Cada clase va ESCRITA ENTERA (Tailwind solo genera las que ve literalmente en el código). */
 export const TONOS = Object.freeze({

@@ -1,11 +1,11 @@
-// Página Premios (ronda 265). Calcula los premios con core/premios.js sobre la edición en curso de cada liga y los pinta como trofeos.
+// Página Premios (ronda 265). Calcula los premios con core/competicion/premios.js sobre la edición en curso de cada liga y los pinta como trofeos.
 // Las fotos (si las hay) salen de las cartas de `jugadores`; si no, iniciales con el color del premio.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { premiosEdicion } from '../core/premios.js';
-import { nombreEnEdicion } from '../core/perfil.js';
-import { escudoHTML } from '../core/escudos.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { premiosEdicion } from '../core/competicion/premios.js';
+import { nombreEnEdicion } from '../core/jugadores/perfil.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { montarVotoSemana } from '../features/reconocimientos.js';

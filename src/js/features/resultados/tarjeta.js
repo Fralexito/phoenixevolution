@@ -1,6 +1,6 @@
-// Dibuja la tarjeta de resultado en un <canvas> (1080×1080) y la comparte o descarga. Datos y textos: core/tarjetaResultado.js.
-import { TAM } from '../../core/tarjetaResultado.js';
-import { toast } from '../../core/toast.js';
+// Dibuja la tarjeta de resultado en un <canvas> (1080×1080) y la comparte o descarga. Datos y textos: core/competicion/tarjetaResultado.js.
+import { TAM } from '../../core/competicion/tarjetaResultado.js';
+import { toast } from '../../core/sistema/toast.js';
 
 function dibujar(d) {
   const c = document.createElement('canvas'); c.width = TAM.ancho; c.height = TAM.alto;

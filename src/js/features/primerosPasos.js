@@ -1,6 +1,6 @@
 // «Empieza en 3 pasos» (patrón de bienvenida guiada de FACEIT/PlayVS): solo en la portada y solo para quien NO tiene sesión.
-import { onSession } from '../core/session.js';
-import { href } from '../core/config.js';
+import { onSession } from '../core/sistema/session.js';
+import { href } from '../core/sistema/config.js';
 
 let caja = null;
 export function montarPrimerosPasos() {

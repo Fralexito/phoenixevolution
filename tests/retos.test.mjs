@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { diaPeru, retoDelDia, retoSemanal, girarRuleta, nocheTematica } from '../src/js/core/retos.js';
+import { diaPeru, retoDelDia, retoSemanal, girarRuleta, nocheTematica } from '../src/js/core/competicion/retos.js';
 import { RETOS_DIARIOS, REGLAS_RULETA, NOCHES_TEMATICAS, MODALIDADES } from '../src/data/modalidades.js';
 
 test('el día cambia a medianoche de Perú, no de UTC', () => {

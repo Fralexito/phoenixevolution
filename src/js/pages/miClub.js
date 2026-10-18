@@ -1,11 +1,11 @@
 // «Mi club» (vestuario). Lee vestuario_* (RLS: cada uno ve lo suyo, el staff todo) y guarda con el RPC vestuario_guardar_cambios.
 // Phoenix Sync sube el club y recoge los cambios «pendientes»; ver docs/web-pes-link/mercado-api.md.
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { POSICIONES, XY, HABILIDADES, PORTERO, BASICOS, leer, bloqueado, validarValor, siguientePosicion, valorActual, cambiosDe, fijar, borradorDesde, agruparPlantilla, euros, colorHab, mensajeError } from '../core/vestuario.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { POSICIONES, XY, HABILIDADES, PORTERO, BASICOS, leer, bloqueado, validarValor, siguientePosicion, valorActual, cambiosDe, fijar, borradorDesde, agruparPlantilla, euros, colorHab, mensajeError } from '../core/pes/vestuario.js';
 
 const $ = (id) => document.getElementById(id);
 const st = { yo: null, clubes: [], club: null, jugadores: [], pendientes: new Map(), rechazados: new Map(), urls: new Map(), sel: null, borrador: {}, guardando: false };

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { premiosEdicion } from '../src/js/core/premios.js';
+import { premiosEdicion } from '../src/js/core/competicion/premios.js';
 
 const ed = { fechas: [
   { n: 1, partidos: [{ l: 'Ana', v: 'Beto', gl: 1, gv: 0 }, { l: 'Caro', v: 'Dani', gl: 2, gv: 2 }, { l: 'Eli', v: 'Fede', gl: 3, gv: 0 }] },
@@ -49,7 +49,7 @@ test('premios: vienen ordenados del más llamativo al menos', () => {
   assert.deepEqual(pesos, [...pesos].sort((a, b) => b - a));
 });
 
-import { tamanosMuro, CELDAS } from '../src/js/core/premios.js';
+import { tamanosMuro, CELDAS } from '../src/js/core/competicion/premios.js';
 test('muro: cada cantidad de premios llena filas completas de 4 (sin huecos)', () => {
   for (let n = 1; n <= 20; n++) {
     const t = tamanosMuro(n);
@@ -59,7 +59,7 @@ test('muro: cada cantidad de premios llena filas completas de 4 (sin huecos)', (
   assert.equal(tamanosMuro(8)[0], 'g');           // el más importante va grande
 });
 
-import { historialJugador, puestosPorFecha } from '../src/js/core/premios.js';
+import { historialJugador, puestosPorFecha } from '../src/js/core/competicion/premios.js';
 test('gráficos: historial y puestos de un jugador', () => {
   const h = historialJugador(ed, 'Ana');
   assert.deepEqual(h.map((x) => x.res), ['G', 'G', 'G']);           // la fecha 4 sin marcador no cuenta

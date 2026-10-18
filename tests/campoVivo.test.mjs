@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado, SIN_CAMPO_MS } from '../src/js/core/campoVivo.js';
+import { normalizarCampo, etiquetaFase, textoPosesion, resumenTanda, faltaCampo, pasoInterpolado, SIN_CAMPO_MS } from '../src/js/core/competicion/campoVivo.js';
 
 const base = { v: 1, j: [[0, 0, 0], [10.5, -3, 1], [-52, 35, 2]], b: [1, 2, 0.4], equipos: true, posesion: [56, 44] };
 
@@ -53,7 +53,7 @@ test('campoVivo: aviso de campo ausente y interpolación', () => {
 });
 
 test('campoVivo: colores de camiseta', async () => {
-  const { colorEquipo } = await import('../src/js/core/campoVivo.js');
+  const { colorEquipo } = await import('../src/js/core/competicion/campoVivo.js');
   const n = normalizarCampo({ j: [], c: ['#a50044', '#DC052D'] });
   assert.deepEqual(n.colores, ['#a50044', '#DC052D']);
   assert.equal(normalizarCampo({ j: [], c: ['rojo', '#dc052d'] }).colores, null);
@@ -67,7 +67,7 @@ test('campoVivo: colores de camiseta', async () => {
 });
 
 test('campoVivo: poseedor del balón, hora de lectura y suavizado', async () => {
-  const { tauSegunIntervalo } = await import('../src/js/core/campoVivo.js');
+  const { tauSegunIntervalo } = await import('../src/js/core/competicion/campoVivo.js');
   const n = normalizarCampo({ j: [[0, 0, 0], [1, 1, 1]], p: 1, ts: 1_790_000_000_000 });
   assert.equal(n.poseedor, 1);
   assert.equal(n.ts, 1_790_000_000_000);
@@ -82,7 +82,7 @@ test('campoVivo: poseedor del balón, hora de lectura y suavizado', async () => 
 });
 
 test('campoVivo: estadísticas derivadas', async () => {
-  const { normalizarEst, FILAS_EST } = await import('../src/js/core/campoVivo.js');
+  const { normalizarEst, FILAS_EST } = await import('../src/js/core/competicion/campoVivo.js');
   const n = normalizarCampo({ j: [], est: { pos: [58.3, 41.7], pas: [10, 8], tir: [3, 1], raro: [1, 1], cor: [1] } });
   assert.deepEqual(n.est, { pos: [58.3, 41.7], pas: [10, 8], tir: [3, 1] });   // lo que no cuadra se descarta
   assert.equal(normalizarCampo({ j: [] }).est, null);

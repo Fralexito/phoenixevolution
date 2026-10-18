@@ -42,7 +42,7 @@ Limitación conocida: la vigilancia usa «24 horas corridas», no «día de Lima
 
 ## Archivos
 - `supabase/migrations/120_economia_fase_b_rachas_misiones_logros.sql` · `supabase/tests/120_fase_b_test.sql`
-- `src/js/core/ganarAscuas.js` (lógica pura) · `src/js/features/economia/ganar.js` (pantalla) · cables en `features/economia/api.js`, `features/economia/demo.js`, `pages/tienda.js`
+- `src/js/core/economia/ganarAscuas.js` (lógica pura) · `src/js/features/economia/ganar.js` (pantalla) · cables en `features/economia/api.js`, `features/economia/demo.js`, `pages/tienda.js`
 - Prueba: `tests/ganarAscuas.test.mjs`
 
 ## Pendientes / ideas

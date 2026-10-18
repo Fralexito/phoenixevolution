@@ -1,10 +1,10 @@
 // Pinta la zona de usuario de la cabecera según la sesión (único lugar que lo hace).
-import { onSession, can, tieneRolStaff, staffVisible_, setStaffVisible } from '../core/session.js';
-import { ROL_INFO, normalizarRol, esStaff } from '../core/roles.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
-import { avatarHTML } from '../core/avatar.js';
-import { href } from '../core/config.js';
+import { onSession, can, tieneRolStaff, staffVisible_, setStaffVisible } from '../core/sistema/session.js';
+import { ROL_INFO, normalizarRol, esStaff } from '../core/sistema/roles.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { href } from '../core/sistema/config.js';
 import { openAuthModal, logout } from './auth.js';
 import { openProfileModal } from './profile.js';
 import { initNotifications } from './notifications.js';

@@ -2,14 +2,14 @@
 // para compartir), tiene botón «Volver al diario», reacciones/encuesta/comentarios (features/noticias/social.js),
 // la tabla al costado y «Sigue leyendo». El staff ve Editar / Ocultar / Eliminar (mismas funciones de antes).
 import { EDICIONES } from '../../../data/ligaResultados.js';
-import { tablaEdicion } from '../../core/tabla.js';
-import { departamento, departamentoDe } from '../../core/departamentos.js';
-import { escapeHTML as esc, safeImg } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { confirmar } from '../../core/dialogo.js';
-import { can } from '../../core/session.js';
+import { tablaEdicion } from '../../core/competicion/tabla.js';
+import { departamento, departamentoDe } from '../../core/portada/departamentos.js';
+import { escapeHTML as esc, safeImg } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar } from '../../core/sistema/dialogo.js';
+import { can } from '../../core/sistema/session.js';
 import { FX } from '../../../data/experimento.js';
-import { href } from '../../core/config.js';
+import { href } from '../../core/sistema/config.js';
 import { montarSocial } from './social.js';
 import { etiqueta } from './zonaSeria.js';
 

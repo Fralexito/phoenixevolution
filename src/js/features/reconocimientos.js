@@ -1,11 +1,11 @@
 // Franja de reconocimientos de Jugadores: Jugador de la fecha, Más en forma, Revelación (datos reales de la liga) y
 // «Jugador de la semana» (voto de la comunidad: un voto por usuario y semana, guardado en `votos_semana`).
-import { supabase } from '../core/supabase.js';
-import { getState, onSession } from '../core/session.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { toast } from '../core/toast.js';
-import { href } from '../core/config.js';
-import { reconocimientos, semanaActual } from '../core/destacados.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { getState, onSession } from '../core/sistema/session.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
+import { href } from '../core/sistema/config.js';
+import { reconocimientos, semanaActual } from '../core/jugadores/destacados.js';
 import { FX } from '../../data/experimento.js';
 
 const TARJETAS = [

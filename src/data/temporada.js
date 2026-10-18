@@ -1,4 +1,4 @@
-// SISTEMA DE DIVISIONES (BETA). Aquí se configura todo; la lógica vive en js/core/temporada.js y la página en pages/temporada.astro.
+// SISTEMA DE DIVISIONES (BETA). Aquí se configura todo; la lógica vive en js/core/competicion/temporada.js y la página en pages/temporada.astro.
 // Para ACTIVAR la Segunda División de verdad:
 //   1) agrega la liga a data/ligas.js con id 'ascenso' (Central y Liga la dibujan solas),
 //   2) agrega su edición en data/ligaResultados.js → EDICIONES.ascenso (mismo formato que galaxy),

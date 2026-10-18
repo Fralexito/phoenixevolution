@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { estadoLiga, selloPartido, rangoElo, progresoRango, RANGOS, factorGoles, calcularElo, clubesMasUsados, indiceLiga, buscarEnLiga } from '../src/js/core/pulso.js';
+import { estadoLiga, selloPartido, rangoElo, progresoRango, RANGOS, factorGoles, calcularElo, clubesMasUsados, indiceLiga, buscarEnLiga } from '../src/js/core/competicion/pulso.js';
 import { EDICIONES } from '../src/data/ligaResultados.js';
 import { LIGAS } from '../src/data/ligas.js';
 
@@ -97,7 +97,7 @@ test('pulso: rangos por ELO', () => {
   assert.equal(progresoRango(900, 0), null);
 });
 
-import { aplanarPartidos, filtrarPartidos, paginar, leerFiltros } from '../src/js/core/partidosGlobal.js';
+import { aplanarPartidos, filtrarPartidos, paginar, leerFiltros } from '../src/js/core/competicion/partidosGlobal.js';
 test('historial global: aplanar, filtrar, paginar', () => {
   const lista = aplanarPartidos(LIGAS, EDICIONES);
   assert.ok(lista.length > 60);
@@ -118,7 +118,7 @@ test('historial global: aplanar, filtrar, paginar', () => {
   assert.deepEqual(esp.map((m) => [m.sello, m.jugado]), [['aplazado', false], ['wo', true]]);
 });
 
-import { validarGol, ordenarGoles, marcadorDeGoles, revisarMarcador, topGoleadores, topAsistentes } from '../src/js/core/golesPartido.js';
+import { validarGol, ordenarGoles, marcadorDeGoles, revisarMarcador, topGoleadores, topAsistentes } from '../src/js/core/competicion/golesPartido.js';
 test('goles del partido: validar, ordenar, revisar y rankings', () => {
   const ok = validarGol({ lado: 'l', goleador: '  Hugo  ', minuto: '23', asistente: ' Fralex ', tipo: 'gol' });
   assert.deepEqual(ok, { ok: true, errores: [], gol: { lado: 'l', goleador: 'Hugo', minuto: 23, asistente: 'Fralex', tipo: 'gol' } });
@@ -138,7 +138,7 @@ test('goles del partido: validar, ordenar, revisar y rankings', () => {
   assert.deepEqual(topAsistentes(gs), [{ nombre: 'C', total: 1 }]); assert.deepEqual(topGoleadores(null), []);
 });
 
-import { normalizarElo, normalizarEloDe } from '../src/js/core/rankingComunidad.js';
+import { normalizarElo, normalizarEloDe } from '../src/js/core/competicion/rankingComunidad.js';
 test('ELO de amistosos: normalizar filas del servidor', () => {
   const l = normalizarElo([{ pos: 1, usuario_id: 'u1', username: 'a', nombre: 'Ana', avatar_url: null, elo: 1180.4, jugados: 6, delta: 12 }, { usuario_id: 'u2', username: 'b', nombre: '<b>', elo: 900, jugados: 2, delta: -9 }, null, { elo: 1000 }]);
   assert.equal(l.length, 2); assert.equal(l[0].rango.id, 'diamante'); assert.equal(l[0].elo, 1180); assert.equal(l[1].rango.id, 'bronce'); assert.equal(l[1].delta, -9); assert.ok(!/[<>]/.test(l[1].nombre));
@@ -147,7 +147,7 @@ test('ELO de amistosos: normalizar filas del servidor', () => {
   assert.equal(normalizarEloDe({ visible: false }), null); assert.equal(normalizarEloDe({ visible: true, elo: null, jugados: 0 }), null); assert.equal(normalizarEloDe(null), null); assert.equal(normalizarEloDe({ visible: true, elo: 'x' }), null);
 });
 
-import { ordenarAmigos, resumenAmigos, unirPerfiles } from '../src/js/core/barraLateral.js';
+import { ordenarAmigos, resumenAmigos, unirPerfiles } from '../src/js/core/sistema/barraLateral.js';
 test('barra lateral: ordenar, recortar y unir amigos', () => {
   const a = [{ id: '3', nombre: 'Óscar' }, { id: '1', nombre: 'beto' }, { id: '2', nombre: 'Ana' }, { id: '4', nombre: 'Zeta' }, { nombre: 'sin id' }];
   assert.deepEqual(ordenarAmigos(a).map((x) => x.id), ['2', '1', '3', '4']);

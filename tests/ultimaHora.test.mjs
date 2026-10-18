@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { limpiarLinea, validarNoticia, estadoNoticia, venceEn, contarVigentes, mensajeError, MAX_TEXTO } from '../src/js/core/ultimaHora.js';
+import { limpiarLinea, validarNoticia, estadoNoticia, venceEn, contarVigentes, mensajeError, MAX_TEXTO } from '../src/js/core/portada/ultimaHora.js';
 
 test('limpiarLinea: una sola línea', () => { assert.equal(limpiarLinea('  hola \n\n mundo\t!'), 'hola mundo !'); });
 test('validarNoticia: acepta lo bueno y explica lo malo', () => {

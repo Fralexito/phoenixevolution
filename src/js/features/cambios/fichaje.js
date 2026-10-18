@@ -1,9 +1,9 @@
 // Tipo «fichaje» del formulario único (migración 125). Campos: jugador, equipo de origen, equipo de destino (+ ids de PES opcionales);
 // si el destino incluye Liga Máster, además el club de Liga Máster. Los nombres son lo que de verdad usa cada PC (cada uno puede tener otro parche).
-import { registrarTipo, validarFichaje, incluyeLm } from '../../core/cambiosOficiales.js';
-import { escapeHTML as esc } from '../../core/dom.js';
+import { registrarTipo, validarFichaje, incluyeLm } from '../../core/pes/cambiosOficiales.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
 import { buscarJugadores, clubesLm } from './api.js';
-import { buscarClubes, clubExacto, escudoImg, paisDe } from '../../core/clubesPes.js';
+import { buscarClubes, clubExacto, escudoImg, paisDe } from '../../core/pes/clubesPes.js';
 import { CLUBES_PES } from '../../../data/clubesPes.js';
 import { abrirSala } from './salaFichajes.js';
 import { cargarLm } from './datosSala.js';

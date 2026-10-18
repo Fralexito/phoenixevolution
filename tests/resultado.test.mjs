@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarMarcador, marcadorDesdeMiLado, veredicto, accionDeResultado, normalizarEstadisticas, vistaPendiente } from '../src/js/core/resultado.js';
+import { validarMarcador, marcadorDesdeMiLado, veredicto, accionDeResultado, normalizarEstadisticas, vistaPendiente } from '../src/js/core/competicion/resultado.js';
 
 test('marcador: solo enteros 0-30', () => {
   assert.deepEqual(validarMarcador('3', ' 1 '), { ok: true, a: 3, b: 1, error: '' });

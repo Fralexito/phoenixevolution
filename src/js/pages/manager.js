@@ -1,14 +1,14 @@
 // Modo Mánager (Liga Máster web). Lee tablas lm_* (lectura pública) y escribe SOLO por RPC (migración 079).
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, elegir, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc, safeUrl } from '../core/dom.js';
-import { haceCuanto } from '../core/notifs.js';
-import { href } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, elegir, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc, safeUrl } from '../core/sistema/dom.js';
+import { haceCuanto } from '../core/sistema/notifs.js';
+import { href } from '../core/sistema/config.js';
 import { montarFotos } from '../features/fotoFutbolista.js';
 import { abrirFichaJugador } from '../features/fichaJugadorModal.js';
-import { avatarHTML } from '../core/avatar.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
 import { FX } from '../../data/experimento.js';
 
 const $ = (id) => document.getElementById(id);

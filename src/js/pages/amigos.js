@@ -1,16 +1,16 @@
 // Página /amigos/: pestañas (Amigos · Solicitudes · Buscar · Seguidores · Siguiendo · Bloqueados · Privacidad · Avisos).
 // Esquema: pages → features/amigos/api (RPC) → core/red (lógica pura).
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { href } from '../core/config.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
 import { me, data, loadPerfiles } from '../features/duelos/data.js';
-import { supabase } from '../core/supabase.js';
-import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_OPCIONES } from '../core/red.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_OPCIONES } from '../core/comunidad/red.js';
 import * as api from '../features/amigos/api.js';
 import * as avisosApi from '../features/avisos/api.js';
-import { CATEGORIAS_AVISO, NOTA_SISTEMA, normalizarPreferencias } from '../core/avisos.js';
+import { CATEGORIAS_AVISO, NOTA_SISTEMA, normalizarPreferencias } from '../core/sistema/avisos.js';
 
 const $ = (id) => document.getElementById(id);
 // ?tab=avisos (o cualquier pestaña válida) abre directamente esa pestaña: lo usa el acceso directo de la campana.

@@ -3,9 +3,9 @@
 // mientras la persona desliza la página (en reposo todo va a 60 y no dice nada). Si 1 de cada 4 cuadros tarda más de 34 ms → ligero.
 // Qué hace «ligero»: cuenta como «Animaciones: reducidas» (apaga 3D, aparición al bajar, efectos) y el CSS quita el fondo borroso de los
 // paneles (styles/modoLigero.css). Se guarda 14 días. «Ajustes → Animaciones → Siempre activas» lo anula. No se activa solo si ya elegiste «Reducidas».
-import { CLAVE_LIGERO, senalDebil, vaLento, leerDecision, guardarDecision, MIN_CUADROS } from '../core/rendimiento.js';
+import { CLAVE_LIGERO, senalDebil, vaLento, leerDecision, guardarDecision, MIN_CUADROS } from '../core/sistema/rendimiento.js';
 import { leerAjustes, aplicarAjustes, ligeroGuardado } from './ajustes.js';
-import { toast } from '../core/toast.js';
+import { toast } from '../core/sistema/toast.js';
 
 const almacen = () => { try { return window.localStorage; } catch { return null; } };
 

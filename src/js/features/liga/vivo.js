@@ -1,10 +1,10 @@
 // Marcador EN VIVO de la liga (ronda 224). Lee la tabla liga_vivo (la escribe Phoenix Link por la Edge Function
 // «liga») y escucha cada cambio por Realtime: sin consultas repetidas y sin coste por visitante.
 // Se monta en cada <section data-liga-vivo> (components/MarcadorVivo.astro). Si no hay partidos, la sección no se ve.
-// Lógica pura y pruebas: core/ligaVivo.js · tests/ligaVivo.test.mjs.
-import { supabase } from '../../core/supabase.js';
-import { escapeHTML } from '../../core/dom.js';
-import { aplicarCambioVivo, limpiarVivos, normalizarVivo, ordenarVivos, huboGol, textoGol, textoEstado } from '../../core/ligaVivo.js';
+// Lógica pura y pruebas: core/competicion/ligaVivo.js · tests/ligaVivo.test.mjs.
+import { supabase } from '../../core/sistema/supabase.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { aplicarCambioVivo, limpiarVivos, normalizarVivo, ordenarVivos, huboGol, textoGol, textoEstado } from '../../core/competicion/ligaVivo.js';
 import { rafaga, salto } from '../dopamina.js';
 import { crearTablero } from './campoVivo.js';
 

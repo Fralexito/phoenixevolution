@@ -5,13 +5,13 @@
 //   · Filtros (Todas / No leídas / Duelos / Social / Otros) con su contador; grupos Hoy / Ayer / Esta semana / Anteriores; «hace 5 min».
 //   · Por aviso: marcar leída o no leída, y descartar (botón, tecla Supr o deslizando en el móvil) con «Deshacer» durante 5 s.
 //   · «Ver más» (paginación), teclado (flechas, Esc), sincroniza entre pestañas y acceso directo a las preferencias de avisos.
-// Lógica pura en core/notifs.js. Movimiento: solo transform/opacity, ≤ 260 ms salvo el balanceo; prefers-reduced-motion lo apaga.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast, beep } from '../core/toast.js';
-import { href } from '../core/config.js';
-import { enlaceAvisoSeguro } from '../core/avisos.js';
-import { categoriaDe, FILTROS, filtrar, conteoPorFiltro, agruparPorTiempo, TITULO_GRUPO, haceCuanto, esUrgente, alcanzaDescartar } from '../core/notifs.js';
+// Lógica pura en core/sistema/notifs.js. Movimiento: solo transform/opacity, ≤ 260 ms salvo el balanceo; prefers-reduced-motion lo apaga.
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast, beep } from '../core/sistema/toast.js';
+import { href } from '../core/sistema/config.js';
+import { enlaceAvisoSeguro } from '../core/sistema/avisos.js';
+import { categoriaDe, FILTROS, filtrar, conteoPorFiltro, agruparPorTiempo, TITULO_GRUPO, haceCuanto, esUrgente, alcanzaDescartar } from '../core/sistema/notifs.js';
 import { regionAhora } from './ajustes.js';
 import { isRadarOn } from './radar.js';
 import { showHolo } from './holo.js';

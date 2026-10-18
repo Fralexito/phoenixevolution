@@ -1,10 +1,10 @@
 // Página /guardados/: mis marcadores (publicaciones y clips), del más reciente al más antiguo.
 // Esquema: pages/guardados → features/social/{api, guardados} + features/muro/tarjeta → core/social (lógica pura).
-import { onSession, can } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { avatarHTML } from '../core/avatar.js';
-import { tiempoRelativo } from '../core/muro.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { tiempoRelativo } from '../core/comunidad/muro.js';
 import * as api from '../features/social/api.js';
 import { botonGuardarHTML, alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';

@@ -1,11 +1,11 @@
 // Verificación en dos pasos (MFA con app de códigos) para el administrador del dinero. Esquema: features/economia/recargas → features/economia/mfa → Supabase Auth.
 // La base (admin_seguro, migración 112) exige nivel aal2 cuando admin_exige_mfa='true'. Aquí se registra el factor, se confirma el código y se sube la sesión a aal2.
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { openModal, closeModal } from '../../core/modal.js';
-import { supabase } from '../../core/supabase.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { supabase } from '../../core/sistema/supabase.js';
 import { esDemo } from './api.js';
-import { resumenMfa } from '../../core/economia.js';
+import { resumenMfa } from '../../core/economia/economia.js';
 
 let C = null; // contexto de la tienda: { S, cargar }
 export const iniciar = (ctx) => { C = ctx; };

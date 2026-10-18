@@ -9,7 +9,7 @@ Estado: **la web ya lo cumple** (migración 121, Fase C de la economía). **Link
 - Conclusión: Link ya sabe reproducir **un `.wav` por nombre de archivo**, con enfriamiento (cooldown). El contrato se apoya en eso: nada de formatos nuevos.
 
 ## 2. La clave de sonido
-Una clave `snd_*` identifica un sonido en TODO el sistema. Es la misma en la base de datos (`tienda_items.estilo.sonido`), en el catálogo de la web (`src/js/core/sonidosChat.js`) y será el nombre del archivo en Link (`<clave>.wav`). **Nunca se renombra ni se reutiliza.**
+Una clave `snd_*` identifica un sonido en TODO el sistema. Es la misma en la base de datos (`tienda_items.estilo.sonido`), en el catálogo de la web (`src/js/core/comunidad/sonidosChat.js`) y será el nombre del archivo en Link (`<clave>.wav`). **Nunca se renombra ni se reutiliza.**
 
 | Clave | Nombre | Rareza (tienda) | Gemas | Duración | Cooldown | Volumen | Archivo |
 |---|---|---|---|---|---|---|---|
@@ -18,7 +18,7 @@ Una clave `snd_*` identifica un sonido en TODO el sistema. Es la misma en la bas
 | `snd_moneda_dorada` | Moneda dorada | raro | 45 | 490 ms | 3 s | 0,7 | `snd_moneda_dorada.wav` |
 | `snd_gol_estadio` | Gol de estadio | épico | 120 | 1100 ms | 6 s | 0,6 | `snd_gol_estadio.wav` |
 
-Fuente de verdad de duración/cooldown/volumen: `SONIDOS_CHAT` en `src/js/core/sonidosChat.js` (la tabla es una copia; si difieren, manda el código).
+Fuente de verdad de duración/cooldown/volumen: `SONIDOS_CHAT` en `src/js/core/comunidad/sonidosChat.js` (la tabla es una copia; si difieren, manda el código).
 
 ## 3. Metadatos (forma JSON que Link recibiría)
 ```json
@@ -47,7 +47,7 @@ PCM sin comprimir, 16 bits, mono, 44 100 Hz, ≤ 1,5 s, pico máximo −3 dBFS (
 Cada sonido es una **partitura** (lista de tonos: tipo, frecuencia, duración, volumen) que la web sintetiza con WebAudio al pulsar «Escuchar» (`src/js/features/sonidosChat.js`). Ventajas: cero descargas y cero derechos de autor. Esa misma partitura es la referencia para generar los `.wav` de Link idénticos (un script de exportación a `.wav` queda como tarea futura).
 
 ## 8. Cómo añadir un sonido nuevo (receta)
-1. Añadir la clave y su partitura en `SONIDOS_CHAT` (`src/js/core/sonidosChat.js`).
+1. Añadir la clave y su partitura en `SONIDOS_CHAT` (`src/js/core/comunidad/sonidosChat.js`).
 2. Nueva migración: añadir la clave a la lista de `private.estilo_valido` (caso `sonido`) e insertar el objeto en `tienda_items` con su rareza y precio (`docs/economia/DISENO-ECONOMIA-COMPLETA.md` §5).
 3. Ejecutar `node --test tests/*.test.mjs`: la prueba «la lista blanca de la web coincide con la de la migración 121» avisa si algo quedó a medias (si la nueva migración redefine la función, actualizar esa prueba para leer la última).
 4. (Cuando Link los use) generar `<clave>.wav` y subir `version` del catálogo.

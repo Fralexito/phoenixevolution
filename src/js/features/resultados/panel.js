@@ -1,8 +1,8 @@
 // Panel «Marcadores» de /mis-partidos/: duelos terminados cuyo marcador aún no está confirmado por los dos líderes.
 // Esquema: pages/misPartidos → este panel → features/resultados/api → core/resultado (puro). Sin dependencias de Duelos: recibe funciones.
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { validarMarcador, marcadorDesdeMiLado, vistaPendiente } from '../../core/resultado.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { validarMarcador, marcadorDesdeMiLado, vistaPendiente } from '../../core/competicion/resultado.js';
 import * as api from './api.js';
 
 /**

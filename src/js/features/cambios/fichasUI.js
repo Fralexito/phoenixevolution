@@ -1,11 +1,11 @@
 // Pantalla de edición de «Estadísticas» e «Información» del jugador (migración 126): pestañas por grupo, barras que se arrastran,
 // puntos de forma, un campo de fútbol para las posiciones y un resumen en vivo («antes → después»). Solo DOM; los datos y reglas
-// están en core/fichasCampos.js y la conexión con la base en features/cambios/fichas.js. El valor de cada campo vive en un elemento
+// están en core/pes/fichasCampos.js y la conexión con la base en features/cambios/fichas.js. El valor de cada campo vive en un elemento
 // con data-clave (input numérico u oculto): fichas.js los lee al mandar el cambio, igual que antes. Vacío = «no cambiar».
-import { escapeHTML as esc } from '../../core/dom.js';
-import { GRUPOS, NIVEL_POSICION, POSICIONES, POS_CAMPO, mostrarValor, nivelStat, siguienteNivelPos, deltaTexto } from '../../core/fichasCampos.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { GRUPOS, NIVEL_POSICION, POSICIONES, POS_CAMPO, mostrarValor, nivelStat, siguienteNivelPos, deltaTexto } from '../../core/pes/fichasCampos.js';
 import { segmentado, caraJugador } from './compositor.js';
-import { incluyeBase, incluyeLm } from '../../core/cambiosOficiales.js';
+import { incluyeBase, incluyeLm } from '../../core/pes/cambiosOficiales.js';
 
 const hay = (vig, c) => Object.prototype.hasOwnProperty.call(vig, c.clave);
 const ahoraDe = (vig, c) => (hay(vig, c) ? vig[c.clave] : null);

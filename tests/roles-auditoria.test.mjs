@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ROLES, ROL_INFO, normalizarRol, etiquetaRol, puede, puedeSancionar, esStaff, PERMISOS } from '../src/js/core/roles.js';
+import { ROLES, ROL_INFO, normalizarRol, etiquetaRol, puede, puedeSancionar, esStaff, PERMISOS } from '../src/js/core/sistema/roles.js';
 import { entradaHTML, lineaHTML, resumenHTML, filtrosHTML, equipoHTML, resultadosHTML, modalRolHTML, rolBadge } from '../src/js/features/auditoria/vista.js';
-import { describirEntrada, normalizarEntrada, resumenCambios, formatearValor, frase, agruparPorDia, normalizarResumen, desdeRango, FILTRO_SECCIONES, FILTRO_ACCIONES, TABLAS } from '../src/js/core/auditoria.js';
+import { describirEntrada, normalizarEntrada, resumenCambios, formatearValor, frase, agruparPorDia, normalizarResumen, desdeRango, FILTRO_SECCIONES, FILTRO_ACCIONES, TABLAS } from '../src/js/core/sistema/auditoria.js';
 
 // ───────── ROLES ─────────
 test('roles: valores antiguos o raros nunca dan poder de más', () => {

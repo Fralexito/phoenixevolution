@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ejesFifa, mediaEjes, extremos, geometria, nivel, aPuntos } from '../src/js/core/radarFifa.js';
+import { ejesFifa, mediaEjes, extremos, geometria, nivel, aPuntos } from '../src/js/core/jugadores/radarFifa.js';
 const p = { atq: 90, fin: 90, pot: 90, cre: 80, pas: 80, efe: 80, reg: 70, cor: 70, def: 60, pos: 60, ant: 60, pre: 50, rit: 70, men: 99 };
 test('nivel por tramos', () => { assert.equal(nivel(95), 'elite'); assert.equal(nivel(80), 'alto'); assert.equal(nivel(70), 'medio'); assert.equal(nivel(69), 'bajo'); });
 test('6 ejes con promedio de sus stats', () => {

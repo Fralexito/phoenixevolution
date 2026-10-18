@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as E from '../src/js/core/economia.js';
+import * as E from '../src/js/core/economia/economia.js';
 
 test('estiloSeguro descarta todo lo que no sea color/texto/icono válido', () => {
   assert.deepEqual(E.estiloSeguro({ color: 'red', color2: '#00ff88', texto: '<b>', icono: 'fa-x"onload', css: 'x' }), { color: null, color2: '#00ff88', texto: null, icono: null });

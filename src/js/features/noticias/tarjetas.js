@@ -1,8 +1,8 @@
 // Dibujo de las tarjetas y del lector de Noticias (solo construye texto HTML: sin DOM, sin red → probable con `npm test`).
-// Cada plantilla de core/noticiasPlantillas.js tiene aquí su dibujo; los estilos (CSS) están en styles/components.css (.nt-*, .nl-*).
-import { escapeHTML as esc, safeImg } from '../../core/dom.js';
+// Cada plantilla de core/portada/noticiasPlantillas.js tiene aquí su dibujo; los estilos (CSS) están en styles/components.css (.nt-*, .nl-*).
+import { escapeHTML as esc, safeImg } from '../../core/sistema/dom.js';
 import { FX } from '../../../data/experimento.js';
-import { ACENTOS, plantillaDe, LECTURAS } from '../../core/noticiasPlantillas.js';
+import { ACENTOS, plantillaDe, LECTURAS } from '../../core/portada/noticiasPlantillas.js';
 
 /** @typedef {{cuando:(n:object)=>string, ligaNombre:(id:string)=>string, borrador:(n:object)=>string}} Ctx */
 const MES = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];

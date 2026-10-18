@@ -1,10 +1,10 @@
 // Visores a pantalla completa del muro: HISTORIAS (barras de progreso, toque izq./der., mantener = pausa) y CLIPS (estilo reels: desliza arriba/abajo).
-// Solo DOM: recibe datos ya normalizados (core/historias.js). Todo texto pasa por escapeHTML; los enlaces ya fueron validados por analizarVideo.
+// Solo DOM: recibe datos ya normalizados (core/comunidad/historias.js). Todo texto pasa por escapeHTML; los enlaces ya fueron validados por analizarVideo.
 // Privacidad: nada de YouTube se carga hasta que la historia/clip activo lo necesita (y con el dominio «nocookie»).
-import { confirmar, pedirTexto } from '../../core/dialogo.js';
-import { escapeHTML, safeImg } from '../../core/dom.js';
-import { HISTORIA_MS, caducaEn } from '../../core/historias.js';
-import { tiempoRelativo, textoAHTML, PROVEEDOR_ETIQUETA } from '../../core/muro.js';
+import { confirmar, pedirTexto } from '../../core/sistema/dialogo.js';
+import { escapeHTML, safeImg } from '../../core/sistema/dom.js';
+import { HISTORIA_MS, caducaEn } from '../../core/comunidad/historias.js';
+import { tiempoRelativo, textoAHTML, PROVEEDOR_ETIQUETA } from '../../core/comunidad/muro.js';
 
 let cierreActual = null;   // solo un visor abierto a la vez
 

@@ -1,8 +1,8 @@
 // Economía: llama a las RPC (reglas en la BD, migraciones 049-051). Esquema: pages/tienda → features/economia/api → core/economia (puro).
-import { supabase } from '../../core/supabase.js';
-import { normalizarPase } from '../../core/phoenix-pass.js';
-import { normalizarEconomia, normalizarLista, normalizarMovimiento, normalizarRegla, normalizarPaquetes, normalizarEquipamiento, normalizarEfectosCarta, normalizarMetodos, normalizarPagoManual } from '../../core/economia.js';
-import { normalizarGanar } from '../../core/ganarAscuas.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarPase } from '../../core/economia/phoenix-pass.js';
+import { normalizarEconomia, normalizarLista, normalizarMovimiento, normalizarRegla, normalizarPaquetes, normalizarEquipamiento, normalizarEfectosCarta, normalizarMetodos, normalizarPagoManual } from '../../core/economia/economia.js';
+import { normalizarGanar } from '../../core/economia/ganarAscuas.js';
 
 // Modo demostración (SOLO en desarrollo: en la web publicada este código no existe). Se activa con ?demo en la dirección y usa datos de mentira.
 const DEMO = import.meta.env.DEV && typeof location !== 'undefined' && new URLSearchParams(location.search).has('demo');

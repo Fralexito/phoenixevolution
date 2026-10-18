@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DESTINOS, incluyeBase, incluyeLm, registrarTipo, tiposDisponibles, validarFichaje, resumenFichaje, resumenResultados, frescura, compararVersion, versionMasNueva, lineaEvento, mensajeError } from '../src/js/core/cambiosOficiales.js';
+import { DESTINOS, incluyeBase, incluyeLm, registrarTipo, tiposDisponibles, validarFichaje, resumenFichaje, resumenResultados, frescura, compararVersion, versionMasNueva, lineaEvento, mensajeError } from '../src/js/core/pes/cambiosOficiales.js';
 
 test('tres casillas: Base normal, Liga Máster, Las dos', () => {
   assert.deepEqual(DESTINOS.map((d) => d.id), ['base', 'lm', 'ambos']);

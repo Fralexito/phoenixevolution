@@ -1,13 +1,13 @@
 // Chat flotante · VENTANITAS abajo a la derecha (como una red social): abiertas (tarjeta) o minimizadas (burbuja con avatar).
-// Cuántas caben lo decide core/chatFlotante.js según el ancho libre; en móvil, una sola a pantalla completa.
+// Cuántas caben lo decide core/comunidad/chatFlotante.js según el ancho libre; en móvil, una sola a pantalla completa.
 // Solo pinta y reacciona; leer, enviar y el tiempo real están en datos.js.
-import { escapeHTML } from '../../core/dom.js';
-import { href } from '../../core/config.js';
-import { avatarHTML } from '../../core/avatar.js';
-import { toast } from '../../core/toast.js';
-import { confirmar } from '../../core/dialogo.js';
-import { agruparMensajes, etiquetaDia, hoyClave, tituloConv, MAX_TEXTO } from '../../core/chat.js';
-import { ventanasQueCaben, insignia } from '../../core/chatFlotante.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
+import { avatarHTML } from '../../core/sistema/avatar.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar } from '../../core/sistema/dialogo.js';
+import { agruparMensajes, etiquetaDia, hoyClave, tituloConv, MAX_TEXTO } from '../../core/comunidad/chat.js';
+import { ventanasQueCaben, insignia } from '../../core/comunidad/chatFlotante.js';
 import { regionAhora } from '../ajustes.js';
 import { S, alCambiar, convDe, perfil, nombre, enviar, cerrar, minimizar, desplegar, leido, cargarMensajes, descartar, setCaben } from './datos.js';
 

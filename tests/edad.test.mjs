@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { edadCumplida, categoriaDeEdad, validarNacimiento, debePedirFecha } from '../src/js/core/edad.js';
+import { edadCumplida, categoriaDeEdad, validarNacimiento, debePedirFecha } from '../src/js/core/sistema/edad.js';
 
 const hoy = new Date(2026, 9, 5);   // 5 oct 2026 (hora local)
 test('edad cumplida: bordes de cumpleaños', () => {

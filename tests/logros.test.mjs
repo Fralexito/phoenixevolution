@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { porcentaje, iconoSeguro, nivelDe, normalizarMisLogros, normalizarLogrosDe, NIVELES } from '../src/js/core/logros.js';
-import { enlaceAvisoSeguro } from '../src/js/core/avisos.js';
+import { porcentaje, iconoSeguro, nivelDe, normalizarMisLogros, normalizarLogrosDe, NIVELES } from '../src/js/core/jugadores/logros.js';
+import { enlaceAvisoSeguro } from '../src/js/core/sistema/avisos.js';
 
 test('porcentaje: acotado y tolerante', () => {
   assert.equal(porcentaje(5, 10), 50); assert.equal(porcentaje(20, 10), 100); assert.equal(porcentaje(-3, 10), 0);

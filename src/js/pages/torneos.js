@@ -1,9 +1,9 @@
 // Página «Torneos»: lista de torneos propios + ficha de creación. Datos por features/torneos/api.js (migración 097).
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { nombreEpico } from '../core/diversion.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { nombreEpico } from '../core/competicion/diversion.js';
 import { DESCRIPCIONES_BASE } from '../../data/dinamicas.js';
 import * as api from '../features/torneos/api.js';
 import { FORMATOS_FICHA, formatoFicha, guiaFormatoHTML, selectorDinamicasHTML, leyendaHTML, ESTADO_TXT, TONO } from '../features/torneos/guia.js';

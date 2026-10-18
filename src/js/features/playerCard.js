@@ -1,10 +1,10 @@
 // Tarjeta de jugador estilo FUT, compartida por Central y Base de Datos.
-import { escapeHTML, safeImg, stat, statColor } from '../core/dom.js';
+import { escapeHTML, safeImg, stat, statColor } from '../core/sistema/dom.js';
 import { posInfo } from '../../data/posiciones.js';
-import { ratioDe } from '../core/crop.js';
-import { fisicoPartes } from '../core/fisico.js';
-import { nivelDe } from '../core/destacados.js';
-import { escudoHTML, escudoDe } from '../core/escudos.js';
+import { ratioDe } from '../core/sistema/crop.js';
+import { fisicoPartes } from '../core/sistema/fisico.js';
+import { nivelDe } from '../core/jugadores/destacados.js';
+import { escudoHTML, escudoDe } from '../core/sistema/escudos.js';
 import { FX } from '../../data/experimento.js';
 
 export const STAT_KEYS = ['atq', 'fin', 'pot', 'efe', 'reg', 'cor', 'cre', 'def', 'pre', 'pos', 'ant', 'pas', 'rit', 'men'];

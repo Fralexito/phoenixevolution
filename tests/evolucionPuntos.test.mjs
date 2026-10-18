@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evolucionPuntos } from '../src/js/core/ligaStats.js';
+import { evolucionPuntos } from '../src/js/core/competicion/ligaStats.js';
 
 const F = [
   { n: 2, partidos: [{ l: 'A', v: 'C', gl: 1, gv: 1 }, { l: 'B', v: 'D', gl: null, gv: null }] },
@@ -16,7 +16,7 @@ test('acumula por fecha, ordena por n y salta fechas sin partidos jugados', () =
 });
 test('sin datos no rompe', () => { assert.deepEqual(evolucionPuntos(null, ['A']), { x: [], series: [{ nombre: 'A', datos: [] }] }); });
 
-import { golesPorFecha } from '../src/js/core/ligaStats.js';
+import { golesPorFecha } from '../src/js/core/competicion/ligaStats.js';
 test('golesPorFecha suma goles de partidos jugados', () => {
   const r = golesPorFecha([{ n: 2, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 1 }] }, { n: 1, partidos: [{ l: 'A', v: 'B', gl: 3, gv: 0 }, { l: 'B', v: 'A', gl: null, gv: null }] }, { n: 3, partidos: [{ l: 'A', v: 'B', gl: null, gv: null }] }]);
   assert.deepEqual(r, { x: [1, 2], datos: [3, 2] });

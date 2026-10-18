@@ -1,9 +1,9 @@
 // Pinta las tarjetas de reto. Solo devuelve HTML (no toca la red); todo dato de la BD pasa por escapeHTML.
-import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/dom.js';
+import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/sistema/dom.js';
 import { regionAhora } from '../ajustes.js';
-import { confirmPhase } from '../../core/schedule.js';
-import { CONFIRM_OPEN_MIN, CONFIRM_CLOSE_MIN } from '../../core/rules.js';
-import { seats } from '../../core/teams.js';
+import { confirmPhase } from '../../core/competicion/schedule.js';
+import { CONFIRM_OPEN_MIN, CONFIRM_CLOSE_MIN } from '../../core/sistema/rules.js';
+import { seats } from '../../core/competicion/teams.js';
 import { data, nm, partsOf, myPart, isLeader, isActive, myProfile } from './data.js';
 
 const fmt = (d) => new Date(d).toLocaleString('es', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });

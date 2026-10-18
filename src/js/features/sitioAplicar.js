@@ -1,7 +1,7 @@
 // Aplica en TODAS las páginas lo que el admin decidió en el Panel (/panel/). Se carga desde boot.js.
 // Guarda la última config en localStorage para pintar al instante la próxima vez y luego la pone al día desde Supabase.
-import { supabase } from '../core/supabase.js';
-import { normalizar, hrefValido } from '../core/sitio.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { normalizar, hrefValido } from '../core/sistema/sitio.js';
 
 const LLAVE = 'pes-sitio-v1';
 const url = (h) => (/^https:/i.test(h) ? h : `${import.meta.env.BASE_URL}${h.replace(/^\//, '')}`);

@@ -3,13 +3,13 @@
 // pages/noticias.js y se ve con ?clasica=1 (ahí está «Acomodar» y el catálogo de diseños para el staff).
 import { NOTICIAS } from '../../data/noticias.js';
 import { LIGAS } from '../../data/ligas.js';
-import { supabase } from '../core/supabase.js';
-import { toast } from '../core/toast.js';
-import { onSession, can } from '../core/session.js';
-import { normalizar, ordenar, fechaRelativa, ligasPresentes } from '../core/noticias.js';
-import { armarPortada } from '../core/diario.js';
-import { departamento } from '../core/departamentos.js';
-import { escapeHTML as esc } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { toast } from '../core/sistema/toast.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { normalizar, ordenar, fechaRelativa, ligasPresentes } from '../core/portada/noticias.js';
+import { armarPortada } from '../core/portada/diario.js';
+import { departamento } from '../core/portada/departamentos.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
 import { abrirEditor, borrarNoticia, ocultarNoticia } from '../features/noticiasAdmin.js';
 import { montarFenix } from '../features/noticias/fenix.js';
 import { zonaSeriaHTML, contarBloques } from '../features/noticias/zonaSeria.js';

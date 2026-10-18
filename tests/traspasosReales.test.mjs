@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarTraspaso, describirMovimiento } from '../src/js/core/traspasosReales.js';
+import { validarTraspaso, describirMovimiento } from '../src/js/core/pes/traspasosReales.js';
 
 const base = { pes_id: '1234', jugador: ' Jugador Prueba ', tipo: 'traspaso', de: '10', a: '20', nota: '' };
 

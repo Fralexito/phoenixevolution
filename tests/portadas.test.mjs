@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PORTADAS } from '../src/data/portadas.js';
-import { limpiarPortada, edicionesPublicadas, etiquetaEdicion, rangoSemana, cuponesSeguidos } from '../src/js/core/portadas.js';
+import { limpiarPortada, edicionesPublicadas, etiquetaEdicion, rangoSemana, cuponesSeguidos } from '../src/js/core/portada/portadas.js';
 
 test('todas las portadas de data/portadas.js son válidas', () => {
   for (const p of PORTADAS) assert.ok(limpiarPortada(p), `inválida: ${p.id}`);

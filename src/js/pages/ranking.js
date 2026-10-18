@@ -1,14 +1,14 @@
 // Página /ranking/: ranking competitivo y de retos por temporada mensual + retos semanales. Esquema: pages/ranking → features/ranking/api → core/rankingComunidad (puro).
-import { vacioHTML } from '../core/vacio.js';
+import { vacioHTML } from '../core/sistema/vacio.js';
 import { rafaga } from '../features/dopamina.js';
-import { onSession } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { avatarHTML } from '../core/avatar.js';
-import { toast } from '../core/toast.js';
+import { onSession } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { toast } from '../core/sistema/toast.js';
 import * as api from '../features/ranking/api.js';
 import { rangoChip } from '../features/rango.js';
-import { mesesDisponibles, mesValido, diferencia, textoFinSemana } from '../core/rankingComunidad.js';
+import { mesesDisponibles, mesValido, diferencia, textoFinSemana } from '../core/competicion/rankingComunidad.js';
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = cobro en curso.

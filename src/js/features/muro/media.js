@@ -1,5 +1,5 @@
-// Ayudantes de video en el navegador (DOM): leer la duración y validar contra las reglas de core/videoSubida.js.
-import { validarArchivoVideo, VIDEO_TIPOS } from '../../core/videoSubida.js';
+// Ayudantes de video en el navegador (DOM): leer la duración y validar contra las reglas de core/comunidad/videoSubida.js.
+import { validarArchivoVideo, VIDEO_TIPOS } from '../../core/comunidad/videoSubida.js';
 
 /** Duración en segundos (NaN si el navegador no puede leer el archivo o tarda más de 8 s). */
 export function leerDuracion(file) {

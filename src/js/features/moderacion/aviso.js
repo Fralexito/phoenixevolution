@@ -1,7 +1,7 @@
 // Aviso para quien tiene una suspensión o baneo vigente: una franja clara arriba de la página (la BD ya le impide escribir; esto solo lo explica).
 // Una sola consulta (`mi_sancion`) por página, con una caché corta en esta pestaña para no repetirla en cada navegación.
-import { onSession } from '../../core/session.js';
-import { describirMiSancion } from '../../core/moderacion.js';
+import { onSession } from '../../core/sistema/session.js';
+import { describirMiSancion } from '../../core/comunidad/moderacion.js';
 import { miSancion } from './api.js';
 import { avisoSancionHTML } from './vista.js';
 

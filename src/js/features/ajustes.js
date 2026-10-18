@@ -1,6 +1,6 @@
 // Aplica los ajustes a TODA la web (atributos data-aj-* en <html>, que el CSS lee) y ofrece lectura/escritura a las demás piezas.
-import { leerDecision, CLAVE_LIGERO } from '../core/rendimiento.js';
-import { cargarAjustes, guardarAjustes, normalizarAjustes, atributosDe, movimientoReducido, opcionesRegion, CLAVE_AJUSTES } from '../core/ajustes.js';
+import { leerDecision, CLAVE_LIGERO } from '../core/sistema/rendimiento.js';
+import { cargarAjustes, guardarAjustes, normalizarAjustes, atributosDe, movimientoReducido, opcionesRegion, CLAVE_AJUSTES } from '../core/sistema/ajustes.js';
 
 const almacen = () => { try { return window.localStorage; } catch { return null; } };
 const sistemaReduce = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;

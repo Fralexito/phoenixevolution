@@ -1,20 +1,20 @@
 import test from 'node:test';
-import { normalizarParticipacion, construirIndice, opcionesFiltro, coincidencias, filtrarJugadores, divisionActual, tituloCaso } from '../src/js/core/participaciones.js';
-import { validarResultadoCopa, resultadosDesdeFilas, zonasDivision, resolverAscensos, clasificadosCopa, ordenCuadro, construirCopa, ganadorDe, normalizarConfig } from '../src/js/core/temporada.js';
+import { normalizarParticipacion, construirIndice, opcionesFiltro, coincidencias, filtrarJugadores, divisionActual, tituloCaso } from '../src/js/core/jugadores/participaciones.js';
+import { validarResultadoCopa, resultadosDesdeFilas, zonasDivision, resolverAscensos, clasificadosCopa, ordenCuadro, construirCopa, ganadorDe, normalizarConfig } from '../src/js/core/competicion/temporada.js';
 import assert from 'node:assert/strict';
-import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/dom.js';
-import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/avatar.js';
-import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/rules.js';
-import { clampStat, calcOvr, distribuirMedia, aleatorias } from '../src/js/core/stats.js';
-import { coverScale, clampPos, initialState, zoomAt, rescale, sourceRect, outSize, MAX_ZOOM, aspectoValido, ratioDe, ASPECTOS } from '../src/js/core/crop.js';
-import { filterPlayers, norm } from '../src/js/core/search.js';
+import { escapeHTML, safeUrl, safeImg, toUsername, statColor, stat } from '../src/js/core/sistema/dom.js';
+import { PRESETS, presetId, presetValue, providerAvatar, avatarHTML } from '../src/js/core/sistema/avatar.js';
+import { cooldownInfo, USERNAME_COOLDOWN_DAYS, speedBucket, SPEED_BUCKETS } from '../src/js/core/sistema/rules.js';
+import { clampStat, calcOvr, distribuirMedia, aleatorias } from '../src/js/core/jugadores/stats.js';
+import { coverScale, clampPos, initialState, zoomAt, rescale, sourceRect, outSize, MAX_ZOOM, aspectoValido, ratioDe, ASPECTOS } from '../src/js/core/sistema/crop.js';
+import { filterPlayers, norm } from '../src/js/core/jugadores/search.js';
 import { posInfo, POSICIONES } from '../src/data/posiciones.js';
 import { STAT_INFO } from '../src/data/stats.js';
 import { STAT_KEYS } from '../src/js/features/playerCard.js';
-import { compareStats, radarPoints, axisPoint, autoTeams, moveToTeam, teamProfile, compareTeams, MAX_TEAM } from '../src/js/core/compare.js';
-import { formatEvento, demoDelay, horaExacta, podarHistorial, mismoDia, HIST_MAX_MS } from '../src/js/core/live.js';
-import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/teams.js';
-import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/schedule.js';
+import { compareStats, radarPoints, axisPoint, autoTeams, moveToTeam, teamProfile, compareTeams, MAX_TEAM } from '../src/js/core/jugadores/compare.js';
+import { formatEvento, demoDelay, horaExacta, podarHistorial, mismoDia, HIST_MAX_MS } from '../src/js/core/competicion/live.js';
+import { setTeamSize, seats, validTeams, clampTeam, maxFor } from '../src/js/core/competicion/teams.js';
+import { slotToDate, manualToDate, isFuture, isStale, presetToReto, confirmPhase } from '../src/js/core/competicion/schedule.js';
 
 test('escapeHTML neutraliza HTML', () => {
   assert.equal(escapeHTML('<img src=x onerror="a()">'), '&lt;img src=x onerror=&quot;a()&quot;&gt;');
@@ -237,9 +237,9 @@ test('proporciones de foto: solo 5/4, 1/1 y 4/5; lo desconocido cae en 5/4; la s
   assert.deepEqual(outSize(5000, '4/5'), { w: 800, h: 1000 }); assert.deepEqual(outSize(5000, '1/1'), { w: 800, h: 800 }); assert.deepEqual(outSize(5000), { w: 800, h: 640 });
 });
 
-import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo, NIVELES } from '../src/js/core/density.js';
-import { rankPlayers } from '../src/js/core/ranking.js';
-import { leerMedida, fisicoTexto, fisicoPartes, ALTURA } from '../src/js/core/fisico.js';
+import { nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo, NIVELES } from '../src/js/core/sistema/density.js';
+import { rankPlayers } from '../src/js/core/jugadores/ranking.js';
+import { leerMedida, fisicoTexto, fisicoPartes, ALTURA } from '../src/js/core/sistema/fisico.js';
 import { puedeEntrar, huecoIrregular } from '../src/js/features/ticker.js';
 test('zoom: niveles válidos, límites y tamaño', () => {
   assert.equal(nivelValido(99, true), 3); assert.equal(nivelValido(-5, false), 0); assert.equal(nivelValido('x', true), NIVELES.movil.def); assert.equal(nivelValido(null, false), NIVELES.pc.def);
@@ -267,7 +267,7 @@ test('ticker: la siguiente noticia entra cuando queda libre el hueco', () => {
   assert.equal(puedeEntrar(400, 300, 800, 90), true);    // 790 ≤ 800
 });
 
-import { dockDesdeRect, dockAjustado, dockLeer, MARGEN } from '../src/js/core/dock.js';
+import { dockDesdeRect, dockAjustado, dockLeer, MARGEN } from '../src/js/core/sistema/dock.js';
 test('dock: lado más cercano, ajuste a la pantalla y lectura segura', () => {
   assert.deepEqual(dockDesdeRect({ left: 20, right: 120, top: 30, bottom: 66 }, 400, 800), { h: 'l', dx: 20, v: 't', dy: 30 });
   assert.deepEqual(dockDesdeRect({ left: 280, right: 380, top: 700, bottom: 736 }, 400, 800), { h: 'r', dx: 20, v: 'b', dy: 64 });
@@ -276,7 +276,7 @@ test('dock: lado más cercano, ajuste a la pantalla y lectura segura', () => {
   assert.equal(dockLeer('basura'), null); assert.equal(dockLeer('{"h":"x","dx":1,"dy":1,"v":"t"}'), null); assert.deepEqual(dockLeer('{"h":"r","dx":5,"dy":9,"v":"t"}'), { h: 'r', dx: 5, v: 't', dy: 9 });
 });
 
-import { etiquetaJuego } from '../src/js/core/rules.js';
+import { etiquetaJuego } from '../src/js/core/sistema/rules.js';
 test('etiqueta de juego: PES 21 con parche y SP con versión', () => {
   assert.equal(etiquetaJuego({ juego: 'PES 2021', parche: 'Dream Patch' }), 'PES 21 (Dream Patch)');
   assert.equal(etiquetaJuego({ juego: 'PES 2021' }), 'PES 21');
@@ -290,7 +290,7 @@ test('físico: piezas para dibujar', () => {
   assert.deepEqual(fisicoPartes({ altura_cm: 180, pie: 'Izquierdo' }).map((x) => [x.k, x.texto]), [['altura', '180 cm'], ['pie', 'Izq.']]); assert.deepEqual(fisicoPartes({}), []);
 });
 
-import { cifra, partirPartidos, ordenPodio } from '../src/js/core/central.js';
+import { cifra, partirPartidos, ordenPodio } from '../src/js/core/competicion/central.js';
 test('central: cifras del pulso y partidos próximos/resultados', () => {
   assert.equal(cifra(12), '12'); assert.equal(cifra(0), '0'); assert.equal(cifra(null), '—'); assert.equal(cifra(NaN), '—'); assert.equal(cifra(-3), '—');
   const r = partirPartidos([{ gl: '3', gv: '2' }, { gl: '-', gv: '-', nota: 'HOY 22:00' }, { gl: '1', gv: '1' }]);
@@ -327,7 +327,7 @@ test('central: podio = 2.º izquierda, 1.º centro, 3.º derecha, sin huecos', (
   assert.deepEqual(ordenPodio(null), []);
 });
 
-import { calcularTabla } from '../src/js/core/tabla.js';
+import { calcularTabla } from '../src/js/core/competicion/tabla.js';
 import { FECHAS } from '../src/data/ligaResultados.js';
 test('tabla: puntos 3-1-0, desempate por diferencia y goles a favor, y datos inválidos se descartan', () => {
   const { tabla, descartados } = calcularTabla(FECHAS.slice(0, 1).flatMap((f) => f.partidos));   // solo la fecha 1
@@ -369,7 +369,7 @@ test('tabla: coincide fila por fila con la tabla OFICIAL que mandó Fralex (hast
   assert.deepEqual(tabla.map((f) => [f.nombre, f.pts, f.pj, f.g, f.e, f.p, f.gf, f.gc]), esperado);
 });
 
-import { resumenFecha, resumenEdicion, estadoFecha, fechaActual, forma, mayoresGoleadas, ranking } from '../src/js/core/ligaStats.js';
+import { resumenFecha, resumenEdicion, estadoFecha, fechaActual, forma, mayoresGoleadas, ranking } from '../src/js/core/competicion/ligaStats.js';
 import { EDICIONES } from '../src/data/ligaResultados.js';
 test('ligaStats: resúmenes, estado de fecha, forma, goleadas y rankings', () => {
   const fe = EDICIONES.galaxy[0].fechas;
@@ -386,8 +386,8 @@ test('ligaStats: resúmenes, estado de fecha, forma, goleadas y rankings', () =>
   assert.deepEqual(ranking(tabla, 'gc', true).slice(0, 2), [{ nombre: 'Degox', valor: 6 }, { nombre: 'Victor', valor: 6 }]);   // Degox y Victor empatan con 6 goles recibidos (orden alfabético)
 });
 
-import { slugify, slugUnico, partirCuerpo, fechaRelativa, normalizar, validar, ordenar, elegirDestacada, ligasPresentes, filtrar } from '../src/js/core/noticias.js';
-import { generarCronica } from '../src/js/core/cronica.js';
+import { slugify, slugUnico, partirCuerpo, fechaRelativa, normalizar, validar, ordenar, elegirDestacada, ligasPresentes, filtrar } from '../src/js/core/portada/noticias.js';
+import { generarCronica } from '../src/js/core/portada/cronica.js';
 test('noticias: slug, párrafos, fecha relativa y validación', () => {
   assert.equal(slugify('¡Auditoría Antifraude: Actas Nº 3!'), 'auditoria-antifraude-actas-n-3'); assert.equal(slugify('###'), 'noticia'); assert.ok(slugify('a'.repeat(200)).length <= 70);
   assert.equal(slugUnico('x', []), 'x'); assert.equal(slugUnico('x', ['x']), 'x-2'); assert.equal(slugUnico('x', ['x', 'x-2']), 'x-3');
@@ -419,7 +419,7 @@ test('crónica: borrador de la fecha 8 (victor golea) y casos límite', () => {
 });
 
 // ---- Perfil público de jugador ----
-import { coincide, nombreEnEdicion, campana, contraRivales } from '../src/js/core/perfil.js';
+import { coincide, nombreEnEdicion, campana, contraRivales } from '../src/js/core/jugadores/perfil.js';
 const EDP = { clubes: { Ana: 'Club A' }, fechas: [
   { n: 1, partidos: [{ l: 'Ana', v: 'Beto', gl: 3, gv: 1 }, { l: 'Cris', v: 'Dani', gl: 0, gv: 0 }] },
   { n: 2, partidos: [{ l: 'Beto', v: 'Ana', gl: 2, gv: 2 }, { l: 'Dani', v: 'Cris', gl: null, gv: null }] },
@@ -444,7 +444,7 @@ test('perfil: campaña con jugados, próximos, puesto y club', () => {
 test('perfil: contra cada rival', () => {
   assert.deepEqual(contraRivales(campana(EDP, 'Ana').jugados), [{ rival: 'Beto', g: 1, e: 1, p: 0, gf: 5, gc: 3 }]);
 });
-import { limpiarRed, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../src/js/core/perfil.js';
+import { limpiarRed, limpiarRedes, enlaceRed, partirLogros, mesAnio } from '../src/js/core/jugadores/perfil.js';
 test('perfil: redes válidas, enlaces seguros', () => {
   assert.equal(limpiarRed('youtube', '@Fralex'), 'Fralex');
   assert.equal(limpiarRed('youtube', 'https://youtube.com/@x'), 'https://youtube.com/@x');
@@ -463,8 +463,8 @@ test('perfil: logros y fecha', () => {
   assert.equal(partirLogros(null).length, 0); assert.equal(partirLogros(Array(30).fill('x').join('\n')).length, 12);
   assert.equal(mesAnio('2024-03-15'), 'marzo de 2024'); assert.equal(mesAnio('basura'), ''); assert.equal(mesAnio('2024-13-01'), '');
 });
-import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../src/js/core/estilo.js';
-import { puntosAcumulados, rendimiento } from '../src/js/core/perfil.js';
+import { ejesEstilo, arquetipos, fortalezasDebilidades, estiloTexto, mapaCalor, EJES } from '../src/js/core/jugadores/estilo.js';
+import { puntosAcumulados, rendimiento } from '../src/js/core/jugadores/perfil.js';
 const FICHA = (o = {}) => ({ posicion: 'DC', atq: 90, fin: 92, pot: 85, efe: 70, reg: 80, cor: 80, cre: 70, def: 50, pre: 60, pos: 55, ant: 50, pas: 70, rit: 80, men: 85, ...o });
 test('estilo: ejes, etiquetas y fortalezas', () => {
   const e = Object.fromEntries(ejesEstilo(FICHA()).map((x) => [x.id, x.valor]));
@@ -490,7 +490,7 @@ test('perfil: puntos acumulados y rendimiento', () => {
   assert.deepEqual(rendimiento({ pj: 4, g: 2, gf: 10, gc: 6, pts: 7 }), { gfPorPartido: 2.5, gcPorPartido: 1.5, victorias: 50, puntos: 58 });
   assert.equal(rendimiento({ pj: 0 }), null); assert.equal(rendimiento(null), null);
 });
-import { nivelDe, agruparPorNivel, agruparPorEstilo, ejeDominante, statsLiga, ordenar as ordenarJug, mezclar, reconocimientos, semanaActual } from '../src/js/core/destacados.js';
+import { nivelDe, agruparPorNivel, agruparPorEstilo, ejeDominante, statsLiga, ordenar as ordenarJug, mezclar, reconocimientos, semanaActual } from '../src/js/core/jugadores/destacados.js';
 const J = (id, nombre, ovr, extra = {}) => ({ id, nombre, ovr, posicion: 'DC', atq: 75, fin: 75, pot: 75, efe: 75, reg: 75, cor: 75, cre: 75, def: 75, pre: 75, pos: 75, ant: 75, pas: 75, rit: 75, men: 75, ...extra });
 const EDR = { fechas: [
   { n: 1, partidos: [{ l: 'Ana', v: 'Beto', gl: 5, gv: 1 }, { l: 'Cris', v: 'Dani', gl: 2, gv: 2 }] },
@@ -525,7 +525,7 @@ test('destacados: reconocimientos y semana', () => {
   assert.equal(semanaActual(new Date('2026-10-05T04:30:00Z')), '2026-09-28');       // lunes 5 oct 04:30 UTC = domingo 23:30 en Lima
   assert.equal(semanaActual(new Date('2026-10-05T05:00:00Z')), '2026-10-05');       // lunes 00:00 en Lima
 });
-import { esCampeon, partirPremios, ordenarHistorial, periodoCorto, medalla, resumenHistorial, validarParticipacion } from '../src/js/core/historial.js';
+import { esCampeon, partirPremios, ordenarHistorial, periodoCorto, medalla, resumenHistorial, validarParticipacion } from '../src/js/core/jugadores/historial.js';
 test('historial: títulos, medallas y resumen', () => {
   assert.equal(esCampeon('Campeón'), true); assert.equal(esCampeon('Campeón de Copa'), true); assert.equal(esCampeon('Subcampeón'), false); assert.equal(esCampeon(null), false);
   assert.equal(medalla({ titulo: 'Campeón' }), 'oro'); assert.equal(medalla({ titulo: 'Subcampeón' }), 'plata'); assert.equal(medalla({ titulo: 'Tercer lugar' }), 'bronce');
@@ -628,7 +628,7 @@ test('copa: validación de resultados y lectura de filas', () => {
 });
 
 test('zoom: el tamaño predeterminado es el nivel por defecto de cada pantalla', async () => {
-  const d = await import('../src/js/core/density.js');
+  const d = await import('../src/js/core/sistema/density.js');
   assert.equal(d.nivelPorDefecto(false), 2); assert.equal(d.nivelPorDefecto(true), 1);
   assert.equal(d.cambiarNivel(d.cambiarNivel(2, 3, false), -3, false), 2); assert.equal(d.nivelValido(d.nivelPorDefecto(false), false), 2);
 });
@@ -639,7 +639,7 @@ test('ticker: el hueco entre noticias es irregular pero acotado', () => {
 });
 
 // ---- ajustes
-import { normalizarAjustes, cargarAjustes, guardarAjustes, AJUSTES_DEFECTO, atributosDe, movimientoReducido, factorTicker, opcionesRegion, exportarAjustes, importarAjustes } from '../src/js/core/ajustes.js';
+import { normalizarAjustes, cargarAjustes, guardarAjustes, AJUSTES_DEFECTO, atributosDe, movimientoReducido, factorTicker, opcionesRegion, exportarAjustes, importarAjustes } from '../src/js/core/sistema/ajustes.js';
 import { SECCIONES } from '../src/data/ajustes.js';
 test('ajustes: catálogo coherente (claves únicas, defecto dentro de lo permitido)', () => {
   const l = SECCIONES.flatMap((x) => x.ajustes); assert.equal(new Set(l.map((a) => a.clave)).size, l.length);
@@ -674,7 +674,7 @@ test('horaExacta con zona y 12 h', () => {
 });
 
 // ---- mis partidos
-import { ordenarAgendados, ordenarPartidosJugados, pendientes, rivalesDeDuelos } from '../src/js/core/misPartidos.js';
+import { ordenarAgendados, ordenarPartidosJugados, pendientes, rivalesDeDuelos } from '../src/js/core/competicion/misPartidos.js';
 test('mis partidos: agendados, historial y pendientes', () => {
   const rs = [{ id: 1, estado: 'BUSCANDO' }, { id: 2, estado: 'ACEPTADO', fecha_programada: '2026-10-06T20:00:00Z' }, { id: 3, estado: 'EN_JUEGO' }, { id: 4, estado: 'ACEPTADO', fecha_programada: '2026-10-05T20:00:00Z' },
     { id: 5, estado: 'FINALIZADO', cerrado_at: '2026-10-01T10:00:00Z' }, { id: 6, estado: 'FINALIZADO', cerrado_at: '2026-10-03T10:00:00Z' }, { id: 7, estado: 'CANCELADO' }];
@@ -684,7 +684,7 @@ test('mis partidos: agendados, historial y pendientes', () => {
 });
 
 // ---- central de partidos
-import { jornadasCentral, partidoDestacado, visualClub } from '../src/js/core/central.js';
+import { jornadasCentral, partidoDestacado, visualClub } from '../src/js/core/competicion/central.js';
 test('central: jornadas, destacado y escudo', () => {
   const F = [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }] }, { n: 2, partidos: [{ l: 'C', v: 'D', gl: 2, gv: 2 }, { l: 'A', v: 'C', gl: null, gv: null }] }, { n: 3, partidos: [{ l: 'B', v: 'D', gl: null, gv: null }, { l: 'A', v: 'D', gl: null, gv: null }] }];
   const j = jornadasCentral(F);
@@ -712,7 +712,7 @@ test('rivalesDeDuelos: cuenta partidos terminados contra cada rival (1v1 y equip
   assert.deepEqual(rivalesDeDuelos([], () => [], 'yo'), []);
 });
 
-import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_DEFECTO } from '../src/js/core/red.js';
+import { normalizarRed, relacion, buscarPerfiles, contadores, PRIVACIDAD_DEFECTO } from '../src/js/core/comunidad/red.js';
 test('red: normalizarRed completa datos faltantes y descarta valores inválidos', () => {
   assert.deepEqual(normalizarRed(null).amigos, []);
   assert.deepEqual(normalizarRed(undefined).privacidad, PRIVACIDAD_DEFECTO);
@@ -735,7 +735,7 @@ test('red: buscarPerfiles ignora tildes, excluye a yo y bloqueados, y exige 2 le
 });
 test('red: contadores', () => { assert.deepEqual(contadores(normalizarRed({ amigos: ['a'], recibidas: ['b', 'c'] })), { amigos: 1, solicitudes: 2, seguidores: 0, siguiendo: 0, bloqueados: 0 }); });
 
-import { validarTexto, normalizarConversaciones, totalNoLeidos, vistaPrevia, agruparMensajes, etiquetaDia, hoyClave } from '../src/js/core/chat.js';
+import { validarTexto, normalizarConversaciones, totalNoLeidos, vistaPrevia, agruparMensajes, etiquetaDia, hoyClave } from '../src/js/core/comunidad/chat.js';
 test('chat: validarTexto recorta, rechaza vacío y > 1000', () => {
   assert.equal(validarTexto('  hola \r\n  ').texto, 'hola'); assert.equal(validarTexto('   ').ok, false); assert.equal(validarTexto(null).ok, false);
   assert.equal(validarTexto('x'.repeat(1000)).ok, true); assert.equal(validarTexto('x'.repeat(1001)).ok, false);
@@ -762,7 +762,7 @@ test('chat: etiquetaDia y hoyClave', () => {
   assert.match(etiquetaDia('2026-09-20', '2026-10-04'), /20/); assert.equal(hoyClave('America/Lima', new Date('2026-10-05T03:00:00Z')), '2026-10-04');
 });
 
-import { MODOS, modoValido, clampMax, normalizarPartidos, normalizarSalas, accionPara } from '../src/js/core/espectadores.js';
+import { MODOS, modoValido, clampMax, normalizarPartidos, normalizarSalas, accionPara } from '../src/js/core/competicion/espectadores.js';
 test('espectadores: modos válidos y límites de cupos', () => {
   assert.deepEqual(MODOS.map((m) => m.id), ['APAGADO', 'APROBACION', 'AMIGOS', 'CUALQUIERA']);
   assert.equal(modoValido('HACK'), 'APAGADO'); assert.equal(modoValido('AMIGOS'), 'AMIGOS');
@@ -783,7 +783,7 @@ test('espectadores: accionPara decide el botón', () => {
   assert.equal(accionPara({ ...base, modo: 'AMIGOS' }).activo, true);
 });
 
-import { sanitizarExtras, resumenExtra, EXTRAS_JUEGOS } from '../src/js/core/hostExtras.js';
+import { sanitizarExtras, resumenExtra, EXTRAS_JUEGOS } from '../src/js/core/competicion/hostExtras.js';
 test('hostExtras: solo juegos del catálogo, sin duplicados, sin < >, con límites', () => {
   assert.deepEqual(EXTRAS_JUEGOS.map((j) => j.id), ['eFootball', 'FIFA']);
   assert.deepEqual(sanitizarExtras(null), []); assert.deepEqual(sanitizarExtras('hola'), []);
@@ -796,14 +796,14 @@ test('hostExtras: resumenExtra', () => {
 });
 
 test('etiquetaJuego: FIFA / EA FC / eFootball con mod entre paréntesis', async () => {
-  const { etiquetaJuego } = await import('../src/js/core/rules.js');
+  const { etiquetaJuego } = await import('../src/js/core/sistema/rules.js');
   assert.equal(etiquetaJuego({ juego: 'FIFA', version: '23', parche: 'Realism Mod' }), 'FIFA 23 (Realism Mod)');
   assert.equal(etiquetaJuego({ juego: 'EA FC', version: '27' }), 'EA FC 27');
   assert.equal(etiquetaJuego({ juego: 'eFootball', version: '2027', parche: 'Option File' }), 'eFootball 2027 (Option File)');
 });
 
 test('historial en vivo: solo el día actual; al cambiar de día lo anterior desaparece', async () => {
-  const { podarHistorialHoy, diaClave } = await import('../src/js/core/live.js');
+  const { podarHistorialHoy, diaClave } = await import('../src/js/core/competicion/live.js');
   const ev = (ts, quien) => ({ tipo: 'radar_on', quien, ts });
   const lunes = new Date(2026, 9, 5, 10, 0, 0).getTime();       // lunes 5 oct 2026, 10:00 local
   const tarde = new Date(2026, 9, 5, 23, 59, 0).getTime();
@@ -817,7 +817,7 @@ test('historial en vivo: solo el día actual; al cambiar de día lo anterior des
 });
 
 test('muro: validar texto, enlaces seguros, tiempo relativo y estilo', async () => {
-  const { validarTexto, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } = await import('../src/js/core/muro.js');
+  const { validarTexto, textoAHTML, tiempoRelativo, estiloDe, estiloParaGuardar, usuarioDeURL } = await import('../src/js/core/comunidad/muro.js');
   assert.equal(validarTexto('   ').ok, false);
   assert.equal(validarTexto('x'.repeat(1001)).ok, false);
   assert.deepEqual(validarTexto('  hola\r\n\r\n\r\n\r\nmundo '), { ok: true, texto: 'hola\n\nmundo', error: '' });
@@ -838,7 +838,7 @@ test('muro: validar texto, enlaces seguros, tiempo relativo y estilo', async () 
 });
 
 test('muro fase 2: respuestas, resumen y reacción local', async () => {
-  const { validarRespuesta, resumenReacciones, aplicarReaccion } = await import('../src/js/core/muro.js');
+  const { validarRespuesta, resumenReacciones, aplicarReaccion } = await import('../src/js/core/comunidad/muro.js');
   assert.equal(validarRespuesta(' ').ok, false);
   assert.equal(validarRespuesta('x'.repeat(501)).ok, false);
   assert.equal(validarRespuesta(' GG ').texto, 'GG');
@@ -857,7 +857,7 @@ test('muro fase 2: respuestas, resumen y reacción local', async () => {
 });
 
 test('muro fase 3: enlaces de video, rutas de imagen y banner con foto', async () => {
-  const { analizarVideo, rutaImagen, rutaDeUrl, estiloDe, estiloParaGuardar } = await import('../src/js/core/muro.js');
+  const { analizarVideo, rutaImagen, rutaDeUrl, estiloDe, estiloParaGuardar } = await import('../src/js/core/comunidad/muro.js');
   assert.deepEqual([analizarVideo('https://www.youtube.com/watch?v=dQw4w9WgXcQ').proveedor, analizarVideo('https://www.youtube.com/watch?v=dQw4w9WgXcQ').id], ['youtube', 'dQw4w9WgXcQ']);
   assert.equal(analizarVideo('https://youtu.be/dQw4w9WgXcQ?t=5').id, 'dQw4w9WgXcQ');
   assert.equal(analizarVideo('https://www.youtube.com/shorts/dQw4w9WgXcQ').ok, true);
@@ -878,8 +878,8 @@ test('muro fase 3: enlaces de video, rutas de imagen y banner con foto', async (
 });
 
 test('historial en vivo: búsqueda avanzada, filtros y enlaces a perfil', async () => {
-  const { parsearBusqueda, filtrarEventos, facetas, hayFiltros, minutosDe, rangoDe } = await import('../src/js/core/liveFiltro.js');
-  const { formatEvento } = await import('../src/js/core/live.js');
+  const { parsearBusqueda, filtrarEventos, facetas, hayFiltros, minutosDe, rangoDe } = await import('../src/js/core/competicion/liveFiltro.js');
+  const { formatEvento } = await import('../src/js/core/competicion/live.js');
   const t = (h, m = 0) => new Date(2026, 9, 5, h, m).getTime();
   const H = [
     { tipo: 'reto_aceptado', quien: 'Camilo', rival: 'Jack', formato: '2v2', juego: 'PES 2021', parche: 'Dream Patch', ts: t(19, 30), demo: true },
@@ -922,7 +922,7 @@ test('historial en vivo: búsqueda avanzada, filtros y enlaces a perfil', async 
 });
 
 test('muro fase 4: tarjeta de duelo adjunto', async () => {
-  const { resumenReto, etiquetaOpcionReto } = await import('../src/js/core/muro.js');
+  const { resumenReto, etiquetaOpcionReto } = await import('../src/js/core/comunidad/muro.js');
   assert.equal(resumenReto(null), null); assert.equal(resumenReto({ id: 'x' }), null);
   const r = resumenReto({ id: 5, estado: 'FINALIZADO', plataforma: 'Parsec', tam_a: 2, tam_b: 2, fecha: '2026-10-03T20:00:00Z', retador: { nombre: 'Fralex', username: 'fralex' }, rival: { nombre: 'Jugador' } });
   assert.deepEqual([r.id, r.formato, r.etiquetaEstado, r.retador.username, r.rival.username], [5, '2 vs 2', 'Finalizado', 'fralex', '']);   // rival oculto por bloqueo: sin @usuario
@@ -932,8 +932,8 @@ test('muro fase 4: tarjeta de duelo adjunto', async () => {
   assert.equal(etiquetaOpcionReto(null), '');
 });
 
-// ---- Historias, destacadas y clips (core/historias.js) ----
-import { validarHistoria, validarTituloDestacada, validarClip, caducaEn, normalizarHistoria, normalizarHistorias, hayNuevas, marcarVistas, indiceInicial, infoClip, HISTORIA_MAX } from '../src/js/core/historias.js';
+// ---- Historias, destacadas y clips (core/comunidad/historias.js) ----
+import { validarHistoria, validarTituloDestacada, validarClip, caducaEn, normalizarHistoria, normalizarHistorias, hayNuevas, marcarVistas, indiceInicial, infoClip, HISTORIA_MAX } from '../src/js/core/comunidad/historias.js';
 test('historias: validarHistoria exige algo, limpia < > y valida el video', () => {
   assert.equal(validarHistoria({}).ok, false);
   assert.equal(validarHistoria({ hayFoto: true }).ok, true);
@@ -979,8 +979,8 @@ test('historias: infoClip (miniatura solo de YouTube; enlaces raros → null)', 
   assert.equal(infoClip(null), null);
 });
 
-// ---- Hosting con varios juegos y parches (core/hostCatalogo.js) ----
-import { sanitizarCatalogo, catalogoDesdeLegacy, catalogoDe, alternarJuego, alternarOpcion, lineasHost, HOST_MAX_OPCIONES, HOST_MAX_JUEGOS } from '../src/js/core/hostCatalogo.js';
+// ---- Hosting con varios juegos y parches (core/competicion/hostCatalogo.js) ----
+import { sanitizarCatalogo, catalogoDesdeLegacy, catalogoDe, alternarJuego, alternarOpcion, lineasHost, HOST_MAX_OPCIONES, HOST_MAX_JUEGOS } from '../src/js/core/competicion/hostCatalogo.js';
 test('hosting: sanitizarCatalogo (juegos conocidos, sin repetir, opciones limpias, límites)', () => {
   const c = sanitizarCatalogo([{ juego: 'PES 2021', opciones: ['Dream Patch', ' Dream  Patch ', '<b>X</b>', 5, ''] }, { juego: 'PES 2021', opciones: ['otro'] }, { juego: 'Minecraft', opciones: [] }, null]);
   assert.deepEqual(c, [{ juego: 'PES 2021', opciones: ['Dream Patch', 'bX/b'] }]);
@@ -1008,8 +1008,8 @@ test('hosting: alternar juegos y opciones (no muta, respeta máximos)', () => {
 });
 
 // ---- Videos propios, segmentos por juego y enlaces para compartir ----
-import { validarArchivoVideo, VIDEO_MAX_SEG } from '../src/js/core/videoSubida.js';
-import { analizarVideo as analizarVid, archivoDeUrl, rutaVideo, segmentoValido, segmentoParaGuardar, etiquetaSegmento, urlCompartir, destinoDeHash } from '../src/js/core/muro.js';
+import { validarArchivoVideo, VIDEO_MAX_SEG } from '../src/js/core/comunidad/videoSubida.js';
+import { analizarVideo as analizarVid, archivoDeUrl, rutaVideo, segmentoValido, segmentoParaGuardar, etiquetaSegmento, urlCompartir, destinoDeHash } from '../src/js/core/comunidad/muro.js';
 test('video propio: validarArchivoVideo (tipo, peso, duración)', () => {
   assert.equal(validarArchivoVideo({ type: 'video/avi', size: 10, duracion: 5 }).ok, false);
   assert.equal(validarArchivoVideo({ type: 'video/mp4', size: 0, duracion: 5 }).ok, false);
@@ -1040,7 +1040,7 @@ test('segmentos por juego y enlaces para compartir', () => {
   assert.deepEqual(destinoDeHash('#p-12'), { tipo: 'p', id: 12 }); assert.equal(destinoDeHash('#x-1'), null); assert.equal(destinoDeHash('#p-12abc'), null); assert.equal(destinoDeHash(''), null);
 });
 
-import { accionesSociales, etiquetaRelacion, enlacePerfil, esRechazoChat } from '../src/js/core/red.js';
+import { accionesSociales, etiquetaRelacion, enlacePerfil, esRechazoChat } from '../src/js/core/comunidad/red.js';
 test('red social: acciones del perfil según la relación', () => {
   assert.deepEqual(accionesSociales('yo'), []);
   assert.deepEqual(accionesSociales('bloqueado'), ['desbloquear']);
@@ -1056,7 +1056,7 @@ test('red social: etiquetas, enlaces y rechazo de chat', () => {
   assert.equal(esRechazoChat('No puedes enviarle mensajes a esta persona.'), true); assert.equal(esRechazoChat('Error de red'), false); assert.equal(esRechazoChat(null), false);
 });
 
-import { partidoDe, recorteTabla, pasoCuenta } from '../src/js/core/central.js';
+import { partidoDe, recorteTabla, pasoCuenta } from '../src/js/core/competicion/central.js';
 test('central: partidoDe, recorteTabla y pasoCuenta', () => {
   const ps = [{ l: 'Beto', v: 'Morgado' }, { l: 'Degox', v: 'Jeremi' }];
   assert.deepEqual(partidoDe(ps, ['degox']), ps[1]); assert.deepEqual(partidoDe(ps, ['  MÓRGADO ']), ps[0]);
@@ -1068,7 +1068,7 @@ test('central: partidoDe, recorteTabla y pasoCuenta', () => {
   assert.equal(pasoCuenta(100, 0), 0); assert.equal(pasoCuenta(100, 1), 100); assert.ok(pasoCuenta(100, 0.5) > 50); assert.equal(pasoCuenta(-5, 1), 0);
 });
 
-import { saludo, horaLima, pasosBienvenida, porcentajePasos, siguientePaso, arcoAnillo } from '../src/js/core/inicio.js';
+import { saludo, horaLima, pasosBienvenida, porcentajePasos, siguientePaso, arcoAnillo } from '../src/js/core/portada/inicio.js';
 test('inicio: saludo, pasos con progreso regalado y anillo', () => {
   assert.equal(saludo(8), 'Buenos días'); assert.equal(saludo(15), 'Buenas tardes'); assert.equal(saludo(23), 'Buenas noches'); assert.equal(saludo(3), 'Buenas noches');
   assert.equal(horaLima(Date.UTC(2026, 9, 5, 12, 0)), 7);
@@ -1080,7 +1080,7 @@ test('inicio: saludo, pasos con progreso regalado y anillo', () => {
   assert.deepEqual(arcoAnillo(100, 10).falta, 0); assert.equal(arcoAnillo(0, 10).falta, arcoAnillo(0, 10).total); assert.ok(arcoAnillo(50, 10).falta < arcoAnillo(0, 10).total);
 });
 
-import { indicePaginas, buscarPaginas } from '../src/js/core/buscador.js';
+import { indicePaginas, buscarPaginas } from '../src/js/core/sistema/buscador.js';
 test('buscador: encuentra por nombre, por sinónimo y por varias palabras', () => {
   const ix = indicePaginas();
   assert.equal(buscarPaginas('liga', ix)[0].id, 'liga'); assert.equal(buscarPaginas('LIGA', ix)[0].id, 'liga');
@@ -1092,14 +1092,14 @@ test('buscador: encuentra por nombre, por sinónimo y por varias palabras', () =
   assert.ok(ix.some((p) => p.id === 'moderacion' && p.staff));
 });
 
-import { historial } from '../src/js/core/ligaStats.js';
+import { historial } from '../src/js/core/competicion/ligaStats.js';
 test('historial: todos los partidos jugados de un jugador, de antiguo a reciente', () => {
   const f = [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: 2, gv: 1 }, { l: 'C', v: 'D', gl: 0, gv: 0 }] }, { n: 2, partidos: [{ l: 'B', v: 'A', gl: 3, gv: 3 }] }, { n: 3, partidos: [{ l: 'A', v: 'C', gl: null, gv: null }] }];
   assert.deepEqual(historial(f, 'A').map((h) => [h.r, h.n, h.rival, h.gf, h.gc, h.local]), [['G', 1, 'B', 2, 1, true], ['E', 2, 'B', 3, 3, false]]);
   assert.equal(historial(f, 'B')[0].r, 'P'); assert.deepEqual(historial(f, 'Z'), []); assert.deepEqual(historial(null, 'A'), []);
 });
 
-import { totalFechas } from '../src/js/core/ligaStats.js';
+import { totalFechas } from '../src/js/core/competicion/ligaStats.js';
 test('totalFechas: se deduce del formato', () => {
   const fs = (n) => Array.from({ length: n }, (_, i) => ({ n: i + 1, partidos: [] }));
   assert.equal(totalFechas({ participantes: 12, formato: 'Todos contra todos, a ida y vuelta', fechas: fs(8) }), 22);
@@ -1108,7 +1108,7 @@ test('totalFechas: se deduce del formato', () => {
   assert.equal(totalFechas({ participantes: 8, formato: 'Eliminatoria', fechas: fs(3) }), 3); assert.equal(totalFechas(null), 0);
 });
 
-import { escudoDe, escudoHTML } from '../src/js/core/escudos.js';
+import { escudoDe, escudoHTML } from '../src/js/core/sistema/escudos.js';
 test('escudos: reconoce el club escrito de varias formas y nunca rompe', () => {
   const u = escudoDe('Liverpool'); assert.match(u, /^(https:\/\/crests\.football-data\.org|\/escudos)\/\d+\.png$/);
   assert.equal(escudoDe('LIVERPOOL'), u); assert.equal(escudoDe('Bayern Múnich'), escudoDe('Bayern Munich')); assert.equal(escudoDe('PSG'), escudoDe('Paris Saint-Germain'));
@@ -1118,7 +1118,7 @@ test('escudos: reconoce el club escrito de varias formas y nunca rompe', () => {
   assert.match(escudoHTML('Agente Libre'), /fa-shield-halved/); assert.match(escudoHTML('Arsenal'), /<img /);
 });
 
-import { TARJETAS, LECTURAS, NORMALES, HEROES, asignarDiseno, limpiarEstilo, estiloAleatorio, esPlantilla, OPCIONES } from '../src/js/core/noticiasPlantillas.js';
+import { TARJETAS, LECTURAS, NORMALES, HEROES, asignarDiseno, limpiarEstilo, estiloAleatorio, esPlantilla, OPCIONES } from '../src/js/core/portada/noticiasPlantillas.js';
 import { tarjetaHTML, lecturaHTML, PLANTILLAS_DIBUJADAS, LECTURAS_DIBUJADAS } from '../src/js/features/noticias/tarjetas.js';
 test('noticias: cada plantilla del catálogo tiene dibujo, y cada lector también', () => {
   for (const t of TARJETAS) assert.ok(PLANTILLAS_DIBUJADAS.includes(t.id), `falta dibujo de ${t.id}`);
@@ -1150,14 +1150,14 @@ test('noticias: el estilo se limpia y el aleatorio es válido y estable', () => 
 });
 
 test('zonasLiga: ascenso, descenso y copa propios de una liga', async () => {
-  const { zonasLiga } = await import('../src/js/core/temporada.js');
+  const { zonasLiga } = await import('../src/js/core/competicion/temporada.js');
   const z = zonasLiga(['a','b','c','d','e','f','g','h'], { suben: 2, bajan: 2, copa: 3 });
   assert.deepEqual(z.get('a'), ['copa','sube']); assert.deepEqual(z.get('c'), ['copa']); assert.deepEqual(z.get('d'), []); assert.deepEqual(z.get('h'), ['baja']);
   assert.deepEqual(zonasLiga(['a','b','c'], { suben: 5, bajan: 5 }).get('b'), []);
 });
 
 test('central: tabla por fecha, movimientos y destacado', async () => {
-  const c = await import('../src/js/core/central.js'); const { calcularTabla } = await import('../src/js/core/tabla.js');
+  const c = await import('../src/js/core/competicion/central.js'); const { calcularTabla } = await import('../src/js/core/competicion/tabla.js');
   const fechas = [
     { n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }, { l: 'C', v: 'D', gl: 2, gv: 2 }] },
     { n: 2, partidos: [{ l: 'B', v: 'C', gl: 3, gv: 0 }, { l: 'D', v: 'A', gl: 0, gv: 4 }] },
@@ -1176,7 +1176,7 @@ test('central: tabla por fecha, movimientos y destacado', async () => {
 });
 
 test('central: rachas y novedades', async () => {
-  const c = await import('../src/js/core/central.js');
+  const c = await import('../src/js/core/competicion/central.js');
   const fechas = [
     { n: 1, partidos: [{ l: 'A', v: 'B', gl: 1, gv: 0 }, { l: 'C', v: 'D', gl: 0, gv: 0 }] },
     { n: 2, partidos: [{ l: 'A', v: 'C', gl: 2, gv: 1 }, { l: 'B', v: 'D', gl: 0, gv: 3 }] },
@@ -1192,7 +1192,7 @@ test('central: rachas y novedades', async () => {
 });
 
 test('compartir: datos de las tarjetas', async () => {
-  const c = await import('../src/js/core/compartir.js');
+  const c = await import('../src/js/core/comunidad/compartir.js');
   const f = { n: 4, partidos: [{ l: 'Beto', v: 'Fralex', gl: 5, gv: 1 }, { l: 'Hugo', v: 'Jack', gl: null, gv: null }] };
   const d = c.datosFecha({ liga: 'Galaxy League', edicion: '1° Edición', fecha: f, clubes: { Beto: 'Liverpool' } });
   assert.equal(d.titulo, 'FECHA 4'); assert.equal(d.filas.length, 2); assert.equal(d.filas[0].jugado, true); assert.equal(d.filas[1].jugado, false);
@@ -1210,7 +1210,7 @@ test('buscador tolera errores de tipeo (Fuse.js) sin romper la búsqueda exacta'
   assert.deepEqual(buscarPaginas('zzzzqq', ix), []);
 });
 
-import { urlEmbed, miniatura, etiquetaFuente } from '../src/js/core/clips.js';
+import { urlEmbed, miniatura, etiquetaFuente } from '../src/js/core/comunidad/clips.js';
 test('clips: embed y miniatura por plataforma', () => {
   assert.match(urlEmbed({ id: 'abc' }), /youtube-nocookie\.com\/embed\/abc/);
   assert.match(urlEmbed({ fuente: 'twitch', id: 'Slug' }, 'sitio.com'), /clips\.twitch\.tv\/embed\?clip=Slug&parent=sitio\.com/);
@@ -1220,7 +1220,7 @@ test('clips: embed y miniatura por plataforma', () => {
   assert.equal(etiquetaFuente({ fuente: 'twitch', id: 'x' }), 'Twitch');
 });
 
-import { elegirProximo, cuando } from '../src/js/core/proximoPartido.js';
+import { elegirProximo, cuando } from '../src/js/core/competicion/proximoPartido.js';
 test('proximoPartido: elige el más cercano y escribe cuándo', () => {
   const R = [
     { id: 1, estado: 'BUSCANDO', retador_id: 'yo' },
@@ -1238,7 +1238,7 @@ test('proximoPartido: elige el más cercano y escribe cuándo', () => {
   assert.match(cuando({ estado: 'ACEPTADO', fecha_programada: '2026-10-17T20:00:00Z' }, ahora, 'UTC'), /^Mañana /);
 });
 
-import { filtrarHosts, calidadPing } from '../src/js/core/hostsCatalogo.js';
+import { filtrarHosts, calidadPing } from '../src/js/core/competicion/hostsCatalogo.js';
 test('hostsCatalogo: filtra, ordena y califica ping', () => {
   const H = [
     { nombre: 'Ana', username: 'ana', ping_ms: 90, precio_partido_centimos: 500, acepta_gemas: false, completados: 1, juegos: [{ juego: 'PES 2021' }] },
@@ -1254,7 +1254,7 @@ test('hostsCatalogo: filtra, ordena y califica ping', () => {
   assert.equal(calidadPing(30).nivel, 'bueno'); assert.equal(calidadPing(100).nivel, 'medio'); assert.equal(calidadPing(200).nivel, 'malo'); assert.equal(calidadPing(null).nivel, 'nd');
 });
 
-import { calcularTotal, marcarChoques } from '../src/js/core/hostsCatalogo.js';
+import { calcularTotal, marcarChoques } from '../src/js/core/competicion/hostsCatalogo.js';
 test('hostsCatalogo: total estimado y choques de horario', () => {
   const pr = { ph: 500, pp: 200, gh: 50, gp: 20 };
   assert.deepEqual(calcularTotal(pr, 'partidos', 3, 'externo'), { valor: 600, unidad: 'centimos' });

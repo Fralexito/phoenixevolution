@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parsecDirecto } from '../src/js/core/dom.js';
+import { parsecDirecto } from '../src/js/core/sistema/dom.js';
 
 test('invitación web de Parsec → enlace directo', () => {
   assert.equal(parsecDirecto('https://dash.parsec.app/join-computer/?peer=3IKhY9bozbb2xi6t1NDy0rFU3ZA&secret=smiznvrf'), 'parsec://peer_id=3IKhY9bozbb2xi6t1NDy0rFU3ZA&secret=smiznvrf');

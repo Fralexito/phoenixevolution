@@ -1,11 +1,11 @@
 // Ventanas flotantes para crear HISTORIAS y gestionar DESTACADAS (se abren sobre el perfil; en celular ocupan casi toda la pantalla).
-// Capa DOM: valida con core/historias.js y core/videoSubida.js, sube archivos y llama a api.js. Cada ventana avisa con `onListo()` al terminar para que el perfil se recargue.
-import { openModal, closeModal } from '../../core/modal.js';
-import { toast } from '../../core/toast.js';
-import { confirmar, pedirTexto } from '../../core/dialogo.js';
-import { escapeHTML, safeImg } from '../../core/dom.js';
-import { validarHistoria, validarTituloDestacada, normalizarHistorias, HISTORIA_MAX, DESTACADA_TITULO_MAX, MAX_DESTACADAS } from '../../core/historias.js';
-import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../../core/videoSubida.js';
+// Capa DOM: valida con core/comunidad/historias.js y core/comunidad/videoSubida.js, sube archivos y llama a api.js. Cada ventana avisa con `onListo()` al terminar para que el perfil se recargue.
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../../core/sistema/dialogo.js';
+import { escapeHTML, safeImg } from '../../core/sistema/dom.js';
+import { validarHistoria, validarTituloDestacada, normalizarHistorias, HISTORIA_MAX, DESTACADA_TITULO_MAX, MAX_DESTACADAS } from '../../core/comunidad/historias.js';
+import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../../core/comunidad/videoSubida.js';
 import * as api from './api.js';
 import { prepararVideo } from './media.js';
 

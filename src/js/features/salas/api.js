@@ -1,8 +1,8 @@
 // Salas Smash Soda · capa de datos de la web para JUGADORES y HOSTS (módulo 2). SIN interfaz: la conecta el rediseño.
-// Esquema: páginas (futuras) → features/salas/api.js (red) → core/salas.js (reglas puras).
+// Esquema: páginas (futuras) → features/salas/api.js (red) → core/competicion/salas.js (reglas puras).
 // Reglas en la BD (migraciones 058–063): la web solo LEE por RLS y ESCRIBE por RPC. Nunca toca tokens de PC.
-import { supabase } from '../../core/supabase.js';
-import { aplicarCambioSala, limpiarParsecId, ESTADOS_VIVOS } from '../../core/salas.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { aplicarCambioSala, limpiarParsecId, ESTADOS_VIVOS } from '../../core/competicion/salas.js';
 
 const COLUMNAS_SALA = 'id, host, estado, visibilidad, juego, parche, region, plazas_total, plazas_libres, limite_espectadores, latido, abierta_en, reto_id, modo, organizacion, torneo_privado';
 

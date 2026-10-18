@@ -1,14 +1,14 @@
 // NOTICIAS SOCIALES · interfaz (ronda 350): barra de emojis, encuesta y comentarios dentro del lector de una noticia.
-// Bandera: FX.noticiasSocial (data/experimento.js). Base: migración 124 (RPC noticia_*). La lógica pura vive en core/noticiaSocial.js.
+// Bandera: FX.noticiasSocial (data/experimento.js). Base: migración 124 (RPC noticia_*). La lógica pura vive en core/portada/noticiaSocial.js.
 // Regla de oro: si la base falla, la noticia se sigue leyendo igual; esta zona muestra un aviso pequeño y nada más.
-import { supabase } from '../../core/supabase.js';
-import { getState, isStaff, can } from '../../core/session.js';
-import { toast } from '../../core/toast.js';
-import { confirmar } from '../../core/dialogo.js';
-import { escapeHTML as esc } from '../../core/dom.js';
-import { href } from '../../core/config.js';
-import { haceCuanto } from '../../core/notifs.js';
-import { EMOJIS, MAX_COMENTARIO, normalizarSocial, totalReacciones, alternarReaccion, porcentajes, validarComentario, limpiarOpciones, mensajeErrorSocial } from '../../core/noticiaSocial.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { getState, isStaff, can } from '../../core/sistema/session.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar } from '../../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
+import { haceCuanto } from '../../core/sistema/notifs.js';
+import { EMOJIS, MAX_COMENTARIO, normalizarSocial, totalReacciones, alternarReaccion, porcentajes, validarComentario, limpiarOpciones, mensajeErrorSocial } from '../../core/portada/noticiaSocial.js';
 
 const conSesion = () => !!getState().session;
 async function pedirSesion() {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { marcadorAl, eventosHasta, estadisticasAl } from '../src/js/core/centroPartido.js';
+import { marcadorAl, eventosHasta, estadisticasAl } from '../src/js/core/competicion/centroPartido.js';
 const ev = [{ min: 10, lado: 'local', tipo: 'gol' }, { min: 20, lado: 'visita', tipo: 'amarilla' }, { min: 30, lado: 'visita', tipo: 'gol' }];
 test('marcador al minuto', () => { assert.deepEqual(marcadorAl(ev, 9), { local: 0, visita: 0 }); assert.deepEqual(marcadorAl(ev, 25), { local: 1, visita: 0 }); assert.deepEqual(marcadorAl(ev, 90), { local: 1, visita: 1 }); assert.deepEqual(marcadorAl(null, 5), { local: 0, visita: 0 }); });
 test('eventos hasta el minuto, el más reciente primero', () => { assert.deepEqual(eventosHasta(ev, 25).map((e) => e.min), [20, 10]); });

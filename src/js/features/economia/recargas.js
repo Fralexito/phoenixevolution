@@ -1,13 +1,13 @@
 // Recargas de gemas: pestaña «Comprar gemas» del jugador y paneles del administrador (cola de pagos, métodos, precios por moneda, auditoría).
 // Esquema: pages/tienda → features/economia/recargas → features/economia/api → core/economia (puro). Reglas reales en la base (migraciones 108-110).
 // Hoy solo hay pago MANUAL (Yape/Plin/transferencia con revisión del admin); las pasarelas se añadirán como métodos nuevos sin tocar esta pantalla.
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { openModal, closeModal } from '../../core/modal.js';
-import { vacioHTML } from '../../core/vacio.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { vacioHTML } from '../../core/sistema/vacio.js';
 import * as api from './api.js';
 import * as mfa from './mfa.js';
-import { formatoPrecio, formatoTokens, gemasPorSol, textoEstadoRecarga } from '../../core/economia.js';
+import { formatoPrecio, formatoTokens, gemasPorSol, textoEstadoRecarga } from '../../core/economia/economia.js';
 
 let C = null; // contexto que entrega la página: { S, hacer, cargar, pintar, esAdmin }
 export const iniciar = (ctx) => { C = ctx; mfa.iniciar(ctx); };

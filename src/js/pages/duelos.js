@@ -1,22 +1,22 @@
 // Sala de Duelos — orquestador. La lógica vive en features/duelos/* (datos, tarjetas, formulario, acciones).
 // Esquema: pages → features → core.
-import { supabase } from '../core/supabase.js';
-import { onSession, refreshProfile } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, refreshProfile } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 import { setRadar, isRadarOn } from '../features/radar.js';
 import { montarTarjetasSalas } from '../features/salas/tarjetas.js';
 import { montarRacha } from '../features/enganche.js';
-import { onSession as alSesion } from '../core/session.js';
+import { onSession as alSesion } from '../core/sistema/session.js';
 import { startPresence, stopPresence, setEstado, onPresence, ESTADOS } from '../features/presence.js';
 import { openAuthModal } from '../features/auth.js';
 import { data, me, myProfile, myPart, isMine, isActive, loadPerfiles, loadRetos, visibleRetos } from '../features/duelos/data.js';
 import { card } from '../features/duelos/cards.js';
-import { pendientes } from '../core/misPartidos.js';
+import { pendientes } from '../core/competicion/misPartidos.js';
 import * as act from '../features/duelos/actions.js';
 import { initForm, refreshForm, submitReto, targetRival, paintRivales } from '../features/duelos/form.js';
 import { openInviteModal } from '../features/duelos/invite.js';
-import { elegirProximo, cuando } from '../core/proximoPartido.js';
+import { elegirProximo, cuando } from '../core/competicion/proximoPartido.js';
 import { montarNumerosVivos } from '../features/numerosVivos.js';
 import { montarDuelosPro } from '../features/duelosPro.js';
 

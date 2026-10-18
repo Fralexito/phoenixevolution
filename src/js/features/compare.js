@@ -1,10 +1,10 @@
 // Comparador 1 vs 1: cabecera y resumen siempre visibles; radar, barras y perfil en pestañas (menos scroll).
 // (La comparación de varios jugadores por equipos vive en compareMasivo.js.)
-import { escudoHTML } from '../core/escudos.js';
-import { openModal, closeModal } from '../core/modal.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
 import { openCompareMasivo } from './compareMasivo.js';
-import { escapeHTML, safeImg, statColor } from '../core/dom.js';
-import { compareStats, axisPoint, radarPoints } from '../core/compare.js';
+import { escapeHTML, safeImg, statColor } from '../core/sistema/dom.js';
+import { compareStats, axisPoint, radarPoints } from '../core/jugadores/compare.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from './playerCard.js';
 import { mountPicker } from './playerPicker.js';

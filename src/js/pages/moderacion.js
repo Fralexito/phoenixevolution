@@ -1,13 +1,13 @@
 // Página /moderacion/: cola de reportes (ayudante, moderador y admin; la BD vuelve a comprobar el rol en cada consulta y en cada acción).
 // Esquema: pages/moderacion → features/moderacion/{api (RPC), vista (HTML), acciones (modales)} → core/{moderacion, roles} (lógica pura).
-import { onSession, can, rolActual } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
+import { onSession, can, rolActual } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
 import * as api from '../features/moderacion/api.js';
 import { listaReportesHTML, historialHTML } from '../features/moderacion/vista.js';
 import { abrirOcultar, abrirSancionar, abrirNota } from '../features/moderacion/acciones.js';
-import { tipoInfo, NOTA_SANCION_MAX } from '../core/moderacion.js';
+import { tipoInfo, NOTA_SANCION_MAX } from '../core/comunidad/moderacion.js';
 import { crearColaMarcadores } from '../features/resultados/staffPanel.js';
 import { montarPanelHosts, montarPanelCreadores } from '../features/salas/panelStaff.js';
 

@@ -2,7 +2,7 @@
 // Tolerante a fallos: si una consulta falla (o la migración aún no existe) esa cuenta queda en 0 y se registra, sin romper la cabecera.
 import { listarConversaciones } from './chat/api.js';
 import { cargarRed } from './amigos/api.js';
-import { totalNoLeidos } from '../core/chat.js';
+import { totalNoLeidos } from '../core/comunidad/chat.js';
 
 /** Devuelve la función para detener el refresco. `onChange({mensajes, solicitudes})` se llama en cada lectura. */
 export function iniciarPendientes(onChange) {

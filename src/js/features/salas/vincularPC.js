@@ -1,10 +1,10 @@
 // Bloque «Vincular Phoenix Link» (reutilizable: Mi perfil → Phoenix Link y la página /mis-salas/).
 // Genera el código de 6 dígitos (10 min, un uso) que la app canjea en POST /v1/emparejar, el código del instalador
 // y la lista de PCs vinculadas (renombrar / desvincular). Suspender es solo del staff (panel de moderación).
-import { toast } from '../../core/toast.js';
-import { confirmar, pedirTexto } from '../../core/dialogo.js';
-import { escapeHTML } from '../../core/dom.js';
-import { mostrarCodigoPC, segundosRestantes } from '../../core/salas.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../../core/sistema/dialogo.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { mostrarCodigoPC, segundosRestantes } from '../../core/competicion/salas.js';
 import * as api from './api.js';
 import { NOMBRE_APP } from '../../../data/site.js';
 

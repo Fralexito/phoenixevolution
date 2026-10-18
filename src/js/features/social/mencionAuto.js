@@ -1,8 +1,8 @@
 // Autocompletado de @menciones: al escribir «@an» en un campo marcado con data-menciones, sugiere personas (buscar_personas) y completa «@usuario ».
 // Delegado en `document`: funciona aunque la página repinte el campo. Si algo falla (sin sesión, sin migración 034, sin red) simplemente no sugiere.
-import { escapeHTML } from '../../core/dom.js';
-import { avatarHTML } from '../../core/avatar.js';
-import { mencionEnCursor, insertarMencion } from '../../core/social.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { avatarHTML } from '../../core/sistema/avatar.js';
+import { mencionEnCursor, insertarMencion } from '../../core/comunidad/social.js';
 import * as api from './api.js';
 
 const ESPERA_MS = 250, MAX = 5;

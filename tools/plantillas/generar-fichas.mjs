@@ -3,10 +3,10 @@
 // (hay una copia en tools/plantillas/ids-liga-master.txt; si el staff importa jugadores nuevos, vuelve a sacar la lista y ejecuta esto).
 //   node tools/plantillas/generar-fichas.mjs "D:/Frank/Games_/Conmegol Patch/download/CGP_database.cpk" tools/plantillas/ids-liga-master.txt
 // Cada jugador queda como texto hexadecimal: por cada campo de BITS_PLAYER (en el orden de CAMPOS) 2 cifras con el valor crudo, y al final 13 cifras con los
-// 52 bits de habilidades (480–531). core/fichaJuego.js lo decodifica. Formato del registro: docs/web-pes-link/MINIFACES.md §3 y base-conocimiento/16-PLAYER-BIN-FICHA-COMPLETA.md.
+// 52 bits de habilidades (480–531). core/pes/fichaJuego.js lo decodifica. Formato del registro: docs/web-pes-link/MINIFACES.md §3 y base-conocimiento/16-PLAYER-BIN-FICHA-COMPLETA.md.
 import fs from 'node:fs';
 import { abrirBase } from './lectorCpk.mjs';
-import { CAMPOS, BITS_PLAYER, BITS_HABILIDADES } from '../../src/js/core/fichasCampos.js';
+import { CAMPOS, BITS_PLAYER, BITS_HABILIDADES } from '../../src/js/core/pes/fichasCampos.js';
 
 const [ruta, archivoIds] = process.argv.slice(2);
 if (!ruta || !archivoIds) { console.error('Uso: node generar-fichas.mjs <CGP_database.cpk> <ids.txt>'); process.exit(1); }
@@ -25,7 +25,7 @@ for (let o = 0; o + 312 <= P.length; o += 312) {
   salida[pid] = texto;
 }
 const faltan = [...ids].filter((id) => !salida[id]);
-fs.writeFileSync(new URL('../../src/data/fichasJuego.js', import.meta.url), `// Datos del juego (Player.bin del parche) de ${Object.keys(salida).length} jugadores de la Liga Máster, generados con tools/plantillas/generar-fichas.mjs. Decodifica core/fichaJuego.js.
+fs.writeFileSync(new URL('../../src/data/fichasJuego.js', import.meta.url), `// Datos del juego (Player.bin del parche) de ${Object.keys(salida).length} jugadores de la Liga Máster, generados con tools/plantillas/generar-fichas.mjs. Decodifica core/pes/fichaJuego.js.
 export const FICHAS_JUEGO = ${JSON.stringify(salida)};
 `);
 console.log(`Jugadores: ${Object.keys(salida).length}/${ids.size}${faltan.length ? ` · sin ficha en el juego: ${faltan.join(', ')}` : ''}`);

@@ -1,9 +1,9 @@
 // Staff · Equivalencias Phoenix ID ↔ ID local por parche (migración 089). Módulo aparte de manager.js: no comparte estado.
 // Lee mercado_equivalencias(_clubes) (RLS: solo staff) y escribe solo por RPC (mercado_eq_confirmar / mercado_eq_sin_candidato).
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML as esc } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
 
 const $ = (id) => document.getElementById(id);
 const POR_PAGINA = 40;

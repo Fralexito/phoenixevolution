@@ -1,13 +1,13 @@
 // Página «Crear mi liga» (ronda 276). Solo staff por ahora. Crea un torneo propio (RPC torneo_crear, igual que /torneos/) y lleva a su ficha.
-import { onSession, rolReal } from '../core/session.js';
-import { puede } from '../core/roles.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { nombreEpico } from '../core/diversion.js';
+import { onSession, rolReal } from '../core/sistema/session.js';
+import { puede } from '../core/sistema/roles.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { nombreEpico } from '../core/competicion/diversion.js';
 import * as api from '../features/torneos/api.js';
 import { selectorDinamicasHTML } from '../features/torneos/guia.js';
-import { PLANTILLAS, plantillaPorId, limitesDe, ajustarJugadores, resumenPartidos, construirTorneo } from '../core/crearLiga.js';
+import { PLANTILLAS, plantillaPorId, limitesDe, ajustarJugadores, resumenPartidos, construirTorneo } from '../core/competicion/crearLiga.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('cl-form');

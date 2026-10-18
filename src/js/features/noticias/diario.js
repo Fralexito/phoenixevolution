@@ -1,10 +1,10 @@
 // LA PORTADA DEL DIARIO: afiche del día + primera plana + lo justo del resto + la joda al final.
 // Regla de Fralex: poco scroll. Nada de filas de relleno; las tarjetas de una fila miden lo mismo.
-import { escapeHTML as esc } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { armarPortada } from '../../core/diario.js';
-import { departamento } from '../../core/departamentos.js';
-import { datosAfiche } from '../../core/afiche.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { armarPortada } from '../../core/portada/diario.js';
+import { departamento } from '../../core/portada/departamentos.js';
+import { datosAfiche } from '../../core/portada/afiche.js';
 import { aficheHTML, aficheArchivo, fechaCorta } from './afiche.js';
 
 const sello = (dep) => { const d = departamento(dep); return `<span class="dia-sello" style="--dp:${d.color}">${esc(d.nombre)}</span>`; };

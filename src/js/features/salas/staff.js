@@ -1,7 +1,7 @@
 // Salas Smash Soda · capa de datos del PANEL DE STAFF (módulo 2). SIN interfaz: la conecta el rediseño.
 // Todo pasa por RPC que comprueban `private.es_staff()` en la base y dejan rastro en la auditoría: aunque alguien llame a
 // estas funciones sin ser staff, la base lo rechaza. Aquí no hay seguridad, solo comodidad.
-import { supabase } from '../../core/supabase.js';
+import { supabase } from '../../core/sistema/supabase.js';
 
 function fallo(nombre, e) {
   console.error(`[salas-staff] ${nombre}:`, e?.code, e?.message);

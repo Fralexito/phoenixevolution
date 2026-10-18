@@ -1,26 +1,26 @@
 // Página Central: partidos, posiciones y partido destacado REALES (edición en curso de data/ligaResultados.js), XI ideal (demo) y Top 3 REAL desde `jugadores`.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { escudoDe, escudoHTML } from '../core/escudos.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { escudoDe, escudoHTML } from '../core/sistema/escudos.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { crearReplica } from '../features/replicaCarta.js';
-import { esIlegible } from '../core/replica.js';
+import { esIlegible } from '../core/jugadores/replica.js';
 import { leerAjustes, hayMovimientoReducido } from '../features/ajustes.js';
 import { DEMO_XI } from '../../data/demo.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { FX } from '../../data/experimento.js';
 import { LIGAS } from '../../data/ligas.js';
 import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
-import { calcularTabla } from '../core/tabla.js';
+import { calcularTabla } from '../core/competicion/tabla.js';
 import { openAuthModal } from '../features/auth.js';
-import { onSession, can } from '../core/session.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { toast } from '../core/toast.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { toast } from '../core/sistema/toast.js';
 import { borrarFilas } from '../features/escritura.js';
-import { estadoLiga, selloPartido, clubesMasUsados, ESTADOS_ESPECIALES } from '../core/pulso.js';
+import { estadoLiga, selloPartido, clubesMasUsados, ESTADOS_ESPECIALES } from '../core/competicion/pulso.js';
 import { contarHasta } from '../features/dopamina.js';
-import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/central.js';
+import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/competicion/central.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -216,7 +216,7 @@ function avisoVisita() {
   } catch { /* sin almacenamiento: simplemente no hay aviso */ }
 }
 
-// ---- Estado de la liga (franja) + Rankings ELO y clubes (minisección plegada). Datos puros en core/pulso.js; aquí solo se pinta. ----
+// ---- Estado de la liga (franja) + Rankings ELO y clubes (minisección plegada). Datos puros en core/competicion/pulso.js; aquí solo se pinta. ----
 let pingMs = null;   // tiempo de respuesta del servidor (se mide con la primera consulta del pulso); null = aún sin dato o sin conexión
 function mostrarPing() { const el = document.querySelector('#estado-liga [data-ping]'); if (el && pingMs !== null) { el.textContent = `· servidor ${pingMs} ms`; el.hidden = false; } }
 function pintarEstado() {
@@ -234,7 +234,7 @@ function pintarEstado() {
 async function pintarGoleadores() {
   const bloque = $('goleadores-bloque'); if (!bloque || !edicion) return;
   try {
-    const [{ leerGolesEdicion }, { topGoleadores, topAsistentes }] = await Promise.all([import('../features/detallePartido.js'), import('../core/golesPartido.js')]);
+    const [{ leerGolesEdicion }, { topGoleadores, topAsistentes }] = await Promise.all([import('../features/detallePartido.js'), import('../core/competicion/golesPartido.js')]);
     const goles = await leerGolesEdicion('galaxy', edicion.id); if (!goles.length) { bloque.hidden = true; return; }
     const fila = (x, i) => `<div class="rank-fila"><span class="rank-n">${i + 1}</span><span class="min-w-0 truncate text-gray-200">${escapeHTML(x.nombre)}</span><span class="rank-val">${x.total}</span></div>`;
     const g = topGoleadores(goles, 5), a = topAsistentes(goles, 5);
@@ -309,7 +309,7 @@ $('seg-partidos').addEventListener('click', (e) => {
 $('matches-container').addEventListener('click', async (e) => {   // «Compartir fecha» → tarjeta-imagen (carga el dibujo solo cuando se pide)
   if (!e.target.closest('[data-compartir-fecha]')) return;
   try {
-    const [{ datosFecha }, { abrirTarjeta }] = await Promise.all([import('../core/compartir.js'), import('../features/compartir.js')]);
+    const [{ datosFecha }, { abrirTarjeta }] = await Promise.all([import('../core/comunidad/compartir.js'), import('../features/compartir.js')]);
     const liga = LIGAS.find((l) => l.id === 'galaxy');
     abrirTarjeta(datosFecha({ liga: liga ? liga.titulo.join(' ') : 'Galaxy League', edicion: edicion?.nombre ?? '', fecha: fechaObj(fechaSel), clubes: edicion?.clubes ?? {} }), 'galaxy');
   } catch (err) { console.error('[central] compartir:', err); toast('No se pudo preparar la tarjeta.', 'error'); }

@@ -3,8 +3,8 @@
 // que la web de verdad (.pc-sheen, .tmp-fila, .live-msg…) y reaccionan solos; el JS solo repinta lo que depende de datos (hora, avisos, almacenamiento).
 import { playerCardHTML } from './playerCard.js';
 import { leerAjustes } from './ajustes.js';
-import { opcionesRegion, factorTicker, exportarAjustes } from '../core/ajustes.js';
-import { escapeHTML } from '../core/dom.js';
+import { opcionesRegion, factorTicker, exportarAjustes } from '../core/sistema/ajustes.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 
 const $ = (id) => document.getElementById(id);
 const DEMO = { nombre: 'Jugador Demo', apodo: 'Fénix', club: 'CLUB DEMO', posicion: 'DC', ovr: 88, atq: 90, fin: 92, pot: 85, efe: 80, reg: 86, cor: 70, cre: 75, def: 40, pre: 88, pos: 82, ant: 79, pas: 77, rit: 84, men: 81 };

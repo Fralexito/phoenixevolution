@@ -1,8 +1,8 @@
 // Modal holográfico flotante: aparece cuando te llega un desafío (en cualquier página).
-import { supabase } from '../core/supabase.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast, beep } from '../core/toast.js';
-import { href } from '../core/config.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast, beep } from '../core/sistema/toast.js';
+import { href } from '../core/sistema/config.js';
 
 let current = null;
 const queue = [];

@@ -1,10 +1,10 @@
 // Historial de estadísticas e información (migración 126): quién, cuándo, antes → después, resultado en cada PC y «Deshacer».
 // Uso: montarHistorialFichas(contenedor) desde pages/cambiosOficiales.js (o cualquier página de staff).
-import { supabase } from '../../core/supabase.js';
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { confirmar } from '../../core/dialogo.js';
-import { textoCambio, resumenPcs } from '../../core/fichasCampos.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar } from '../../core/sistema/dialogo.js';
+import { textoCambio, resumenPcs } from '../../core/pes/fichasCampos.js';
 
 const DESTINO = { base: 'Base normal', lm: 'Liga Máster', ambos: 'Las dos' };
 const fecha = (iso) => (iso ? new Date(iso).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }) : '');

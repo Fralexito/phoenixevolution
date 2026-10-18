@@ -1,14 +1,14 @@
 // Formulario "Lanzar reto": destino, tamaño de equipos, amigos, host, plataforma y hora.
-import { supabase } from '../../core/supabase.js';
-import { toast } from '../../core/toast.js';
-import { escapeHTML } from '../../core/dom.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { toast } from '../../core/sistema/toast.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
 import { regionAhora } from '../ajustes.js';
-import { SLOT_HOURS, slotToDate, manualToDate, isFuture, presetToReto } from '../../core/schedule.js';
-import { MAX_PLAYERS } from '../../core/rules.js';
-import { setTeamSize, maxFor } from '../../core/teams.js';
+import { SLOT_HOURS, slotToDate, manualToDate, isFuture, presetToReto } from '../../core/competicion/schedule.js';
+import { MAX_PLAYERS } from '../../core/sistema/rules.js';
+import { setTeamSize, maxFor } from '../../core/competicion/teams.js';
 import { data, me, myProfile, nm } from './data.js';
 import { needLogin, guard, friendly, refresh, invitar } from './actions.js';
-import { MODOS, modoDe } from '../../core/espectadores.js';
+import { MODOS, modoDe } from '../../core/competicion/espectadores.js';
 import * as espectadores from '../espectadores/api.js';
 
 const $ = (id) => document.getElementById(id);

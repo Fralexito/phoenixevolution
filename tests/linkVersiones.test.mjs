@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compararVersion, estadoVersion, normalizarPanel, partesVersion, tamanoTexto } from '../src/js/core/linkVersiones.js';
+import { compararVersion, estadoVersion, normalizarPanel, partesVersion, tamanoTexto } from '../src/js/core/pes/linkVersiones.js';
 
 test('las versiones se comparan como números', () => {
   assert.ok(compararVersion('0.3.9', '0.3.16') < 0);

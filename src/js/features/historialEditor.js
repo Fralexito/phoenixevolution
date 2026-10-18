@@ -1,10 +1,10 @@
 // Editor del historial de participación (admin y moderador; la BD lo refuerza con RLS). Lista las filas del jugador y permite añadir y editar; borrar solo si `puedeBorrar` (admin).
-import { supabase } from '../core/supabase.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
 import { borrarFilas } from './escritura.js';
-import { ordenarHistorial, periodoCorto, validarParticipacion } from '../core/historial.js';
+import { ordenarHistorial, periodoCorto, validarParticipacion } from '../core/jugadores/historial.js';
 
 const ID = 'historial-editor';
 const TITULOS = ['Campeón', 'Subcampeón', 'Tercer lugar'];

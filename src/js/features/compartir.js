@@ -1,10 +1,10 @@
 // TARJETAS PARA COMPARTIR (interruptor: FX.compartir en data/experimento.js). Dibuja una imagen 1080×1350 (formato 4:5 de Instagram) en un <canvas>,
 // la muestra en una ventana y permite compartirla (menú del celular), descargarla o copiar el enlace. Todo ocurre en el navegador: no se sube nada.
 // Los escudos son de la propia web (modo local); si alguno no carga o el navegador lo bloquea, la tarjeta se dibuja igual sin él.
-import { openModal, closeModal } from '../core/modal.js';
-import { toast } from '../core/toast.js';
-import { escapeHTML } from '../core/dom.js';
-import { nombreArchivo } from '../core/compartir.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { toast } from '../core/sistema/toast.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { nombreArchivo } from '../core/comunidad/compartir.js';
 
 const W = 1080, H = 1350, ID = 'compartir-modal';
 const TEMAS = {
@@ -63,7 +63,7 @@ async function dibujarJugador(c, d, t) {
   pie(c, t, d.forma.length ? 'Mis últimos partidos' : '');
 }
 
-/** Abre la ventana con la tarjeta ya dibujada. `d` sale de core/compartir.js; `tema` = 'galaxy' | 'sudario'. */
+/** Abre la ventana con la tarjeta ya dibujada. `d` sale de core/comunidad/compartir.js; `tema` = 'galaxy' | 'sudario'. */
 export async function abrirTarjeta(d, tema = 'galaxy') {
   if (!d) return;
   const t = TEMAS[tema] ?? TEMAS.galaxy;

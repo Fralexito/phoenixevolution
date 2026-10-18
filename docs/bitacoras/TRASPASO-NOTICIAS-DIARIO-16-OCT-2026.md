@@ -8,9 +8,9 @@ La página de Noticias pasó a ser **un diario con departamentos**. Bandera: `FX
 
 | Archivo | Qué hace |
 |---|---|
-| `src/js/core/departamentos.js` | Catálogo de **24 departamentos** (color, firma, voz, de qué parte de la web se alimenta) + `departamentoDe()`. Detecta **primero por la etiqueta** y recién después por el título. |
-| `src/js/core/diario.js` | `ordenDelDia()` baraja la portada con semilla de la fecha + 5 reglas; `armarPortada()` arma afiche, primera plana, últimas, resto y joda. Si hay orden manual del staff, ese manda. |
-| `src/js/core/afiche.js` | Decide **qué** va en el afiche del día: tipo, color del día, grito corto, palabra resaltada, marcador, inicial. |
+| `src/js/core/portada/departamentos.js` | Catálogo de **24 departamentos** (color, firma, voz, de qué parte de la web se alimenta) + `departamentoDe()`. Detecta **primero por la etiqueta** y recién después por el título. |
+| `src/js/core/portada/diario.js` | `ordenDelDia()` baraja la portada con semilla de la fecha + 5 reglas; `armarPortada()` arma afiche, primera plana, últimas, resto y joda. Si hay orden manual del staff, ese manda. |
+| `src/js/core/portada/afiche.js` | Decide **qué** va en el afiche del día: tipo, color del día, grito corto, palabra resaltada, marcador, inicial. |
 | `src/js/features/noticias/afiche.js` | Dibuja el afiche en HTML y lo exporta a **PNG con canvas** (3:4 y 9:16) + `navigator.share` en celular. |
 | `src/js/features/noticias/diario.js` | Pinta la portada corta y conecta los botones de descarga. |
 | `src/styles/diario.css` | Estilos (`.af-*`, `.dia-*`). Ojo: dentro del afiche se anula `main[data-sia] h2`, que ponía los títulos en fila. |

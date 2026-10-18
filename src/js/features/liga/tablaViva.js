@@ -1,14 +1,14 @@
 // Página Liga (ronda 224): la tabla y los resultados se calculan al construir la web (data/ligaResultados.js).
 // Aquí, al abrir la página, se piden a la base los resultados CONFIRMADOS de las ediciones en curso (los que el
 // staff o el árbitro validaron desde Phoenix Link). Si hay alguno que la web aún no tiene, se recalcula la tabla
-// con la MISMA fórmula (core/tabla.js, con enfrentamiento directo) y se actualizan puntos, orden, zonas y el
+// con la MISMA fórmula (core/competicion/tabla.js, con enfrentamiento directo) y se actualizan puntos, orden, zonas y el
 // marcador del partido. Si la base no responde o no hay nada nuevo, la página queda exactamente como se construyó.
-import { supabase } from '../../core/supabase.js';
+import { supabase } from '../../core/sistema/supabase.js';
 import { EDICIONES } from '../../../data/ligaResultados.js';
 import { SISTEMA, SISTEMAS_LIGA } from '../../../data/temporada.js';
-import { calcularTabla } from '../../core/tabla.js';
-import { zonasDivision, zonasLiga } from '../../core/temporada.js';
-import { fusionarConfirmados } from '../../core/ligaVivo.js';
+import { calcularTabla } from '../../core/competicion/tabla.js';
+import { zonasDivision, zonasLiga } from '../../core/competicion/temporada.js';
+import { fusionarConfirmados } from '../../core/competicion/ligaVivo.js';
 
 const PUESTO = ['text-gold-400', 'text-gray-200', 'text-bronze-400'];
 const ZONAS = ['tmp-fila', 'tmp-baja', 'tmp-sube', 'tmp-copa'];

@@ -1,10 +1,10 @@
 // Tarjeta «Mandar aviso a mi juego» + aviso global del staff. Escribe por RPC (migración 096); lee juego_avisos por RLS.
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { validarTexto, etiquetaEstado, mensajeError, ICONO_TIPO, MAX_TEXTO } from '../core/buzon.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { validarTexto, etiquetaEstado, mensajeError, ICONO_TIPO, MAX_TEXTO } from '../core/pes/buzon.js';
 import { misDispositivos } from './salas/api.js';
 
 const $ = (s) => document.querySelector(s);

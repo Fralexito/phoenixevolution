@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { liderDe, puestoDe, proximoPartido, nombreEnLiga, numeroMiembro, tocaIntro } from '../src/js/core/pase.js';
+import { liderDe, puestoDe, proximoPartido, nombreEnLiga, numeroMiembro, tocaIntro } from '../src/js/core/portada/pase.js';
 
 const tabla = [{ nombre: 'Victor', pj: 9, pts: 27 }, { nombre: 'Beto', pj: 9, pts: 20 }, { nombre: 'Fralex', pj: 8, pts: 15 }];
 const fechas = [

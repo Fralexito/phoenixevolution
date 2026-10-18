@@ -4,13 +4,13 @@
 //  · Mueve las ventanas UNA A LA VEZ, por turnos (como los tableros de un aeropuerto): nunca cambian todas juntas.
 //  · Se pausa con el mouse sobre las ventanas, con el foco del teclado y con la pestaña oculta. Con «menos movimiento» no rota.
 //  · Con sesión, el saludo dice «Hola de nuevo, <nombre>».
-import { supabase } from '../core/supabase.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { avatarHTML } from '../core/avatar.js';
-import { onSession } from '../core/session.js';
-import { tiempoRelativo } from '../core/muro.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
+import { onSession } from '../core/sistema/session.js';
+import { tiempoRelativo } from '../core/comunidad/muro.js';
 import { hayMovimientoReducido } from './ajustes.js';
-import { itemDuelo, itemSocial, itemFichaje } from '../core/ventanas.js';
+import { itemDuelo, itemSocial, itemFichaje } from '../core/portada/ventanas.js';
 
 const TURNO_MS = 2800;
 // Si el elemento tiene persona, va su foto; si no (un fichaje), el ícono de la ventana.

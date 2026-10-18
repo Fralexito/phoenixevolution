@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { senalDebil, vaLento, leerDecision, guardarDecision, CADUCA_MS, MIN_CUADROS } from '../src/js/core/rendimiento.js';
-import { movimientoReducido } from '../src/js/core/ajustes.js';
+import { senalDebil, vaLento, leerDecision, guardarDecision, CADUCA_MS, MIN_CUADROS } from '../src/js/core/sistema/rendimiento.js';
+import { movimientoReducido } from '../src/js/core/sistema/ajustes.js';
 test('señales débiles: ahorro de datos, ≤2 GB, red 2G', () => {
   assert.equal(senalDebil({ saveData: true }), true); assert.equal(senalDebil({ memoria: 2 }), true); assert.equal(senalDebil({ memoria: 0.5 }), true);
   assert.equal(senalDebil({ tipoRed: '2g' }), true); assert.equal(senalDebil({ tipoRed: 'slow-2g' }), true);

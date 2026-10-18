@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buscarClubes, clubExacto } from '../src/js/core/clubesPes.js';
+import { buscarClubes, clubExacto } from '../src/js/core/pes/clubesPes.js';
 import { CLUBES_PES } from '../src/data/clubesPes.js';
 
 test('catálogo: 5 ligas, ids únicos, sin nombres vacíos', () => {
@@ -21,7 +21,7 @@ test('clubExacto devuelve el id de PES', () => {
   assert.equal(clubExacto('real madrid cf')?.id, 109);
   assert.equal(clubExacto('Real'), null);
 });
-import { paisDe, escudoUrl, escudoImg } from '../src/js/core/clubesPes.js';
+import { paisDe, escudoUrl, escudoImg } from '../src/js/core/pes/clubesPes.js';
 import { existsSync } from 'node:fs';
 test('país, escudo e imagen del club', () => {
   const c = clubExacto('FC Barcelona');
@@ -36,7 +36,7 @@ test('cada club del catálogo tiene su escudo en public/escudos-pes', () => {
   assert.deepEqual(faltan.map((c) => c.nombre), []);
 });
 
-import { LINEAS, lineaDe, agruparPlantilla, buscarJugadoresPes, emparejarClubesLm } from '../src/js/core/clubesPes.js';
+import { LINEAS, lineaDe, agruparPlantilla, buscarJugadoresPes, emparejarClubesLm } from '../src/js/core/pes/clubesPes.js';
 import { PLANTILLAS } from '../src/data/plantillasPes.js';
 test('plantillas: todos los clubes del catálogo tienen jugadores y posiciones válidas', () => {
   const pos = new Set(LINEAS.flatMap((l) => l.posiciones));

@@ -4,10 +4,10 @@
 // · Corrector: revisa en vivo huecos, filas escalonadas, tarjetas que se cortan, jerarquía… y ofrece «Arreglar».
 // · Deshacer / Rehacer (Ctrl+Z / Ctrl+Y).
 // Se guarda en noticias.lienzo {x,y,w,h}. GridStack se carga solo al entrar al modo.
-import { supabase } from '../../core/supabase.js';
-import { toast } from '../../core/toast.js';
-import { escapeHTML as esc } from '../../core/dom.js';
-import { COLS, FILA_PX, tamanoBase, PROPUESTAS, diagnosticar, arreglar, arreglarTodo } from '../../core/noticiasLienzo.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { toast } from '../../core/sistema/toast.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { COLS, FILA_PX, tamanoBase, PROPUESTAS, diagnosticar, arreglar, arreglarTodo } from '../../core/portada/noticiasLienzo.js';
 
 const ICONO = { mal: 'fa-circle-xmark text-rose-400', ojo: 'fa-triangle-exclamation text-amber-300', tip: 'fa-lightbulb text-cyan-300' };
 

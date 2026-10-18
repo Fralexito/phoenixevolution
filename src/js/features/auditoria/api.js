@@ -1,8 +1,8 @@
 // Acceso a la auditoría y a los roles: cada función llama a una RPC de Supabase (las reglas viven en la base de datos, migración 030).
 // Esquema: pages/auditoria.js → features/auditoria/{api, vista} → core/{auditoria, roles} (lógica pura).
-import { supabase } from '../../core/supabase.js';
-import { describirEntrada, normalizarResumen } from '../../core/auditoria.js';
-import { normalizarRol } from '../../core/roles.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { describirEntrada, normalizarResumen } from '../../core/sistema/auditoria.js';
+import { normalizarRol } from '../../core/sistema/roles.js';
 
 /** Error que sabe decir si la causa es «la migración 030 todavía no está aplicada» (la función no existe). */
 export class ErrorAuditoria extends Error {

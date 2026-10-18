@@ -1,8 +1,8 @@
 // Cola de «Marcadores en disputa» dentro de /moderacion/ (migración 039). El moderador ve ambos nombres y decide el marcador con un motivo (queda en la Auditoría).
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { openModal, closeModal } from '../../core/modal.js';
-import { validarMarcador } from '../../core/resultado.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { validarMarcador } from '../../core/competicion/resultado.js';
 import * as api from './api.js';
 
 const ID = 'res-modal';

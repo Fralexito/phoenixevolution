@@ -1,11 +1,11 @@
 // Staff · Capa 1 (traspasos reales por ventana). Módulo aparte de manager.js: no comparte estado.
 // Lee y escribe lm_ventanas_reales / lm_traspasos_reales directo: la RLS (migración 084) solo deja escribir al staff.
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
-import { TIPOS, ESTADOS_VENTANA, validarTraspaso, describirMovimiento } from '../core/traspasosReales.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
+import { TIPOS, ESTADOS_VENTANA, validarTraspaso, describirMovimiento } from '../core/pes/traspasosReales.js';
 
 const $ = (id) => document.getElementById(id);
 const ERR = { duplicate: 'Ese jugador ya tiene un movimiento en esta ventana.', 'row-level security': 'Solo el staff puede hacer esto.', 'does not exist': 'Falta la migración 084 en la base.' };

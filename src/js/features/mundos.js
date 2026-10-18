@@ -1,6 +1,6 @@
 // «¿Qué quieres hacer?» de la portada (FX.portada): pestañas cápsula de los 4 mundos.
 // Al tocar una pestaña se muestra su panel; con el teclado se mueve con flechas, Inicio y Fin.
-import { pestanaSegunTecla } from '../core/pestanas.js';
+import { pestanaSegunTecla } from '../core/sistema/pestanas.js';
 
 export function montarMundos(raiz = document.querySelector('[data-mundos]')) {
   if (!raiz) return;

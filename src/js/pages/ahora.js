@@ -1,7 +1,7 @@
 // «Ahora mismo»: cifras en vivo + retos esperando rival + salas para mirar + racha + ranking semanal.
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 import { montarTarjetasSalas } from '../features/salas/tarjetas.js';
 import { montarRacha, montarRankingSemanal } from '../features/enganche.js';
 

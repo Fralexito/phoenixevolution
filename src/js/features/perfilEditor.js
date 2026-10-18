@@ -1,10 +1,10 @@
 // Editor de biografía y datos públicos del jugador (botón propio en el perfil). Solo admin (la BD lo refuerza con RLS).
 // Guarda ÚNICAMENTE estas columnas: biografia, ciudad, miembro_desde, estilo_juego, logros, redes.
-import { supabase } from '../core/supabase.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
-import { REDES, limpiarRed, limpiarRedes } from '../core/perfil.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
+import { REDES, limpiarRed, limpiarRedes } from '../core/jugadores/perfil.js';
 
 const ID = 'perfil-editor';
 const limpio = (v, max) => String(v ?? '').trim().replace(/[<>]/g, '').slice(0, max) || null;

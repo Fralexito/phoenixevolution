@@ -1,8 +1,8 @@
 // Radar «estilo FIFA» de la ficha de un jugador (ronda 341). Se enciende con FX.radarFifa.
 // Todo responde a la persona: al tocar/pasar sobre un eje (en el dibujo o en la lista) se resalta y se ve de qué stats sale.
-import { escapeHTML as esc, statColor } from '../core/dom.js';
+import { escapeHTML as esc, statColor } from '../core/sistema/dom.js';
 import { STAT_INFO } from '../../data/stats.js';
-import { ejesFifa, mediaEjes, extremos, geometria, aPuntos } from '../core/radarFifa.js';
+import { ejesFifa, mediaEjes, extremos, geometria, aPuntos } from '../core/jugadores/radarFifa.js';
 
 const NIVEL = { elite: 'Élite', alto: 'Alto', medio: 'Medio', bajo: 'Por mejorar' };
 

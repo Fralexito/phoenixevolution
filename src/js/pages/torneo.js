@@ -1,13 +1,13 @@
 // Página de UN torneo propio: inscripción, empezar, resultados con avance automático, tablas, suizo/grupos/colina/escalera/circuito, cierre.
-// La lógica pura está en core/torneos.js y core/formatos.js; los datos en features/torneos/api.js (migración 097).
-import { onSession, can } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc, safeUrl } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { generar, mezclar, validarFormato, jugarColina, retarEscalera, limpiarJugadores } from '../core/formatos.js';
-import { construirPlan, tablaTorneo, crucesDePuestos, estadoSuizo, siguienteRondaSuizo, campeonSugerido, agregarFechaCircuito, tablaCircuito, porRonda, etiquetaLado, progreso } from '../core/torneos.js';
-import { reglaDelPartido, castigoDelPartido } from '../core/diversion.js';
+// La lógica pura está en core/competicion/torneos.js y core/competicion/formatos.js; los datos en features/torneos/api.js (migración 097).
+import { onSession, can } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc, safeUrl } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { generar, mezclar, validarFormato, jugarColina, retarEscalera, limpiarJugadores } from '../core/competicion/formatos.js';
+import { construirPlan, tablaTorneo, crucesDePuestos, estadoSuizo, siguienteRondaSuizo, campeonSugerido, agregarFechaCircuito, tablaCircuito, porRonda, etiquetaLado, progreso } from '../core/competicion/torneos.js';
+import { reglaDelPartido, castigoDelPartido } from '../core/competicion/diversion.js';
 import { REGLAS_RULETA } from '../../data/modalidades.js';
 import * as api from '../features/torneos/api.js';
 import { formatoFicha, guiaFormatoHTML, dinamicasActivasHTML, leyendaHTML, ESTADO_TXT } from '../features/torneos/guia.js';

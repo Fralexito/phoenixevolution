@@ -1,12 +1,12 @@
 // Chat flotante · DATOS compartidos por la columna de contactos y las ventanitas (un solo lugar que habla con Supabase).
-// Esquema: contactos.js / ventanas.js (pintan) → este archivo (red + tiempo real) → core/chatFlotante.js y core/chat.js (reglas puras).
+// Esquema: contactos.js / ventanas.js (pintan) → este archivo (red + tiempo real) → core/comunidad/chatFlotante.js y core/comunidad/chat.js (reglas puras).
 // Reglas de quién puede escribir a quién: en la BD (migración 018). Aquí solo se muestran sus errores con texto legible.
-import { supabase } from '../../core/supabase.js';
+import { supabase } from '../../core/sistema/supabase.js';
 import * as chat from '../chat/api.js';
 import { cargarRed } from '../amigos/api.js';
 import { iniciarEnLinea, alCambiarEnLinea, detenerEnLinea } from '../enLinea.js';
-import { leerEstado, abrirVentana, cerrarVentana, minimizarVentana, ajustarACaben, debeAparecer, noLeidosPorUsuario } from '../../core/chatFlotante.js';
-import { validarTexto } from '../../core/chat.js';
+import { leerEstado, abrirVentana, cerrarVentana, minimizarVentana, ajustarACaben, debeAparecer, noLeidosPorUsuario } from '../../core/comunidad/chatFlotante.js';
+import { validarTexto } from '../../core/comunidad/chat.js';
 
 const CLAVE = 'pes-chat-ventanas';
 const leerSesion = () => { try { return sessionStorage.getItem(CLAVE); } catch { return null; } };

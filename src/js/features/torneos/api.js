@@ -1,6 +1,6 @@
 // Acceso a datos de TORNEOS PROPIOS (migración 097). Lee por RLS; escribe solo por RPC. Los errores de la base llegan como «CODIGO: texto».
-import { supabase } from '../../core/supabase.js';
-import { normalizarTorneoPremium } from '../../core/phoenix-pass.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarTorneoPremium } from '../../core/economia/phoenix-pass.js';
 
 const MENSAJES = {
   NO_AUTORIZADO: 'No tienes permiso para hacer eso en este torneo.',

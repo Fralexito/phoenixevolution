@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { EMOJIS, normalizarSocial, totalReacciones, alternarReaccion, porcentajes, validarComentario, limpiarOpciones, mensajeErrorSocial } from '../src/js/core/noticiaSocial.js';
+import { EMOJIS, normalizarSocial, totalReacciones, alternarReaccion, porcentajes, validarComentario, limpiarOpciones, mensajeErrorSocial } from '../src/js/core/portada/noticiaSocial.js';
 
 test('5 emojis acordados, en orden', () => {
   assert.deepEqual(EMOJIS.map((e) => e.id), ['fuego', 'risa', 'sorpresa', 'aplauso', 'calavera']);

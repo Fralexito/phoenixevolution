@@ -2,20 +2,20 @@
 // Fuente: tabla `noticias` de Supabase. Si falla o viene vacía, se usan las noticias estáticas de data/noticias.js (sin controles de edición).
 import { NOTICIAS } from '../../data/noticias.js';
 import { LIGAS } from '../../data/ligas.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { supabase } from '../core/supabase.js';
-import { toast } from '../core/toast.js';
-import { onSession, can } from '../core/session.js';
-import { normalizar, ordenar, elegirDestacada, ligasPresentes, filtrar, fechaRelativa } from '../core/noticias.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { toast } from '../core/sistema/toast.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { normalizar, ordenar, elegirDestacada, ligasPresentes, filtrar, fechaRelativa } from '../core/portada/noticias.js';
 import { abrirEditor, borrarNoticia, ocultarNoticia, guardarDiseno } from '../features/noticiasAdmin.js';
 import { tarjetaHTML, lecturaHTML } from '../features/noticias/tarjetas.js';
 import { abrirCatalogo } from '../features/noticias/catalogo.js';
 import { entrarAcomodar } from '../features/noticias/acomodar.js';
-import { asignarDiseno, plantillaDe } from '../core/noticiasPlantillas.js';
-import { hayLienzo, ordenLectura, FILA_PX } from '../core/noticiasLienzo.js';
+import { asignarDiseno, plantillaDe } from '../core/portada/noticiasPlantillas.js';
+import { hayLienzo, ordenLectura, FILA_PX } from '../core/portada/noticiasLienzo.js';
 import { FX } from '../../data/experimento.js';
-import { departamentoDe, departamentosPresentes } from '../core/departamentos.js';
+import { departamentoDe, departamentosPresentes } from '../core/portada/departamentos.js';
 import { pintarDiario } from '../features/noticias/diario.js';
 import { montarSocial } from '../features/noticias/social.js';
 

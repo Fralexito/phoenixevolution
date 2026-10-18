@@ -1,10 +1,10 @@
 // Moderación · solicitudes de privacidad (RPC existentes: staff_solicitudes_privacidad, staff_resolver_solicitud_privacidad).
 // Módulo aparte de moderacion.js: no comparte estado. Solo aparece si el RPC responde (es_staff en la base).
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { pedirTexto } from '../core/dialogo.js';
-import { escapeHTML as esc } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML as esc } from '../core/sistema/dom.js';
 
 const sec = document.getElementById('mod-privacidad');
 const TIPO = { acceso: 'Acceso', rectificacion: 'Corregir dato', eliminacion: 'Eliminar cuenta', oposicion: 'Oposición', baja: 'Baja de avisos' };

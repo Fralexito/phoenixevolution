@@ -1,6 +1,6 @@
 // Acceso a espectadores: RPC (las reglas viven en la base de datos, migración 019).
-import { supabase } from '../../core/supabase.js';
-import { normalizarPartidos, normalizarSalas } from '../../core/espectadores.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarPartidos, normalizarSalas } from '../../core/competicion/espectadores.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

@@ -7,7 +7,7 @@
 |---|---|
 | Base de datos (aplicada en `fiibiyijojkxqlsrhcil`) | `supabase/migrations/121_economia_fase_c_efectos_banners_sonidos.sql` |
 | Prueba SQL (se deshace sola, termina en `TODO_OK_REVERTIDO`) | `supabase/tests/121_fase_c_test.sql` (y 119 ajustada: 28→39 objetos) |
-| Lógica pura con pruebas | `src/js/core/economia.js`, `src/js/core/sonidosChat.js`, `tests/economiaFaseC.test.mjs` |
+| Lógica pura con pruebas | `src/js/core/economia/economia.js`, `src/js/core/comunidad/sonidosChat.js`, `tests/economiaFaseC.test.mjs` |
 | Efectos de carta (CSS puro) | `src/styles/efectosCarta.css`, `src/js/features/efectosCarta.js` |
 | Banner en el perfil | `src/js/pages/perfil.js` (`#pf-banner`) |
 | Sonidos: vista previa con botón | `src/js/features/sonidosChat.js` |

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validarTexto, estadoAviso, etiquetaEstado, mensajeError, MAX_TEXTO } from '../src/js/core/buzon.js';
+import { validarTexto, estadoAviso, etiquetaEstado, mensajeError, MAX_TEXTO } from '../src/js/core/pes/buzon.js';
 
 test('validarTexto: vacío, largo y demasiadas líneas', () => {
   assert.equal(validarTexto('   ').ok, false);

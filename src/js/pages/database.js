@@ -1,21 +1,21 @@
 // Base de Datos Global: lista, filtro por club, búsqueda; admin puede añadir/editar/borrar.
-import { supabase } from '../core/supabase.js';
-import { onSession, can } from '../core/session.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, can } from '../core/sistema/session.js';
 import { borrarFilas } from '../features/escritura.js';
-import { escapeHTML } from '../core/dom.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 import { posInfo } from '../../data/posiciones.js';
-import { href } from '../core/config.js';
+import { href } from '../core/sistema/config.js';
 import { leerAjustes, hayMovimientoReducido } from '../features/ajustes.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { playerCardHTML } from '../features/playerCard.js';
 import { openPlayerForm } from '../features/playerForm.js';
 import { openCompare } from '../features/compare.js';
-import { MAX_COMPARE } from '../core/compare.js';
-import { norm } from '../core/search.js';
-import { nivelPorDefecto, nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo } from '../core/density.js';
-import { rankPlayers } from '../core/ranking.js';
-import { agruparPorEstilo, agruparPorNivel, ordenar, statsLiga, CRITERIOS } from '../core/destacados.js';
+import { MAX_COMPARE } from '../core/jugadores/compare.js';
+import { norm } from '../core/jugadores/search.js';
+import { nivelPorDefecto, nivelValido, cambiarNivel, anchoMinimo, separacion, esDenso, esUltimo } from '../core/sistema/density.js';
+import { rankPlayers } from '../core/jugadores/ranking.js';
+import { agruparPorEstilo, agruparPorNivel, ordenar, statsLiga, CRITERIOS } from '../core/jugadores/destacados.js';
 import { montarReconocimientos } from '../features/reconocimientos.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { LIGAS } from '../../data/ligas.js';
@@ -23,14 +23,14 @@ import { montarJugadoresBarra } from '../features/jugadoresBarra.js';
 import { mountAdvanced } from '../features/advancedSearch.js';
 import { openStatLegend } from '../features/statLegend.js';
 import { crearReplica } from '../features/replicaCarta.js';
-import { construirIndice, opcionesFiltro, filtrarJugadores, divisionActual } from '../core/participaciones.js';
+import { construirIndice, opcionesFiltro, filtrarJugadores, divisionActual } from '../core/jugadores/participaciones.js';
 import { SISTEMA } from '../../data/temporada.js';
 
 const $ = (id) => document.getElementById(id);
 let all = [];
 let club = 'ALL';
 let fLiga = ''; let fTorneo = ''; let fTemp = '';   // filtros de participación (liga, torneo, temporada)
-let indice = new Map();                           // jugadorId → participaciones (core/participaciones.js)
+let indice = new Map();                           // jugadorId → participaciones (core/jugadores/participaciones.js)
 let hitsPorId = new Map(); let divPorId = new Map();
 let term = '';
 let vista = 'plano';      // 'plano' | 'estilo' | 'nivel'

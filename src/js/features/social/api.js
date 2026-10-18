@@ -1,7 +1,7 @@
 // Guardados, búsqueda y sugerencias: cada función llama a una RPC de Supabase (reglas en la base de datos, migración 034).
 // Esquema: pages/{buscar,guardados,comunidad,perfil} → features/social/{api, guardados, mencionAuto} → core/social (lógica pura).
-import { supabase } from '../../core/supabase.js';
-import { normalizarPersona } from '../../core/social.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarPersona } from '../../core/comunidad/social.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

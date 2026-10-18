@@ -1,4 +1,4 @@
-// Catálogo de modalidades, reglas de ruleta, retos y noches temáticas. Texto plano editable; la lógica está en js/core/retos.js.
+// Catálogo de modalidades, reglas de ruleta, retos y noches temáticas. Texto plano editable; la lógica está en js/core/competicion/retos.js.
 // tono: 'serio' | 'casual' | 'divertido'. Mínimo 12 px en pantalla (lo cuida el CSS).
 
 export const MODALIDADES = Object.freeze([

@@ -1,10 +1,10 @@
 // Pie de acciones de una publicación en el feed de /social/: reaccionar (un toque + paleta), responder (lleva al hilo) y compartir.
 // Se pasa a `tarjetaComunidadHTML(it, { pie })`. Solo HTML: los clics los reparte pages/social.js mediante `data-sx`.
-import { escapeHTML } from '../../core/dom.js';
-import { href } from '../../core/config.js';
-import { resumenReacciones } from '../../core/muro.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { href } from '../../core/sistema/config.js';
+import { resumenReacciones } from '../../core/comunidad/muro.js';
 import { PALETA_EMOJIS } from '../../../data/muroEstilo.js';
-import { REACCION_RAPIDA, totalReacciones, textoRespuestas } from '../../core/feedSocial.js';
+import { REACCION_RAPIDA, totalReacciones, textoRespuestas } from '../../core/comunidad/feedSocial.js';
 
 const PALETA_RAPIDA = PALETA_EMOJIS.slice(0, 16);
 

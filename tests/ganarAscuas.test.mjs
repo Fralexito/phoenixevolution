@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as G from '../src/js/core/ganarAscuas.js';
+import * as G from '../src/js/core/economia/ganarAscuas.js';
 
 test('racha: +5 por día, día 3 +10 extra, día 7 +40 extra y el ciclo se repite', () => {
   assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 10, 14].map(G.ascuasRacha), [5, 5, 15, 5, 5, 5, 45, 5, 15, 45]);

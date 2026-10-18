@@ -1,10 +1,10 @@
 // Página «Phoenix Soda» (/mis-salas/): cuenta Parsec (todos), mis salas abiertas y mis PCs (solo hosts aprobados o staff).
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar } from '../core/dialogo.js';
-import { escapeHTML } from '../core/dom.js';
-import { supabase } from '../core/supabase.js';
-import { SALUD_TXT, saludSala } from '../core/salas.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { SALUD_TXT, saludSala } from '../core/competicion/salas.js';
 import * as api from '../features/salas/api.js';
 import { montarVincularPC } from '../features/salas/vincularPC.js';
 

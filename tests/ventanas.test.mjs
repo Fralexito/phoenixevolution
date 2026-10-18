@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { recortar, itemsCompetencia, itemDuelo, itemSocial, itemFichaje } from '../src/js/core/ventanas.js';
+import { recortar, itemsCompetencia, itemDuelo, itemSocial, itemFichaje } from '../src/js/core/portada/ventanas.js';
 
 test('ventanas: recortar sin partir palabras', () => {
   assert.equal(recortar('hola mundo', 20), 'hola mundo');

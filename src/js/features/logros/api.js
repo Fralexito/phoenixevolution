@@ -1,6 +1,6 @@
 // Logros: llama a las RPC (reglas en la BD, migración 035). Nunca deja la página muda: la franja del perfil falla en silencio.
-import { supabase } from '../../core/supabase.js';
-import { normalizarMisLogros, normalizarLogrosDe } from '../../core/logros.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarMisLogros, normalizarLogrosDe } from '../../core/jugadores/logros.js';
 
 /** → { logros, obtenidos, total }. Lanza Error legible (la página «Logros» muestra el mensaje). */
 export async function misLogros() {

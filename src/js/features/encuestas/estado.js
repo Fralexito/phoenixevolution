@@ -1,8 +1,8 @@
 // Estado de las encuestas visibles en la página + su dibujo + el clic de votar (un solo oyente global; cada página solo pide los datos y pone `encuestaHTML(id)`).
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { porcentajes, textoCierre } from '../../core/encuesta.js';
-import { onSession } from '../../core/session.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { porcentajes, textoCierre } from '../../core/comunidad/encuesta.js';
+import { onSession } from '../../core/sistema/session.js';
 import * as api from './api.js';
 
 const cache = new Map();            // id de publicación → encuesta

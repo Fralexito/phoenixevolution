@@ -1,16 +1,16 @@
 // Página /mensajes/: lista de chats, sala con mensajes en vivo, nuevo chat (directo o grupo), gestión de grupo, silenciar, reportar.
 // Esquema: pages → features/chat/api (RPC + RLS) → core/chat (lógica pura). La privacidad la decide el servidor; aquí solo se muestran sus errores.
 import { abrirReportar } from '../features/moderacion/acciones.js';
-import { onSession } from '../core/session.js';
-import { toast } from '../core/toast.js';
-import { confirmar, pedirTexto } from '../core/dialogo.js';
-import { escapeHTML, safeImg } from '../core/dom.js';
-import { supabase } from '../core/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { toast } from '../core/sistema/toast.js';
+import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
+import { escapeHTML, safeImg } from '../core/sistema/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
 import { me, data, loadPerfiles } from '../features/duelos/data.js';
 import { cargarRed, solicitar, responder } from '../features/amigos/api.js';
-import { buscarPerfiles, normalizarRed, relacion, etiquetaRelacion, enlacePerfil, esRechazoChat } from '../core/red.js';
-import { href } from '../core/config.js';
-import { validarTexto, tituloConv, vistaPrevia, agruparMensajes, etiquetaDia, hoyClave, totalNoLeidos, MAX_TEXTO } from '../core/chat.js';
+import { buscarPerfiles, normalizarRed, relacion, etiquetaRelacion, enlacePerfil, esRechazoChat } from '../core/comunidad/red.js';
+import { href } from '../core/sistema/config.js';
+import { validarTexto, tituloConv, vistaPrevia, agruparMensajes, etiquetaDia, hoyClave, totalNoLeidos, MAX_TEXTO } from '../core/comunidad/chat.js';
 import * as api from '../features/chat/api.js';
 import { regionAhora } from '../features/ajustes.js';
 

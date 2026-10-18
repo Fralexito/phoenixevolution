@@ -1,13 +1,13 @@
 // Página /alquilar-host/: catálogo de hosts con filtros, precios, ping y contacto + mis alquileres + mi oferta.
 // La lógica de alquiler (solicitar, aceptar, cancelar) vive en features/alquiler.js; aquí solo se arma la página.
-import { supabase } from '../core/supabase.js';
-import { onSession } from '../core/session.js';
-import { escapeHTML, safeUrl } from '../core/dom.js';
-import { toast } from '../core/toast.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession } from '../core/sistema/session.js';
+import { escapeHTML, safeUrl } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
 import { openAuthModal } from '../features/auth.js';
 import { rpc, precios, juegos, alquilerHTML, formSolicitud, accionAlquiler, enviarSolicitud, montarOfertaHost } from '../features/alquiler.js';
-import { filtrarHosts, calidadPing, calcularTotal, marcarChoques } from '../core/hostsCatalogo.js';
-import { formatoPrecio } from '../core/economia.js';
+import { filtrarHosts, calidadPing, calcularTotal, marcarChoques } from '../core/competicion/hostsCatalogo.js';
+import { formatoPrecio } from '../core/economia/economia.js';
 
 const $ = (id) => document.getElementById(id);
 const S = { hosts: [], sesion: null, tab: 'catalogo', cargado: false };

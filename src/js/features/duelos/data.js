@@ -1,7 +1,7 @@
 // Estado y lectura de datos de Duelos (única fuente; los demás módulos solo leen de aquí).
-import { supabase } from '../../core/supabase.js';
-import { getState } from '../../core/session.js';
-import { isStale } from '../../core/schedule.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { getState } from '../../core/sistema/session.js';
+import { isStale } from '../../core/competicion/schedule.js';
 
 export const data = {
   retos: [],                 // retos visibles para mí (RLS decide cuáles)

@@ -1,7 +1,7 @@
 // Marcadores de duelos y estadísticas: llama a las RPC de la migración 036 (las reglas viven en la BD).
-import { supabase } from '../../core/supabase.js';
-import { normalizarEstadisticas } from '../../core/resultado.js';
-import { normalizarEloDe } from '../../core/rankingComunidad.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarEstadisticas } from '../../core/competicion/resultado.js';
+import { normalizarEloDe } from '../../core/competicion/rankingComunidad.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

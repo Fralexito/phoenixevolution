@@ -1,6 +1,6 @@
 // Ranking y retos semanales: llama a las RPC de la migración 045 (las reglas viven en la BD).
-import { supabase } from '../../core/supabase.js';
-import { normalizarCompetitivo, normalizarRetosRank, normalizarMisRetos, normalizarElo } from '../../core/rankingComunidad.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarCompetitivo, normalizarRetosRank, normalizarMisRetos, normalizarElo } from '../../core/competicion/rankingComunidad.js';
 
 async function rpc(nombre, args = {}) {
   const { data, error } = await supabase.rpc(nombre, args);

@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { generar } from '../src/js/core/formatos.js';
-import { construirPlan, tablaTorneo, crucesDePuestos, grupoCompleto, siguienteRondaSuizo, estadoSuizo, campeonSugerido, agregarFechaCircuito, tablaCircuito, porRonda, etiquetaLado, leerMarcador, progreso } from '../src/js/core/torneos.js';
-import { nombreEpico, reglaDelPartido, castigoDelPartido, hashTexto } from '../src/js/core/diversion.js';
+import { generar } from '../src/js/core/competicion/formatos.js';
+import { construirPlan, tablaTorneo, crucesDePuestos, grupoCompleto, siguienteRondaSuizo, estadoSuizo, campeonSugerido, agregarFechaCircuito, tablaCircuito, porRonda, etiquetaLado, leerMarcador, progreso } from '../src/js/core/competicion/torneos.js';
+import { nombreEpico, reglaDelPartido, castigoDelPartido, hashTexto } from '../src/js/core/competicion/diversion.js';
 import { REGLAS_RULETA } from '../src/data/modalidades.js';
 import { DINAMICAS, GUIAS_FORMATOS } from '../src/data/dinamicas.js';
-import { FORMATOS } from '../src/js/core/formatos.js';
+import { FORMATOS } from '../src/js/core/competicion/formatos.js';
 
 const nombres = (n) => Array.from({ length: n }, (_, i) => `J${i + 1}`);
 // Simula lo que hace la base: rellena fila con nombres y resultados.

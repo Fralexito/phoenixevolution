@@ -1,7 +1,7 @@
-// Pruebas de core/notifs.js (campana: categorías, filtros, grupos por día y tiempo relativo).
+// Pruebas de core/sistema/notifs.js (campana: categorías, filtros, grupos por día y tiempo relativo).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { categoriaDe, filtrar, conteoPorFiltro, grupoTiempo, agruparPorTiempo, haceCuanto, esUrgente, alcanzaDescartar } from '../src/js/core/notifs.js';
+import { categoriaDe, filtrar, conteoPorFiltro, grupoTiempo, agruparPorTiempo, haceCuanto, esUrgente, alcanzaDescartar } from '../src/js/core/sistema/notifs.js';
 
 const AHORA = new Date('2026-10-07T01:30:00Z');       // 6 oct 20:30 en Lima
 const hace = (min) => new Date(AHORA.getTime() - min * 60000).toISOString();

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { textoSeguro, contar, mensajeError } from '../src/js/core/bandejaIA.js';
+import { textoSeguro, contar, mensajeError } from '../src/js/core/comunidad/bandejaIA.js';
 
 test('bandeja IA: el texto de la IA se muestra seguro (sin HTML inyectado) con párrafos, viñetas y negrita', () => {
   assert.equal(textoSeguro('Hola **mundo**\n\n- uno\n- dos'), '<p>Hola <b>mundo</b></p><ul><li>uno</li><li>dos</li></ul>');

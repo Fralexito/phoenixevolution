@@ -1,6 +1,6 @@
 // RESULTADOS de la Galaxy League, copiados de CopaFácil fecha por fecha (l = local, v = visitante, gl/gv = goles).
 // Partido AÚN NO JUGADO: gl y gv en null (la tabla lo ignora hasta que se escriba el marcador).
-// Es la base del «espejo»: la tabla se calcula con core/tabla.js y se compara con la de CopaFácil.
+// Es la base del «espejo»: la tabla se calcula con core/competicion/tabla.js y se compara con la de CopaFácil.
 export const CLUBES = {
   Hugo: 'Arsenal', Arens: 'Manchester City', Degox: 'Atlético de Madrid', Beto: 'Liverpool', Jack: 'Manchester United', Morgado: 'AC Milan',
   Victor: 'Bayern Múnich', Fralex: 'FC Barcelona', Camilo: 'PSG', Jeremi: 'Chelsea', Maurisgame: 'Inter', Axel: 'Real Madrid',

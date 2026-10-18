@@ -8,7 +8,7 @@
 //  · Solo con mouse de verdad y sin «menos movimiento».
 import { FX } from '../../data/experimento.js';
 import { hayMovimientoReducido } from './ajustes.js';
-import { inclinacion } from '../core/inclinacion.js';
+import { inclinacion } from '../core/sistema/inclinacion.js';
 
 const OBJETIVOS = '.glass-panel, .liga-card, .player-card, .match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido, .accion, .campeones, .cierre, [data-pub], .cat-item, .lanza';
 const FUERA = '.vt, .pilar-tabs, .mundos-tabs, [data-no3d], [role="dialog"], dialog, .modal';

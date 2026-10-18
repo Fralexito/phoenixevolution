@@ -1,6 +1,6 @@
 // Panel de BÚSQUEDA AVANZADA (dinámica): eliges una o varias stats y la lista se reordena al instante por su promedio.
-// Estado: { keys: ['men','pot'], min: 0, top: 10 }. El cálculo está en core/ranking.js; aquí solo se dibuja y se avisa con onChange(estado).
-import { escapeHTML } from '../core/dom.js';
+// Estado: { keys: ['men','pot'], min: 0, top: 10 }. El cálculo está en core/jugadores/ranking.js; aquí solo se dibuja y se avisa con onChange(estado).
+import { escapeHTML } from '../core/sistema/dom.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from './playerCard.js';
 

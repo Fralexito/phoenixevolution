@@ -1,7 +1,7 @@
 // Acceso a reportes, moderación y sanciones: cada función llama a una RPC de Supabase (las reglas viven en la base de datos, migración 032).
 // Esquema: pages/moderacion.js · features/moderacion/{acciones, aviso} → api (este archivo) + vista → core/moderacion (lógica pura).
-import { supabase } from '../../core/supabase.js';
-import { normalizarReporte, normalizarSancion } from '../../core/moderacion.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarReporte, normalizarSancion } from '../../core/comunidad/moderacion.js';
 
 /** Error que sabe decir si la causa es «la migración 032 todavía no está aplicada» (la función no existe). */
 export class ErrorModeracion extends Error {

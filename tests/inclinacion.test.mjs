@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { maxInclinacion, inclinacion } from '../src/js/core/inclinacion.js';
+import { maxInclinacion, inclinacion } from '../src/js/core/sistema/inclinacion.js';
 
 test('inclinación: lo chico se inclina más que lo grande (8° máx, 1° mín)', () => {
   assert.equal(maxInclinacion(300, 200), 8);

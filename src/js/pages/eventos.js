@@ -1,10 +1,10 @@
 // Página /eventos/: lista de próximos y pasados, «Me interesa» + recordatorio, y gestión para moderación/admin.
 // Esquema: pages/eventos → features/eventos/api → core/evento (puro). Las reglas viven en la BD (migración 042).
-import { onSession, can } from '../core/session.js';
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
+import { onSession, can } from '../core/sistema/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
 import { listarEventos, marcarInteres, crearEvento, editarEvento, cancelarEvento } from '../features/eventos/api.js';
-import { JUEGOS_EVENTO, ESTADOS, LIMITES, estadoEvento, cuentaRegresiva, formatoLima, isoALima, nombreJuego, validarFormulario, textoVacio } from '../core/evento.js';
+import { JUEGOS_EVENTO, ESTADOS, LIMITES, estadoEvento, cuentaRegresiva, formatoLima, isoALima, nombreJuego, validarFormulario, textoVacio } from '../core/comunidad/evento.js';
 
 const $ = (id) => document.getElementById(id);
 // S.pend = ids con una acción en curso (evita dobles clics); S.req = «versión» de la última carga (descarta respuestas viejas al cambiar de pestaña).

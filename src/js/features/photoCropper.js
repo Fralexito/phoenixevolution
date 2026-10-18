@@ -2,8 +2,8 @@
 // openPhotoCropper(file, { getPlayer, aspecto }) → Promise<{ blob, aspecto }|null>  (null = canceló).
 // Largo de la foto: Normal 5:4 (solo la zona superior), Media 1:1 (llega al nombre) o Larga 4:5 (llega a las estadísticas).
 // La tarjeta NO cambia de tamaño: la foto es una capa detrás del contenido.
-import { openModal, closeModal } from '../core/modal.js';
-import { initialState, zoomAt, clampPos, rescale, sourceRect, outSize, coverScale, ASPECTOS, ASPECTO_NUEVA, aspectoValido, ratioDe, MAX_ZOOM } from '../core/crop.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { initialState, zoomAt, clampPos, rescale, sourceRect, outSize, coverScale, ASPECTOS, ASPECTO_NUEVA, aspectoValido, ratioDe, MAX_ZOOM } from '../core/sistema/crop.js';
 import { playerCardHTML } from './playerCard.js';
 
 const ID = 'crop-modal';

@@ -1,6 +1,6 @@
 // Encuestas: llama a las RPC de la migración 040 (las reglas viven en la BD).
-import { supabase } from '../../core/supabase.js';
-import { normalizarEncuestas } from '../../core/encuesta.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { normalizarEncuestas } from '../../core/comunidad/encuesta.js';
 
 const sinMigracion = (e) => e.code === 'PGRST202' || /could not find the function|schema cache/i.test(e.message ?? '');
 async function rpc(nombre, args) {

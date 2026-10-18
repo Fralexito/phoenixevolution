@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ANCHO_BASE, ESCALA_MAX, ESCALA_MIN, anchoBase, esIlegible, escalaInicial, rectBase, destino, regreso } from '../src/js/core/replica.js';
+import { ANCHO_BASE, ESCALA_MAX, ESCALA_MIN, anchoBase, esIlegible, escalaInicial, rectBase, destino, regreso } from '../src/js/core/jugadores/replica.js';
 
 test('anchoBase: las cartas angostas se reconstruyen con ancho normal; las normales o grandes se respetan', () => {
   assert.equal(anchoBase(84, true), ANCHO_BASE.movil);      // zoom mínimo en celular

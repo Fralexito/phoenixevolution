@@ -1,5 +1,5 @@
 import { computePosition, shift } from '@floating-ui/dom';
-import { onSession, can } from '../core/session.js';
+import { onSession, can } from '../core/sistema/session.js';
 // Pilares del menú de arriba: el desplegable se abre con hover/teclado por CSS; aquí solo el clic (pantallas táctiles),
 // Escape y clic afuera para cerrar, y aria-expanded para lectores de pantalla.
 export function montarPilares() {

@@ -1,6 +1,6 @@
 // DIBUJO DEL AFICHE DEL DÍA: en la página (HTML) y para descargar (PNG hecho con canvas).
-// Qué va dentro lo decide core/afiche.js; aquí solo se pinta. Usa las fuentes del sitio (Rajdhani + Inter).
-import { escapeHTML as esc } from '../../core/dom.js';
+// Qué va dentro lo decide core/portada/afiche.js; aquí solo se pinta. Usa las fuentes del sitio (Rajdhani + Inter).
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
 
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 const DIAS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];

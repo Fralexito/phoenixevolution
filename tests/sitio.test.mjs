@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizar, mover, moverA, alternar, hrefValido, esBase, iguales, VENTANAS } from '../src/js/core/sitio.js';
+import { normalizar, mover, moverA, alternar, hrefValido, esBase, iguales, VENTANAS } from '../src/js/core/sistema/sitio.js';
 
 test('normalizar: basura → config completa y segura', () => {
   const c = normalizar(null);

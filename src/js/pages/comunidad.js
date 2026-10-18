@@ -1,11 +1,11 @@
 // Página /comunidad/: publicaciones recientes de TODOS los muros (los que quien mira puede ver), con filtro opcional por juego.
 // Esquema: este archivo (pinta y reparte eventos) → features/muro/api.comunidad (RPC muro_comunidad, migración 027) → core/muro (lógica pura).
-import { escapeHTML } from '../core/dom.js';
-import { toast } from '../core/toast.js';
-import { onSession, can } from '../core/session.js';
+import { escapeHTML } from '../core/sistema/dom.js';
+import { toast } from '../core/sistema/toast.js';
+import { onSession, can } from '../core/sistema/session.js';
 import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js';
-import { segmentoParaGuardar } from '../core/muro.js';
-import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../core/feed.js';
+import { segmentoParaGuardar } from '../core/comunidad/muro.js';
+import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../core/comunidad/feed.js';
 import { SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { reproductorYT } from '../features/muro/render.js';
@@ -13,7 +13,7 @@ import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { observarPresence, stopPresence, onPresence, ESTADOS } from '../features/presence.js';
-import { href } from '../core/config.js';
+import { href } from '../core/sistema/config.js';
 
 const feedEl = document.getElementById('com-feed'); const filtroEl = document.getElementById('com-filtro'); const vistasEl = document.getElementById('com-vistas');
 const q = new URLSearchParams(location.search);

@@ -5,12 +5,12 @@
 //   · montarMisOficiales(section)   → Mis partidos: mis partidos oficiales que llegaron por Link, con «Reclamar».
 // Todo pasa por las funciones de la base (migración 102): liga_resolver_resultado, liga_designar_arbitro y
 // liga_reclamar_resultado. Ellas comprueban los permisos; aquí solo se muestra el botón a quien tiene sentido.
-import { supabase } from '../../core/supabase.js';
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { confirmar, pedirTexto, elegir } from '../../core/dialogo.js';
-import { openModal, closeModal } from '../../core/modal.js';
-import { ESTADOS_LIGA, golesVivo, textoGol, validarMarcador, colaValidacion, puedeReclamar, resumenDoctor } from '../../core/ligaVivo.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { confirmar, pedirTexto, elegir } from '../../core/sistema/dialogo.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { ESTADOS_LIGA, golesVivo, textoGol, validarMarcador, colaValidacion, puedeReclamar, resumenDoctor } from '../../core/competicion/ligaVivo.js';
 
 const COLS = 'id, edicion_id, fecha, local, visitante, goles_local, goles_visita, estado, origen, detalle, arbitro, propuesto_en, resuelto_en';
 const MODAL = 'liga-corregir';

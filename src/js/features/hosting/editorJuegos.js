@@ -1,8 +1,8 @@
 // Selector de juegos y parches que hosteas (varios). Se usa en Mi perfil → Sistema Host.
 // Guarda en perfiles.host_catalogo con la misma RPC que el panel «Hosting» del muro (muro_guardar_host).
-import { escapeHTML } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
-import { HOST_JUEGOS, HOST_MAX_TEXTO, limpiarOpcion, alternarJuego, alternarOpcion } from '../../core/hostCatalogo.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
+import { HOST_JUEGOS, HOST_MAX_TEXTO, limpiarOpcion, alternarJuego, alternarOpcion } from '../../core/competicion/hostCatalogo.js';
 
 /** Monta el selector en `caja` con el catálogo inicial. → { get(): catálogo actual } */
 export function montarEditorJuegos(caja, catInicial = []) {

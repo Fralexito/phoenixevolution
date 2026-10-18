@@ -1,6 +1,6 @@
 // Piezas de ayuda reutilizables: «¿cómo funciona?» de cada formato, dinámicas con su guía y leyendas. Solo devuelven HTML (texto escapado).
-import { FORMATOS } from '../../core/formatos.js';
-import { escapeHTML as esc } from '../../core/dom.js';
+import { FORMATOS } from '../../core/competicion/formatos.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
 import { GUIAS_FORMATOS, DINAMICAS, GRUPOS_DINAMICAS, dinamicaPorId, LEYENDA_ESTADOS, LEYENDA_VISIBILIDAD } from '../../../data/dinamicas.js';
 
 export const FORMATO_LIBRE = Object.freeze({ id: 'libre', nombre: 'Libre (tú decides)', icono: 'fa-pen-ruler', tono: 'divertido', min: 2, max: 256, frase: 'Tú añades los partidos que quieras.', cuando: 'Ligas inventadas, retos entre amigos, lo que se te ocurra.' });

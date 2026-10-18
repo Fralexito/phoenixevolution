@@ -1,8 +1,8 @@
-// Pruebas de core/chatFlotante.js (qué ventanas hay, cuántas caben, qué se recuerda entre páginas y orden de contactos).
+// Pruebas de core/comunidad/chatFlotante.js (qué ventanas hay, cuántas caben, qué se recuerda entre páginas y orden de contactos).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ventanasQueCaben, abrirVentana, cerrarVentana, minimizarVentana, ajustarACaben, leerEstado, ordenarContactos,
-  noLeidosPorUsuario, debeAparecer, insignia, MAX_RECORDADAS } from '../src/js/core/chatFlotante.js';
+  noLeidosPorUsuario, debeAparecer, insignia, MAX_RECORDADAS } from '../src/js/core/comunidad/chatFlotante.js';
 
 const id = (n) => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
 

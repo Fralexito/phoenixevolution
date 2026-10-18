@@ -1,9 +1,9 @@
 // Bloques de enganche reutilizables: racha diaria, historia del perfil y ranking semanal (migración 070).
 // Si la migración falta o algo falla, el bloque se oculta sin romper la página.
-import { supabase } from '../core/supabase.js';
-import { escapeHTML, safeUrl } from '../core/dom.js';
-import { href } from '../core/config.js';
-import { textoRacha, CLASE_FORMA, formaValida, faltaReinicio, textoFalta } from '../core/enganche.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { escapeHTML, safeUrl } from '../core/sistema/dom.js';
+import { href } from '../core/sistema/config.js';
+import { textoRacha, CLASE_FORMA, formaValida, faltaReinicio, textoFalta } from '../core/competicion/enganche.js';
 
 const rpc = async (n, a) => { const { data, error } = await supabase.rpc(n, a); if (error) throw error; return data; };
 const ocultar = (el, e, n) => { console.warn(`[enganche] ${n}:`, e?.message); el.hidden = true; };

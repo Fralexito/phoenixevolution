@@ -4,10 +4,10 @@
 //    El formulario de fichaje (125) los pinta con camposLmFichaje.pintar(cont) y añade datos.lm = camposLmFichaje.leer().
 //  · pintarHistorialLM: qué pasó en la Liga Máster de cada PC (por usuario y partida). Deshacer = anular el cambio.
 // La página que monta el formulario importa este archivo: import './features/cambios/ligaMaster.js' (en js/pages/cambiosOficiales.js).
-import { registrarTipo } from '../../core/cambiosOficiales.js';
-import { supabase } from '../../core/supabase.js';
-import { escapeHTML as e } from '../../core/dom.js';
-import { datosDinero, datosValor, lmDeFichaje, textoResultado } from '../../core/ligaMasterPc.js';
+import { registrarTipo } from '../../core/pes/cambiosOficiales.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { escapeHTML as e } from '../../core/sistema/dom.js';
+import { datosDinero, datosValor, lmDeFichaje, textoResultado } from '../../core/pes/ligaMasterPc.js';
 
 const CSS_IN = 'w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-[14px]';
 const CSS_LB = 'block text-[12px] text-white/70 mb-1';

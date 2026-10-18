@@ -1,15 +1,15 @@
 // Formulario único (/cambios-oficiales/): tipos «stats» (Estadísticas) e «info» (Información) del jugador — migración 126.
 // Enchufe del contrato §6: registrarTipo({ tipo, etiqueta, destinos, pintar(contenedor, ctx), leer(), vista(caja, st) }). Lo importa pages/cambiosOficiales.js.
-// Lógica pura en core/fichasCampos.js. Pantalla (barras, puntos, campo de fútbol, resumen en vivo): features/cambios/fichasUI.js.
+// Lógica pura en core/pes/fichasCampos.js. Pantalla (barras, puntos, campo de fútbol, resumen en vivo): features/cambios/fichasUI.js.
 // Historial y deshacer: features/cambios/historialFichas.js.
-import { supabase } from '../../core/supabase.js';
-import { escapeHTML } from '../../core/dom.js';
-import { registrarTipo } from '../../core/cambiosOficiales.js';
-import { camposDe, construirDatos, vigentesPlanos } from '../../core/fichasCampos.js';
+import { supabase } from '../../core/sistema/supabase.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
+import { registrarTipo } from '../../core/pes/cambiosOficiales.js';
+import { camposDe, construirDatos, vigentesPlanos } from '../../core/pes/fichasCampos.js';
 import { minifaceUrl } from '../fotoFutbolista.js';
 import { pintarFicha, enlazarFicha, valoresEscritos, restaurarValores, vistaFicha } from './fichasUI.js';
 
-let catalogo = null;   // filas de pes_fichas_campos (vacío = se usa la misma lista de core/fichasCampos.js)
+let catalogo = null;   // filas de pes_fichas_campos (vacío = se usa la misma lista de core/pes/fichasCampos.js)
 async function cargarCatalogo() {
   if (catalogo) return catalogo;
   const { data, error } = await supabase.from('pes_fichas_campos').select('clave, tipo, grupo, texto, minimo, maximo, orden').order('orden');

@@ -1,11 +1,11 @@
 ---
 // FORMATOS: generador de torneos (eliminatoria, doble, liguilla, grupos, suizo, rey de la colina, escalera, circuito), reto del día y ruleta de reglas.
-// Todo se calcula en el navegador con js/core/formatos.js y js/core/retos.js (sin base de datos: sirve para planear antes de crear el torneo real). Guía: docs/liga-y-torneos/FORMATOS.md
+// Todo se calcula en el navegador con js/core/competicion/formatos.js y js/core/competicion/retos.js (sin base de datos: sirve para planear antes de crear el torneo real). Guía: docs/liga-y-torneos/FORMATOS.md
 import Layout from '../layouts/Layout.astro';
 import Plegable from '../components/Plegable.astro';
-import { FORMATOS } from '../js/core/formatos.js';
+import { FORMATOS } from '../js/core/competicion/formatos.js';
 import { MODALIDADES, NOCHES_TEMATICAS } from '../data/modalidades.js';
-import { href } from '../js/core/config.js';
+import { href } from '../js/core/sistema/config.js';
 const TONO = { serio: 'Serio', casual: 'Casual', divertido: 'Divertido' };
 ---
 <Layout title="Formatos" active="formatos" description="Arma torneos con el formato que quieras, gira la ruleta de reglas y mira el reto del día.">

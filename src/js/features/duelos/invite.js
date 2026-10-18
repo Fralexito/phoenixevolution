@@ -1,9 +1,9 @@
 // Ventana para invitar jugadores a un equipo (solo el líder de ese equipo; la BD lo vuelve a validar).
-import { openModal, closeModal } from '../../core/modal.js';
-import { escapeHTML } from '../../core/dom.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { escapeHTML } from '../../core/sistema/dom.js';
 import { data, me, partsOf } from './data.js';
 import { invitar } from './actions.js';
-import { seats } from '../../core/teams.js';
+import { seats } from '../../core/competicion/teams.js';
 
 export function openInviteModal(reto, equipo) {
   const wrap = openModal(`

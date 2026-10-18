@@ -1,6 +1,6 @@
 // Verificación en vivo del @usuario (único y público, como en TikTok). Lee `perfiles` (lectura pública).
-import { supabase } from '../core/supabase.js';
-import { toUsername } from '../core/dom.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { toUsername } from '../core/sistema/dom.js';
 
 const RESERVADOS = ['admin', 'administrador', 'moderador', 'ayudante', 'arbitro', 'auditoria', 'soporte', 'staff', 'comisario', 'oficial', 'phoenix', 'phoenixevolution', 'galaxyleague', 'sistema', 'root']; // [BD] igual que perfiles_username_reservado
 export const MIN_HANDLE = 3;

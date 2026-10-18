@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { circulosHistorias, mapaMisReacciones, conMisReacciones, totalReacciones, textoRespuestas, REACCION_RAPIDA } from '../src/js/core/feedSocial.js';
+import { circulosHistorias, mapaMisReacciones, conMisReacciones, totalReacciones, textoRespuestas, REACCION_RAPIDA } from '../src/js/core/comunidad/feedSocial.js';
 import { PALETA_EMOJIS } from '../src/data/muroEstilo.js';
 
 const h = (id) => ({ id, texto: 'hola', imagen_url: null, video_url: null, created_at: '2026-10-05T10:00:00Z' });

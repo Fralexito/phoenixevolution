@@ -1,8 +1,8 @@
 // Catálogo de diseños de Noticias: galería de TODAS las plantillas con vista previa en vivo y controles de estilo (color, forma, brillo, animación, letra).
 // Se abre desde la página (para aplicar un diseño a una noticia), desde el lector («Rediseñar») o desde el editor («Elegir diseño»).
-import { openModal, closeModal } from '../../core/modal.js';
-import { escapeHTML as esc } from '../../core/dom.js';
-import { NORMALES, HEROES, LECTURAS, ACENTOS, OPCIONES, ETIQUETAS_OPCION, asignarDiseno, estiloAleatorio, limpiarEstilo, plantillaDe } from '../../core/noticiasPlantillas.js';
+import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { NORMALES, HEROES, LECTURAS, ACENTOS, OPCIONES, ETIQUETAS_OPCION, asignarDiseno, estiloAleatorio, limpiarEstilo, plantillaDe } from '../../core/portada/noticiasPlantillas.js';
 import { tarjetaHTML, lecturaHTML } from './tarjetas.js';
 
 const ID = 'news-catalogo';

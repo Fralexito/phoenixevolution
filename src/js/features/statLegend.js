@@ -1,6 +1,6 @@
 // Leyenda de estadísticas: ventana con el nombre completo y el significado de cada stat (lee de data/stats.js).
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML } from '../core/dom.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML } from '../core/sistema/dom.js';
 import { STAT_INFO } from '../../data/stats.js';
 
 const ID = 'stat-legend';

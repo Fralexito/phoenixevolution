@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { titularesPortada, rachaVictorias, lineaEstado } from '../src/js/core/titulares.js';
+import { titularesPortada, rachaVictorias, lineaEstado } from '../src/js/core/portada/titulares.js';
 
 const fechas = [
   { n: 1, partidos: [{ l: 'Victor', v: 'Beto', gl: 2, gv: 0 }, { l: 'Hugo', v: 'Jack', gl: 1, gv: 1 }] },

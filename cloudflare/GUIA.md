@@ -37,7 +37,7 @@ Navegador ──(4) publica el enlace (URL)──▶ Supabase (RPC muro_publicar
 
 ## Parte 2 · lo que hago yo con esos dos datos
 1. Migración **028**: la base de datos acepta enlaces de TU bucket R2 (host exacto, igual que hoy con Supabase) además de los de Supabase.
-2. Pongo el DATO 2 como valor por defecto de `VIDEO_WORKER_URL` en `src/js/core/config.js`.
+2. Pongo el DATO 2 como valor por defecto de `VIDEO_WORKER_URL` en `src/js/core/sistema/config.js`.
 3. Pruebas, MAPA, commit en `borrador`.
 4. Tú ejecutas la 028 en Supabase y pruebas subir un video desde la vista previa (`/fase-beta-1-0/`).
 

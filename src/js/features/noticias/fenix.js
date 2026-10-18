@@ -1,13 +1,13 @@
 // EL FÉNIX · el diario chicha de arriba de Noticias (ronda 351, FX.noticiasV2).
 // Pinta la portada de la edición elegida, los botones de ediciones, la descarga en PNG (post 4:5 e historia 9:16),
 // compartir (WhatsApp / Discord / sistema) y el álbum de cupones (solo en este navegador).
-// Datos: data/portadas.js → core/portadas.js. Si algo falla, la zona seria de abajo se sigue viendo igual.
+// Datos: data/portadas.js → core/portada/portadas.js. Si algo falla, la zona seria de abajo se sigue viendo igual.
 import { PORTADAS } from '../../../data/portadas.js';
 import { CLUBES } from '../../../data/ligaResultados.js';
-import { edicionesPublicadas, etiquetaEdicion, cuponesSeguidos } from '../../core/portadas.js';
-import { escudoDe } from '../../core/escudos.js';
-import { escapeHTML as esc } from '../../core/dom.js';
-import { toast } from '../../core/toast.js';
+import { edicionesPublicadas, etiquetaEdicion, cuponesSeguidos } from '../../core/portada/portadas.js';
+import { escudoDe } from '../../core/sistema/escudos.js';
+import { escapeHTML as esc } from '../../core/sistema/dom.js';
+import { toast } from '../../core/sistema/toast.js';
 
 const CLAVE_VISTAS = 'pes:fenix:vistas';
 const leerVistas = () => { try { return JSON.parse(localStorage.getItem(CLAVE_VISTAS) ?? '[]'); } catch { return []; } };

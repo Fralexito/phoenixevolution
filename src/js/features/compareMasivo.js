@@ -1,9 +1,9 @@
 // Comparación MASIVA: de 2 a 8 jugadores repartidos en dos equipos (A y B, máx. 4 cada uno; admite 3 vs 2, 4 vs 3…).
 // Se compara el PROMEDIO de cada equipo. Para no tener que bajar tanto, el resultado se divide en mini secciones
 // (Resumen · Radar · Barras · Tabla) y solo una está abierta a la vez.
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML, safeImg, statColor } from '../core/dom.js';
-import { compareTeams, teamProfile, axisPoint, radarPoints, autoTeams, moveToTeam, MAX_COMPARE, MAX_TEAM } from '../core/compare.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML, safeImg, statColor } from '../core/sistema/dom.js';
+import { compareTeams, teamProfile, axisPoint, radarPoints, autoTeams, moveToTeam, MAX_COMPARE, MAX_TEAM } from '../core/jugadores/compare.js';
 import { posInfo } from '../../data/posiciones.js';
 import { STAT_INFO } from '../../data/stats.js';
 import { STAT_KEYS } from './playerCard.js';

@@ -1,12 +1,12 @@
 // Formulario de bienvenida: se muestra a quien aún no completó su perfil (perfiles.perfil_completo = false):
 // todos los que entran con Discord o Google, y quien se registró con correo sin pasar por el formulario.
 // Aquí el @usuario se elige LIBRE (el límite de 14 días empieza a contar después, ver trigger de la BD).
-import { supabase } from '../core/supabase.js';
-import { onSession, refreshProfile } from '../core/session.js';
-import { openModal, closeModal } from '../core/modal.js';
-import { escapeHTML, toUsername } from '../core/dom.js';
-import { providerName } from '../core/avatar.js';
-import { toast } from '../core/toast.js';
+import { supabase } from '../core/sistema/supabase.js';
+import { onSession, refreshProfile } from '../core/sistema/session.js';
+import { openModal, closeModal } from '../core/sistema/modal.js';
+import { escapeHTML, toUsername } from '../core/sistema/dom.js';
+import { providerName } from '../core/sistema/avatar.js';
+import { toast } from '../core/sistema/toast.js';
 import { PAISES } from '../../data/paises.js';
 import { avatarPickerHTML, bindAvatarPicker, resolveAvatar, identityError } from './avatarPicker.js';
 import { bindHandle } from './handleCheck.js';
