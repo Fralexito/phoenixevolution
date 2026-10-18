@@ -35,3 +35,48 @@ export const paisDe = (club) => PAIS[club?.liga] ?? '';
 export const escudoUrl = (club) => (club?.id ? `${import.meta.env?.BASE_URL ?? '/'}escudos-pes/${club.id}.webp` : null);
 /** <img> del escudo, o nada si el club no está en el catálogo. */
 export const escudoImg = (club, px = 28) => (club ? `<img src="${escudoUrl(club)}" alt="" width="${px}" height="${px}" loading="lazy" decoding="async" class="cfx-esc" style="width:${px}px;height:${px}px">` : '');
+
+// ── Sala de fichajes (features/cambios/salaFichajes.js): funciones puras, sin DOM ni red ──
+/** Línea del campo a la que pertenece una posición registrada (para agrupar la plantilla). */
+export const LINEAS = [
+  { id: 'porteros', nombre: 'Porteros', posiciones: ['PT'] },
+  { id: 'defensas', nombre: 'Defensas', posiciones: ['DFC', 'LI', 'LD'] },
+  { id: 'medios', nombre: 'Mediocampistas', posiciones: ['MCD', 'MC', 'MI', 'MD', 'MO'] },
+  { id: 'delanteros', nombre: 'Delanteros', posiciones: ['EI', 'ED', 'SD', 'DC'] },
+];
+export const lineaDe = (pos) => LINEAS.find((l) => l.posiciones.includes(pos))?.id ?? 'otros';
+/** Plantilla [[pid, nombre, pos], …] → [{ linea, nombre, jugadores: [{pid, nombre, pos}] }] en el orden del campo. */
+export function agruparPlantilla(plantilla = []) {
+  const jugadores = plantilla.map(([pid, nombre, pos]) => ({ pid, nombre, pos }));
+  const grupos = LINEAS.map((l) => ({ linea: l.id, nombre: l.nombre, jugadores: jugadores.filter((j) => l.posiciones.includes(j.pos)) }));
+  const otros = jugadores.filter((j) => lineaDe(j.pos) === 'otros');
+  if (otros.length) grupos.push({ linea: 'otros', nombre: 'Otros', jugadores: otros });
+  return grupos.filter((g) => g.jugadores.length);
+}
+/** Jugadores de TODAS las plantillas cuyo nombre encaja con el texto (sin tildes). Los que empiezan por el texto o por su apellido van primero. */
+export function buscarJugadoresPes(texto, plantillas, { max = 24 } = {}) {
+  const q = norm(texto);
+  if (q.length < 2) return [];
+  const hits = [];
+  for (const [clubId, lista] of Object.entries(plantillas ?? {})) {
+    for (const [pid, nombre, pos] of lista) {
+      const n = norm(nombre);
+      const i = n.indexOf(q);
+      if (i < 0) continue;
+      const palabra = i === 0 || n[i - 1] === ' ';
+      hits.push({ pid, nombre, pos, clubId: Number(clubId), puntos: (n === q ? 3 : 0) + (i === 0 ? 2 : palabra ? 1 : 0) });
+    }
+  }
+  return hits.sort((a, b) => b.puntos - a.puntos || a.nombre.localeCompare(b.nombre, 'es')).slice(0, max);
+}
+/** Une cada club de la Liga Máster de la web con su club del catálogo por las palabras del nombre («Inter» ↔ «FC Inter de Milán»). Devuelve Map<id del catálogo, club LM>. */
+export function emparejarClubesLm(clubesLm, lista = CLUBES_PES) {
+  const palabras = (s) => norm(s).split(' ').filter(Boolean);
+  const r = new Map();
+  for (const lm of clubesLm ?? []) {
+    const w = palabras(lm.nombre); if (!w.length) continue;
+    const c = lista.find((x) => !r.has(x.id) && w.every((p) => palabras(x.nombre).includes(p)));
+    if (c) r.set(c.id, lm);
+  }
+  return r;
+}

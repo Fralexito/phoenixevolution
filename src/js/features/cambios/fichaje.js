@@ -4,6 +4,9 @@ import { registrarTipo, validarFichaje, incluyeLm } from '../../core/cambiosOfic
 import { escapeHTML as esc } from '../../core/dom.js';
 import { buscarJugadores, clubesLm } from './api.js';
 import { buscarClubes, clubExacto, escudoImg, paisDe } from '../../core/clubesPes.js';
+import { CLUBES_PES } from '../../../data/clubesPes.js';
+import { abrirSala } from './salaFichajes.js';
+import { cargarLm } from './datosSala.js';
 
 let raiz = null;
 let clubes = null;
@@ -29,13 +32,32 @@ async function sugerir() {
   } catch { lista.innerHTML = ''; }
 }
 
+let destinoActual = 'base';
+/** Rellena los campos del formulario con lo elegido en la sala de fichajes (jugador, club de origen, club destino y, si hay, sus ids de la Liga Máster). */
+function aplicarSala(r) {
+  v('jugador').value = r.jugador.nombre; v('jugador_id').value = r.jugador.pid; v('jugador_id').dataset.auto = '1';
+  v('libre').checked = false; v('desde').disabled = false; v('desde_id').disabled = false;
+  v('desde').value = r.jugador.clubNombre; v('desde_id').value = r.jugador.clubId;
+  v('hasta').value = r.destino.nombre; v('hasta_id').value = r.destino.clubId;
+  v('lm_jugador_id').value = r.lm.jugadorId ?? '';
+  if (r.lm.clubId) v('lm_club_id').value = String(r.lm.clubId);
+  for (const id of ['sugerencias', 'clubes-desde', 'clubes-hasta']) v(id).innerHTML = '';
+  raiz.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
 registrarTipo({
   tipo: 'fichaje',
   etiqueta: 'Fichaje (jugador → equipo)',
   destinos: ['base', 'lm', 'ambos'],
   async pintar(contenedor, ctx) {
     raiz = contenedor;
+    destinoActual = ctx.destino;
     contenedor.innerHTML = `
+      <button type="button" class="cfx-sala" id="cf-abrir-sala">
+        <span class="cfx-sala-escudos" aria-hidden="true">${[108, 101, 109, 114].map((id) => escudoImg(CLUBES_PES.find((c) => c.id === id), 34)).join('')}</span>
+        <span class="cfx-sala-texto"><b>Abrir la sala de fichajes</b><small>Elige el club, el jugador y su destino mirando escudos y plantillas.</small></span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
       <div class="cf-rejilla">
         ${campo('jugador', 'Jugador', { ph: 'Ej.: Lamine Yamal', ayuda: 'Escríbelo como sale en el PES. Si está en la Liga Máster de la web, elígelo de la lista.', lista: 'sugerencias', ancho: true })}
         ${campo('desde', 'Sale de (equipo)', { ph: 'Ej.: FC Barcelona', ayuda: 'Su club, no su selección. Escribe y elige de la lista (5 grandes ligas).', lista: 'clubes-desde' })}
@@ -53,6 +75,11 @@ registrarTipo({
           <input type="hidden" id="cf-lm_jugador_id">
         </div>
       </div>`;
+    v('abrir-sala').addEventListener('click', async () => {
+      const r = await abrirSala({ soloLm: incluyeLm(destinoActual) });
+      if (r) aplicarSala(r);
+    });
+    cargarLm().then(() => raiz?.dispatchEvent(new Event('change', { bubbles: true })));   // los DT llegan después: la vista previa se repinta
     let espera = null;
     v('jugador').addEventListener('input', () => {
       v('lm_jugador_id').value = '';
@@ -86,7 +113,7 @@ registrarTipo({
       v('lm_club_id').insertAdjacentHTML('beforeend', clubes.map((c) => `<option value="${c.id}" data-nombre="${esc(c.nombre)}" data-pes="${c.pes_team_id ?? ''}">${esc(c.nombre)}</option>`).join(''));
     } catch { /* sin clubes de LM: el resto del formulario sigue sirviendo */ }
   },
-  cambiarDestino(destino) { const lm = v('lm'); if (lm) lm.hidden = !incluyeLm(destino); },
+  cambiarDestino(destino) { destinoActual = destino; const lm = v('lm'); if (lm) lm.hidden = !incluyeLm(destino); },
   leer(ctx) {
     const lm = incluyeLm(ctx.destino);
     if (lm && !v('lm_club_id').value) throw new Error('Elige el club de Liga Máster al que va.');

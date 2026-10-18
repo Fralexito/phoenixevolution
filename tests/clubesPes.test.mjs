@@ -35,3 +35,32 @@ test('cada club del catálogo tiene su escudo en public/escudos-pes', () => {
   const faltan = CLUBES_PES.filter((c) => !existsSync(new URL(`../public/escudos-pes/${c.id}.webp`, import.meta.url)));
   assert.deepEqual(faltan.map((c) => c.nombre), []);
 });
+
+import { LINEAS, lineaDe, agruparPlantilla, buscarJugadoresPes, emparejarClubesLm } from '../src/js/core/clubesPes.js';
+import { PLANTILLAS } from '../src/data/plantillasPes.js';
+test('plantillas: todos los clubes del catálogo tienen jugadores y posiciones válidas', () => {
+  const pos = new Set(LINEAS.flatMap((l) => l.posiciones));
+  for (const c of CLUBES_PES) {
+    const l = PLANTILLAS[c.id];
+    assert.ok(l && l.length >= 15, `${c.nombre} sin plantilla`);
+    for (const [pid, nombre, p] of l) { assert.ok(pid > 0 && nombre, c.nombre); assert.ok(pos.has(p), `${nombre}: posición ${p}`); }
+  }
+});
+test('agruparPlantilla ordena por líneas del campo', () => {
+  const g = agruparPlantilla([[1, 'A', 'DC'], [2, 'B', 'PT'], [3, 'C', 'MC'], [4, 'D', 'DFC']]);
+  assert.deepEqual(g.map((x) => x.linea), ['porteros', 'defensas', 'medios', 'delanteros']);
+  assert.equal(lineaDe('LI'), 'defensas'); assert.equal(lineaDe('xx'), 'otros');
+});
+test('buscarJugadoresPes: sin tildes, mínimo 2 letras, primero los que empiezan', () => {
+  const p = { 1: [[10, 'Pedri', 'MC'], [11, 'Alejandro Pedrinho', 'MD']], 2: [[20, 'Rodri', 'MCD']] };
+  assert.deepEqual(buscarJugadoresPes('p', p), []);
+  assert.deepEqual(buscarJugadoresPes('pedri', p).map((x) => x.pid), [10, 11]);
+  assert.equal(buscarJugadoresPes('RODRI', p)[0].clubId, 2);
+});
+test('emparejarClubesLm: los 12 clubes de la Liga Máster encuentran su club del catálogo', () => {
+  const lm = ['AC Milan', 'Arsenal', 'Atlético de Madrid', 'Bayern Múnich', 'Chelsea', 'FC Barcelona', 'Inter', 'Liverpool', 'Manchester City', 'Manchester United', 'Paris Saint-Germain', 'Real Madrid']
+    .map((nombre, i) => ({ id: 700 + i, nombre }));
+  const r = emparejarClubesLm(lm);
+  assert.equal(r.size, 12);
+  assert.equal(r.get(119).nombre, 'Inter'); assert.equal(r.get(101).nombre, 'Arsenal'); assert.equal(r.get(114).nombre, 'Paris Saint-Germain'); assert.equal(r.get(108).nombre, 'FC Barcelona');
+});

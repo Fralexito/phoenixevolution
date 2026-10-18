@@ -227,3 +227,17 @@ html[data-tema='sudario'] .cfx { --a: #f5c542; }
   .ft-rango { grid-row: auto; }
   .ft-fila-pips, .ft-fila-chips { grid-template-columns: 1fr; grid-template-areas: 'etq' 'ahora' 'pips'; row-gap: .4rem; }
 }
+
+/* Botón grande que abre la sala de fichajes (features/cambios/salaFichajes.js) y la línea del usuario (DT) en la vista previa. */
+.cfx-sala { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem; padding: .9rem 1.1rem; margin-bottom: 1rem; text-align: left; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--a) 40%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--a) 14%, transparent), rgba(255,255,255,.02)); transition: transform .3s var(--curva), border-color .2s, background-color .2s; }
+.cfx-sala-escudos { display: inline-flex; }
+.cfx-sala-escudos .cfx-esc { margin-left: -.55rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,.5)); transition: transform .35s var(--curva); }
+.cfx-sala-escudos .cfx-esc:first-child { margin-left: 0; }
+.cfx-sala-texto { display: grid; gap: .15rem; }
+.cfx-sala-texto b { font-size: 15px; font-weight: 700; color: #fff; }
+.cfx-sala-texto small { font-size: 12.5px; color: var(--tx2); }
+.cfx-sala > i { color: var(--a); transition: transform .3s var(--curva); }
+@media (hover: hover) { .cfx-sala:hover { transform: translateY(-2px); border-color: var(--a); } .cfx-sala:hover > i { transform: translateX(4px); } .cfx-sala:hover .cfx-esc { transform: translateY(-3px); } .cfx-sala:hover .cfx-esc:nth-child(2) { transition-delay: 40ms; } .cfx-sala:hover .cfx-esc:nth-child(3) { transition-delay: 80ms; } .cfx-sala:hover .cfx-esc:nth-child(4) { transition-delay: 120ms; } }
+.cfx-tk-dt { font-size: 12px; color: var(--a); min-height: 1.1em; }
+.cfx-tk-dt:empty { display: none; }
