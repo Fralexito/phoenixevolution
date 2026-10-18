@@ -91,3 +91,9 @@ html[data-fx-pasada] .modal-card :is(button, a, input, select, textarea):focus-v
 /* Club para elegir en «Mi club»: mismo gesto que las tarjetas de la Sala (se levanta, el escudo crece). */
 html[data-fx-pasada] .mg-club-op { transition: transform .3s cubic-bezier(.16, 1, .3, 1), border-color .2s, box-shadow .3s; }
 html[data-fx-pasada] .mg-club-op:active { transform: translateY(-1px); }
+
+/* ---------- 9 · Mi club: los botones de línea llevan su color (mismo código que la Sala de fichajes) ---------- */
+html[data-fx-pasada] .mg-lineas button:not([data-linea='']) { display: inline-flex; align-items: center; gap: .4rem; }
+html[data-fx-pasada] .mg-lineas button:not([data-linea=''])::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: rgb(var(--lc)); }
+html[data-fx-pasada] .mg-lineas button:not([data-linea='']):hover { border-color: rgb(var(--lc) / .6); }
+html[data-fx-pasada] .mg-lineas button:not([data-linea=''])[aria-pressed='true'] { background: rgb(var(--lc) / .18); border-color: rgb(var(--lc) / .7); }

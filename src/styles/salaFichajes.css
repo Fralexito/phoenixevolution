@@ -133,3 +133,18 @@ html[data-tema='sudario'] .sf { --a: #f5c542; }
 .sf-bloque small { padding: .05rem .5rem; border-radius: 999px; background: color-mix(in srgb, var(--a) 14%, transparent); color: #fff; font-weight: 600; }
 @media (hover: hover) { .sf-bloque:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--a) 55%, transparent); } }
 @media (max-width: 960px) { .sf-pl-barra { top: 4.4rem; } }
+
+/* Un color por línea del campo (ronda 361): porteros ámbar, defensas azul, medios verde, delanteros rojo. Se ve en filtros, títulos, cara y etiqueta de posición. */
+.sf [data-linea='porteros'], .sf [data-pos='porteros'] { --lc: #fbbf24; }
+.sf [data-linea='defensas'], .sf [data-pos='defensas'] { --lc: #38bdf8; }
+.sf [data-linea='medios'], .sf [data-pos='medios'] { --lc: #34d399; }
+.sf [data-linea='delanteros'], .sf [data-pos='delanteros'] { --lc: #fb7185; }
+.sf [data-linea='otros'], .sf [data-pos='otros'] { --lc: #a78bfa; }
+.sf-pos button[data-pos]:not([data-pos='todos'])::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--lc); }
+.sf-pos button[data-pos]:not([data-pos='todos'])[aria-pressed='true'] { border-color: var(--lc); background: color-mix(in srgb, var(--lc) 18%, transparent); }
+.sf-pl-cuerpo h4[data-linea] { display: flex; align-items: center; gap: .5rem; color: var(--lc); }
+.sf-pl-cuerpo h4[data-linea]::before { content: ''; width: 3px; height: 1em; border-radius: 2px; background: var(--lc); }
+.sf-jug[data-linea] .sf-av { border-color: color-mix(in srgb, var(--lc) 65%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--lc) 18%, transparent); }
+.sf-jug[data-linea] small { color: var(--lc); font-weight: 600; }
+.sf-bloque[data-linea] small { background: color-mix(in srgb, var(--lc) 20%, transparent); color: #fff; }
+@media (hover: hover) { .sf-bloque[data-linea]:hover, .sf-jug[data-linea]:hover { border-color: var(--lc); } .sf-jug[data-linea]:hover:not(.sf-bloque) { background: color-mix(in srgb, var(--lc) 12%, transparent); } }

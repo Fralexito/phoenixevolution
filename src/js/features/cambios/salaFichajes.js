@@ -3,7 +3,7 @@
 // Liga Máster: quien pierde al jugador y quien lo recibe. No guarda nada: devuelve la elección y el formulario rellena sus campos.
 // Datos: src/data/clubesPes.js (clubes) · plantillasPes.js (plantillas, del parche) · datosSala.js (Liga Máster de la web).
 import { CLUBES_PES } from '../../../data/clubesPes.js';
-import { buscarClubes, escudoImg, escudoUrl, paisDe, agruparPlantilla, buscarJugadoresPes } from '../../core/clubesPes.js';
+import { buscarClubes, escudoImg, escudoUrl, paisDe, agruparPlantilla, buscarJugadoresPes, lineaDe } from '../../core/clubesPes.js';
 import { escapeHTML as esc } from '../../core/dom.js';
 import { minifaceUrl, montarFotos } from '../fotoFutbolista.js';
 import { cargarPlantillas, cargarLm } from './datosSala.js';
@@ -85,7 +85,7 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
         const clubes = buscarClubes(texto, { max: 6 });
         const jugs = st.etapa === 'jugador' ? buscarJugadoresPes(texto, st.plantillas, { max: 18 }) : [];
         html += clubes.length ? `<h3 class="sf-h">Clubes</h3><div class="sf-rejilla">${clubes.map(tarjetaClub).join('')}</div>` : '';
-        html += jugs.length ? `<h3 class="sf-h">Jugadores</h3><ul class="sf-lista">${jugs.map((j, i) => `<li><button type="button" class="sf-jug" data-pid="${j.pid}" data-club="${j.clubId}" style="--i:${i}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)} · ${esc(porId.get(j.clubId)?.nombre ?? '')}</small></span>${escudoImg(porId.get(j.clubId), 26)}</button></li>`).join('')}</ul>` : '';
+        html += jugs.length ? `<h3 class="sf-h">Jugadores</h3><ul class="sf-lista">${jugs.map((j, i) => `<li><button type="button" class="sf-jug" data-linea="${lineaDe(j.pos)}" data-pid="${j.pid}" data-club="${j.clubId}" style="--i:${i}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)} · ${esc(porId.get(j.clubId)?.nombre ?? '')}</small></span>${escudoImg(porId.get(j.clubId), 26)}</button></li>`).join('')}</ul>` : '';
         if (!clubes.length && !jugs.length) html = `<p class="sf-vacio">Nada con «${esc(texto)}». Prueba con otra parte del nombre.</p>`;
       } else {
         const lista = st.liga === LM ? CLUBES_PES.filter((x) => st.lm.clubes.has(x.id)) : CLUBES_PES.filter((x) => x.liga === st.liga);
@@ -107,15 +107,15 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
         const total = grupos.reduce((n, g) => n + g.jugadores.length, 0);
         const visibles = st.posFiltro === 'todos' ? grupos : grupos.filter((g) => g.linea === st.posFiltro);
         const fila = (j, i) => st.vista === 'bloques'
-          ? `<li><button type="button" class="sf-jug sf-bloque" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 64)}<b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></button></li>`
-          : `<li><button type="button" class="sf-jug" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></span><em class="sf-elegir">Elegir</em></button></li>`;
+          ? `<li><button type="button" class="sf-jug sf-bloque" data-linea="${lineaDe(j.pos)}" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 64)}<b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></button></li>`
+          : `<li><button type="button" class="sf-jug" data-linea="${lineaDe(j.pos)}" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></span><em class="sf-elegir">Elegir</em></button></li>`;
         const filtros = grupos.length > 1 ? `<div class="sf-pl-barra">
             <div class="sf-pos" role="group" aria-label="Filtrar por posición"><button type="button" data-pos="todos" aria-pressed="${st.posFiltro === 'todos'}">Todos <em>${total}</em></button>${grupos.map((g) => `<button type="button" data-pos="${esc(g.linea)}" aria-pressed="${st.posFiltro === g.linea}">${esc(g.nombre)} <em>${g.jugadores.length}</em></button>`).join('')}</div>
             <div class="sf-vista" role="group" aria-label="Forma de ver la plantilla"><button type="button" data-vista="lista" aria-pressed="${st.vista === 'lista'}" aria-label="Ver en lista" title="Lista"><i class="fa-solid fa-list" aria-hidden="true"></i></button><button type="button" data-vista="bloques" aria-pressed="${st.vista === 'bloques'}" aria-label="Ver en bloques" title="Bloques"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button></div></div>` : '';
         l.dataset.abierto = '1';
         l.innerHTML = `<div class="sf-plantilla"><div class="sf-pl-cab"><button type="button" class="sf-atras" data-atras aria-label="Volver a los clubes"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>${escudoImg(club, 48)}
           <div><h3>${esc(club.nombre)}</h3><p>${esc(club.liga)} · ${esc(paisDe(club))}${lm ? ` · ${lm.dt ? `DT ${esc(lm.dt.nombre)}` : 'lo lleva la IA'}` : ''}</p></div></div>${filtros}
-          <div class="sf-pl-cuerpo" data-vista-actual="${st.vista}">${visibles.map((g) => `<h4 class="sf-h">${esc(g.nombre)}</h4><ul class="sf-lista ${st.vista === 'bloques' ? 'sf-lista-bloques' : ''}">${g.jugadores.map(fila).join('')}</ul>`).join('') || '<p class="sf-vacio">Este club no tiene plantilla en tu parche.</p>'}</div></div>`;
+          <div class="sf-pl-cuerpo" data-vista-actual="${st.vista}">${visibles.map((g) => `<h4 class="sf-h" data-linea="${esc(g.linea)}">${esc(g.nombre)}</h4><ul class="sf-lista ${st.vista === 'bloques' ? 'sf-lista-bloques' : ''}">${g.jugadores.map(fila).join('')}</ul>`).join('') || '<p class="sf-vacio">Este club no tiene plantilla en tu parche.</p>'}</div></div>`;
         return;
       }
       const j = st.jugador, origen = porId.get(j.clubId), dest = porId.get(st.destino);
