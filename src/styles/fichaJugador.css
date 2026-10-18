@@ -97,3 +97,36 @@ html[data-tema='sudario'] .fj { --a: #f5c542; }
   .fj, .fj *, .fj *::before, .fj *::after { transition: none !important; animation: none !important; }
   .fj-cuerpo { opacity: 1; transform: none; }
 }
+
+/* Campo de posiciones interactivo: detalle al pasar el cursor, puesto fijo al pulsar, resaltar por nivel con A/B/C. */
+.fj-punto { cursor: pointer; animation: fj-pop .55s var(--curva) both; animation-delay: calc(var(--i, 0) * 32ms); }
+.fj-punto:hover, .fj-punto:focus-visible { transform: translate(-50%, -50%) scale(1.14); z-index: 4; }
+.fj-punto[data-sel] { transform: translate(-50%, -50%) scale(1.14); z-index: 4; box-shadow: 0 0 0 3px #0c0a1f, 0 0 0 5px var(--a); }
+.fj-punto[data-nivel='2']::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid #67e8f9; pointer-events: none; animation: fj-pulso 1.8s ease-out .7s 3 both; }
+.fj-punto[data-registrada='1']::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px dashed #fff; opacity: .75; pointer-events: none; }
+.fj-juego[data-filtro='2'] .fj-punto:not([data-nivel='2']), .fj-juego[data-filtro='1'] .fj-punto:not([data-nivel='1']), .fj-juego[data-filtro='0'] .fj-punto:not([data-nivel='0']) { opacity: .18; filter: grayscale(.6); }
+.fj-punto { transition: opacity .3s, filter .3s, transform .25s var(--curva), box-shadow .2s; }
+.fj-ley { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; max-width: 19rem; }
+.fj-filtro { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .7rem .3rem .35rem; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--tx2); border: 1px solid var(--linea); transition: color .2s, border-color .2s, background-color .2s; }
+@media (hover: hover) { .fj-filtro:hover { color: #fff; border-color: color-mix(in srgb, var(--a) 55%, transparent); } }
+.fj-filtro[aria-pressed='true'] { color: #fff; border-color: var(--a); background: color-mix(in srgb, var(--a) 14%, transparent); }
+.fj-der { display: grid; gap: 1.4rem; align-content: start; min-width: 0; }
+.fj-pos-detalle { min-height: 9.5rem; padding: 1rem 1.1rem; border-radius: 14px; border: 1px solid var(--linea); background: rgba(255,255,255,.03); display: grid; gap: .7rem; align-content: start; }
+.fj-pos-detalle > p { margin: 0; font-size: 13.5px; color: #dfe2ef; animation: fj-entra .3s var(--curva); }
+.fj-det-cab { display: flex; align-items: center; gap: .8rem; animation: fj-entra .3s var(--curva); }
+.fj-det-cab > div { flex: 1; min-width: 0; display: grid; }
+.fj-det-cab b { font-family: var(--font-display, inherit); font-size: 1.05rem; color: #fff; line-height: 1.2; }
+.fj-det-cab small { font-size: 12px; color: var(--tx2); }
+.fj-det-pos, .fj-det-nivel { display: grid; place-items: center; border-radius: 50%; font-weight: 800; color: #fff; background: #3a3f58; border: 2px solid #6b7088; }
+.fj-det-pos { width: 2.9rem; height: 2.9rem; font-size: 12px; } .fj-det-nivel { width: 1.8rem; height: 1.8rem; font-size: 12px; color: #05060f; background: #8b92a8; border: 0; }
+.fj-det-pos[data-nivel='2'] { background: #0891b2; border-color: #67e8f9; } .fj-det-nivel[data-nivel='2'] { background: #67e8f9; }
+.fj-det-pos[data-nivel='1'] { background: #b45309; border-color: #fcd34d; } .fj-det-nivel[data-nivel='1'] { background: #fcd34d; }
+.fj-resumen { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+.fj-resumen li { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: .6rem; font-size: 13.5px; }
+.fj-resumen b { color: #fff; font-weight: 600; } .fj-resumen em { font-style: normal; color: var(--tx2); font-size: 12.5px; overflow-wrap: anywhere; }
+.fj-ley-dot { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: 50%; font-size: 10px; font-weight: 800; color: #05060f; background: #8b92a8; }
+.fj-ley-dot[data-n='2'] { background: #67e8f9; } .fj-ley-dot[data-n='1'] { background: #fcd34d; }
+.fj-pista { margin: 0; font-size: 12px; color: var(--tx2); }
+.fj-chips li b { margin-left: .35rem; font-size: 11px; color: var(--a); }
+@keyframes fj-pop { from { opacity: 0; transform: translate(-50%, -50%) scale(.4); } }
+@keyframes fj-pulso { from { transform: scale(1); opacity: .8; } to { transform: scale(1.55); opacity: 0; } }

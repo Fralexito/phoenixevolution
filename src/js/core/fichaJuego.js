@@ -69,3 +69,11 @@ export function puntosRadar(ejes, radio = 100, centro = 110) {
     return [Number((centro + r * Math.cos(a)).toFixed(1)), Number((centro + r * Math.sin(a)).toFixed(1))];
   });
 }
+
+/** Nombre completo de cada posición (para el detalle del campo). */
+export const NOMBRE_POSICION = {
+  PT: 'Portero', DFC: 'Defensa central', LI: 'Lateral izquierdo', LD: 'Lateral derecho', MCD: 'Mediocentro defensivo', MC: 'Mediocentro', MI: 'Mediocampista izquierdo',
+  MD: 'Mediocampista derecho', MO: 'Mediapunta', EI: 'Extremo izquierdo', ED: 'Extremo derecho', SD: 'Segundo delantero', DC: 'Delantero centro',
+};
+/** Qué significa cada nivel de una posición. */
+export const TEXTO_NIVEL = { A: 'La juega bien: es una posición natural para él.', B: 'Se defiende: la cubre con soltura si hace falta.', C: 'No la juega: rinde peor si lo pones ahí.' };

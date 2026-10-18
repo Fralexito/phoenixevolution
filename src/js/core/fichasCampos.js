@@ -113,8 +113,8 @@ export function resumenPcs(pcs = []) {
 export const nivelStat = (v) => (v >= 90 ? 'elite' : v >= 80 ? 'alto' : v >= 70 ? 'medio' : v >= 60 ? 'bajo' : 'flojo');
 /** Posición de cada puesto en el campo dibujado (en %: [izquierda, arriba]; la portería abajo). */
 export const POS_CAMPO = {
-  pos_pt: [50, 91], pos_dfc: [50, 76], pos_li: [14, 70], pos_ld: [86, 70], pos_mcd: [50, 61], pos_mc: [50, 49],
-  pos_mi: [12, 46], pos_md: [88, 46], pos_mo: [50, 36], pos_ei: [16, 20], pos_ed: [84, 20], pos_sd: [32, 20], pos_dc: [50, 10],
+  pos_pt: [50, 91], pos_dfc: [50, 79], pos_li: [13, 72], pos_ld: [87, 72], pos_mcd: [50, 63], pos_mc: [50, 50],
+  pos_mi: [12, 46], pos_md: [88, 46], pos_mo: [50, 36], pos_ei: [15, 22], pos_ed: [85, 22], pos_sd: [50, 23], pos_dc: [50, 10],
 };
 /** Siguiente nivel al pulsar un puesto: sin cambio → A → B → C → sin cambio. Devuelve '' o '2' | '1' | '0'. */
 export const siguienteNivelPos = (actual) => ({ '': '2', 2: '1', 1: '0', 0: '' }[actual === '' || actual == null ? '' : Number(actual)] ?? '');

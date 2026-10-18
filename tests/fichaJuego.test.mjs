@@ -39,3 +39,17 @@ test('tablas: cada habilidad tiene nombre y los grupos de estadísticas existen 
   const claves = new Set(CAMPOS.map((c) => c.clave));
   for (const g of GRUPOS_STATS) for (const k of g.claves) assert.ok(claves.has(k), k);
 });
+
+import { NOMBRE_POSICION, TEXTO_NIVEL } from '../src/js/core/fichaJuego.js';
+import { POS_CAMPO } from '../src/js/core/fichasCampos.js';
+test('cada posición del campo tiene nombre y el campo las coloca como en el juego (centrales al centro, bandas a los lados, sin amontonarse)', () => {
+  const letras = Object.keys(POS_CAMPO).map((k) => k.slice(4).toUpperCase()).sort();
+  assert.deepEqual(Object.keys(NOMBRE_POSICION).sort(), letras);
+  assert.deepEqual(Object.keys(TEXTO_NIVEL), ['A', 'B', 'C']);
+  const x = (p) => POS_CAMPO[`pos_${p}`][0], y = (p) => POS_CAMPO[`pos_${p}`][1];
+  for (const p of ['pt', 'dfc', 'mcd', 'mc', 'mo', 'sd', 'dc']) assert.equal(x(p), 50, p);
+  for (const [i, d] of [['li', 'ld'], ['mi', 'md'], ['ei', 'ed']]) { assert.ok(x(i) < 50 && x(d) > 50 && x(i) + x(d) === 100 && y(i) === y(d), `${i}/${d}`); }
+  assert.ok(y('dc') < y('sd') && y('sd') < y('mo') && y('mo') < y('mc') && y('mc') < y('mcd') && y('mcd') < y('dfc') && y('dfc') < y('pt'));
+  const todos = Object.values(POS_CAMPO);
+  for (let a = 0; a < todos.length; a++) for (let b = a + 1; b < todos.length; b++) assert.ok(Math.hypot(todos[a][0] - todos[b][0], (todos[a][1] - todos[b][1]) * 1.3) > 11, `se pisan ${a}-${b}`);
+});

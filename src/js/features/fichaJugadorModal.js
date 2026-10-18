@@ -7,7 +7,7 @@ import { href } from '../core/config.js';
 import { CLUBES_PES } from '../../data/clubesPes.js';
 import { emparejarClubesLm, escudoImg } from '../core/clubesPes.js';
 import { nivelStat, POS_CAMPO } from '../core/fichasCampos.js';
-import { decodificarFicha, esPortero, posicionRegistrada, nivelesPosicion, perfilEjes, puntosRadar, GRUPOS_STATS, CLAVES_PORTERO, nombreDeCampo } from '../core/fichaJuego.js';
+import { decodificarFicha, esPortero, posicionRegistrada, nivelesPosicion, perfilEjes, puntosRadar, GRUPOS_STATS, CLAVES_PORTERO, nombreDeCampo, NOMBRE_POSICION, TEXTO_NIVEL } from '../core/fichaJuego.js';
 import { minifaceUrl, montarFotos } from './fotoFutbolista.js';
 
 let datos = null;
@@ -45,18 +45,30 @@ function seccionStats(v) {
   const portero = `<section class="fj-grupo"><h4>Portero</h4>${CLAVES_PORTERO.map((k) => barra(k, v[k])).join('')}</section>`;
   return esPortero(v) ? portero + campo : campo + (CLAVES_PORTERO.some((k) => v[k] > 40) ? portero : '');
 }
+const NIVEL_LETRA = { 2: 'A', 1: 'B', 0: 'C' };
+/** Detalle de UN puesto (al pasar el cursor, enfocar o pulsar): nombre completo, nivel y qué significa. */
+const detallePosHTML = (pos, nivel, registrada) => `<div class="fj-det-cab"><span class="fj-det-pos" data-nivel="${NIVEL_A_NUM[nivel]}">${esc(pos)}</span>
+  <div><b>${esc(NOMBRE_POSICION[pos] ?? pos)}</b><small>${registrada ? 'Su posición registrada' : `Nivel ${nivel}`}</small></div><span class="fj-det-nivel" data-nivel="${NIVEL_A_NUM[nivel]}">${nivel}</span></div><p>${esc(TEXTO_NIVEL[nivel] ?? '')}</p>`;
+/** Resumen de todas sus posiciones (lo que se ve cuando no hay ninguna señalada). Se arma con los puntos del campo: [{pos, nivel: 'A'|'B'|'C', registrada}]. */
+function resumenPosHTML(puntos) {
+  const reg = puntos.find((p) => p.registrada);
+  const fila = (n, t) => { const l = puntos.filter((p) => p.nivel === n).map((p) => p.pos); return l.length ? `<li><span class="fj-ley-dot" data-n="${NIVEL_A_NUM[n]}">${n}</span><b>${t}</b><em>${l.join(' · ')}</em></li>` : ''; };
+  return `<div class="fj-det-cab"><div><b>Sus posiciones</b><small>Registrada: ${reg ? `${esc(NOMBRE_POSICION[reg.pos])} (${esc(reg.pos)})` : '—'}</small></div></div>
+    <ul class="fj-resumen">${fila('A', 'La juega bien')}${fila('B', 'Se defiende')}</ul><p class="fj-pista">Pasa el cursor o pulsa un puesto del campo para ver su detalle. Los botones A, B y C resaltan sus puestos.</p>`;
+}
 function seccionPosiciones(v) {
-  const niv = nivelesPosicion(v);
-  const puntos = niv.map((p) => { const [x, y] = POS_CAMPO[p.clave]; return `<span class="ft-punto fj-punto" data-nivel="${NIVEL_A_NUM[p.nivel]}" style="left:${x}%;top:${y}%" title="${p.pos}: ${p.nivel}"><b>${p.pos}</b><i>${p.nivel}</i></span>`; }).join('');
-  return `<div class="fj-dos"><div><div class="ft-juego fj-juego"><svg class="ft-cancha" viewBox="0 0 100 130" preserveAspectRatio="none" aria-hidden="true">
+  const niv = nivelesPosicion(v), reg = posicionRegistrada(v);
+  const puntos = niv.map((p, i) => { const [x, y] = POS_CAMPO[p.clave]; return `<button type="button" class="ft-punto fj-punto" data-pos="${p.pos}" data-nivel="${NIVEL_A_NUM[p.nivel]}"${p.pos === reg ? ' data-registrada="1"' : ''} style="left:${x}%;top:${y}%;--i:${i}" aria-label="${esc(NOMBRE_POSICION[p.pos])} (${p.pos}): nivel ${p.nivel}"><b>${p.pos}</b><i>${p.nivel}</i></button>`; }).join('');
+  return `<div class="fj-dos"><div><div class="ft-juego fj-juego" data-filtro=""><svg class="ft-cancha" viewBox="0 0 100 130" preserveAspectRatio="none" aria-hidden="true">
       <rect x="2" y="2" width="96" height="126" rx="2"/><line x1="2" y1="65" x2="98" y2="65"/><circle cx="50" cy="65" r="11"/><rect x="22" y="2" width="56" height="20"/><rect x="36" y="2" width="28" height="8"/><rect x="22" y="108" width="56" height="20"/><rect x="36" y="120" width="28" height="8"/></svg>${puntos}</div>
-      <p class="fj-ley"><span data-n="2">A</span> la juega bien · <span data-n="1">B</span> se defiende · <span data-n="0">C</span> no la juega</p></div>
+      <div class="fj-ley" role="group" aria-label="Resaltar posiciones por nivel"><button type="button" class="fj-filtro" data-filtro="2" aria-pressed="false"><span data-n="2">A</span> la juega bien</button><button type="button" class="fj-filtro" data-filtro="1" aria-pressed="false"><span data-n="1">B</span> se defiende</button><button type="button" class="fj-filtro" data-filtro="0" aria-pressed="false"><span data-n="0">C</span> no la juega</button></div></div>
+    <div class="fj-der"><div class="fj-pos-detalle" data-pos-detalle aria-live="polite">${resumenPosHTML(niv.map((p) => ({ pos: p.pos, nivel: p.nivel, registrada: p.pos === reg })))}</div>
     <div class="fj-estado"><h4>Estado y pie malo</h4>
       <div class="fj-fila"><span>Posición registrada</span><b>${esc(posicionRegistrada(v) || '—')}</b></div>
       <div class="fj-fila"><span>Forma</span>${pips(v.forma, 8, `Forma ${v.forma} de 8`)}<b>${v.forma}</b></div>
       <div class="fj-fila"><span>Resistencia a lesiones</span>${pips(v.resistencia_lesiones, 3, `Lesiones ${LESIONES[v.resistencia_lesiones]}`)}<b>${esc(LESIONES[v.resistencia_lesiones] ?? '')}</b></div>
       <div class="fj-fila"><span>Uso del pie malo</span>${pips(v.pie_malo_uso, 4, `Uso del pie malo ${v.pie_malo_uso} de 4`)}<b>${esc(PIE[v.pie_malo_uso] ?? '')}</b></div>
-      <div class="fj-fila"><span>Precisión del pie malo</span>${pips(v.pie_malo_precision, 4, `Precisión ${v.pie_malo_precision} de 4`)}<b>${esc(PRECISION[v.pie_malo_precision] ?? '')}</b></div></div></div>`;
+      <div class="fj-fila"><span>Precisión del pie malo</span>${pips(v.pie_malo_precision, 4, `Precisión ${v.pie_malo_precision} de 4`)}<b>${esc(PRECISION[v.pie_malo_precision] ?? '')}</b></div></div></div></div>`;
 }
 function seccionHabilidades(f) {
   const hab = f.habilidades.filter((h) => !h.com), com = f.habilidades.filter((h) => h.com);
@@ -65,8 +77,11 @@ function seccionHabilidades(f) {
 }
 function seccionDatos(j, v, x, club) {
   const filas = [['Edad', `${v?.edad ?? j.edad ?? '—'} años`], ['Altura', `${v?.altura ?? x.altura ?? '—'} cm`], ['Peso', v?.peso ? `${v.peso} kg` : (x.peso ? `${x.peso} kg` : '—')],
-    ['Nacionalidad', x.nacionalidad ?? '—'], ['Dorsal', x.dorsal ?? '—'], ['Valor', millones(j.valor)], ['Club', club?.nombre ?? 'Sin club'], ['Id en PES', j.pes_id ?? 'Sin id']];
-  return `<dl class="fj-datos">${filas.map(([k, val]) => `<div><dt>${esc(k)}</dt><dd>${esc(String(val))}</dd></div>`).join('')}</dl>`;
+    ['Nacionalidad', x.nacionalidad ?? '—'], ['Dorsal', x.dorsal ?? '—'], ['Valor', millones(j.valor)], ['Club', club?.nombre ?? 'Sin club'],
+    ['Posición registrada', v ? `${NOMBRE_POSICION[posicionRegistrada(v)] ?? '—'} (${posicionRegistrada(v) || '—'})` : (j.posicion ?? '—')], ['Id en PES', j.pes_id ?? 'Sin id']];
+  const naturales = v ? nivelesPosicion(v).filter((p) => p.nivel === 'A').map((p) => p.pos) : [];
+  return `<dl class="fj-datos">${filas.map(([k, val]) => `<div><dt>${esc(k)}</dt><dd>${esc(String(val))}</dd></div>`).join('')}</dl>
+    ${naturales.length ? `<section class="fj-grupo"><h4>Juega bien de <small>${naturales.length}</small></h4><ul class="fj-chips">${naturales.map((p) => `<li title="${esc(NOMBRE_POSICION[p])}">${esc(NOMBRE_POSICION[p])} <b>${p}</b></li>`).join('')}</ul></section>` : ''}`;
 }
 const contenido = (tab, j, f, v, x, club) => (tab === 'stats' ? seccionStats(v) : tab === 'pos' ? seccionPosiciones(v) : tab === 'hab' ? seccionHabilidades(f) : seccionDatos(j, v, x, club));
 
@@ -74,7 +89,7 @@ const contenido = (tab, j, f, v, x, club) => (tab === 'stats' ? seccionStats(v) 
 export function abrirFichaJugador({ lista, indice = 0, clubDe = () => null }) {
   if (!lista?.length) return;
   const previo = document.activeElement;
-  const st = { i: Math.max(0, Math.min(indice, lista.length - 1)), tab: 'stats' };
+  const st = { i: Math.max(0, Math.min(indice, lista.length - 1)), tab: 'datos' };
   const raiz = document.createElement('div');
   raiz.className = 'fj'; raiz.setAttribute('role', 'dialog'); raiz.setAttribute('aria-modal', 'true'); raiz.setAttribute('aria-label', 'Ficha del jugador');
   raiz.innerHTML = `<div class="fj-fondo" data-cerrar></div><div class="fj-caja" data-caja>
@@ -100,7 +115,7 @@ export function abrirFichaJugador({ lista, indice = 0, clubDe = () => null }) {
     const clubPes = CLUBES_PES.find((c) => c.id === lmClub);
     const escudo = clubPes ? escudoImg(clubPes, 30) : safeUrl(club?.escudo_url) ? `<img src="${esc(safeUrl(club.escudo_url))}" alt="" width="30" height="30" class="cfx-esc" style="width:30px;height:30px">` : '';
     const mini = minifaceUrl(j.pes_id), pos = j.posicion ?? posicionRegistrada(v);
-    const tabs = [['stats', 'Estadísticas'], ['pos', 'Posiciones y estado'], ['hab', 'Habilidades'], ['datos', 'Datos']];
+    const tabs = [['datos', 'Datos'], ['stats', 'Estadísticas'], ['pos', 'Posiciones y estado'], ['hab', 'Habilidades']];
     $('[data-cuerpo]').innerHTML = `
       <aside class="fj-lado">
         <span class="fj-cara" ${mini ? '' : `data-foto="${esc(j.nombre)}" data-club="${esc(club?.nombre ?? '')}"`} data-pes="${esc(j.pes_id ?? '')}">${mini ? `<img src="${mini}" alt="${esc(j.nombre)}">` : `<em>${esc(iniciales(j.nombre))}</em>`}</span>
@@ -130,9 +145,28 @@ export function abrirFichaJugador({ lista, indice = 0, clubDe = () => null }) {
       p.classList.add('fj-entra');
     });
   }
+  // Campo de posiciones: al pasar el cursor, enfocar o pulsar un puesto se ve su detalle; pulsar lo deja fijo; A/B/C resaltan sus puestos.
+  const dots = () => [...raiz.querySelectorAll('.fj-punto')];
+  const fijo = () => raiz.querySelector('.fj-punto[data-sel]');
+  function mostrarPos(dot) {
+    const p = raiz.querySelector('[data-pos-detalle]'); if (!p) return;
+    p.innerHTML = dot ? detallePosHTML(dot.dataset.pos, NIVEL_LETRA[dot.dataset.nivel], dot.dataset.registrada === '1')
+      : resumenPosHTML(dots().map((d) => ({ pos: d.dataset.pos, nivel: NIVEL_LETRA[d.dataset.nivel], registrada: d.dataset.registrada === '1' })));
+  }
+  const sobreDot = (e) => e.target?.closest?.('.fj-punto');
+  raiz.addEventListener('mouseover', (e) => { const d = sobreDot(e); if (d) mostrarPos(d); });
+  raiz.addEventListener('focusin', (e) => { const d = sobreDot(e); if (d) mostrarPos(d); });
+  for (const ev of ['mouseout', 'focusout']) raiz.addEventListener(ev, (e) => { if (sobreDot(e) && !e.relatedTarget?.closest?.('.fj-punto')) mostrarPos(fijo()); });
   raiz.addEventListener('click', (e) => {
     const t = e.target.closest('button, [data-cerrar]'); if (!t) return;
     if (t.matches('[data-cerrar]')) return cerrar();
+    if (t.matches('.fj-punto')) { const ya = t.hasAttribute('data-sel'); dots().forEach((d) => d.removeAttribute('data-sel')); if (!ya) t.setAttribute('data-sel', ''); return mostrarPos(ya ? null : t); }
+    if (t.matches('.fj-filtro')) {
+      const j = raiz.querySelector('.fj-juego'), activo = j.dataset.filtro === t.dataset.filtro;
+      j.dataset.filtro = activo ? '' : t.dataset.filtro;
+      raiz.querySelectorAll('.fj-filtro').forEach((b) => b.setAttribute('aria-pressed', String(!activo && b === t)));
+      return;
+    }
     if (t.dataset.paso) return paso(Number(t.dataset.paso));
     if (t.dataset.tab) pestana(t.dataset.tab);
   });
