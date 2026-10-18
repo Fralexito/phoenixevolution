@@ -48,3 +48,11 @@ Hay varias sesiones editando el mismo repositorio a la vez (visual, Link, Sync, 
 2. Auditoría de CSS por página (la «Pasada visual premium» ya mira las 4-5 más usadas).
 3. Revisar índices y políticas duplicadas cuando alguna tabla supere unos miles de filas.
 4. Reorganización de carpetas por fases (con las sesiones paradas).
+
+## 6. Segunda tanda (18-oct, noche) — lo que se terminó
+
+- **Código:** `src/js/core/` reorganizado en 7 carpetas por tema (detalle y cómo adaptar una rama vieja: `docs/trabajo-en-equipo/REORGANIZACION-CODIGO-18-OCT.md`). 624 pruebas, build y las 57 páginas cargando sus 437 módulos sin errores.
+- **Base de datos:** migración 130 (políticas RLS sin duplicar en 6 tablas, misma seguridad). Ya no quedan avisos de seguridad o rendimiento «WARN» propios del diseño de tablas; solo los informativos de índices.
+- **CSS:** medido. De 588 KB de CSS propio, solo ~12 KB son reglas cuyas clases no aparecen en ningún archivo (la mayoría de uPlot, que las crea la librería). No vale la pena borrar a ciegas; lo que más pesaría menos sería cargar el CSS por página en vez de todo en `global.css`, y eso se hará junto a la pasada visual (hay estilos compartidos entre páginas, como el campo de fútbol).
+- **Carpetas de trabajo:** web solo con `borrador` y `pes-rediseno` (propuesta de portada del 9-oct, sin fusionar a propósito). Link y Sync solo con sus dos carpetas principales; retiradas ws-actualizar-link, ws-amistosos-link, ws-lm-link, ws-lm-sync, ws-stats-link y ws-stats-sync (todo su contenido ya estaba en rediseño-phoenix-portal / mercado-fase0; ramas conservadas).
+- **Sin tocar a propósito:** las carpetas principales de Link (`_phoenix-link`, 4 archivos sin subir) y Sync (`smash-soda-fork`, 13 archivos sin subir) tienen trabajo en curso de otras sesiones.
