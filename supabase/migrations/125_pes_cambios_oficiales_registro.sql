@@ -392,3 +392,9 @@ grant execute on function public.pes_cambio_crear(text, text, jsonb, text), publ
   public.pes_pc_historial(uuid, int) to authenticated;
 grant execute on function public.pes_cambio_marcar(uuid, text, text, text), public.pes_registrar_informe(uuid, uuid, jsonb) to service_role;
 revoke all on function private.pes_fichaje_normalizar(jsonb), private.pes_huella_lote(jsonb), private.pes_firma(uuid, int, text, text, jsonb), private.pes_sha(text), private.pes_bool(jsonb, boolean) from public;
+
+-- ─── 7) Endurecimiento (18-oct): pes_registrar_informe SOLO la ejecuta el servidor ──────────────────────────────────
+-- Los permisos por defecto de Supabase dejaban EXECUTE a «authenticated»: un usuario con sesión podía falsear informes de un PC ajeno.
+-- La Edge Function «traspasos» la llama con service role, así que no hace falta que nadie más pueda. (Aplicado en la base como 125b.)
+revoke execute on function public.pes_registrar_informe(uuid, uuid, jsonb) from public, anon, authenticated;
+grant execute on function public.pes_registrar_informe(uuid, uuid, jsonb) to service_role;

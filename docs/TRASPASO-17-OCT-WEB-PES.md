@@ -29,3 +29,14 @@ Orden obligatorio: **125 → 126 → 127**; la **128** va aparte, en cualquier m
 
 ## Lo último de Link en esta cuenta (antes de los frentes)
 0.3.12–0.3.16 (traspasos sin papel; aprobar al enviar y al recibir; «Mantener mis fichajes en mi juego»: los fichajes propios van a la Phoenix-DB y no se pierden al cerrar PES). Falta probar en el PES de Fralex: la primera vez con PES cerrado para crear Phoenix-DB y la línea del sider.ini.
+
+---
+
+## ACTUALIZACIÓN 18-oct (segunda cuenta): 125 y 126 ya aplicadas y verificadas
+- **Migración 125 aplicada** en la base y su prueba `supabase/tests/125_pes_cambios_test.sql` pasó entera contra la base real (se deshace sola: `TODO_OK_REVERTIDO`).
+- **Migración 126 aplicada** y su prueba `126_pes_estadisticas_test.sql` también pasó entera.
+- **Fallo de seguridad corregido (125b):** `pes_registrar_informe` quedaba ejecutable por cualquier usuario con sesión (permiso por defecto de Supabase). Ahora solo la ejecuta el servidor (service role). Está añadido al final del archivo de la 125 (idempotente).
+- **Función `traspasos` desplegada (versión 2):** ya existen `GET /v1/cambios` y `POST /v1/pc/informe` (antes daban 404). Las rutas viejas siguen igual (comprobado: sin token piden token, ruta desconocida da 404, método malo da 405). Código: `supabase/functions/traspasos/index.ts`.
+- Web: 592 pruebas pasan y compila (55 páginas). Toda función `pes_*` que llama la web existe en la base.
+- **Siguen SIN aplicar:** 127 (Liga Máster) y 128 (botón ACTUALIZAR): a medias en sus ramas `respaldo/*`.
+- **Falta probar en un PES real** (Fralex): un fichaje oficial desde la web hasta el PC de un amigo (Link 0.3.19 con «Recibir los cambios oficiales») y que el resultado aparezca en «Usuarios en PES».
