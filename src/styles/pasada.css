@@ -66,3 +66,10 @@ html[data-fx-pasada] main :is(section, div).glass-panel:empty { display: none; }
 html[data-fx-pasada] #ticker { background: color-mix(in srgb, var(--color-galaxy-dark) 80%, transparent); border-bottom-color: color-mix(in srgb, var(--color-galaxy-400) 14%, transparent); }
 html[data-fx-pasada] #ticker > :first-child { background: color-mix(in srgb, var(--color-galaxy-600) 24%, transparent); box-shadow: none; border-right: 1px solid color-mix(in srgb, var(--color-galaxy-400) 22%, transparent); }
 html[data-fx-pasada] #ticker .animate-pulse { animation: none; }
+
+/* ---------- 7 · Etiquetas y barra lateral más calladas (3.ª tanda) ---------- */
+/* La etiquetita sobre cada título (Economía, Mi cuenta, Registro…) se queda con su texto pero sin caja: letra tenue en vez de recuadro con borde. */
+html[data-fx-pasada] main span[class*='tracking-widest'][class*='bg-galaxy-600/20'] { background: transparent; border-color: transparent; padding-inline: 0; color: color-mix(in srgb, var(--color-galaxy-400) 72%, #94a3b8); letter-spacing: .2em; }
+/* Barra lateral de atajos (solo PC ancho): descansa más tenue y se enciende al acercarse o enfocarla. */
+html[data-fx-pasada] #barra-lat { opacity: .72; transition: opacity .25s var(--ps-ease, ease); }
+html[data-fx-pasada] #barra-lat:is(:hover, :focus-within) { opacity: 1; }
