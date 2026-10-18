@@ -9,10 +9,12 @@ let raiz = null;
 let clubes = null;
 const v = (id) => raiz?.querySelector(`#cf-${id}`);
 
-function campo(id, etiqueta, { ayuda = '', max = 48, ph = '', modo = 'text' } = {}) {
-  return `<label class="cf-campo" for="cf-${id}"><span>${esc(etiqueta)}</span>
-    <input id="cf-${id}" class="field" ${modo === 'numeric' ? 'inputmode="numeric" pattern="[0-9]*"' : ''} maxlength="${max}" placeholder="${esc(ph)}" autocomplete="off">
-    ${ayuda ? `<small>${esc(ayuda)}</small>` : ''}</label>`;
+/** Campo de texto. Con `lista`, la lista de sugerencias (id cf-<lista>) cuelga justo debajo del cuadro, antes de la ayuda. */
+function campo(id, etiqueta, { ayuda = '', max = 48, ph = '', modo = 'text', lista = '', ancho = false } = {}) {
+  return `<div class="cf-campo${ancho ? ' cf-ancho' : ''}"><label for="cf-${id}"><span>${esc(etiqueta)}</span></label>
+    <div class="cf-ent"><input id="cf-${id}" class="field" ${modo === 'numeric' ? 'inputmode="numeric" pattern="[0-9]*"' : ''} maxlength="${max}" placeholder="${esc(ph)}" autocomplete="off">
+    ${lista ? `<ul id="cf-${lista}" class="cf-sugerencias" aria-live="polite"></ul>` : ''}</div>
+    ${ayuda ? `<small>${esc(ayuda)}</small>` : ''}</div>`;
 }
 
 async function sugerir() {
@@ -35,10 +37,9 @@ registrarTipo({
     raiz = contenedor;
     contenedor.innerHTML = `
       <div class="cf-rejilla">
-        <div class="cf-campo cf-ancho">${campo('jugador', 'Jugador', { ph: 'Ej.: Lamine Yamal', ayuda: 'Escríbelo como sale en el PES. Si está en la Liga Máster de la web, elígelo de la lista.' })}
-          <ul id="cf-sugerencias" class="cf-sugerencias" aria-live="polite"></ul></div>
-        <div class="cf-campo-club">${campo('desde', 'Sale de (equipo)', { ph: 'Ej.: FC Barcelona', ayuda: 'Su club, no su selección. Escribe y elige de la lista (5 grandes ligas).' })}<ul id="cf-clubes-desde" class="cf-sugerencias"></ul></div>
-        <div class="cf-campo-club">${campo('hasta', 'Va a (equipo)', { ph: 'Ej.: Arsenal FC' })}<ul id="cf-clubes-hasta" class="cf-sugerencias"></ul></div>
+        ${campo('jugador', 'Jugador', { ph: 'Ej.: Lamine Yamal', ayuda: 'Escríbelo como sale en el PES. Si está en la Liga Máster de la web, elígelo de la lista.', lista: 'sugerencias', ancho: true })}
+        ${campo('desde', 'Sale de (equipo)', { ph: 'Ej.: FC Barcelona', ayuda: 'Su club, no su selección. Escribe y elige de la lista (5 grandes ligas).', lista: 'clubes-desde' })}
+        ${campo('hasta', 'Va a (equipo)', { ph: 'Ej.: Arsenal FC', lista: 'clubes-hasta' })}
         <label class="cf-check"><input type="checkbox" id="cf-libre"> Agente libre (no sale de ningún equipo)</label>
       </div>
       <details class="cf-avanzado"><summary>Ids de PES (opcional)</summary>
@@ -53,7 +54,10 @@ registrarTipo({
         </div>
       </div>`;
     let espera = null;
-    v('jugador').addEventListener('input', () => { v('lm_jugador_id').value = ''; clearTimeout(espera); espera = setTimeout(sugerir, 300); });
+    v('jugador').addEventListener('input', () => {
+      v('lm_jugador_id').value = '';
+      if (v('jugador_id').dataset.auto) { v('jugador_id').value = ''; delete v('jugador_id').dataset.auto; }   // el id puesto al elegir de la lista ya no corresponde al nombre editado
+      clearTimeout(espera); espera = setTimeout(sugerir, 300); });
     for (const lado of ['desde', 'hasta']) {
       const lista = v('clubes-' + lado);
       v(lado).addEventListener('input', () => {
@@ -69,7 +73,7 @@ registrarTipo({
     v('libre').addEventListener('change', () => { v('desde').disabled = v('libre').checked; v('desde_id').disabled = v('libre').checked; });
     v('sugerencias').addEventListener('click', (ev) => {
       const b = ev.target.closest('.cf-sug'); if (!b) return;
-      v('jugador').value = b.dataset.nombre; v('jugador_id').value = b.dataset.pes; v('lm_jugador_id').value = b.dataset.id;
+      v('jugador').value = b.dataset.nombre; v('jugador_id').value = b.dataset.pes; v('jugador_id').dataset.auto = '1'; v('lm_jugador_id').value = b.dataset.id;
       if (b.dataset.club && !v('desde').value) { v('desde').value = b.dataset.club; v('desde_id').value = b.dataset.clubPes; }
       v('sugerencias').innerHTML = '';
     });

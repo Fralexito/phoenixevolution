@@ -39,7 +39,8 @@ html[data-tema='sudario'] .cfx { --a: #f5c542; }
 .cfx-campos { display: grid; gap: .9rem; }
 .cfx .cf-rejilla { gap: .9rem 1rem; }
 .cfx .cf-campo { gap: .4rem; font-size: 13px; color: var(--tx2); }
-.cfx .cf-campo > span { font-weight: 600; color: #d6d9e6; font-size: 13px; }
+.cfx .cf-campo > span, .cfx .cf-campo > label > span { font-weight: 600; color: #d6d9e6; font-size: 13px; }
+.cf-ent { position: relative; }
 .cfx .cf-campo small, .cfx .cf-ayuda { font-size: 12px; color: var(--tx2); font-weight: 400; }
 .cfx .field { min-height: 2.9rem; padding: .7rem .9rem; font-size: 15px; color: #fff; background: var(--fondo-in); border: 1px solid var(--linea); border-radius: 12px; caret-color: var(--a);
   transition: border-color .2s, background-color .2s, box-shadow .2s; }
@@ -53,7 +54,6 @@ html[data-tema='sudario'] .cfx { --a: #f5c542; }
 .cfx .cf-avanzado summary { cursor: pointer; color: var(--tx2); font-size: 13px; font-weight: 600; min-height: 2.25rem; display: flex; align-items: center; }
 .cfx .cf-lm { border-top: 1px solid var(--linea); padding-top: 1rem; }
 .cfx .cf-subtitulo { font-weight: 600; color: #d6d9e6; font-size: 13px; margin-bottom: .5rem; }
-.cf-campo-club { display: grid; gap: .25rem; align-content: start; position: relative; }
 
 /* Sugerencias: lista flotante bajo el campo, no empuja el formulario. */
 .cf-sugerencias { display: grid; gap: 2px; list-style: none; margin: 0; padding: 0; }
@@ -81,6 +81,14 @@ html[data-tema='sudario'] .cfx { --a: #f5c542; }
 @media (min-width: 960px) { .cfx-vista { position: sticky; top: 5.5rem; padding: 0 0 0 2.2rem; border-top: 0; border-left: 1px solid var(--linea); } }
 .cfx-vista-t { font-size: 13px; font-weight: 600; color: var(--tx2); margin-bottom: 1.1rem; }
 .cfx-ticket { display: grid; gap: 1.2rem; }
+.cfx-tk-cabeza { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1rem; align-items: center; }
+.cfx-tk-cara { width: 4.5rem; height: 4.5rem; border-radius: 50%; display: grid; place-items: center; overflow: hidden; color: #5d6380; font-size: 1.6rem;
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--a) 16%, transparent), rgba(255,255,255,.04)); border: 1px solid var(--linea); transition: border-color .3s; }
+.cfx-tk-cara img { width: 100%; height: 100%; object-fit: cover; object-position: center top; animation: cfx-entra .4s var(--curva); }
+.cfx-tk-cara.con-foto { border-color: color-mix(in srgb, var(--a) 45%, transparent); }
+.cfx-tk-sub { margin-top: .25rem; font-size: 12px; color: var(--tx2); }
+.cfx-tk-esc { display: block; height: 26px; margin-bottom: .3rem; }
+.cfx-tk-esc:empty { height: 0; margin: 0; }
 .cfx-tk-jug { font-family: var(--font-display, inherit); font-weight: 700; font-size: clamp(1.35rem, 2.2vw, 1.7rem); line-height: 1.15; color: #fff; overflow-wrap: anywhere; transition: color .25s; }
 .cfx-tk-jug[data-vacio='true'], .cfx-tk-club[data-vacio='true'] b { color: #7d839a; font-weight: 500; }
 .cfx-tk-ruta { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .9rem; align-items: center; }
