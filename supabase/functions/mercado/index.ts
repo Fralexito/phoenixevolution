@@ -296,13 +296,38 @@ async function firmar(contenido: string) {
  *  contenido = { liga, desde, version_actual, cambios:[{ version, phoenix_id, pes_id, club_desde, club_hacia, club_desde_pes, club_hacia_pes, tipo, fecha }] }
  *  Máx. 1000 cambios por respuesta: si version_actual > último version recibido, volver a pedir con desde=<último>. */
 async function ligaCambios(req: Request) {
+  const u = new URL(req.url);
+  if (u.searchParams.get("ambito") === "pc") return ligaCambiosPc(req, u);
   await autenticar(req, { exigeManager: true });
-  const u = new URL(req.url); const liga = (u.searchParams.get("liga") || LIGA).slice(0, 40);
+  const liga = (u.searchParams.get("liga") || LIGA).slice(0, 40);
   const desde = Number(u.searchParams.get("desde") ?? "0");
   if (!Number.isInteger(desde) || desde < 0) throw err("DATOS_INVALIDOS", { campo: "desde" });
   const { data, error } = await sb.rpc("lm_cambios_desde", { p_liga: liga, p_desde: desde, p_limite: 1000 });
   if (error) throw err("ERROR_INTERNO");
   return firmar(JSON.stringify({ ...(data as object), generado: new Date().toISOString() }));
+}
+
+// ───────── Liga Máster de cada PC (127, contrato docs/CONTRATO-WEB-PES.md §3b) ─────────
+/** GET /v1/liga/cambios?ambito=pc&desde=<version> → firmado. contenido = { formato:"phoenix-lm/cambios-1", desde, version_actual,
+ *  cambios:[{ version, tipo:"traspaso"|"dinero"|"valor"|"stat"|"deshacer", partida, cambio_id, … }] } — lo de todos + lo de este usuario.
+ *  Máx. 500 por respuesta: si version_actual > último recibido, volver a pedir con desde=<último>. PhoenixSync/core/CambiosLM.h lo aplica. */
+async function ligaCambiosPc(req: Request, u: URL) {
+  const d = await autenticar(req);
+  const desde = Number(u.searchParams.get("desde") ?? "0");
+  if (!Number.isInteger(desde) || desde < 0) throw err("DATOS_INVALIDOS", { campo: "desde" });
+  const { data, error } = await sb.rpc("lm_pc_cambios_desde", { p_usuario: d.usuario, p_desde: desde, p_limite: 500 });
+  if (error) { log("error", "lm_pc_cambios", { m: error.message }); throw err("ERROR_INTERNO"); }
+  return firmar(JSON.stringify({ ...(data as object), generado: new Date().toISOString() }));
+}
+/** POST /v1/liga/aplicado-pc { formato:"phoenix-lm/aplicado-1", partidas:[{ partida, ranura, club_pes, club_nombre, fecha_partida, version_aplicada,
+ *  huella?, error?, resultados:[{ version, estado:"aplicado"|"rechazado"|"pendiente"|"sin_efecto", motivo?, antes?, despues? }] }] } → { partidas, guardados, ignorados } */
+async function ligaAplicadoPc(req: Request) {
+  const d = await autenticar(req); frenar(`aplpc:${d.id}`, 60, 60 * 60_000);
+  const b = await leerJson(req, 200_000);
+  if (b.formato !== "phoenix-lm/aplicado-1" || !Array.isArray(b.partidas) || b.partidas.length > 20) throw err("DATOS_INVALIDOS", { campo: "partidas" });
+  const { data, error } = await sb.rpc("lm_pc_informe", { p_usuario: d.usuario, p_dispositivo: d.id, p_origen: d.origen, p_informe: b });
+  if (error) { log("error", "lm_pc_informe", { m: error.message }); throw err(error.message.includes("INFORME_NO_VALIDO") ? "DATOS_INVALIDOS" : "ERROR_INTERNO"); }
+  return data;
 }
 
 /** POST /v1/liga/aplicado { version, huella_plantillas, liga? } → { version_actual, al_dia, coincide }
@@ -437,7 +462,7 @@ const RUTAS: Record<string, Record<string, (r: Request) => Promise<unknown>>> = 
   "/v1/catalogo": { POST: subirCatalogo }, "/v1/fichajes": { GET: fichajes }, "/v1/fichajes/aplicados": { POST: marcarAplicados }, "/v1/huella": { GET: huella },
   "/v1/clave-publica": { GET: clavePublica }, "/v1/plantillas": { GET: plantillas }, "/v1/correcciones": { POST: correcciones }, "/v1/reportes/lote": { POST: reportesLote },
   "/v1/equivalencias": { POST: equivalencias, GET: leerEquivalencias },
-  "/v1/liga/cambios": { GET: ligaCambios }, "/v1/liga/aplicado": { POST: ligaAplicado },
+  "/v1/liga/cambios": { GET: ligaCambios }, "/v1/liga/aplicado": { POST: ligaAplicado }, "/v1/liga/aplicado-pc": { POST: ligaAplicadoPc },
   "/v1/vestuario/subir": { POST: vestuarioSubir }, "/v1/vestuario/cambios": { GET: vestuarioCambios }, "/v1/vestuario/aplicado": { POST: vestuarioAplicado }, "/v1/eco": { GET: async () => ({ ok: true, version_api: VERSION_API, hora: new Date().toISOString() }) },
 };
 

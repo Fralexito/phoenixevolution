@@ -27,7 +27,8 @@ begin
   if x.estado_base <> 'publicado' or x.base_ref <> 'v1/cambios' or x.estado_lm <> 'no_aplica' then raise exception 'P2 estados base: % %', x.estado_base, x.estado_lm; end if;
   c3 := public.pes_cambio_crear('info', 'ambos', '{"jugador":"Lamine Yamal","valores":{"pos_dc":2,"altura":181,"pie_malo_uso":4}}');
   select * into x from public.pes_cambios where id = (c3->>'id')::uuid;
-  if x.estado_base <> 'publicado' or x.estado_lm <> 'pendiente' then raise exception 'P2 estados ambos'; end if;
+  -- con la 127 la parte lm sale de «pendiente» al crearse (publicado, o error si no hay id de PES real)
+  if x.estado_base <> 'publicado' or x.estado_lm not in ('pendiente', 'publicado', 'error') then raise exception 'P2 estados ambos'; end if;
 
   -- 3) Datos malos: campo de otro tipo, fuera de rango, decimal, clave rara, sin jugador, sin valores, id en texto
   begin perform public.pes_cambio_crear('stats', 'base', '{"jugador":"X","valores":{"pos_dc":2}}'); raise exception 'P3 campo info en stats';

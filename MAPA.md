@@ -465,3 +465,10 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 ### Ronda 347 (cuenta WEB, borrador): ANTI-LAG celular (sin perder nada visual). (1) Escudos flotantes: se pausan fuera de pantalla (`features/pausaFueraDePantalla.js`, `[data-fuera]`). (2) Punto «estado» ahora pulsa con transform/opacity en un pseudo-elemento (antes box-shadow, que repinta). (3) Estrellas de la portada a ~30 fps y dpr máx 1,5 en celular. Pendiente: recortar fuentes de iconos (Phosphor+FA) y CSS sin usar. 506 tests OK, build 53 páginas.
 
 ### Ronda 348 (cuenta WEB, borrador): ARREGLO — la lista de Contactos/Chats volvía sola al inicio. Cada aviso en vivo repintaba la lista con innerHTML y el scroll se reiniciaba. Ahora `repintar()` en `features/chatFlotante/contactos.js` conserva el scroll y no toca el DOM si el HTML no cambió. 506 tests OK.
+
+### Ronda 352 (sesión Liga Máster 127, borrador): Liga Máster de cada PC desde el formulario único (migración 127)
+- Tipos `dinero` y `valor` encendidos (solo destino Liga Máster). Fichaje con destino lm/ambos: bloque `lm` con usuario, partida, monto, sueldo, cláusula, fin de contrato y dorsal.
+- Disparador sobre `pes_cambios`: cada cambio con parte LM (fichaje, dinero, valor, stats/info) se traduce al canal `lm_pc_cambios` y queda `estado_lm = publicado` (o `error` + motivo). Anular = deshacer en cada partida.
+- Edge Function `mercado`: `GET /v1/liga/cambios?ambito=pc` (firmado Ed25519) y `POST /v1/liga/aplicado-pc` (historial `lm_pc_partidas` / `lm_pc_resultados` + `pes_eventos` destino lm).
+- Formulario: `src/js/features/cambios/ligaMaster.js` (registra dinero y valor; exporta `camposLmFichaje` y `pintarHistorialLM`), lógica pura `core/ligaMasterPc.js` (+ tests/ligaMasterPc.test.mjs 6/6). Falta que la página de la 125 lo importe.
+- Contrato: docs/CONTRATO-WEB-PES.md §2 (fichaje·LM, dinero, valor, stats lm) y §3b «Cómo lo hace la 127». PC: PhoenixSync 0.2.1 `lm-sincronizar` (rama mercado-fase0).
