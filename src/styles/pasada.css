@@ -1,0 +1,60 @@
+/* PASADA DE DISEÑO (FX.pasada, ronda 360). Interruptor: src/data/experimento.js → pasada. Con false nada de esto se aplica.
+   Qué hace, en poco: (1) las cosas del navegador que no eran del diseño (selección, barras de scroll, foco, cifras alineadas) ahora usan la paleta;
+   (2) tarjetas, rejillas y listas entran en cascada al bajar (CSS puro con view(), sin JS; si el navegador no lo soporta, simplemente no hay animación);
+   (3) hover/foco/pulsado coherentes en tarjetas-enlace, botones y filas; (4) estados vacíos más calmados; (5) móvil: objetivos táctiles cómodos.
+   Todo se tiñe con --color-galaxy-400, así que en «sudario» sale dorado solo. Prefijo propio: ps-. No toca lógica ni datos. */
+
+/* ---------- 1 · Superficies del navegador, con la paleta ---------- */
+html[data-fx-pasada] { scrollbar-color: color-mix(in srgb, var(--color-galaxy-400) 38%, #1a0b36) transparent; scrollbar-width: thin; }
+html[data-fx-pasada] ::selection { background: color-mix(in srgb, var(--color-galaxy-400) 38%, transparent); color: #fff; }
+html[data-fx-pasada] :focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 3px; border-radius: .35rem; }
+html[data-fx-pasada] main table, html[data-fx-pasada] main .tabular { font-variant-numeric: tabular-nums; }
+html[data-fx-pasada] main :is(h1, h2, h3) { text-wrap: balance; }
+html[data-fx-pasada] main :is(p, li) { text-wrap: pretty; }
+html[data-fx-pasada] input, html[data-fx-pasada] textarea { caret-color: var(--color-galaxy-400); }
+html[data-fx-pasada] main { --ps-ease: cubic-bezier(.22, 1, .36, 1); }
+
+/* ---------- 2 · Entrada en cascada (cuando el bloque asoma por abajo) ---------- */
+@keyframes ps-entra { from { opacity: .35; translate: 0 18px; } to { opacity: 1; translate: 0 0; } }
+@keyframes ps-titulo { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  /* El título de cada página llega primero, una sola vez: es «el momento» de la pantalla. */
+  html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) main h1 { animation: ps-titulo .6s var(--ps-ease, ease-out) both; }
+  @supports (animation-timeline: view()) {
+    /* Rejillas y listas: cada hijo entra un poquito después que el anterior (se escalona el tramo de entrada). */
+    html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) main :is(.grid, .ps-lista) > :where(:not([data-reveal], .cfx, .cfx *, [hidden], script, style)) {
+      animation: ps-entra linear backwards; animation-timeline: view(); animation-range: entry 0% entry 55%;
+    }
+    html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) main :is(.grid, .ps-lista) > :nth-child(2) { animation-range: entry 6% entry 61%; }
+    html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) main :is(.grid, .ps-lista) > :nth-child(3) { animation-range: entry 12% entry 67%; }
+    html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) main :is(.grid, .ps-lista) > :nth-child(4) { animation-range: entry 18% entry 73%; }
+    html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) main :is(.grid, .ps-lista) > :nth-child(n+5) { animation-range: entry 24% entry 79%; }
+  }
+}
+
+/* ---------- 3 · Tarjetas, botones y filas: hover / foco / pulsado ---------- */
+html[data-fx-pasada] .glass-panel { transition: border-color .25s var(--ps-ease, ease), background-color .25s, box-shadow .3s var(--ps-ease, ease), translate .3s var(--ps-ease, ease); }
+html[data-fx-pasada] :is(a, button, [role='button'], [tabindex='0']).glass-panel:hover { border-color: color-mix(in srgb, var(--color-galaxy-400) 55%, transparent); translate: 0 -2px; box-shadow: 0 10px 26px -12px rgb(0 0 0 / .7); }
+html[data-fx-pasada] :is(a, button, [role='button'], [tabindex='0']).glass-panel:active { translate: 0 0; box-shadow: none; }
+html[data-fx-pasada] .btn { transition: background .2s, box-shadow .25s, opacity .2s, translate .2s var(--ps-ease, ease), border-color .2s, color .2s; }
+html[data-fx-pasada] .btn:not(:disabled):active { translate: 0 1px; }
+html[data-fx-pasada] .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 22px -4px color-mix(in srgb, var(--color-galaxy-600) 70%, transparent); }
+html[data-fx-pasada] .btn:disabled { filter: saturate(.4); }
+html[data-fx-pasada] main tbody tr { transition: background-color .15s; }
+html[data-fx-pasada] main tbody tr:hover { background-color: color-mix(in srgb, var(--color-galaxy-400) 7%, transparent); }
+html[data-fx-pasada] .pilar-tabs-lista a:hover { color: #fff; background: color-mix(in srgb, var(--color-galaxy-400) 10%, transparent); }
+
+/* ---------- 4 · Estados vacíos: calmados, sin tarjeta de relleno ---------- */
+html[data-fx-pasada] main .glass-panel.text-center:is(.text-gray-500, .text-gray-400):is(.p-6, .p-8, .py-8, .py-10, .py-12) {
+  background: transparent; border: 1px dashed color-mix(in srgb, var(--color-galaxy-border) 85%, transparent); box-shadow: none; backdrop-filter: none;
+  color: #94a3b8; font-size: .8rem; line-height: 1.6; max-width: 38rem; margin-inline: auto; padding-block: 2.25rem; text-wrap: balance;
+}
+
+/* ---------- 5 · Móvil ---------- */
+@media (max-width: 639px) {
+  html[data-fx-pasada] main :is(.grid, .ps-lista) { gap: .75rem; }
+  html[data-fx-pasada] .btn { min-height: 2.5rem; }
+}
+@media (hover: none) {
+  html[data-fx-pasada] :is(a, button, [role='button'], [tabindex='0']).glass-panel:hover { translate: 0 0; box-shadow: none; }
+}
