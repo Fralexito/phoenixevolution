@@ -59,6 +59,8 @@ const ACCOUNT_NAV_BASE = [
   { id: 'panel', label: 'Panel del sitio', path: 'panel/', icon: 'fa-sliders', staff: 'verAuditoriaCompleta', grupo: 'staff' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
   { id: 'linkversiones', label: 'Versiones de Link', path: 'link-versiones/', icon: 'fa-download', staff: 'verAuditoriaCompleta', grupo: 'staff' },
+  { id: 'cambiosoficiales', label: 'Cambios oficiales', path: 'cambios-oficiales/', icon: 'fa-arrows-rotate', staff: 'verAuditoriaCompleta', grupo: 'staff' },
+  { id: 'usuariospes', label: 'Usuarios en PES', path: 'usuarios-pes/', icon: 'fa-computer', staff: 'verAuditoriaCompleta', grupo: 'staff' },
   { id: 'ayudaia',  label: 'Ayuda con IA', path: 'ayuda-ia/',     icon: 'fa-robot', grupo: 'comunidad' },
   { id: 'bandejaia', label: 'Bandeja IA',  path: 'bandeja-ia/',    icon: 'fa-inbox',          staff: 'bandejaIA',    grupo: 'staff' },
   // `grupo` = bloque del panel «Mi cuenta» (ver GRUPOS_CUENTA). `menu: false` = no sale en el panel (ya está a la vista: la lupa del header), pero sí en el buscador.
