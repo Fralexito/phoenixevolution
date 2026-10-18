@@ -3,7 +3,7 @@
 import { registrarTipo, validarFichaje, incluyeLm } from '../../core/cambiosOficiales.js';
 import { escapeHTML as esc } from '../../core/dom.js';
 import { buscarJugadores, clubesLm } from './api.js';
-import { buscarClubes, clubExacto } from '../../core/clubesPes.js';
+import { buscarClubes, clubExacto, escudoImg, paisDe } from '../../core/clubesPes.js';
 
 let raiz = null;
 let clubes = null;
@@ -63,7 +63,7 @@ registrarTipo({
       v(lado).addEventListener('input', () => {
         const t = v(lado).value;
         v(lado + '_id').value = clubExacto(t)?.id ?? '';
-        lista.innerHTML = buscarClubes(t).map((c) => `<li><button type="button" class="cf-sug" data-id="${c.id}" data-nombre="${esc(c.nombre)}">${esc(c.nombre)} <small>· ${esc(c.liga)}</small></button></li>`).join('');
+        lista.innerHTML = buscarClubes(t).map((c) => `<li><button type="button" class="cf-sug cf-sug-club" data-id="${c.id}" data-nombre="${esc(c.nombre)}">${escudoImg(c, 28)}<span><b>${esc(c.nombre)}</b><small>${esc(c.liga)} · ${esc(paisDe(c))}</small></span></button></li>`).join('');
       });
       lista.addEventListener('click', (ev) => {
         const b = ev.target.closest('.cf-sug'); if (!b) return;

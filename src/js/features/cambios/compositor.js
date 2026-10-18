@@ -1,6 +1,6 @@
 // Piezas visuales del compositor de Cambios oficiales (control segmentado + vista previa en vivo). Solo tocan el DOM que se les pasa.
 import { tipoRegistrado, incluyeBase, incluyeLm } from '../../core/cambiosOficiales.js';
-import { clubExacto } from '../../core/clubesPes.js';
+import { clubExacto, escudoImg, paisDe } from '../../core/clubesPes.js';
 import { escapeHTML as esc } from '../../core/dom.js';
 import { escudoHTML } from '../../core/escudos.js';
 import { montarFotos } from '../fotoFutbolista.js';
@@ -33,7 +33,8 @@ function caraJugador(el, nombre, pes, club) {
   const buscar = () => { nuevo.dataset.foto = nombre; nuevo.dataset.pes = pes; nuevo.dataset.club = club; montarFotos(nuevo.parentElement); };
   if (pes) buscar(); else relojCara = setTimeout(buscar, 700);
 }
-const lugar = (club) => { const c = clubExacto(club); return c ? c.liga : ''; };
+/** Línea breve de información del club: liga, país e id de PES (vacía si el club no está en el catálogo). */
+const lugar = (club) => { const c = clubExacto(club); return c ? `${c.liga} · ${paisDe(c)} · id PES ${c.id}` : ''; };
 /** Vista previa en vivo de lo que se va a mandar (solo lee lo escrito en el formulario; no valida). El esqueleto se crea una vez y luego se actualiza el texto, para que la flecha no se reinicie con cada tecla. */
 export function pintarVista(caja, st) {
   if (!caja) return;
@@ -58,7 +59,7 @@ export function pintarVista(caja, st) {
   const club = (k, nombre, vacio, sub) => {
     const el = q(k); el.dataset.vacio = String(vacio); el.querySelector('b').textContent = nombre; el.querySelector('small').textContent = sub;
     const esc_ = q(`esc-${k}`), clave = vacio ? '' : nombre;   // el escudo solo se vuelve a pintar si cambia el club (evita parpadeos al teclear)
-    if (esc_.dataset.k !== clave) { esc_.dataset.k = clave; esc_.innerHTML = vacio ? '' : escudoHTML(nombre, 26); }
+    if (esc_.dataset.k !== clave) { esc_.dataset.k = clave; esc_.innerHTML = vacio ? '' : (escudoImg(clubExacto(nombre), 36) || escudoHTML(nombre, 36)); }
   };
   q('base').dataset.on = String(incluyeBase(st.destino)); q('lm').dataset.on = String(incluyeLm(st.destino));
   const tk = caja.querySelector('.cfx-ticket');

@@ -27,3 +27,11 @@ export function clubExacto(texto, lista = CLUBES_PES) {
   const q = norm(texto);
   return q ? lista.find((c) => norm(c.nombre) === q) ?? null : null;
 }
+
+const PAIS = { 'Premier League': 'Inglaterra', LaLiga: 'España', 'Serie A': 'Italia', Bundesliga: 'Alemania', 'Ligue 1': 'Francia' };
+/** País de la liga del club (para la línea de información breve). */
+export const paisDe = (club) => PAIS[club?.liga] ?? '';
+/** Escudo del club tal como lo trae el parche (public/escudos-pes/<id PES>.webp, 128 px, versión para fondo oscuro). */
+export const escudoUrl = (club) => (club?.id ? `${import.meta.env?.BASE_URL ?? '/'}escudos-pes/${club.id}.webp` : null);
+/** <img> del escudo, o nada si el club no está en el catálogo. */
+export const escudoImg = (club, px = 28) => (club ? `<img src="${escudoUrl(club)}" alt="" width="${px}" height="${px}" loading="lazy" decoding="async" class="cfx-esc" style="width:${px}px;height:${px}px">` : '');

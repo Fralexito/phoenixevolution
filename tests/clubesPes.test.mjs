@@ -21,3 +21,17 @@ test('clubExacto devuelve el id de PES', () => {
   assert.equal(clubExacto('real madrid cf')?.id, 109);
   assert.equal(clubExacto('Real'), null);
 });
+import { paisDe, escudoUrl, escudoImg } from '../src/js/core/clubesPes.js';
+import { existsSync } from 'node:fs';
+test('país, escudo e imagen del club', () => {
+  const c = clubExacto('FC Barcelona');
+  assert.equal(paisDe(c), 'España');
+  assert.equal(paisDe(null), '');
+  assert.match(escudoUrl(c), /escudos-pes\/108\.webp$/);
+  assert.equal(escudoImg(null), '');
+  assert.match(escudoImg(c, 30), /width="30"/);
+});
+test('cada club del catálogo tiene su escudo en public/escudos-pes', () => {
+  const faltan = CLUBES_PES.filter((c) => !existsSync(new URL(`../public/escudos-pes/${c.id}.webp`, import.meta.url)));
+  assert.deepEqual(faltan.map((c) => c.nombre), []);
+});
