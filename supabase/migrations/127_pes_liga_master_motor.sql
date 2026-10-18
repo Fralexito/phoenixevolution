@@ -341,7 +341,9 @@ $$;
 
 revoke all on function private.lm_euros(jsonb), private.lm_id_real(jsonb), private.lm_pc_traducir(public.pes_cambios), private.lm_pc_publicar(uuid),
   private.lm_pc_al_crear(), private.lm_pc_al_anular() from public;
-revoke all on function public.lm_pc_tomar_pendientes(), public.lm_pc_cambios_desde(uuid, bigint, int), public.lm_pc_informe(uuid, uuid, text, jsonb),
-  public.lm_pc_partidas_lista(), public.lm_pc_historial(uuid, int) from public, anon;
+revoke all on function public.lm_pc_tomar_pendientes(), public.lm_pc_partidas_lista(), public.lm_pc_historial(uuid, int) from public, anon;
 grant execute on function public.lm_pc_tomar_pendientes(), public.lm_pc_partidas_lista(), public.lm_pc_historial(uuid, int) to authenticated;
+-- Endurecimiento (18-oct): estas dos SOLO las ejecuta el servidor. Los permisos por defecto de Supabase dejaban EXECUTE a «authenticated»:
+-- cualquier usuario con sesión habría podido leer los cambios de otro (p_usuario) o falsear informes de un PC.
+revoke all on function public.lm_pc_cambios_desde(uuid, bigint, int), public.lm_pc_informe(uuid, uuid, text, jsonb) from public, anon, authenticated;
 grant execute on function public.lm_pc_tomar_pendientes(), public.lm_pc_cambios_desde(uuid, bigint, int), public.lm_pc_informe(uuid, uuid, text, jsonb) to service_role;
