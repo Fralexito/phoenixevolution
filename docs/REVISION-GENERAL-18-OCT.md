@@ -44,7 +44,7 @@ Hay varias sesiones editando el mismo repositorio a la vez (visual, Link, Sync, 
 
 ## 5. Siguientes pasos propuestos (en este orden)
 
-1. Retirar las 7 carpetas de trabajo ya fusionadas (`git worktree remove`) y borrar esas ramas locales.
+1. ✅ HECHO (18-oct): retiradas las carpetas de trabajo de econ-fase-b/c/d/e, ws-amistosos-web y ws-stats-web (sin cambios pendientes). Las ramas se conservan; se recrean con `git worktree add <ruta> <rama>`.
 2. Auditoría de CSS por página (la «Pasada visual premium» ya mira las 4-5 más usadas).
 3. Revisar índices y políticas duplicadas cuando alguna tabla supere unos miles de filas.
 4. Reorganización de carpetas por fases (con las sesiones paradas).
