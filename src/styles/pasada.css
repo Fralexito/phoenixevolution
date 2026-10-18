@@ -73,3 +73,21 @@ html[data-fx-pasada] main span[class*='tracking-widest'][class*='bg-galaxy-600/2
 /* Barra lateral de atajos (solo PC ancho): descansa más tenue y se enciende al acercarse o enfocarla. */
 html[data-fx-pasada] #barra-lat { opacity: .72; transition: opacity .25s var(--ps-ease, ease); }
 html[data-fx-pasada] #barra-lat:is(:hover, :focus-within) { opacity: 1; }
+
+/* ---------- 8 · Todas las ventanas con el estilo de la Sala de fichajes (ronda 361) ---------- */
+/* Fondo oscuro con desenfoque fuerte, caja de 20 px con borde fino y un toque del acento arriba a la derecha, y entrada con curva exponencial. Afecta a toda ventana
+   que abra openModal (confirmar, elegir, pedir texto, perfil, ficha…). Cambia solo la piel: nada de lógica ni de tamaños de contenido. */
+html[data-fx-pasada] .modal-backdrop { background: rgba(4, 5, 14, .8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+html[data-fx-pasada] .modal-card { border-radius: 20px; border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 30px 80px -20px rgb(0 0 0 / .8);
+  background: radial-gradient(90% 60% at 100% 0%, color-mix(in srgb, var(--color-galaxy-400) 9%, transparent), transparent 60%), var(--color-galaxy-panel);
+  scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .18) transparent; }
+html[data-fx-pasada] .modal-card :is(button, a, input, select, textarea):focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+@keyframes ps-vela { from { opacity: 0; } }
+@keyframes ps-ventana { from { opacity: 0; translate: 0 16px; scale: .985; } }
+@media (prefers-reduced-motion: no-preference) {
+  html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) .modal-backdrop { animation: ps-vela .25s ease both; }
+  html[data-fx-pasada]:not([data-aj-mov-efectivo='reducido']) .modal-card { animation: ps-ventana .5s cubic-bezier(.16, 1, .3, 1) both; }
+}
+/* Club para elegir en «Mi club»: mismo gesto que las tarjetas de la Sala (se levanta, el escudo crece). */
+html[data-fx-pasada] .mg-club-op { transition: transform .3s cubic-bezier(.16, 1, .3, 1), border-color .2s, box-shadow .3s; }
+html[data-fx-pasada] .mg-club-op:active { transform: translateY(-1px); }
