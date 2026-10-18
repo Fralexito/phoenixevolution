@@ -36,3 +36,4 @@ html[data-tema='sudario'] .sy-op[aria-checked='true'] { background: rgba(245,197
 .up-tabla tr[aria-selected='true'] td { background: rgba(0,229,255,.08); }
 @media (hover: hover) { .up-tabla tr[data-pc]:hover td { background: rgba(255,255,255,.04); } }
 .up-evento { font-size: 13px; color: #d1d5db; display: flex; flex-wrap: wrap; gap: .4rem; align-items: baseline; }
+.cf-campo-club { display: grid; gap: .25rem; align-content: start; }
