@@ -1,8 +1,0 @@
----
-import Layout from '../layouts/Layout.astro';
----
-<Layout title="demo"><button id="abrir" class="btn btn-primary">Abrir</button></Layout>
-<script>
-  import { abrirSala } from '../js/features/cambios/salaFichajes.js';
-  document.getElementById('abrir').addEventListener('click', () => abrirSala({}));
-</script>
