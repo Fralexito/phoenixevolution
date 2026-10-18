@@ -1,5 +1,5 @@
 // Pestaña «Pase» de la tienda: Phoenix Pass (pase de temporada). Pista gratis y pista premium, progreso por XP, compra única con gemas y reclamo de premios.
-// Esquema: pages/tienda → features/economia/pase → features/economia/api → core/phoenix-pass (puro). Las reglas reales viven en la base (migración 123).
+// Esquema: pages/tienda → features/economia/pase → features/economia/api → core/economia/phoenix-pass (puro). Las reglas reales viven en la base (migración 123).
 import { escapeHTML } from '../../core/sistema/dom.js';
 import { openModal, closeModal } from '../../core/sistema/modal.js';
 import { vacioHTML } from '../../core/sistema/vacio.js';
