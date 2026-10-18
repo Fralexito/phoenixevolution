@@ -120,3 +120,19 @@ export const POS_CAMPO = {
 export const siguienteNivelPos = (actual) => ({ '': '2', 2: '1', 1: '0', 0: '' }[actual === '' || actual == null ? '' : Number(actual)] ?? '');
 /** Diferencia «nuevo − anterior» con signo, o '' si no hay con qué comparar. */
 export const deltaTexto = (antes, despues) => (Number.isFinite(antes) && Number.isFinite(despues) && antes !== despues ? `${despues > antes ? '+' : '−'}${Math.abs(despues - antes)}` : '');
+
+/** Dónde vive cada campo dentro del registro de Player.bin: [bit de inicio, ancho en bits, suma que da el valor que muestra el juego]. Mismos números que Link (Fichas.cpp)
+ *  y que docs/PROMPT-SISTEMA-DATOS-WEB-PES.md. Lo usan tools/plantillas/generar-fichas.mjs (leer) y core/fichaJuego.js (decodificar). */
+export const BITS_PLAYER = {
+  ataque: [370, 6, 40], control: [281, 6, 40], regate: [352, 6, 40], regate_ajustado: [416, 6, 40], pase_raso: [263, 6, 40], pase_bombeado: [402, 6, 40],
+  finalizacion: [396, 6, 40], cabezazo: [288, 6, 40], balon_parado: [250, 6, 40], efecto: [332, 6, 40], velocidad: [306, 6, 40], aceleracion: [344, 6, 40],
+  equilibrio: [376, 6, 40], contacto_fisico: [390, 6, 40], salto: [294, 6, 40], resistencia: [338, 6, 40], defensa: [275, 6, 40], recuperacion: [312, 6, 40],
+  agresividad: [384, 6, 40], potencia_tiro: [358, 6, 40],
+  pt_despejar: [269, 6, 40], pt_cobertura: [300, 6, 40], pt_reflejos: [320, 6, 40], pt_actitud: [326, 6, 40], pt_atajar: [364, 6, 40],
+  pie_malo_uso: [454, 2, 1], pie_malo_precision: [462, 2, 1], forma: [438, 3, 1], resistencia_lesiones: [458, 2, 1],
+  pos_pt: [350, 2, 0], pos_dfc: [468, 2, 0], pos_li: [318, 2, 0], pos_ld: [474, 2, 0], pos_mcd: [414, 2, 0], pos_mc: [456, 2, 0], pos_mi: [466, 2, 0],
+  pos_md: [460, 2, 0], pos_mo: [464, 2, 0], pos_ei: [472, 2, 0], pos_ed: [476, 2, 0], pos_sd: [478, 2, 0], pos_dc: [470, 2, 0],
+  altura: [216, 8, 100], peso: [256, 7, 30], edad: [408, 6, 15], posicion_registrada: [434, 4, 0],
+};
+/** Primer bit de las habilidades especiales y estilos COM (1 bit cada una) y cuántos son: 480 … 531. */
+export const BITS_HABILIDADES = { desde: 480, cuantos: 52 };

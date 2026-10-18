@@ -11,6 +11,7 @@ import { cargarPlantillas, cargarLm } from './datosSala.js';
 const LIGAS = ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1'];
 const LM = 'Liga Máster';
 const iniciales = (n) => { const p = String(n ?? '').split(/\s+/).filter(Boolean); return ((p[0]?.[0] ?? '') + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase(); };
+const vistaGuardada = () => { try { return localStorage.getItem('sf-vista') === 'bloques' ? 'bloques' : 'lista'; } catch { return 'lista'; } };
 const porId = new Map(CLUBES_PES.map((c) => [c.id, c]));
 
 function avatar(j, px = 44) {
@@ -29,7 +30,7 @@ function insigniaDt(lm) {
 export function abrirSala({ soloLm = false, jugador = null } = {}) {
   return new Promise((resolver) => {
     const previo = document.activeElement;
-    const st = { etapa: jugador ? 'destino' : 'jugador', liga: LIGAS[0], clubVer: null, jugador, destino: null, texto: '', plantillas: null, lm: { clubes: new Map(), jugadores: new Map() } };
+    const st = { etapa: jugador ? 'destino' : 'jugador', liga: LIGAS[0], clubVer: null, jugador, destino: null, texto: '', posFiltro: 'todos', vista: vistaGuardada(), plantillas: null, lm: { clubes: new Map(), jugadores: new Map() } };
     const raiz = document.createElement('div');
     raiz.className = 'sf'; raiz.setAttribute('role', 'dialog'); raiz.setAttribute('aria-modal', 'true'); raiz.setAttribute('aria-label', 'Sala de fichajes');
     raiz.innerHTML = `
@@ -102,10 +103,19 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
         if (!club) { l.innerHTML = '<div class="sf-hueco"><i class="fa-solid fa-people-group" aria-hidden="true"></i><p>Elige un club para ver su plantilla.</p></div>'; l.dataset.abierto = '0'; return; }
         const lm = lmDe(club.id);
         const grupos = agruparPlantilla(st.plantillas?.[club.id] ?? []);
+        if (st.posFiltro !== 'todos' && !grupos.some((g) => g.linea === st.posFiltro)) st.posFiltro = 'todos';
+        const total = grupos.reduce((n, g) => n + g.jugadores.length, 0);
+        const visibles = st.posFiltro === 'todos' ? grupos : grupos.filter((g) => g.linea === st.posFiltro);
+        const fila = (j, i) => st.vista === 'bloques'
+          ? `<li><button type="button" class="sf-jug sf-bloque" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 64)}<b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></button></li>`
+          : `<li><button type="button" class="sf-jug" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></span><em class="sf-elegir">Elegir</em></button></li>`;
+        const filtros = grupos.length > 1 ? `<div class="sf-pl-barra">
+            <div class="sf-pos" role="group" aria-label="Filtrar por posición"><button type="button" data-pos="todos" aria-pressed="${st.posFiltro === 'todos'}">Todos <em>${total}</em></button>${grupos.map((g) => `<button type="button" data-pos="${esc(g.linea)}" aria-pressed="${st.posFiltro === g.linea}">${esc(g.nombre)} <em>${g.jugadores.length}</em></button>`).join('')}</div>
+            <div class="sf-vista" role="group" aria-label="Forma de ver la plantilla"><button type="button" data-vista="lista" aria-pressed="${st.vista === 'lista'}" aria-label="Ver en lista" title="Lista"><i class="fa-solid fa-list" aria-hidden="true"></i></button><button type="button" data-vista="bloques" aria-pressed="${st.vista === 'bloques'}" aria-label="Ver en bloques" title="Bloques"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button></div></div>` : '';
         l.dataset.abierto = '1';
         l.innerHTML = `<div class="sf-plantilla"><div class="sf-pl-cab"><button type="button" class="sf-atras" data-atras aria-label="Volver a los clubes"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>${escudoImg(club, 48)}
-          <div><h3>${esc(club.nombre)}</h3><p>${esc(club.liga)} · ${esc(paisDe(club))}${lm ? ` · ${lm.dt ? `DT ${esc(lm.dt.nombre)}` : 'lo lleva la IA'}` : ''}</p></div></div>
-          <div class="sf-pl-cuerpo">${grupos.map((g) => `<h4 class="sf-h">${esc(g.nombre)}</h4><ul class="sf-lista">${g.jugadores.map((j, i) => `<li><button type="button" class="sf-jug" data-pid="${j.pid}" data-club="${club.id}" style="--i:${Math.min(i, 14)}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)}</small></span><em class="sf-elegir">Elegir</em></button></li>`).join('')}</ul>`).join('') || '<p class="sf-vacio">Este club no tiene plantilla en tu parche.</p>'}</div></div>`;
+          <div><h3>${esc(club.nombre)}</h3><p>${esc(club.liga)} · ${esc(paisDe(club))}${lm ? ` · ${lm.dt ? `DT ${esc(lm.dt.nombre)}` : 'lo lleva la IA'}` : ''}</p></div></div>${filtros}
+          <div class="sf-pl-cuerpo" data-vista-actual="${st.vista}">${visibles.map((g) => `<h4 class="sf-h">${esc(g.nombre)}</h4><ul class="sf-lista ${st.vista === 'bloques' ? 'sf-lista-bloques' : ''}">${g.jugadores.map(fila).join('')}</ul>`).join('') || '<p class="sf-vacio">Este club no tiene plantilla en tu parche.</p>'}</div></div>`;
         return;
       }
       const j = st.jugador, origen = porId.get(j.clubId), dest = porId.get(st.destino);
@@ -147,11 +157,13 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
       if (t.dataset.liga) { st.liga = t.dataset.liga; st.texto = ''; $('[data-buscar]').value = ''; st.clubVer = null; return todo(); }
       if (t.matches('.sf-club')) {
         const id = Number(t.dataset.club);
-        if (st.etapa === 'jugador') { st.clubVer = id; pintarCentro(); pintarLado(); } else { st.destino = id; pintarCentro(); pintarLado(); }
+        if (st.etapa === 'jugador') { st.clubVer = id; st.posFiltro = 'todos'; pintarCentro(); pintarLado(); } else { st.destino = id; pintarCentro(); pintarLado(); }
         return;
       }
       if (t.matches('.sf-jug')) return elegirJugador(t.dataset.pid, t.dataset.club);
-      if (t.matches('[data-atras]')) { st.clubVer = null; pintarCentro(); return pintarLado(); }
+      if (t.dataset.pos) { st.posFiltro = t.dataset.pos; return pintarLado(); }
+      if (t.dataset.vista) { st.vista = t.dataset.vista; try { localStorage.setItem('sf-vista', st.vista); } catch { /* sin almacenamiento */ } return pintarLado(); }
+      if (t.matches('[data-atras]')) { st.clubVer = null; st.posFiltro = 'todos'; pintarCentro(); return pintarLado(); }
       if (t.matches('[data-cambiar-jugador]')) { st.etapa = 'jugador'; st.destino = null; st.jugador = null; return todo(); }
       if (t.matches('[data-confirmar]') && !t.disabled) confirmar();
     });

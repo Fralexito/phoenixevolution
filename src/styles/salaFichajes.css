@@ -116,3 +116,20 @@ html[data-tema='sudario'] .sf { --a: #f5c542; }
   .sf, .sf *, .sf *::before, .sf *::after { transition: none !important; animation: none !important; }
   .sf-ruta:has([data-listo='true']) .sf-flecha path { stroke-dasharray: none; }
 }
+
+/* Filtro por posición + vista en bloques de la plantilla (ronda 361). */
+.sf-pl-barra { position: sticky; top: 4.9rem; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .6rem .8rem; background: #0e0c22; border-bottom: 1px solid var(--linea); }
+.sf-pos { display: flex; gap: .3rem; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.sf-pos button { flex: none; display: inline-flex; align-items: center; gap: .35rem; min-height: 2rem; padding: 0 .7rem; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--tx2); border: 1px solid var(--linea); transition: color .2s, background-color .2s, border-color .2s; }
+.sf-pos button em { font-style: normal; font-size: 12px; font-variant-numeric: tabular-nums; opacity: .75; }
+@media (hover: hover) { .sf-pos button:hover { color: #fff; border-color: color-mix(in srgb, var(--a) 45%, transparent); } }
+.sf-pos button[aria-pressed='true'] { color: #fff; border-color: var(--a); background: color-mix(in srgb, var(--a) 16%, transparent); }
+.sf-vista { flex: none; display: inline-flex; padding: 2px; border-radius: 10px; border: 1px solid var(--linea); }
+.sf-vista button { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 8px; color: var(--tx2); transition: color .2s, background-color .2s; }
+.sf-vista button[aria-pressed='true'] { color: #fff; background: color-mix(in srgb, var(--a) 22%, transparent); }
+.sf-lista-bloques { grid-template-columns: repeat(auto-fill, minmax(6.3rem, 1fr)); gap: .5rem; padding: 0 .5rem; }
+.sf-bloque { grid-template-columns: 1fr; justify-items: center; align-content: start; gap: .3rem; padding: .8rem .4rem .7rem; text-align: center; border: 1px solid var(--linea); background: rgba(255,255,255,.03); transition: transform .3s var(--curva), border-color .2s, background-color .2s; }
+.sf-bloque b { max-width: 100%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 13px; line-height: 1.2; }
+.sf-bloque small { padding: .05rem .5rem; border-radius: 999px; background: color-mix(in srgb, var(--a) 14%, transparent); color: #fff; font-weight: 600; }
+@media (hover: hover) { .sf-bloque:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--a) 55%, transparent); } }
+@media (max-width: 960px) { .sf-pl-barra { top: 4.4rem; } }

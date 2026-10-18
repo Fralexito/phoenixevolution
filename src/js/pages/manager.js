@@ -7,6 +7,7 @@ import { escapeHTML as esc, safeUrl } from '../core/dom.js';
 import { haceCuanto } from '../core/notifs.js';
 import { href } from '../core/config.js';
 import { montarFotos } from '../features/fotoFutbolista.js';
+import { abrirFichaJugador } from '../features/fichaJugadorModal.js';
 import { avatarHTML } from '../core/avatar.js';
 import { FX } from '../../data/experimento.js';
 
@@ -24,12 +25,22 @@ const LINEAS = [['por', 'Porteros'], ['def', 'Defensas'], ['med', 'Mediocampo'],
 const linea = (pos) => LINEA[String(pos ?? '').toUpperCase()] ?? 'otros';
 const millones = (n) => { const v = Number(n || 0) / 1e6; return v >= 1 ? `€${v.toLocaleString('es-PE', { maximumFractionDigits: 1 })} M` : plata(n); };
 /** Tarjeta de jugador estilo carta: media grande, posición coloreada, nombre, edad y valor. */
-const carta = (j, pie = '', extra = '') => `<article class="mg-carta" data-linea="${linea(j.posicion)}"${clubes.get(j.club_id)?.dueno ? ` data-dueno-carta="${esc(clubes.get(j.club_id).dueno)}"` : ''}>
+const filas = new Map();   // id del jugador → fila de lm_jugadores tal como se pintó (la usa la ficha rápida al pulsar la carta)
+const carta = (j, pie = '', extra = '') => { filas.set(j.id, j); return `<article class="mg-carta" data-ficha data-jid="${j.id}" data-linea="${linea(j.posicion)}"${clubes.get(j.club_id)?.dueno ? ` data-dueno-carta="${esc(clubes.get(j.club_id).dueno)}"` : ''}>
+  <button type="button" class="mg-ver" aria-label="Ver la ficha rápida de ${esc(j.nombre)}" title="Ver su ficha rápida"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
   <div class="mg-carta-top"><span class="mg-media">${j.media ?? '—'}</span><span class="mg-pos">${esc(j.posicion ?? '—')}</span></div>
   <span class="mg-foto" data-foto="${esc(j.nombre)}" data-pes="${j.pes_id ?? ''}" data-club="${esc(clubes.get(j.club_id)?.nombre ?? '')}" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
   <a class="mg-nombre" title="Ver la ficha de ${esc(j.nombre)}" href="${href(`futbolista/?id=${j.id}`)}">${esc(j.nombre)}</a>
   <p class="mg-meta">${j.edad ? `${j.edad} años · ` : ''}<b>${millones(j.valor)}</b></p>${extra}
-  ${pie ? `<div class="mg-carta-pie">${pie}</div>` : ''}</article>`;
+  ${pie ? `<div class="mg-carta-pie">${pie}</div>` : ''}</article>`; };
+// Pulsar una carta (menos sus botones y enlaces) abre la ficha rápida con todo lo del juego; las flechas pasan al jugador anterior o siguiente de esa lista.
+document.addEventListener('click', (e) => {
+  const c = e.target.closest('.mg-carta[data-ficha]'); if (!c) return;
+  if (e.target.closest('a, button:not(.mg-ver)')) return;
+  const lista = [...c.closest('#mg-plantilla, #mg-mercado, body').querySelectorAll('.mg-carta[data-ficha]')].map((x) => filas.get(Number(x.dataset.jid))).filter(Boolean);
+  const indice = lista.findIndex((j) => j.id === Number(c.dataset.jid));
+  if (indice >= 0) abrirFichaJugador({ lista, indice, clubDe: (j) => (j.club_id === undefined ? club : clubes.get(j.club_id)) ?? null });
+});
 const vacio = (icono, titulo, txt) => `<div class="mg-vacio"><i class="fa-solid ${icono}"></i><b>${titulo}</b><span>${txt}</span></div>`;
 const nomClub = (id) => (id == null ? 'Agente libre' : esc(clubes.get(id)?.nombre ?? 'Club'));
 

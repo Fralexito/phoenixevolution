@@ -67,3 +67,10 @@ test('deltaTexto', () => {
   assert.equal(deltaTexto(80, 85), '+5'); assert.equal(deltaTexto(85, 80), '−5');
   assert.equal(deltaTexto(80, 80), ''); assert.equal(deltaTexto(undefined, 80), '');
 });
+
+import { BITS_PLAYER, BITS_HABILIDADES } from '../src/js/core/fichasCampos.js';
+test('BITS_PLAYER cubre todos los campos del catálogo y cada uno cabe en el registro de 312 bytes', () => {
+  assert.deepEqual(Object.keys(BITS_PLAYER).sort(), CAMPOS.map((c) => c.clave).sort());
+  for (const [k, [bit, ancho]] of Object.entries(BITS_PLAYER)) assert.ok(bit + ancho <= 312 * 8, k);
+  assert.ok(BITS_HABILIDADES.desde + BITS_HABILIDADES.cuantos <= 312 * 8);
+});
