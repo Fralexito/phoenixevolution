@@ -1,39 +1,56 @@
 ---
 // CAMBIOS OFICIALES (migración 125): UN SOLO FORMULARIO para cambiar el PES de todos desde la web.
-// Cada cambio va a ☐ Base normal (amistosos) ☐ Liga Máster ☐ Las dos. Contrato: docs/CONTRATO-WEB-PES.md · Lógica: js/pages/cambiosOficiales.js
+// Cada cambio va a Base normal (amistosos), Liga Máster o Las dos. Contrato: docs/CONTRATO-WEB-PES.md · Lógica: js/pages/cambiosOficiales.js
+// Diseño: compositor con vista previa en vivo + historial en línea de tiempo (estilos cfx- en styles/cambiosOficiales.css).
 import Layout from '../layouts/Layout.astro';
 import { href } from '../js/core/config.js';
 ---
 <Layout title="Cambios oficiales" active="mercado" description="Cambios hechos en la web que llegan al PES de todos.">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-20 space-y-5">
-    <header class="glass-panel rounded-2xl px-5 py-4 space-y-1">
-      <span class="sy-sello">Staff</span>
-      <h1 class="text-3xl sm:text-4xl font-display font-extrabold text-white uppercase tracking-wider"><i class="fa-solid fa-satellite-dish text-galaxy-400 mr-2"></i>Cambios <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">oficiales</span></h1>
-      <p class="text-sm text-gray-300 max-w-3xl">Lo que cambies aquí llega solo al PES de todos los que usan Phoenix Link. Quién lo recibió y qué pasó en cada PC lo ves en <a class="text-galaxy-400 underline" href={href('usuarios-pes/')}>Usuarios en PES</a>.</p>
+  <div class="cfx max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-24">
+    <header class="cfx-cabecera">
+      <div>
+        <h1 class="cfx-titulo">Cambios oficiales</h1>
+        <p class="cfx-sub">Lo que cambies aquí llega al PES de todos los que usan Phoenix Link.</p>
+      </div>
+      <a class="cfx-enlace" href={href('usuarios-pes/')}>Ver quién lo recibió <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
     </header>
 
     <p id="cf-sin-permiso" class="sy-aviso" hidden>Solo el staff ve esta página. Inicia sesión con la cuenta de admin.</p>
 
-    <section id="cf-formulario" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4" aria-labelledby="cf-h-form" hidden>
-      <h2 id="cf-h-form" class="sy-titulo"><i class="fa-solid fa-pen-to-square"></i> Nuevo cambio</h2>
-      <form id="cf-form" class="space-y-4" autocomplete="off" novalidate>
-        <fieldset class="cf-grupo"><legend>1 · ¿Qué cambias?</legend><div id="cf-tipos" class="cf-opciones" role="radiogroup" aria-label="Tipo de cambio"></div></fieldset>
-        <fieldset class="cf-grupo"><legend>2 · ¿Dónde se aplica?</legend><div id="cf-destinos" class="cf-opciones" role="radiogroup" aria-label="Dónde se aplica"></div></fieldset>
-        <fieldset class="cf-grupo"><legend>3 · Datos</legend><div id="cf-campos"></div></fieldset>
-        <label class="cf-campo" for="cf-nota"><span>Nota (opcional, solo la ve el staff)</span><input id="cf-nota" class="field" maxlength="300" placeholder="Ej.: fichaje real de enero"></label>
+    <section id="cf-formulario" class="cfx-compositor" aria-label="Nuevo cambio" hidden>
+      <form id="cf-form" class="cfx-flujo" autocomplete="off" novalidate>
+        <fieldset class="cfx-bloque">
+          <legend>Qué cambias</legend>
+          <div id="cf-tipos" class="cfx-seg" role="radiogroup" aria-label="Tipo de cambio"></div>
+        </fieldset>
+        <fieldset class="cfx-bloque">
+          <legend>Dónde se aplica</legend>
+          <div id="cf-destinos" class="cfx-seg" role="radiogroup" aria-label="Dónde se aplica"></div>
+          <p id="cf-destino-ayuda" class="cfx-pista" aria-live="polite"></p>
+        </fieldset>
+        <fieldset class="cfx-bloque">
+          <legend>Datos</legend>
+          <div id="cf-campos" class="cfx-campos"></div>
+        </fieldset>
+        <label class="cf-campo" for="cf-nota"><span>Nota <small>(opcional, solo la ve el staff)</small></span><input id="cf-nota" class="field" maxlength="300" placeholder="Ej.: fichaje real de enero"></label>
         <p id="cf-error" class="sy-aviso" role="alert" hidden></p>
-        <div class="flex flex-wrap gap-2"><button type="submit" class="btn btn-primary" id="cf-enviar"><i class="fa-solid fa-paper-plane"></i> Mandar al PES</button></div>
+        <div class="cfx-accion"><button type="submit" class="cfx-enviar" id="cf-enviar"><span>Mandar al PES</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></div>
       </form>
+
+      <aside class="cfx-vista" aria-label="Vista previa del cambio">
+        <p class="cfx-vista-t">Así llegará</p>
+        <div id="cf-vista" aria-live="polite"></div>
+      </aside>
     </section>
 
-    <section id="cf-historial-sec" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-3" aria-labelledby="cf-h-hist" hidden>
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="cf-h-hist" class="sy-titulo"><i class="fa-solid fa-clock-rotate-left"></i> Historial de cambios</h2>
-        <button type="button" id="cf-recargar" class="btn btn-ghost"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+    <section id="cf-historial-sec" class="cfx-historial" aria-labelledby="cf-h-hist" hidden>
+      <div class="cfx-hist-cab">
+        <h2 id="cf-h-hist">Historial</h2>
+        <button type="button" id="cf-recargar" class="cfx-fantasma"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Actualizar</button>
       </div>
-      <p class="sy-ayuda">Cada cambio es un solo registro. Si fue a «Las dos», verás dos resultados: Base normal y Liga Máster. Los números dicen cuántos PCs lo aplicaron, lo saltaron o esperan.</p>
+      <p class="cfx-pista">Cada cambio es un registro. Si fue a «Las dos», verás dos resultados. Los números dicen cuántos PCs lo aplicaron, lo saltaron o esperan.</p>
       <div id="cf-historial" aria-live="polite"><div class="esqueleto h-20"></div></div>
-      <button type="button" id="cf-mas" class="btn btn-ghost" hidden>Ver más</button>
+      <button type="button" id="cf-mas" class="cfx-fantasma" hidden>Ver más</button>
       <div id="cf-historial-fichas"></div>
     </section>
   </div>

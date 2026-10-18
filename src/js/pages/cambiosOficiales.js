@@ -5,6 +5,7 @@ import { toast } from '../core/toast.js';
 import { confirmar, pedirTexto } from '../core/dialogo.js';
 import { escapeHTML as esc } from '../core/dom.js';
 import { DESTINOS, tiposDisponibles, tipoRegistrado, ESTADO_LADO, resumenResultados, resumenFichaje, mensajeError } from '../core/cambiosOficiales.js';
+import { segmentado, pintarVista } from '../features/cambios/compositor.js';
 import * as api from '../features/cambios/api.js';
 import '../features/cambios/fichaje.js';
 import '../features/cambios/fichas.js';   // 126: stats e info
@@ -16,17 +17,21 @@ const st = { tipos: [], tipo: null, destino: 'base', cambios: [], hayMas: false,
 const ctx = () => ({ tipo: st.tipo, destino: st.destino });
 
 function pintarOpciones() {
-  $('cf-tipos').innerHTML = st.tipos.map((t) => `<button type="button" role="radio" class="sy-op" data-tipo="${t.tipo}" aria-checked="${t.tipo === st.tipo}"><b>${esc(t.etiqueta)}</b></button>`).join('')
-    || '<p class="sy-ayuda">No hay tipos de cambio encendidos.</p>';
+  if (st.tipos.length) segmentado($('cf-tipos'), st.tipos.map((t) => ({ id: t.tipo, nombre: t.etiqueta })), st.tipo, 'data-tipo');
+  else $('cf-tipos').innerHTML = '<p class="sy-ayuda">No hay tipos de cambio encendidos.</p>';
   const permitidos = st.tipos.find((t) => t.tipo === st.tipo)?.destinos ?? [];
   if (!permitidos.includes(st.destino)) st.destino = permitidos[0] ?? 'base';
-  $('cf-destinos').innerHTML = DESTINOS.filter((d) => permitidos.includes(d.id)).map((d) =>
-    `<button type="button" role="radio" class="sy-op" data-destino="${d.id}" aria-checked="${d.id === st.destino}"><b>${d.id === st.destino ? '☑' : '☐'} ${esc(d.nombre)}</b><small>${esc(d.ayuda)}</small></button>`).join('');
+  const dd = DESTINOS.filter((d) => permitidos.includes(d.id));
+  segmentado($('cf-destinos'), dd.map((d) => ({ id: d.id, nombre: d.nombre })), st.destino, 'data-destino');
+  $('cf-destino-ayuda').textContent = dd.find((d) => d.id === st.destino)?.ayuda ?? '';
+  pintarVista($('cf-vista'), st);
 }
+
 async function pintarCampos() {
   const t = tipoRegistrado(st.tipo);
   if (!t) { $('cf-campos').innerHTML = ''; return; }
   await t.pintar($('cf-campos'), ctx());
+  pintarVista($('cf-vista'), st);
 }
 
 function chips(lista) {
@@ -39,19 +44,19 @@ function lado(nombre, estado, lista) {
 }
 function pintarHistorial() {
   if (!st.cambios.length) { $('cf-historial').innerHTML = '<p class="sy-vacio">Todavía no hay cambios oficiales. El primero que mandes aparecerá aquí.</p>'; $('cf-mas').hidden = true; return; }
-  $('cf-historial').innerHTML = `<ul class="sy-lista">${st.cambios.map((c) => {
+  $('cf-historial').innerHTML = `<ol class="cfx-linea">${st.cambios.map((c) => {
     const res = resumenResultados(c.resultados);
     const que = c.tipo === 'fichaje' ? resumenFichaje(c.datos) : c.tipo;
     const destino = DESTINOS.find((d) => d.id === c.destino)?.nombre ?? c.destino;
     return `<li class="cf-cambio" data-anulado="${c.estado === 'anulado'}">
-      <div class="flex flex-wrap items-baseline justify-between gap-2"><b>#${c.seq} · ${esc(que)}</b>
+      <div class="cfx-fila-t"><b><span class="cfx-seq">#${c.seq}</span> ${esc(que)}</b>
         <small class="sy-ayuda">${esc(destino)} · ${esc(c.autor_nombre || 'Staff')} · ${esc(new Date(c.creado).toLocaleString('es-PE'))}</small></div>
       ${c.nota ? `<p class="sy-ayuda">${esc(c.nota)}</p>` : ''}
       ${c.estado === 'anulado' ? `<p><span class="cf-chip" data-tono="mal">Anulado${c.motivo_anulacion ? `: ${esc(c.motivo_anulacion)}` : ''}</span></p>` : ''}
       ${lado('Base normal', c.estado_base, res.base)}${lado('Liga Máster', c.estado_lm, res.lm)}
-      ${c.estado === 'activo' && isAdmin() ? `<button type="button" class="btn btn-ghost cf-anular" data-id="${esc(c.id)}"><i class="fa-solid fa-ban"></i> Anular</button>` : ''}
+      ${c.estado === 'activo' && isAdmin() ? `<button type="button" class="cfx-fantasma cf-anular" data-id="${esc(c.id)}"><i class="fa-solid fa-ban" aria-hidden="true"></i> Anular</button>` : ''}
     </li>`;
-  }).join('')}</ul>`;
+  }).join('')}</ol>`;
   $('cf-mas').hidden = !st.hayMas;
 }
 async function cargarHistorial(mas = false) {
@@ -94,6 +99,16 @@ async function iniciar() {
   pintarOpciones(); await pintarCampos();
   $('cf-tipos').addEventListener('click', async (ev) => { const b = ev.target.closest('[data-tipo]'); if (!b || b.dataset.tipo === st.tipo) return; st.tipo = b.dataset.tipo; pintarOpciones(); await pintarCampos(); });
   $('cf-destinos').addEventListener('click', (ev) => { const b = ev.target.closest('[data-destino]'); if (!b) return; st.destino = b.dataset.destino; pintarOpciones(); tipoRegistrado(st.tipo)?.cambiarDestino?.(st.destino); });
+  // La vista previa sigue lo que se escribe; el clic va con un turno de espera porque elegir una sugerencia rellena los campos después del clic.
+  const repintar = () => pintarVista($('cf-vista'), st);
+  for (const ev of ['input', 'change']) $('cf-campos').addEventListener(ev, repintar);
+  $('cf-campos').addEventListener('click', () => setTimeout(repintar, 0));
+  for (const id of ['cf-tipos', 'cf-destinos']) $(id).addEventListener('keydown', (ev) => {
+    const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[ev.key]; if (!d) return;
+    const bs = [...$(id).querySelectorAll('.cfx-op')], i = bs.findIndex((b) => b.getAttribute('aria-checked') === 'true');
+    if (i < 0) return; ev.preventDefault(); const sig = bs[(i + d + bs.length) % bs.length]; sig.click(); sig.focus();
+  });
+  if (typeof ResizeObserver === 'function') new ResizeObserver(() => pintarOpciones()).observe($('cf-formulario'));
   $('cf-form').addEventListener('submit', enviar);
   $('cf-recargar').addEventListener('click', () => cargarHistorial());
   $('cf-mas').addEventListener('click', () => cargarHistorial(true));
