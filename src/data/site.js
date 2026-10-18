@@ -73,7 +73,8 @@ const ACCOUNT_NAV_BASE = [
 // Lo público (En vivo, Salas, Chat, Clanes, Eventos, Ranking, Tienda, Torneos, Formatos) ya vive en los 3 grupos del menú
 // (arriba en PC, al inicio del panel en celular): aquí se ocultaba duplicado. Siguen en el buscador (`menu: false`).
 const ORDEN_CUENTA = { perfil: ['tu', 1], muro: ['tu', 2], logros: ['tu', 3], guardados: ['tu', 4], mensajes: ['tu', 5], amigos: ['tu', 6],
-  partidos: ['juego', 1], moderacion: ['staff', 1], bandejaia: ['staff', 2], auditoria: ['staff', 3], panel: ['staff', 4] };
+  partidos: ['juego', 1], moderacion: ['staff', 1], bandejaia: ['staff', 2], auditoria: ['staff', 3], panel: ['staff', 4],
+  cambiosoficiales: ['staff', 5], usuariospes: ['staff', 6], linkversiones: ['staff', 7] };
 const repartirCuenta = (lista) => {
   const pos = (n) => (ORDEN_CUENTA[n.id]?.[1] ?? 99);
   return lista.map((n) => n.abajo ? n : ORDEN_CUENTA[n.id] ? { ...n, grupo: ORDEN_CUENTA[n.id][0] } : { ...n, menu: false })
