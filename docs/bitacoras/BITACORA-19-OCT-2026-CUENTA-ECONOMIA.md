@@ -90,6 +90,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 17:22 | (ver REGISTRO) | **Beta 1.10.1**: Social menos saturado |
 | 17:27 | (ver REGISTRO) | **Beta 1.10.2**: Social como en la 1.10.0, sin saludo ni días de racha |
 | 17:36 | (ver REGISTRO) | **Beta 1.10.3**: Mi club, cancha de la plantilla sin líneas encima de los jugadores |
+| 17:48 | (ver REGISTRO) | **Beta 1.11.0**: stickers en los comentarios (**migración 137**) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -295,6 +296,13 @@ Fralex prefirió el aspecto de la 1.10.0: se deshizo la 1.10.1 y se quitaron el 
 
 ### 5.23 Mi club: la cancha de la plantilla (1.10.3)
 Las marcas del campo (línea del medio, círculo central, áreas) iban fijas y tapaban jugadores y títulos. Ahora la línea del medio separa Mediocampo y Defensas con un punto central, y las áreas son bajitas. El foco de la ficha es un aro dorado en la cara (antes un recuadro cuadrado). Archivo: `styles/miClubEstadio.css`.
+
+### 5.24 Stickers en los comentarios (1.11.0) — migración 137
+Pedido: «haz todos los comentarios que tengan stickers, e incluso pueda subir stickers de WhatsApp y TikTok».
+- **Base (137_stickers.sql, aplicada y probada)**: bucket «stickers» (1 MB; .webp de WhatsApp —también animados—, GIF/PNG de TikTok); columna `muro_respuestas.sticker`; responder solo con sticker; «Mis stickers» (máx. 60, se pueden guardar los de otros).
+- **Pack Phoenix** (`data/stickers.js`): 12 stickers dibujados en la web (¡GOLAZO!, ¡QUÉ ATAJADA!, GG, ¿REVANCHA?, CRACK, ¡VAR!, ¡ROBADO!, ¡ERA PENAL!, ¡LAG!, EN LLAMAS, TE FALTA CALLE, JAJAJA). Añadir uno = una línea en ese archivo.
+- **Cómo se usa**: en la caja «Escribe una respuesta…» (Social y perfiles) está el botón de stickers → pestañas Phoenix / Mis stickers → tocar uno lo envía al instante. «Subir sticker» acepta el archivo del sticker (en WhatsApp Web: clic derecho sobre el sticker → Guardar imagen; en el celular, compartirlo o guardarlo como archivo) o pegarlo con Ctrl+V. Sobre un sticker ajeno aparece ＋ para guardarlo.
+- Los animados se suben tal cual (sin re-codificar) para que sigan animados.
 
 ---
 

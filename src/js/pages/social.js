@@ -30,6 +30,7 @@ import { initMencionAuto } from '../features/social/mencionAuto.js';
 import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar, montarDeslizarA, marcarDesliza } from '../features/social/gestos.js';
 import { originalHTML, abrirCompartir, abrirQuienReacciono, abrirTarjetaPerfil, vigilarVistas } from '../features/social/fase2.js';
 import { openAuthModal } from '../features/auth.js';
+import { stickerHTML, abrirSelectorStickers } from '../features/social/stickers.js';
 
 const $ = (id) => document.getElementById(id);
 const feedEl = $('sx-feed'); const histEl = $('sx-hist'); const vistasEl = $('sx-vistas'); const filtroEl = $('sx-filtro'); const compEl = $('sx-compositor'); const finEl = $('sx-fin');
@@ -304,9 +305,9 @@ function pintarHilo(id) {
   if (!abierto) { caja.innerHTML = ''; return; }
   const lista = S.resp.get(Number(id));
   const filas = lista === undefined ? '<p class="sxr-hilo-nota">Cargando respuestas…</p>'
-    : lista.length ? lista.map((r) => `<div class="sxr-resp"><span class="sxr-resp-av">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span><div class="sxr-resp-cuerpo"><p class="sxr-resp-cab"><a href="${escapeHTML(href('perfil/'))}?u=${encodeURIComponent(r.username ?? '')}">${escapeHTML(r.nombre_display ?? 'Jugador')}</a> <time data-t="${escapeHTML(r.created_at ?? '')}">${tiempoRelativo(r.created_at)}</time></p><p class="sxr-resp-tx">${textoAHTML(r.texto)}</p>${likeRespHTML(r.id)}${r.puedo_borrar ? `<button type="button" class="sxr-resp-borrar" data-borrar-resp="${Number(r.id)}" data-pub="${Number(id)}" aria-label="Eliminar esta respuesta"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar</button>` : ''}</div></div>`).join('')
+    : lista.length ? lista.map((r) => `<div class="sxr-resp"><span class="sxr-resp-av">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span><div class="sxr-resp-cuerpo"><p class="sxr-resp-cab"><a href="${escapeHTML(href('perfil/'))}?u=${encodeURIComponent(r.username ?? '')}">${escapeHTML(r.nombre_display ?? 'Jugador')}</a> <time data-t="${escapeHTML(r.created_at ?? '')}">${tiempoRelativo(r.created_at)}</time></p>${r.texto ? `<p class="sxr-resp-tx">${textoAHTML(r.texto)}</p>` : ''}${r.sticker ? `<div class="sxr-resp-stk">${stickerHTML(r.sticker, { guardable: !!S.yo && r.autor_id !== S.yo })}</div>` : ''}${likeRespHTML(r.id)}${r.puedo_borrar ? `<button type="button" class="sxr-resp-borrar" data-borrar-resp="${Number(r.id)}" data-pub="${Number(id)}" aria-label="Eliminar esta respuesta"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar</button>` : ''}</div></div>`).join('')
       : '<p class="sxr-hilo-nota">Aún no hay respuestas. Sé el primero.</p>';
-  const form = S.yo ? `<form class="sxr-responder" data-responder="${Number(id)}"><input data-menciones maxlength="600" placeholder="Escribe una respuesta…" aria-label="Escribe una respuesta" autocomplete="off"><button type="submit" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></form>`
+  const form = S.yo ? `<form class="sxr-responder" data-responder="${Number(id)}"><input data-menciones maxlength="600" placeholder="Escribe una respuesta…" aria-label="Escribe una respuesta" autocomplete="off"><button type="button" class="stk-btn" data-sxr-sticker="${Number(id)}" aria-label="Enviar un sticker" title="Stickers"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i></button><button type="submit" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></form>`
     : '<button type="button" class="sxr-hilo-nota sxr-hilo-entrar" data-sxr-entrar>Inicia sesión para responder.</button>';
   caja.innerHTML = `<div class="sxr-hilo-lista">${filas}</div>${form}`;
 }
@@ -337,11 +338,22 @@ async function enviarRespuesta(form) {
     repintar(id); pintarHilo(id); cargarLikes(id); toast('Respuesta publicada.', 'ok'); window.dispatchEvent(new Event('social:actividad'));
   } catch (e) { toast(String(e?.message ?? 'No se pudo responder.'), 'error'); boton.disabled = false; }
 }
+async function enviarSticker(id, sticker) {
+  try {
+    await api.responder(id, '', sticker);
+    if (!S.abiertas.has(id)) S.abiertas.add(id);
+    S.resp.set(id, (await api.respuestasDe(id).catch(() => S.resp.get(id))) ?? []);
+    S.items = S.items.map((x) => (Number(x.id) === id ? { ...x, respuestas: (S.resp.get(id) ?? []).length } : x));
+    repintar(id); pintarHilo(id); cargarLikes(id); window.dispatchEvent(new Event('social:actividad'));
+  } catch (e) { toast(String(e?.message ?? 'No se pudo enviar el sticker.'), 'error'); }
+}
 // Estos clics se atienden ANTES que el manejador general del feed (fase de captura).
 feedEl.addEventListener('click', (e) => {
   const enlace = e.target.closest('[data-pie] a.sx-btn'); if (enlace && !e.ctrlKey && !e.metaKey) { e.preventDefault(); e.stopPropagation(); alternarHilo(enlace.closest('[data-pie]').dataset.pie); return; }
   const mas = e.target.closest('[data-leer-mas]');
   if (mas) { e.stopPropagation(); const cuerpo = mas.parentElement.querySelector('.sx-post-cuerpo'); const abierto = cuerpo.dataset.largo === 'abierto'; cuerpo.dataset.largo = abierto ? '1' : 'abierto'; mas.setAttribute('aria-expanded', String(!abierto)); mas.textContent = abierto ? 'Leer más' : 'Leer menos'; return; }
+  const stk = e.target.closest('[data-sxr-sticker]');   // stickers (migración 137): se envían solos, como en WhatsApp; lo escrito queda en la caja
+  if (stk) { e.stopPropagation(); if (!S.yo) { openAuthModal('login'); return; } abrirSelectorStickers({ ancla: stk, uid: S.yo, alElegir: (v) => enviarSticker(Number(stk.dataset.sxrSticker), v) }); return; }
   if (e.target.closest('[data-sxr-entrar]')) { e.stopPropagation(); openAuthModal('login'); return; }
   if (e.target.closest('[data-sxr-crear]')) { e.stopPropagation(); S.compositor?.abrir?.(); }
 }, true);

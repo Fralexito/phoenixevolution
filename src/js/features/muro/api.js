@@ -31,7 +31,8 @@ export const fijar = (id, fijada) => rpc('muro_fijar', { p_id: id, p_fijar: fija
 export const guardarEstilo = (e) => rpc('muro_guardar_estilo', e);
 export const guardarPrivacidadMuro = (ver, responder) => rpc('muro_guardar_privacidad', { p_ver: ver, p_responder: responder });
 export const respuestasDe = (idPublicacion) => rpc('muro_respuestas_de', { p_publicacion: idPublicacion });
-export const responder = (idPublicacion, texto) => rpc('muro_responder', { p_publicacion: idPublicacion, p_texto: texto });
+// sticker (migración 137): 'phx:<id>' del pack Phoenix o la URL de un archivo del bucket «stickers»; con sticker el texto puede ir vacío
+export const responder = (idPublicacion, texto, sticker = null) => rpc('muro_responder', { p_publicacion: idPublicacion, p_texto: texto ?? '', ...(sticker ? { p_sticker: sticker } : {}) });
 export const borrarRespuesta = (id) => rpc('muro_borrar_respuesta', { p_id: id });
 export const reaccionar = (idPublicacion, tipo) => rpc('muro_reaccionar', { p_publicacion: idPublicacion, p_tipo: tipo });   // → mi reacción final o null
 
@@ -128,3 +129,24 @@ export const jugadaPublicar = (titulo, video, juego = null, categoria = null) =>
 export const jugadaReaccionar = (idClip, tipo) => rpc('jugada_reaccionar', { p_clip: idClip, p_tipo: tipo });
 /** Vista (1 por persona; sin sesión no cuenta). */
 export const jugadaVista = (idClip) => rpc('jugadas_registrar_vista', { p_clip: idClip });
+
+/* ---------- Stickers (migración 137): «Mis stickers» y subir los de WhatsApp (.webp) o TikTok (GIF/PNG) ---------- */
+export const misStickers = () => rpc('mis_stickers');                       // → [{ id, url }] (los más nuevos primero)
+export const guardarSticker = (url) => rpc('sticker_guardar', { p_url: url });   // → id (si ya estaba, el mismo)
+export const quitarSticker = (id) => rpc('sticker_quitar', { p_id: id });
+const TIPOS_STICKER = { 'image/webp': 'webp', 'image/png': 'png', 'image/gif': 'gif' };
+const EXT_STICKER = { webp: 'image/webp', png: 'image/png', gif: 'image/gif' };
+/** Tipo de un archivo de sticker: el que dice el navegador o el de su extensión (algunos .webp de WhatsApp llegan sin tipo). '' si no sirve. */
+export const tipoSticker = (file) => (TIPOS_STICKER[file?.type] ? file.type : EXT_STICKER[String(file?.name ?? '').split('.').pop().toLowerCase()] ?? '');
+/** Sube el archivo TAL CUAL (así los animados siguen animados) a MI carpeta del bucket «stickers» y lo guarda en «Mis stickers». → URL pública. */
+export async function subirSticker(file, uid) {
+  const tipo = tipoSticker(file);
+  if (!tipo) throw new Error('Ese archivo no es un sticker: usa .webp (WhatsApp), .gif o .png (TikTok).');
+  if ((file?.size ?? 0) > 1024 * 1024) throw new Error('El sticker pesa más de 1 MB.');
+  const ruta = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${TIPOS_STICKER[tipo]}`;
+  const { error } = await supabase.storage.from('stickers').upload(ruta, file, { contentType: tipo, cacheControl: '31536000' });
+  if (error) { console.error('[muro] subir sticker:', error.message); throw new Error(/policy|row-level|limit|exceed/i.test(error.message) ? 'No se pudo subir: límite de 100 stickers por persona o archivo muy grande.' : 'No se pudo subir el sticker. Intenta de nuevo.'); }
+  const url = supabase.storage.from('stickers').getPublicUrl(ruta).data.publicUrl;
+  await guardarSticker(url);
+  return url;
+}

@@ -120,6 +120,7 @@ export const FA_A_PH = {
   'medal': 'medal',
   'meteor': 'planet',
   'newspaper': 'newspaper',
+  'note-sticky': 'sticker',
   'palette': 'palette',
   'paper-plane': 'paper-plane-tilt',
   'pause': 'pause',

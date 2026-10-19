@@ -41,6 +41,7 @@ import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/comunidad/videoSubida.js';
 // 19-oct-2026 (Fralex: perfil público «dinámico, visual, premium»): bandera del país, escudo del club, cifras que cuentan y pestaña que se desliza.
 import { banderaSVG } from '../../data/banderas.js';
 import { paisNombre } from '../../data/paises.js';
+import { stickerHTML, abrirSelectorStickers } from '../features/social/stickers.js';
 import { clubExacto, escudoUrl } from '../core/pes/clubesPes.js';
 
 initMencionAuto();
@@ -265,9 +266,9 @@ function seccionRespuestas(it, p) {
   const filas = lista === undefined ? '<p class="text-[12px] text-gray-500 py-2">Cargando respuestas…</p>'
     : lista.map((r) => `<div class="flex gap-2 py-1.5"><span class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span>
         <div class="min-w-0 flex-1 rounded-xl bg-white/[0.03] px-2.5 py-1.5"><p class="text-[12px]"><a href="${escapeHTML(href('perfil/'))}?u=${escapeHTML(r.username)}" class="font-display font-bold text-white hover:text-galaxy-400">${escapeHTML(r.nombre_display)}</a> <span class="text-gray-500">· ${tiempoRelativo(r.created_at)}</span>${S.sesion && r.autor_id !== yoId() ? ` <button type="button" data-act="reportar" data-tipo="respuesta" data-id="${r.id}" title="Reportar respuesta" aria-label="Reportar respuesta" class="text-gray-500 hover:text-amber-300 ml-1"><i class="fa-regular fa-flag text-[12px]"></i></button>${can('resolverReportes') ? ` <button type="button" data-act="mod-ocultar" data-tipo="respuesta" data-id="${r.id}" data-pub="${it.id}" title="Ocultar (moderación)" aria-label="Ocultar respuesta (moderación)" class="text-gray-500 hover:text-orange-300 ml-1"><i class="fa-solid fa-eye-slash text-[12px]"></i></button>` : ''}` : ''}${r.puedo_borrar ? ` <button type="button" data-act="borrar-resp" data-id="${r.id}" data-pub="${it.id}" title="Borrar respuesta" class="text-gray-500 hover:text-bad ml-1"><i class="fa-solid fa-trash text-[12px]"></i></button>` : ''}</p>
-          <p class="text-xs text-gray-200 leading-snug">${textoAHTML(r.texto)}</p></div></div>`).join('');
+          ${r.texto ? `<p class="text-xs text-gray-200 leading-snug">${textoAHTML(r.texto)}</p>` : ''}${r.sticker ? `<div class="mu-resp-stk">${stickerHTML(r.sticker, { guardable: !!S.sesion && r.autor_id !== yoId() })}</div>` : ''}</div></div>`).join('');
   const form = p.puede_responder
-    ? `<div class="flex gap-2 mt-1"><input data-resp-input="${it.id}" data-menciones maxlength="${RESP_MAX + 100}" placeholder="Escribe una respuesta…" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"><button type="button" data-act="enviar-resp" data-id="${it.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane"></i></button></div>`
+    ? `<div class="flex gap-2 mt-1"><input data-resp-input="${it.id}" data-menciones maxlength="${RESP_MAX + 100}" placeholder="Escribe una respuesta…" class="flex-1 min-w-0 rounded-lg bg-black/30 border border-galaxy-border px-3 py-2 text-xs text-white"><button type="button" class="stk-btn" data-act="sticker" data-id="${it.id}" aria-label="Enviar un sticker" title="Stickers"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i></button><button type="button" data-act="enviar-resp" data-id="${it.id}" class="btn btn-primary !min-h-9 !px-3 !text-xs" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane"></i></button></div>`
     : `<p class="text-[12px] text-gray-500 mt-1">${S.sesion ? 'Este jugador limita quién puede responder.' : 'Inicia sesión para responder.'}</p>`;
   return `<div class="mt-2">${filas}${form}</div>`;
 }
@@ -649,6 +650,16 @@ const ACCIONES = {
     if (S.abiertas.has(id)) { S.abiertas.delete(id); pintarFeed(); return; }
     S.abiertas.add(id); pintarFeed();
     if (!S.resp.has(id)) { const r = await seguro(() => api.respuestasDe(id)); S.resp.set(id, r ?? []); pintarFeed(); }
+  },
+  // Stickers (migración 137): se envían solos, como en WhatsApp
+  sticker: (el) => {
+    if (!S.sesion) { toast('Inicia sesión para enviar stickers.', 'info'); return; }
+    const id = Number(el.dataset.id);
+    abrirSelectorStickers({ ancla: el, uid: yoId(), alElegir: async (v) => {
+      if (await seguro(() => api.responder(id, '', v)) === undefined) return;
+      S.resp.set(id, await api.respuestasDe(id).catch(() => S.resp.get(id) ?? []));
+      S.items = S.items.map((x) => (x.id === id ? { ...x, respuestas: (S.resp.get(id) ?? []).length } : x)); pintarFeed();
+    } });
   },
   'enviar-resp': async (el) => {
     const id = Number(el.dataset.id); const input = document.querySelector(`[data-resp-input="${id}"]`);
