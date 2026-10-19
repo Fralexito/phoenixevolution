@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 282 nombres que usa la web. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 283 nombres que usa la web. */
 /*!
  * Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -1756,6 +1756,10 @@
 
 .fa-clipboard-list {
   --fa: "\f46d";
+}
+
+.fa-box-open {
+  --fa: "\f49e";
 }
 
 .fa-comment-dots {

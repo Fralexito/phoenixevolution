@@ -91,6 +91,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 17:27 | (ver REGISTRO) | **Beta 1.10.2**: Social como en la 1.10.0, sin saludo ni días de racha |
 | 17:36 | (ver REGISTRO) | **Beta 1.10.3**: Mi club, cancha de la plantilla sin líneas encima de los jugadores |
 | 17:48 | (ver REGISTRO) | **Beta 1.11.0**: stickers en los comentarios (**migración 137**) |
+| 18:05 | (ver REGISTRO) | **Beta 1.12.0**: interruptor Demo/Real y stickers desde las apps de WhatsApp/Telegram (**migración 138**) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -303,6 +304,13 @@ Pedido: «haz todos los comentarios que tengan stickers, e incluso pueda subir s
 - **Pack Phoenix** (`data/stickers.js`): 12 stickers dibujados en la web (¡GOLAZO!, ¡QUÉ ATAJADA!, GG, ¿REVANCHA?, CRACK, ¡VAR!, ¡ROBADO!, ¡ERA PENAL!, ¡LAG!, EN LLAMAS, TE FALTA CALLE, JAJAJA). Añadir uno = una línea en ese archivo.
 - **Cómo se usa**: en la caja «Escribe una respuesta…» (Social y perfiles) está el botón de stickers → pestañas Phoenix / Mis stickers → tocar uno lo envía al instante. «Subir sticker» acepta el archivo del sticker (en WhatsApp Web: clic derecho sobre el sticker → Guardar imagen; en el celular, compartirlo o guardarlo como archivo) o pegarlo con Ctrl+V. Sobre un sticker ajeno aparece ＋ para guardarlo.
 - Los animados se suben tal cual (sin re-codificar) para que sigan animados.
+
+### 5.25 Interruptor Demo/Real y stickers desde otras apps (1.12.0) — migración 138
+- **Demo/Real**: en la beta la píldora de abajo a la izquierda está siempre: «Modo demostración · Ver datos reales» o «Datos reales · Ver demo». La elección se recuerda en el navegador. En la web oficial solo aparece si la demo está encendida.
+- **Stickers desde las apps de stickers (Android)**: con Phoenix instalada como app, sale en «Compartir» de Sticker.ly, Sticker Maker, etc. (`share_target` del manifiesto + `sw.js`) y lo compartido llega a **/stickers-recibir/**, que lo guarda en «Mis stickers».
+- **Paquetes .wastickers/.zip**: se abren en el navegador (`core/sistema/zip.js`, sin librerías) y se suben todos sus stickers.
+- **Telegram**: .webp (estáticos) y .webm (video; migración 138). Los .tgs (animados Lottie) todavía no.
+- **Límites**: iPhone no deja a las webs recibir lo compartido (allí: guardar en Archivos y subir). Máx. 1 MB por sticker, 100 archivos y 60 en «Mis stickers».
 
 ---
 

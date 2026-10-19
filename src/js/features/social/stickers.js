@@ -5,6 +5,7 @@
 // Base: migración 137 (bucket «stickers», muro_respuestas.sticker, stickers_usuario). Lo usan pages/social.js y pages/perfil.js; estilos en styles/stickers.css.
 import { escapeHTML } from '../../core/sistema/dom.js';
 import { toast } from '../../core/sistema/toast.js';
+import { href } from '../../core/sistema/config.js';
 import { STICKERS_PHX, stickerPhx } from '../../../data/stickers.js';
 import * as api from '../muro/api.js';
 
@@ -16,7 +17,10 @@ export function stickerHTML(valor, { guardable = false } = {}) {
   const p = stickerPhx(valor);
   if (p) return `<span class="stk stk-phx" style="--c:${p.color}" role="img" aria-label="Sticker: ${escapeHTML(p.texto)}"><span class="stk-emo" aria-hidden="true">${p.emoji}</span><b>${escapeHTML(p.texto)}</b></span>`;
   if (!esStickerSubido(valor)) return '';
-  return `<span class="stk stk-img"><img src="${escapeHTML(valor)}" alt="Sticker" loading="lazy" decoding="async">${guardable ? `<button type="button" class="stk-guardar" data-stk-guardar="${escapeHTML(valor)}" aria-label="Guardar en mis stickers" title="Guardar en mis stickers"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>` : ''}</span>`;
+  const media = /\.webm$/i.test(valor)   // sticker de VIDEO de Telegram: se reproduce solo, en bucle y sin sonido (como en Telegram)
+    ? `<video src="${escapeHTML(valor)}" autoplay loop muted playsinline preload="metadata" aria-label="Sticker"></video>`
+    : `<img src="${escapeHTML(valor)}" alt="Sticker" loading="lazy" decoding="async">`;
+  return `<span class="stk stk-img">${media}${guardable ? `<button type="button" class="stk-guardar" data-stk-guardar="${escapeHTML(valor)}" aria-label="Guardar en mis stickers" title="Guardar en mis stickers"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>` : ''}</span>`;
 }
 
 // «Guardar en mis stickers» (el ＋ sobre un sticker ajeno), en cualquier página que muestre stickers
@@ -27,6 +31,11 @@ document.addEventListener('click', async (e) => {
   catch (err) { toast(/sesi/i.test(String(err?.message)) ? 'Inicia sesión para guardar stickers.' : String(err?.message ?? 'No se pudo guardar.'), 'error'); b.disabled = false; }
 }, true);
 
+/** Lo que acepta «Subir»: stickers sueltos (WhatsApp/Telegram/TikTok) y paquetes de las apps de stickers. */
+export const ACEPTA = 'image/webp,image/png,image/gif,video/webm,.webp,.png,.gif,.webm,.wastickers,.zip,application/zip';
+/** Sube stickers sueltos y/o paquetes (.wastickers/.zip). Lo usa el selector y la página que recibe lo compartido desde otras apps. */
+export const importarArchivosSticker = (archivos, uid, alProgreso) => api.importarStickers(archivos, uid, alProgreso);
+
 let abierto = null;
 export function cerrarSelectorStickers() { abierto?.(); }
 
@@ -34,7 +43,7 @@ export function cerrarSelectorStickers() { abierto?.(); }
 export function abrirSelectorStickers({ ancla, uid, alElegir }) {
   cerrarSelectorStickers();
   const panel = document.createElement('div'); panel.className = 'stk-panel'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Elegir un sticker');
-  let pestana = 'phx'; let mios = null; let subiendo = false;
+  let pestana = 'phx'; let mios = null; let subiendo = false; let avance = '';
   const pintar = () => {
     const rejilla = pestana === 'phx'
       ? STICKERS_PHX.map((s) => `<button type="button" class="stk-op" data-stk-valor="phx:${s.id}" title="${escapeHTML(s.texto)}">${stickerHTML(`phx:${s.id}`)}</button>`).join('')
@@ -44,16 +53,22 @@ export function abrirSelectorStickers({ ancla, uid, alElegir }) {
             : '<p class="stk-nota">Aún no tienes stickers. Sube uno de WhatsApp o TikTok, o guarda los que te gusten con el ＋ que aparece sobre ellos en los comentarios.</p>';
     panel.innerHTML = `<div class="stk-cab"><div class="stk-tabs" role="tablist" aria-label="Paquetes de stickers"><button type="button" role="tab" data-stk-tab="phx" aria-selected="${pestana === 'phx'}">🔥 Phoenix</button><button type="button" role="tab" data-stk-tab="mios" aria-selected="${pestana === 'mios'}">⭐ Mis stickers</button></div><button type="button" class="stk-x" data-stk-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
       <div class="stk-rejilla${pestana === 'phx' ? ' es-phx' : ''}">${rejilla}</div>
-      <label class="stk-subir${subiendo ? ' is-subiendo' : ''}"><input type="file" accept="image/webp,image/png,image/gif,.webp,.png,.gif" hidden data-stk-archivo ${subiendo ? 'disabled' : ''}><i class="fa-solid ${subiendo ? 'fa-spinner fa-spin' : 'fa-upload'}" aria-hidden="true"></i><span><b>${subiendo ? 'Subiendo…' : 'Subir sticker'}</b><small>WhatsApp (.webp) · TikTok (GIF o PNG) · máx. 1 MB · o pégalo con Ctrl+V</small></span></label>`;
+      <label class="stk-subir${subiendo ? ' is-subiendo' : ''}"><input type="file" multiple accept="${ACEPTA}" hidden data-stk-archivo ${subiendo ? 'disabled' : ''}><i class="fa-solid ${subiendo ? 'fa-spinner fa-spin' : 'fa-upload'}" aria-hidden="true"></i><span><b>${subiendo ? `Subiendo${avance}…` : 'Subir stickers o un paquete'}</b><small>WhatsApp y Telegram (.webp, .webm) · paquetes .wastickers · TikTok (GIF o PNG) · máx. 1 MB c/u · o pégalo con Ctrl+V</small></span></label>
+      <a class="stk-guia" href="${escapeHTML(href('stickers-recibir/'))}"><i class="fa-solid fa-circle-question" aria-hidden="true"></i> ¿Cómo traer stickers desde las apps de WhatsApp o Telegram?</a>`;
   };
   const cargarMios = async () => { if (!uid) return; try { mios = (await api.misStickers()) ?? []; } catch { mios = []; } if (pestana === 'mios') pintar(); };
-  const subir = async (file) => {
+  const subir = async (archivos) => {
     if (!uid) { toast('Inicia sesión para subir stickers.', 'info'); return; }
-    if (subiendo || !file) return;
-    subiendo = true; pintar();
-    try { const url = await api.subirSticker(file, uid); mios = [{ id: 0, url }, ...(mios ?? [])]; pestana = 'mios'; toast('Sticker subido: tócalo para enviarlo.', 'ok'); cargarMios(); }
-    catch (err) { toast(String(err?.message ?? 'No se pudo subir el sticker.'), 'error'); }
-    subiendo = false; pintar();
+    if (subiendo || !archivos?.length) return;
+    subiendo = true; avance = ''; pintar();
+    try {
+      const r = await importarArchivosSticker(archivos, uid, (hechos, total) => { if (total > 1) { avance = ` ${Math.min(hechos + 1, total)}/${total}`; const b = panel.querySelector('.stk-subir b'); if (b) b.textContent = `Subiendo${avance}…`; } });
+      mios = [...r.urls.map((url) => ({ id: 0, url })), ...(mios ?? [])]; pestana = 'mios';
+      if (r.urls.length) toast(r.urls.length === 1 ? 'Sticker subido: tócalo para enviarlo.' : `${r.urls.length} stickers subidos.${r.fallidos ? ` ${r.fallidos} no se pudieron.` : ''}`, 'ok');
+      else toast(r.error || 'No se pudo subir el sticker.', 'error');
+      cargarMios();
+    } catch (err) { toast(String(err?.message ?? 'No se pudo subir el sticker.'), 'error'); }
+    subiendo = false; avance = ''; pintar();
   };
   const colocar = () => {
     if (innerWidth <= 560) { panel.classList.add('es-hoja'); return; }
@@ -69,8 +84,8 @@ export function abrirSelectorStickers({ ancla, uid, alElegir }) {
     if (q) { try { await api.quitarSticker(Number(q.dataset.stkQuitar)); mios = (mios ?? []).filter((m) => m.id !== Number(q.dataset.stkQuitar)); pintar(); } catch (err) { toast(String(err?.message ?? 'No se pudo quitar.'), 'error'); } return; }
     const op = e.target.closest('[data-stk-valor]'); if (op) { const v = op.dataset.stkValor; cerrar(); alElegir?.(v); }
   });
-  panel.addEventListener('change', (e) => { const inp = e.target.closest('[data-stk-archivo]'); if (inp?.files?.[0]) subir(inp.files[0]); });
-  const alPegar = (e) => { const f = [...(e.clipboardData?.files ?? [])].find((x) => api.tipoSticker(x)); if (f) { e.preventDefault(); subir(f); } };
+  panel.addEventListener('change', (e) => { const inp = e.target.closest('[data-stk-archivo]'); if (inp?.files?.length) subir([...inp.files]); });
+  const alPegar = (e) => { const fs = [...(e.clipboardData?.files ?? [])].filter((x) => api.tipoSticker(x) || api.esPaqueteStickers(x)); if (fs.length) { e.preventDefault(); subir(fs); } };
   const fuera = (e) => { if (!panel.contains(e.target) && !ancla.contains(e.target)) cerrar(); };
   const teclas = (e) => { if (e.key === 'Escape') { e.preventDefault(); cerrar(); ancla.focus?.(); } };
   function cerrar() {

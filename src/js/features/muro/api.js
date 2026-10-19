@@ -134,14 +134,15 @@ export const jugadaVista = (idClip) => rpc('jugadas_registrar_vista', { p_clip: 
 export const misStickers = () => rpc('mis_stickers');                       // → [{ id, url }] (los más nuevos primero)
 export const guardarSticker = (url) => rpc('sticker_guardar', { p_url: url });   // → id (si ya estaba, el mismo)
 export const quitarSticker = (id) => rpc('sticker_quitar', { p_id: id });
-const TIPOS_STICKER = { 'image/webp': 'webp', 'image/png': 'png', 'image/gif': 'gif' };
-const EXT_STICKER = { webp: 'image/webp', png: 'image/png', gif: 'image/gif' };
+// .webm = stickers de VIDEO de Telegram (migración 138). Los .tgs (animados de Telegram, formato Lottie) aún no se admiten.
+const TIPOS_STICKER = { 'image/webp': 'webp', 'image/png': 'png', 'image/gif': 'gif', 'video/webm': 'webm' };
+const EXT_STICKER = { webp: 'image/webp', png: 'image/png', gif: 'image/gif', webm: 'video/webm' };
 /** Tipo de un archivo de sticker: el que dice el navegador o el de su extensión (algunos .webp de WhatsApp llegan sin tipo). '' si no sirve. */
 export const tipoSticker = (file) => (TIPOS_STICKER[file?.type] ? file.type : EXT_STICKER[String(file?.name ?? '').split('.').pop().toLowerCase()] ?? '');
 /** Sube el archivo TAL CUAL (así los animados siguen animados) a MI carpeta del bucket «stickers» y lo guarda en «Mis stickers». → URL pública. */
 export async function subirSticker(file, uid) {
   const tipo = tipoSticker(file);
-  if (!tipo) throw new Error('Ese archivo no es un sticker: usa .webp (WhatsApp), .gif o .png (TikTok).');
+  if (!tipo) throw new Error(/\.tgs$/i.test(file?.name ?? '') ? 'Los stickers animados de Telegram (.tgs) aún no se pueden subir: usa uno .webp o .webm.' : 'Ese archivo no es un sticker: usa .webp (WhatsApp/Telegram), .webm (video de Telegram), .gif o .png (TikTok).');
   if ((file?.size ?? 0) > 1024 * 1024) throw new Error('El sticker pesa más de 1 MB.');
   const ruta = `${uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${TIPOS_STICKER[tipo]}`;
   const { error } = await supabase.storage.from('stickers').upload(ruta, file, { contentType: tipo, cacheControl: '31536000' });
@@ -149,4 +150,26 @@ export async function subirSticker(file, uid) {
   const url = supabase.storage.from('stickers').getPublicUrl(ruta).data.publicUrl;
   await guardarSticker(url);
   return url;
+}
+/** ¿Es un paquete de stickers? (.wastickers de las apps de stickers para WhatsApp, o un .zip con los stickers dentro) */
+export const esPaqueteStickers = (file) => /\.(wastickers|zip)$/i.test(file?.name ?? '') || /zip/i.test(file?.type ?? '');
+/** Sube varios archivos y/o paquetes: abre los .wastickers/.zip y sube cada sticker que traen (sin la miniatura «tray» del paquete).
+ *  `alProgreso(hechos, total)` para mostrar «Subiendo 3/24…». → { urls, fallidos, error } (error = el último motivo de fallo, para avisarlo). */
+export async function importarStickers(archivos, uid, alProgreso = () => {}) {
+  const sueltos = [];
+  for (const f of archivos) {
+    if (!esPaqueteStickers(f)) { sueltos.push(f); continue; }
+    const { leerZip } = await import('../../core/sistema/zip.js');
+    for (const e of await leerZip(f)) {
+      if (/^tray|^icon/i.test(e.nombre) || !EXT_STICKER[e.nombre.split('.').pop().toLowerCase()]) continue;   // la miniatura del paquete no es un sticker
+      sueltos.push(new File([e.blob], e.nombre, { type: EXT_STICKER[e.nombre.split('.').pop().toLowerCase()] }));
+    }
+  }
+  const urls = []; let fallidos = 0; let error = '';
+  for (let i = 0; i < sueltos.length; i += 1) {
+    alProgreso(i, sueltos.length);
+    try { urls.push(await subirSticker(sueltos[i], uid)); } catch (e) { fallidos += 1; error = String(e?.message ?? e); if (/60 stickers|límite de 100/i.test(error)) { fallidos += sueltos.length - i - 1; break; } }
+  }
+  alProgreso(sueltos.length, sueltos.length);
+  return { urls, fallidos, error };
 }

@@ -30,3 +30,10 @@ export function salirDeDemo() {
   escribir(false);
   const u = new URL(location.href); u.searchParams.delete('demo'); location.replace(u.href);
 }
+/** Enciende el modo demostración y recarga (19-oct-2026, Fralex: «déjame intercambiar entre el modo demo y el modo normal»). */
+export function entrarDemo() {
+  escribir(true);
+  const u = new URL(location.href); u.searchParams.delete('demo'); location.replace(u.href);
+}
+/** ¿Se muestra el interruptor Demo/Real? En la beta siempre; en la web oficial solo mientras la demostración esté encendida (para poder salir). */
+export const interruptorDemo = () => BETA || activo;

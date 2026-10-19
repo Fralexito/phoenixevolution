@@ -19,3 +19,11 @@
 @keyframes pxd-late { 0% { opacity: .6; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(2.4); } }
 @media (max-width: 639.98px) { .pxd-txt { display: none; } .pxd b { font-size: 10.5px; } }
 @media (min-width: 768px) { .pxd { left: 6.25rem; bottom: 1.25rem; } }
+
+/* Interruptor con los DATOS REALES (19-oct-2026, Fralex: «déjame intercambiar entre el modo demo y el modo normal»): más discreto, sin latido */
+.pxd.es-real { gap: .45rem; padding: .25rem .3rem .25rem .7rem; color: #cbd5e1; background: rgb(16 12 32 / .88); border-color: rgb(255 255 255 / .14); box-shadow: 0 8px 24px -10px rgb(0 0 0 / .8); }
+.pxd.es-real b { color: #cbd5e1; font-size: 10.5px; }
+.pxd.es-real .pxd-punto { background: #34d399; }
+.pxd.es-real .pxd-punto::after { display: none; }
+.pxd.es-real .pxd-salir { min-height: 1.7rem; padding: 0 .7rem; font-size: 10.5px; color: #1a1203; background: rgb(251 191 36 / .9); }
+.pxd.es-real .pxd-salir:hover { background: #fcd34d; }

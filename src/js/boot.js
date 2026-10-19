@@ -16,7 +16,7 @@ import { initMarco } from './features/marco.js';
 import { initSitio } from './features/sitioAplicar.js';
 import { initAvisoSancion } from './features/moderacion/aviso.js';
 import { FX } from '../data/experimento.js';
-import { demoActivo } from './core/sistema/modoDemo.js';
+import { interruptorDemo } from './core/sistema/modoDemo.js';
 
 initAjustes();
 initModoLigero();
@@ -29,8 +29,8 @@ initWelcome();
 initAvisoSancion();
 initReveal();
 initCarruseles();
-// Modo demostración (core/sistema/modoDemo.js): la píldora «Datos simulados · Salir», solo si está encendido.
-if (demoActivo()) import('./features/demo/aviso.js').then((m) => m.initAvisoDemo()).catch((e) => console.error('[boot] demo:', e));
+// Modo demostración (core/sistema/modoDemo.js): el interruptor Demo/Real (en la beta siempre; en la web oficial solo con la demo encendida).
+if (interruptorDemo()) import('./features/demo/aviso.js').then((m) => m.initAvisoDemo()).catch((e) => console.error('[boot] demo:', e));
 // Lo que no se necesita para ver la página arranca cuando ya se mostró (antes se hacía en plena carga y frenaba la primera vista,
 // sobre todo en celulares). Medido el 18-oct-2026 con Lighthouse y perfiles de CPU: ver docs/bitacoras/REVISION-GENERAL-18-OCT.md §7.
 const despues = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 2000 }) : setTimeout(f, 800));

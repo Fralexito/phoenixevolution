@@ -1,0 +1,39 @@
+---
+// STICKERS RECIBIDOS (19-oct-2026, Fralex: «que sea posible subir stickers desde las típicas apps que hacen stickers de WhatsApp y Telegram»).
+// Con la web instalada como app en Android, Phoenix aparece en «Compartir» de esas apps: el sistema envía los archivos aquí (share_target del
+// manifiesto + public/sw.js) y esta página los muestra y los guarda en «Mis stickers». También sirve para elegirlos a mano. Lógica: js/pages/stickersRecibir.js.
+import Layout from '../layouts/Layout.astro';
+import '../styles/stickers.css';
+---
+<Layout title="Stickers recibidos" active="social" description="Guarda en Phoenix los stickers que compartes desde las apps de stickers de WhatsApp y Telegram.">
+  <div class="stkr">
+    <header class="stkr-cab">
+      <span class="stkr-ic" aria-hidden="true"><i class="fa-solid fa-note-sticky"></i></span>
+      <div><h1>Traer stickers</h1><p>De las apps de stickers para WhatsApp y de Telegram, directo a «Mis stickers».</p></div>
+    </header>
+    <section class="stkr-caja" data-stkr-recibidos hidden>
+      <h2 data-stkr-titulo>Stickers recibidos</h2>
+      <div class="stkr-rejilla" data-stkr-rejilla></div>
+      <button type="button" class="stkr-boton" data-stkr-guardar><i class="fa-solid fa-star" aria-hidden="true"></i> <span>Guardar en Mis stickers</span></button>
+      <p class="stkr-nota" data-stkr-nota></p>
+    </section>
+    <section class="stkr-caja">
+      <h2>O elígelos tú</h2>
+      <label class="stk-subir"><input type="file" multiple hidden data-stkr-archivo><i class="fa-solid fa-upload" aria-hidden="true"></i><span><b>Elegir stickers o un paquete</b><small>.webp y .webm (WhatsApp y Telegram) · paquetes .wastickers · GIF o PNG · máx. 1 MB c/u</small></span></label>
+    </section>
+    <section class="stkr-caja stkr-guia">
+      <h2>Cómo traerlos desde otras apps</h2>
+      <ol>
+        <li><b>Android (lo más rápido):</b> instala Phoenix como app (menú del navegador → «Instalar app» o «Agregar a la pantalla principal»). Luego, en tu app de stickers (Sticker.ly, Sticker Maker, Personal Stickers…) usa <b>Compartir</b> → <b>Phoenix</b>. Llegan aquí solos.</li>
+        <li><b>Paquete completo:</b> si la app exporta un archivo <b>.wastickers</b>, compártelo o elígelo arriba: se suben todos sus stickers de una vez.</li>
+        <li><b>WhatsApp Web (PC):</b> clic derecho sobre un sticker → «Guardar imagen como» (.webp) y súbelo arriba.</li>
+        <li><b>Telegram Desktop:</b> clic derecho sobre un sticker → «Guardar como» (.webp o .webm de video). Los animados .tgs aún no se pueden.</li>
+        <li><b>iPhone:</b> Apple no deja que las webs reciban archivos compartidos: guarda el sticker en Archivos y súbelo con el botón de arriba.</li>
+      </ol>
+      <a class="stkr-volver" href={`${import.meta.env.BASE_URL}social/`}><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver a Social</a>
+    </section>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/stickersRecibir.js';
+</script>
