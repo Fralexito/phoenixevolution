@@ -4,5 +4,5 @@
 //   · algo GRANDE terminado (una sección rehecha, un sistema nuevo) → sube el del MEDIO y el último vuelve a 0 (1.1.4 → 1.2.0).
 // Anótalo en REGISTRO.md. Se ve en la cinta «Fase beta» de abajo a la izquierda (Layout.astro), junto a la hora en que se generó la web.
 // La dirección de la vista previa (/fase-beta-1-0/) NO cambia con este número: así los enlaces que ya se compartieron siguen sirviendo.
-// Historia: 1.0.1 (cinta con número) · 1.1.0 (19-oct: muro minimalista, modo demostración, chat Amigos|General, publicar descriptivo).
-export const VERSION_BETA = '1.1.0';
+// Historia: 1.0.1 (cinta con número) · 1.1.0 (19-oct: muro minimalista, modo demostración, chat Amigos|General, publicar descriptivo) · 1.2.0 («Lanzar reto» por pasos).
+export const VERSION_BETA = '1.2.0';

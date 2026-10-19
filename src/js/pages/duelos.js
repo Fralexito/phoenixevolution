@@ -19,6 +19,9 @@ import { openInviteModal } from '../features/duelos/invite.js';
 import { elegirProximo, cuando } from '../core/competicion/proximoPartido.js';
 import { montarNumerosVivos } from '../features/numerosVivos.js';
 import { montarDuelosPro } from '../features/duelosPro.js';
+import { montarAsistenteReto } from '../features/duelos/asistente.js';
+import { FX } from '../../data/experimento.js';
+const FX_PRO = !!FX.duelosPro;
 
 const $ = (id) => document.getElementById(id);
 montarNumerosVivos();
@@ -198,3 +201,24 @@ alSesion((st) => { if (st?.session) montarRacha(document.getElementById('racha-d
   document.getElementById('btn-abrir-form')?.addEventListener('click', () => { plegar(false); document.getElementById('form-crear-reto')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 }
 montarDuelosPro();   // ronda 259: pestañas para las listas (FX.duelosPro)
+
+// «Lanzar reto» como ASISTENTE por pasos en una ventana (19-oct-2026, features/duelos/asistente.js). El formulario de siempre vive dentro;
+// todo lo que antes desplegaba la columna (botones «Lanzar reto», el radar, el enlace ?retar=…) ahora abre la ventana.
+{
+  const asistente = montarAsistenteReto();
+  if (asistente) {
+    document.documentElement.setAttribute('data-reto-asistente', '');
+    const grid = $('duelos-grid');
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#btn-abrir-form, #seg-vista [data-v="lanzar"], [data-lanzar], .dp-lanzar')) return;
+      e.preventDefault(); e.stopPropagation(); asistente.abrir();
+    }, true);
+    // duelos.js «despliega» la columna para apuntar a un rival (setVista('lanzar') / quitar data-plegado): se convierte en abrir la ventana.
+    if (grid) new MutationObserver(() => {
+      const quiere = grid.dataset.vista === 'lanzar' || (FX_PRO && !grid.hasAttribute('data-plegado'));
+      if (!quiere) return;
+      grid.dataset.vista = 'ninguna'; if (FX_PRO) grid.setAttribute('data-plegado', '');
+      asistente.abrir({ alRival: true });
+    }).observe(grid, { attributes: true, attributeFilter: ['data-vista', 'data-plegado'] });
+  }
+}
