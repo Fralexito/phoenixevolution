@@ -96,6 +96,66 @@ function extras(a = {}) {
   return r;
 }
 
+/* ---------- Historias (forma de historias_recientes, mig. 056): solo texto; una persona más cada 2 minutos ---------- */
+const FRASES_HIST = ['Calentando para la final de esta noche 🔥', '¿Quién se anima a un amistoso? Sala abierta 🎮', 'Nuevo parche instalado, a probar ⚽', 'GG a todos, qué partidazo 🤝', 'Hoy toca remontada 💪', 'Mi once para el sábado 👀'];
+function historias() {
+  const cuantas = Math.min(GENTE.length, 4 + Math.floor(seg() / 120));
+  return { items: Array.from({ length: cuantas }, (_, k) => {
+    const a = GENTE[(k * 7 + 2) % GENTE.length]; const n = 1 + (k % 2);
+    return { autor: { id: a.id, username: a.username, nombre_display: a.nombre, avatar_url: a.avatar_url }, ultima: ID0 + 300 + k * 2 + n,
+      historias: Array.from({ length: n }, (_, j) => ({ id: ID0 + 300 + k * 2 + j, texto: FRASES_HIST[(k + j) % FRASES_HIST.length], imagen_url: null, video_url: null, created_at: hace(5 + k * 23 + j * 4), expira_at: new Date(Date.now() + 20 * 3600e3).toISOString(), destacada_id: null })) };
+  }) };
+}
+
+/* ---------- Chat general (forma de private.chat_listar, mig. 099): un mensaje cada 12 s; lo que escribes queda solo aquí ---------- */
+const FRASES_CHAT = ['buenas a todos 👋', 'alguien para un amistoso? tengo sala abierta en Lima', 'qué golazo el de anoche en la liga', 'el Milan de este parche está roto jaja', 'GG @Zurdo_Letal, revancha mañana', 'quién hostea hoy?', 'ya salió la jornada 7?', 'ping de 18 ms con Phoenix Link, una maravilla', 'voy con el Liverpool esta temporada', 'alguien sabe cómo activar el modo espectador?', 'jajaja ese penal no era', 'me sumo al torneo del sábado'];
+const MIOS = [];
+function chatListar(a = {}) {
+  const ahora = Math.floor(seg() / 12); const desde = Number(a.p_desde) || 0;
+  const todos = Array.from({ length: 40 }, (_, k) => { const i = ahora - 39 + k; const p = GENTE[((i % 12) + 12) % 12];
+    return { id: ID0 + 1000 + i * 2, usuario_id: p.id, nombre: p.nombre, texto: FRASES_CHAT[((i % FRASES_CHAT.length) + FRASES_CHAT.length) % FRASES_CHAT.length], creado_en: new Date(T0 + i * 12000).toISOString(), rol: i % 9 === 0 ? 'moderador' : 'jugador' }; })
+    .concat(MIOS).sort((x, y) => x.id - y.id);
+  return { ok: true, mensajes: todos.filter((m) => m.id > desde).slice(-Math.max(1, Math.min(100, Number(a.p_limite) || 50))), borrados: [], espera_seg: 0 };
+}
+async function chatEnviar(a = {}) {
+  let yo = null; try { const { supabase } = await import('../../core/sistema/supabase.js'); yo = (await supabase.auth.getSession()).data.session?.user?.id ?? null; } catch { /* sin sesión: se ve igual */ }
+  MIOS.push({ id: ID0 + 1000 + Math.floor(seg() / 12) * 2 + 1, usuario_id: yo, nombre: 'Tú', texto: String(a.p_texto ?? '').slice(0, 500), creado_en: new Date().toISOString(), rol: 'jugador' });
+  return { ok: true };
+}
+
+/* ---------- Notificaciones (tabla «notificaciones»; la campana la consulta con .from()): una nueva cada 90 s ---------- */
+const AVISOS = [
+  ['RETO_DIRECTO', 'Te retaron a un duelo', '{a} te retó a un amistoso 1v1. Tienes 10 minutos para aceptar.'],
+  ['SALA_LISTA', 'Tu sala está lista', 'La sala de {a} ya está abierta en Phoenix Link. Entra cuando quieras.'],
+  ['MURO_RESPUESTA', 'Nueva respuesta', '{a} respondió a tu publicación: «¡qué golazo!»'],
+  ['SEGUIDOR_NUEVO', 'Nuevo seguidor', '{a} empezó a seguirte.'],
+  ['RESULTADO_CONFIRMADO', 'Resultado confirmado', 'Tu partido contra {a} quedó 3–2. Sumaste 18 puntos de ELO.'],
+  ['LOGRO', '¡Logro desbloqueado!', 'Conseguiste «Racha de 5». Míralo en tus logros.'],
+  ['AMISTAD_SOLICITUD', 'Solicitud de amistad', '{a} quiere ser tu amigo.'],
+  ['EVENTO', 'Evento por empezar', 'El torneo relámpago de los sábados empieza en 30 minutos.'],
+];
+const leidas = new Set(); const quitadas = new Set();
+function notificaciones() {
+  const nuevas = Math.min(AVISOS.length, 3 + Math.floor(seg() / 90));
+  return Array.from({ length: nuevas }, (_, k) => { const [tipo, titulo, msj] = AVISOS[k]; const id = ID0 + 2000 + k;
+    return { id, tipo, titulo, mensaje: msj.replace('{a}', GENTE[(k * 3 + 1) % GENTE.length].nombre), reto_id: null, fecha_ref: null, enlace: null, leida: k < nuevas - 3 || leidas.has(id), created_at: new Date(T0 + k * 90000 - 20 * 60e3).toISOString() }; })
+    .filter((n) => !quitadas.has(n.id)).reverse();
+}
+/** Sustituto de una consulta .from(tabla) en modo demostración (hoy solo «notificaciones»). `ops` = [[método, args], …]; `real()` la hace de verdad. */
+export async function tablaDemo(tabla, ops, real) {
+  if (tabla !== 'notificaciones') return real();
+  const op = (m) => ops.find(([k]) => k === m);
+  const ids = (op('in')?.[1]?.[1] ?? []).map(Number);
+  if (op('update') || op('delete')) {
+    if (!ids.length || ids.some((x) => x < ID0)) return real();   // algo real: lo hace la base
+    for (const id of ids) (op('delete') ? quitadas : leidas).add(id);
+    if (op('update') && op('update')[1]?.[0]?.leida === false) ids.forEach((id) => leidas.delete(id));
+    return { data: null, error: null };
+  }
+  const antes = op('lt')?.[1]?.[1]; let data = notificaciones(); if (antes) data = data.filter((n) => n.created_at < antes);
+  return { data, error: null, count: data.length };
+}
+
 /* ---------- Estadísticas de cualquier perfil (si la base no tiene, se inventan) ---------- */
 const estadisticas = () => ({ visible: true, jugados: 48, victorias: 29, empates: 8, derrotas: 11, gf: 97, gc: 61, efectividad: 69 });
 const elo = () => ({ visible: true, elo: 1386, jugados: 31, delta: 12 });
@@ -103,12 +163,13 @@ const elo = () => ({ visible: true, elo: 1386, jugados: 31, delta: 12 });
 const SIMULADAS = {
   salas_en_vivo: salasEnVivo, radar_salas: radarSalas, ticker_comunidad: ticker,
   muro_comunidad: (a) => muro(a), muro_siguiendo: (a) => muro(a), muro_destacado: (a) => muro(a, 'destacado'),
+  historias_recientes: historias, chat_global_listar: chatListar, chat_global_enviar: chatEnviar,
 };
 const SI_FALTA = { estadisticas_de: estadisticas, elo_de: elo };   // primero la base; si no hay datos visibles, lo simulado
 
 /** Sustituto de supabase.rpc en modo demostración. `real()` hace la llamada de verdad. → { data, error } */
 export async function rpcDemo(nombre, args, real) {
-  if (SIMULADAS[nombre]) return { data: SIMULADAS[nombre](args ?? {}), error: null };
+  if (SIMULADAS[nombre]) return { data: await SIMULADAS[nombre](args ?? {}), error: null };
   if (nombre === 'muro_extras_de') {
     const r = await real(); return { data: { ...(r.data ?? {}), ...extras(args) }, error: null };
   }
