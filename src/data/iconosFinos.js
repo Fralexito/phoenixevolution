@@ -62,6 +62,8 @@ export const FA_A_PH = {
   'eraser': 'eraser',
   'face-grin-squint-tears': 'smiley',
   'face-smile': 'smiley',
+  'icons': 'smiley-wink',          // «Emojis» al publicar (19-oct-2026)
+  'circle-notch': 'circle-notch',  // «Historia» al publicar (19-oct-2026)
   'file-import': 'file-arrow-down',
   'film': 'film-strip',
   'filter': 'funnel',

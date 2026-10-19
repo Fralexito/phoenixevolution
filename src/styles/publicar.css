@@ -147,3 +147,35 @@ button.px-pill:hover { background: rgb(255 255 255 / .13); } .px-pill-v { font-s
 /* El texto principal no lleva el recuadro de foco (el cursor ya indica dónde escribes) */
 .px-lienzo textarea:focus, .px-lienzo textarea:focus-visible { outline: none !important; box-shadow: none !important; }
 @media (max-width: 560px) { .px-herr { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); justify-items: center; row-gap: .25rem; } }
+
+/* ── Herramientas con NOMBRE y frase (19-oct-2026, Fralex: «no entiendo qué es cada cosa… intuitivo, dinámico y descriptivo») ──
+   Cada opción dice qué es y para qué sirve; apagada dice por qué; puesta dice qué elegiste (compositor.js → pintar()). */
+.px-anadir { display: grid; gap: .6rem; padding: .8rem; align-items: stretch; }
+.px-anadir-t { display: grid; gap: .1rem; margin: 0; font-size: 13.5px; font-weight: 700; color: #fff; }
+.px-anadir-t small { font-size: 12px; font-weight: 400; color: #8e98ad; }
+.px-herr, .px-anadir .px-herr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: stretch; gap: .35rem; width: 100%; }
+@media (min-width: 641px) { .px-herr, .px-anadir .px-herr { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.px-herr button { width: auto; height: auto; display: flex; align-items: center; gap: .6rem; min-height: 3.1rem; padding: .45rem .55rem; border-radius: .85rem; text-align: left; color: #e6eaf2;
+  background: rgb(255 255 255 / .035); border: 1px solid rgb(255 255 255 / .06); font-size: inherit;
+  transition: background-color .2s ease, border-color .2s ease, transform .16s var(--px-e), opacity .2s ease; }
+.px-herr button:hover:not(:disabled) { background: color-mix(in srgb, var(--c) 10%, transparent); border-color: color-mix(in srgb, var(--c) 35%, transparent); transform: translateY(-1px); }
+.px-herr button:active:not(:disabled) { transform: scale(.97); }
+.px-herr button[aria-pressed='true'] { background: color-mix(in srgb, var(--c) 16%, transparent); border-color: color-mix(in srgb, var(--c) 60%, transparent); box-shadow: none; }
+.px-herr button:disabled { opacity: .45; }
+.px-herr-ic { flex: none; display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: .7rem; font-size: 1rem; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); transition: transform .25s var(--px-e); }
+.px-herr-ic b { font-size: 1rem; font-weight: 800; }
+.px-herr button[aria-pressed='true'] .px-herr-ic { color: #0b0a1a; background: var(--c); transform: scale(1.06); }
+.px-herr-tx { display: grid; min-width: 0; line-height: 1.2; }
+.px-herr-tx b { font-size: 13px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.px-herr-tx small { font-size: 11.5px; color: #98a2b6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.px-herr button[aria-pressed='true'] .px-herr-tx small { color: color-mix(in srgb, var(--c) 70%, #fff); }
+.px-herr button:disabled .px-herr-tx small { color: #fca5a5; }
+@media (prefers-reduced-motion: no-preference) { .px-herr-tx small { transition: color .2s ease; } }
+/* Pie: el resumen «Vas a publicar…» se ve también en el celular */
+.px-ayuda, .px-pie .px-ayuda { display: block; flex: 1; min-width: 0; font-size: 12px; color: #a3acbf; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.px-publicar { margin-left: 0; }
+@media (max-width: 640px) { .px-publicar { min-width: 0; padding: 0 1.1rem; } }
+/* Ajuste: la regla antigua «.px-herr button b» agrandaba el título; la frase puede ir en dos líneas y el resumen también */
+.px-herr button .px-herr-tx b { font-size: 13px; font-weight: 700; }
+.px-herr-tx small { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.px-pie .px-ayuda { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }

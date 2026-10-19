@@ -25,18 +25,24 @@ const leerBorrador = () => { try { return JSON.parse(localStorage.getItem(CLAVE_
 const guardarBorrador = (b) => { try { if (b) localStorage.setItem(CLAVE_BORRADOR, JSON.stringify(b)); else localStorage.removeItem(CLAVE_BORRADOR); } catch { /* sin almacenamiento */ } };
 
 // Herramientas de «Añade a tu publicación» (cada una con su color, como en Facebook).
+// 19-oct-2026 (Fralex: «no entiendo qué es cada cosa… que sea intuitivo, dinámico y descriptivo»): cada una lleva su NOMBRE y una frase
+// que dice para qué sirve; si no se puede usar, la frase dice por qué; si ya está puesta, dice qué elegiste.
 const HERRAMIENTAS = [
-  ['foto', 'fa-photo-film', 'Foto o video', '#34d399'], ['encuesta', 'fa-chart-simple', 'Encuesta', '#fb923c'], ['sentimiento', 'fa-face-smile', 'Cómo te sientes', '#fbbf24'],
-  ['fondo', 'fa-palette', 'Fondo', '#f472b6'], ['enlace', 'fa-link', 'Enlace', '#60a5fa'], ['duelo', 'fa-gamepad', 'Duelo', '#a78bfa'],
-  ['juego', 'fa-futbol', 'Juego', '#22d3ee'], ['emoji', 'fa-icons', 'Emojis', '#facc15'],
+  ['foto', 'fa-photo-film', 'Foto o video', '#34d399', `Hasta ${FOTOS_MAX} fotos o 1 video`], ['encuesta', 'fa-chart-simple', 'Encuesta', '#fb923c', 'Haz una pregunta y que voten'],
+  ['sentimiento', 'fa-face-smile', 'Cómo estás', '#fbbf24', 'Tu ánimo o lo que haces'], ['fondo', 'fa-palette', 'Fondo de color', '#f472b6', 'Texto corto en grande'],
+  ['enlace', 'fa-link', 'Video o directo', '#60a5fa', 'YouTube, TikTok, Kick o Twitch'], ['duelo', 'fa-gamepad', 'Duelo jugado', '#a78bfa', 'Adjunta un resultado tuyo'],
+  ['juego', 'fa-futbol', 'Juego', '#22d3ee', '¿De qué juego hablas?'], ['emoji', 'fa-icons', 'Emojis', '#facc15', 'Insértalos en el texto'],
 ];
+const INSERTAR = [['@', 'Mencionar', '#38bdf8', 'Nombra a un jugador'], ['#', 'Etiqueta', '#c084fc', 'Un tema, como #Liga']];
+const herrHTML = (id, icono, titulo, color, desc, attr = `data-px-herr="${id}"`) => `<button type="button" ${attr} style="--c:${color}" aria-pressed="false">
+  <span class="px-herr-ic" aria-hidden="true">${icono}</span><span class="px-herr-tx"><b>${titulo}</b><small data-px-desc="${escapeHTML(desc)}">${escapeHTML(desc)}</small></span></button>`;
 
 /**
  * Pinta el compositor dentro de `host`. Devuelve { destruir, abrir }.
  * @param {HTMLElement} host
  * @param {{ yo: string|null, perfil: object|null, onLogin: () => void, onPublicado: () => void }} cfg
  */
-export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
+export function montarCompositor(host, { yo, perfil, onLogin, onPublicado, onHistoria }) {
   if (!yo) {
     host.innerHTML = `<div class="px-disparador px-invita"><span class="px-av px-av-vacio" aria-hidden="true"><i class="fa-solid fa-pen"></i></span>
       <p class="flex-1">Entra para publicar fotos, videos, encuestas y tus resultados.</p><button type="button" data-sx-login class="btn btn-primary !min-h-9 !text-xs">Entrar</button></div>`;
@@ -61,18 +67,18 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
     <div class="px-cuerpo">
       <div class="px-autor"><span class="px-av" aria-hidden="true">${av}</span>
         <div class="min-w-0"><p class="px-nombre"><b>${escapeHTML(nombre)}</b><span id="px-siente"></span></p>
-          <div class="px-pills"><button type="button" class="px-pill" data-px-panel="juego"><i class="fa-solid fa-futbol" aria-hidden="true"></i><span id="px-juego-t">Todos los juegos</span><i class="fa-solid fa-chevron-down px-pill-v" aria-hidden="true"></i></button>
-            <span class="px-pill px-pill-info"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i>Social y tu muro</span></div></div></div>
+          <div class="px-pills"><button type="button" class="px-pill" data-px-panel="juego" title="Elige de qué juego es tu publicación"><i class="fa-solid fa-futbol" aria-hidden="true"></i>Juego: <span id="px-juego-t">Todos</span><i class="fa-solid fa-chevron-down px-pill-v" aria-hidden="true"></i></button>
+            <span class="px-pill px-pill-info" title="Tu publicación aparece en Social y en tu muro"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i>Pública · Social y tu muro</span></div></div></div>
       <p class="px-borrador" id="px-borrador" hidden><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Recuperamos tu borrador. <button type="button" data-px-descartar>Descartar</button></p>
       <div class="px-lienzo" id="px-lienzo">
         <textarea id="px-texto" data-menciones rows="3" maxlength="${MURO_MAX + 200}" aria-label="Escribe tu publicación" placeholder="¿Qué está pasando, ${primer}?"></textarea>
       </div>
-      <div class="px-panel" id="px-p-fondo" hidden><div class="px-fondos" role="radiogroup" aria-label="Fondo del texto">
+      <div class="px-panel" id="px-p-fondo" hidden><p class="px-panel-t"><i class="fa-solid fa-palette" aria-hidden="true"></i> Fondo de color <small>Tu texto se ve en grande sobre el color</small></p><div class="px-fondos" role="radiogroup" aria-label="Fondo del texto">
         <button type="button" class="px-fondo-op px-fondo-no" data-px-fondo="" role="radio" aria-label="Sin fondo" title="Sin fondo"><i class="fa-solid fa-ban" aria-hidden="true"></i></button>
         ${FONDOS_POST.map((f) => `<button type="button" class="px-fondo-op" data-px-fondo="${f.id}" role="radio" aria-label="${escapeHTML(f.label)}" title="${escapeHTML(f.label)}" style="background:${f.css}"></button>`).join('')}</div>
         <p class="px-nota">El fondo se usa con textos de hasta ${FONDO_MAX_TEXTO} letras y sin foto ni video.</p></div>
       <div class="px-adjuntos" id="px-adjuntos"></div>
-      <div class="px-panel" id="px-p-enlace" hidden><label class="px-campo"><i class="fa-solid fa-link" aria-hidden="true"></i><input id="px-link" maxlength="300" placeholder="Pega un enlace de YouTube, TikTok, Kick o Twitch" autocomplete="off"></label></div>
+      <div class="px-panel" id="px-p-enlace" hidden><p class="px-panel-t"><i class="fa-solid fa-link" aria-hidden="true"></i> Video o directo <small>Pega el enlace y se verá dentro de tu publicación</small></p><label class="px-campo"><i class="fa-solid fa-link" aria-hidden="true"></i><input id="px-link" maxlength="300" placeholder="Pega un enlace de YouTube, TikTok, Kick o Twitch" autocomplete="off"></label></div>
       <div class="px-panel" id="px-p-encuesta" hidden>
         <p class="px-panel-t"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Encuesta <small>Tu texto de arriba es la pregunta</small></p>
         <div class="px-opciones" id="px-opciones"></div>
@@ -80,23 +86,23 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
         <div class="px-dias" role="radiogroup" aria-label="Duración"><span>Dura</span>${[1, 3, 7].map((d) => `<button type="button" role="radio" data-px-dias="${d}">${d} día${d === 1 ? '' : 's'}</button>`).join('')}</div>
         <button type="button" class="px-quitar-panel" data-px-quitar="encuesta">Quitar encuesta</button></div>
       <div class="px-panel" id="px-p-sentimiento" hidden>
-        <p class="px-panel-t">¿Cómo te sientes?</p><div class="px-sents">${SENTIMIENTOS.filter((s) => !s.actividad).map((s) => `<button type="button" data-px-sent="${s.id}"><span aria-hidden="true">${s.emoji}</span>${escapeHTML(s.t)}</button>`).join('')}</div>
+        <p class="px-panel-t">¿Cómo te sientes? <small>Sale junto a tu nombre: «se siente feliz 😄»</small></p><div class="px-sents">${SENTIMIENTOS.filter((s) => !s.actividad).map((s) => `<button type="button" data-px-sent="${s.id}"><span aria-hidden="true">${s.emoji}</span>${escapeHTML(s.t)}</button>`).join('')}</div>
         <p class="px-panel-t">¿Qué estás haciendo?</p><div class="px-sents">${SENTIMIENTOS.filter((s) => s.actividad).map((s) => `<button type="button" data-px-sent="${s.id}"><span aria-hidden="true">${s.emoji}</span>${escapeHTML(s.t)}</button>`).join('')}</div></div>
-      <div class="px-panel" id="px-p-juego" hidden><p class="px-panel-t">¿De qué juego es?</p><div class="px-sents">
+      <div class="px-panel" id="px-p-juego" hidden><p class="px-panel-t">¿De qué juego es? <small>Así la encuentran quienes filtran por ese juego</small></p><div class="px-sents">
         <button type="button" data-px-juego="">🌐 Todos los juegos</button>${SEGMENTOS.map(([id, n]) => `<button type="button" data-px-juego="${id}">🎮 ${escapeHTML(n)}</button>`).join('')}</div></div>
       <div class="px-panel" id="px-p-duelo" hidden><p class="px-panel-t">Adjunta un duelo tuyo <small>Se muestra como «Duelo verificado»</small></p><div class="px-duelos" id="px-duelos"><p class="px-nota">Cargando tus duelos…</p></div></div>
-      <div class="px-panel" id="px-p-emoji" hidden><div class="px-emojis">${PALETA_EMOJIS.map((e) => `<button type="button" data-px-emoji="${e}" aria-label="Insertar ${e}">${e}</button>`).join('')}</div></div>
+      <div class="px-panel" id="px-p-emoji" hidden><p class="px-panel-t"><i class="fa-solid fa-icons" aria-hidden="true"></i> Emojis <small>Toca uno para ponerlo donde estás escribiendo</small></p><div class="px-emojis">${PALETA_EMOJIS.map((e) => `<button type="button" data-px-emoji="${e}" aria-label="Insertar ${e}">${e}</button>`).join('')}</div></div>
       <div class="px-anadir">
-        <p>Añade a tu publicación</p>
-        <div class="px-herr">${HERRAMIENTAS.map(([id, ic, t, c]) => `<button type="button" data-px-herr="${id}" style="--c:${c}" title="${t}" aria-label="${t}" aria-pressed="false"><i class="fa-solid ${ic}" aria-hidden="true"></i></button>`).join('')}
-          <button type="button" data-px-insertar="@" style="--c:#38bdf8" title="Mencionar a alguien" aria-label="Mencionar a alguien"><b aria-hidden="true">@</b></button>
-          <button type="button" data-px-insertar="#" style="--c:#c084fc" title="Etiqueta (#)" aria-label="Añadir una etiqueta"><b aria-hidden="true">#</b></button></div>
+        <p class="px-anadir-t">Añade a tu publicación <small>Toca una opción · puedes combinar varias</small></p>
+        <div class="px-herr">${HERRAMIENTAS.map(([id, ic, t, c, d]) => herrHTML(id, `<i class="fa-solid ${ic}"></i>`, t, c, d)).join('')}
+          ${INSERTAR.map(([s, t, c, d]) => herrHTML('', `<b>${s}</b>`, t, c, d, `data-px-insertar="${s}"`)).join('')}
+          ${onHistoria ? herrHTML('', '<i class="fa-solid fa-circle-notch"></i>', 'Historia', '#f43f5e', 'Foto o texto que dura 24 h', 'data-px-historia') : ''}</div>
       </div>
       <input type="file" id="px-file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple hidden>
     </div>
     <div class="px-pie">
       <span class="px-anillo" id="px-anillo" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" class="px-anillo-f"/><circle cx="18" cy="18" r="15" class="px-anillo-v" id="px-anillo-v"/></svg><b id="px-restan"></b></span>
-      <span class="px-ayuda">Ctrl + Enter para publicar</span>
+      <span class="px-ayuda" id="px-resumen" aria-live="polite" title="Ctrl + Enter para publicar"></span>
       <button type="button" class="px-publicar" id="px-ok" disabled><span>Publicar</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
     </div>
   </div>`;
@@ -130,7 +136,7 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
     texto.placeholder = S.encuesta ? 'Escribe tu pregunta…' : `¿Qué está pasando, ${String(nombre).split(/\s+/)[0]}?`;
     const s = sentimientoPorId(S.sentimiento);
     $('#px-siente').innerHTML = s ? ` <span class="px-siente-chip">${s.actividad ? 'está' : 'se siente'} <b>${escapeHTML(s.t)}</b> ${s.emoji}<button type="button" data-px-quitar="sentimiento" aria-label="Quitar">×</button></span>` : '';
-    $('#px-juego-t').textContent = S.juego ? etiquetaSegmento(S.juego) : 'Todos los juegos';
+    $('#px-juego-t').textContent = S.juego ? etiquetaSegmento(S.juego) : 'Todos';
     dlg.querySelectorAll('[data-px-fondo]').forEach((b) => b.setAttribute('aria-checked', String((b.dataset.pxFondo || null) === S.fondo)));
     dlg.querySelectorAll('[data-px-sent]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pxSent === S.sentimiento)));
     dlg.querySelectorAll('[data-px-juego]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pxJuego === S.juego)));
@@ -138,7 +144,21 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
     const off = { foto: !!S.encuesta || !!S.video || S.fotos.length >= FOTOS_MAX, fondo: !!S.encuesta || hayMedios() || !!S.reto, encuesta: hayMedios() || !!S.reto || !!S.fondo,
       enlace: !!S.encuesta || !!S.video, duelo: !!S.encuesta, sentimiento: !!S.encuesta };
     const activo = { foto: hayMedios(), encuesta: !!S.encuesta, sentimiento: !!S.sentimiento, fondo: !!S.fondo, enlace: S.enlaceAbierto, duelo: !!S.reto, juego: !!S.juego };
-    dlg.querySelectorAll('.px-herr [data-px-herr]').forEach((b) => { const id = b.dataset.pxHerr; b.disabled = !!off[id]; b.setAttribute('aria-pressed', String(!!activo[id] || S.panel === id)); });
+    // Por qué no se puede (en vez de solo apagarla) y qué elegiste (en vez de solo marcarla).
+    const motivo = {
+      foto: S.encuesta ? 'No va con encuesta' : S.video ? 'Ya pusiste un video' : `Ya tienes ${FOTOS_MAX} fotos`,
+      fondo: S.encuesta ? 'No va con encuesta' : hayMedios() ? 'No va con fotos o video' : 'No va con un duelo',
+      encuesta: hayMedios() ? 'No va con fotos o video' : S.reto ? 'No va con un duelo' : 'Quita el fondo primero',
+      enlace: S.encuesta ? 'No va con encuesta' : 'Ya pusiste un video', duelo: 'No va con encuesta', sentimiento: 'No va con encuesta' };
+    const sent = sentimientoPorId(S.sentimiento); const fnd = fondoPorId(S.fondo);
+    const elegido = { foto: S.video ? '1 video listo' : `${S.fotos.length} foto${S.fotos.length === 1 ? '' : 's'} lista${S.fotos.length === 1 ? '' : 's'}`, encuesta: 'Activada · abajo las opciones',
+      sentimiento: sent ? `${sent.emoji} ${sent.t}` : '', fondo: fnd ? `Fondo «${fnd.label}»` : '', enlace: 'Pega el enlace abajo', duelo: 'Duelo adjuntado', juego: S.juego ? etiquetaSegmento(S.juego) : '' };
+    dlg.querySelectorAll('.px-herr [data-px-herr]').forEach((b) => {
+      const id = b.dataset.pxHerr; const apagada = !!off[id]; const puesta = !!activo[id];
+      b.disabled = apagada; b.setAttribute('aria-pressed', String(puesta || S.panel === id));
+      const d = b.querySelector('[data-px-desc]'); d.textContent = apagada ? motivo[id] : (puesta && elegido[id]) || d.dataset.pxDesc;
+    });
+    $('#px-resumen').textContent = resumen();
     for (const p of ['fondo', 'sentimiento', 'juego', 'duelo', 'emoji']) $(`#px-p-${p}`).hidden = S.panel !== p;
     $('#px-p-encuesta').hidden = !S.encuesta; $('#px-p-enlace').hidden = !S.enlaceAbierto;
     // Anillo de caracteres (como X): se llena y cambia de color al acercarse al máximo.
@@ -147,6 +167,17 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
     $('#px-restan').textContent = p > 0.8 ? String(lim - n) : '';
     $('#px-ok').disabled = S.publicando || !(texto.value.trim() || hayMedios() || S.reto || $('#px-link').value.trim());
     pintarAdjuntos();
+  }
+
+  /** «Vas a publicar: texto · 2 fotos · PES 2021» — para saber de un vistazo qué saldrá. */
+  function resumen() {
+    const p = [];
+    if (texto.value.trim()) p.push(S.encuesta ? 'pregunta' : fondoActivo() ? 'texto con fondo' : 'texto');
+    if (S.fotos.length) p.push(`${S.fotos.length} foto${S.fotos.length === 1 ? '' : 's'}`); if (S.video) p.push('video');
+    if (S.encuesta) p.push(`encuesta de ${S.encuesta.opciones.filter((o) => o.trim()).length} opciones`);
+    if ($('#px-link').value.trim()) p.push('enlace'); if (S.reto) p.push('duelo'); if (S.sentimiento) p.push('cómo te sientes');
+    if (S.juego) p.push(etiquetaSegmento(S.juego));
+    return p.length ? `Vas a publicar: ${p.join(' · ')}` : 'Escribe algo o elige qué añadir';
   }
 
   // ── Borrador (se guarda solo) ──
@@ -208,6 +239,7 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
     else if (d.pxReto) { S.reto = S.misRetos?.[Number(d.pxReto)] ?? null; S.panel = null; pintar(); }
     else if (d.pxEmoji) insertar(d.pxEmoji);
     else if (d.pxInsertar) insertar(d.pxInsertar);
+    else if ('pxHistoria' in d) { cerrar(); onHistoria?.(); }
     else if (d.pxQuitar === 'sentimiento') { S.sentimiento = null; pintar(); guardarPronto(); }
     else if (d.pxQuitar === 'duelo') { S.reto = null; pintar(); }
     else if (d.pxQuitar === 'encuesta') usarHerramienta('encuesta');
@@ -218,7 +250,7 @@ export function montarCompositor(host, { yo, perfil, onLogin, onPublicado }) {
     else if (d.pxDias) { if (S.encuesta) { S.encuesta.dias = Number(d.pxDias); pintarOpciones(); } }
     else if ('pxDescartar' in d) { texto.value = ''; S.fondo = null; S.sentimiento = null; S.juego = ''; guardarBorrador(null); $('#px-borrador').hidden = true; pintar(); autoAltura(); texto.focus(); }
   });
-  dlg.addEventListener('input', (e) => { if (e.target.dataset?.pxOp != null && S.encuesta) S.encuesta.opciones[Number(e.target.dataset.pxOp)] = e.target.value; if (e.target.id === 'px-link') pintar(); });
+  dlg.addEventListener('input', (e) => { if (e.target.dataset?.pxOp != null && S.encuesta) { S.encuesta.opciones[Number(e.target.dataset.pxOp)] = e.target.value; $('#px-resumen').textContent = resumen(); } if (e.target.id === 'px-link') pintar(); });
   texto.addEventListener('input', () => { pintar(); autoAltura(); guardarPronto(); });
   texto.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); publicar(); } });
 
