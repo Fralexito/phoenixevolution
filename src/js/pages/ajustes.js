@@ -10,6 +10,7 @@ import { toast } from '../core/sistema/toast.js';
 import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { iniciarVistas } from '../features/ajustesVista.js';
 import { pintarDerechos } from '../features/derechos.js';
+import { avatarHTML } from '../core/sistema/avatar.js';
 
 const estado = document.getElementById('aj-estado');
 const avisar = (t) => { if (estado) estado.textContent = t; };
@@ -17,9 +18,9 @@ const controles = () => [...document.querySelectorAll('[data-clave]')];
 
 function pintar() {
   const a = leerAjustes();
-  for (const el of controles()) { const v = a[el.dataset.clave]; if (el.dataset.tipo === 'switch') el.checked = !!v; else el.value = String(v); }
+  for (const el of controles()) { const v = a[el.dataset.clave]; if (el.dataset.tipo === 'switch') el.checked = !!v; else if (el.dataset.tipo === 'radio') el.checked = el.value === String(v); else el.value = String(v); }
 }
-function valorDe(el) {   // los valores de los <select> son texto: se devuelve el tipo original (aquí todos son texto salvo los switches)
+function valorDe(el) {   // las opciones (botones de radio) son texto: se devuelve el tipo original (aquí todos son texto salvo los switches)
   return el.dataset.tipo === 'switch' ? el.checked : el.value;
 }
 for (const el of controles()) {
@@ -59,7 +60,8 @@ document.getElementById('aj-archivo')?.addEventListener('change', async (e) => {
 const cuenta = document.getElementById('aj-cuenta');
 onSession(({ session, profile }) => {
   if (!cuenta) return;
-  if (!session) { cuenta.innerHTML = '<p>No has iniciado sesión. Usa el botón «Ingresar» de la cabecera para ver aquí tu perfil.</p>'; return; }
+  if (!session) { pintarTarjetaCuenta(null); cuenta.innerHTML = '<p>No has iniciado sesión. Usa el botón «Ingresar» de la cabecera para ver aquí tu perfil.</p>'; return; }
+  pintarTarjetaCuenta(profile);
   cuenta.innerHTML = `<p class="mb-3">Sesión iniciada como <b class="text-white">${escapeHTML(profile?.nombre_display || 'Jugador')}</b>${profile?.username ? ` <span class="text-gray-500">@${escapeHTML(profile.username)}</span>` : ''}.</p>
     <div class="flex flex-wrap gap-2"><button type="button" id="aj-perfil" class="btn btn-ghost"><i class="fa-solid fa-user-pen"></i> Editar perfil</button>
     <a class="btn btn-ghost" href="${escapeHTML(href('mis-partidos/'))}"><i class="fa-solid fa-gamepad"></i> Mis partidos</a>
@@ -70,13 +72,54 @@ onSession(({ session, profile }) => {
 });
 pintar();
 
-// Pestañas: una sección a la vez (la de la URL #seccion, o la primera). Sin JS se ven todas.
+// ── Navegación al estilo de «Configuración y privacidad» de Meta (19-oct-2026) ──
+// La dirección dice dónde estás (#apariencia, #cuenta…). En PC se ve la lista y la sección a la vez (sin dirección, la primera);
+// en el celular, o la lista o la sección, con flecha para volver. Sin JS se ven todas las secciones.
+const raiz = document.querySelector('[data-cfg]');
 const tabs = [...document.querySelectorAll('[data-tab]')]; const paneles = [...document.querySelectorAll('[data-panel]')];
+const esPC = () => matchMedia('(min-width: 1024px)').matches;
 function abrir(id) {
-  const ok = paneles.some((p) => p.id === `panel-${id}`) ? id : paneles[0]?.id.replace('panel-', '');
-  paneles.forEach((p) => { p.hidden = p.id !== `panel-${ok}`; }); tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === ok)));
+  const existe = paneles.some((p) => p.dataset.seccion === id);
+  const ver = existe ? id : (esPC() ? paneles[0]?.dataset.seccion : null);
+  paneles.forEach((p) => { p.hidden = p.dataset.seccion !== ver; });
+  tabs.forEach((t) => { if (t.dataset.tab === ver) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
+  const antes = raiz.dataset.cfgVista; raiz.dataset.cfgVista = existe ? 'seccion' : 'indice';
+  if (!esPC() && antes !== raiz.dataset.cfgVista) scrollTo({ top: 0 });
 }
-tabs.forEach((t) => t.addEventListener('click', () => { abrir(t.dataset.tab); history.replaceState(null, '', `#${t.dataset.tab}`); }));
 window.addEventListener('hashchange', () => abrir(location.hash.slice(1)));
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-cfg-volver]')) return;
+  e.preventDefault(); history.pushState(null, '', location.pathname + location.search); abrir('');
+});
+window.addEventListener('popstate', () => abrir(location.hash.slice(1)));
 abrir(location.hash.slice(1));
+
+// La tarjeta de tu cuenta (como el «Centro de cuentas»): tu foto, tu nombre y tu usuario.
+function pintarTarjetaCuenta(perfil) {
+  const av = document.getElementById('cfg-av'); const nom = document.getElementById('cfg-nombre'); const us = document.getElementById('cfg-usuario');
+  if (!av || !nom || !us) return;
+  if (!perfil) { av.innerHTML = '<i class="fa-solid fa-user"></i>'; nom.textContent = 'Tu cuenta'; us.textContent = 'Inicia sesión para ver tu perfil'; return; }
+  const n = perfil.nombre_display || perfil.username || 'Jugador';
+  av.innerHTML = avatarHTML(perfil.avatar_url, n, 48); nom.textContent = n; us.textContent = perfil.username ? `@${perfil.username} · perfil, sesión y tus datos` : 'Perfil, sesión y tus datos';
+}
+
+// Buscador: encuentra cualquier opción, acción o sección por lo que dice; al tocar un resultado se abre su sección y la opción se ilumina.
+const q = document.getElementById('cfg-q'); const res = document.getElementById('cfg-resultados'); const indice = document.querySelector('[data-cfg-indice]');
+const titulos = Object.fromEntries(paneles.map((p) => [p.dataset.seccion, p.querySelector('h2')?.textContent ?? '']));
+const iconos = Object.fromEntries(paneles.map((p) => [p.dataset.seccion, p.querySelector('.cfg-ic-grande i')?.className ?? 'fa-solid fa-gear']));
+const sinTildes = (s) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();   // «notificación» = «notificacion»
+q?.addEventListener('input', () => {
+  const texto = sinTildes(q.value.trim());
+  if (!texto) { res.hidden = true; indice.hidden = false; return; }
+  const hallados = [...document.querySelectorAll('[data-busca]')].filter((el) => sinTildes(el.dataset.busca).includes(texto)).slice(0, 12);
+  indice.hidden = true; res.hidden = false;
+  res.innerHTML = hallados.length
+    ? `<p class="cfg-res-n">${hallados.length} resultado${hallados.length === 1 ? '' : 's'}</p>` + hallados.map((el, k) => `<a class="cfg-fila" href="#${el.dataset.buscaS}" data-ir="${k}"><span class="cfg-ic" aria-hidden="true"><i class="${escapeHTML(iconos[el.dataset.buscaS])}"></i></span><span class="cfg-txt"><b>${escapeHTML(el.dataset.buscaT)}</b><small>${escapeHTML(titulos[el.dataset.buscaS])}</small></span><span class="cfg-flecha" aria-hidden="true"></span></a>`).join('')
+    : '<p class="cfg-res-vacio">No hay ninguna opción con esas palabras. Prueba con «tema», «notificaciones» o «datos».</p>';
+  res.querySelectorAll('[data-ir]').forEach((a) => a.addEventListener('click', () => {
+    const el = hallados[Number(a.dataset.ir)];
+    requestAnimationFrame(() => { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); el.classList.remove('cfg-destello'); void el.offsetWidth; el.classList.add('cfg-destello'); });
+    q.value = ''; res.hidden = true; indice.hidden = false;
+  }));
+});
 iniciarVistas();

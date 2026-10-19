@@ -1,55 +1,98 @@
 ---
+// CONFIGURACIÓN (19-oct-2026, Fralex: «clona la sección de ajustes y opciones de Facebook / Meta y aplícala de la mejor manera»).
+// La forma de «Configuración y privacidad» de Meta, con la identidad de Phoenix:
+//   · arriba un buscador que encuentra cualquier opción; debajo la tarjeta de tu cuenta (como el «Centro de cuentas»);
+//   · las secciones en grupos (Preferencias · Privacidad y datos), cada una como fila con ícono, para qué sirve y flecha;
+//   · en PC, lista a la izquierda y la sección abierta a la derecha; en el celular, la lista y al tocar una fila se entra a su pantalla
+//     con flecha para volver (la dirección guarda dónde estás: #apariencia, #cuenta…);
+//   · las opciones se eligen tocando (botones), sin menús desplegables; los interruptores, como en el celular.
+// Las opciones, sus valores y cómo se guardan NO cambian: salen de data/ajustes.js y las guarda js/pages/ajustes.js.
 import Layout from '../layouts/Layout.astro';
+import '../styles/configuracion.css';
 import { SECCIONES } from '../data/ajustes.js';
-const base = import.meta.env.BASE_URL;
+const porId = Object.fromEntries(SECCIONES.map((s) => [s.id, s]));
+const GRUPOS = [
+  ['Preferencias', 'Cómo se ve y se comporta la web para ti', ['apariencia', 'cartas', 'liga', 'notificaciones', 'idioma', 'accesibilidad']],
+  ['Privacidad y datos', 'Qué recuerda este navegador y qué puedes llevarte', ['privacidad', 'datos']],
+].map(([titulo, texto, ids]) => ({ titulo, texto, secciones: ids.map((id) => porId[id]).filter(Boolean) }));
+const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
 ---
-<Layout title="Configuración" active="ajustes">
-  <div class="max-w-5xl mx-auto px-4 py-6 sm:py-8 space-y-4">
-    <header class="glass-panel px-4 py-3 rounded-2xl">
-      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Mi cuenta</span>
-      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-gear text-galaxy-400 mr-2"></i>Configuración</h1>
-      <p class="text-gray-300 text-xs mt-0.5">Se guardan en este navegador y se aplican al instante. Si usas otro dispositivo, puedes llevarlos con «Exportar» / «Importar» en la sección Datos.</p>
-    </header>
+<Layout title="Configuración" active="ajustes" description="Tu cuenta, cómo se ve la web, notificaciones, privacidad y tus datos.">
+  <div class="cfg" data-cfg data-cfg-vista="indice">
+    <aside class="cfg-lado" aria-label="Secciones de la configuración">
+      <h1 class="cfg-h1">Configuración</h1>
+      <label class="cfg-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="cfg-q" type="search" placeholder="Buscar en la configuración" autocomplete="off" aria-label="Buscar en la configuración"></label>
 
-    <div role="tablist" aria-label="Secciones" class="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-      {SECCIONES.map((s) => <button type="button" role="tab" id={`tab-${s.id}`} aria-controls={`panel-${s.id}`} aria-selected="false" data-tab={s.id} class="aj-tab shrink-0"><i class={`fa-solid ${s.icono}`}></i><span>{s.titulo}</span></button>)}
-    </div>
+      <div class="cfg-indice" data-cfg-indice>
+        <a class="cfg-cuenta" href="#cuenta" data-tab="cuenta">
+          <span class="cfg-cuenta-av" id="cfg-av" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+          <span class="cfg-txt"><b id="cfg-nombre">Tu cuenta</b><small id="cfg-usuario">Perfil, sesión y tus datos</small></span>
+          <span class="cfg-flecha" aria-hidden="true"></span>
+        </a>
+        {GRUPOS.map((g) => (
+          <section class="cfg-grupo">
+            <h2>{g.titulo}</h2><p>{g.texto}</p>
+            <nav class="cfg-filas">
+              {g.secciones.map((s) => (
+                <a class="cfg-fila" href={`#${s.id}`} data-tab={s.id}>
+                  <span class="cfg-ic" aria-hidden="true"><i class={`fa-solid ${s.icono}`}></i></span>
+                  <span class="cfg-txt"><b>{s.titulo}</b><small>{s.texto}</small></span>
+                  <span class="cfg-flecha" aria-hidden="true"></span>
+                </a>
+              ))}
+            </nav>
+          </section>
+        ))}
+      </div>
+      <div class="cfg-resultados" id="cfg-resultados" hidden aria-live="polite"></div>
+    </aside>
 
-    {SECCIONES.map((s) => (
-      <section id={`panel-${s.id}`} role="tabpanel" aria-labelledby={`tab-${s.id}`} data-panel class="rounded-xl border border-galaxy-border bg-galaxy-card/60">
-        <header class="px-4 py-3 border-b border-galaxy-border/70 flex items-baseline gap-3 flex-wrap">
-          <h2 class="font-display font-bold text-lg text-white uppercase tracking-wider"><i class={`fa-solid ${s.icono} text-galaxy-400 mr-2`}></i>{s.titulo}</h2>
-          <p class="text-xs text-gray-400">{s.texto}</p>
-        </header>
-        <div class={`grid gap-0 ${s.vista ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,19rem)]' : ''}`}>
-          <div class="divide-y divide-galaxy-border/60 min-w-0">
-            {s.ajustes.map((a) => (
-              <div class="px-4 py-3 flex items-center justify-between gap-3">
-                <div class="min-w-0"><label class="text-white text-sm font-semibold" for={`aj-${a.clave}`}>{a.etiqueta}</label><div class="text-[12px] text-gray-400 leading-snug">{a.ayuda}</div></div>
-                {a.tipo === 'switch'
-                  ? <input id={`aj-${a.clave}`} data-clave={a.clave} data-tipo="switch" type="checkbox" class="w-5 h-5 shrink-0 accent-cyan-400" />
-                  : <select id={`aj-${a.clave}`} data-clave={a.clave} data-tipo="opciones" class="field !w-auto !min-h-9 !py-1 max-w-[52%]">{a.opciones.map((o) => <option value={String(o.valor)}>{o.etiqueta}</option>)}</select>}
-              </div>
-            ))}
-            {s.cuenta && <div id="aj-cuenta" class="px-4 py-3 text-sm text-gray-400">Cargando tu sesión…</div>}
-            {s.acciones && (
-              <div class="px-4 py-3 flex flex-wrap gap-2">
-                {s.acciones.map((x) => <button type="button" data-accion={x.id} class={`btn ${x.peligro ? 'btn-ghost !text-bad !border-bad/50' : 'btn-ghost'} !min-h-9 !text-xs`}><i class={`fa-solid ${x.icono}`}></i> {x.etiqueta}</button>)}
-                {s.id === 'datos' && <input id="aj-archivo" type="file" accept="application/json,.json" hidden />}
-              </div>
+    <div class="cfg-panel">
+      {SECCIONES.map((s) => (
+        <section id={`panel-${s.id}`} data-panel data-seccion={s.id} hidden aria-labelledby={`cfg-t-${s.id}`}>
+          <header class="cfg-panel-cab">
+            <a class="cfg-volver" href="#" data-cfg-volver aria-label="Volver a la configuración"><span class="cfg-flecha cfg-flecha-atras" aria-hidden="true"></span></a>
+            <span class="cfg-ic cfg-ic-grande" aria-hidden="true"><i class={`fa-solid ${s.icono}`}></i></span>
+            <div class="min-w-0"><h2 id={`cfg-t-${s.id}`}>{s.titulo}</h2><p>{s.texto}</p></div>
+          </header>
+          <div class:list={['cfg-cuerpo', s.vista && 'cfg-con-vista']}>
+            <div class="cfg-ajustes">
+              {s.ajustes.map((a) => a.tipo === 'switch' ? (
+                <label class="cfg-aj cfg-aj-switch" for={`aj-${a.clave}`} data-busca={busca(a.etiqueta, a.ayuda, s.titulo)} data-busca-t={a.etiqueta} data-busca-s={s.id}>
+                  <span class="cfg-txt"><b>{a.etiqueta}</b><small>{a.ayuda}</small></span>
+                  <input id={`aj-${a.clave}`} type="checkbox" role="switch" class="cfg-switch" data-clave={a.clave} data-tipo="switch">
+                </label>
+              ) : (
+                <fieldset class="cfg-aj" data-busca={busca(a.etiqueta, a.ayuda, s.titulo, ...a.opciones.map((o) => o.etiqueta))} data-busca-t={a.etiqueta} data-busca-s={s.id}>
+                  <legend class="cfg-txt"><b>{a.etiqueta}</b><small>{a.ayuda}</small></legend>
+                  <div class="cfg-ops">
+                    {a.opciones.map((o) => (<label class="cfg-op"><input type="radio" name={`aj-${a.clave}`} value={String(o.valor)} data-clave={a.clave} data-tipo="radio"><span>{o.etiqueta}</span></label>))}
+                  </div>
+                </fieldset>
+              ))}
+              {s.cuenta && <div id="aj-cuenta" class="cfg-aj cfg-cuenta-panel" data-busca={busca('cuenta perfil sesión cerrar sesión datos derechos descargar mis datos eliminar')} data-busca-t="Perfil, sesión y tus datos" data-busca-s={s.id}>Cargando tu sesión…</div>}
+              {s.acciones && (
+                <div class="cfg-acciones">
+                  {s.acciones.map((x) => (
+                    <button type="button" data-accion={x.id} class:list={['cfg-accion', x.peligro && 'cfg-peligro']} data-busca={busca(x.etiqueta, s.titulo)} data-busca-t={x.etiqueta} data-busca-s={s.id}>
+                      <span class="cfg-ic" aria-hidden="true"><i class={`fa-solid ${x.icono}`}></i></span><span class="cfg-txt"><b>{x.etiqueta}</b></span><span class="cfg-flecha" aria-hidden="true"></span>
+                    </button>
+                  ))}
+                  {s.id === 'datos' && <input id="aj-archivo" type="file" accept="application/json,.json" hidden />}
+                </div>
+              )}
+            </div>
+            {s.vista && (
+              <aside class="cfg-vista" aria-label="Vista previa">
+                <p class="cfg-vista-t"><i class="fa-regular fa-eye" aria-hidden="true"></i> Así se ve</p>
+                <div id={`vp-${s.id}`} class="aj-vp"></div>
+              </aside>
             )}
           </div>
-          {s.vista && (
-            <aside aria-label="Vista previa" class="p-4 border-t lg:border-t-0 lg:border-l border-galaxy-border/70 bg-black/20 space-y-2">
-              <div class="text-[12px] text-gray-500 tracking-[0.25em] uppercase"><i class="fa-regular fa-eye mr-1"></i>Vista previa en vivo</div>
-              <div id={`vp-${s.id}`} class="aj-vp"></div>
-            </aside>
-          )}
-        </div>
-      </section>
-    ))}
-    <p id="aj-estado" class="text-xs text-gray-400 min-h-4" role="status" aria-live="polite"></p>
-    <a href={base} class="btn btn-primary inline-flex"><i class="fa-solid fa-house"></i> Volver a Central</a>
+        </section>
+      ))}
+      <p id="aj-estado" class="cfg-estado" role="status" aria-live="polite"></p>
+    </div>
   </div>
 </Layout>
 <script>

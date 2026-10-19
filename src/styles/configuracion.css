@@ -1,0 +1,111 @@
+/* CONFIGURACIÓN al estilo de «Configuración y privacidad» de Meta (19-oct-2026). Solo lo importa src/pages/ajustes.astro.
+   PC: lista a la izquierda (pegada) y la sección a la derecha. Celular: la lista, y al tocar una fila se entra a su pantalla con flecha para volver. */
+.cfg { --cfg-ease: cubic-bezier(.23, 1, .32, 1); --cfg-borde: rgb(255 255 255 / .08); --cfg-fondo: rgb(255 255 255 / .035);
+  display: grid; gap: 1.5rem; max-width: 72rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+@media (min-width: 1024px) { .cfg { grid-template-columns: 22rem minmax(0, 1fr); align-items: start; padding-inline: 2rem; } .cfg-lado { position: sticky; top: 6.5rem; } }
+
+.cfg-h1 { font: 900 1.6rem var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #fff; margin-bottom: .9rem; }
+.cfg-buscar { position: relative; display: flex; align-items: center; margin-bottom: 1rem; }
+.cfg-buscar i { position: absolute; left: 1rem; color: #8e98ad; pointer-events: none; }
+.cfg-buscar input { width: 100%; min-height: 2.9rem; padding: 0 1rem 0 2.7rem; border-radius: 99px; font-size: 15px; color: #fff; background: rgb(255 255 255 / .06); border: 1px solid var(--cfg-borde); outline: none; transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease; }
+.cfg-buscar input:focus { background: rgb(255 255 255 / .08); border-color: color-mix(in srgb, var(--color-galaxy-400) 60%, transparent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-galaxy-400) 14%, transparent); }
+.cfg-buscar input::-webkit-search-cancel-button { filter: invert(1) opacity(.6); }
+
+/* Tarjeta de tu cuenta (el «Centro de cuentas») */
+.cfg-cuenta { display: flex; align-items: center; gap: .9rem; padding: .9rem 1rem; border-radius: 1.1rem; margin-bottom: 1.25rem;
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--color-galaxy-400) 16%, transparent), transparent 60%), var(--cfg-fondo); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 28%, transparent);
+  transition: transform .16s var(--cfg-ease), border-color .2s ease; }
+.cfg-cuenta-av { flex: none; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 99px; overflow: hidden; font-size: 1.2rem; color: var(--color-galaxy-400); background: rgb(0 0 0 / .4); box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-galaxy-400) 45%, transparent); }
+.cfg-cuenta-av img { width: 100%; height: 100%; object-fit: cover; }
+.cfg-cuenta .cfg-txt b { font-size: 1rem; }
+
+/* Grupos de filas */
+.cfg-grupo { margin-bottom: 1.25rem; }
+.cfg-grupo > h2 { font: 800 .95rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; }
+.cfg-grupo > p { margin: .15rem 0 .55rem; font-size: 12.5px; color: #8e98ad; }
+.cfg-filas, .cfg-resultados { display: grid; overflow: hidden; border-radius: 1.1rem; background: var(--cfg-fondo); border: 1px solid var(--cfg-borde); }
+.cfg-resultados[hidden], .cfg-indice[hidden] { display: none; }
+.cfg-fila, .cfg-accion { display: flex; align-items: center; gap: .85rem; width: 100%; min-height: 3.6rem; padding: .6rem .9rem; text-align: left; color: inherit; transition: background-color .2s ease, transform .16s var(--cfg-ease); }
+.cfg-fila + .cfg-fila, .cfg-accion + .cfg-accion { border-top: 1px solid var(--cfg-borde); }
+.cfg-fila:active, .cfg-accion:active, .cfg-cuenta:active { transform: scale(.985); }
+@media (hover: hover) and (pointer: fine) { .cfg-fila:hover, .cfg-accion:hover { background: rgb(255 255 255 / .05); } .cfg-cuenta:hover { border-color: color-mix(in srgb, var(--color-galaxy-400) 55%, transparent); } }
+.cfg-fila[aria-current='page'] { background: color-mix(in srgb, var(--color-galaxy-400) 11%, transparent); }
+.cfg-fila[aria-current='page'] .cfg-ic { color: #04121a; background: var(--color-galaxy-400); }
+.cfg-ic { flex: none; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 99px; font-size: 1rem; color: var(--color-galaxy-400); background: color-mix(in srgb, var(--color-galaxy-400) 12%, transparent); transition: background-color .2s ease, color .2s ease; }
+.cfg-txt { display: grid; gap: .1rem; min-width: 0; flex: 1; }
+.cfg-txt b { font-size: 14.5px; font-weight: 600; color: #f1f4f9; }
+.cfg-txt small { font-size: 12.5px; line-height: 1.4; color: #94a0b6; }
+.cfg-fila .cfg-txt small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cfg-flecha { flex: none; width: .5rem; height: .5rem; margin-right: .2rem; border-right: 2px solid #6f7a90; border-top: 2px solid #6f7a90; transform: rotate(45deg); }
+.cfg-flecha-atras { transform: rotate(-135deg); margin: 0 0 0 .2rem; width: .65rem; height: .65rem; border-color: #fff; }
+@media (min-width: 1024px) { .cfg-fila .cfg-flecha { opacity: 0; } .cfg-fila[aria-current='page'] .cfg-flecha, .cfg-fila:hover .cfg-flecha { opacity: 1; } }
+.cfg-res-n, .cfg-res-vacio { padding: .7rem .9rem; font-size: 12.5px; color: #94a0b6; }
+.cfg-res-vacio { line-height: 1.5; }
+
+/* La sección abierta */
+.cfg-panel { min-width: 0; }
+.cfg-panel > section { border-radius: 1.3rem; background: var(--cfg-fondo); border: 1px solid var(--cfg-borde); overflow: hidden; }
+.cfg-panel-cab { display: flex; align-items: center; gap: .85rem; padding: 1.1rem 1.2rem; border-bottom: 1px solid var(--cfg-borde); }
+.cfg-panel-cab h2 { font: 900 1.2rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; }
+.cfg-panel-cab p { font-size: 13px; color: #94a0b6; margin-top: .1rem; }
+.cfg-ic-grande { width: 2.9rem; height: 2.9rem; font-size: 1.2rem; }
+.cfg-volver { display: none; flex: none; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 99px; background: rgb(255 255 255 / .06); transition: background-color .2s ease, transform .16s var(--cfg-ease); }
+.cfg-volver:active { transform: scale(.94); }
+.cfg-cuerpo { display: grid; }
+@media (min-width: 1280px) { .cfg-con-vista { grid-template-columns: minmax(0, 1fr) 18rem; } .cfg-vista { border-left: 1px solid var(--cfg-borde); } }
+.cfg-ajustes { display: grid; min-width: 0; align-content: start; }
+.cfg-aj { display: grid; gap: .65rem; margin: 0; padding: 1rem 1.2rem; border: 0; min-width: 0; }
+.cfg-aj + .cfg-aj, .cfg-ajustes > .cfg-acciones { border-top: 1px solid var(--cfg-borde); }
+.cfg-aj legend { float: left; width: 100%; padding: 0; }
+.cfg-aj legend + .cfg-ops { clear: both; }
+.cfg-aj-switch { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
+.cfg-destello { animation: cfg-destello 1.4s ease-out; }
+@keyframes cfg-destello { 0%, 30% { background: color-mix(in srgb, var(--color-galaxy-400) 18%, transparent); } 100% { background: transparent; } }
+
+/* Interruptor como en el celular */
+.cfg-switch { flex: none; appearance: none; position: relative; width: 3.1rem; height: 1.85rem; margin: 0; border-radius: 99px; background: rgb(255 255 255 / .16); cursor: pointer; transition: background-color .22s ease; }
+.cfg-switch::after { content: ''; position: absolute; top: .2rem; left: .2rem; width: 1.45rem; height: 1.45rem; border-radius: 99px; background: #fff; box-shadow: 0 2px 6px rgb(0 0 0 / .4); transition: transform .26s var(--cfg-ease), width .2s var(--cfg-ease); }
+.cfg-switch:checked { background: var(--color-galaxy-400); }
+.cfg-switch:checked::after { transform: translateX(1.25rem); }
+.cfg-switch:focus-visible { outline: 2px solid var(--color-galaxy-400); outline-offset: 3px; }
+
+/* Opciones para tocar (en vez de menús desplegables) */
+.cfg-ops { display: flex; flex-wrap: wrap; gap: .45rem; }
+.cfg-op { position: relative; cursor: pointer; }
+.cfg-op input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
+.cfg-op span { display: inline-flex; align-items: center; min-height: 2.6rem; padding: 0 1rem; border-radius: 99px; font-size: 13.5px; font-weight: 600; color: #c9d1de; background: rgb(0 0 0 / .3); border: 1px solid var(--cfg-borde); transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .16s var(--cfg-ease); }
+.cfg-op:active span { transform: scale(.96); }
+@media (hover: hover) and (pointer: fine) { .cfg-op:hover span { border-color: rgb(255 255 255 / .22); color: #fff; } }
+.cfg-op input:checked + span { color: #04121a; background: var(--color-galaxy-400); border-color: transparent; box-shadow: 0 6px 18px -8px var(--color-galaxy-400); }
+.cfg-op input:focus-visible + span { outline: 2px solid var(--color-galaxy-400); outline-offset: 2px; }
+
+/* Acciones: filas como en Meta; las peligrosas, en rojo */
+.cfg-acciones { display: grid; }
+.cfg-acciones .cfg-accion { padding-inline: 1.2rem; }
+.cfg-peligro .cfg-txt b { color: #fda4af; } .cfg-peligro .cfg-ic { color: #fb7185; background: rgb(244 63 94 / .12); }
+.cfg-cuenta-panel { font-size: 13.5px; color: #c3cad8; }
+.cfg-vista { padding: 1rem 1.2rem; background: rgb(0 0 0 / .2); border-top: 1px solid var(--cfg-borde); }
+@media (min-width: 1280px) { .cfg-vista { border-top: 0; } }
+.cfg-vista-t { display: flex; align-items: center; gap: .4rem; margin-bottom: .6rem; font-size: 12px; font-weight: 600; color: #94a0b6; }
+.cfg-estado { min-height: 1.2rem; margin-top: .6rem; font-size: 12.5px; color: #94a0b6; }
+
+/* Celular y tablet: o la lista o la sección; al entrar, la sección llega desde la derecha */
+@media (max-width: 1023.98px) {
+  .cfg[data-cfg-vista='seccion'] .cfg-lado { display: none; }
+  .cfg[data-cfg-vista='indice'] .cfg-panel > section { display: none; }
+  .cfg-volver { display: grid; }
+  .cfg-panel > section { border-radius: 1.1rem; }
+  .cfg-panel-cab { padding: .8rem .9rem; gap: .7rem; }
+  .cfg-panel-cab .cfg-ic-grande { display: none; }
+  .cfg-aj { padding: .95rem 1rem; }
+}
+@media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {
+  .cfg[data-cfg-vista='seccion'] .cfg-panel > section:not([hidden]) { animation: cfg-entra .28s var(--cfg-ease) backwards; }
+  .cfg[data-cfg-vista='indice'] .cfg-lado { animation: cfg-vuelve .24s var(--cfg-ease) backwards; }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) { .cfg-panel > section:not([hidden]) { animation: cfg-aparece .22s var(--cfg-ease) backwards; } }
+@keyframes cfg-entra { from { opacity: 0; transform: translateX(28px); } }
+@keyframes cfg-vuelve { from { opacity: 0; transform: translateX(-20px); } }
+@keyframes cfg-aparece { from { opacity: 0; transform: translateY(6px); } }
+/* El estilo e-sports del sitio (sinIA.css) pone una «mira» de esquinas en los encabezados de sección: aquí tapaba la flecha de volver. Se quedan las rayas y el borde cian. */
+main[data-sia] .cfg-panel-cab::after { content: none; }
