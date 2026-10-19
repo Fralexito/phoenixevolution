@@ -2,7 +2,7 @@
 // «Social»: la portada social de la comunidad (historias · publicar · feed de todos). Es una sección de la zona principal, casi un segundo inicio.
 // Los datos salen de las mismas publicaciones del muro que ya alimentan /comunidad/ (que se mantiene intacta). Lógica en js/pages/social.js.
 // 19-oct-2026 (Fralex: «clona el apartado inicial de Reddit»): distribución de foro en TRES columnas, con la identidad de Phoenix (no la de Reddit):
-//   izquierda = feeds (Inicio · Destacado · Siguiendo), juegos y accesos · centro = historias, publicar, orden y feed en hilo · derecha = la comunidad.
+//   izquierda = feeds (Recientes · Siguiendo · Destacado), juegos y accesos · centro = historias, publicar, orden y feed en hilo · derecha = la comunidad.
 // Las reacciones y las historias siguen como estaban (decisión de Fralex). En celular queda una sola columna, como antes.
 import Layout from '../layouts/Layout.astro';
 // CSS propio de esta página (no va en global.css). DESPUÉS de Layout: así gana a global.css.
@@ -10,7 +10,8 @@ import '../styles/socialHilo.css';
 import '../styles/deslizar.css';
 import '../styles/publicar.css';   // la ventana «Crear publicación» (features/muro/compositor.js)
 const base = import.meta.env.BASE_URL;
-const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-group', 'Amigos'], ['mensajes/', 'fa-comments', 'Mensajes'], ['guardados/', 'fa-bookmark', 'Guardados'], ['buscar/', 'fa-magnifying-glass', 'Buscar']];
+// «Tu espacio» (auditoría 19-oct): sin repetir lo que ya está en el menú de cuenta (Amigos, Mensajes…); solo se muestra con sesión.
+const enlaces = [['perfil/', 'fa-user', 'Mi muro'], ['guardados/', 'fa-bookmark', 'Guardados'], ['buscar/', 'fa-magnifying-glass', 'Buscar jugadores']];
 ---
 <Layout title="Social" active="social" description="Lo que publican los jugadores de Phoenix Evolution Series: historias, fotos, videos y resultados de toda la comunidad.">
   <script is:inline>addEventListener('pagereveal', (e) => { try { const d = sessionStorage.getItem('px-desliza'); sessionStorage.removeItem('px-desliza'); if (d && e.viewTransition) e.viewTransition.types.add('desliza-' + d); } catch {} });</script>
@@ -20,7 +21,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
       <nav class="sxr-nav">
         <div data-sxr-feeds></div>
         <details class="sxr-grupo" open><summary>Juegos</summary><div data-sxr-juegos></div></details>
-        <details class="sxr-grupo" open><summary>Tu espacio</summary>
+        <details class="sxr-grupo" open data-sxr-espacio hidden><summary>Tu espacio</summary>
           <div>{enlaces.map(([ruta, icono, texto]) => <a class="sxr-item" href={`${base}${ruta}`}><span class="sxr-ic"><i class={`fa-solid ${icono}`} aria-hidden="true"></i></span><span>{texto}</span></a>)}</div>
         </details>
       </nav>
@@ -29,7 +30,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
     <div class="sxr-centro">
       <header class="sxr-saludo" data-sxr-saludo hidden></header>
       <section id="sx-hist" hidden aria-label="Historias" class="sxr-hist"></section>
-      <section id="sx-compositor" aria-label="Publicar"></section>
+      <section id="sx-compositor" aria-label="Crear publicación"></section>
       <!-- 19-oct-2026 (Fralex: «que el muro no se vea tan cargado… minimalista pero completo»): UNA barra pegada arriba —
            pestañas con pastilla que se desliza + un botón «Ordenar y filtrar» que abre orden, juego y vista (antes eran tres filas). -->
       <div class="sxr-orden">
@@ -52,7 +53,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
         </div>
       </div>
       <button type="button" class="sxr-nuevas" data-sxr-nuevas hidden><i class="fa-solid fa-arrow-up" aria-hidden="true"></i> <span></span></button>
-      <div id="sx-feed" class="sxr-feed" data-modo="tarjeta" aria-live="polite"></div>
+      <div id="sx-feed" class="sxr-feed" data-modo="tarjeta"></div>
       <div id="sx-fin" hidden class="py-3 text-center"><button type="button" id="sx-mas" class="btn btn-ghost !text-xs">Cargar más</button></div>
     </div>
 
@@ -60,11 +61,8 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
       <section class="sxr-caja sxr-sobre">
         <div class="sxr-sobre-cab"><span class="sxr-sobre-logo" aria-hidden="true"><img src={`${base}logo.webp`} alt="" width="44" height="44" loading="lazy" decoding="async" /></span><div><h2>Phoenix Social</h2><p>La comunidad de Phoenix Evolution Series</p></div></div>
         <p class="sxr-sobre-tx">Fotos, videos, resultados y debates de los jugadores de la liga. Publica lo tuyo, reacciona y sigue a quien quieras.</p>
-        <div class="sxr-cifras" data-sxr-cifras></div>
-        <button type="button" class="sxr-crear" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Crear publicación</button>
       </section>
       <section class="sxr-caja" data-sxr-tend hidden><h2 class="sxr-caja-t"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Tendencias</h2><div data-sxr-tend-lista></div></section>
-      <section class="sxr-caja"><h2 class="sxr-caja-t">Juegos con más movimiento</h2><div data-sxr-activos></div></section>
       <section class="sxr-caja" data-sxr-seguir-caja hidden><h2 class="sxr-caja-t">A quién seguir</h2><div data-sxr-seguir></div></section>
       <section class="sxr-caja"><h2 class="sxr-caja-t">Lo más reaccionado</h2><div data-sxr-top></div></section>
       <details class="sxr-caja sxr-atajos"><summary class="sxr-caja-t">Atajos de teclado</summary>

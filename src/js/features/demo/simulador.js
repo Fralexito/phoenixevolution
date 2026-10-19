@@ -71,12 +71,14 @@ const TEXTOS = [
   ['Armé mi once ideal para la temporada: ¿qué le cambiarían?', 'atardecer', 'nervioso'],
 ];
 const REAC = ['🔥', '🤝', '👏', '😂', '❤️'];
+// Juego de cada publicación simulada (antes todas eran PES 2021 y filtrar por juego no cambiaba nada). Mayoría PES, como la comunidad real.
+const JUEGOS_DEMO = ['pes', 'pes', 'efootball', 'sp', 'pes', 'eafc', 'fifa', 'pes', 'sp', 'efootball'];
 function publicacion(i) {
   const [texto, fondo, sentimiento] = TEXTOS[i % TEXTOS.length]; const a = GENTE[(i * 5) % GENTE.length];
   const nueva = i >= 100; const edadMin = nueva ? Math.max(0, (seg() - (i - 100 + 1) * 75) / 60) : 20 + (8 - i) * 37;
   const crece = Math.min(1, (seg() / 600) + 0.3); const reacciones = {};
   REAC.forEach((r, k) => { const v = Math.round(azar(i * 7 + k) * 14 * crece * (k === 0 ? 1.6 : 1)); if (v) reacciones[r] = v; });
-  return { id: ID0 + i, texto, imagen_url: null, video_url: null, juego: 'pes', reto: null, created_at: hace(edadMin), respuestas: Math.floor(azar(i + 4) * 6 * crece),
+  return { id: ID0 + i, texto, imagen_url: null, video_url: null, juego: JUEGOS_DEMO[i % JUEGOS_DEMO.length], reto: null, created_at: hace(edadMin), respuestas: Math.floor(azar(i + 4) * 6 * crece),
     reacciones, autor: { id: a.id, username: a.username, nombre_display: a.nombre, avatar_url: a.avatar_url }, _extra: fondo || sentimiento ? { ...(fondo ? { fondo } : {}), ...(sentimiento ? { sentimiento } : {}) } : null };
 }
 const MIS_COMPARTIDAS = [];   // lo que compartes en tu muro estando en demo (solo en esta pestaña)
@@ -106,9 +108,11 @@ function reaccionesDeDemo(a = {}) {
 }
 const FRASES_RESP = ['Golazo, sin duda 🔥', 'Jajaja te pasaste', 'GG, revancha cuando quieras', 'Ese penal no era 😤', 'Nivelazo hermano'];
 const likesDemo = new Map();
+// Respuestas que escribes o borras en publicaciones inventadas (solo en esta pestaña; auditoría 19-oct: antes la tuya no aparecía y la borrada volvía).
+const MIS_RESP = new Map(); const RESP_BORRADAS = new Set(); const MIS_RX = new Map();
 function respuestasDeDemo(a = {}) {
   const id = Number(a.p_publicacion); const i = id - ID0; const n = 2 + Math.floor(azar(i + 4) * 3);
-  return Array.from({ length: n }, (_, k) => { const g = GENTE[(i + k * 3 + 1) % GENTE.length]; return { id: ID0 + 5000 + i * 10 + k, autor_id: g.id, texto: FRASES_RESP[(i + k) % FRASES_RESP.length], created_at: hace(30 - k * 6), nombre_display: g.nombre, username: g.username, avatar_url: null, puedo_borrar: false }; });
+  return [...Array.from({ length: n }, (_, k) => { const g = GENTE[(i + k * 3 + 1) % GENTE.length]; return { id: ID0 + 5000 + i * 10 + k, autor_id: g.id, texto: FRASES_RESP[(i + k) % FRASES_RESP.length], created_at: hace(30 - k * 6), nombre_display: g.nombre, username: g.username, avatar_url: null, puedo_borrar: false }; }), ...(MIS_RESP.get(id) ?? [])].filter((r) => !RESP_BORRADAS.has(r.id));
 }
 const likeDe = (id) => likesDemo.get(id) ?? { n: Math.floor(azar(id) * 9), mio: false };
 function likesRespuestasDemo(a = {}) { const r = {}; for (const raw of a.p_respuestas ?? []) { const id = Number(raw); if (id >= ID0) r[String(id)] = likeDe(id); } return r; }
@@ -123,6 +127,7 @@ function compartirDemo(a = {}) {
 function muro(a = {}, orden = 'recientes') {
   let lista = publicaciones();
   if (orden === 'destacado') lista = [...lista].sort((x, y) => Object.values(y.reacciones).reduce((s, v) => s + v, 0) - Object.values(x.reacciones).reduce((s, v) => s + v, 0));
+  if (a.p_juego) lista = lista.filter((p) => p.juego === a.p_juego);   // el filtro por juego de Social
   if (a.p_antes) lista = lista.filter((p) => p.id < Number(a.p_antes));
   const n = Math.max(1, Math.min(40, Number(a.p_limite) || 20));
   return { hay_mas: false, items: lista.slice(0, n).map(sinExtra) };
@@ -258,10 +263,16 @@ export async function rpcDemo(nombre, args, real) {
     const r = await real(); return { data: { ...(r.data ?? {}), ...extras(args) }, error: null };
   }
   if (nombre === 'jugada_reaccionar' && esDemo(args?.p_clip)) return { data: jugadaReaccionarDemo(args), error: null };
-  if (nombre === 'muro_reaccionar' && Number(args?.p_publicacion) >= ID0) return { data: args?.p_tipo ?? null, error: null };   // reaccionar a algo inventado: se ve marcado, no se guarda
+  // Reaccionar a algo inventado: se ve marcado, no se guarda; el mismo emoji otra vez la quita (como en la base)
+  if (nombre === 'muro_reaccionar' && esDemo(args?.p_publicacion)) { const id = Number(args.p_publicacion); const t = args?.p_tipo ?? null; if (MIS_RX.get(id) === t) { MIS_RX.delete(id); return { data: null, error: null }; } MIS_RX.set(id, t); return { data: t, error: null }; }
+  // Responder y borrar respuestas en publicaciones inventadas: se ven en esta pestaña
+  if (nombre === 'muro_responder' && esDemo(args?.p_publicacion)) { const id = Number(args.p_publicacion); const l = MIS_RESP.get(id) ?? []; const r = { id: ID0 + 7000 + l.length + MIS_RESP.size * 50, autor_id: null, texto: String(args?.p_texto ?? '').slice(0, 600), created_at: new Date().toISOString(), nombre_display: 'Tú', username: '', avatar_url: null, puedo_borrar: true }; MIS_RESP.set(id, [...l, r]); return { data: r.id, error: null }; }
+  if (nombre === 'muro_borrar_respuesta' && esDemo(args?.p_id)) { RESP_BORRADAS.add(Number(args.p_id)); return { data: null, error: null }; }
   if (Object.values(args ?? {}).some((v) => Number(v) >= ID0 && Number(v) < ID0 + 1e6)) return { data: null, error: null };   // acción sobre algo inventado
   // Entrar a una sala inventada: se reserva el puesto pero sin enlace (así no se abre Parsec hacia ningún equipo real).
   if ((nombre === 'ver_sala' || nombre === 'aceptar_sala') && String(args?.p_sala ?? '').startsWith('00000000-0000-4000-8000-9000')) return { data: { rol: nombre === 'ver_sala' ? 'espectador' : 'rival', enlace: null }, error: null };
+  // Acciones sobre las personas inventadas (seguir, bloquear…): se aceptan sin ir a la base (sus uuid empiezan por 00000000-0000-4000-8000-9000)
+  if (Object.values(args ?? {}).some((v) => typeof v === 'string' && v.startsWith('00000000-0000-4000-8000-9000'))) return { data: null, error: null };
   const r = await real();
   if (SI_FALTA[nombre] && (r.error || !r.data || r.data.visible !== true)) return { data: SI_FALTA[nombre](), error: null };
   return r;

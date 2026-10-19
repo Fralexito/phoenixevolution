@@ -86,6 +86,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 16:26 | (ver REGISTRO) | **Beta 1.8.2**: logo de la página en «Phoenix Social» y logo FL26 de Football Life |
 | 16:33 | (ver REGISTRO) | **Beta 1.9.0**: Social con personalidad (saludo, pulso, acentos de fuego, final del feed) y recargar sutil |
 | 16:55 | (ver REGISTRO) | **Beta 1.9.1**: logos de los 5 juegos en Social (los más recientes) |
+| 17:15 | (ver REGISTRO) | **Beta 1.10.0**: auditoría completa de Social (errores, redundancias, inconsistencias) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -274,6 +275,14 @@ Pedido: «verifica la opción de eliminar post o comentarios».
 - **Acentos de fuego** (naranja→rosa, como Jugadas y la racha) en la pestaña activa y en lo elegido de la columna izquierda.
 - **Final del feed**: logo de Phoenix, «Estás al día 🔥», botones Publicar algo y Recargar.
 - **Recargar**: ↻ discreto en la barra pegada; el botón flotante (aparece al bajar 500 px) sube y recarga; el del final también. El icono gira mientras carga y se pone verde al terminar.
+
+### 5.20 Auditoría completa de Social (1.10.0)
+Pedido: «verifica función por función y apartado por apartado y corrige todo, con redundancias y todo». Se hizo en dos frentes: un agente leyó el código (social.astro, social.js, socialHilo.css, tarjeta, pie, fase 2, gestos) y yo recorrí cada control en el navegador (390 y 1440, demo y real).
+- **Errores corregidos (12)**: filtros que se cerraban solos; una carga vieja apagaba la nueva; la #etiqueta bloqueaba pestañas y juegos; aviso de nuevas con etiqueta; punto de filtros; paleta que quedaba abierta; recargar sin limpiar hilos; atajos con ventanas abiertas; tecla N; acción del feed vacío según vista/sesión; plurales; accesibilidad (aria-busy, botones en vez de href="#", aria-current único).
+- **Demostración**: publicaciones de varios juegos (el filtro ya hace algo), quitar reacción, responder/borrar respuesta, seguir a inventados sin error, sin «Retar» a inventados.
+- **Redundancias quitadas**: cifras y botón «Crear publicación» de la tarjeta Phoenix Social, «Juegos con más movimiento», «Más reacciones» en Ordenar, «Recargar» del final; una sola función de recarga para ↻, flotante, aviso de nuevas y tirar hacia abajo; «Tu espacio» reducido (Mi muro, Guardados, Buscar jugadores) y solo con sesión.
+- **Unificado**: color de «elegido» = fuego (`--sxr-on`), azul solo para enlaces/foco; textos («Todos los juegos», «Crear publicación»); alturas de la barra (2,5rem PC, 2,25rem celular); radios 99px; columnas pegadas a la misma altura; en celular la racha va en el saludo.
+- **CSS**: reglas duplicadas o pisadas fusionadas y muertas borradas; copia de antes en el scratchpad de la sesión.
 
 ---
 

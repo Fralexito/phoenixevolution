@@ -2,14 +2,13 @@
 //   fila de historias (RPC historias_recientes, 056) → compositor (features/muro/compositor.js) → feed (muro_comunidad / siguiendo / destacado, ya existentes)
 //   → pie de acciones (features/muro/pieSocial.js; reacciones con mis_reacciones, 057). La lógica pura vive en core/comunidad/feedSocial.js y core/comunidad/feed.js.
 // Todo lo que se pinta de otros usuarios pasa por escapeHTML en los módulos que generan el HTML (tarjeta.js, render.js, pieSocial.js).
-import { vacioHTML } from '../core/sistema/vacio.js';
 import { escapeHTML } from '../core/sistema/dom.js';
 import { toast } from '../core/sistema/toast.js';
 import { onSession, can, getState, isAdmin } from '../core/sistema/session.js';
 import { confirmar } from '../core/sistema/dialogo.js';
 import { avatarHTML } from '../core/sistema/avatar.js';
 import { href } from '../core/sistema/config.js';
-import { segmentoParaGuardar, urlCompartir, aplicarReaccion, tiempoRelativo, validarRespuesta, textoAHTML } from '../core/comunidad/muro.js';
+import { segmentoParaGuardar, urlCompartir, aplicarReaccion, tiempoRelativo, validarRespuesta, textoAHTML, etiquetasDe } from '../core/comunidad/muro.js';
 import * as socialApi from '../features/social/api.js';
 import * as amigosApi from '../features/amigos/api.js';
 import { marcarVistas, indiceInicial } from '../core/comunidad/historias.js';
@@ -28,7 +27,6 @@ import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js'
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { initMencionAuto } from '../features/social/mencionAuto.js';
-import { etiquetasDe } from '../core/comunidad/muro.js';
 import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar, montarDeslizarA, marcarDesliza } from '../features/social/gestos.js';
 import { originalHTML, abrirCompartir, abrirQuienReacciono, abrirTarjetaPerfil, vigilarVistas } from '../features/social/fase2.js';
 import { openAuthModal } from '../features/auth.js';
@@ -37,7 +35,10 @@ const $ = (id) => document.getElementById(id);
 const feedEl = $('sx-feed'); const histEl = $('sx-hist'); const vistasEl = $('sx-vistas'); const filtroEl = $('sx-filtro'); const compEl = $('sx-compositor'); const finEl = $('sx-fin');
 const KEY_VISTAS = 'pes-historias-vistas';   // la misma clave que usa /perfil/: «ya vista» se comparte entre las dos páginas
 const q = new URLSearchParams(location.search);
-const S = { yo: null, perfil: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0, paleta: null, crudos: [], circulos: [], vistas: leerVistas(), compositor: null, orden: ordenValido(q.get('o')), abiertas: new Set(), resp: new Map(), foco: null, tag: tagValido(q.get('tag')), social: {}, likesResp: new Map() };
+// «Ordenar»: «Más reacciones» repetía la pestaña «Destacado» (mismo concepto, mismo icono) → en Social solo Nuevos · Más comentados (auditoría 19-oct).
+const ORDENES_SOCIAL = ORDENES.filter((o) => o.id !== 'reacciones');
+const ordenSocial = (v) => { const o = ordenValido(v); return ORDENES_SOCIAL.some((x) => x.id === o) ? o : 'nuevos'; };
+const S = { yo: null, perfil: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0, paleta: null, crudos: [], circulos: [], vistas: leerVistas(), compositor: null, orden: ordenSocial(q.get('o')), abiertas: new Set(), resp: new Map(), foco: null, tag: tagValido(q.get('tag')), social: {}, likesResp: new Map() };
 // #etiqueta elegida (?tag=Liga): el feed muestra solo las publicaciones con ella (buscar_publicaciones). Letras, números y _ (máx. 30).
 function tagValido(t) { const s = String(t ?? '').replace(/^#/, '').trim(); return /^[0-9]*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9_]{0,29}$/.test(s) ? s : ''; }
 
@@ -61,7 +62,7 @@ function pintarHistorias() {
   const crear = S.yo && mio ? `<button type="button" data-hist-nueva class="sx-hist-item" aria-label="Añadir otra historia"><span class="sx-anillo sx-anillo-nuevo"><span class="sx-anillo-in"><i class="fa-solid fa-plus text-galaxy-400 text-xl" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Añadir</span></button>` : '';
   const lista = S.circulos.map(circuloHTML).join('');
   histEl.hidden = !(nueva || crear || lista);
-  histEl.innerHTML = `<div class="sx-hist-fila" role="list" aria-label="Historias de las últimas 24 horas">${nueva}${crear}${lista}</div>`;
+  histEl.innerHTML = `<div class="sx-hist-fila" role="group" aria-label="Historias de las últimas 24 horas">${nueva}${crear}${lista}</div>`;
   pintarLado();
 }
 async function cargarHistorias() {
@@ -87,7 +88,7 @@ function pintarVistas() {
   vistasEl.innerHTML = `<span class="sxr-vistas-pastilla" aria-hidden="true"></span>${VISTAS.map((v) => `<button type="button" data-v="${v.id}" role="tab" aria-selected="${S.vista === v.id}" class="sx-tab ${S.vista === v.id ? 'is-on' : ''}"><i class="fa-solid ${v.icono}" aria-hidden="true"></i>${escapeHTML(v.texto)}</button>`).join('')}`;
   requestAnimationFrame(moverPastilla);   // la pastilla se desliza desde la pestaña anterior hasta la nueva
   $('sx-filtro-wrap').hidden = !vistaInfo(S.vista).filtraJuego;
-  pintarNav();
+  pintarNav(); marcarFiltros();
 }
 /** Pastilla de las pestañas (celular): se coloca bajo la elegida; el CSS la desliza. */
 function moverPastilla() {
@@ -100,7 +101,7 @@ function marcarFiltros() {
   p.hidden = !(S.orden !== 'nuevos' || (S.vista === 'recientes' && S.juego) || feedEl.dataset.modo === 'compacta');
 }
 function pintarFiltro() {
-  filtroEl.innerHTML = [['', 'Todo'], ...SEGMENTOS].map(([id, n]) => `<button type="button" data-j="${id}" aria-pressed="${S.juego === id}" class="sxr-chip">${escapeHTML(n)}</button>`).join('');
+  filtroEl.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" data-j="${id}" aria-pressed="${S.juego === id}" class="sxr-chip">${escapeHTML(n)}</button>`).join('');
   pintarNav(); marcarFiltros();
 }
 const tarjeta = (it) => { const so = S.social[String(it.id)] ?? null;   // fase 2: la publicación original dentro de una compartida, vistas y veces compartida
@@ -108,7 +109,7 @@ const tarjeta = (it) => { const so = S.social[String(it.id)] ?? null;   // fase 
 let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
 function pintar() {
   feedEl.innerHTML = S.items.length ? ordenarFeed(S.items, S.orden).map(tarjeta).join('') + (S.hayMas ? '' : finalHTML())
-    : `<div class="sxr-vacio"><span class="sxr-vacio-ic" aria-hidden="true"><i class="fa-solid fa-fire"></i></span><b>${escapeHTML(textoVacio(S.vista, { juego: S.juego, conSesion: !!S.yo }))}</b><p>Sé quien abre la conversación: una foto de tu último partido, un golazo o una pregunta para la comunidad.</p><button type="button" class="sxr-crear" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Crear publicación</button></div>`;
+    : vacioSocialHTML();
   for (const id of S.abiertas) pintarHilo(id);
   finEl.hidden = !S.hayMas;
   const idPrimero = S.items[0]?.id ?? null; const continuacion = pintados > 0 && idPrimero !== null && idPrimero === primero && S.items.length > pintados;
@@ -116,11 +117,21 @@ function pintar() {
   pintados = S.items.length; primero = idPrimero;
   pintarLado();
 }
-// Final del feed (19-oct-2026, más personalidad): en vez de cortarse en seco, el logo de Phoenix y qué hacer ahora.
+// Botón de acción según la situación: sin sesión → Entrar; «Siguiendo» → Buscar jugadores; si no → Crear publicación (auditoría 19-oct).
+function accionHTML(clase) {
+  if (!S.yo) return `<button type="button" class="${clase}" data-sxr-entrar><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Entrar</button>`;
+  if (S.vista === 'siguiendo' && !S.tag) return `<a class="${clase}" href="${escapeHTML(href('buscar/'))}"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Buscar jugadores</a>`;
+  return `<button type="button" class="${clase}" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Crear publicación</button>`;
+}
+function vacioSocialHTML() {
+  const titulo = S.tag ? `Aún no hay publicaciones con #${S.tag}` : textoVacio(S.vista, { juego: S.juego, conSesion: !!S.yo });
+  const texto = S.vista === 'siguiendo' && S.yo && !S.tag ? 'Sigue a jugadores para ver aquí lo que publican.' : 'Sé quien abre la conversación: una foto de tu último partido, un golazo o una pregunta para la comunidad.';
+  return `<div class="sxr-vacio"><span class="sxr-vacio-ic" aria-hidden="true"><i class="fa-solid fa-fire"></i></span><b>${escapeHTML(titulo)}</b><p>${escapeHTML(texto)}</p>${accionHTML('sxr-crear')}</div>`;
+}
+// Final del feed (19-oct-2026, más personalidad): en vez de cortarse en seco, el logo de Phoenix; el texto depende de lo que se está viendo.
 function finalHTML() {
-  return `<div class="sxr-final"><img src="${escapeHTML(href('logo.webp'))}" alt="" width="44" height="44" loading="lazy" decoding="async"><b>Estás al día 🔥</b>
-    <p>Ya viste todo lo nuevo de la comunidad. Vuelve en un rato o enciende tú la conversación.</p>
-    <div class="sxr-final-acc">${S.yo ? '<button type="button" class="sxr-final-b is-fuego" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Publicar algo</button>' : ''}<button type="button" class="sxr-final-b" data-sxr-recargar><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Recargar</button></div></div>`;
+  const texto = S.tag ? `No hay más publicaciones con #${S.tag}.` : S.vista === 'destacado' ? 'Eso es todo lo destacado de la semana.' : S.vista === 'siguiendo' ? 'Ya viste todo lo nuevo de quienes sigues.' : 'Ya viste todo lo nuevo de la comunidad. Vuelve en un rato o enciende tú la conversación.';
+  return `<div class="sxr-final"><img src="${escapeHTML(href('logo.webp'))}" alt="" width="44" height="44" loading="lazy" decoding="async"><b>Estás al día 🔥</b><p>${escapeHTML(texto)}</p><div class="sxr-final-acc">${accionHTML('sxr-final-b is-fuego')}</div></div>`;
 }
 /** Repinta SOLO una tarjeta (reaccionar no debe reiniciar los videos ni mover el scroll de las demás). */
 function repintar(id) {
@@ -139,7 +150,7 @@ async function pedir(mas) {
 async function cargar({ mas = false } = {}) {
   if (S.cargando) return;
   if (vistaInfo(S.vista).requiereSesion && !S.yo) { S.items = []; S.hayMas = false; pintar(); return; }
-  S.cargando = true; const req = ++S.req;
+  S.cargando = true; const req = ++S.req; feedEl.setAttribute('aria-busy', 'true');
   try {
     const m = await pedir(mas); if (req !== S.req) return;
     let nuevos = m.items ?? [];
@@ -151,16 +162,16 @@ async function cargar({ mas = false } = {}) {
     if (req === S.req) pintar();
   } catch (e) {
     console.error('[social] carga:', e);
-    if (mas) toast('No se pudo cargar más. Intenta de nuevo.', 'error'); else feedEl.innerHTML = vacioHTML('No se pudo cargar el feed. Intenta de nuevo en un momento.', { error: true });
-  } finally { S.cargando = false; }
+    if (mas) toast('No se pudo cargar más. Intenta de nuevo.', 'error'); else feedEl.innerHTML = '<div class="sxr-vacio"><span class="sxr-vacio-ic is-error" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span><b>No se pudo cargar el feed</b><p>Revisa tu conexión e inténtalo de nuevo.</p><button type="button" class="sxr-crear" data-sxr-recargar><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Reintentar</button></div>';
+  } finally { if (req === S.req) { S.cargando = false; feedEl.removeAttribute('aria-busy'); } }   // una carga vieja no apaga «cargando» de la nueva
 }
-function reiniciarFeed() { S.items = []; S.hayMas = false; S.cargando = false; S.paleta = null; S.req += 1; feedEl.innerHTML = cargandoHTML; finEl.hidden = true; cargar(); }
+function reiniciarFeed() { S.items = []; S.hayMas = false; S.cargando = false; S.paleta = null; S.req += 1; S.abiertas.clear(); S.resp.clear(); S.likesResp.clear(); S.foco = null; feedEl.innerHTML = cargandoHTML; finEl.hidden = true; cargar(); }
 
 /* ---------- Eventos ---------- */
 async function reaccionar(id, tipo) {
   if (!S.yo) { toast('Inicia sesión para reaccionar.', 'info'); openAuthModal('login'); return; }
   let final; try { final = await api.reaccionar(id, tipo); } catch (e) { toast(String(e?.message ?? 'No se pudo reaccionar.'), 'error'); return; }   // null = quité mi reacción
-  S.paleta = null; S.items = S.items.map((x) => (Number(x.id) === Number(id) ? aplicarReaccion(x, final) : x)); repintar(id); window.dispatchEvent(new Event('social:actividad'));
+  const antes = S.paleta; S.paleta = null; S.items = S.items.map((x) => (Number(x.id) === Number(id) ? aplicarReaccion(x, final) : x)); repintar(id); if (antes && antes !== Number(id)) repintar(antes); window.dispatchEvent(new Event('social:actividad'));
   if (final) { const b = feedEl.querySelector(`[data-pie="${Number(id)}"] [data-sx="reaccionar"]`); if (b) { salto(b.querySelector('span')); rafaga(b, [final, '✨'], { n: 7 }); } }   // pequeña celebración al reaccionar (no al quitar)
 }
 const baseAbsoluta = () => new URL(href(''), location.href).href;
@@ -204,11 +215,11 @@ histEl.addEventListener('click', (e) => {
 });
 vistasEl.addEventListener('click', (e) => {
   const b = e.target.closest('[data-v]'); if (!b || b.dataset.v === S.vista) return;
-  S.vista = vistaValida(b.dataset.v); pintarVistas(); history.replaceState(null, '', urlActual()); reiniciarFeed();
+  S.vista = vistaValida(b.dataset.v); S.tag = ''; pintarTag(); pintarVistas(); history.replaceState(null, '', urlActual()); reiniciarFeed();
 });
 filtroEl.addEventListener('click', (e) => {
   const b = e.target.closest('[data-j]'); if (!b) return;
-  S.juego = b.dataset.j; pintarFiltro(); history.replaceState(null, '', urlActual()); reiniciarFeed();
+  S.juego = b.dataset.j; S.tag = ''; pintarTag(); pintarFiltro(); history.replaceState(null, '', urlActual()); reiniciarFeed();
 });
 $('sx-mas')?.addEventListener('click', () => cargar({ mas: true }));
 // Scroll infinito: cuando el aviso del final entra en pantalla se pide la siguiente página (el botón «Cargar más» queda como respaldo).
@@ -222,9 +233,9 @@ const icJuegoHTML = (id) => `<span class="sxr-ic sxr-ic-juego${LOGOS_JUEGO[id] ?
 document.addEventListener('error', (e) => { const im = e.target; if (im instanceof HTMLImageElement && im.hasAttribute('data-logo-juego')) { im.parentElement?.classList.remove('con-logo'); im.remove(); } }, true);
 function pintarNav() {
   const tit = document.querySelector('[data-sxr-titulo]');   // en PC el feed se elige a la izquierda; aquí solo se nombra
-  if (tit) tit.innerHTML = `<b>${escapeHTML(vistaInfo(S.vista).texto)}</b>${S.vista === 'recientes' ? ` · ${escapeHTML(S.juego ? nombreJuego(S.juego) ?? 'Todos los juegos' : 'Todos los juegos')}` : ''}`;
-  if (navFeeds) navFeeds.innerHTML = VISTAS.map((v) => `<button type="button" class="sxr-item" data-v="${v.id}" aria-current="${S.vista === v.id ? 'page' : 'false'}"><span class="sxr-ic"><i class="fa-solid ${v.icono}" aria-hidden="true"></i></span><span>${escapeHTML(v.texto)}</span></button>`).join('');
-  if (navJuegos) navJuegos.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" class="sxr-item" data-j="${id}" aria-current="${S.vista === 'recientes' && S.juego === id ? 'true' : 'false'}">${id ? icJuegoHTML(id) : '<span class="sxr-ic sxr-ic-juego"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></span>'}<span>${escapeHTML(n)}</span></button>`).join('');
+  if (tit) tit.innerHTML = S.tag ? `<b>#${escapeHTML(S.tag)}</b> · Etiqueta` : `<b>${escapeHTML(vistaInfo(S.vista).texto)}</b>${S.vista === 'recientes' ? ` · ${escapeHTML(S.juego ? nombreJuego(S.juego) ?? 'Todos los juegos' : 'Todos los juegos')}` : ''}`;
+  if (navFeeds) navFeeds.innerHTML = VISTAS.map((v) => `<button type="button" class="sxr-item" data-v="${v.id}" aria-current="${S.vista === v.id && !S.tag ? 'true' : 'false'}"><span class="sxr-ic"><i class="fa-solid ${v.icono}" aria-hidden="true"></i></span><span>${escapeHTML(v.texto)}</span></button>`).join('');
+  if (navJuegos) navJuegos.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" class="sxr-item" data-j="${id}" aria-current="${S.vista === 'recientes' && !S.tag && S.juego === id ? 'true' : 'false'}">${id ? icJuegoHTML(id) : '<span class="sxr-ic sxr-ic-juego sxr-ic-todos"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></span>'}<span>${escapeHTML(n)}</span></button>`).join('');
 }
 const nombreJuego = (id) => SEGMENTOS.find((s) => s[0] === id)?.[1] ?? null;
 // Saludo (19-oct-2026, más personalidad): según la hora, con tu nombre, una frase Phoenix del día y el pulso de la comunidad.
@@ -233,33 +244,31 @@ function pintarSaludo() {
   const el = document.querySelector('[data-sxr-saludo]'); if (!el) return;
   const h = new Date().getHours(); const [hola, ic] = h >= 5 && h < 12 ? ['Buenos días', '☀️'] : h >= 12 && h < 19 ? ['Buenas tardes', '⚽'] : ['Buenas noches', '🌙'];
   const nombre = S.yo ? String(S.perfil?.nombre_display || S.perfil?.username || '').split(' ')[0] : '';
-  const hoy = new Date().toDateString(); const deHoy = S.items.filter((x) => new Date(x.created_at).toDateString() === hoy);
-  const gente = new Set(deHoy.map((x) => x.autor?.id).filter(Boolean)).size;
+  if (S.vista === 'recientes' && !S.juego && !S.tag && S.items.length) { const hoy = new Date().toDateString(); const de = S.items.filter((x) => new Date(x.created_at).toDateString() === hoy); S.pulso = { n: de.length, gente: new Set(de.map((x) => x.autor?.id).filter(Boolean)).size }; }
+  const deHoy = { length: S.pulso?.n ?? 0 }; const gente = S.pulso?.gente ?? 0;   // el pulso es de toda la comunidad: no cambia al filtrar ni al cambiar de pestaña
   const frase = FRASES_DIA[Math.floor(Date.now() / 864e5) % FRASES_DIA.length];
   const pulso = deHoy.length ? `<span class="sxr-saludo-pulso"><i aria-hidden="true"></i>${deHoy.length} publicaci${deHoy.length === 1 ? 'ón' : 'ones'} hoy · ${gente} jugador${gente === 1 ? '' : 'es'} activo${gente === 1 ? '' : 's'}</span>` : '';
-  el.innerHTML = `<p class="sxr-saludo-hola"><span aria-hidden="true">${ic}</span> ${escapeHTML(hola)}${nombre ? `, <b>${escapeHTML(nombre)}</b>` : ''}</p><p class="sxr-saludo-frase">${escapeHTML(frase)}${S.yo ? '' : ' · Bienvenido a Phoenix Social'}</p>${pulso}`;
+  // En celular la racha va aquí, junto al pulso (en la barra no cabía con las tres pestañas)
+  const racha = S.racha ? `<span class="sxr-saludo-racha" title="${S.racha.hoy ? 'Días seguidos con actividad en Social' : 'Reacciona, responde o publica hoy para no perderla'}">🔥 ${S.racha.n} día${S.racha.n === 1 ? '' : 's'}${S.racha.hoy ? '' : ' · ¡hoy!'}</span>` : '';
+  el.innerHTML = `<p class="sxr-saludo-hola"><span aria-hidden="true">${ic}</span> ${escapeHTML(hola)}${nombre ? `, <b>${escapeHTML(nombre)}</b>` : ''}</p><p class="sxr-saludo-frase">${escapeHTML(frase)}${S.yo ? '' : ' · Bienvenido a Phoenix Social'}</p>${pulso || racha ? `<div class="sxr-saludo-fila">${pulso}${racha}</div>` : ''}`;
   el.hidden = false;
 }
 function pintarLado() {
-  const cifras = document.querySelector('[data-sxr-cifras]'); const activos = document.querySelector('[data-sxr-activos]'); const top = document.querySelector('[data-sxr-top]');
-  if (!cifras) return;
-  const autores = new Set(S.items.map((x) => x.autor?.id).filter(Boolean)).size;
-  cifras.innerHTML = `<div><b>${S.circulos.length}</b><small>historias hoy</small></div><div><b>${autores}</b><small>autores en el feed</small></div>`;
+  // Auditoría 19-oct: se quitaron las cifras de la tarjeta («historias hoy» contaba personas, y «autores» repetía el pulso del saludo)
+  // y «Juegos con más movimiento» (repetía la lista de juegos de la izquierda y con un juego elegido solo mostraba ese).
+  const top = document.querySelector('[data-sxr-top]');
   pintarSaludo();
   pintarTendencias();
-  const porJuego = new Map(); for (const it of S.items) if (nombreJuego(it.juego)) porJuego.set(it.juego, (porJuego.get(it.juego) || 0) + 1);
-  const lista = [...porJuego].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  activos.innerHTML = lista.length ? lista.map(([id, n]) => `<button type="button" class="sxr-fila" data-j="${id}">${icJuegoHTML(id)}<span class="sxr-fila-tx"><b>${escapeHTML(nombreJuego(id))}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'} en el feed</small></span></button>`).join('')
-    : '<p class="sxr-nada">Cuando haya publicaciones con juego, aparecen aquí.</p>';
+  if (!top) return;
   const mejores = [...S.items].filter((x) => totalReacciones(x) > 0).sort((a, b) => totalReacciones(b) - totalReacciones(a)).slice(0, 4);
   top.innerHTML = mejores.length ? mejores.map((it) => { const a = it.autor ?? {}; const txt = String(it.texto ?? '').replace(/\s+/g, ' ').trim();
-    return `<a class="sxr-fila" href="#" data-sxr-ir="${Number(it.id)}"><span class="sxr-fila-av">${avatarHTML(a.avatar_url, a.nombre_display, 28)}</span><span class="sxr-fila-tx"><b>${escapeHTML(txt ? (txt.length > 70 ? txt.slice(0, 70) + '…' : txt) : 'Publicación con foto o video')}</b><small>${escapeHTML(a.nombre_display ?? 'Jugador')} · ${totalReacciones(it)} reacciones</small></span></a>`; }).join('')
+    const n = totalReacciones(it); return `<button type="button" class="sxr-fila" data-sxr-ir="${Number(it.id)}"><span class="sxr-fila-av">${avatarHTML(a.avatar_url, a.nombre_display, 28)}</span><span class="sxr-fila-tx"><b>${escapeHTML(txt ? (txt.length > 70 ? txt.slice(0, 70) + '…' : txt) : 'Publicación con foto o video')}</b><small>${escapeHTML(a.nombre_display || a.username || 'Jugador')} · ${n} reacci${n === 1 ? 'ón' : 'ones'}</small></span></button>`; }).join('')
     : '<p class="sxr-nada">Aún nadie ha reaccionado a lo que hay en el feed.</p>';
 }
 // Clics de las columnas: cambiar de feed, filtrar por juego, ir a una publicación, crear publicación.
 function irAVista(v, juego) {
-  const cambia = v !== S.vista || (juego !== undefined && juego !== S.juego); if (!cambia) return;
-  S.vista = vistaValida(v); if (juego !== undefined) S.juego = juego;
+  const cambia = v !== S.vista || (juego !== undefined && juego !== S.juego) || !!S.tag; if (!cambia) return;
+  S.vista = vistaValida(v); if (juego !== undefined) S.juego = juego; S.tag = ''; pintarTag();
   pintarVistas(); pintarFiltro(); history.replaceState(null, '', urlActual()); reiniciarFeed();
 }
 document.querySelector('.sxr')?.addEventListener('click', (e) => {
@@ -284,10 +293,10 @@ try { aplicarModo(localStorage.getItem(KEY_MODO)); } catch { aplicarModo('tarjet
 /* ---------- Más vida (19-oct-2026): ordenar, respuestas en el feed, nuevas en vivo, a quién seguir, atajos ---------- */
 // Ordenar lo cargado (Nuevos · Más reacciones · Más comentados): no pide nada a la base, solo reordena.
 const ordenesEl = document.querySelector('[data-sxr-ordenes]');
-function pintarOrdenes() { marcarFiltros(); if (ordenesEl) ordenesEl.innerHTML = ORDENES.map((o) => `<button type="button" data-sxr-orden="${o.id}" aria-pressed="${S.orden === o.id}" title="Ordenar: ${escapeHTML(o.texto)}"><i class="fa-solid ${o.icono}" aria-hidden="true"></i><span>${escapeHTML(o.texto)}</span></button>`).join(''); }
+function pintarOrdenes() { marcarFiltros(); if (ordenesEl) ordenesEl.innerHTML = ORDENES_SOCIAL.map((o) => `<button type="button" data-sxr-orden="${o.id}" aria-pressed="${S.orden === o.id}" title="Ordenar: ${escapeHTML(o.texto)}"><i class="fa-solid ${o.icono}" aria-hidden="true"></i><span>${escapeHTML(o.texto)}</span></button>`).join(''); }
 ordenesEl?.addEventListener('click', (e) => {
   const b = e.target.closest('[data-sxr-orden]'); if (!b || b.dataset.sxrOrden === S.orden) return;
-  S.orden = ordenValido(b.dataset.sxrOrden); pintarOrdenes(); history.replaceState(null, '', urlActual()); pintados = 0; pintar();
+  S.orden = ordenSocial(b.dataset.sxrOrden); pintarOrdenes(); history.replaceState(null, '', urlActual()); pintados = 0; pintar();
 });
 
 // Respuestas dentro del feed (como los comentarios de un foro): se abren bajo la publicación, sin ir al perfil.
@@ -344,7 +353,7 @@ feedEl.addEventListener('submit', (e) => { const form = e.target.closest('[data-
 // Publicaciones nuevas en vivo: cada minuto (con la pestaña visible y en «Recientes») se mira si hay algo más nuevo; si lo hay, aparece el aviso.
 const nuevasEl = document.querySelector('[data-sxr-nuevas]');
 async function mirarNuevas() {
-  if (document.visibilityState !== 'visible' || S.vista !== 'recientes' || S.cargando || !S.items.length || !nuevasEl) return;
+  if (document.visibilityState !== 'visible' || S.vista !== 'recientes' || S.tag || S.cargando || !S.items.length || !nuevasEl) return;
   try {
     const m = await api.comunidad(S.juego || null, null, 20);
     const n = contarNuevas(m?.items ?? [], S.items.map((x) => x.id));
@@ -352,7 +361,7 @@ async function mirarNuevas() {
   } catch { /* sin red: se vuelve a mirar en el siguiente minuto */ }
 }
 setInterval(mirarNuevas, 60000);
-nuevasEl?.addEventListener('click', () => { nuevasEl.hidden = true; window.scrollTo({ top: 0, behavior: 'smooth' }); reiniciarFeed(); });
+nuevasEl?.addEventListener('click', () => refrescar());
 
 // «hace 2 min» se mantiene al día sin repintar (los videos no se reinician).
 setInterval(() => { for (const el of document.querySelectorAll('.sxr [data-t]')) { const v = tiempoRelativo(el.dataset.t); if (el.textContent !== v) el.textContent = v; } }, 60000);
@@ -368,7 +377,7 @@ async function cargarSugerencias() {
 }
 seguirEl?.addEventListener('click', async (e) => {
   const s = e.target.closest('[data-seguir]'); const d = e.target.closest('[data-descartar]');
-  if (s && !s.disabled) { s.disabled = true; try { await amigosApi.seguir(s.dataset.seguir); s.textContent = 'Siguiendo'; s.classList.add('is-on'); rafaga(s, ['💜', '✨'], { n: 6 }); } catch (err) { s.disabled = false; toast(String(err?.message ?? 'No se pudo seguir.'), 'error'); } }
+  if (s && !s.disabled) { s.disabled = true; try { await amigosApi.seguir(s.dataset.seguir); s.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> Siguiendo'; s.classList.add('is-on'); rafaga(s, ['💜', '✨'], { n: 6 }); } catch (err) { s.disabled = false; toast(String(err?.message ?? 'No se pudo seguir.'), 'error'); } }
   if (d) { const fila = d.closest('[data-sug]'); fila.classList.add('sxr-sale'); try { await socialApi.descartarSugerencia(d.dataset.descartar); } catch { /* si falla, solo vuelve a salir la próxima vez */ } setTimeout(() => { fila.remove(); if (!seguirEl.children.length) seguirCaja.hidden = true; }, 250); }
 });
 
@@ -376,13 +385,13 @@ seguirEl?.addEventListener('click', async (e) => {
 const posts = () => [...feedEl.querySelectorAll('.sx-post')];
 function enfocar(el) { if (!el) return; posts().forEach((p) => p.classList.toggle('sxr-foco', p === el)); S.foco = Number(el.dataset.pub); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')) return;
+  if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]') || document.querySelector('dialog[open]')) return;
   const k = e.key.toLowerCase(); const lista = posts(); const i = lista.findIndex((p) => Number(p.dataset.pub) === S.foco);
   if (k === 'j') { e.preventDefault(); enfocar(lista[Math.min(lista.length - 1, i + 1)]); }
   else if (k === 'k') { e.preventDefault(); enfocar(lista[Math.max(0, i - 1)]); }
   else if (k === 'r' && S.foco) { e.preventDefault(); feedEl.querySelector(`[data-pie="${S.foco}"] [data-sx="reaccionar"]`)?.click(); }
   else if (k === 'c' && S.foco) { e.preventDefault(); alternarHilo(S.foco); }
-  else if (k === 'n') { e.preventDefault(); document.querySelector('.sxr-der [data-sxr-crear]')?.click(); }
+  else if (k === 'n' && S.yo) { e.preventDefault(); S.compositor?.abrir?.(); }
 });
 
 // RECARGAR (19-oct-2026, Fralex: «un botón de recargar sutil tanto para recargar las publicaciones y también para subir hasta arriba rápidamente»):
@@ -412,7 +421,7 @@ pintarOrdenes();
 const filtrosBtn = document.querySelector('[data-sxr-filtros]'); const popEl = $('sx-pop');
 function abrirFiltros(abrir) { if (!popEl || !filtrosBtn) return; popEl.hidden = !abrir; filtrosBtn.setAttribute('aria-expanded', String(abrir)); }
 filtrosBtn?.addEventListener('click', (e) => { e.stopPropagation(); abrirFiltros(popEl.hidden); });
-document.addEventListener('click', (e) => { if (popEl && !popEl.hidden && !e.target.closest('.sxr-filtros')) abrirFiltros(false); });
+document.addEventListener('click', (e) => { if (popEl && !popEl.hidden && !e.composedPath().some((n) => n === popEl || n === filtrosBtn)) abrirFiltros(false); });   // por el recorrido del clic: elegir un juego repinta los botones y antes el panel se cerraba solo
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && popEl && !popEl.hidden) { abrirFiltros(false); filtrosBtn?.focus(); } });
 window.addEventListener('resize', () => requestAnimationFrame(moverPastilla), { passive: true });
 
@@ -446,9 +455,9 @@ function pintarTendencias() {
 // Gestos: visor de fotos, doble toque = 🔥 (si ya reaccionaste no lo quita: solo celebra) y tirar hacia abajo para recargar.
 montarVisorFotos(feedEl);
 montarDobleToque(feedEl, (id) => { const it = S.items.find((x) => Number(x.id) === id); if (!it?.mia) reaccionar(id, REACCION_RAPIDA); });
-montarTirarParaRecargar(document.querySelector('.sxr-centro') ?? feedEl, async () => { reiniciarFeed(); await cargarHistorias(); });
+montarTirarParaRecargar(document.querySelector('.sxr-centro') ?? feedEl, () => refrescar());
 // Jugadas como los Reels de Instagram (19-oct-2026): el botón de la barra o deslizar hacia la izquierda en cualquier parte del muro
-montarDeslizarA(document.body, { lado: 'izq', url: href('jugadas/'), etiqueta: 'Jugadas' });
+montarDeslizarA(document.querySelector('.sxr-centro') ?? document.body, { lado: 'izq', url: href('jugadas/'), etiqueta: 'Jugadas' });
 document.querySelector('[data-sxr-reels]')?.addEventListener('click', () => marcarDesliza('izq'));
 // Mantener pulsado «Reaccionar» medio segundo abre las reacciones Phoenix (como en Facebook).
 {
@@ -485,7 +494,7 @@ async function pintarRacha() {
   if (!S.yo) { rachaEl.hidden = true; return; }
   let r = null; try { r = await api.rachaSocial(); } catch { r = null; }
   const n = Number(r?.dias) || 0; const antes = Number(rachaEl.dataset.n) || 0;
-  rachaEl.hidden = n < 1; rachaEl.dataset.n = String(n); rachaEl.dataset.hoy = String(!!r?.hoy);
+  rachaEl.hidden = n < 1; rachaEl.dataset.n = String(n); rachaEl.dataset.hoy = String(!!r?.hoy); S.racha = n > 0 ? { n, hoy: !!r?.hoy } : null; pintarSaludo();
   rachaEl.title = r?.hoy ? `${n} día${n === 1 ? '' : 's'} seguidos con actividad en Social` : `Racha de ${n} día${n === 1 ? '' : 's'}: reacciona, responde o publica hoy para no perderla`;
   rachaEl.innerHTML = `<span aria-hidden="true">🔥</span><b>${n}</b><small>${r?.hoy ? 'días' : '¡hoy!'}</small>`;
   if (n > antes && antes > 0) { rachaEl.classList.remove('sxr-racha-sube'); void rachaEl.offsetWidth; rachaEl.classList.add('sxr-racha-sube'); }
@@ -500,6 +509,7 @@ onSession(({ session, profile }) => {
   if (cambio || !S.compositor) {   // solo se monta de nuevo si cambió la persona: un refresco de sesión no debe borrar lo que está escribiendo
     S.compositor?.destruir(); S.compositor = montarCompositor(compEl, { yo: S.yo, perfil: S.perfil, onLogin: () => openAuthModal('login'), onHistoria: () => abrirNuevaHistoria({ uid: S.yo, onListo: cargarHistorias }), onPublicado: () => { if (S.vista !== 'recientes') { S.vista = 'recientes'; pintarVistas(); history.replaceState(null, '', urlActual()); } reiniciarFeed(); rafaga(compEl, ['🔥', '✨', '⚽', '🏆'], { n: 14 }); window.dispatchEvent(new Event('social:actividad')); } });
   }
+  const espacio = document.querySelector('[data-sxr-espacio]'); if (espacio) espacio.hidden = !S.yo;   // «Tu espacio» solo con sesión
   if (!cambio) return;
   cargarSugerencias(); cargarHistorias(); pintarRacha(); if (vistaInfo(S.vista).requiereSesion || S.items.length) reiniciarFeed();
 });

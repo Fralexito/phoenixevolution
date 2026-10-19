@@ -16,7 +16,7 @@ function botonesHTML(it, { yo, puedeOcultar, puedeBorrar }) {
   if (!yo) return '';
   const mia = it.autor?.id === yo;
   // «Retar a duelo» (19-oct-2026): de una publicación al asistente de Duelos con ese rival ya elegido (/duelos/?retar=<id>).
-  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(it.autor?.id ?? ''));
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(it.autor?.id ?? '')) && !String(it.autor?.id).startsWith('00000000-0000-4000-8000-9000');   // los de la demostración no se pueden retar
   return botonGuardarHTML('publicacion', it.id)
     + (!mia && uuid ? `<a href="${escapeHTML(`${href('duelos/')}?retar=${encodeURIComponent(it.autor.id)}`)}" title="Retar a duelo" aria-label="Retar a duelo a ${escapeHTML(it.autor?.nombre_display ?? 'este jugador')}" class="w-8 h-8 rounded-lg text-gray-400 hover:text-galaxy-400 shrink-0 inline-grid place-items-center"><i class="fa-solid fa-bolt"></i></a>` : '')
     + (mia ? '' : `<button type="button" data-reportar="${Number(it.id)}" title="Reportar" aria-label="Reportar publicación" class="w-8 h-8 rounded-lg text-gray-400 hover:text-amber-300 shrink-0"><i class="fa-regular fa-flag"></i></button>`)
