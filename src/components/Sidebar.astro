@@ -22,7 +22,7 @@ const { active } = Astro.props;
     <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil es el menú completo. -->
     <div class="flex flex-col gap-1.5 lg:hidden">
     {FX.pilares ? (<>
-      <a href={base} aria-current={active === 'central' ? 'page' : undefined} class="cuenta-tile !flex-row !justify-start !min-h-0 !py-3 !px-3 !gap-3 !text-[.8rem]"><i class="fa-solid fa-house"></i><span>Central</span></a>
+      <a href={base} aria-current={active === 'central' ? 'page' : undefined} class="cuenta-tile !flex-row !justify-start !min-h-0 !py-3 !px-3 !gap-3 !text-[.8rem]"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
       {PILARES.map((p) => (
         <section class="cuenta-grupo">
           <p class="cuenta-tit"><i class={`fa-solid ${p.icon} mr-1`}></i> {p.label}</p>

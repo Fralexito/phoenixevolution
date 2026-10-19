@@ -2,7 +2,7 @@
 import { FX } from './experimento.js';
 
 export const NAV = [
-  { id: 'central',   label: 'Central',       path: '',           icon: 'fa-house' },
+  { id: 'central',   label: 'Inicio',        path: '',           icon: 'fa-house' },
   // «Social» va en la zona principal, justo después de Central. FX.social = false la quita del menú.
   ...(FX.social ? [{ id: 'social', label: 'Social', path: 'social/', icon: 'fa-earth-americas' }] : []),
   { id: 'liga',      label: 'Liga',          path: 'liga/',      icon: 'fa-crown' },
@@ -10,7 +10,7 @@ export const NAV = [
   { id: 'database',  label: 'Jugadores', path: 'database/',  icon: 'fa-database' },
   { id: 'duelos',    label: 'Duelos',        path: 'duelos/',    icon: 'fa-gamepad' },
   { id: 'creadores', label: 'Creadores',     path: 'creadores/', icon: 'fa-video' },
-  { id: 'mercado',   label: 'Mercado',       path: 'mercado/',   icon: 'fa-handshake' },
+  { id: 'mercado',   label: 'Conectar juego', path: 'mercado/',  icon: 'fa-plug' },
   { id: 'palmares',  label: 'Palmarés',      path: 'palmares/',  icon: 'fa-trophy' },
 ];
 
@@ -138,6 +138,17 @@ const conBloques = (id, label, icon, bloques, extra = {}) => {
   return { id, label, icon, ...extra, bloques: bs, items: bs.flatMap((b) => b.items) };
 };
 const PILARES_REPARTO = [
+  // 19-oct-2026 (Fralex): orden del menú por lo que más importa en la web. Primero MI CLUB (gestionar a los jugadores de tu PES desde la web:
+  // «lo más exclusivo que tengo»), destacado con su propio estilo (`destacado`); luego la red social, jugar en vivo y las competiciones.
+  // «Competiciones» queda organizada igual (le gusta así). Mi club tiene su propio ecosistema (manager.astro) con su navegación interna.
+  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>miclub', 'mercado'] : ['manager', 'miclub', 'mercado'], { lema: 'Tu club, tus fichajes, tu vestuario', destacado: true }),
+  conBloques('comunidad', 'Comunidad', 'fa-people-group', [
+    ['Conversar', ['social', 'chatgeneral', 'noticias']],
+    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda', 'organizadores']],
+  ], { lema: 'La gente y lo que se dice' }),
+  conBloques('jugar', 'Jugar', 'fa-gamepad', [
+    ['Partidos', ['duelos', 'ahora>envivo', 'hosts', 'missalas']],
+  ], { lema: 'Lo que haces tú, ahora' }),
   // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
   // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
   // Ronda 302: el menú muestra solo 3 entradas (cada una abre un GRUPO) y las pestañas de abajo enseñan las páginas de ese grupo.
@@ -150,14 +161,6 @@ const PILARES_REPARTO = [
   ], { lema: 'Ligas, torneos y campeones' }),
   // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
   ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
-  conBloques('jugar', 'Jugar', 'fa-gamepad', [
-    ['Partidos', ['duelos', 'ahora>envivo', 'hosts', 'missalas']],
-  ], { lema: 'Lo que haces tú, ahora' }),
-  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>mercado,miclub'] : ['manager>mercado', 'miclub'], { lema: 'Tu club, tus fichajes, tu vestuario' }),
-  conBloques('comunidad', 'Comunidad', 'fa-people-group', [
-    ['Conversar', ['social', 'chatgeneral', 'noticias']],
-    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda', 'organizadores']],
-  ], { lema: 'La gente y lo que se dice' }),
 ];
 const PILARES_ANTES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),

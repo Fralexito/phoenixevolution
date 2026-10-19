@@ -9,7 +9,8 @@ const p0 = pilarDe(active);
 const grupo = p0?.bloques?.some((b) => b.compacto) ? p0.bloques.find((b) => b.items.some((n) => esDe(n, active))) : null;
 const p = grupo ? { ...p0, label: `${p0.label} · ${grupo.titulo}`, bloques: [grupo], items: grupo.items } : p0;
 ---
-{p && p.items.length > 1 && (
+{/* Mi club (destacado) tiene su propia navegación dentro de su ecosistema (manager.astro): aquí no se repite. */}
+{p && !p0.destacado && p.items.length > 1 && (
   <nav class="pilar-tabs" aria-label={`Secciones de ${p.label}`}>
     <span class="pilar-tabs-tit"><i class={`fa-solid ${p.icon}`}></i> {p.label}</span>
     <div class="pilar-tabs-lista">
