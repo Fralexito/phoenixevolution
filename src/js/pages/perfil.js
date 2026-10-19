@@ -38,6 +38,10 @@ import { textoSello } from '../core/jugadores/reputacion.js';
 import { abrirValoracionesStaff } from '../features/valoraciones/staff.js';
 import { abrirReportar, abrirOcultar, abrirSancionar } from '../features/moderacion/acciones.js';
 import { VIDEO_MAX_MB, VIDEO_MAX_SEG } from '../core/comunidad/videoSubida.js';
+// 19-oct-2026 (Fralex: perfil público «dinámico, visual, premium»): bandera del país, escudo del club, cifras que cuentan y pestaña que se desliza.
+import { banderaSVG } from '../../data/banderas.js';
+import { paisNombre } from '../../data/paises.js';
+import { clubExacto, escudoUrl } from '../core/pes/clubesPes.js';
 
 initMencionAuto();
 const root = document.getElementById('muro-root');
@@ -118,11 +122,14 @@ function candadoMuro(p) {
 function cabecera(p) {
   const { banner, acento, lema, foto } = estiloDe(p);
   const fondo = safeImg(foto) ? `url(&quot;${escapeHTML(safeImg(foto))}&quot;) center/cover no-repeat` : banner.css;
+  const chip = (ico, txt) => `<span class="pfx-chip">${ico}${escapeHTML(txt)}</span>`;
+  const clubCat = p.club_favorito ? clubExacto(p.club_favorito) : null;
   const chips = [
-    p.club_favorito && ['fa-shield-halved', p.club_favorito], p.posicion_preferida && ['fa-location-crosshairs', p.posicion_preferida],
-    p.pais_codigo && ['fa-flag', p.pais_codigo], `${p.partidos_jugados ?? 0}` !== '' && ['fa-gamepad', `${p.partidos_jugados ?? 0} partidos`],
-    p.rango_fairplay && ['fa-handshake', p.rango_fairplay],
-  ].filter(Boolean).map(([i, t]) => `<span class="inline-flex items-center gap-1.5 text-[12px] text-gray-300 bg-black/30 border border-galaxy-border/70 rounded-full px-2.5 py-1"><i class="fa-solid ${i}" style="color:${acento}"></i>${escapeHTML(t)}</span>`).join('');
+    p.pais_codigo && chip(banderaSVG(p.pais_codigo, 'pfx-flag'), paisNombre(p.pais_codigo) || p.pais_codigo),
+    p.club_favorito && chip(clubCat ? `<img src="${escapeHTML(escudoUrl(clubCat))}" alt="" width="18" height="18" loading="lazy">` : `<i class="fa-solid fa-shield-halved" style="color:${acento}"></i>`, p.club_favorito),
+    p.posicion_preferida && chip(`<i class="fa-solid fa-location-crosshairs" style="color:${acento}"></i>`, p.posicion_preferida),
+    p.rango_fairplay && chip(`<i class="fa-solid fa-handshake" style="color:${acento}"></i>`, p.rango_fairplay),
+  ].filter(Boolean).join('');
   const lineas = p.puede_hostear ? lineasHost(catalogoDe(p)) : [];
   const detalleHost = lineas.length ? lineas.map((l) => `<b class="text-white">${escapeHTML(l.juego)}</b>${l.detalle ? ` <span class="text-gray-400">(${escapeHTML(l.detalle)})</span>` : ''}`).join(' · ') : '<b class="text-white">PES 2021</b>';
   const host = p.puede_hostear ? `<p class="text-xs text-gray-300"><i class="fa-solid fa-server mr-1.5" style="color:${acento}"></i>Hostea ${detalleHost} · ${escapeHTML(p.software_host || 'Parsec')}${p.soy_yo && p.host_visible === false ? ' <em class="text-amber-300 not-italic">· oculto para los demás</em>' : ''}</p>` : '';
@@ -133,8 +140,8 @@ function cabecera(p) {
        <button type="button" data-act="panel" data-panel="privacidad" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-shield-halved"></i><span>Privacidad</span></button>`
     : (S.sesion ? `${botonesCartaReto(p)}${botonesSociales(p)}${botonesModeracion(p)}`
       : `${botonesCartaReto(p)}<span class="text-[12px] text-gray-400"><i class="fa-solid fa-circle-info mr-1"></i>Inicia sesión (botón «Entrar», arriba) para escribirle, agregarlo o retarlo.</span>`);
-  return `<section class="rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
-    <div id="pf-banner" class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div>
+  return `<section class="pfx-cab rounded-2xl overflow-hidden border border-galaxy-border bg-galaxy-panel" style="--acento:${acento}">
+    <div id="pf-banner" class="h-36 sm:h-52 relative" style="background:${fondo}"><div class="absolute inset-0 bg-gradient-to-t from-galaxy-panel/80 to-transparent"></div><span class="pfx-luces" aria-hidden="true"><i></i><i></i></span>
       ${p.soy_yo ? `<input type="file" id="bn-file" accept="image/jpeg,image/png,image/webp" hidden><button type="button" data-act="cambiar-banner" aria-label="Cambiar banner" title="Cambiar banner" class="absolute top-2 right-2 z-10 h-9 px-3 rounded-full bg-black/60 hover:bg-black/80 text-white text-[12px] font-bold inline-flex items-center gap-1.5"><i class="fa-solid fa-camera"></i><span class="max-sm:hidden">Cambiar banner</span></button>` : ''}</div>
     <div class="px-4 sm:px-6 pb-5 -mt-10 sm:-mt-12 relative">
       <div class="flex flex-wrap items-end gap-3 sm:gap-4">
@@ -142,24 +149,56 @@ function cabecera(p) {
         <div class="min-w-0 flex-1 pt-10 sm:pt-12">
           <h1 class="font-display font-extrabold text-white uppercase tracking-wider text-xl sm:text-2xl truncate">${escapeHTML(p.nombre_display || 'Jugador')}</h1>
           <p class="text-xs text-gray-400">@${escapeHTML(p.username)} <a id="pf-clan" hidden class="ml-1 font-display font-extrabold text-galaxy-400 hover:underline" title="Clan"></a> <span id="pf-nivel" hidden class="ml-1 text-[12px] font-display font-bold uppercase tracking-wider border border-amber-400/40 text-amber-300 rounded px-1.5 py-0.5"></span> <span id="pf-titulo" hidden class="ml-1 text-[12px] font-display font-bold uppercase tracking-wider"></span> <span id="pf-rep" hidden class="ml-1 text-[12px] font-display font-bold uppercase tracking-wider border rounded px-1.5 py-0.5"></span></p></div>
-        <div class="flex flex-wrap gap-1.5 w-full sm:w-auto sm:pt-12">${acciones}<button type="button" data-act="compartir" data-tipo="" aria-label="Compartir perfil" title="Compartir perfil" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-share-nodes"></i></button></div>
+        <div class="pfx-acciones flex flex-wrap gap-1.5 w-full">${acciones}<button type="button" data-act="compartir" data-tipo="" aria-label="Compartir perfil" title="Compartir perfil" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]"><i class="fa-solid fa-share-nodes"></i></button></div>
       </div>
       ${lema ? `<p class="mt-3 text-sm italic" style="color:${acento}">«${escapeHTML(lema)}»</p>` : ''}
       ${p.bio ? `<p class="mt-2 text-sm text-gray-300 whitespace-pre-line">${escapeHTML(p.bio)}</p>` : ''}
       <div class="mt-3 flex flex-wrap gap-1.5">${chips}</div>
+      ${cifrasHTML(p)}
       <div class="mt-3 space-y-1.5">${host}${stream}</div>
     </div></section>`;
 }
 
+/** Cifras grandes de la cabecera (cuentan desde 0 al aparecer): partidos, victorias, goles y logros.
+ *  La efectividad y el ELO NO van aquí: ya se ven grandes en «Duelos» (sin repetir). */
+function cifrasHTML(p) {
+  const e = S.stats; const jug = e?.jugados ?? p.partidos_jugados ?? 0; const logros = S.logros?.visible ? S.logros.logros?.length ?? 0 : 0;
+  const cifra = (n, txt, suf = '') => `<div class="pfx-cifra"><b data-contar="${Number(n) || 0}" data-sufijo="${suf}">0${suf}</b><span>${txt}</span></div>`;
+  return `<div class="pfx-cifras" aria-label="Cifras del jugador">${cifra(jug, 'Partidos')}${e?.jugados ? cifra(e.victorias, 'Victorias') + cifra(e.gf, 'Goles') : ''}${logros ? cifra(logros, 'Logros') : ''}</div>`;
+}
+/** Hace contar las cifras de 0 a su valor (respeta «menos movimiento»). */
+function animarCifras(raiz = document) {
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.ajMovEfectivo === 'reducido';
+  raiz.querySelectorAll('[data-contar]').forEach((el) => {
+    const fin = Number(el.dataset.contar) || 0; const suf = el.dataset.sufijo ?? '';
+    if (quieto || !fin) { el.textContent = `${fin}${suf}`; return; }
+    const t0 = performance.now(); const dur = 900 + Math.min(600, fin);
+    const paso = (now) => { const k = Math.min(1, (now - t0) / dur); el.textContent = `${Math.round(fin * (1 - (1 - k) ** 3))}${suf}`; if (k < 1) requestAnimationFrame(paso); };
+    requestAnimationFrame(paso);
+  });
+}
+/** La pastilla de las pestañas se desliza hasta la elegida. */
+function moverPestana() {
+  const lista = document.querySelector('.pfx-tabs'); const b = lista?.querySelector('[aria-selected="true"]'); if (!lista || !b) return;
+  lista.style.setProperty('--x', `${b.offsetLeft}px`); lista.style.setProperty('--w', `${b.offsetWidth}px`);
+}
 const opcionesSel = (lista, actual) => lista.map(([v, t]) => `<option value="${v}" ${v === actual ? 'selected' : ''}>${t}</option>`).join('');
 function franjaEstadisticas() {
   const e = S.stats; if (!e || !e.jugados) return '';
-  const caja = (n, t, c = 'text-white') => `<div class="text-center min-w-[3.2rem]"><b class="block font-display text-lg ${c}">${n}</b><span class="text-[12px] uppercase tracking-wider text-gray-500">${t}</span></div>`;
-  return `<section class="glass-panel rounded-2xl px-3 py-2.5 flex items-center gap-3 flex-wrap" aria-label="Estadísticas de duelos">
-    <span class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-400"><i class="fa-solid fa-chart-simple text-galaxy-400"></i> Duelos</span>
-    ${caja(e.jugados, 'Jugados')}${caja(e.victorias, 'Ganados', 'text-ok')}${caja(e.empates, 'Empates')}${caja(e.derrotas, 'Perdidos', 'text-bad')}${caja(`${e.gf}-${e.gc}`, 'Goles')}${e.efectividad != null ? caja(`${e.efectividad}%`, 'Efectividad', 'text-galaxy-400') : ''}
-    ${S.elo ? `<div class="w-full border-t border-galaxy-border/40 pt-1">${rangoBloque(progresoRango(S.elo.elo, S.elo.jugados), S.elo.elo)}<span class="text-[12px] text-gray-500">ELO de amistosos 1v1 (${S.elo.jugados} jugado${S.elo.jugados === 1 ? '' : 's'}).</span></div>` : ''}
-    <span class="w-full text-[12px] text-gray-500">Solo cuentan marcadores confirmados por los dos líderes.</span></section>`;
+  const pct = (n) => Math.round(((Number(n) || 0) * 100) / e.jugados);
+  const ef = e.efectividad != null ? Number(e.efectividad) : null;
+  return `<section class="pfx-stats glass-panel rounded-2xl" aria-label="Estadísticas de duelos">
+    <header class="pfx-stats-cab"><span><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Duelos</span><b>${e.jugados} jugados</b></header>
+    <div class="pfx-stats-cuerpo">
+      ${ef != null ? `<div class="pfx-ef" style="--p:${Math.max(0, Math.min(100, ef))}"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" class="f"/><circle cx="22" cy="22" r="19" class="v"/></svg><b data-contar="${Math.round(ef)}" data-sufijo="%">0%</b><span>Efectividad</span></div>` : ''}
+      <div class="pfx-wdl-caja">
+        <div class="pfx-wdl" role="img" aria-label="${e.victorias} ganados, ${e.empates} empates, ${e.derrotas} perdidos"><i class="g" style="--p:${pct(e.victorias)}%"></i><i class="e" style="--p:${pct(e.empates)}%"></i><i class="d" style="--p:${pct(e.derrotas)}%"></i></div>
+        <div class="pfx-wdl-ley"><span class="g"><b data-contar="${e.victorias}">0</b> ganados</span><span class="e"><b data-contar="${e.empates}">0</b> empates</span><span class="d"><b data-contar="${e.derrotas}">0</b> perdidos</span></div>
+        <p class="pfx-goles"><i class="fa-solid fa-futbol" aria-hidden="true"></i> Goles <b>${e.gf}</b> a favor · <b>${e.gc}</b> en contra</p>
+      </div>
+    </div>
+    ${S.elo ? `<div class="pfx-elo">${rangoBloque(progresoRango(S.elo.elo, S.elo.jugados), S.elo.elo)}<span>ELO de amistosos 1v1 (${S.elo.jugados} jugado${S.elo.jugados === 1 ? '' : 's'}).</span></div>` : ''}
+    <p class="pfx-nota">Solo cuentan marcadores confirmados por los dos líderes.</p></section>`;
 }
 function franjaLogros(p) {
   const l = S.logros; if (!l?.visible || !l.logros.length) return '';
@@ -276,8 +315,8 @@ function barraHistorias(p) {
   const ayuda = p.soy_yo && !archivo.length && !historias.length && !destacadas.length ? '<p class="text-[12px] text-gray-500 mt-1">Las historias duran 24 h. Luego las encuentras en tu archivo para guardarlas como destacadas.</p>' : '';
   return `<section class="glass-panel rounded-2xl p-3" aria-label="Historias y destacadas" style="--acento:${acento}"><div class="flex gap-3 overflow-x-auto pb-1">${mias}${dest}</div>${ayuda}</section>`;
 }
-const pestanas = () => `<div class="flex gap-2" role="tablist" aria-label="Secciones del perfil">${[['pub', 'fa-newspaper', 'Publicaciones'], ['clips', 'fa-clapperboard', `Clips${S.clips.length ? ` · ${S.clips.length}${S.hayMasClips ? '+' : ''}` : ''}`]].map(([id, ic, t]) =>
-  `<button type="button" role="tab" data-act="tab" data-tab="${id}" aria-selected="${S.tab === id}" class="adv-chip !min-h-9 !px-3"><i class="fa-solid ${ic} mr-1.5"></i>${t}</button>`).join('')}</div>`;
+const pestanas = () => `<div class="pfx-tabs" role="tablist" aria-label="Secciones del perfil"><span class="pfx-tabs-pastilla" aria-hidden="true"></span>${[['pub', 'fa-newspaper', 'Publicaciones'], ['clips', 'fa-clapperboard', `Clips${S.clips.length ? ` · ${S.clips.length}${S.hayMasClips ? '+' : ''}` : ''}`]].map(([id, ic, t]) =>
+  `<button type="button" role="tab" data-act="tab" data-tab="${id}" aria-selected="${S.tab === id}" class="pfx-tab"><i class="fa-solid ${ic}" aria-hidden="true"></i>${t}</button>`).join('')}</div>`;
 /** Segmentos (juegos) que este perfil usa en publicaciones o clips. */
 const juegosUsados = () => SEGMENTOS.filter(([id]) => S.juegos.includes(id) || S.clipJuegos.includes(id));
 /** Filtro sutil por juego: solo aparece si el perfil usó al menos un segmento. */
@@ -318,6 +357,7 @@ function pintar() {
     <div class="space-y-3 max-w-2xl mx-auto w-full">${barraHistorias(p)}${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>
       ${conExtras ? `<div id="tab-clips" ${S.tab === 'clips' ? '' : 'hidden'}>${seccionClips(p)}</div>` : ''}</div></div>`;
+  animarCifras(root); requestAnimationFrame(moverPestana);
 }
 const pintarFeed = () => { const f = document.getElementById('mu-feed'); if (f) f.innerHTML = feed(S.p); };
 
@@ -484,7 +524,7 @@ const ACCIONES = {
   'panel-destacada': () => abrirDestacadas({ hist: S.hist, onListo: recargarExtras }),
   'cerrar-panel': () => PANELES.forEach((n) => { const x = document.getElementById(`panel-${n}`); if (x) x.hidden = true; }),
   tab: (el) => { S.tab = el.dataset.tab === 'clips' ? 'clips' : 'pub'; document.getElementById('tab-pub').hidden = S.tab !== 'pub'; document.getElementById('tab-clips').hidden = S.tab !== 'clips';
-    document.querySelectorAll('[data-act=tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === S.tab))); },
+    document.querySelectorAll('[data-act=tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === S.tab))); moverPestana(); },
   'ver-historias': () => verHistorias(normalizarHistorias(S.hist?.historias), '', { vigentes: true }),
   'ver-destacada': (el) => { const d = S.hist?.destacadas.find((x) => x.id === Number(el.dataset.id)); if (d) verHistorias(normalizarHistorias(d.historias), d.titulo); },
   'elegir-video-clip': () => document.getElementById('cl-vfile').click(),

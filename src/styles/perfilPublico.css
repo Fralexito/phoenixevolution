@@ -1,0 +1,70 @@
+/* PERFIL PÚBLICO (19-oct-2026; js/pages/perfil.js). Fralex: «dinámico, visual, premium». Solo lo importa src/pages/perfil.astro.
+   Cabecera tipo estadio (luces), bandera y escudo en los datos, cifras que cuentan, estadísticas de duelos visuales y pestañas que se deslizan. */
+.pfx-cab { --pfx-e: cubic-bezier(.23, 1, .32, 1); position: relative; }
+/* Luces de estadio sobre el banner */
+.pfx-luces { position: absolute; inset: 0; overflow: hidden; pointer-events: none; mix-blend-mode: screen; }
+.pfx-luces i { position: absolute; top: -40%; width: 38%; height: 180%; background: linear-gradient(180deg, color-mix(in srgb, var(--acento, #00e5ff) 45%, transparent), transparent 70%); filter: blur(18px); opacity: .45; transform-origin: top center; }
+.pfx-luces i:first-child { left: 8%; transform: rotate(18deg); }
+.pfx-luces i:last-child { right: 8%; transform: rotate(-18deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .pfx-luces i:first-child { animation: pfx-luz1 9s ease-in-out infinite alternate; }
+  .pfx-luces i:last-child { animation: pfx-luz2 11s ease-in-out infinite alternate; }
+}
+@keyframes pfx-luz1 { to { transform: rotate(8deg); opacity: .6; } }
+@keyframes pfx-luz2 { to { transform: rotate(-8deg); opacity: .6; } }
+@media (max-width: 767.98px) { .pfx-luces i { animation: none !important; filter: blur(12px); opacity: .35; } }
+
+/* Datos con bandera y escudo */
+.pfx-chip { display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .7rem; border-radius: 99px; font-size: 12.5px; color: #d6dbe5; background: rgb(0 0 0 / .32); border: 1px solid rgb(255 255 255 / .1); }
+.pfx-chip img { width: 18px; height: 18px; object-fit: contain; }
+.pfx-flag { flex: none; width: 1.35rem; height: .9rem; border-radius: .2rem; box-shadow: 0 0 0 1px rgb(255 255 255 / .18); }
+
+/* Cifras grandes que cuentan */
+.pfx-cifras { max-width: 38rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(4.4rem, 1fr)); gap: .45rem; margin-top: 1rem; }
+.pfx-cifra { display: grid; justify-items: center; gap: .15rem; padding: .7rem .4rem; border-radius: 1rem; background: linear-gradient(160deg, color-mix(in srgb, var(--acento, #00e5ff) 12%, transparent), rgb(0 0 0 / .25)); border: 1px solid color-mix(in srgb, var(--acento, #00e5ff) 25%, transparent); }
+.pfx-cifra b { font: 900 clamp(1.25rem, 5.5vw, 1.6rem)/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.pfx-cifra span { font: 700 10px var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: #9aa6bd; }
+@media (prefers-reduced-motion: no-preference) {
+  .pfx-cifra { animation: pfx-entra .5s var(--pfx-e) backwards; }
+  .pfx-cifra:nth-child(2) { animation-delay: 70ms; } .pfx-cifra:nth-child(3) { animation-delay: 140ms; } .pfx-cifra:nth-child(4) { animation-delay: 210ms; }
+}
+@keyframes pfx-entra { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+
+/* Estadísticas de duelos visuales */
+.pfx-stats { --pfx-e: cubic-bezier(.23, 1, .32, 1); display: grid; gap: .9rem; padding: 1rem 1.1rem; }
+.pfx-stats-cab { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.pfx-stats-cab span { font: 800 12px var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #c9d1de; }
+.pfx-stats-cab span i { color: var(--color-galaxy-400); }
+.pfx-stats-cab b { font-size: 12.5px; color: #9aa6bd; font-weight: 600; }
+.pfx-stats-cuerpo { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.pfx-ef { position: relative; display: grid; place-items: center; width: 6.75rem; height: 6.75rem; flex: none; background: none; }
+.pfx-ef svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-galaxy-400) 55%, transparent)); }
+.pfx-ef circle { fill: none; stroke-width: 4; } .pfx-ef .f { stroke: rgb(255 255 255 / .08); }
+.pfx-ef .v { stroke: var(--color-galaxy-400); stroke-dasharray: 119.4; stroke-dashoffset: calc(119.4 - 119.4 * var(--p) / 100); stroke-linecap: round; }
+.pfx-ef b { position: relative; margin-top: -.6rem; font: 900 1.45rem var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.pfx-ef span { position: absolute; bottom: 1.55rem; font: 700 8px var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #8e98ad; }
+@media (prefers-reduced-motion: no-preference) { .pfx-ef .v { animation: pfx-anillo 1.2s var(--pfx-e) backwards .2s; } }
+@keyframes pfx-anillo { from { stroke-dashoffset: 119.4; } }
+.pfx-wdl-caja { flex: 1 1 14rem; display: grid; gap: .5rem; min-width: 0; }
+.pfx-wdl { display: flex; height: .8rem; border-radius: 99px; overflow: hidden; background: rgb(255 255 255 / .06); gap: 2px; }
+.pfx-wdl i { width: var(--p); min-width: 0; transform-origin: left; }
+.pfx-wdl .g { background: linear-gradient(90deg, #059669, #34d399); } .pfx-wdl .e { background: #64748b; } .pfx-wdl .d { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+@media (prefers-reduced-motion: no-preference) {
+  .pfx-wdl i { animation: pfx-barra .9s var(--pfx-e) backwards; } .pfx-wdl .e { animation-delay: .15s; } .pfx-wdl .d { animation-delay: .3s; }
+}
+@keyframes pfx-barra { from { transform: scaleX(0); } }
+.pfx-wdl-ley { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: 12.5px; color: #a3acbf; }
+.pfx-wdl-ley b { font-size: 1rem; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+.pfx-wdl-ley .g b { color: #34d399; } .pfx-wdl-ley .d b { color: #fb7185; }
+.pfx-goles { font-size: 12.5px; color: #a3acbf; } .pfx-goles b { color: #fff; } .pfx-goles i { color: #8e98ad; margin-right: .2rem; }
+.pfx-elo { display: grid; gap: .35rem; padding-top: .7rem; border-top: 1px solid rgb(255 255 255 / .07); }
+.pfx-elo > span, .pfx-nota { font-size: 12px; color: #6f7a90; }
+
+/* Pestañas con pastilla que se desliza */
+.pfx-tabs { position: relative; display: inline-flex; gap: .25rem; padding: .3rem; border-radius: 99px; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); }
+.pfx-tabs-pastilla { position: absolute; top: .3rem; left: 0; height: calc(100% - .6rem); width: var(--w, 0); transform: translateX(var(--x, 0)); border-radius: 99px;
+  background: linear-gradient(135deg, var(--color-galaxy-400), color-mix(in srgb, var(--color-galaxy-400) 55%, #7c3aed)); box-shadow: 0 6px 18px -6px var(--color-galaxy-400);
+  transition: transform .35s cubic-bezier(.23, 1, .32, 1), width .35s cubic-bezier(.23, 1, .32, 1); }
+.pfx-tab { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: .45rem; min-height: 2.4rem; padding: 0 1rem; border-radius: 99px; font: 800 12.5px var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #c9d1de; transition: color .25s ease, transform .16s cubic-bezier(.23, 1, .32, 1); }
+.pfx-tab[aria-selected='true'] { color: #04121a; } .pfx-tab:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .pfx-tabs-pastilla { transition: none; } }
