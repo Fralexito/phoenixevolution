@@ -13,7 +13,7 @@ concurrency:
 jobs:
   pruebas:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,3 +26,6 @@ jobs:
         run: npm test
       - name: Compilar la web
         run: npm run build
+      - name: Abrir todas las páginas (prueba de humo)
+        # Abre cada página compilada en Chrome y falla si alguna da error de JavaScript, no encuentra un archivo o queda en blanco.
+        run: npm run test:paginas

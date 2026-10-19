@@ -10,7 +10,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "test:paginas": "node tools/humo/abrir-paginas.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.0",
@@ -39,6 +40,7 @@
     "uplot": "^1.6.32"
   },
   "devDependencies": {
+    "puppeteer-core": "23.11.1",
     "subset-font": "^2.9.0"
   }
 }

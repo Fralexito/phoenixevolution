@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { FX } from '../data/experimento.js';
+// Precarga de la letra del titular de El Fénix (Anton): si llega tarde, el titular cambia de tamaño y la página salta (medido 19-oct-2026).
+import fAnton from '@fontsource/anton/files/anton-latin-400-normal.woff2?url';
 import '@fontsource/anton/400.css';
 import '@fontsource/oswald/500.css';
 import '@fontsource/oswald/700.css';
@@ -10,7 +13,15 @@ import 'gridstack/dist/gridstack.min.css';
 ---
 <Layout title="Noticias" active="noticias">
   <!-- NOTICIAS v2 (ronda 351, FX.noticiasV2): El Fénix arriba + zona seria abajo + lector de página completa. -->
-  <div id="nv-root" hidden class="nv w-full">
+  <!-- 19-oct-2026: la vista sale ya elegida desde el servidor (antes se mostraba con JS después de pintar y la página «saltaba», CLS 0,14).
+       ?clasica=1 (staff) se decide con un guion en línea ANTES de pintar: marca <html data-nv-clasica> y el CSS oculta la nueva. -->
+  <script is:inline>if (/[?&]clasica(=|&|$)/.test(location.search)) document.documentElement.setAttribute('data-nv-clasica', '');</script>
+<style is:global>
+  /* ?clasica=1: la vista nueva no llega a pintarse (el guion en línea marca <html> antes de que se vea). */
+  html[data-nv-clasica] #nv-root { display: none; }
+</style>
+  <link rel="preload" as="font" type="font/woff2" href={fAnton} crossorigin />
+  <div id="nv-root" hidden={!FX.noticiasV2} class="nv w-full">
     <div id="nv-portada">
       <div class="nv-ancho">
         <header class="nv-cab">
@@ -31,7 +42,7 @@ import 'gridstack/dist/gridstack.min.css';
   </div>
 
   <!-- Vista CLÁSICA (antes de la ronda 351): queda guardada. El staff la abre con ?clasica=1 para «Acomodar» y el catálogo de diseños. -->
-  <div id="news-root" hidden class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+  <div id="news-root" hidden={FX.noticiasV2} class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
     <header class="glass-panel px-4 py-3 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
       <div>
         <span class="text-xs font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30 inline-block">Cobertura oficial</span>
@@ -64,9 +75,8 @@ import 'gridstack/dist/gridstack.min.css';
   // Una sola vista por visita: la nueva (por defecto) o la clásica con ?clasica=1. Si la nueva falla al cargar, cae a la clásica.
   const clasica = !FX.noticiasV2 || new URLSearchParams(location.search).has('clasica');
   const mostrar = (id) => { const el = document.getElementById(id); if (el) el.hidden = false; };
-  if (clasica) { mostrar('news-root'); import('../js/pages/noticias.js'); }
+  if (clasica) { document.getElementById('nv-root').hidden = true; mostrar('news-root'); import('../js/pages/noticias.js'); }
   else {
-    mostrar('nv-root');
     import('../js/pages/noticiasV2.js').catch((e) => {
       console.error('[noticias] la vista nueva falló, se muestra la clásica:', e);
       document.getElementById('nv-root').hidden = true; mostrar('news-root'); import('../js/pages/noticias.js');
