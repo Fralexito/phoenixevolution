@@ -60,14 +60,14 @@ function ticker() {
 
 /* ---------- Muro (una publicación nueva cada 75 s; las reacciones suben con el tiempo) ---------- */
 const TEXTOS = [
-  ['¡Qué golazo de chilena en el minuto 89! 🔥 El que me lo empató ya sabe quién es 😎', 'galaxia', 'orgulloso'],
-  ['Busco rival para un amistoso con el parche ConmeGOL, ping bajo desde Lima 🇵🇪', null, 'motivado'],
-  ['Remontada 3–2 con diez jugadores. No me hablen por una semana 💪', 'atardecer', 'emocionado'],
+  ['¡Qué golazo de chilena en el minuto 89! 🔥 El que me lo empató ya sabe quién es 😎 #Golazo', 'galaxia', 'orgulloso'],
+  ['Busco rival para un amistoso con el parche ConmeGOL, ping bajo desde Lima 🇵🇪 #BuscoRival', null, 'motivado'],
+  ['Remontada 3–2 con diez jugadores. No me hablen por una semana 💪 #LigaPhoenix #Golazo', 'atardecer', 'emocionado'],
   ['GG a todos los de la liga de anoche, nivelazo. ¿Revancha el sábado?', null, 'agradecido'],
-  ['Nuevo récord: 12 partidos sin perder en la Liga Phoenix 🏆', 'neon', 'feliz'],
+  ['Nuevo récord: 12 partidos sin perder en la Liga Phoenix 🏆 #LigaPhoenix', 'neon', 'feliz'],
   ['¿Alguien más siente que el Milan de este parche está roto? 😂', null, 'picado'],
-  ['Primera vez de host con Phoenix Link y salió perfecto, cero lag 👏', 'galaxia', 'feliz'],
-  ['Me robaron el Clásico en el 93’. Penal inexistente 😤', null, 'picado'],
+  ['Primera vez de host con Phoenix Link y salió perfecto, cero lag 👏 #PhoenixLink', 'galaxia', 'feliz'],
+  ['Me robaron el Clásico en el 93’. Penal inexistente 😤 #LigaPhoenix', null, 'picado'],
   ['Armé mi once ideal para la temporada: ¿qué le cambiarían?', 'atardecer', 'nervioso'],
 ];
 const REAC = ['🔥', '🤝', '👏', '😂', '❤️'];
@@ -164,6 +164,7 @@ const SIMULADAS = {
   salas_en_vivo: salasEnVivo, radar_salas: radarSalas, ticker_comunidad: ticker,
   muro_comunidad: (a) => muro(a), muro_siguiendo: (a) => muro(a), muro_destacado: (a) => muro(a, 'destacado'),
   historias_recientes: historias, chat_global_listar: chatListar, chat_global_enviar: chatEnviar,
+  buscar_publicaciones: (a) => { const q = String(a.p_q ?? '').toLowerCase(); const r = publicaciones().filter((p) => p.texto.toLowerCase().includes(q)); const d = Number(a.p_desplazamiento) || 0; return { items: r.slice(d, d + (Number(a.p_limite) || 20)).map(sinExtra), hay_mas: false }; },
 };
 const SI_FALTA = { estadisticas_de: estadisticas, elo_de: elo };   // primero la base; si no hay datos visibles, lo simulado
 
@@ -173,6 +174,7 @@ export async function rpcDemo(nombre, args, real) {
   if (nombre === 'muro_extras_de') {
     const r = await real(); return { data: { ...(r.data ?? {}), ...extras(args) }, error: null };
   }
+  if (nombre === 'muro_reaccionar' && Number(args?.p_publicacion) >= ID0) return { data: args?.p_tipo ?? null, error: null };   // reaccionar a algo inventado: se ve marcado, no se guarda
   if (Object.values(args ?? {}).some((v) => Number(v) >= ID0 && Number(v) < ID0 + 1e6)) return { data: null, error: null };   // acción sobre algo inventado
   // Entrar a una sala inventada: se reserva el puesto pero sin enlace (así no se abre Parsec hacia ningún equipo real).
   if ((nombre === 'ver_sala' || nombre === 'aceptar_sala') && String(args?.p_sala ?? '').startsWith('00000000-0000-4000-8000-9000')) return { data: { rol: nombre === 'ver_sala' ? 'espectador' : 'rival', enlace: null }, error: null };

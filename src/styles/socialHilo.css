@@ -287,3 +287,82 @@
 @media (min-width: 768px) { html[data-cab-compacta][data-ticker-oculto] .sxr { --sxr-arriba: 4.125rem; } }
 /* Celular: las tres pestañas caben sin iconos */
 @media (max-width: 479.98px) { .sxr-vistas .sx-tab i { display: none; } .sxr-vistas .sx-tab { padding: 0 .55rem; font-size: 12.5px; } }
+
+/* ───── Red social completa, fase 1 (19-oct-2026; js/pages/social.js + features/social/gestos.js) ───── */
+/* #etiquetas dentro del texto */
+.tx-tag { color: var(--color-galaxy-400); font-weight: 700; text-decoration: none; border-radius: .3rem; padding: 0 .1rem; transition: background-color .2s ease; }
+.tx-tag:hover { background: color-mix(in srgb, var(--color-galaxy-400) 14%, transparent); }
+/* Cabecera del feed de una etiqueta */
+.sxr-tag { display: flex; align-items: center; gap: .75rem; padding: .8rem .9rem; border-radius: 1.1rem; background: linear-gradient(135deg, color-mix(in srgb, var(--color-galaxy-400) 14%, transparent), rgb(168 85 247 / .1)); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 30%, transparent); }
+.sxr-tag[hidden] { display: none; }
+@media (prefers-reduced-motion: no-preference) { .sxr-tag:not([hidden]) { animation: sxr-pop .3s var(--sxr-e); } }
+.sxr-tag-ic { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: .9rem; font: 900 1.4rem var(--font-display); color: #04121a; background: var(--color-galaxy-400); }
+.sxr-tag div { flex: 1; display: grid; min-width: 0; }
+.sxr-tag b { font: 800 1.05rem var(--font-display); color: #fff; overflow: hidden; text-overflow: ellipsis; }
+.sxr-tag small { font-size: 12px; color: #a3acbf; }
+.sxr-tag button { flex: none; display: inline-flex; align-items: center; gap: .35rem; min-height: 2.2rem; padding: 0 .85rem; border-radius: 99px; font-size: 12.5px; font-weight: 700; color: #fff; background: rgb(255 255 255 / .1); }
+.sxr-tag button:hover { background: rgb(255 255 255 / .16); }
+/* Tendencias: cápsulas en el celular, lista numerada en PC */
+.sxr-tend-movil { display: flex; align-items: center; gap: .4rem; overflow-x: auto; scrollbar-width: none; padding: .1rem 0; }
+.sxr-tend-movil[hidden] { display: none; }
+.sxr-tend-movil::-webkit-scrollbar { display: none; }
+.sxr-tend-t { flex: none; display: inline-flex; align-items: center; gap: .35rem; font: 800 .7rem var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #fb923c; }
+.sxr-tend-movil button { flex: none; min-height: 2rem; padding: 0 .8rem; border-radius: 99px; font-size: 12.5px; font-weight: 700; color: #e6eaf2; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); transition: background-color .2s ease, border-color .2s ease, transform .16s var(--sxr-e); }
+.sxr-tend-movil button:hover { border-color: var(--color-galaxy-400); } .sxr-tend-movil button:active { transform: scale(.95); }
+@media (min-width: 1200px) { .sxr-tend-movil { display: none !important; } }
+.sxr-tend-n { flex: none; width: 1.75rem; text-align: center; font: 900 1rem var(--font-display); color: #5c6478; }
+.sxr-tend:first-child .sxr-tend-n { color: #fb923c; }
+.sxr-tend .sxr-fila-tx { flex: 1; }
+.sxr-tend-fuego { color: #fb923c; }
+@media (prefers-reduced-motion: no-preference) { .sxr-tend-fuego { animation: sxr-latido 1.6s ease-in-out infinite; } }
+/* «Retar a duelo» en el menú ⋯ (es un enlace: mismo aspecto que los botones del menú) */
+.sx-post-menu-lista a { width: 100% !important; height: auto !important; min-height: 2.4rem; display: flex !important; align-items: center; gap: .65rem; padding: 0 .7rem; border-radius: .6rem; font-size: 13.5px; }
+.sx-post-menu-lista a::after { content: attr(title); color: #e4e7f0; }
+.sx-post-menu-lista a:hover { background: rgb(255 255 255 / .07); }
+
+/* Reacciones Phoenix: fila grande con nombre (aparecen en cascada) + el resto de emojis debajo */
+.sx-paleta { display: grid; gap: .4rem; grid-template-columns: none; }
+.sx-rx-phx { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .2rem; }
+.sx-rx-phx button { display: grid; justify-items: center; gap: .05rem; height: auto !important; padding: .35rem 0 .3rem; border-radius: .8rem; }
+.sx-rx-phx span { font-size: 1.55rem; line-height: 1; transition: transform .25s var(--sxr-e); }
+.sx-rx-phx small { font-size: 10.5px; font-weight: 700; color: #a3acbf; }
+.sx-rx-phx button:hover span { transform: translateY(-4px) scale(1.25); }
+.sx-rx-phx button[aria-pressed='true'] small { color: #fff; }
+@media (prefers-reduced-motion: no-preference) { .sx-rx-phx button { animation: sx-rx-sube .35s var(--sxr-e) backwards; animation-delay: calc(var(--k, 0) * 35ms); } }
+@keyframes sx-rx-sube { from { opacity: 0; transform: translateY(8px) scale(.8); } }
+.sx-rx-mas { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .15rem; padding-top: .35rem; border-top: 1px solid rgb(255 255 255 / .07); }
+
+/* Visor de fotos a pantalla completa */
+.gx-visor { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0; background: rgb(3 2 10 / .96); color: #fff; overflow: hidden; }
+.gx-visor::backdrop { background: rgb(0 0 0 / .8); }
+.gx-pista { position: absolute; inset: 0; display: grid; place-items: center; padding: 3.5rem .5rem; }
+.gx-foto { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: .6rem; box-shadow: 0 30px 80px rgb(0 0 0 / .7); user-select: none; -webkit-user-drag: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .gx-visor[open] .gx-foto { animation: gx-entra .3s var(--sxr-e, cubic-bezier(.23, 1, .32, 1)); }
+  .gx-pista[data-dir='sig'] .gx-foto { animation: gx-sig .28s cubic-bezier(.23, 1, .32, 1); }
+  .gx-pista[data-dir='ant'] .gx-foto { animation: gx-ant .28s cubic-bezier(.23, 1, .32, 1); }
+}
+@keyframes gx-entra { from { opacity: 0; transform: scale(.94); } }
+@keyframes gx-sig { from { opacity: 0; transform: translateX(30px); } }
+@keyframes gx-ant { from { opacity: 0; transform: translateX(-30px); } }
+.gx-x, .gx-flecha { position: absolute; z-index: 2; display: grid; place-items: center; width: 2.8rem; height: 2.8rem; border-radius: 99px; color: #fff; background: rgb(255 255 255 / .1); backdrop-filter: blur(8px); transition: background-color .2s ease, transform .16s ease; }
+.gx-x:hover, .gx-flecha:hover { background: rgb(255 255 255 / .2); } .gx-x:active, .gx-flecha:active { transform: scale(.92); }
+.gx-x { top: max(.8rem, env(safe-area-inset-top)); right: .8rem; }
+.gx-flecha { top: 50%; margin-top: -1.4rem; } .gx-ant { left: .8rem; } .gx-sig { right: .8rem; }
+.gx-flecha[hidden] { display: none; }
+.gx-cuenta { position: absolute; z-index: 2; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); padding: .3rem .8rem; border-radius: 99px; font-size: 13px; font-weight: 700; background: rgb(255 255 255 / .1); }
+.gx-cuenta:empty { display: none; }
+
+/* Llamarada del doble toque */
+.gx-llama { position: fixed; z-index: 90; pointer-events: none; font-size: 5rem; line-height: 1; transform: translate(-50%, -50%) scale(.2); filter: drop-shadow(0 6px 24px rgb(251 146 60 / .7)); animation: gx-llama .85s cubic-bezier(.23, 1, .32, 1) forwards; }
+@keyframes gx-llama { 30% { transform: translate(-50%, -60%) scale(1.15); opacity: 1; } 60% { transform: translate(-50%, -65%) scale(1); } 100% { transform: translate(-50%, -140%) scale(.7); opacity: 0; } }
+
+/* Aro de «tirar para recargar» */
+.gx-aro { position: fixed; z-index: 30; left: 50%; top: 7rem; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 99px; color: var(--color-galaxy-400); background: #140e2c; border: 1px solid rgb(255 255 255 / .12); box-shadow: 0 10px 26px rgb(0 0 0 / .5);
+  opacity: 0; transform: translate(-50%, -20px) rotate(calc(var(--k, 0) * 270deg)) scale(.6); transition: opacity .2s ease; pointer-events: none; }
+.gx-aro.gx-ve { opacity: 1; transform: translate(-50%, calc(var(--k, 0) * 30px)) rotate(calc(var(--k, 0) * 270deg)) scale(calc(.6 + var(--k, 0) * .4)); }
+.gx-aro[data-listo='true'] { color: #04121a; background: var(--color-galaxy-400); }
+.gx-aro.gx-girando { opacity: 1; transform: translate(-50%, 30px); }
+.gx-aro.gx-girando i { animation: gx-gira .7s linear infinite; }
+@keyframes gx-gira { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .gx-llama, .gx-aro.gx-girando i, .sx-rx-phx button { animation: none !important; } .gx-llama { display: none; } }

@@ -20,10 +20,22 @@ function enlaceURL(u) {
   const url = safeUrl(limpio.replace(/&amp;/g, '&'));
   return url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer nofollow" class="text-galaxy-400 underline break-all">${limpio}</a>${resto}` : u;
 }
-export function textoAHTML(t, { urlPerfil = urlPerfilPorDefecto } = {}) {
-  return escapeHTML(t).replace(/(https:\/\/[^\s<]+)|(^|[^A-Za-z0-9_@])@([A-Za-z0-9_]{1,20})/gi, (m, url, pre, usuario) =>
-    url ? enlaceURL(url) : `${pre}<a href="${escapeHTML(urlPerfil(usuario))}" class="text-galaxy-400 font-bold hover:underline">@${usuario}</a>`,
-  ).replace(/\n/g, '<br>');
+// #etiquetas (19-oct-2026, Fralex: «métele todo lo que tiene una red social»): llevan a Social filtrado por esa etiqueta.
+// Necesitan al menos una letra (#1 no es etiqueta) y no pueden ir pegadas a una letra ni a «&» (así «&#39;», el apóstrofo escapado, no se toca).
+const urlTagPorDefecto = (tag) => `../social/?tag=${encodeURIComponent(tag)}`;
+const RE_TEXTO = /(https:\/\/[^\s<]+)|(^|[^A-Za-z0-9_@])@([A-Za-z0-9_]{1,20})|(^|[^A-Za-z0-9_&#À-ÿ])#([0-9]*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9_]{0,29})/gi;
+export function textoAHTML(t, { urlPerfil = urlPerfilPorDefecto, urlTag = urlTagPorDefecto } = {}) {
+  return escapeHTML(t).replace(RE_TEXTO, (m, url, pre, usuario, preTag, tag) => {
+    if (url) return enlaceURL(url);
+    if (usuario) return `${pre}<a href="${escapeHTML(urlPerfil(usuario))}" class="text-galaxy-400 font-bold hover:underline">@${usuario}</a>`;
+    return `${preTag}<a href="${escapeHTML(urlTag(tag))}" class="tx-tag" data-tag="${escapeHTML(tag)}">#${tag}</a>`;
+  }).replace(/\n/g, '<br>');
+}
+/** Las #etiquetas de un texto (sin «#», sin repetir aunque cambien mayúsculas; se queda la primera forma escrita). Sirve para «Tendencias». */
+export function etiquetasDe(t) {
+  const out = new Map();
+  for (const m of String(t ?? '').matchAll(/(^|[^A-Za-z0-9_&#À-ÿ])#([0-9]*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9_]{0,29})/g)) if (!out.has(m[2].toLowerCase())) out.set(m[2].toLowerCase(), m[2]);
+  return [...out.values()];
 }
 
 /** «hace 5 min», «hace 3 h», «ayer», o la fecha. `now` inyectable para probar. */

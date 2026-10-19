@@ -28,19 +28,23 @@ import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js'
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { initMencionAuto } from '../features/social/mencionAuto.js';
+import { etiquetasDe } from '../core/comunidad/muro.js';
+import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar } from '../features/social/gestos.js';
 import { openAuthModal } from '../features/auth.js';
 
 const $ = (id) => document.getElementById(id);
 const feedEl = $('sx-feed'); const histEl = $('sx-hist'); const vistasEl = $('sx-vistas'); const filtroEl = $('sx-filtro'); const compEl = $('sx-compositor'); const finEl = $('sx-fin');
 const KEY_VISTAS = 'pes-historias-vistas';   // la misma clave que usa /perfil/: «ya vista» se comparte entre las dos páginas
 const q = new URLSearchParams(location.search);
-const S = { yo: null, perfil: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0, paleta: null, crudos: [], circulos: [], vistas: leerVistas(), compositor: null, orden: ordenValido(q.get('o')), abiertas: new Set(), resp: new Map(), foco: null };
+const S = { yo: null, perfil: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0, paleta: null, crudos: [], circulos: [], vistas: leerVistas(), compositor: null, orden: ordenValido(q.get('o')), abiertas: new Set(), resp: new Map(), foco: null, tag: tagValido(q.get('tag')) };
+// #etiqueta elegida (?tag=Liga): el feed muestra solo las publicaciones con ella (buscar_publicaciones). Letras, números y _ (máx. 30).
+function tagValido(t) { const s = String(t ?? '').replace(/^#/, '').trim(); return /^[0-9]*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9_]{0,29}$/.test(s) ? s : ''; }
 
 function leerVistas() { try { const o = JSON.parse(localStorage.getItem(KEY_VISTAS) ?? '{}'); return o && typeof o === 'object' ? o : {}; } catch { return {}; } }
 function guardarVistas(ids) { S.vistas = marcarVistas(S.vistas, ids); try { localStorage.setItem(KEY_VISTAS, JSON.stringify(S.vistas)); } catch { /* sin almacenamiento: solo se pierde el «ya vista» */ } }
 const esqueleto = '<div class="sxr-esq" aria-hidden="true"><span class="sxr-esq-cab"></span><span class="sxr-esq-l"></span><span class="sxr-esq-l sxr-esq-c"></span><span class="sxr-esq-pie"></span></div>';
 const cargandoHTML = `<div role="status" aria-label="Cargando publicaciones">${esqueleto.repeat(3)}</div>`;
-const urlActual = () => { const p = new URLSearchParams(); if (S.vista !== 'recientes') p.set('v', S.vista); if (S.vista === 'recientes' && S.juego) p.set('j', S.juego); if (S.orden !== 'nuevos') p.set('o', S.orden); const t = p.toString(); return `${location.pathname}${t ? `?${t}` : ''}`; };
+const urlActual = () => { const p = new URLSearchParams(); if (S.vista !== 'recientes') p.set('v', S.vista); if (S.vista === 'recientes' && S.juego) p.set('j', S.juego); if (S.orden !== 'nuevos') p.set('o', S.orden); if (S.tag) p.set('tag', S.tag); const t = p.toString(); return `${location.pathname}${t ? `?${t}` : ''}`; };
 
 /* ---------- Historias ---------- */
 function circuloHTML(c, i) {
@@ -118,6 +122,7 @@ function repintar(id) {
   if (pieNuevo && pieViejo) pieViejo.replaceWith(pieNuevo); else el.replaceWith(nuevo);   // solo se cambia el pie: el contenido (video, foto) queda intacto
 }
 async function pedir(mas) {
+  if (S.tag) { const r = await socialApi.buscarPublicaciones(`#${S.tag}`, mas ? S.items.length : 0); return { items: r.items, hay_mas: r.hayMas }; }
   const pag = mas ? paginaSiguiente(S.vista, S.items) : { antes: null, desplazamiento: 0 };
   if (S.vista === 'siguiendo') return api.siguiendo(pag.antes ?? null);
   if (S.vista === 'destacado') return api.destacado(pag.desplazamiento ?? 0);
@@ -197,6 +202,7 @@ function pintarLado() {
   if (!cifras) return;
   const autores = new Set(S.items.map((x) => x.autor?.id).filter(Boolean)).size;
   cifras.innerHTML = `<div><b>${S.circulos.length}</b><small>historias hoy</small></div><div><b>${autores}</b><small>autores en el feed</small></div>`;
+  pintarTendencias();
   const porJuego = new Map(); for (const it of S.items) if (nombreJuego(it.juego)) porJuego.set(it.juego, (porJuego.get(it.juego) || 0) + 1);
   const lista = [...porJuego].sort((a, b) => b[1] - a[1]).slice(0, 5);
   activos.innerHTML = lista.length ? lista.map(([id, n]) => `<button type="button" class="sxr-fila" data-j="${id}"><span class="sxr-ic sxr-ic-juego">${escapeHTML(LETRA[id] ?? '?')}</span><span class="sxr-fila-tx"><b>${escapeHTML(nombreJuego(id))}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'} en el feed</small></span></button>`).join('')
@@ -340,9 +346,50 @@ document.addEventListener('click', (e) => { if (popEl && !popEl.hidden && !e.tar
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && popEl && !popEl.hidden) { abrirFiltros(false); filtrosBtn?.focus(); } });
 window.addEventListener('resize', () => requestAnimationFrame(moverPastilla), { passive: true });
 
+/* ---------- Red social completa, fase 1 (19-oct-2026, Fralex: «métele todo lo que tiene una red social… dopamínica, dinámica, inmersiva») ---------- */
+// #Etiquetas: tocar una abre el feed de esa etiqueta (sin recargar la página); arriba aparece su cabecera con «Quitar».
+const tagEl = document.createElement('div'); tagEl.className = 'sxr-tag'; tagEl.hidden = true; feedEl.before(tagEl);
+function pintarTag() {
+  tagEl.hidden = !S.tag;
+  tagEl.innerHTML = S.tag ? `<span class="sxr-tag-ic" aria-hidden="true">#</span><div><b>#${escapeHTML(S.tag)}</b><small>Publicaciones con esta etiqueta</small></div><button type="button" data-sxr-sin-tag>Quitar <i class="fa-solid fa-xmark" aria-hidden="true"></i></button>` : '';
+}
+function irATag(tag) {
+  S.tag = tagValido(tag); if (S.tag && S.vista !== 'recientes') S.vista = 'recientes';
+  pintarTag(); pintarVistas(); history.replaceState(null, '', urlActual()); window.scrollTo({ top: 0, behavior: 'smooth' }); reiniciarFeed();
+}
+tagEl.addEventListener('click', (e) => { if (e.target.closest('[data-sxr-sin-tag]')) irATag(''); });
+document.querySelector('.sxr')?.addEventListener('click', (e) => {
+  const t = e.target.closest('a.tx-tag, [data-sxr-tag]'); if (!t || e.ctrlKey || e.metaKey) return;
+  e.preventDefault(); e.stopPropagation(); irATag(t.dataset.tag ?? t.dataset.sxrTag);
+}, true);
+// Tendencias: las etiquetas más usadas en lo cargado (columna derecha en PC; fila de cápsulas bajo la barra en el celular).
+const tendMovil = document.createElement('div'); tendMovil.className = 'sxr-tend-movil'; tendMovil.hidden = true; document.querySelector('.sxr-orden')?.after(tendMovil);
+function pintarTendencias() {
+  const cuenta = new Map(); const forma = new Map();   // se cuenta sin mayúsculas, se muestra como la escribió la primera persona
+  for (const it of S.items) for (const t of etiquetasDe(it.texto)) { const k = t.toLowerCase(); if (!forma.has(k)) forma.set(k, t); cuenta.set(k, (cuenta.get(k) || 0) + 1); }
+  const top = [...cuenta].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, n]) => [forma.get(k), n]);
+  const caja = document.querySelector('[data-sxr-tend]'); const lista = document.querySelector('[data-sxr-tend-lista]');
+  if (caja && lista) { caja.hidden = !top.length; lista.innerHTML = top.map(([t, n], i) => `<button type="button" class="sxr-fila sxr-tend" data-sxr-tag="${escapeHTML(t)}"><span class="sxr-tend-n">${i + 1}</span><span class="sxr-fila-tx"><b>#${escapeHTML(t)}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'}</small></span>${i === 0 ? '<i class="fa-solid fa-fire sxr-tend-fuego" aria-hidden="true"></i>' : ''}</button>`).join(''); }
+  tendMovil.hidden = !top.length || !!S.tag;
+  tendMovil.innerHTML = top.length ? `<span class="sxr-tend-t"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Tendencias</span>${top.map(([t]) => `<button type="button" data-sxr-tag="${escapeHTML(t)}">#${escapeHTML(t)}</button>`).join('')}` : '';
+}
+// Gestos: visor de fotos, doble toque = 🔥 (si ya reaccionaste no lo quita: solo celebra) y tirar hacia abajo para recargar.
+montarVisorFotos(feedEl);
+montarDobleToque(feedEl, (id) => { const it = S.items.find((x) => Number(x.id) === id); if (!it?.mia) reaccionar(id, REACCION_RAPIDA); });
+montarTirarParaRecargar(document.querySelector('.sxr-centro') ?? feedEl, async () => { reiniciarFeed(); await cargarHistorias(); });
+// Mantener pulsado «Reaccionar» medio segundo abre las reacciones Phoenix (como en Facebook).
+{
+  let t = 0; let abrio = false;
+  const abrir = (b) => { const id = Number(b.dataset.id); if (S.paleta === id) return; const antes = S.paleta; S.paleta = id; if (antes) repintar(antes); repintar(id); abrio = true; try { navigator.vibrate?.(10); } catch { /* sin vibración */ } };
+  feedEl.addEventListener('pointerdown', (e) => { const b = e.target.closest('[data-sx="reaccionar"]'); if (!b) return; abrio = false; clearTimeout(t); t = setTimeout(() => abrir(b), 450); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => feedEl.addEventListener(ev, () => clearTimeout(t), true));
+  feedEl.addEventListener('click', (e) => { if (abrio && e.target.closest('[data-sx="reaccionar"]')) { e.stopPropagation(); e.preventDefault(); abrio = false; } }, true);
+  feedEl.addEventListener('contextmenu', (e) => { if (e.target.closest('[data-sx="reaccionar"]')) e.preventDefault(); });
+}
+
 /* ---------- Arranque ---------- */
 initMencionAuto();
-pintarVistas(); pintarFiltro(); feedEl.innerHTML = cargandoHTML; cargar(); cargarHistorias();
+pintarVistas(); pintarFiltro(); pintarTag(); feedEl.innerHTML = cargandoHTML; cargar(); cargarHistorias();
 onSession(({ session, profile }) => {
   const id = session?.user?.id ?? null; const cambio = id !== S.yo; S.yo = id; S.perfil = profile ?? getState().profile ?? null;
   if (cambio || !S.compositor) {   // solo se monta de nuevo si cambió la persona: un refresco de sesión no debe borrar lo que está escribiendo
