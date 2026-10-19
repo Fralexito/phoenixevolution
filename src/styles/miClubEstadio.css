@@ -22,7 +22,7 @@
   background: radial-gradient(circle at 78% 50%, transparent 0 5.5rem, var(--mcx-linea) 5.5rem calc(5.5rem + 1px), transparent calc(5.5rem + 1.5px)),
     linear-gradient(90deg, transparent calc(78% - .5px), var(--mcx-linea) calc(78% - .5px) calc(78% + .5px), transparent calc(78% + .5px)),
     radial-gradient(90% 120% at 85% 40%, color-mix(in srgb, var(--club) 26%, transparent), transparent 70%); }
-.mcx .mcg-titulo { background-image: linear-gradient(95deg, #fff 25%, var(--oro2) 55%, var(--oro)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mcx .mcg-titulo { color: #fff; }
 
 /* Con club: el escudo manda (sale la insignia genérica del DT) */
 .mcx[data-con-club='true'] .mcg-insignia { display: none; }
@@ -31,9 +31,8 @@
 .mcx .mcx-escudo { position: relative; padding: .9rem; border-radius: 1.6rem; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--club) 35%, rgb(0 0 0 / .5)), rgb(0 0 0 / .55)); border: 1px solid color-mix(in srgb, var(--club) 55%, transparent); box-shadow: 0 0 0 1px rgb(255 255 255 / .06) inset, 0 18px 40px -12px color-mix(in srgb, var(--club) 70%, transparent); }
 .mcx .mcx-escudo img { width: clamp(4.5rem, 9vw, 6.5rem) !important; height: clamp(4.5rem, 9vw, 6.5rem) !important; filter: drop-shadow(0 8px 16px rgb(0 0 0 / .55)); }
 .mcx .mcx-escudo::before { content: ''; position: absolute; inset: -6px; border-radius: 1.9rem; border: 1px solid color-mix(in srgb, var(--oro) 55%, transparent); opacity: .7; }
-@media (prefers-reduced-motion: no-preference) { .mcx .mcx-escudo img { animation: mcx-escudo .9s cubic-bezier(.34, 1.56, .64, 1) both; } }
+@media (prefers-reduced-motion: no-preference) { .mcx .mcx-escudo img { animation: mcx-escudo .8s cubic-bezier(.16, 1, .3, 1) both; } }
 @keyframes mcx-escudo { from { opacity: 0; transform: scale(.7) rotate(-8deg); } }
-.mcx .mcx-kicker { font: 700 11px var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: var(--oro); }
 .mcx .mg-club-tit { font-size: clamp(1.8rem, 4.2vw, 3rem); }
 .mcx .mg-stat { background: rgb(0 0 0 / .4); border-color: color-mix(in srgb, var(--club) 30%, var(--color-galaxy-border)); }
 .mcx .mg-stat > i { background: color-mix(in srgb, var(--oro) 14%, transparent); color: var(--oro); }
@@ -51,11 +50,12 @@
 .mcx-dock a em { font-style: normal; font-size: 10px; padding: .1rem .35rem; border-radius: .35rem; background: color-mix(in srgb, var(--club) 40%, transparent); color: #fff; letter-spacing: .08em; }
 .mcx-dock a[aria-current='page'] em { background: rgb(0 0 0 / .2); color: #1a1205; }
 .mcx-dock-n { min-width: 1.25rem; height: 1.25rem; display: inline-grid; place-items: center; padding: 0 .3rem; border-radius: 9999px; background: #f43f5e; color: #fff; font: 800 11px var(--font-sans, inherit); }
-.mcx-dock .mcx-dock-ext { margin-left: auto; color: #8ea0b8; border: 1px dashed rgb(255 255 255 / .14); }
-.mcx-dock .mcx-dock-ext:hover { border-color: color-mix(in srgb, var(--club) 60%, transparent); }
-/* Sin club: solo Resumen (que invita a elegir), Vestuario y Conectar juego */
+/* «?»: vuelve a abrir la guía «Cómo funciona Mi club» */
+.mcx-dock-ayuda { flex: none; margin-left: auto; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; border-radius: .85rem; color: #8ea0b8; font-size: 1.1rem; transition: color .2s, background-color .2s; }
+.mcx-dock-ayuda:hover { color: #fff; background: rgb(255 255 255 / .06); }
+/* Sin club: solo Resumen (que invita a elegir) y Vestuario */
 .mcx:not([data-con-club='true']) .mcx-dock [data-mcx-club] { display: none; }
-@media (max-width: 767.98px) { .mcx-dock { top: 6.2rem; } .mcx-dock a { padding: 0 .8rem; font-size: .75rem; } .mcx-dock .mcx-dock-ext span { display: none; } }
+@media (max-width: 767.98px) { .mcx-dock { top: 6.2rem; } .mcx-dock a { padding: 0 .8rem; font-size: .75rem; } }
 
 /* Resumen del club: cuadrícula de tarjetas (bento) */
 .mcx-bento { display: grid; gap: .9rem; grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -70,7 +70,7 @@ a.mcx-b:hover, .mcx-b:hover { transform: translateY(-3px); border-color: color-m
 .mcx-b-t i { color: var(--oro); }
 .mcx-b-grande { font: 800 clamp(1.7rem, 3.4vw, 2.5rem)/1.05 var(--font-display); color: #fff; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
 .mcx-b-grande small { font-size: .5em; color: #8e98ad; margin-left: .15rem; }
-.mcx-b-presu .mcx-b-grande { font-size: clamp(2.2rem, 5vw, 3.4rem); background: linear-gradient(95deg, #fff 30%, var(--oro2) 65%, var(--oro)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mcx-b-presu .mcx-b-grande { font-size: clamp(2.2rem, 5vw, 3.4rem); color: var(--oro2); }
 .mcx-b-sub { font-size: 13px; line-height: 1.5; color: #b3bccd; }
 .mcx-b-sub b { color: #fff; }
 .mcx-b-ir { margin-top: auto; padding-top: .5rem; font: 700 12px var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--oro); }
@@ -108,10 +108,57 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 
 /* Con club, la entrada es del club: sin el texto genérico y con el título más contenido. */
 .mcx[data-con-club='true'] .mcg-sub { display: none; }
-.mcx[data-con-club='true'] .mcg-titulo { font-size: clamp(1.6rem, 3.4vw, 2.4rem); }
+/* Con club, el nombre del club ES el título: «Mi club» queda solo para lectores de pantalla. */
+.mcx[data-con-club='true'] .mcg-titulo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 1400px) { .mcx-dock a { padding: 0 .75rem; } }
 
 /* Celular (19-oct-2026, Fralex: «siento más lento en mi celular»): las luces quietas y con menos desenfoque; animar un desenfoque grande cuesta mucho en celulares modestos. */
 @media (max-width: 767.98px) { .mcx-luces i { animation: none !important; filter: blur(14px); opacity: .4; } }
 /* Las etiquetas de arriba (beta, ventana, Phoenix Sync) en UNA fila que se desliza: su texto llega después y antes hacía crecer la portada (salto). */
 @media (max-width: 767.98px) { .mcx .mcg-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(90deg, #000 85%, transparent); } .mcx .mcg-chips::-webkit-scrollbar { display: none; } .mcx .mcg-chips > * { flex: none; } }
+
+/* ── Reorganización (19-oct-2026, Fralex: «hay secciones que no me cuadran y no entiendo cómo se usa») ── */
+/* En Resumen las cifras de la entrada sobran: el Resumen ya las muestra en grande. */
+.mcx[data-seccion='resumen'] .mg-stats { display: none; }
+
+/* Guía «Cómo funciona Mi club»: sin club sale siempre; con club, solo en Resumen y hasta pulsar «Entendido». */
+.mcx-guia { margin-top: 1rem; padding: 1.15rem 1.25rem; border-radius: 1.2rem; background: rgb(0 0 0 / .32); border: 1px solid color-mix(in srgb, var(--oro) 30%, transparent); }
+.mcx[data-guia='oculta'] .mcx-guia, .mcx[data-con-club='true']:not([data-seccion='resumen']) .mcx-guia { display: none; }
+.mcx-guia-cab { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .9rem; }
+.mcx-guia-cab h2 { font: 800 1.05rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; }
+.mcx-guia-ok { flex: none; min-height: 2.4rem; padding: 0 1rem; border-radius: 9999px; font: 700 .78rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fde68a; border: 1px solid rgb(251 191 36 / .35); transition: background-color .15s; }
+.mcx-guia-ok:hover { background: rgb(251 191 36 / .14); }
+.mcx-guia-pasos { display: grid; gap: .75rem; grid-template-columns: repeat(3, minmax(0, 1fr)); counter-reset: paso; }
+.mcx-guia-pasos li { counter-increment: paso; display: grid; align-content: start; gap: .3rem; padding-top: .7rem; border-top: 2px solid color-mix(in srgb, var(--oro) 45%, transparent); }
+.mcx-guia-pasos li b { font: 700 .92rem var(--font-display); color: #fde68a; }
+.mcx-guia-pasos li b::before { content: counter(paso) '. '; color: var(--oro); }
+.mcx-guia-pasos li p { font-size: 13.5px; line-height: 1.55; color: #c3cad8; }
+.mcx-guia-link { justify-self: start; margin-top: .2rem; font: 700 .78rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fde68a; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) { .mcx-guia-pasos { grid-template-columns: minmax(0, 1fr); } }
+
+/* Fichajes: sala → tus ofertas → lista completa plegada */
+.mcx-fichajes { display: grid; gap: 1.25rem; }
+.mcx-h { font: 800 1rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; margin-bottom: .6rem; }
+.mcx-ofertas-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 767.98px) { .mcx-ofertas-grid { grid-template-columns: minmax(0, 1fr); } }
+.mcx-lista { border-radius: 1.1rem; border: 1px solid var(--mcx-linea); background: rgb(255 255 255 / .025); }
+.mcx-lista > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .8rem; padding: 1rem 1.15rem; min-height: 3.5rem; }
+.mcx-lista > summary::-webkit-details-marker { display: none; }
+.mcx-lista > summary::after { content: '+'; margin-left: auto; font: 700 1.3rem/1 var(--font-display); color: var(--oro); }
+.mcx-lista[open] > summary::after { content: '−'; }
+.mcx-lista > summary > i { color: var(--oro); }
+.mcx-lista > summary span { display: grid; gap: .1rem; }
+.mcx-lista > summary b { font: 700 .92rem var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #fff; }
+.mcx-lista > summary small { font-size: 12.5px; color: #9aa6bd; }
+.mcx-lista-cuerpo { padding: 0 1.15rem 1.15rem; display: grid; gap: 1rem; }
+
+/* «Dejar mi club», discreto al pie del Resumen */
+.mcx-pie { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
+.mcx-pie[hidden] { display: none; }
+.mcx-dejar { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.5rem; padding: 0 .9rem; border-radius: .7rem; font-size: 13px; color: #fda4af; transition: background-color .15s; }
+.mcx-dejar:hover { background: rgb(244 63 94 / .12); }
+
+/* Vestuario del juego: qué es, antes de editar nada */
+.mcx-vest-intro { padding: 1rem 1.15rem; border-radius: 1.1rem; background: rgb(0 0 0 / .3); border: 1px solid color-mix(in srgb, var(--club) 40%, var(--mcx-linea)); }
+.mcx-vest-intro h2 { font: 800 1.05rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; }
+.mcx-vest-intro p { margin-top: .3rem; font-size: 13.5px; line-height: 1.55; color: #c3cad8; max-width: 75ch; }

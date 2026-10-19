@@ -1,8 +1,9 @@
 // MI CLUB · «EL ESTADIO» (19-oct-2026). Fralex: «Mi club es lo más exclusivo que tengo… merece todo un ecosistema diferente… que se disfrute entrar».
 // Lo que hace (solo presentación; la lógica sigue en manager.js y clubUnificado.js):
 //   · la barra propia de Mi club marca la sección activa según la dirección (#resumen, #vestuario, #plantilla…);
-//   · las pestañas que necesitan club (Plantilla, Fichajes, Oficina, Movimientos) solo salen si ya diriges uno;
-//   · número de ofertas recibidas pendientes en «Oficina»;
+//   · las pestañas que necesitan club (Plantilla, Fichajes, Diario) solo salen si ya diriges uno;
+//   · número de ofertas recibidas pendientes en «Fichajes» (#oficina, de enlaces viejos, abre Fichajes);
+//   · la guía «Cómo funciona Mi club» y su botón «?»;
 //   · el estadio se tiñe con el color del escudo de tu club (se calcula del propio escudo, sin datos nuevos);
 //   · la tarjeta «Tu PES» del Resumen sigue en vivo el estado de Phoenix Sync.
 const raiz = document.querySelector('[data-mcx]');
@@ -10,7 +11,8 @@ const dock = document.querySelector('[data-mcx-dock]');
 
 if (raiz && dock) {
   const enlaces = [...dock.querySelectorAll('[data-mcx]')];
-  const activo = () => { const h = location.hash.slice(1); return enlaces.some((a) => a.dataset.mcx === h) ? h : 'resumen'; };
+  const ALIAS = { oficina: 'mercado' };   // las ofertas viven dentro de Fichajes
+  const activo = () => { const h = ALIAS[location.hash.slice(1)] ?? location.hash.slice(1); return enlaces.some((a) => a.dataset.mcx === h) ? h : 'resumen'; };
   const marcar = () => {
     const id = activo();
     for (const a of enlaces) { if (a.dataset.mcx === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }
@@ -29,6 +31,18 @@ if (raiz && dock) {
     if (!conClub && enlaces.some((a) => a.hasAttribute('data-mcx-club') && a.dataset.mcx === activo())) history.replaceState(null, '', '#resumen');
     marcar();
     teñir();
+  });
+
+  // Guía «Cómo funciona Mi club»: «Entendido» la oculta (se recuerda en este navegador); el «?» de la barra la vuelve a abrir.
+  const KEY_GUIA = 'pes-mcx-guia';
+  try { if (localStorage.getItem(KEY_GUIA) === 'oculta') raiz.dataset.guia = 'oculta'; } catch { /* sin almacenamiento: se ve */ }
+  raiz.addEventListener('click', (e) => {
+    if (e.target.closest('[data-mcx-guia-cerrar]')) { raiz.dataset.guia = 'oculta'; try { localStorage.setItem(KEY_GUIA, 'oculta'); } catch { /* no se recuerda */ } }
+    if (e.target.closest('[data-mcx-guia-abrir]')) {
+      delete raiz.dataset.guia; try { localStorage.removeItem(KEY_GUIA); } catch { /* nada */ }
+      if (raiz.dataset.conClub === 'true' && activo() !== 'resumen') location.hash = '#resumen';
+      requestAnimationFrame(() => document.querySelector('[data-mcx-guia]')?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+    }
   });
 
   // Ofertas recibidas pendientes (las cuenta el Resumen).

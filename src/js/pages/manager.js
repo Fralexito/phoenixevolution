@@ -72,7 +72,7 @@ function pintarCabecera() {
   const local = escudoLocal(club);   // 19-oct-2026: el escudo del catálogo (alta calidad y mismo origen: el estadio toma su color)
   $('mg-club').innerHTML = `<div class="mg-club mcx-club">
       <div class="mg-escudo mcx-escudo">${local ? `<img src="${esc(local)}" alt="" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" data-mcx-escudo>` : escudo(club, 'w-16 h-16 sm:w-20 sm:h-20')}</div>
-      <div class="min-w-0"><p class="mcx-kicker">Tu club</p><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT${chip ? '' : ` · ${ventana}`}</p></div>
+      <div class="min-w-0"><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT${chip ? '' : ` · ${ventana}`}</p></div>
     </div>
     <div class="mg-stats">
       ${stat('Presupuesto', millones(club.presupuesto), 'fa-wallet')}
@@ -286,7 +286,7 @@ async function pintarResumen() {
     <article class="mcx-b mcx-b-presu"><p class="mcx-b-t"><i class="fa-solid fa-wallet" aria-hidden="true"></i> Presupuesto</p><p class="mcx-b-grande"><span data-mcx-contar>€0</span></p><p class="mcx-b-sub">Valor de tu plantilla: <b>${millones(resumen.valor)}</b></p></article>
     <article class="mcx-b mcx-b-ventana" data-abierta="${abierta}"><p class="mcx-b-t"><i class="fa-solid ${abierta ? 'fa-door-open' : 'fa-lock'}" aria-hidden="true"></i> Ventana de fichajes</p><p class="mcx-b-grande mcx-b-estado">${abierta ? 'Abierta' : 'Cerrada'}</p><p class="mcx-b-sub">${abierta ? 'Ficha a agentes libres y a clubes de la IA, o haz ofertas a otros DT.' : 'Puedes mirar plantillas y preparar a quién fichar.'}</p><button type="button" class="mcx-b-boton" data-mcx-sala><i class="fa-solid fa-handshake" aria-hidden="true"></i> Abrir la sala de fichajes</button></article>
     <a class="mcx-b mcx-b-plantilla" href="#plantilla"><p class="mcx-b-t"><i class="fa-solid fa-people-group" aria-hidden="true"></i> Plantilla</p><p class="mcx-b-grande">${resumen.n}<small>/${max}</small></p><span class="mcx-barra" style="--p:${lleno}%"><i></i></span><p class="mcx-b-sub">Media del XI <b>${resumen.mediaXI ?? '—'}</b></p><span class="mcx-b-ir">Ver plantilla</span></a>
-    <a class="mcx-b mcx-b-ofertas" href="#oficina"><p class="mcx-b-t"><i class="fa-solid fa-inbox" aria-hidden="true"></i> Oficina</p><p class="mcx-b-grande">${recibidas}<small> recibida${recibidas === 1 ? '' : 's'}</small></p><p class="mcx-b-sub">${enviadas} oferta${enviadas === 1 ? '' : 's'} tuya${enviadas === 1 ? '' : 's'} esperando respuesta</p><span class="mcx-b-ir">${recibidas ? 'Responder' : 'Ir a la oficina'}</span></a>
+    <a class="mcx-b mcx-b-ofertas" href="#oficina"><p class="mcx-b-t"><i class="fa-solid fa-inbox" aria-hidden="true"></i> Tus ofertas</p><p class="mcx-b-grande">${recibidas}<small> recibida${recibidas === 1 ? '' : 's'}</small></p><p class="mcx-b-sub">${enviadas} oferta${enviadas === 1 ? '' : 's'} tuya${enviadas === 1 ? '' : 's'} esperando respuesta</p><span class="mcx-b-ir">${recibidas ? 'Responder' : 'Ver mis ofertas'}</span></a>
     <a class="mcx-b mcx-b-juego" data-sync="${esc(sync)}" href="${FX.clubUnificado ? '#vestuario' : href('mercado/')}"><p class="mcx-b-t"><i class="fa-solid fa-plug" aria-hidden="true"></i> Tu PES</p><p class="mcx-b-grande mcx-b-estado"><i class="mcx-punto" aria-hidden="true"></i>${syncTxt[0]}</p><p class="mcx-b-sub">${syncTxt[1]}</p><span class="mcx-b-ir">${FX.clubUnificado ? 'Vestuario del juego' : 'Conectar juego'}</span></a>
     <article class="mcx-b mcx-b-movs"><p class="mcx-b-t"><i class="fa-solid fa-right-left" aria-hidden="true"></i> Últimos movimientos de la liga</p>
       ${ms.length ? `<ol class="mcx-movs">${ms.map((m) => `<li class="${m.a_club === club.id || m.de_club === club.id ? 'es-mio' : ''}"><b>${nj(m.jugador_id)}</b><span>${nomClub(m.de_club)} → ${nomClub(m.a_club)}</span>${m.monto ? `<em>${millones(m.monto)}</em>` : ''}</li>`).join('')}</ol>` : '<p class="mcx-b-sub">Aún no hubo fichajes en esta ventana.</p>'}
@@ -306,9 +306,10 @@ document.addEventListener('click', (e) => { if (e.target.closest('[data-mcx-sala
 function mostrarTab(id) {
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== id; });
-  ({ resumen: pintarResumen, plantilla: pintarPlantilla, mercado: pintarMercado, oficina: pintarOficina, movimientos: pintarMovimientos })[id]?.();
+  ({ resumen: pintarResumen, plantilla: pintarPlantilla, mercado: () => { pintarMercado(); pintarOficina(); }, movimientos: pintarMovimientos })[id]?.();
+  if (location.hash === '#oficina') requestAnimationFrame(() => $('mcx-ofertas')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
 }
-const tabActual = () => (['resumen', 'plantilla', 'mercado', 'oficina', 'movimientos'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'resumen');
+const tabActual = () => { const h = location.hash.slice(1); if (h === 'oficina') return 'mercado'; return ['resumen', 'plantilla', 'mercado', 'movimientos'].includes(h) ? h : 'resumen'; };   // «oficina» ahora vive dentro de Fichajes
 window.addEventListener('hashchange', () => club && mostrarTab(tabActual()));
 
 async function refrescar() {
