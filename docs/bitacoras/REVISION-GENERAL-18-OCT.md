@@ -66,7 +66,7 @@ Medido con Lighthouse móvil (Edge, sin caché) sobre la web publicada en `borra
 | Cambios oficiales | 39 | 67 | JS de arranque |
 | Tienda | 20 | 58 | JS de arranque |
 | Noticias | 11 | 45 | JS de arranque + chat flotante |
-| Inicio | 35 (llegó a 20) | 34–37 | salto arreglado (CLS 0,36 → 0,09); sigue pesando el JS de la portada (TBT ~2,7 s) |
+| Inicio | 35 (llegó a 20) | 40–43 | salto arreglado (CLS 0,36 → 0,09) y sin :has() en html/body (bloqueo 2,7 s → 1,5 s) |
 
 Arreglos (commits 2c58153, 0e78171, 007fe2b):
 - `src/js/boot.js`: lo que no hace falta para VER la página (cinta, en vivo, buscador, efectos, chat flotante…) arranca en `requestIdleCallback`; cada pieza va envuelta para que un error no tumbe las demás.
@@ -76,3 +76,5 @@ Arreglos (commits 2c58153, 0e78171, 007fe2b):
 - Luces de la portada (`escenario.css`) ancladas a la pantalla, no a la altura de la portada.
 
 Siguiente, si se quiere más: el script de `Layout.astro` sigue siendo lo más pesado (~0,5 s de CPU en móvil lento); dividirlo por página es el próximo paso grande.
+
+- Reglas  /  eliminadas (commit 0ccfbc0): hacían recalcular toda la página con cualquier cambio. La prueba  impide volver a escribirlas.
