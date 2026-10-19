@@ -554,3 +554,5 @@ a.sxr-final-b, a.sxr-crear { text-decoration: none; }
 @media (max-width: 479.98px) { .sxr-vistas .sx-tab { min-height: 1.85rem; } }   /* celular: pestañas del mismo alto (2.25rem con su borde) que ↻, Jugadas y filtros */
 .sxr-saludo-fila { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .35rem; }
 .sxr-saludo-fila .sxr-saludo-pulso { margin-top: 0; }
+/* La rueda del mouse sobre las columnas mueve SOLO la columna (19-oct-2026, Fralex: «al pasar por aquí, que se baje con la rueda»); al llegar al final no arrastra la página */
+.sxr-der, .sxr-nav { overscroll-behavior: contain; }

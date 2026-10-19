@@ -5,7 +5,9 @@ import { hayMovimientoReducido } from './ajustes.js';
 export async function initScrollSuave() {
   if (hayMovimientoReducido() || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const { default: Lenis } = await import('lenis');
-  const l = new Lenis({ duration: 0.7, easing: (t) => 1 - Math.pow(1 - t, 3), prevent: (n) => n.closest?.('[data-lenis-prevent], dialog, .modal, [role=dialog], textarea, select') });
+  // allowNestedScroll (19-oct-2026, Fralex: «al pasar por aquí, que se baje con la rueda del mouse»): sobre una zona con su propio scroll
+  // (la columna derecha de Social, listas, paneles) la rueda mueve ESA zona y no toda la página.
+  const l = new Lenis({ duration: 0.7, easing: (t) => 1 - Math.pow(1 - t, 3), allowNestedScroll: true, prevent: (n) => n.closest?.('[data-lenis-prevent], dialog, .modal, [role=dialog], textarea, select') });
   let raf = 0; let quietos = 0;
   const tick = (t) => {
     l.raf(t);

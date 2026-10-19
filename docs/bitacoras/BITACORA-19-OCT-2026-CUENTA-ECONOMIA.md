@@ -92,6 +92,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 17:36 | (ver REGISTRO) | **Beta 1.10.3**: Mi club, cancha de la plantilla sin líneas encima de los jugadores |
 | 17:48 | (ver REGISTRO) | **Beta 1.11.0**: stickers en los comentarios (**migración 137**) |
 | 18:05 | (ver REGISTRO) | **Beta 1.12.0**: interruptor Demo/Real y stickers desde las apps de WhatsApp/Telegram (**migración 138**) |
+| 18:22 | (ver REGISTRO) | **Beta 1.12.1**: la rueda del mouse baja las columnas de Social (y cualquier zona con scroll propio) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 

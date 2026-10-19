@@ -19,7 +19,7 @@ const enlaces = [['perfil/', 'fa-user', 'Mi muro'], ['guardados/', 'fa-bookmark'
   <div class="sxr w-full">
     <h1 class="sr-only">Social</h1>
     <aside class="sxr-izq" aria-label="Navegación de Social">
-      <nav class="sxr-nav">
+      <nav class="sxr-nav" data-lenis-prevent>
         <div data-sxr-feeds></div>
         <details class="sxr-grupo" open><summary>Juegos</summary><div data-sxr-juegos></div></details>
         <details class="sxr-grupo" open data-sxr-espacio hidden><summary>Tu espacio</summary>
@@ -58,7 +58,7 @@ const enlaces = [['perfil/', 'fa-user', 'Mi muro'], ['guardados/', 'fa-bookmark'
       <div id="sx-fin" hidden class="py-3 text-center"><button type="button" id="sx-mas" class="btn btn-ghost !text-xs">Cargar más</button></div>
     </div>
 
-    <aside class="sxr-der" aria-label="Sobre la comunidad">
+    <aside class="sxr-der" aria-label="Sobre la comunidad" data-lenis-prevent>
       <section class="sxr-caja sxr-sobre">
         <div class="sxr-sobre-cab"><span class="sxr-sobre-logo" aria-hidden="true"><img src={`${base}logo.webp`} alt="" width="44" height="44" loading="lazy" decoding="async" /></span><div><h2>Phoenix Social</h2><p>La comunidad de Phoenix Evolution Series</p></div></div>
         <p class="sxr-sobre-tx">Fotos, videos, resultados y debates de los jugadores de la liga. Publica lo tuyo, reacciona y sigue a quien quieras.</p>
