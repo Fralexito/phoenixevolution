@@ -1,4 +1,5 @@
 // Chat flotante · COLUMNA DE CONTACTOS (PC ≥ 1280 px, fija a la derecha) y HOJA DE CHATS (pantallas menores, botón «Chats»).
+// Las dos tienen pestañas «Amigos | General» (19-oct-2026): la segunda es el chat general en pequeño (general.js).
 // Las dos pintan la misma lista: amigos (en línea primero) + grupos. Pulsar un contacto abre su ventanita (o, en /mensajes/,
 // navega a esa conversación de la página completa). Solo pinta: los datos vienen de datos.js.
 import { escapeHTML } from '../../core/sistema/dom.js';
@@ -9,6 +10,29 @@ import { norm } from '../../core/jugadores/search.js';
 import { ordenarContactos, insignia } from '../../core/comunidad/chatFlotante.js';
 import { tituloConv, totalNoLeidos } from '../../core/comunidad/chat.js';
 import { S, alCambiar, abrirConUsuario, abrirConv, noLeidosPor, nombre } from './datos.js';
+import { montarGeneral } from './general.js';
+
+// Pestañas «Amigos | General» (19-oct-2026, Fralex: «que sea el chat general y el chat con amigos a la vez, con un botoncito para cambiar»).
+// La misma pareja en la columna (PC) y en la hoja «Chats» (celular); se recuerda la última elegida. En /chat-general/ no se repite el general.
+const CLAVE_PESTANA = 'pes-cf-pestana';
+const EN_CHAT_GENERAL = typeof location !== 'undefined' && /\/chat-general\/?$/.test(location.pathname);
+const leerPestana = () => { if (EN_CHAT_GENERAL) return 'amigos'; try { return localStorage.getItem(CLAVE_PESTANA) === 'general' ? 'general' : 'amigos'; } catch { return 'amigos'; } };
+const pestanasHTML = () => (EN_CHAT_GENERAL ? '' : `<div class="cf-tabs" role="tablist" aria-label="Qué chat ver"><span class="cf-tabs-pastilla" aria-hidden="true"></span>
+      <button type="button" role="tab" data-cf-tab="amigos" aria-selected="true"><i class="fa-solid fa-user-group" aria-hidden="true"></i>Amigos</button>
+      <button type="button" role="tab" data-cf-tab="general" aria-selected="false"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i>General</button></div>`);
+/** Conecta las pestañas de `raiz`: cambia el título, muestra un panel u otro y enciende el chat general solo cuando se ve. → elegir(p) */
+function conPestanas(raiz, titulos) {
+  const tit = raiz.querySelector('.cf-col-tit'); const gen = montarGeneral(raiz.querySelector('.cf-pane-gen'));
+  const elegir = (p, guardar = true) => {
+    raiz.dataset.cfPestana = p; tit.textContent = titulos[p];
+    raiz.querySelectorAll('[data-cf-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.cfTab === p)));
+    gen.activar(p === 'general');
+    if (guardar) { try { localStorage.setItem(CLAVE_PESTANA, p); } catch { /* no se recuerda */ } }
+  };
+  raiz.addEventListener('click', (e) => { const b = e.target.closest('[data-cf-tab]'); if (b && b.dataset.cfTab !== raiz.dataset.cfPestana) elegir(b.dataset.cfTab); });
+  elegir(leerPestana(), false);
+  return { elegir, gen };
+}
 
 const CLAVE_COMPACTO = 'pes-contactos-compacto';
 let filtro = '';
@@ -70,9 +94,11 @@ export function montarColumna({ enPaginaMensajes }) {
   col.innerHTML = `<header class="cf-col-cab"><h2 class="cf-col-tit">Contactos</h2>
       <a class="cf-ico" href="${escapeHTML(href('mensajes/'))}" title="Todos los mensajes" aria-label="Ir a Mensajes"><i class="fa-solid fa-comments"></i></a>
       <button type="button" class="cf-ico" data-cf-plegar aria-pressed="false" title="Plegar / desplegar" aria-label="Plegar o desplegar contactos"><i class="fa-solid fa-angles-right"></i></button></header>
-    <label class="cf-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" maxlength="40" placeholder="Buscar amigo" aria-label="Buscar amigo"></label>
-    <div class="cf-lista" role="list"></div>`;
+    ${pestanasHTML()}
+    <div class="cf-pane-amigos"><label class="cf-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" maxlength="40" placeholder="Buscar amigo" aria-label="Buscar amigo"></label>
+    <div class="cf-lista" role="list"></div></div><div class="cf-pane-gen"></div>`;
   document.body.appendChild(col);
+  conPestanas(col, { amigos: 'Contactos', general: 'Chat general' });
   const lista = col.querySelector('.cf-lista');
   const aplicarCompacto = (v) => { document.documentElement.toggleAttribute('data-cf-compacto', v); col.querySelector('[data-cf-plegar]').setAttribute('aria-pressed', String(v)); };
   aplicarCompacto(leerCompacto());
@@ -80,7 +106,7 @@ export function montarColumna({ enPaginaMensajes }) {
     if (e.target.closest('[data-cf-plegar]')) { const v = !document.documentElement.hasAttribute('data-cf-compacto'); aplicarCompacto(v); guardarCompacto(v); window.dispatchEvent(new Event('resize')); return; }
     alPulsar(e, enPaginaMensajes);
   });
-  col.querySelector('input').addEventListener('input', (e) => { filtro = e.target.value; repintar(lista); });
+  col.querySelector('.cf-buscar input').addEventListener('input', (e) => { filtro = e.target.value; repintar(lista); });
   const pintar = () => { repintar(lista); };
   alCambiar((m) => { if (!m.startsWith('mensajes') && !m.startsWith('nuevo')) pintar(); });
   pintar();
@@ -101,15 +127,21 @@ export function montarHoja({ enPaginaMensajes }) {
   hoja.innerHTML = `<header class="cf-col-cab"><h2 class="cf-col-tit">Chats</h2>
       <a class="cf-ico" href="${escapeHTML(href('mensajes/'))}" title="Todos los mensajes" aria-label="Ir a Mensajes"><i class="fa-solid fa-comments"></i></a>
       <button type="button" class="cf-ico" data-cf-cerrar-hoja aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
-    <label class="cf-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" maxlength="40" placeholder="Buscar amigo" aria-label="Buscar amigo"></label>
-    <div class="cf-lista"></div>`;
+    ${pestanasHTML()}
+    <div class="cf-pane-amigos"><label class="cf-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" maxlength="40" placeholder="Buscar amigo" aria-label="Buscar amigo"></label>
+    <div class="cf-lista"></div></div><div class="cf-pane-gen"></div>`;
   document.body.appendChild(hoja);
   const lista = hoja.querySelector('.cf-lista');
-  const abrirHoja = (v) => { hoja.hidden = !v; boton.setAttribute('aria-expanded', String(v)); if (v) { repintar(lista); hoja.querySelector('input').focus({ preventScroll: true }); } };
+  const { gen } = conPestanas(hoja, { amigos: 'Chats', general: 'Chat general' });
+  const abrirHoja = (v) => {
+    hoja.hidden = !v; boton.setAttribute('aria-expanded', String(v)); if (!v) return;
+    repintar(lista); gen.alMostrar();
+    if (hoja.dataset.cfPestana !== 'general') hoja.querySelector('.cf-buscar input').focus({ preventScroll: true });
+  };
   boton.addEventListener('click', () => abrirHoja(hoja.hidden));
   hoja.addEventListener('click', (e) => { if (e.target.closest('[data-cf-cerrar-hoja]')) { abrirHoja(false); boton.focus(); return; } alPulsar(e, enPaginaMensajes, () => abrirHoja(false)); });
   hoja.addEventListener('keydown', (e) => { if (e.key === 'Escape') { abrirHoja(false); boton.focus(); } });
-  hoja.querySelector('input').addEventListener('input', (e) => { filtro = e.target.value; repintar(lista); });
+  hoja.querySelector('.cf-buscar input').addEventListener('input', (e) => { filtro = e.target.value; repintar(lista); });
   document.addEventListener('pointerdown', (e) => { if (!hoja.hidden && !hoja.contains(e.target) && !boton.contains(e.target)) abrirHoja(false); });
 
   const insig = boton.querySelector('.cf-badge');

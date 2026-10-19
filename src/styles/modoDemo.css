@@ -1,5 +1,5 @@
-/* Píldora del MODO DEMOSTRACIÓN (19-oct-2026; js/features/demo/aviso.js). Abajo a la izquierda (el panel «En vivo» va a la derecha): no tapa pestañas ni títulos. */
-.pxd { position: fixed; z-index: 70; left: 1rem; bottom: calc(env(safe-area-inset-bottom, 0px) + 5.9rem); display: flex; align-items: center; gap: .55rem; max-width: calc(100vw - 2rem);
+/* Píldora del MODO DEMOSTRACIÓN (19-oct-2026; js/features/demo/aviso.js). Abajo a la izquierda (el panel «En vivo» va a la derecha): no tapa pestañas ni títulos. La hoja «Chats» (z 66) queda por encima. */
+.pxd { position: fixed; z-index: 60; left: 1rem; bottom: calc(env(safe-area-inset-bottom, 0px) + 5.9rem); display: flex; align-items: center; gap: .55rem; max-width: calc(100vw - 2rem);
   padding: .3rem .35rem .3rem .8rem; border-radius: 99px; font-size: 12.5px; color: #fde68a; white-space: nowrap;
   background: rgb(36 22 4 / .92); border: 1px solid rgb(251 191 36 / .45); box-shadow: 0 10px 30px -10px rgb(0 0 0 / .8), 0 0 0 4px rgb(251 191 36 / .08);
   backdrop-filter: blur(10px); }
