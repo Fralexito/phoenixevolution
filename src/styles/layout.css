@@ -160,7 +160,7 @@ html { scrollbar-gutter: stable; }
   color: #fff; background: linear-gradient(90deg, #6a1fd1, #0e7490); box-shadow: 0 4px 14px rgb(0 0 0 / .35); }   /* mismo degradado morado→cian, más oscuro: el blanco pasa de 2.4:1 a ≥5.3:1 (19-oct-2026) */
 .fase-beta-cinta b { font-weight: inherit; }
 /* 19-oct-2026: en PC la cápsula de abajo solo dice «Fase beta 1.0» (la larga tapaba el pie); el texto completo queda en el título accesible. */
-@media (min-width: 641px) { .fase-beta-cinta .fbc-largo { display: none; } }
+.fase-beta-cinta .fbc-largo { font-weight: 600; letter-spacing: .06em; opacity: .85; }   /* 19-oct-2026: ahora es la hora de la versión (corta): se ve también en PC */
 /* En celular era una cápsula FIJA encima de la cabecera y tapaba el logo y «Entrar / Registrarse»: ahora es una franja fina arriba del todo, en el flujo de la página (se va al bajar). */
 @media (max-width: 640px) { .fase-beta-cinta { position: static; display: flex; justify-content: center; width: 100%; border-radius: 0; padding: .3rem .75rem; font-size: 10.5px; letter-spacing: .1em; box-shadow: none; } }
 

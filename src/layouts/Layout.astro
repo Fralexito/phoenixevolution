@@ -1,5 +1,8 @@
 ---
 // PLANTILLA ÚNICA. Cabecera, ticker, menú y pie existen SOLO aquí.
+import { VERSION_BETA } from '../data/versionWeb.js';
+// Hora en que se generó esta versión (hora de Lima): sale en la cinta «Fase beta» para saber si ya ves lo último.
+const HORA_BUILD = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).replace('.,', '');
 import '@fontsource/rajdhani/500.css';
 import '@fontsource/rajdhani/600.css';
 import '@fontsource/rajdhani/700.css';
@@ -65,7 +68,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <script is:inline set:html={"try{var h=document.documentElement,a=JSON.parse(localStorage.getItem('pes-ajustes-v1')||'{}'),m=a&&a.movimiento,s=matchMedia('(prefers-reduced-motion: reduce)').matches,l=0;try{var d=JSON.parse(localStorage.getItem('pes-rend-ligero')||'null');l=d&&d.v===1&&Date.now()-d.t<1209600000&&Date.now()>d.t-60000&&m!=='normal'?1:0}catch(e){}for(var k in a){var v=a[k];if(typeof v==='boolean')v=v?'si':'no';if(typeof v==='string'&&v.length<40)h.setAttribute('data-aj-'+k.replace(/[A-Z]/g,function(x){return '-'+x.toLowerCase()}),v)}if(a.barraInferior===false)h.removeAttribute('data-barra-inf');if(a.contactos===false)h.removeAttribute('data-fx-contactos');h.setAttribute('data-aj-mov-efectivo',m==='reducido'||(m!=='normal'&&(s||l))?'reducido':'normal');if(l)h.setAttribute('data-rend-ligero','1')}catch(e){}addEventListener('pagereveal',function(e){if(e.viewTransition&&(document.documentElement.getAttribute('data-aj-mov-efectivo')==='reducido'||document.documentElement.getAttribute('data-aj-transiciones')==='no'))e.viewTransition.skipTransition()});addEventListener('pageswap',function(e){if(e.viewTransition&&(document.documentElement.getAttribute('data-aj-mov-efectivo')==='reducido'||document.documentElement.getAttribute('data-aj-transiciones')==='no'))e.viewTransition.skipTransition()});"} />
   </head>
   <body class="flex flex-col min-h-screen">
-    {import.meta.env.PUBLIC_PREVIEW && <div class="fase-beta-cinta" role="note" aria-label="Fase beta 1.0: versión privada de pruebas"><i class="fa-solid fa-flask"></i> <b>Fase beta 1.0</b><span class="fbc-largo"> · versión privada de pruebas</span></div>}
+    {import.meta.env.PUBLIC_PREVIEW && <div class="fase-beta-cinta" role="note" aria-label={`Fase beta ${VERSION_BETA}: versión privada de pruebas, generada el ${HORA_BUILD}`} title={`Generada el ${HORA_BUILD} (hora de Lima)`}><i class="fa-solid fa-flask"></i> <b>Fase beta {VERSION_BETA}</b><span class="fbc-largo"> · {HORA_BUILD}</span></div>}
     <div class="sticky top-0 z-50 flex flex-col pointer-events-none">
       <Header active={active} />
       <Ticker />
