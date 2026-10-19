@@ -77,4 +77,4 @@ Arreglos (commits 2c58153, 0e78171, 007fe2b):
 
 Siguiente, si se quiere más: el script de `Layout.astro` sigue siendo lo más pesado (~0,5 s de CPU en móvil lento); dividirlo por página es el próximo paso grande.
 
-- Reglas  /  eliminadas (commit 0ccfbc0): hacían recalcular toda la página con cualquier cambio. La prueba  impide volver a escribirlas.
+- Reglas `html:has(…)` / `body:has(…)` eliminadas (commit 0ccfbc0): hacían recalcular toda la página con cualquier cambio. La prueba `tests/cssRendimiento.test.mjs` impide volver a escribirlas.
