@@ -1,0 +1,112 @@
+/* MI CLUB · «EL ESTADIO» (19-oct-2026). Fralex: Mi club es lo más exclusivo de la web y «merece todo un ecosistema diferente».
+   Mundo propio dentro de Phoenix: luces de estadio, líneas de cancha, el escudo de tu club en grande y la página teñida con SU color
+   (--club, lo calcula features/miClub/estadio.js del propio escudo). Dorado = lo exclusivo (igual que «Mi club» en el menú).
+   Lo importa solo src/pages/manager.astro. */
+.mcx { --club: #8b5cf6; --oro: #fbbf24; --oro2: #fde68a; --mcx-linea: rgb(255 255 255 / .09); position: relative; isolation: isolate; }
+
+/* Luces del estadio: dos haces desde arriba, del color del club, que se mecen muy despacio */
+.mcx-luces { position: absolute; inset: -1.5rem -2rem auto; height: 34rem; z-index: -1; pointer-events: none; overflow: hidden; }
+.mcx-luces i { position: absolute; top: -6rem; width: 46%; height: 140%; background: linear-gradient(180deg, color-mix(in srgb, var(--club) 42%, transparent), transparent 70%); filter: blur(26px); opacity: .55; transform-origin: top center; }
+.mcx-luces i:nth-child(1) { left: 2%; transform: rotate(16deg); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+.mcx-luces i:nth-child(2) { right: 2%; transform: rotate(-16deg); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+@media (prefers-reduced-motion: no-preference) {
+  .mcx-luces i:nth-child(1) { animation: mcx-mece 11s ease-in-out infinite alternate; }
+  .mcx-luces i:nth-child(2) { animation: mcx-mece2 13s ease-in-out infinite alternate; }
+}
+@keyframes mcx-mece { to { transform: rotate(9deg); opacity: .4; } }
+@keyframes mcx-mece2 { to { transform: rotate(-9deg); opacity: .42; } }
+
+/* Entrada: la portada de siempre, ahora con líneas de cancha y el color del club */
+.mcx .mcg-hero { border-color: color-mix(in srgb, var(--club) 45%, rgb(255 255 255 / .12)); transition: border-color .6s; }
+.mcx .mcg-hero::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+  background: radial-gradient(circle at 78% 50%, transparent 0 5.5rem, var(--mcx-linea) 5.5rem calc(5.5rem + 1px), transparent calc(5.5rem + 1.5px)),
+    linear-gradient(90deg, transparent calc(78% - .5px), var(--mcx-linea) calc(78% - .5px) calc(78% + .5px), transparent calc(78% + .5px)),
+    radial-gradient(90% 120% at 85% 40%, color-mix(in srgb, var(--club) 26%, transparent), transparent 70%); }
+.mcx .mcg-titulo { background-image: linear-gradient(95deg, #fff 25%, var(--oro2) 55%, var(--oro)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Con club: el escudo manda (sale la insignia genérica del DT) */
+.mcx[data-con-club='true'] .mcg-insignia { display: none; }
+.mcx[data-con-club='true'] .mcg-hero { grid-template-columns: minmax(0, 1fr); }
+.mcx .mcx-club { gap: 1.25rem; }
+.mcx .mcx-escudo { position: relative; padding: .9rem; border-radius: 1.6rem; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--club) 35%, rgb(0 0 0 / .5)), rgb(0 0 0 / .55)); border: 1px solid color-mix(in srgb, var(--club) 55%, transparent); box-shadow: 0 0 0 1px rgb(255 255 255 / .06) inset, 0 18px 40px -12px color-mix(in srgb, var(--club) 70%, transparent); }
+.mcx .mcx-escudo img { width: clamp(4.5rem, 9vw, 6.5rem) !important; height: clamp(4.5rem, 9vw, 6.5rem) !important; filter: drop-shadow(0 8px 16px rgb(0 0 0 / .55)); }
+.mcx .mcx-escudo::before { content: ''; position: absolute; inset: -6px; border-radius: 1.9rem; border: 1px solid color-mix(in srgb, var(--oro) 55%, transparent); opacity: .7; }
+@media (prefers-reduced-motion: no-preference) { .mcx .mcx-escudo img { animation: mcx-escudo .9s cubic-bezier(.34, 1.56, .64, 1) both; } }
+@keyframes mcx-escudo { from { opacity: 0; transform: scale(.7) rotate(-8deg); } }
+.mcx .mcx-kicker { font: 700 11px var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: var(--oro); }
+.mcx .mg-club-tit { font-size: clamp(1.8rem, 4.2vw, 3rem); }
+.mcx .mg-stat { background: rgb(0 0 0 / .4); border-color: color-mix(in srgb, var(--club) 30%, var(--color-galaxy-border)); }
+.mcx .mg-stat > i { background: color-mix(in srgb, var(--oro) 14%, transparent); color: var(--oro); }
+
+/* Las navegaciones viejas siguen en la página (su lógica las usa) pero no se ven: ahora manda la barra de Mi club */
+.mcx .cu-modos, .mcx .mg-tabs { display: none !important; }
+
+/* La barra de Mi club */
+.mcx-dock { position: sticky; top: 7rem; z-index: 30; display: flex; align-items: center; gap: .3rem; padding: .35rem; border-radius: 1.15rem; overflow-x: auto; scrollbar-width: none;
+  background: rgb(10 8 26 / .82); border: 1px solid color-mix(in srgb, var(--club) 30%, rgb(255 255 255 / .1)); box-shadow: 0 14px 34px -14px rgb(0 0 0 / .8); backdrop-filter: blur(14px); }
+.mcx-dock::-webkit-scrollbar { display: none; }
+.mcx-dock a { position: relative; flex: none; display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1rem; border-radius: .85rem; color: #b6bdd0; font: 700 .82rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: color .2s, background-color .2s; }
+.mcx-dock a:hover { color: #fff; background: rgb(255 255 255 / .06); }
+.mcx-dock a[aria-current='page'] { color: #1a1205; background: linear-gradient(135deg, var(--oro2), var(--oro) 55%, #f59e0b); box-shadow: 0 6px 20px -6px rgb(251 191 36 / .7); }
+.mcx-dock a em { font-style: normal; font-size: 10px; padding: .1rem .35rem; border-radius: .35rem; background: color-mix(in srgb, var(--club) 40%, transparent); color: #fff; letter-spacing: .08em; }
+.mcx-dock a[aria-current='page'] em { background: rgb(0 0 0 / .2); color: #1a1205; }
+.mcx-dock-n { min-width: 1.25rem; height: 1.25rem; display: inline-grid; place-items: center; padding: 0 .3rem; border-radius: 9999px; background: #f43f5e; color: #fff; font: 800 11px var(--font-sans, inherit); }
+.mcx-dock .mcx-dock-ext { margin-left: auto; color: #8ea0b8; border: 1px dashed rgb(255 255 255 / .14); }
+.mcx-dock .mcx-dock-ext:hover { border-color: color-mix(in srgb, var(--club) 60%, transparent); }
+/* Sin club: solo Resumen (que invita a elegir), Vestuario y Conectar juego */
+.mcx:not([data-con-club='true']) .mcx-dock [data-mcx-club] { display: none; }
+@media (max-width: 767.98px) { .mcx-dock { top: 6.2rem; } .mcx-dock a { padding: 0 .8rem; font-size: .75rem; } .mcx-dock .mcx-dock-ext span { display: none; } }
+
+/* Resumen del club: cuadrícula de tarjetas (bento) */
+.mcx-bento { display: grid; gap: .9rem; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.mcx-b { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .35rem; padding: 1.15rem 1.2rem; border-radius: 1.2rem; text-align: left;
+  background: linear-gradient(160deg, rgb(255 255 255 / .05), rgb(255 255 255 / .015)); border: 1px solid var(--mcx-linea); transition: transform .25s cubic-bezier(.16, 1, .3, 1), border-color .25s, box-shadow .25s; }
+a.mcx-b:hover, .mcx-b:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--club) 55%, transparent); box-shadow: 0 18px 36px -18px color-mix(in srgb, var(--club) 80%, transparent); }
+.mcx-b::before { content: ''; position: absolute; inset: auto -30% -60% auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--club) 22%, transparent), transparent 70%); pointer-events: none; }
+.mcx-b-presu { grid-column: span 3; } .mcx-b-ventana { grid-column: span 3; }
+.mcx-b-plantilla, .mcx-b-ofertas, .mcx-b-juego { grid-column: span 2; }
+.mcx-b-movs { grid-column: span 6; }
+.mcx-b-t { display: flex; align-items: center; gap: .45rem; font: 700 11px var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: #9aa6bd; }
+.mcx-b-t i { color: var(--oro); }
+.mcx-b-grande { font: 800 clamp(1.7rem, 3.4vw, 2.5rem)/1.05 var(--font-display); color: #fff; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.mcx-b-grande small { font-size: .5em; color: #8e98ad; margin-left: .15rem; }
+.mcx-b-presu .mcx-b-grande { font-size: clamp(2.2rem, 5vw, 3.4rem); background: linear-gradient(95deg, #fff 30%, var(--oro2) 65%, var(--oro)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mcx-b-sub { font-size: 13px; line-height: 1.5; color: #b3bccd; }
+.mcx-b-sub b { color: #fff; }
+.mcx-b-ir { margin-top: auto; padding-top: .5rem; font: 700 12px var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--oro); }
+.mcx-b-ir::after { content: ' →'; transition: margin .2s; }
+a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
+.mcx-barra { display: block; height: .45rem; border-radius: 9999px; background: rgb(255 255 255 / .08); overflow: hidden; margin: .2rem 0; }
+.mcx-barra i { display: block; height: 100%; width: var(--p); border-radius: inherit; background: linear-gradient(90deg, var(--club), var(--oro)); }
+@media (prefers-reduced-motion: no-preference) { .mcx-barra i { animation: mcx-llena 1s cubic-bezier(.16, 1, .3, 1) .2s both; } }
+@keyframes mcx-llena { from { width: 0; } }
+.mcx-b-ventana[data-abierta='true'] .mcx-b-estado { color: #34d399; }
+.mcx-b-ventana[data-abierta='false'] .mcx-b-estado { color: #fb7185; }
+.mcx-b-boton { margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: .5rem; min-height: 2.6rem; padding: 0 1.1rem; border-radius: 9999px; font: 800 .8rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #1a1205; background: linear-gradient(135deg, var(--oro2), var(--oro) 55%, #f59e0b); box-shadow: 0 8px 22px -8px rgb(251 191 36 / .75); transition: transform .15s, filter .15s; }
+.mcx-b-boton:hover { transform: translateY(-1px); filter: brightness(1.07); }
+.mcx-b-estado { display: flex; align-items: center; gap: .55rem; font-size: clamp(1.25rem, 2.4vw, 1.6rem) !important; }
+.mcx-punto { width: .7rem; height: .7rem; border-radius: 50%; background: #64748b; flex: none; }
+.mcx-b-juego[data-sync='on'] .mcx-punto { background: #34d399; box-shadow: 0 0 0 4px rgb(52 211 153 / .2); }
+.mcx-b-juego[data-sync='off'] .mcx-punto { background: #fb7185; box-shadow: 0 0 0 4px rgb(251 113 133 / .18); }
+@media (prefers-reduced-motion: no-preference) { .mcx-b-juego[data-sync='on'] .mcx-punto { animation: mcx-late 2s ease-in-out infinite; } }
+@keyframes mcx-late { 50% { box-shadow: 0 0 0 8px rgb(52 211 153 / .05); } }
+.mcx-movs { display: grid; gap: .1rem; margin-top: .25rem; }
+.mcx-movs li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto; gap: .75rem; align-items: center; padding: .55rem .65rem; border-radius: .7rem; font-size: 13.5px; }
+.mcx-movs li:nth-child(odd) { background: rgb(255 255 255 / .03); }
+.mcx-movs li.es-mio { background: color-mix(in srgb, var(--oro) 12%, transparent); box-shadow: inset 3px 0 0 var(--oro); }
+.mcx-movs b { color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mcx-movs span { color: #aab3c5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mcx-movs em { font-style: normal; font-weight: 700; color: var(--oro2); font-variant-numeric: tabular-nums; }
+/* Entrada escalonada de las tarjetas */
+@media (prefers-reduced-motion: no-preference) {
+  .mcx-bento > * { animation: mcx-sube .55s cubic-bezier(.16, 1, .3, 1) both; }
+  .mcx-bento > :nth-child(2) { animation-delay: .05s; } .mcx-bento > :nth-child(3) { animation-delay: .1s; } .mcx-bento > :nth-child(4) { animation-delay: .15s; } .mcx-bento > :nth-child(5) { animation-delay: .2s; } .mcx-bento > :nth-child(6) { animation-delay: .25s; }
+}
+@keyframes mcx-sube { from { opacity: 0; transform: translateY(12px); } }
+@media (max-width: 900px) { .mcx-b-presu, .mcx-b-ventana { grid-column: span 6; } .mcx-b-plantilla, .mcx-b-ofertas, .mcx-b-juego { grid-column: span 3; } .mcx-b-juego { grid-column: span 6; } }
+@media (max-width: 560px) { .mcx-bento > * { grid-column: span 6 !important; } .mcx-movs li { grid-template-columns: minmax(0, 1fr) auto; } .mcx-movs span { grid-column: 1 / -1; grid-row: 2; font-size: 12.5px; } }
+
+/* Con club, la entrada es del club: sin el texto genérico y con el título más contenido. */
+.mcx[data-con-club='true'] .mcg-sub { display: none; }
+.mcx[data-con-club='true'] .mcg-titulo { font-size: clamp(1.6rem, 3.4vw, 2.4rem); }
+@media (max-width: 1400px) { .mcx-dock a { padding: 0 .75rem; } }

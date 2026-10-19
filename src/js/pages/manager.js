@@ -10,6 +10,8 @@ import { montarFotos } from '../features/fotoFutbolista.js';
 import { abrirFichaJugador } from '../features/fichaJugadorModal.js';
 import { avatarHTML } from '../core/sistema/avatar.js';
 import { FX } from '../../data/experimento.js';
+import { CLUBES_PES } from '../../data/clubesPes.js';
+import { emparejarClubesLm, escudoUrl } from '../core/pes/clubesPes.js';
 
 const $ = (id) => document.getElementById(id);
 const LIGA = 'galaxy';
@@ -67,9 +69,10 @@ function pintarCabecera() {
   if (chip) { chip.dataset.abierta = cfg?.ventana_abierta ? '1' : '0'; chip.querySelector('b').textContent = cfg?.ventana_abierta ? 'Ventana de fichajes abierta' : 'Ventana cerrada'; }
   if (!club) { $('mg-club').innerHTML = chip ? '' : `<div class="mt-1">${ventana}</div>`; return; }
   const stat = (lbl, val, ic) => `<div class="mg-stat"><i class="fa-solid ${ic}"></i><span><small>${lbl}</small><b>${val}</b></span></div>`;
-  $('mg-club').innerHTML = `<div class="mg-club">
-      <div class="mg-escudo">${escudo(club, 'w-16 h-16 sm:w-20 sm:h-20')}</div>
-      <div class="min-w-0"><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT${chip ? '' : ` · ${ventana}`}</p></div>
+  const local = escudoLocal(club);   // 19-oct-2026: el escudo del catálogo (alta calidad y mismo origen: el estadio toma su color)
+  $('mg-club').innerHTML = `<div class="mg-club mcx-club">
+      <div class="mg-escudo mcx-escudo">${local ? `<img src="${esc(local)}" alt="" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" data-mcx-escudo>` : escudo(club, 'w-16 h-16 sm:w-20 sm:h-20')}</div>
+      <div class="min-w-0"><p class="mcx-kicker">Tu club</p><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT${chip ? '' : ` · ${ventana}`}</p></div>
     </div>
     <div class="mg-stats">
       ${stat('Presupuesto', millones(club.presupuesto), 'fa-wallet')}
@@ -77,7 +80,9 @@ function pintarCabecera() {
       ${stat('Media XI', resumen.mediaXI ?? '—', 'fa-star')}
       ${stat('Plantilla', `${resumen.n}/${cfg?.max_plantilla ?? 40}`, 'fa-people-group')}
     </div>`;
+  if (tabActual() === 'resumen') pintarResumen();
 }
+const escudoLocal = (c) => { const [idCat] = [...emparejarClubesLm([{ id: c.id, nombre: c.nombre }], CLUBES_PES).keys()]; const cat = CLUBES_PES.find((x) => x.id === idCat); return cat ? escudoUrl(cat) : null; };
 
 function pintarElegir() {
   const libres = [...clubes.values()].filter((c) => c.aprobado && !c.dueno);
@@ -256,13 +261,54 @@ async function prepararCatalogo(file) {
   } catch (e) { catalogoPendiente = null; $('mg-prev').hidden = true; toast(e instanceof SyntaxError ? 'El archivo no es un JSON válido.' : e.message, 'error'); }
 }
 
+
+// ── Resumen del club (19-oct-2026, «El Estadio»): de un vistazo, lo que importa de tu club; cada tarjeta lleva a su sección. ──
+let resumenReq = 0;
+async function pintarResumen() {
+  const caja = $('mcx-resumen'); if (!caja || !club) return;
+  const req = ++resumenReq;
+  const [ofs, movs] = await Promise.all([
+    supabase.from('lm_ofertas').select('id, club_comprador, club_vendedor, monto, estado').or(`club_comprador.eq.${club.id},club_vendedor.eq.${club.id}`).eq('estado', 'pendiente').limit(50),
+    supabase.from('lm_movimientos').select('jugador_id, de_club, a_club, monto, tipo, created_at, revertido_en').eq('liga', LIGA).is('revertido_en', null).order('created_at', { ascending: false }).limit(4),
+  ]);
+  if (req !== resumenReq) return;
+  const pend = ofs.data ?? []; const recibidas = pend.filter((o) => o.club_vendedor === club.id).length; const enviadas = pend.filter((o) => o.club_comprador === club.id).length;
+  window.dispatchEvent(new CustomEvent('mcx:ofertas', { detail: { recibidas } }));
+  const ms = movs.data ?? []; const ids = [...new Set(ms.map((m) => m.jugador_id))];
+  const { data: js } = ids.length ? await supabase.from('lm_jugadores').select('id, nombre').in('id', ids) : { data: [] };
+  if (req !== resumenReq) return;
+  const nj = (id) => esc((js ?? []).find((x) => x.id === id)?.nombre ?? 'Jugador');
+  const max = cfg?.max_plantilla ?? 40; const lleno = Math.min(100, Math.round((resumen.n / max) * 100));
+  const abierta = !!cfg?.ventana_abierta;
+  const sync = document.getElementById('mc-estado')?.dataset.estado ?? 'out';
+  const syncTxt = { on: ['Juego conectado', 'Phoenix Sync aplica tus cambios en tu partida.'], off: ['Juego sin conectar', 'Abre Phoenix Sync en tu PC para llevar tus cambios al PES.'] }[sync] ?? ['Conecta tu PES', 'Con Phoenix Sync, lo que hagas aquí llega a tu partida.'];
+  caja.innerHTML = `
+    <article class="mcx-b mcx-b-presu"><p class="mcx-b-t"><i class="fa-solid fa-wallet" aria-hidden="true"></i> Presupuesto</p><p class="mcx-b-grande"><span data-mcx-contar>€0</span></p><p class="mcx-b-sub">Valor de tu plantilla: <b>${millones(resumen.valor)}</b></p></article>
+    <article class="mcx-b mcx-b-ventana" data-abierta="${abierta}"><p class="mcx-b-t"><i class="fa-solid ${abierta ? 'fa-door-open' : 'fa-lock'}" aria-hidden="true"></i> Ventana de fichajes</p><p class="mcx-b-grande mcx-b-estado">${abierta ? 'Abierta' : 'Cerrada'}</p><p class="mcx-b-sub">${abierta ? 'Ficha a agentes libres y a clubes de la IA, o haz ofertas a otros DT.' : 'Puedes mirar plantillas y preparar a quién fichar.'}</p><button type="button" class="mcx-b-boton" data-mcx-sala><i class="fa-solid fa-handshake" aria-hidden="true"></i> Abrir la sala de fichajes</button></article>
+    <a class="mcx-b mcx-b-plantilla" href="#plantilla"><p class="mcx-b-t"><i class="fa-solid fa-people-group" aria-hidden="true"></i> Plantilla</p><p class="mcx-b-grande">${resumen.n}<small>/${max}</small></p><span class="mcx-barra" style="--p:${lleno}%"><i></i></span><p class="mcx-b-sub">Media del XI <b>${resumen.mediaXI ?? '—'}</b></p><span class="mcx-b-ir">Ver plantilla</span></a>
+    <a class="mcx-b mcx-b-ofertas" href="#oficina"><p class="mcx-b-t"><i class="fa-solid fa-inbox" aria-hidden="true"></i> Oficina</p><p class="mcx-b-grande">${recibidas}<small> recibida${recibidas === 1 ? '' : 's'}</small></p><p class="mcx-b-sub">${enviadas} oferta${enviadas === 1 ? '' : 's'} tuya${enviadas === 1 ? '' : 's'} esperando respuesta</p><span class="mcx-b-ir">${recibidas ? 'Responder' : 'Ir a la oficina'}</span></a>
+    <a class="mcx-b mcx-b-juego" data-sync="${esc(sync)}" href="${FX.clubUnificado ? '#vestuario' : href('mercado/')}"><p class="mcx-b-t"><i class="fa-solid fa-plug" aria-hidden="true"></i> Tu PES</p><p class="mcx-b-grande mcx-b-estado"><i class="mcx-punto" aria-hidden="true"></i>${syncTxt[0]}</p><p class="mcx-b-sub">${syncTxt[1]}</p><span class="mcx-b-ir">${FX.clubUnificado ? 'Vestuario del juego' : 'Conectar juego'}</span></a>
+    <article class="mcx-b mcx-b-movs"><p class="mcx-b-t"><i class="fa-solid fa-right-left" aria-hidden="true"></i> Últimos movimientos de la liga</p>
+      ${ms.length ? `<ol class="mcx-movs">${ms.map((m) => `<li class="${m.a_club === club.id || m.de_club === club.id ? 'es-mio' : ''}"><b>${nj(m.jugador_id)}</b><span>${nomClub(m.de_club)} → ${nomClub(m.a_club)}</span>${m.monto ? `<em>${millones(m.monto)}</em>` : ''}</li>`).join('')}</ol>` : '<p class="mcx-b-sub">Aún no hubo fichajes en esta ventana.</p>'}
+      <a class="mcx-b-ir" href="#movimientos">Ver el diario completo</a></article>`;
+  const n = caja.querySelector('[data-mcx-contar]'); if (n) contarHastaDinero(n, Number(club.presupuesto || 0));
+}
+// El presupuesto sube contando (como un marcador). Respeta «menos movimiento».
+function contarHastaDinero(el, total) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !total) { el.textContent = millones(total); return; }
+  const t0 = performance.now(); const dur = 900;
+  const paso = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = millones(Math.round(total * (1 - (1 - k) ** 3))); if (k < 1) requestAnimationFrame(paso); };
+  requestAnimationFrame(paso);
+}
+document.addEventListener('click', (e) => { if (e.target.closest('[data-mcx-sala]')) $('mg-abrir-sala')?.click(); });
+
 // ── Tabs ──
 function mostrarTab(id) {
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== id; });
-  ({ plantilla: pintarPlantilla, mercado: pintarMercado, oficina: pintarOficina, movimientos: pintarMovimientos })[id]?.();
+  ({ resumen: pintarResumen, plantilla: pintarPlantilla, mercado: pintarMercado, oficina: pintarOficina, movimientos: pintarMovimientos })[id]?.();
 }
-const tabActual = () => (['plantilla', 'mercado', 'oficina', 'movimientos'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'plantilla');
+const tabActual = () => (['resumen', 'plantilla', 'mercado', 'oficina', 'movimientos'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'resumen');
 window.addEventListener('hashchange', () => club && mostrarTab(tabActual()));
 
 async function refrescar() {

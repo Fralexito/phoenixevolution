@@ -9,13 +9,20 @@ import '../styles/miClub.css';
 import '../styles/cambiosOficiales.css';
 import '../styles/salaFichajes.css';
 import '../styles/perfilJugador.css';
+// 19-oct-2026 (Fralex: «Mi club es lo más exclusivo que tengo… merece todo un ecosistema diferente… que se disfrute entrar ahí»):
+// «El Estadio»: entrada con el escudo de tu club bajo las luces y teñida con su color, UNA barra propia (Resumen · Vestuario · Plantilla ·
+// Fichajes · Oficina · Movimientos · Conectar juego) y un Resumen del club. La lógica de siempre (manager.js, clubUnificado.js) no cambia:
+// la barra usa las mismas direcciones (#plantilla, #vestuario…). Estilos en miClubEstadio.css; comportamiento en features/miClub/estadio.js.
+import '../styles/miClubEstadio.css';
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 const base = import.meta.env.BASE_URL;
 const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-magnifying-glass-dollar', 'Mercado'], ['oficina', 'fa-envelope-open-text', 'Oficina'], ['movimientos', 'fa-right-left', 'Movimientos']];
 ---
 <Layout title="Liga Máster" active="manager" description="Tu carrera de DT en la Galaxy League: club, presupuesto y fichajes que llegan al juego.">
-  <div class={`max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6${FX.ligaMasterGalaxia ? ' lmg' : ''}`}>
+  <div class={`mcx max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6${FX.ligaMasterGalaxia ? ' lmg' : ''}`} data-mcx>
+    <!-- Luces del estadio: dos haces que caen sobre la entrada (decorativo). -->
+    <div class="mcx-luces" aria-hidden="true"><i></i><i></i></div>
 
     {FX.ligaMasterGalaxia ? (
       <Fragment>
@@ -54,6 +61,17 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </Fragment>
     )}
 
+    <!-- La barra de Mi club: una sola navegación para todo el club (se pega bajo la cabecera al bajar). -->
+    <nav class="mcx-dock" aria-label="Secciones de Mi club" data-mcx-dock>
+      <a href="#resumen" data-mcx="resumen"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i><span>Resumen</span></a>
+      {FX.clubUnificado && <a href="#vestuario" data-mcx="vestuario" data-modo="vestuario"><i class="fa-solid fa-shirt" aria-hidden="true"></i><span>Vestuario del juego</span><em>PES</em></a>}
+      <a href="#plantilla" data-mcx="plantilla" data-mcx-club><i class="fa-solid fa-people-group" aria-hidden="true"></i><span>Plantilla</span></a>
+      <a href="#mercado" data-mcx="mercado" data-mcx-club><i class="fa-solid fa-handshake" aria-hidden="true"></i><span>Fichajes</span></a>
+      <a href="#oficina" data-mcx="oficina" data-mcx-club><i class="fa-solid fa-inbox" aria-hidden="true"></i><span>Oficina</span><b class="mcx-dock-n" data-mcx-ofertas hidden></b></a>
+      <a href="#movimientos" data-mcx="movimientos" data-mcx-club><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>Movimientos</span></a>
+      <a href={`${base}mercado/`} class="mcx-dock-ext"><i class="fa-solid fa-plug" aria-hidden="true"></i><span>Conectar juego</span></a>
+    </nav>
+
     {FX.clubUnificado && (
       <nav class="cu-modos" role="tablist" aria-label="Mi club">
         <button type="button" role="tab" data-modo="carrera" aria-selected="true"><i class="fa-solid fa-user-tie"></i><span><b>Carrera de DT</b><small>Club, fichajes y ofertas</small></span></button>
@@ -74,7 +92,9 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       <nav class="mg-tabs" role="tablist">
         {TABS.map(([id, ic, t], i) => <a href={`#${id}`} role="tab" data-tab={id} aria-current={i === 0 ? 'page' : undefined}><i class={`fa-solid ${ic}`}></i>{t}</a>)}
       </nav>
-      <section data-panel="plantilla" class="space-y-5"><div class="mg-herr"><div class="mg-lineas" role="group" aria-label="Ver solo una línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Mediocampo</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas grandes"><i class="fa-solid fa-table-cells-large"></i><span>Grandes</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista compacta"><i class="fa-solid fa-list"></i><span>Compactas</span></button></div></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
+      <!-- Resumen del club (19-oct-2026): lo pinta manager.js (pintarResumen) con los datos de siempre. -->
+      <section data-panel="resumen" class="mcx-resumen" hidden aria-live="polite"><div id="mcx-resumen" class="mcx-bento"></div></section>
+      <section data-panel="plantilla" hidden class="space-y-5"><div class="mg-herr"><div class="mg-lineas" role="group" aria-label="Ver solo una línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Mediocampo</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas grandes"><i class="fa-solid fa-table-cells-large"></i><span>Grandes</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista compacta"><i class="fa-solid fa-list"></i><span>Compactas</span></button></div></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
       <section data-panel="mercado" hidden class="space-y-4">
         <!-- 19-oct-2026 (Fralex): la sala de fichajes también aquí, para que cada DT busque a quién fichar (js/features/mercado/salaMercado.js). -->
         <button type="button" id="mg-abrir-sala" class="cfx-sala mg-sala"><span class="cfx-sala-escudos" aria-hidden="true"><i class="fa-solid fa-people-group"></i></span><span class="cfx-sala-texto"><b>Abrir la sala de fichajes</b><small>Mira cada club, su plantilla y su DT, y ficha u oferta desde ahí.</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
@@ -242,4 +262,4 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
     )}
   </div>
 </Layout>
-<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js'; import '../js/pages/managerTraspasosReales.js'; import '../js/features/clubUnificado.js';</script>
+<script>import '../js/pages/manager.js'; import '../js/pages/managerEquivalencias.js'; import '../js/pages/managerTraspasosReales.js'; import '../js/features/clubUnificado.js'; import '../js/features/miClub/estadio.js';</script>
