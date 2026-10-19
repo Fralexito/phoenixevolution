@@ -37,7 +37,7 @@
 @media (min-width: 768px) { .sxr-filtro-movil { display: none; } }
 
 /* Publicaciones en hilo: sin caja, separadas por una línea, se iluminan al pasar el mouse */
-.sxr-feed { display: grid; }
+.sxr-feed { display: grid; grid-template-columns: minmax(0, 1fr); }   /* sin esto la columna crecía al ancho del encabezado más largo y desbordaba en celular (19-oct) */
 .sx-post { position: relative; padding: .75rem .9rem .5rem; border-radius: 1rem; transition: background-color .15s; }
 .sx-post + .sx-post { margin-top: 1px; }
 .sx-post + .sx-post::before { content: ''; position: absolute; left: .9rem; right: .9rem; top: -1px; height: 1px; background: var(--sxr-linea); }

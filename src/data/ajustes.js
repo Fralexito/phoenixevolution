@@ -57,6 +57,7 @@ export const SECCIONES = [
     { clave: 'vivoRadar', tipo: 'switch', etiqueta: 'Avisos de radar', ayuda: '«X activó el radar».', defecto: true },
     { clave: 'ticker', tipo: 'switch', etiqueta: 'Barra de última hora', ayuda: 'La franja de noticias de arriba.', defecto: true },
     { clave: 'tickerVel', tipo: 'opciones', etiqueta: 'Velocidad de la barra', ayuda: 'Qué tan rápido pasan las noticias.', defecto: 'normal', opciones: [{ valor: 'lenta', etiqueta: 'Lenta' }, { valor: 'normal', etiqueta: 'Normal' }, { valor: 'rapida', etiqueta: 'Rápida' }] },
+    { clave: 'demo', tipo: 'switch', etiqueta: 'Modo demostración', ayuda: 'Llena la web de datos simulados con actividad (salas con marcador en vivo, publicaciones, última hora) para ver cómo funciona cada sistema. Solo en este navegador; no guarda nada.', defecto: false },
   ] },
   { id: 'privacidad', grupo: 'privacidad', vista: true, titulo: 'Privacidad', icono: 'fa-user-shield', texto: 'Qué recuerda este navegador. Nada de esto sale de tu equipo.', ajustes: [
     { clave: 'vivoHistorial', tipo: 'switch', etiqueta: 'Guardar el historial de «En vivo»', ayuda: 'Solo el del día de hoy; se vacía solo al cambiar de día. Se abre en otra pestaña con el botón «Historial».', defecto: true },

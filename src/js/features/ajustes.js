@@ -18,6 +18,8 @@ export function aplicarAjustes(a) {
   // Barra de abajo y columna de contactos: su CSS cuelga de estos atributos; el ajuste los quita o los devuelve (solo si la web los trae: data-base-*).
   r.toggleAttribute('data-barra-inf', r.hasAttribute('data-base-barra-inf') && a.barraInferior !== false);
   r.toggleAttribute('data-fx-contactos', r.hasAttribute('data-base-contactos') && a.contactos !== false);
+  // Modo demostración (core/sistema/modoDemo.js): se decide al cargar la página, así que al cambiarlo se recarga (tras el aviso «Guardado»).
+  if (typeof window.__pxDemo === 'boolean' && !!a.demo !== window.__pxDemo) { window.__pxDemo = !!a.demo; setTimeout(() => { const u = new URL(location.href); u.searchParams.delete('demo'); location.replace(u.href); }, 700); }
 }
 /** Guarda UN cambio, lo aplica al instante y avisa a las demás piezas (evento «ajustes:cambio»). */
 export function cambiarAjuste(clave, valor) { return reemplazarAjustes({ ...leerAjustes(), [clave]: valor }); }
