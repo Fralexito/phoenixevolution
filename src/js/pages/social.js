@@ -247,10 +247,10 @@ function pintarSaludo() {
   if (S.vista === 'recientes' && !S.juego && !S.tag && S.items.length) { const hoy = new Date().toDateString(); const de = S.items.filter((x) => new Date(x.created_at).toDateString() === hoy); S.pulso = { n: de.length, gente: new Set(de.map((x) => x.autor?.id).filter(Boolean)).size }; }
   const deHoy = { length: S.pulso?.n ?? 0 }; const gente = S.pulso?.gente ?? 0;   // el pulso es de toda la comunidad: no cambia al filtrar ni al cambiar de pestaña
   const frase = FRASES_DIA[Math.floor(Date.now() / 864e5) % FRASES_DIA.length];
-  const pulso = deHoy.length ? `<span class="sxr-saludo-pulso"><i aria-hidden="true"></i>${deHoy.length} publicaci${deHoy.length === 1 ? 'ón' : 'ones'} hoy · ${gente} jugador${gente === 1 ? '' : 'es'} activo${gente === 1 ? '' : 's'}</span>` : '';
-  // En celular la racha va aquí, junto al pulso (en la barra no cabía con las tres pestañas)
-  const racha = S.racha ? `<span class="sxr-saludo-racha" title="${S.racha.hoy ? 'Días seguidos con actividad en Social' : 'Reacciona, responde o publica hoy para no perderla'}">🔥 ${S.racha.n} día${S.racha.n === 1 ? '' : 's'}${S.racha.hoy ? '' : ' · ¡hoy!'}</span>` : '';
-  el.innerHTML = `<p class="sxr-saludo-hola"><span aria-hidden="true">${ic}</span> ${escapeHTML(hola)}${nombre ? `, <b>${escapeHTML(nombre)}</b>` : ''}</p><p class="sxr-saludo-frase">${escapeHTML(frase)}${S.yo ? '' : ' · Bienvenido a Phoenix Social'}</p>${pulso || racha ? `<div class="sxr-saludo-fila">${pulso}${racha}</div>` : ''}`;
+  const pulso = deHoy.length ? `<span class="sxr-vivo"><i aria-hidden="true"></i>${deHoy.length} publicaci${deHoy.length === 1 ? 'ón' : 'ones'} hoy · ${gente} activo${gente === 1 ? '' : 's'}</span>` : '';
+  // La racha va aquí, como texto (19-oct, menos saturado: antes era una cápsula naranja en la barra)
+  const racha = S.racha ? `<span class="sxr-racha-tx${S.racha.hoy ? '' : ' is-pendiente'}" title="${S.racha.hoy ? 'Días seguidos con actividad en Social' : 'Reacciona, responde o publica hoy para no perderla'}">🔥 ${S.racha.n} día${S.racha.n === 1 ? '' : 's'}${S.racha.hoy ? '' : ', ¡hoy!'}</span>` : '';
+  el.innerHTML = `<p class="sxr-saludo-hola"><span aria-hidden="true">${ic}</span> ${escapeHTML(hola)}${nombre ? `, <b>${escapeHTML(nombre)}</b>` : ''}</p><p class="sxr-saludo-frase">${[escapeHTML(frase) + (S.yo ? '' : ' · Bienvenido a Phoenix Social'), pulso, racha].filter(Boolean).join('<span class="sxr-sep" aria-hidden="true">·</span>')}</p>`;
   el.hidden = false;
 }
 function pintarLado() {
@@ -260,7 +260,7 @@ function pintarLado() {
   pintarSaludo();
   pintarTendencias();
   if (!top) return;
-  const mejores = [...S.items].filter((x) => totalReacciones(x) > 0).sort((a, b) => totalReacciones(b) - totalReacciones(a)).slice(0, 4);
+  const mejores = [...S.items].filter((x) => totalReacciones(x) > 0).sort((a, b) => totalReacciones(b) - totalReacciones(a)).slice(0, 3);
   top.innerHTML = mejores.length ? mejores.map((it) => { const a = it.autor ?? {}; const txt = String(it.texto ?? '').replace(/\s+/g, ' ').trim();
     const n = totalReacciones(it); return `<button type="button" class="sxr-fila" data-sxr-ir="${Number(it.id)}"><span class="sxr-fila-av">${avatarHTML(a.avatar_url, a.nombre_display, 28)}</span><span class="sxr-fila-tx"><b>${escapeHTML(txt ? (txt.length > 70 ? txt.slice(0, 70) + '…' : txt) : 'Publicación con foto o video')}</b><small>${escapeHTML(a.nombre_display || a.username || 'Jugador')} · ${n} reacci${n === 1 ? 'ón' : 'ones'}</small></span></button>`; }).join('')
     : '<p class="sxr-nada">Aún nadie ha reaccionado a lo que hay en el feed.</p>';
@@ -441,16 +441,13 @@ document.querySelector('.sxr')?.addEventListener('click', (e) => {
   const t = e.target.closest('a.tx-tag, [data-sxr-tag]'); if (!t || e.ctrlKey || e.metaKey) return;
   e.preventDefault(); e.stopPropagation(); irATag(t.dataset.tag ?? t.dataset.sxrTag);
 }, true);
-// Tendencias: las etiquetas más usadas en lo cargado (columna derecha en PC; fila de cápsulas bajo la barra en el celular).
-const tendMovil = document.createElement('div'); tendMovil.className = 'sxr-tend-movil'; tendMovil.hidden = true; document.querySelector('.sxr-orden')?.after(tendMovil);
+// Tendencias: las etiquetas más usadas en lo cargado (columna derecha en PC).
 function pintarTendencias() {
   const cuenta = new Map(); const forma = new Map();   // se cuenta sin mayúsculas, se muestra como la escribió la primera persona
   for (const it of S.items) for (const t of etiquetasDe(it.texto)) { const k = t.toLowerCase(); if (!forma.has(k)) forma.set(k, t); cuenta.set(k, (cuenta.get(k) || 0) + 1); }
   const top = [...cuenta].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, n]) => [forma.get(k), n]);
   const caja = document.querySelector('[data-sxr-tend]'); const lista = document.querySelector('[data-sxr-tend-lista]');
   if (caja && lista) { caja.hidden = !top.length; lista.innerHTML = top.map(([t, n], i) => `<button type="button" class="sxr-fila sxr-tend" data-sxr-tag="${escapeHTML(t)}"><span class="sxr-tend-n">${i + 1}</span><span class="sxr-fila-tx"><b>#${escapeHTML(t)}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'}</small></span>${i === 0 ? '<i class="fa-solid fa-fire sxr-tend-fuego" aria-hidden="true"></i>' : ''}</button>`).join(''); }
-  tendMovil.hidden = !top.length || !!S.tag;
-  tendMovil.innerHTML = top.length ? `<span class="sxr-tend-t"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Tendencias</span>${top.map(([t]) => `<button type="button" data-sxr-tag="${escapeHTML(t)}">#${escapeHTML(t)}</button>`).join('')}` : '';
 }
 // Gestos: visor de fotos, doble toque = 🔥 (si ya reaccionaste no lo quita: solo celebra) y tirar hacia abajo para recargar.
 montarVisorFotos(feedEl);
@@ -489,7 +486,7 @@ feedEl.addEventListener('click', (e) => {
 // Vistas: cuenta una por persona cuando la publicación se ve 1 segundo
 vigilarVistas(feedEl, { conSesion: () => !!S.yo });
 // Racha de actividad: 🔥 N días seguidos (en la barra de arriba); se pone al día al reaccionar, responder o publicar
-const rachaEl = document.createElement('span'); rachaEl.className = 'sxr-racha'; rachaEl.hidden = true; document.querySelector('.sxr-filtros')?.before(rachaEl);
+const rachaEl = document.createElement('span'); rachaEl.className = 'sxr-racha'; rachaEl.hidden = true;   // ya no se pone en la barra (19-oct, menos saturado): la racha se ve en el saludo
 async function pintarRacha() {
   if (!S.yo) { rachaEl.hidden = true; return; }
   let r = null; try { r = await api.rachaSocial(); } catch { r = null; }

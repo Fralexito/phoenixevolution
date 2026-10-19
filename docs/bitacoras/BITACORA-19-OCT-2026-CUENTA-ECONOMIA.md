@@ -87,6 +87,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 16:33 | (ver REGISTRO) | **Beta 1.9.0**: Social con personalidad (saludo, pulso, acentos de fuego, final del feed) y recargar sutil |
 | 16:55 | (ver REGISTRO) | **Beta 1.9.1**: logos de los 5 juegos en Social (los más recientes) |
 | 17:15 | (ver REGISTRO) | **Beta 1.10.0**: auditoría completa de Social (errores, redundancias, inconsistencias) |
+| 17:22 | (ver REGISTRO) | **Beta 1.10.1**: Social menos saturado |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -283,6 +284,9 @@ Pedido: «verifica función por función y apartado por apartado y corrige todo,
 - **Redundancias quitadas**: cifras y botón «Crear publicación» de la tarjeta Phoenix Social, «Juegos con más movimiento», «Más reacciones» en Ordenar, «Recargar» del final; una sola función de recarga para ↻, flotante, aviso de nuevas y tirar hacia abajo; «Tu espacio» reducido (Mi muro, Guardados, Buscar jugadores) y solo con sesión.
 - **Unificado**: color de «elegido» = fuego (`--sxr-on`), azul solo para enlaces/foco; textos («Todos los juegos», «Crear publicación»); alturas de la barra (2,5rem PC, 2,25rem celular); radios 99px; columnas pegadas a la misma altura; en celular la racha va en el saludo.
 - **CSS**: reglas duplicadas o pisadas fusionadas y muertas borradas; copia de antes en el scratchpad de la sesión.
+
+### 5.21 Social menos saturado (1.10.1)
+Pedido: «la estoy sintiendo saturada… solo mejora un poco eso». Ninguna función fuera; menos cosas compitiendo: saludo en dos líneas (pulso y racha como texto), racha fuera de la barra, «Jugadas» discreto, íconos del compositor en gris, logos atenuados, sin fila de Tendencias en celular, tarjeta Phoenix sin párrafo, 3 en «Lo más reaccionado», atajos en una línea al pie.
 
 ---
 
