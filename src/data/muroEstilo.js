@@ -28,9 +28,9 @@ export const REACCION_ANTIGUA = { fuego: '🔥', gg: '🤝', aplauso: '👏', ri
 export const SEGMENTOS = [['pes', 'PES 2021'], ['sp', 'SP Football Life'], ['fifa', 'FIFA'], ['eafc', 'EA FC'], ['efootball', 'eFootball']];
 // Logo de cada juego (19-oct-2026): archivo dentro de public/juegos/. Si el archivo no está, la web muestra la letra (P, SP, F, FC, eF).
 // Para cambiar un logo: reemplaza el archivo (mismo nombre) o cambia aquí la ruta. Mejor PNG/WebP/SVG con fondo transparente.
-// Por ahora solo Football Life (logo que dio Fralex, recortado a la placa «FL26»). Los demás se agregan al tener el archivo: pes → 'juegos/pes2021.png',
-// fifa → 'juegos/fifa.svg', eafc → 'juegos/ea-sports-fc.svg', efootball → 'juegos/efootball.svg' (así no se pide un archivo que no existe).
-export const LOGOS_JUEGO = { sp: 'juegos/sp-football-life.png' };
+// Las versiones más recientes (19-oct-2026, Fralex: «los más recientes»): PES 2021 Season Update, FIFA 23 (el último FIFA), FC 26 y eFootball 2026,
+// de Wikimedia Commons (dominio público), recortados a 64 px de alto; Football Life: la placa «FL26» que dio Fralex.
+export const LOGOS_JUEGO = { pes: 'juegos/pes2021.png', sp: 'juegos/sp-football-life.png', fifa: 'juegos/fifa23.png', eafc: 'juegos/ea-sports-fc-26.png', efootball: 'juegos/efootball-2026.png' };
 
 // ── Publicar como en una red social (19-oct-2026, migración 133: muro_publicaciones.extra) ──
 /** Fondos para textos cortos (como los de Facebook). El id lo guarda la BD (solo a-z, 0-9 y guion); el dibujo vive aquí. */

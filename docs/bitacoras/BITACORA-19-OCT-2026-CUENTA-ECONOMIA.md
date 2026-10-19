@@ -85,6 +85,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 16:03 | (ver REGISTRO) | **Beta 1.8.1**: Social más aireado (publicaciones separadas, columna izquierda angosta) |
 | 16:26 | (ver REGISTRO) | **Beta 1.8.2**: logo de la página en «Phoenix Social» y logo FL26 de Football Life |
 | 16:33 | (ver REGISTRO) | **Beta 1.9.0**: Social con personalidad (saludo, pulso, acentos de fuego, final del feed) y recargar sutil |
+| 16:55 | (ver REGISTRO) | **Beta 1.9.1**: logos de los 5 juegos en Social (los más recientes) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -265,7 +266,7 @@ Pedido: «verifica la opción de eliminar post o comentarios».
 ### 5.18 Logos en Social (1.8.2)
 - Tarjeta «Phoenix Social»: el logo de la página (`public/logo.webp`) en vez de la llama.
 - Juegos: `data/muroEstilo.js` → `LOGOS_JUEGO` (archivo por juego en `public/juegos/`); si un archivo falta o no carga, se ve la letra de siempre. Hoy solo **Football Life** (`sp-football-life.png`, la placa «FL26» recortada de la imagen que dio Fralex).
-- **Pendiente**: PES 2021, FIFA, EA FC y eFootball. Candidatos en Wikimedia Commons: `Logo Pes2021.png` (78 KB), `FIFA series logo (2010–2020).svg` (2 KB), `EA Sports FC logo.svg` (6 KB), `EFootball logo.svg` (7 KB). Falta el «sí» de Fralex para descargarlos; al tenerlos, agregarlos a `LOGOS_JUEGO`.
+- **Hecho en 1.9.1** (Fralex: «sí, descárgalos, pero los más recientes»): de Wikimedia Commons (dominio público), recortados a 64 px: PES 2021 Season Update (`pes2021.png`), FIFA 23 —el último FIFA— (`fifa23.png`), FC 26 (`ea-sports-fc-26.png`) y eFootball 2026 (`efootball-2026.png`). Para cambiar uno: reemplazar el archivo en `public/juegos/` o la ruta en `LOGOS_JUEGO`.
 
 ### 5.19 Social con personalidad + recargar (1.9.0)
 - Pedido: «un poco más de personalidad» y «un botón de recargar sutil… y también para subir hasta arriba rápidamente».

@@ -509,7 +509,7 @@ button.sx-pie-total:hover { background: rgb(255 255 255 / .07); }
    El logo del juego va en una plaquita clara (los logos oficiales suelen ser oscuros o de color) y tapa la letra; si no carga, queda la letra. */
 .sxr-sobre-logo:has(> img) { background: none; padding: 0; overflow: hidden; box-shadow: 0 0 0 2px rgb(255 255 255 / .12), 0 6px 18px -6px var(--color-galaxy-600); }
 .sxr-sobre-logo > img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
-.sxr-ic-juego.con-logo { position: relative; width: 2.6rem; height: 1.6rem; border-radius: .45rem; color: transparent; background: #f4f5fa; overflow: hidden; }
+.sxr-ic-juego.con-logo { position: relative; width: 3rem; height: 1.7rem; border-radius: .45rem; color: transparent; background: #f4f5fa; overflow: hidden; }
 .sxr-ic-juego.con-logo > img { position: absolute; inset: .15rem .2rem; width: calc(100% - .4rem); height: calc(100% - .3rem); object-fit: contain; }
 /* Football Life: su placa «FL26» ya es oscura con borde; ocupa toda la plaquita */
 .sxr-ic-juego.con-logo[data-logo='sp'] { background: #0d0606; }
