@@ -23,7 +23,7 @@
   html[data-fx-marco] .barra-item:hover > i { transform: scale(1.12); }
   html[data-fx-marco] .barra-item:active > i { transform: scale(.94); }
   html[data-fx-marco][data-fx-barra] .barra-lat:not([hidden]) { top: 6.9rem; transition: width .24s cubic-bezier(.22, 1, .36, 1), box-shadow .24s ease, top .3s cubic-bezier(.22, 1, .36, 1); }
-  html[data-fx-marco][data-fx-barra][data-cab-compacta]:has(#ticker[data-oculto="true"]) .barra-lat:not([hidden]) { top: 4.6rem; }
+  html[data-fx-marco][data-fx-barra][data-cab-compacta][data-ticker-oculto] .barra-lat:not([hidden]) { top: 4.6rem; }
 }
 
 /* C · ticker más delgado que se esconde al bajar */

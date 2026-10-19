@@ -26,6 +26,8 @@ import { crearReplica } from '../features/replicaCarta.js';
 import { construirIndice, opcionesFiltro, filtrarJugadores, divisionActual } from '../core/jugadores/participaciones.js';
 import { SISTEMA } from '../../data/temporada.js';
 
+document.body.classList.add('pg-jugadores');   // overflow-x: clip (components.css; antes era body:has(#players-container))
+
 const $ = (id) => document.getElementById(id);
 let all = [];
 let club = 'ALL';
@@ -105,7 +107,7 @@ function fillHist() {
   return o.clubes;
 }
 function paintBar() {
-  const bar = $('cmp-bar'); bar.hidden = !sel.length;
+  const bar = $('cmp-bar'); bar.hidden = !sel.length; document.documentElement.toggleAttribute('data-cmp-abierta', !bar.hidden);   // para layout.css (sin :has)
   $('cmp-bar-txt').textContent = sel.length === 1 ? `${all.find((p) => p.id === sel[0])?.nombre ?? ''} · elige al menos otro` : `${sel.length} jugadores seleccionados`;
   $('cmp-go').disabled = sel.length < 2;        // un solo botón: con 2 abre 1 vs 1; con 3 o más, la masiva (se puede cambiar dentro)
 }

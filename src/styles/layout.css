@@ -45,7 +45,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .live-msg { transform: none; transition: opacity .2s; } .live-dot { animation: none; } }
 /* Si hay una barra flotante propia de la página (p. ej. «Comparar»), el pulso en vivo sube para no taparse. */
-@media (max-width: 1279.98px) { body:has(#cmp-bar:not([hidden])) #live-wrap:not([data-movido]) { bottom: 4.75rem; } }
+@media (max-width: 1279.98px) { html[data-cmp-abierta] #live-wrap:not([data-movido]) { bottom: 4.75rem; } }
 /* PC: el pulso vive abajo a la derecha y los mensajes entran desde ese lado. */
 @media (min-width: 768px) { .live-msg:not(.live-in) { transform: translateX(10px); } }
 /* Hora exacta en cada mensaje + historial. */

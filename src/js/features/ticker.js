@@ -105,7 +105,7 @@ export function initTicker() {
   const revisar = () => {
     pendiente = false;
     const oculto = window.scrollY >= ARRIBA;
-    if (el.dataset.oculto !== String(oculto)) el.dataset.oculto = String(oculto);
+    if (el.dataset.oculto !== String(oculto)) { el.dataset.oculto = String(oculto); document.documentElement.toggleAttribute('data-ticker-oculto', oculto); }   // en <html> para el CSS (sin :has)
   };
   revisar();                                                                // por si la página se abre ya desplazada (recarga a mitad de página)
   window.addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } }, { passive: true });

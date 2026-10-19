@@ -36,7 +36,7 @@
 /* 2 · formulario pegado (solo PC con altura suficiente) */
 @media (min-width: 1024px) and (min-height: 760px) {
   html[data-fx-duelos-pro] #col-lanzar { position: sticky; top: 6.9rem; max-height: calc(100dvh - 7.6rem); overflow-y: auto; scrollbar-width: thin; transition: top .3s cubic-bezier(.22, 1, .36, 1); }
-  html[data-fx-duelos-pro][data-cab-compacta]:has(#ticker[data-oculto='true']) #col-lanzar { top: 4.7rem; max-height: calc(100dvh - 5.4rem); }
+  html[data-fx-duelos-pro][data-cab-compacta][data-ticker-oculto] #col-lanzar { top: 4.7rem; max-height: calc(100dvh - 5.4rem); }
 }
 
 /* 3 · cabecera premium */
@@ -121,7 +121,7 @@ html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content
 .dp-cab #racha-diaria > div > p:first-child { font-size: .78rem !important; }
 .dp-cab .dp-lanzar { display: none; }
 @media (min-width: 1024px) {
-  html[data-fx-duelos-pro]:has(#duelos-grid[data-plegado]) .dp-cab .dp-lanzar { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; min-height: 3rem;
+  html[data-fx-duelos-pro][data-duelos-plegado] .dp-cab .dp-lanzar { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; min-height: 3rem;
     padding: .7rem 1rem; border-radius: .9rem; position: relative; overflow: hidden; isolation: isolate;
     font-family: var(--font-display, inherit); font-weight: 800; font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; color: #fff;
     background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 22px rgb(128 0 255 / .45); transition: transform .2s, box-shadow .2s; }

@@ -11,6 +11,9 @@ export function montarDuelosPro() {
   // (botón grande «Lanzar reto»). Después de emitirlo, se vuelve a plegar. En celular ya funcionaba así (botón de la cabecera).
   const grid = document.getElementById('duelos-grid');
   grid?.setAttribute('data-plegado', '');
+  // Copia «plegado» a <html> para duelosPro.css (sin :has, que hacía recalcular toda la página). duelos.js lo cambia en varios sitios: se sigue con un observador.
+  const copiar = () => document.documentElement.toggleAttribute('data-duelos-plegado', !!grid?.hasAttribute('data-plegado'));
+  if (grid) { copiar(); new MutationObserver(copiar).observe(grid, { attributes: true, attributeFilter: ['data-plegado'] }); }
   // Ronda 262 (Fralex: «todo ese espacio se podría aprovechar mejor»): la racha y el botón «Lanzar reto» entran en la cabecera
   // (racha como píldora bajo la descripción; «Lanzar reto» bajo «Tu estado»). Se ahorran dos filas completas.
   const cab = document.querySelector('main section.glass-panel:has(> div > h1)');

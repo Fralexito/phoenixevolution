@@ -285,7 +285,8 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
   background: radial-gradient(closest-side, color-mix(in srgb, var(--aura, #00e5ff) 70%, transparent), color-mix(in srgb, var(--aura, #00e5ff) 25%, transparent) 55%, transparent 100%); filter: blur(18px); }
 .pcw-replica-sale::before { opacity: 0; transition: opacity .3s ease; }
 @keyframes pcw-aura { from { transform: scale(.94); filter: blur(16px); } to { transform: scale(1.08); filter: blur(24px); } }
-body:has(#players-container) { overflow-x: clip; }
+/* Sin :has() en html/body: obligaba a recalcular el estilo de TODA la página con cualquier cambio del DOM (Inicio lo hacía ~15 veces al cargar). El JS marca el estado en <html>. */
+body.pg-jugadores { overflow-x: clip; }   /* la pone js/pages/database.js */
 #players-container[data-foco='true'] .pcw:not(.pcw-origen) { filter: blur(3px) saturate(.65); opacity: .5; }
 #players-container[data-foco='true'] .pcw:not(.pcw-origen):hover { transform: none; }
 @media (prefers-reduced-motion: reduce) { #players-container .pcw { transition: none; } .pcw-replica::before { animation: none; } .pcw-replica-in { transition: none; } }
