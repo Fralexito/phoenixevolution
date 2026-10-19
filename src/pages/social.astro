@@ -30,6 +30,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
       <div class="sxr-orden">
         <p class="sxr-titulo" data-sxr-titulo></p>
         <div id="sx-vistas" role="tablist" aria-label="Qué ver en el feed" class="sxr-vistas"></div>
+        <div class="sxr-ordenar" role="group" aria-label="Ordenar lo que ves" data-sxr-ordenes></div>
         <div class="sxr-vista" role="group" aria-label="Cómo ver las publicaciones">
           <button type="button" data-sxr-modo="tarjeta" aria-pressed="true" title="Tarjetas" aria-label="Ver en tarjetas"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
           <button type="button" data-sxr-modo="compacta" aria-pressed="false" title="Compacta" aria-label="Ver compacta"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
@@ -40,6 +41,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
           <div id="sx-filtro" class="flex flex-wrap items-center gap-1.5 text-[12px]" role="group" aria-label="Filtrar por juego"></div>
         </Plegable>
       </div>
+      <button type="button" class="sxr-nuevas" data-sxr-nuevas hidden><i class="fa-solid fa-arrow-up" aria-hidden="true"></i> <span></span></button>
       <div id="sx-feed" class="sxr-feed" data-modo="tarjeta" aria-live="polite"></div>
       <div id="sx-fin" hidden class="py-3 text-center"><button type="button" id="sx-mas" class="btn btn-ghost !text-xs">Cargar más</button></div>
     </div>
@@ -52,9 +54,14 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
         <button type="button" class="sxr-crear" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Crear publicación</button>
       </section>
       <section class="sxr-caja"><h2 class="sxr-caja-t">Juegos con más movimiento</h2><div data-sxr-activos></div></section>
+      <section class="sxr-caja" data-sxr-seguir-caja hidden><h2 class="sxr-caja-t">A quién seguir</h2><div data-sxr-seguir></div></section>
       <section class="sxr-caja"><h2 class="sxr-caja-t">Lo más reaccionado</h2><div data-sxr-top></div></section>
+      <section class="sxr-caja sxr-atajos"><h2 class="sxr-caja-t">Atajos de teclado</h2>
+        <ul><li><kbd>J</kbd> <kbd>K</kbd><span>Siguiente / anterior publicación</span></li><li><kbd>R</kbd><span>Reaccionar a la elegida</span></li><li><kbd>C</kbd><span>Abrir sus respuestas</span></li><li><kbd>N</kbd><span>Crear publicación</span></li></ul>
+      </section>
     </aside>
   </div>
+  <button type="button" class="sxr-arriba" data-sxr-arriba hidden aria-label="Volver arriba"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
 </Layout>
 <script>
   import '../js/pages/social.js';

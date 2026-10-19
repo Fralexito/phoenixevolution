@@ -37,3 +37,19 @@ test('totales y textos', () => {
   assert.equal(totalReacciones({}), 0);
   assert.equal(textoRespuestas(0), 'Responder'); assert.equal(textoRespuestas(1), '1 respuesta'); assert.equal(textoRespuestas(4), '4 respuestas'); assert.equal(textoRespuestas('x'), 'Responder');
 });
+
+import { ordenarFeed, ordenValido, contarNuevas, esLargo } from '../src/js/core/comunidad/feedSocial.js';
+test('social: ordenar lo cargado, contar nuevas y plegar textos largos', () => {
+  const a = { id: 1, created_at: '2026-10-18T10:00:00Z', reacciones: { '🔥': 5 }, respuestas: 0 };
+  const b = { id: 2, created_at: '2026-10-19T10:00:00Z', reacciones: { '🔥': 1 }, respuestas: 9 };
+  const c = { id: 3, created_at: '2026-10-19T12:00:00Z', reacciones: {}, respuestas: 2 };
+  assert.deepEqual(ordenarFeed([a, b, c], 'nuevos').map((x) => x.id), [3, 2, 1]);
+  assert.deepEqual(ordenarFeed([a, b, c], 'reacciones').map((x) => x.id), [1, 2, 3]);
+  assert.deepEqual(ordenarFeed([a, b, c], 'comentados').map((x) => x.id), [2, 3, 1]);
+  assert.equal(ordenValido('raro'), 'nuevos');
+  const lista = [a, b]; assert.deepEqual(ordenarFeed(lista, 'reacciones').length, 2); assert.equal(lista[0], a);   // no muta
+  assert.equal(contarNuevas([{ id: 5 }, { id: 4 }, { id: 2 }], [1, 2, 3]), 2);
+  assert.equal(contarNuevas([{ id: 2 }], []), 1);
+  assert.equal(contarNuevas([], [1]), 0);
+  assert.equal(esLargo('hola'), false); assert.equal(esLargo('x'.repeat(600)), true); assert.equal(esLargo('a\nb\nc\nd\ne\nf\ng\nh\ni'), true);
+});

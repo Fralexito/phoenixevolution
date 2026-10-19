@@ -8,6 +8,7 @@ import { tiempoRelativo, resumenReacciones } from '../../core/comunidad/muro.js'
 import { contenidoHTML, segmentoChipHTML } from './render.js';
 import { botonGuardarHTML } from '../social/guardados.js';
 import { encuestaHTML } from '../encuestas/estado.js';
+import { esLargo } from '../../core/comunidad/feedSocial.js';
 
 /** Reportar (cualquiera con sesión, salvo lo propio), ocultar (solo moderación) y guardar (con sesión). La base de datos vuelve a comprobar todo. */
 function botonesHTML(it, { yo, puedeOcultar }) {
@@ -30,10 +31,11 @@ export function tarjetaComunidadHTML(it, opciones = {}) {
     <header class="sx-post-cab">
       <a href="${escapeHTML(perfil)}" class="sx-post-av" tabindex="-1" aria-hidden="true">${avatarHTML(a.avatar_url, a.nombre_display, 24)}</a>
       <a href="${escapeHTML(perfil)}" class="sx-post-autor">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
-      <span class="sx-post-punto" aria-hidden="true">•</span><span class="sx-post-hace">${tiempoRelativo(it.created_at)}</span>${segmentoChipHTML(it.juego)}
+      <span class="sx-post-punto" aria-hidden="true">•</span><time class="sx-post-hace" datetime="${escapeHTML(it.created_at ?? '')}" data-t="${escapeHTML(it.created_at ?? '')}">${tiempoRelativo(it.created_at)}</time>${segmentoChipHTML(it.juego)}
       <span class="sx-post-acc">${botonesHTML(it, opciones)}</span></header>
-    <div class="sx-post-cuerpo">${contenidoHTML(it)}${encuestaHTML(it.id)}${opciones.extra ?? ''}</div>
-    ${opciones.pie ?? ''}</article>`;
+    <div class="sx-post-cuerpo"${esLargo(it.texto) ? ' data-largo="1"' : ''}>${contenidoHTML(it)}${encuestaHTML(it.id)}${opciones.extra ?? ''}</div>
+    ${esLargo(it.texto) ? `<button type="button" class="sx-post-mas" data-leer-mas="${Number(it.id)}" aria-expanded="false">Leer más</button>` : ''}
+    ${opciones.pie ?? ''}<div class="sx-post-hilo" data-hilo="${Number(it.id)}" hidden></div></article>`;
   }
   return `<article class="glass-panel rounded-2xl p-3 sm:p-4" data-pub="${Number(it.id)}">
     <header class="flex items-center gap-2.5 mb-2">

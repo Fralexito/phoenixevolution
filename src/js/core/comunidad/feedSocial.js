@@ -38,3 +38,27 @@ export const totalReacciones = (it) => resumenReacciones(it?.reacciones).reduce(
 
 /** Texto del contador de respuestas: «Comentar», «1 respuesta», «5 respuestas». */
 export const textoRespuestas = (n) => { const k = Math.max(0, Math.trunc(Number(n) || 0)); return k === 0 ? 'Responder' : k === 1 ? '1 respuesta' : `${k} respuestas`; };
+
+// ---- /social/ con más vida (19-oct-2026, Fralex: «dale interactividad y más dinamismo») ----
+/** Formas de ordenar lo que ya está cargado (sin pedir nada más a la base). */
+export const ORDENES = Object.freeze([
+  { id: 'nuevos', texto: 'Nuevos', icono: 'fa-clock' },
+  { id: 'reacciones', texto: 'Más reacciones', icono: 'fa-fire' },
+  { id: 'comentados', texto: 'Más comentados', icono: 'fa-comments' },
+]);
+export const ordenValido = (o) => (ORDENES.some((x) => x.id === o) ? o : 'nuevos');
+const fecha = (it) => Date.parse(it?.created_at ?? '') || 0;
+/** Copia ordenada: «nuevos» = más reciente primero; «reacciones» / «comentados» = más primero y, a igualdad, la más reciente. */
+export function ordenarFeed(items, orden) {
+  const lista = [...(items ?? [])];
+  const clave = { reacciones: totalReacciones, comentados: (it) => Math.max(0, Number(it?.respuestas) || 0) }[ordenValido(orden)];
+  return lista.sort((a, b) => (clave ? clave(b) - clave(a) : 0) || fecha(b) - fecha(a));
+}
+/** Cuántas publicaciones de `recientes` (la primera página que devuelve la base) NO están en `conocidas` (ids ya en pantalla) y son más nuevas que la más nueva en pantalla. */
+export function contarNuevas(recientes, conocidas) {
+  const ids = new Set([...(conocidas ?? [])].map(Number));
+  const tope = Math.max(0, ...[...(conocidas ?? [])].map(Number).filter(Number.isFinite));
+  return (recientes ?? []).filter((it) => !ids.has(Number(it?.id)) && Number(it?.id) > tope).length;
+}
+/** Texto largo → si conviene plegarlo con «Leer más» (más de `limite` caracteres o más de 8 líneas). */
+export const esLargo = (texto, limite = 480) => { const t = String(texto ?? ''); return t.length > limite || t.split('\n').length > 8; };

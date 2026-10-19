@@ -109,3 +109,95 @@
 .sxr-feed > .glass-panel { background: transparent; border: 0; box-shadow: none; padding: 3rem 1rem; color: var(--sxr-tx2); font-size: 14px; }
 /* Los hijos de una rejilla no encogen por debajo de su contenido sin esto: la fila de pestañas ensanchaba la página 30 px en celular. */
 .sxr-centro > * { min-width: 0; }
+
+/* ───── Más vida (19-oct-2026, Fralex: «dale interactividad y más dinamismo») ───── */
+/* Ordenar: cápsulas pequeñas junto al nombre del feed */
+.sxr-ordenar { display: flex; gap: .15rem; padding: .15rem; border-radius: 9999px; background: var(--sxr-caja); flex: none; }
+.sxr-ordenar button { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.1rem; padding: 0 .7rem; border-radius: 9999px; color: var(--sxr-tx2); font-size: 12.5px; font-weight: 600; transition: background-color .15s, color .15s; }
+.sxr-ordenar button:hover { color: #fff; }
+.sxr-ordenar button[aria-pressed='true'] { background: rgb(255 255 255 / .12); color: #fff; }
+@media (max-width: 640px) { .sxr-ordenar button span { display: none; } .sxr-ordenar button { padding: 0 .6rem; } }
+
+/* Aviso «N publicaciones nuevas»: cápsula que baja suavemente y se queda arriba mientras se lee */
+.sxr-nuevas { position: sticky; top: 7.2rem; z-index: 5; justify-self: center; display: inline-flex; align-items: center; gap: .45rem; min-height: 2.4rem; padding: 0 1.1rem; border-radius: 9999px; background: var(--color-galaxy-600); color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 8px 24px rgb(0 0 0 / .45), 0 0 0 1px rgb(255 255 255 / .15) inset; animation: sxr-baja .45s cubic-bezier(.16, 1, .3, 1) both; }
+.sxr-nuevas:hover { filter: brightness(1.12); }
+@keyframes sxr-baja { from { opacity: 0; transform: translateY(-14px) scale(.96); } }
+
+/* Esqueletos de carga */
+.sxr-esq { display: grid; gap: .55rem; padding: 1rem .9rem; border-bottom: 1px solid var(--sxr-linea); }
+.sxr-esq span { display: block; height: .8rem; border-radius: 9999px; background: linear-gradient(90deg, rgb(255 255 255 / .05), rgb(255 255 255 / .11), rgb(255 255 255 / .05)); background-size: 200% 100%; animation: sxr-brillo 1.3s linear infinite; }
+.sxr-esq-cab { width: 38%; } .sxr-esq-l { width: 92%; height: 1rem !important; } .sxr-esq-c { width: 64%; } .sxr-esq-pie { width: 46%; height: 1.9rem !important; margin-top: .25rem; }
+@keyframes sxr-brillo { to { background-position: -200% 0; } }
+
+/* Feed vacío: invitación a publicar */
+.sxr-vacio { display: grid; justify-items: center; gap: .5rem; padding: 3rem 1.25rem; text-align: center; }
+.sxr-vacio-ic { width: 4rem; height: 4rem; border-radius: 9999px; display: grid; place-items: center; font-size: 1.6rem; color: #fff; background: radial-gradient(circle at 30% 30%, var(--color-galaxy-400), var(--color-galaxy-600)); box-shadow: 0 0 0 8px color-mix(in srgb, var(--color-galaxy-600) 18%, transparent); animation: sxr-latido 2.4s ease-in-out infinite; }
+.sxr-vacio b { font-size: 16px; color: #fff; margin-top: .5rem; }
+.sxr-vacio p { max-width: 26rem; font-size: 13.5px; line-height: 1.55; color: var(--sxr-tx2); }
+.sxr-vacio .sxr-crear { width: auto; padding: 0 1.4rem; }
+@keyframes sxr-latido { 50% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--color-galaxy-600) 8%, transparent); } }
+
+/* Publicaciones: la elegida con J/K se marca, los textos largos se pliegan */
+.sx-post { scroll-margin-top: 8rem; }
+.sx-post.sxr-foco { background: var(--sxr-hover); box-shadow: inset 3px 0 0 var(--color-galaxy-400); }
+.sx-post-cuerpo[data-largo='1'] { max-height: 13rem; overflow: hidden; -webkit-mask-image: linear-gradient(#000 65%, transparent); mask-image: linear-gradient(#000 65%, transparent); }
+.sx-post-mas { margin-top: .25rem; padding: .2rem .1rem; font-size: 13px; font-weight: 700; color: var(--color-galaxy-400); }
+.sx-post-mas:hover { text-decoration: underline; }
+.sx-post [data-pie] a.sx-btn[aria-expanded='true'] { background: color-mix(in srgb, var(--color-galaxy-600) 35%, transparent); color: #fff; }
+.sx-post [data-pie] .sx-btn:active { transform: scale(.95); }
+
+/* Respuestas dentro del feed (hilo con línea a la izquierda, como los comentarios de un foro) */
+.sx-post-hilo { margin: .4rem 0 .2rem .7rem; padding-left: .9rem; border-left: 2px solid var(--sxr-linea); animation: sxr-abre .3s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes sxr-abre { from { opacity: 0; transform: translateY(-4px); } }
+.sxr-hilo-lista { display: grid; gap: .35rem; }
+.sxr-resp { display: flex; gap: .55rem; padding: .3rem 0; }
+.sxr-resp-av { flex: none; width: 1.75rem; height: 1.75rem; border-radius: 9999px; overflow: hidden; }
+.sxr-resp-cuerpo { min-width: 0; }
+.sxr-resp-cab { font-size: 12.5px; color: var(--sxr-tx2); }
+.sxr-resp-cab a { font-weight: 700; color: #e8ebf4; }
+.sxr-resp-cab a:hover { color: var(--color-galaxy-400); }
+.sxr-resp-tx { font-size: 14px; line-height: 1.5; color: #e4e7f0; overflow-wrap: anywhere; }
+.sxr-hilo-nota { font-size: 13px; color: var(--sxr-tx2); padding: .3rem 0; text-align: left; }
+.sxr-hilo-entrar:hover { color: var(--color-galaxy-400); text-decoration: underline; }
+.sxr-responder { display: flex; gap: .4rem; margin-top: .4rem; }
+.sxr-responder input { flex: 1; min-width: 0; min-height: 2.4rem; padding: 0 1rem; border-radius: 9999px; border: 1px solid var(--sxr-linea); background: rgb(0 0 0 / .3); color: #fff; font-size: 13.5px; transition: border-color .15s, box-shadow .15s; }
+.sxr-responder input:focus { outline: none; border-color: var(--color-galaxy-400); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-galaxy-400) 20%, transparent); }
+.sxr-responder button { flex: none; width: 2.4rem; height: 2.4rem; border-radius: 9999px; background: var(--color-galaxy-600); color: #fff; display: grid; place-items: center; transition: transform .15s, filter .15s; }
+.sxr-responder button:hover { filter: brightness(1.15); transform: translateX(2px); }
+.sxr-responder button:disabled { opacity: .5; }
+
+/* A quién seguir */
+.sxr-sug { transition: opacity .25s, transform .25s; }
+.sxr-sug.sxr-sale { opacity: 0; transform: translateX(12px); }
+.sxr-sug .sxr-fila-tx { flex: 1; }
+.sxr-seguir { flex: none; min-height: 1.9rem; padding: 0 .85rem; border-radius: 9999px; background: #fff; color: #0b0a1a; font-size: 12.5px; font-weight: 700; transition: filter .15s, background-color .2s, color .2s; }
+.sxr-seguir:hover { filter: brightness(.9); }
+.sxr-seguir.is-on { background: rgb(255 255 255 / .1); color: #fff; }
+.sxr-descartar { flex: none; width: 1.75rem; height: 1.75rem; border-radius: 9999px; color: var(--sxr-tx2); font-size: 12px; }
+.sxr-descartar:hover { background: var(--sxr-hover); color: #fff; }
+
+/* Atajos */
+.sxr-atajos ul { display: grid; gap: .45rem; }
+.sxr-atajos li { display: flex; align-items: center; gap: .3rem; font-size: 12.5px; color: var(--sxr-tx2); }
+.sxr-atajos li span { margin-left: .35rem; }
+.sxr-atajos kbd { min-width: 1.5rem; height: 1.5rem; display: inline-grid; place-items: center; padding: 0 .35rem; border-radius: .4rem; border: 1px solid var(--sxr-linea); border-bottom-width: 2px; background: rgb(255 255 255 / .05); color: #fff; font: 700 11px var(--font-sans, inherit); }
+
+/* Cajas de la derecha: aparecen con un pequeño escalón; el feed elegido se marca con una barra */
+.sxr-der .sxr-caja { animation: sxr-sube .5s cubic-bezier(.16, 1, .3, 1) both; transition: border-color .2s; }
+.sxr-der .sxr-caja:nth-child(2) { animation-delay: .06s; } .sxr-der .sxr-caja:nth-child(3) { animation-delay: .12s; } .sxr-der .sxr-caja:nth-child(4) { animation-delay: .18s; } .sxr-der .sxr-caja:nth-child(5) { animation-delay: .24s; }
+.sxr-der .sxr-caja:hover { border-color: rgb(255 255 255 / .16); }
+@keyframes sxr-sube { from { opacity: 0; transform: translateY(8px); } }
+.sxr-item { position: relative; }
+.sxr-item[aria-current='page']::before, .sxr-item[aria-current='true']::before { content: ''; position: absolute; left: -.15rem; top: 25%; bottom: 25%; width: 3px; border-radius: 9999px; background: var(--color-galaxy-400); animation: sxr-barra .3s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes sxr-barra { from { transform: scaleY(0); } }
+
+/* Volver arriba */
+.sxr-arriba { position: fixed; right: 1.25rem; bottom: 5.5rem; z-index: 40; width: 2.9rem; height: 2.9rem; border-radius: 9999px; display: grid; place-items: center; background: rgb(20 16 40 / .92); color: #fff; border: 1px solid rgb(255 255 255 / .14); box-shadow: 0 10px 28px rgb(0 0 0 / .5); backdrop-filter: blur(8px); animation: sxr-sube .3s ease both; transition: transform .15s, background-color .15s; }
+.sxr-arriba:hover { transform: translateY(-2px); background: var(--color-galaxy-600); }
+@media (max-width: 767.98px) { .sxr-arriba { bottom: 6.5rem; right: .9rem; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sxr-nuevas, .sxr-esq span, .sxr-vacio-ic, .sx-post-hilo, .sxr-der .sxr-caja, .sxr-item::before, .sxr-arriba { animation: none !important; }
+}
+/* Celular: pestañas del feed en su propia fila; debajo, ordenar y la vista (antes se apretaban en una sola fila). */
+@media (max-width: 767.98px) { .sxr-orden { flex-wrap: wrap; row-gap: .4rem; } .sxr-vistas { flex: 1 1 100%; } .sxr-ordenar { margin-right: auto; } }
