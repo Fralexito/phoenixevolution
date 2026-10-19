@@ -2,6 +2,8 @@
 // Página «Liga»: lo esencial — portada compacta, TABLA y RESULTADOS por fecha. Cada liga tiene su historial de ediciones (selector).
 // Todo sale de datos (data/ligas.js + data/ligaResultados.js) y se calcula al construir la web. CopaFácil sigue siendo la fuente oficial.
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/uplot.css';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
 import { calcularTabla, tablaEdicion } from '../js/core/competicion/tabla.js';

@@ -2,6 +2,9 @@
 // USUARIOS EN PES (migración 125): cada PC con Phoenix Link — usuario, versión, parche, último contacto — y su historial de cambios oficiales.
 // Staff ve todos; un usuario normal ve solo sus PCs. Contrato: docs/web-pes-link/CONTRATO-WEB-PES.md §4 · Lógica: js/pages/usuariosPes.js
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/cambiosOficiales.css';
+import '../styles/sync.css';
 import { href } from '../js/core/sistema/config.js';
 ---
 <Layout title="Usuarios en PES" active="mercado" description="Registro de las PCs que usan Phoenix Link y qué cambios aplicó cada una.">

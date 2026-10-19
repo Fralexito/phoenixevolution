@@ -2,6 +2,8 @@
 // PREMIOS (ronda 265): sección propia con los reconocimientos de la liga. Pedido de Fralex: los de antes eran genéricos y pocos.
 // Se calculan solos con los resultados (core/competicion/premios.js); las fotos salen de las cartas de Jugadores. Lo pinta js/pages/premios.js.
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/premios.css';
 import { LIGAS } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
 const ligas = LIGAS.filter((l) => (EDICIONES[l.id] ?? []).some((e) => (e.fechas ?? []).length));

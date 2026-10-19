@@ -3,6 +3,10 @@
 // Cada cambio va a Base normal (amistosos), Liga Máster o Las dos. Contrato: docs/web-pes-link/CONTRATO-WEB-PES.md · Lógica: js/pages/cambiosOficiales.js
 // Diseño: compositor con vista previa en vivo + historial en línea de tiempo (estilos cfx- en styles/cambiosOficiales.css).
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/cambiosOficiales.css';
+import '../styles/salaFichajes.css';
+import '../styles/sync.css';
 import { href } from '../js/core/sistema/config.js';
 ---
 <Layout title="Cambios oficiales" active="mercado" description="Cambios hechos en la web que llegan al PES de todos.">

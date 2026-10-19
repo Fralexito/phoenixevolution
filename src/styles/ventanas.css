@@ -65,7 +65,9 @@
   .vt-v:hover .vt-flecha { transform: translateX(4px); color: var(--vt-c); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .vt-tit .esc-w { animation: esc-enfoca 1s var(--esc-ease, cubic-bezier(.22,1,.36,1)) both; animation-delay: calc(var(--i) * 60ms + .05s); }
+  /* El título es lo más grande de Inicio (lo que Google mide como «carga»). Empieza ya visible, borroso y tenue, y enfoca: con opacity 0 no contaba
+     como pintado hasta que la animación avanzaba (2,4 s de espera en celular lento, 19-oct-2026). Mismo efecto a la vista. */
+  .vt-tit .esc-w { animation: vt-enfoca-tit 1s var(--esc-ease, cubic-bezier(.22,1,.36,1)) both; animation-delay: calc(var(--i) * 60ms + .05s); }
   .vt-sub { animation: esc-enfoca .9s cubic-bezier(.22,1,.36,1) .35s both; }
   /* Las 4 ventanas entran una tras otra */
   .vt-v { animation: vt-entra .9s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--n) * 90ms + .45s); }
@@ -106,3 +108,5 @@
 
 .vt-dorso .vt-acc { margin-top: .6rem; flex-grow: 1; align-content: start; }
 .vt-dorso:not([data-vista='mosaico']):not([data-vista='grande']) .vt-acc { align-content: start; }
+
+@keyframes vt-enfoca-tit { from { opacity: .22; filter: blur(12px); transform: translateY(.2em); } to { opacity: 1; filter: blur(0); transform: none; } }

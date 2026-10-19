@@ -1,6 +1,8 @@
 ---
 // CHAT GENERAL: el mismo chat global que ve Phoenix Link en el juego (migración 099). Guía: docs/comunidad/CHAT-GENERAL.md
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/chatgen.css';
 import Plegable from '../components/Plegable.astro';
 ---
 <Layout title="Chat general" active="chatgeneral" description="El chat de toda la comunidad, también dentro del juego con Phoenix Link.">

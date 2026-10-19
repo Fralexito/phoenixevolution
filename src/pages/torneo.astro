@@ -1,6 +1,9 @@
 ---
 // DETALLE de un torneo propio (/torneo/?id=N): inscripción, cruces, resultados, tablas y guía. Guía: docs/liga-y-torneos/TORNEOS-LIBRES.md
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/formatos.css';
+import '../styles/torneos.css';
 import { href } from '../js/core/sistema/config.js';
 ---
 <Layout title="Torneo" active="torneos" description="Cruces, resultados y tabla de un torneo de la comunidad.">

@@ -1,20 +1,14 @@
 /* Punto de entrada de estilos. El ORDEN es la cascada:
    tokens → base → layout → componentes → páginas. */
 @import 'tailwindcss';
+/* 19-oct-2026: los CSS que solo usan unas pocas páginas ya NO se importan aquí: cada página importa el suyo en su frontmatter
+   (noticiasV2, fichaJugador, diario, premios, crearLiga, chatgen, uplot, miClub, formatos, cambiosOficiales, salaFichajes, sync, perfilJugador, torneos).
+   Así Inicio y el resto no los descargan. Si una página nueva necesita uno, impórtalo en esa página. Ver docs/bitacoras/REVISION-GENERAL-18-OCT.md §7. */
 @import './tokens.css';
 @import './base.css';
 @import './layout.css';
 @import './components.css';
 @import './pages.css';
-@import './miClub.css';
-@import './formatos.css';
-@import './torneos.css';
-@import './crearLiga.css';
-@import './sync.css';
-@import './cambiosOficiales.css';
-@import './salaFichajes.css';
-@import './fichaJugador.css';
-@import './chatgen.css';
 @import './dopamina.css';
 @import './chatFlotante.css';
 @import './ligaVivo.css';
@@ -39,19 +33,14 @@
 @import './marco.css';
 @import './duelosPro.css';
 @import './jugadoresBarra.css';
-@import './premios.css';
 @import './estiloPro.css';
 @import './sinIA.css';
 @import './barraInferior.css';
 @import './sinIconosWeb.css';
-@import './uplot.css';
 /* Phosphor Bold RECORTADO a los iconos de data/iconosFinos.js (147 KB → ~20 KB). Icono nuevo: node tools/iconos/recortar-iconos.mjs */
 @import './iconos/phosphor-bold.css';
-@import './perfilJugador.css';
 @import './modoLigero.css';
-@import './diario.css';
 @import './noticiaSocial.css';
-@import './noticiasV2.css';
 @import './pasada.css';
 
 /* Rendimiento (18-oct-2026): el contenido de muchas páginas llega por JS; sin esto el pie de página aparecía arriba y luego

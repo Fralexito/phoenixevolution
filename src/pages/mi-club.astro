@@ -3,6 +3,8 @@
 // Los datos los sube Phoenix Sync (POST /mercado/v1/vestuario/subir); lo que cambies aquí queda «pendiente» y el programa lo aplica al juego.
 // BD: migración 095 (vestuario_*). Lógica: js/core/pes/vestuario.js · pantalla: js/pages/miClub.js · estilos: styles/miClub.css
 import Layout from '../layouts/Layout.astro';
+// CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
+import '../styles/miClub.css';
 import Plegable from '../components/Plegable.astro';
 import { FX } from '../data/experimento.js';
 const B = import.meta.env.BASE_URL;
