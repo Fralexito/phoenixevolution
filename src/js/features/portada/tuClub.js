@@ -29,7 +29,7 @@ const VISITANTE = () => `
     </div>
     <ul class="tuclub-puntos">
       <li><b>Sala de fichajes</b><span>Clubes, plantillas y el DT de cada club, a un clic.</span></li>
-      <li><b>Vestuario del juego</b><span>Dorsales, posiciones y fichas de tu partida.</span></li>
+      <li><b>Mi partida de PES</b><span>Dorsales, posiciones y habilidades de tu partida, desde el celular.</span></li>
       <li><b>Carrera de DT</b><span>Presupuesto, ofertas y la ventana de fichajes.</span></li>
     </ul>
   </div>`;
@@ -55,7 +55,7 @@ function conClub({ club, ventana, ofertas, plantilla, max }) {
       <div><dt>Ofertas recibidas</dt><dd class="${ofertas ? 'tuclub-alerta' : ''}">${ofertas}</dd></div>
       <div><dt>Ventana</dt><dd class="${ventana ? 'tuclub-ok' : 'tuclub-no'}">${ventana ? 'Abierta' : 'Cerrada'}</dd></div>
     </dl>
-    <nav class="tuclub-atajos" aria-label="Ir a tu club">${atajo('#resumen', 'Resumen')}${atajo('#mercado', 'Fichajes')}${atajo('#vestuario', 'Vestuario del juego')}${ofertas ? atajo('#oficina', 'Responder ofertas') : ''}</nav>
+    <nav class="tuclub-atajos" aria-label="Ir a tu club">${atajo('#resumen', 'Resumen')}${atajo('#mercado', 'Fichajes')}${atajo('#vestuario', 'Mi partida de PES')}${ofertas ? atajo('#oficina', 'Responder ofertas') : ''}</nav>
   </div>`;
 }
 

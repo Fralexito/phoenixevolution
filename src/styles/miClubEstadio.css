@@ -115,7 +115,8 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 /* Celular (19-oct-2026, Fralex: «siento más lento en mi celular»): las luces quietas y con menos desenfoque; animar un desenfoque grande cuesta mucho en celulares modestos. */
 @media (max-width: 767.98px) { .mcx-luces i { animation: none !important; filter: blur(14px); opacity: .4; } }
 /* Las etiquetas de arriba (beta, ventana, Phoenix Sync) en UNA fila que se desliza: su texto llega después y antes hacía crecer la portada (salto). */
-@media (max-width: 767.98px) { .mcx .mcg-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(90deg, #000 85%, transparent); } .mcx .mcg-chips::-webkit-scrollbar { display: none; } .mcx .mcg-chips > * { flex: none; } }
+/* Celular: de las etiquetas de la portada queda solo la ventana (las otras dos repiten lo que ya dice la página) — sin fila deslizable. */
+@media (max-width: 767.98px) { .mcx .mcg-chips > :not(.lmg-ventana) { display: none; } .mcx .mcg-chips { flex-wrap: nowrap; } }
 
 /* ── Reorganización (19-oct-2026, Fralex: «hay secciones que no me cuadran y no entiendo cómo se usa») ── */
 /* En Resumen las cifras de la entrada sobran: el Resumen ya las muestra en grande. */
@@ -141,16 +142,6 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 .mcx-h { font: 800 1rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; margin-bottom: .6rem; }
 .mcx-ofertas-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 767.98px) { .mcx-ofertas-grid { grid-template-columns: minmax(0, 1fr); } }
-.mcx-lista { border-radius: 1.1rem; border: 1px solid var(--mcx-linea); background: rgb(255 255 255 / .025); }
-.mcx-lista > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .8rem; padding: 1rem 1.15rem; min-height: 3.5rem; }
-.mcx-lista > summary::-webkit-details-marker { display: none; }
-.mcx-lista > summary::after { content: '+'; margin-left: auto; font: 700 1.3rem/1 var(--font-display); color: var(--oro); }
-.mcx-lista[open] > summary::after { content: '−'; }
-.mcx-lista > summary > i { color: var(--oro); }
-.mcx-lista > summary span { display: grid; gap: .1rem; }
-.mcx-lista > summary b { font: 700 .92rem var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: #fff; }
-.mcx-lista > summary small { font-size: 12.5px; color: #9aa6bd; }
-.mcx-lista-cuerpo { padding: 0 1.15rem 1.15rem; display: grid; gap: 1rem; }
 
 /* «Dejar mi club», discreto al pie del Resumen */
 .mcx-pie { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
@@ -191,7 +182,7 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
   :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(5) { animation-delay: 120ms; }
   :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(6) { animation-delay: 150ms; }
   :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(n+7) { animation-delay: 180ms; }
-  .mcx-admin-avanzado[open] .mcx-admin-avanzado-cuerpo, .mcx-lista[open] .mcx-lista-cuerpo { animation: mcx-entra .26s var(--ease-out) backwards; }
+  .mcx-admin-avanzado[open] .mcx-admin-avanzado-cuerpo { animation: mcx-entra .26s var(--ease-out) backwards; }
 }
 @keyframes mcx-entra { from { opacity: 0; transform: translateY(8px); } }
 
@@ -224,8 +215,7 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 @media (prefers-reduced-motion: no-preference) { .mcx-fz-barra i { animation: mcx-crece .7s var(--ease-out) .1s both; } }
 @keyframes mcx-crece { from { transform: scaleX(0); } }
 @media (max-width: 640px) {
-  .mcx-fuerza { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 6.6rem; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(90deg, #000 88%, transparent); }
-  .mcx-fuerza::-webkit-scrollbar { display: none; }
+  .mcx-fuerza { gap: .3rem; }
   .mcx-fuerza button { padding: .55rem .6rem; }
   .mcx-fz-n { flex-direction: column; align-items: flex-start; gap: .1rem; } .mcx-fz-n b { font-size: 1.25rem; } .mcx-fz-n small { font-size: 11px; }
 }
@@ -278,8 +268,6 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
   #mg-panel .mg-acciones .mg-mini { position: static; flex: 1; justify-content: center; width: auto; min-height: 2rem; padding: 0 .3rem; } #mg-panel .mg-acciones .mg-mini:not(:disabled) { opacity: 1; }
   #mg-panel:not([data-tam='4']) .mg-acciones .mg-mini span { display: none; }
   .mg-linea-tit { margin-bottom: .45rem; }
-  .mcx-plantilla .mg-herr, .mcx-plantilla .mg-herr-der { flex-wrap: nowrap; }
-  .mcx-plantilla .mg-orden select { max-width: 7rem; }
 }
 
 /* ── Administrar la liga (antes «Centro de control»): su propia pestaña y 3 pasos ── */
@@ -307,3 +295,88 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 .mcx-admin-avanzado > summary::after { content: '+'; margin-left: auto; font: 700 1.3rem/1 var(--font-display); color: var(--oro); }
 .mcx-admin-avanzado[open] > summary::after { content: '−'; }
 .mcx-admin-avanzado-cuerpo { display: grid; gap: 1.5rem; padding: 0 1.1rem 1.1rem; }
+/* Los clubes se ven todos, sin una cajita con su propia barra de desplazamiento */
+.mcx-admin .mg-clubes-grid { max-height: none; overflow: visible; }
+
+/* ── Sin controles viejos (19-oct-2026, Fralex: «elimina… listas, algunas barras de desplazamiento y más cosas de ese estilo») ── */
+/* Fichajes se salía de la pantalla en el celular (559 px): los hijos de la cuadrícula no podían encogerse. */
+.mcx-fichajes, .mcx-mercado { grid-template-columns: minmax(0, 1fr); }
+.mcx-fichajes > *, .mcx-mercado > * { min-width: 0; }
+.mcx .cfx-sala { width: 100%; min-width: 0; } .mcx .cfx-sala-texto { min-width: 0; } .mcx .cfx-sala-texto small { white-space: normal; }
+
+/* Botones segmentados: reemplazan menús desplegables, casillas y filas deslizables. Si no caben, bajan de línea. */
+.mcx-seg { display: inline-flex; flex-wrap: wrap; gap: .25rem; padding: .25rem; max-width: 100%; overflow: visible; border-radius: .9rem; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); }
+.mcx .mcx-seg button { flex: none; display: inline-flex; align-items: center; gap: .4rem; min-height: 2.25rem; padding: 0 .8rem; border: 0; border-radius: .65rem; background: transparent; font: 800 12px var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #9ca3af; }
+.mcx .mcx-seg button:hover { color: #fff; }
+.mcx .mcx-seg button[aria-pressed='true'] { color: #1a1205; background: linear-gradient(135deg, var(--oro2), var(--oro)); box-shadow: 0 4px 14px -6px rgb(251 191 36 / .8); }
+html[data-fx-pasada] .mcx .mcx-seg button::before { content: none; }
+.mcx-herr { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+
+/* Explorar el mercado */
+.mcx-mercado { display: grid; gap: .8rem; }
+.mcx-mercado-cab { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
+.mcx-mercado-cab .mcx-h { margin: 0; }
+.mcx-mercado-n { font-size: 12.5px; color: #9aa6bd; font-variant-numeric: tabular-nums; }
+.mcx-buscar { position: relative; display: flex; align-items: center; }
+.mcx-buscar i { position: absolute; left: 1rem; color: #8ea0b8; pointer-events: none; }
+.mcx-buscar input { width: 100%; min-height: 3rem; padding: 0 1rem 0 2.75rem; border-radius: 1rem; font-size: 15px; color: #fff; background: rgb(0 0 0 / .35); border: 1px solid var(--color-galaxy-border); outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
+.mcx-buscar input:focus { border-color: color-mix(in srgb, var(--oro) 70%, transparent); box-shadow: 0 0 0 4px rgb(251 191 36 / .12); }
+.mcx-buscar input::-webkit-search-cancel-button { filter: invert(1) opacity(.6); }
+.mcx-filtros { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.mcx-libres { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.75rem; padding: 0 1rem; border-radius: .9rem; font: 800 12px var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #9ca3af; background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .16s var(--ease-out); }
+.mcx-libres:active { transform: scale(.97); }
+.mcx-libres[aria-pressed='true'] { color: #a7f3d0; border-color: rgb(52 211 153 / .55); background: rgb(16 185 129 / .14); }
+.mcx-mas { justify-self: center; min-height: 2.75rem; padding: 0 1.4rem; border-radius: 99px; font: 800 12.5px var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #fde68a; border: 1px solid rgb(251 191 36 / .4); transition: background-color .2s ease, transform .16s var(--ease-out); }
+.mcx-mas:hover { background: rgb(251 191 36 / .12); } .mcx-mas:active { transform: scale(.97); }
+.mcx-mas[hidden] { display: none; }
+
+/* Celular: la barra de Mi club cabe entera (icono y nombre corto), sin deslizar de lado */
+.mcx-corto { display: none; }
+@media (max-width: 767.98px) {
+  .mcx-dock { overflow: visible; gap: .1rem; padding: .3rem; }
+  .mcx-dock a { flex: 1 1 0; min-width: 0; flex-direction: column; justify-content: center; gap: .2rem; min-height: 3.25rem; padding: .3rem .1rem; font-size: 9.5px; letter-spacing: .02em; }
+  .mcx-dock a > i { font-size: 1rem; }
+  .mcx-dock a > span:not(.mcx-corto) { display: none; }
+  .mcx-dock a > .mcx-corto { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mcx-dock-n { position: absolute; top: .15rem; right: 18%; min-width: 1.05rem; height: 1.05rem; font-size: 10px; }
+  .mcx-dock-ayuda { flex: none; width: 2.2rem; height: auto; align-self: stretch; margin-left: 0; }
+  .mcx-dock-pastilla { top: .3rem; height: calc(100% - .6rem); }
+  .mcx-fz-largo { display: none; }
+}
+.mcx-fz-corto { display: none; }
+@media (max-width: 767.98px) { .mcx-fz-corto { display: inline; } }
+
+/* Mi partida de PES: qué es, en dibujo */
+.mcx-vest-intro { display: grid; gap: .9rem; padding: 1.15rem 1.25rem; }
+.mcx-vest-intro h2 { font-size: 1.15rem; }
+.mcx-vest-intro b { color: #fff; }
+.mcx-flujo { display: grid; grid-template-columns: minmax(0, 1fr) 2.5rem minmax(0, 1fr) 2.5rem minmax(0, 1fr); align-items: center; gap: .3rem; }
+.mcx-flujo-paso { display: grid; justify-items: center; gap: .2rem; padding: .8rem .5rem; border-radius: 1rem; text-align: center; background: rgb(255 255 255 / .04); border: 1px solid rgb(255 255 255 / .09); }
+.mcx-flujo-paso i { font-size: 1.35rem; color: var(--oro); margin-bottom: .15rem; }
+.mcx-flujo-paso b { font: 800 .82rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; }
+.mcx-flujo-paso small { font-size: 11.5px; line-height: 1.35; color: #9aa6bd; }
+.mcx-flujo-linea { position: relative; height: 2px; border-radius: 2px; background: rgb(251 191 36 / .25); overflow: hidden; }
+.mcx-flujo-linea i { position: absolute; top: 0; left: 0; width: 40%; height: 100%; background: var(--oro); box-shadow: 0 0 8px var(--oro); }
+@media (prefers-reduced-motion: no-preference) { .mcx-flujo-linea i { animation: mcx-viaja 2.4s cubic-bezier(.77, 0, .175, 1) infinite alternate; } .mcx-flujo-linea + .mcx-flujo-paso + .mcx-flujo-linea i { animation-delay: 1.2s; } }
+@keyframes mcx-viaja { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.mcx-vest-puedes { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .45rem; }
+.mcx-vest-puedes div { display: flex; align-items: center; gap: .55rem; min-height: 2.75rem; padding: .4rem .75rem; border-radius: .8rem; background: rgb(0 0 0 / .28); border: 1px solid rgb(255 255 255 / .07); font-size: 13px; }
+.mcx-vest-puedes i { color: color-mix(in srgb, var(--club) 60%, var(--oro)); }
+.mcx-vest-puedes b { font-weight: 600; color: #e5e9f2; }
+.mcx-vest-nota { padding: .7rem .9rem; border-radius: .8rem; font-size: 13px; line-height: 1.5; color: #c3cad8; background: rgb(251 191 36 / .07); border: 1px solid rgb(251 191 36 / .22); }
+@media (max-width: 560px) {
+  .mcx-flujo { grid-template-columns: minmax(0, 1fr); }
+  .mcx-flujo-paso { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; column-gap: .75rem; text-align: left; padding: .65rem .85rem; }
+  .mcx-flujo-paso i { grid-row: 1 / span 2; align-self: center; margin: 0; }
+  .mcx-flujo-linea { justify-self: center; width: 2px; height: 1.1rem; }
+  .mcx-flujo-linea i { width: 100%; height: 40%; }
+  .mcx-vest-puedes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) and (prefers-reduced-motion: no-preference) { .mcx-flujo-linea i { animation-name: mcx-viaja-v; } }
+@keyframes mcx-viaja-v { from { transform: translateY(-100%); } to { transform: translateY(250%); } }
+@media (max-width: 560px) {
+  /* Las 5 líneas del mercado en una fila que ocupa todo el ancho (antes la última bajaba sola) */
+  .mcx-filtros > .mg-lineas.mcx-seg { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 100%; }
+  .mcx .mcx-filtros > .mg-lineas.mcx-seg button { justify-content: center; padding: 0 .15rem; font-size: 9.5px; letter-spacing: 0; }
+  .mcx-vest-puedes > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}

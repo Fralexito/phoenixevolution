@@ -115,11 +115,12 @@ async function pintarPlantilla() {
 }
 const apellido = (n) => { const p = String(n ?? '').trim().split(/\s+/); return p.length > 1 ? p.slice(1).join(' ') : p[0] ?? ''; };
 // Tu equipo por líneas (19-oct-2026): cuántos hay y su media, con una barra; tocar una línea filtra (mismo data-linea de siempre).
+const CORTO = { '': 'Todos', por: 'POR', def: 'DEF', med: 'MED', del: 'DEL' };   // en el celular caben las 5 sin deslizar
 function pintarFuerza(data) {
   const caja = document.querySelector('[data-mcx-fuerza]'); if (!caja) return;
   const prom = (g) => (g.length ? Math.round(g.reduce((s, j) => s + (j.media || 0), 0) / g.length) : 0);
   const barra = (m) => Math.max(6, Math.min(100, Math.round(((m - 50) / 45) * 100)));
-  const boton = (id, t, g, m) => `<button type="button" data-linea="${id}" ${id ? `data-linea-color="${id}"` : ''} aria-pressed="${herr.linea === id}"><span class="mcx-fz-t">${t}</span><span class="mcx-fz-n"><b>${g}</b>${m ? `<small>media ${m}</small>` : ''}</span><span class="mcx-fz-barra" style="--p:${barra(m)}%"><i></i></span></button>`;
+  const boton = (id, t, g, m) => `<button type="button" data-linea="${id}" ${id ? `data-linea-color="${id}"` : ''} aria-pressed="${herr.linea === id}"><span class="mcx-fz-t"><span class="mcx-fz-largo">${t}</span><span class="mcx-fz-corto" aria-hidden="true">${CORTO[id]}</span></span><span class="mcx-fz-n"><b>${g}</b>${m ? `<small>media ${m}</small>` : ''}</span><span class="mcx-fz-barra" style="--p:${barra(m)}%"><i></i></span></button>`;
   caja.innerHTML = boton('', 'Todos', data.length, resumen.mediaXI ?? 0) + LINEAS.filter(([id]) => id !== 'otros').map(([id, t]) => { const g = data.filter((j) => linea(j.posicion) === id); return boton(id, t, g.length, prom(g)); }).join('');
 }
 // La cancha: todo el equipo en una pantalla, por líneas (delanteros arriba, portero abajo). Los 11 de mejor media llevan aro dorado.
@@ -159,7 +160,7 @@ async function dibujarPlantilla() {
 // en Cancha (todo el equipo en una pantalla) y la PC en Cartas.
 const CLAVE_VISTA = 'pes-mg-vista';
 function ponerVista(v) {
-  const vista = ['compacta', 'cancha'].includes(v) ? v : 'grande';
+  const vista = v === 'cancha' ? 'cancha' : 'grande';   // la vista «Lista» se quitó (19-oct-2026): quien la tenía guardada ve Cartas
   $('mg-panel')?.setAttribute('data-vista', vista);
   document.querySelectorAll('.mg-vista [data-vista]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === vista)));
   return vista;
@@ -174,37 +175,38 @@ document.addEventListener('click', (e) => {
 // Herramientas de las cartas (ronda 292, pedido de Fralex): ver solo una línea, ordenar a gusto y agrandar/alejar.
 const CLAVE_HERR = 'pes-mg-herr';
 const herr = { linea: '', orden: 'media', tam: 2 };
-try { const g = JSON.parse(localStorage.getItem(CLAVE_HERR) || '{}'); if (['media', 'valor', 'edad', 'nombre'].includes(g.orden)) herr.orden = g.orden; if (g.tam >= 1 && g.tam <= 4) herr.tam = g.tam; } catch { /* sin almacenamiento */ }
+try { const g = JSON.parse(localStorage.getItem(CLAVE_HERR) || '{}'); if (['media', 'valor', 'edad', 'nombre'].includes(g.orden)) herr.orden = g.orden; } catch { /* sin almacenamiento */ }
 const ORDEN = { media: (a, b) => (b.media ?? 0) - (a.media ?? 0), valor: (a, b) => Number(b.valor || 0) - Number(a.valor || 0), edad: (a, b) => (a.edad ?? 99) - (b.edad ?? 99), nombre: (a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es') };
 const ordenar = (lista) => [...lista].sort((a, b) => ORDEN[herr.orden](a, b) || ORDEN.media(a, b));
 const POS_DE = (l) => Object.keys(LINEA).filter((k) => LINEA[k] === l);
 function pintarHerr() {
   $('mg-panel')?.setAttribute('data-tam', String(herr.tam));
   document.querySelectorAll('.mg-lineas [data-linea]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.linea === herr.linea)));
-  document.querySelectorAll('.mg-herr [data-orden]').forEach((x) => { x.value = herr.orden; });
+  document.querySelectorAll('[data-orden-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ordenBtn === herr.orden)));   // el orden va en botones (sin menú desplegable)
   document.querySelectorAll('.mg-tam [data-tam]').forEach((b) => { b.disabled = (b.dataset.tam === '-1' && herr.tam <= 1) || (b.dataset.tam === '1' && herr.tam >= 4); });
   try { localStorage.setItem(CLAVE_HERR, JSON.stringify({ orden: herr.orden, tam: herr.tam })); } catch { /* no se recuerda */ }
 }
-const repintarCartas = () => { pintarHerr(); if (tabActual() === 'mercado') pintarMercado(); else if (plantillaDatos) dibujarPlantilla(); else pintarPlantilla(); };
+const repintarCartas = () => { pintarHerr(); if (tabActual() === 'mercado') { mercadoVer = 12; pintarMercado(); } else if (plantillaDatos) dibujarPlantilla(); else pintarPlantilla(); };
 document.addEventListener('click', (e) => {
   const l = e.target.closest('.mg-lineas [data-linea]'); if (l) { herr.linea = l.dataset.linea; repintarCartas(); return; }
+  const o = e.target.closest('[data-orden-btn]'); if (o) { herr.orden = o.dataset.ordenBtn; repintarCartas(); return; }
   const t = e.target.closest('.mg-tam [data-tam]'); if (t && !t.disabled) { herr.tam = Math.max(1, Math.min(4, herr.tam + Number(t.dataset.tam))); pintarHerr(); }   // solo cambia el tamaño: no hace falta volver a pedir datos
 });
-document.addEventListener('change', (e) => { if (e.target.matches('.mg-herr [data-orden]')) { herr.orden = e.target.value; repintarCartas(); } });
 pintarHerr();
 
-let tBuscar = null;
+let tBuscar = null; let mercadoVer = 12;   // el mercado se muestra de 12 en 12 («Ver más»), no en un muro de 60
 async function pintarMercado() {
-  const q = $('mg-buscar').value.trim(); const pos = $('mg-pos').value; const libres = $('mg-libres').checked;
+  const q = $('mg-buscar').value.trim(); const libres = $('mg-libres')?.getAttribute('aria-pressed') === 'true';
   const col = { media: ['media', false], valor: ['valor', false], edad: ['edad', true], nombre: ['nombre', true] }[herr.orden];
   let s = supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, club_id, pes_id').eq('liga', LIGA).order(col[0], { ascending: col[1], nullsFirst: false }).limit(60);
   if (herr.linea) s = s.in('posicion', POS_DE(herr.linea));
   if (q) s = s.ilike('nombre', `%${q.replace(/[%_]/g, '')}%`);
-  if (pos) s = s.eq('posicion', pos);
   if (libres) s = s.is('club_id', null); else if (club) s = s.neq('club_id', club.id);
   const { data, error } = await s;
   if (error) { $('mg-mercado').textContent = 'No se pudo buscar.'; return; }
-  const lista = ordenar(data.filter((j) => j.club_id !== club?.id));
+  const todos = ordenar(data.filter((j) => j.club_id !== club?.id)); const lista = todos.slice(0, mercadoVer);
+  const n = $('mcx-mercado-n'); if (n) n.textContent = todos.length ? `${lista.length} de ${todos.length}${todos.length >= 60 ? '+' : ''} jugadores` : '';
+  const mas = $('mg-mas'); if (mas) mas.hidden = todos.length <= mercadoVer;
   $('mg-mercado').innerHTML = !lista.length ? vacio('fa-magnifying-glass', 'Sin resultados', 'Prueba con otro nombre o posición.')
     : `<div class="mg-grid">${lista.map((j) => { const vend = clubes.get(j.club_id); const directo = !vend || !vend.dueno;
       const origen = `<p class="mg-club-chip">${vend ? `${escudo(vend, 'w-4 h-4')} <span>${esc(vend.nombre)}</span>` : '<i class="fa-solid fa-unlock text-emerald-300"></i> <span>Agente libre</span>'}</p>${dtHTML(vend)}`;
@@ -331,7 +333,7 @@ async function pintarResumen() {
     <article class="mcx-b mcx-b-ventana" data-abierta="${abierta}"><p class="mcx-b-t"><i class="fa-solid ${abierta ? 'fa-door-open' : 'fa-lock'}" aria-hidden="true"></i> Ventana de fichajes</p><p class="mcx-b-grande mcx-b-estado">${abierta ? 'Abierta' : 'Cerrada'}</p><p class="mcx-b-sub">${abierta ? 'Ficha a agentes libres y a clubes de la IA, o haz ofertas a otros DT.' : 'Puedes mirar plantillas y preparar a quién fichar.'}</p><button type="button" class="mcx-b-boton" data-mcx-sala><i class="fa-solid fa-handshake" aria-hidden="true"></i> Abrir la sala de fichajes</button></article>
     <a class="mcx-b mcx-b-plantilla" href="#plantilla"><p class="mcx-b-t"><i class="fa-solid fa-people-group" aria-hidden="true"></i> Plantilla</p><p class="mcx-b-grande"><span data-mcx-num="${resumen.n}">${resumen.n}</span><small>/${max}</small></p><span class="mcx-barra" style="--p:${lleno}%"><i></i></span><p class="mcx-b-sub">Media del XI <b>${resumen.mediaXI ?? '—'}</b></p><span class="mcx-b-ir">Ver plantilla</span></a>
     <a class="mcx-b mcx-b-ofertas" href="#oficina"><p class="mcx-b-t"><i class="fa-solid fa-inbox" aria-hidden="true"></i> Tus ofertas</p><p class="mcx-b-grande"><span data-mcx-num="${recibidas}">${recibidas}</span><small> recibida${recibidas === 1 ? '' : 's'}</small></p><p class="mcx-b-sub">${enviadas} oferta${enviadas === 1 ? '' : 's'} tuya${enviadas === 1 ? '' : 's'} esperando respuesta</p><span class="mcx-b-ir">${recibidas ? 'Responder' : 'Ver mis ofertas'}</span></a>
-    <a class="mcx-b mcx-b-juego" data-sync="${esc(sync)}" href="${FX.clubUnificado ? '#vestuario' : href('mercado/')}"><p class="mcx-b-t"><i class="fa-solid fa-plug" aria-hidden="true"></i> Tu PES</p><p class="mcx-b-grande mcx-b-estado"><i class="mcx-punto" aria-hidden="true"></i>${syncTxt[0]}</p><p class="mcx-b-sub">${syncTxt[1]}</p><span class="mcx-b-ir">${FX.clubUnificado ? 'Vestuario del juego' : 'Conectar juego'}</span></a>
+    <a class="mcx-b mcx-b-juego" data-sync="${esc(sync)}" href="${FX.clubUnificado ? '#vestuario' : href('mercado/')}"><p class="mcx-b-t"><i class="fa-solid fa-plug" aria-hidden="true"></i> Tu PES</p><p class="mcx-b-grande mcx-b-estado"><i class="mcx-punto" aria-hidden="true"></i>${syncTxt[0]}</p><p class="mcx-b-sub">${syncTxt[1]}</p><span class="mcx-b-ir">${FX.clubUnificado ? 'Mi partida de PES' : 'Conectar juego'}</span></a>
     <article class="mcx-b mcx-b-movs"><p class="mcx-b-t"><i class="fa-solid fa-right-left" aria-hidden="true"></i> Últimos movimientos de la liga</p>
       ${ms.length ? `<ol class="mcx-movs">${ms.map((m) => `<li class="${m.a_club === club.id || m.de_club === club.id ? 'es-mio' : ''}"><b>${nj(m.jugador_id)}</b><span>${nomClub(m.de_club)} → ${nomClub(m.a_club)}</span>${m.monto ? `<em>${millones(m.monto)}</em>` : ''}</li>`).join('')}</ol>` : '<p class="mcx-b-sub">Aún no hubo fichajes en esta ventana.</p>'}
       <a class="mcx-b-ir" href="#movimientos">Ver el diario completo</a></article>`;
@@ -406,9 +408,10 @@ document.addEventListener('change', async (ev) => {
   }
   if (ev.target.id === 'mg-c-ventana') { cfg.ventana_abierta = ev.target.checked; pintarControles(); guardarCfg(); }
   if (ev.target.id === 'mg-json') { const f = ev.target.files?.[0]; if (f) prepararCatalogo(f); ev.target.value = ''; }
-  if (['mg-pos', 'mg-libres'].includes(ev.target.id)) pintarMercado();
 });
-$('mg-buscar').addEventListener('input', () => { clearTimeout(tBuscar); tBuscar = setTimeout(pintarMercado, 300); });
+$('mg-buscar').addEventListener('input', () => { mercadoVer = 12; clearTimeout(tBuscar); tBuscar = setTimeout(pintarMercado, 300); });
+$('mg-libres')?.addEventListener('click', (e) => { const b = e.currentTarget; b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); mercadoVer = 12; pintarMercado(); });
+$('mg-mas')?.addEventListener('click', () => { mercadoVer += 12; pintarMercado(); });
 // Staff: controles con autoguardado
 $('mg-c-presu')?.addEventListener('input', (e) => { cfg.presupuesto_inicial = Number(e.target.value); pintarControles(); guardarPronto(); });
 $('mg-c-buscar')?.addEventListener('input', (e) => { filtroClub = e.target.value; pintarClubesStaff(); });

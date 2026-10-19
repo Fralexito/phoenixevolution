@@ -63,12 +63,12 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
 
     <!-- La barra de Mi club: una sola navegación para todo el club (se pega bajo la cabecera al bajar). -->
     <nav class="mcx-dock" aria-label="Secciones de Mi club" data-mcx-dock>
-      <a href="#resumen" data-mcx="resumen"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i><span>Resumen</span></a>
-      <a href="#plantilla" data-mcx="plantilla" data-mcx-club><i class="fa-solid fa-people-group" aria-hidden="true"></i><span>Plantilla</span></a>
-      <a href="#mercado" data-mcx="mercado" data-mcx-club><i class="fa-solid fa-handshake" aria-hidden="true"></i><span>Fichajes</span><b class="mcx-dock-n" data-mcx-ofertas hidden></b></a>
-      {FX.clubUnificado && <a href="#vestuario" data-mcx="vestuario" data-modo="vestuario"><i class="fa-solid fa-shirt" aria-hidden="true"></i><span>Vestuario del juego</span><em>PES</em></a>}
-      <a href="#movimientos" data-mcx="movimientos" data-mcx-club><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>Diario</span></a>
-      <a href="#admin" data-mcx="admin" data-mcx-staff><i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Administrar la liga</span></a>
+      <a href="#resumen" data-mcx="resumen"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i><span>Resumen</span><span class="mcx-corto" aria-hidden="true">Resumen</span></a>
+      <a href="#plantilla" data-mcx="plantilla" data-mcx-club><i class="fa-solid fa-people-group" aria-hidden="true"></i><span>Plantilla</span><span class="mcx-corto" aria-hidden="true">Plantilla</span></a>
+      <a href="#mercado" data-mcx="mercado" data-mcx-club><i class="fa-solid fa-handshake" aria-hidden="true"></i><span>Fichajes</span><span class="mcx-corto" aria-hidden="true">Fichajes</span><b class="mcx-dock-n" data-mcx-ofertas hidden></b></a>
+      {FX.clubUnificado && <a href="#vestuario" data-mcx="vestuario" data-modo="vestuario"><i class="fa-solid fa-gamepad" aria-hidden="true"></i><span>Mi partida de PES</span><span class="mcx-corto" aria-hidden="true">Mi PES</span></a>}
+      <a href="#movimientos" data-mcx="movimientos" data-mcx-club><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>Diario</span><span class="mcx-corto" aria-hidden="true">Diario</span></a>
+      <a href="#admin" data-mcx="admin" data-mcx-staff><i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Administrar la liga</span><span class="mcx-corto" aria-hidden="true">Liga</span></a>
       <button type="button" class="mcx-dock-ayuda" data-mcx-guia-abrir aria-label="Cómo funciona Mi club" title="Cómo funciona Mi club"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></button>
     </nav>
 
@@ -79,14 +79,14 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       <ol class="mcx-guia-pasos">
         <li><b>Diriges un club de la Liga Máster</b><p>Eliges un club libre de la liga de la web y recibes un presupuesto. Desde ahí eres su DT; puedes dejarlo cuando quieras.</p></li>
         <li><b>Fichas con la ventana abierta</b><p>En Fichajes abres la sala: a los clubes de la IA y a los agentes libres los fichas al momento; a los clubes con DT les haces una oferta y la respuesta te llega a «Tus ofertas».</p></li>
-        <li><b>Llevas todo a tu partida de PES</b><p>Con Phoenix Sync en tu PC, tus fichajes llegan a tu partida de PES 2021. En Vestuario del juego editas dorsales, posiciones y fichas del club que subiste.</p><a class="mcx-guia-link" href={`${base}mercado/`}>Conectar mi juego</a></li>
+        <li><b>Llevas todo a tu partida de PES</b><p>Con Phoenix Sync en tu PC, tus fichajes llegan a tu partida de PES 2021. En «Mi partida de PES» editas dorsales, posiciones y habilidades del club de tu partida.</p><a class="mcx-guia-link" href={`${base}mercado/`}>Conectar mi juego</a></li>
       </ol>
     </section>
 
     {FX.clubUnificado && (
       <nav class="cu-modos" role="tablist" aria-label="Mi club">
         <button type="button" role="tab" data-modo="carrera" aria-selected="true"><i class="fa-solid fa-user-tie"></i><span><b>Carrera de DT</b><small>Club, fichajes y ofertas</small></span></button>
-        <button type="button" role="tab" data-modo="vestuario" aria-selected="false"><i class="fa-solid fa-shirt"></i><span><b>Vestuario del juego</b><small>Fichas de tu partida de PES</small></span></button>
+        <button type="button" role="tab" data-modo="vestuario" aria-selected="false"><i class="fa-solid fa-gamepad"></i><span><b>Mi partida de PES</b><small>El club de tu partida de PES</small></span></button>
       </nav>
     )}
     <div id="cu-carrera" class="space-y-6">
@@ -105,11 +105,11 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </nav>
       <!-- Resumen del club (19-oct-2026): lo pinta manager.js (pintarResumen) con los datos de siempre. -->
       <section data-panel="resumen" class="mcx-resumen" hidden aria-live="polite"><div id="mcx-resumen" class="mcx-bento"></div></section>
-      <!-- PLANTILLA (19-oct-2026): arriba, tu equipo por líneas (cuántos y su media; tocar una filtra). Tres formas de verlo: Cancha (todo el equipo
-           en una pantalla, como en la pizarra), Cartas y Lista. En el celular las cartas van de a 3 por fila (antes 2). -->
-      <section data-panel="plantilla" hidden class="space-y-4 mcx-plantilla"><div class="mg-lineas mcx-fuerza" role="group" aria-label="Tu equipo por líneas: toca una para ver solo esa" data-mcx-fuerza></div><div class="mg-herr"><div class="mg-vista" role="group" aria-label="Cómo ver a tus jugadores"><button type="button" data-vista="cancha" aria-pressed="false" title="Todo el equipo en la cancha"><i class="fa-solid fa-futbol"></i><span>Cancha</span></button><button type="button" data-vista="grande" aria-pressed="true" title="Cartas"><i class="fa-solid fa-table-cells-large"></i><span>Cartas</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista"><i class="fa-solid fa-list"></i><span>Lista</span></button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
+      <!-- PLANTILLA (19-oct-2026): arriba, tu equipo por líneas (cuántos y su media; tocar una filtra). Dos formas de verlo: Cancha (todo el equipo
+           en una pantalla, como en la pizarra) y Cartas (para vender o liberar). Sin menús desplegables ni lupa: el orden va en botones. En el celular las cartas van de a 3 por fila (antes 2). -->
+      <section data-panel="plantilla" hidden class="space-y-4 mcx-plantilla"><div class="mg-lineas mcx-fuerza" role="group" aria-label="Tu equipo por líneas: toca una para ver solo esa" data-mcx-fuerza></div><div class="mg-herr mcx-herr"><div class="mg-vista mcx-seg" role="group" aria-label="Cómo ver a tus jugadores"><button type="button" data-vista="cancha" aria-pressed="false" title="Todo el equipo en la cancha"><i class="fa-solid fa-futbol"></i><span>Cancha</span></button><button type="button" data-vista="grande" aria-pressed="true" title="Cartas"><i class="fa-solid fa-table-cells-large"></i><span>Cartas</span></button></div><div class="mcx-seg mcx-orden" role="group" aria-label="Ordenar por"><button type="button" data-orden-btn="media" aria-pressed="true">Media</button><button type="button" data-orden-btn="valor" aria-pressed="false">Valor</button><button type="button" data-orden-btn="edad" aria-pressed="false">Edad</button><button type="button" data-orden-btn="nombre" aria-pressed="false">A-Z</button></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
       <!-- FICHAJES (19-oct-2026): primero la sala (la forma principal de fichar), luego tus ofertas (antes estaban en otra pestaña, «Oficina»)
-           y al final la lista completa del mercado, plegada: antes era un muro de 60 cartas que ocupaba casi seis pantallas. -->
+           y «Explorar el mercado»: buscador, filtros en botones y de 12 en 12 con «Ver más» (antes: un muro de 60 cartas, menús y casillas). -->
       <section data-panel="mercado" hidden class="mcx-fichajes">
         <button type="button" id="mg-abrir-sala" class="cfx-sala mg-sala"><span class="cfx-sala-escudos" aria-hidden="true"><i class="fa-solid fa-people-group"></i></span><span class="cfx-sala-texto"><b>Abrir la sala de fichajes</b><small>Mira cada club, su plantilla y su DT, y ficha u oferta desde ahí.</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
         <section class="mcx-ofertas" id="mcx-ofertas" aria-labelledby="mcx-ofertas-t">
@@ -119,18 +119,17 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
             <div class="mg-caja"><h4 class="mg-caja-tit"><i class="fa-solid fa-paper-plane"></i> Enviadas</h4><div id="mg-enviadas" class="space-y-2"></div></div>
           </div>
         </section>
-        <details class="mcx-lista" id="mcx-lista">
-        <summary><i class="fa-solid fa-list" aria-hidden="true"></i><span><b>Lista completa del mercado</b><small>Busca por nombre o posición, o mira solo a los agentes libres</small></span></summary>
-        <div class="mcx-lista-cuerpo">
-        <div class="mg-filtros">
-          <label class="relative flex-1 min-w-48"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i><input id="mg-buscar" type="search" placeholder="Buscar jugador…" class="field w-full !pl-8"></label>
-          <select id="mg-pos" class="field w-32"><option value="">Posición</option>{['PT','DEC','LD','LI','MCD','MC','MO','MD','MI','ED','EI','SD','DC'].map((p) => <option>{p}</option>)}</select>
-          <label class="mg-toggle"><input id="mg-libres" type="checkbox"><span><i class="fa-solid fa-unlock"></i> Solo libres</span></label>
-        </div>
-        <div class="mg-herr"><div class="mg-lineas" role="group" aria-label="Ver solo una línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Mediocampo</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas"><i class="fa-solid fa-table-cells-large"></i><span>Cartas</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista"><i class="fa-solid fa-list"></i><span>Lista</span></button></div></div></div>
-        <div id="mg-mercado"></div>
-        </div>
-        </details>
+        <section class="mcx-mercado" aria-labelledby="mcx-mercado-t">
+          <div class="mcx-mercado-cab"><h3 class="mcx-h" id="mcx-mercado-t">Explorar el mercado</h3><p class="mcx-mercado-n" id="mcx-mercado-n" aria-live="polite"></p></div>
+          <label class="mcx-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="mg-buscar" type="search" placeholder="Busca un jugador por su nombre" autocomplete="off" aria-label="Buscar jugador"></label>
+          <div class="mcx-filtros">
+            <div class="mg-lineas mcx-seg" role="group" aria-label="Línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Medios</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div>
+            <button type="button" id="mg-libres" class="mcx-libres" aria-pressed="false"><i class="fa-solid fa-unlock" aria-hidden="true"></i> Solo agentes libres</button>
+            <div class="mcx-seg mcx-orden" role="group" aria-label="Ordenar por"><button type="button" data-orden-btn="media" aria-pressed="true">Media</button><button type="button" data-orden-btn="valor" aria-pressed="false">Valor</button><button type="button" data-orden-btn="edad" aria-pressed="false">Edad</button><button type="button" data-orden-btn="nombre" aria-pressed="false">A-Z</button></div>
+          </div>
+          <div id="mg-mercado"></div>
+          <button type="button" id="mg-mas" class="mcx-mas" hidden>Ver más jugadores</button>
+        </section>
       </section>
       <section data-panel="movimientos" hidden class="mg-caja"><h3 class="mg-caja-tit"><i class="fa-solid fa-right-left"></i> Diario de fichajes · Galaxy League</h3><div id="mg-movs"></div></section>
       <!-- «Dejar mi club» solo al pie del Resumen (antes salía bajo TODAS las pestañas). -->
@@ -241,9 +240,25 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
 
     {FX.clubUnificado && (
       <div id="cu-vestuario" hidden class="space-y-4">
+        <!-- «MI PARTIDA DE PES» (antes «Vestuario del juego», 19-oct-2026: Fralex no entendía para qué sirve). Qué es, cómo viaja y qué se puede hacer. -->
         <header class="mcx-vest-intro">
-          <h2>Vestuario del juego</h2>
-          <p>Es el club de tu partida de PES 2021 (la Liga Máster del juego), tal como lo subiste con Phoenix Sync. Lo que edites aquí, Phoenix Sync lo aplica en tu juego. No es lo mismo que tu club de la Liga Máster de la web: ese se maneja en Resumen, Plantilla y Fichajes.</p>
+          <h2>Tu partida de PES 2021, en la web</h2>
+          <p>Aquí editas el club de la <b>Liga Máster de tu PES</b>, la que juegas en tu PC, desde el celular o cualquier navegador. Phoenix Sync sube tu partida a la web y escribe en ella lo que cambies aquí.</p>
+          <div class="mcx-flujo" role="img" aria-label="Tu PES en la PC, Phoenix Sync y esta pantalla, conectados en los dos sentidos">
+            <div class="mcx-flujo-paso"><i class="fa-solid fa-desktop" aria-hidden="true"></i><b>Tu PES</b><small>Tu partida en la PC</small></div>
+            <span class="mcx-flujo-linea" aria-hidden="true"><i></i></span>
+            <div class="mcx-flujo-paso"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i><b>Phoenix Sync</b><small>Sube tu club y trae tus cambios</small></div>
+            <span class="mcx-flujo-linea" aria-hidden="true"><i></i></span>
+            <div class="mcx-flujo-paso"><i class="fa-solid fa-globe" aria-hidden="true"></i><b>Esta pantalla</b><small>Editas desde donde estés</small></div>
+          </div>
+          <div class="mcx-vest-puedes">
+            <div><i class="fa-solid fa-shirt" aria-hidden="true"></i><b>Dorsal y posición</b></div>
+            <div><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><b>Habilidades</b></div>
+            <div><i class="fa-solid fa-ruler-vertical" aria-hidden="true"></i><b>Edad, altura y peso</b></div>
+            <div><i class="fa-solid fa-sack-dollar" aria-hidden="true"></i><b>Sueldo y valor</b></div>
+            <div><i class="fa-solid fa-bell" aria-hidden="true"></i><b>Avisos a tu juego</b></div>
+          </div>
+          <p class="mcx-vest-nota"><b>No es tu club de la web.</b> Resumen, Plantilla y Fichajes son de la liga online, contra otros DT. Esto es tu partida personal de PES.</p>
         </header>
         <!-- Vestuario (antes /mi-club/): mismos ids que usa js/pages/miClub.js -->
         <p id="mc-sin-sesion" class="!hidden"></p>
