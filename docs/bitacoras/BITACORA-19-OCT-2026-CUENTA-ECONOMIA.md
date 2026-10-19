@@ -84,6 +84,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 15:58 | (ver REGISTRO) | **Beta 1.8.0**: web más ligera (cinta, scroll, animaciones, estrellas, iconos), Jugadas como Reels (botón + deslizar), eliminar en Social y Jugadas |
 | 16:03 | (ver REGISTRO) | **Beta 1.8.1**: Social más aireado (publicaciones separadas, columna izquierda angosta) |
 | 16:26 | (ver REGISTRO) | **Beta 1.8.2**: logo de la página en «Phoenix Social» y logo FL26 de Football Life |
+| 16:33 | (ver REGISTRO) | **Beta 1.9.0**: Social con personalidad (saludo, pulso, acentos de fuego, final del feed) y recargar sutil |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -265,6 +266,13 @@ Pedido: «verifica la opción de eliminar post o comentarios».
 - Tarjeta «Phoenix Social»: el logo de la página (`public/logo.webp`) en vez de la llama.
 - Juegos: `data/muroEstilo.js` → `LOGOS_JUEGO` (archivo por juego en `public/juegos/`); si un archivo falta o no carga, se ve la letra de siempre. Hoy solo **Football Life** (`sp-football-life.png`, la placa «FL26» recortada de la imagen que dio Fralex).
 - **Pendiente**: PES 2021, FIFA, EA FC y eFootball. Candidatos en Wikimedia Commons: `Logo Pes2021.png` (78 KB), `FIFA series logo (2010–2020).svg` (2 KB), `EA Sports FC logo.svg` (6 KB), `EFootball logo.svg` (7 KB). Falta el «sí» de Fralex para descargarlos; al tenerlos, agregarlos a `LOGOS_JUEGO`.
+
+### 5.19 Social con personalidad + recargar (1.9.0)
+- Pedido: «un poco más de personalidad» y «un botón de recargar sutil… y también para subir hasta arriba rápidamente».
+- **Saludo** arriba del muro según la hora, con tu nombre (naranja), una frase Phoenix del día (rotan 7) y el pulso «N publicaciones hoy · M jugadores activos».
+- **Acentos de fuego** (naranja→rosa, como Jugadas y la racha) en la pestaña activa y en lo elegido de la columna izquierda.
+- **Final del feed**: logo de Phoenix, «Estás al día 🔥», botones Publicar algo y Recargar.
+- **Recargar**: ↻ discreto en la barra pegada; el botón flotante (aparece al bajar 500 px) sube y recarga; el del final también. El icono gira mientras carga y se pone verde al terminar.
 
 ---
 

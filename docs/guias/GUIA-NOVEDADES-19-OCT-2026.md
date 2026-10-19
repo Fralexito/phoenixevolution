@@ -185,7 +185,16 @@ La cinta de «Última hora», el desplazamiento suave, los puntos que laten y la
 
 ---
 
-## 15. Si algo no se ve bien
+## 15. Recargar y subir en Social
+
+- El **↻** junto a «Jugadas», en la barra de arriba del muro, trae las publicaciones nuevas.
+- Al bajar aparece un **botón redondo** abajo a la derecha: te sube arriba y recarga a la vez.
+- Al final del muro también hay **Recargar** (y **Publicar algo**).
+- Mientras carga, el icono gira; al terminar se pone verde.
+
+---
+
+## 16. Si algo no se ve bien
 
 1. Mira la versión de la cinta (paso 1) y recarga.
 2. Prueba con `?demo=1` para ver si es por falta de datos.

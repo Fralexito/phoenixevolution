@@ -514,3 +514,54 @@ button.sx-pie-total:hover { background: rgb(255 255 255 / .07); }
 /* Football Life: su placa «FL26» ya es oscura con borde; ocupa toda la plaquita */
 .sxr-ic-juego.con-logo[data-logo='sp'] { background: #0d0606; }
 .sxr-ic-juego.con-logo[data-logo='sp'] > img { inset: 0; width: 100%; height: 100%; }
+
+/* ===== Más personalidad (19-oct-2026) ===== */
+/* Saludo: según la hora, con tu nombre, la frase Phoenix del día y el pulso de la comunidad */
+.sxr-saludo { display: grid; gap: .15rem; padding: .35rem .15rem .1rem; }
+.sxr-saludo[hidden] { display: none; }
+.sxr-saludo-hola { margin: 0; font: 700 1.15rem/1.25 var(--font-display); color: #fff; letter-spacing: .01em; }
+.sxr-saludo-hola b { color: #fdba74; }   /* tu nombre en el naranja de Phoenix */
+.sxr-saludo-frase { margin: 0; font-size: 13px; color: var(--sxr-tx2); }
+.sxr-saludo-pulso { justify-self: start; display: inline-flex; align-items: center; gap: .45rem; margin-top: .35rem; padding: .25rem .65rem; border-radius: 99px; font-size: 12px; font-weight: 600; color: #fed7aa;
+  background: linear-gradient(100deg, rgb(251 146 60 / .14), rgb(244 63 94 / .1)); border: 1px solid rgb(251 146 60 / .22); }
+.sxr-saludo-pulso i { position: relative; width: .45rem; height: .45rem; border-radius: 50%; background: #fb923c; }
+.sxr-saludo-pulso i::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #fb923c; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) { .sxr-saludo-pulso i::after { animation: sxr-pulso 2s ease-out infinite; } .sxr-saludo { animation: sxr-sube .45s var(--sxr-e) both; } }
+@keyframes sxr-pulso { 0% { opacity: .6; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(2.6); } }
+
+/* Acentos de fuego (la identidad de Phoenix, igual que Jugadas y la racha): pestaña activa y lo elegido a la izquierda */
+.sxr-vistas-pastilla { background: linear-gradient(100deg, rgb(251 146 60 / .22), rgb(244 63 94 / .2)); box-shadow: inset 0 0 0 1px rgb(251 146 60 / .3); }
+.sxr-item[aria-current='page']::before, .sxr-item[aria-current='true']::before { background: linear-gradient(180deg, #fdba74, #f43f5e); }
+
+/* Botón ↻ de la barra: discreto, del mismo tamaño que «Ordenar y filtrar» */
+.sxr-recargar { flex: none; width: 2.55rem; height: 2.55rem; display: grid; place-items: center; border-radius: 99px; color: #9aa3b8; background: transparent;
+  transition: background-color .2s ease, color .2s ease, transform .16s var(--sxr-e); }
+.sxr-recargar:hover { color: #fff; background: rgb(255 255 255 / .08); }
+.sxr-recargar:active, .sxr-arriba:active { transform: scale(.92); }
+.sxr-recargar.is-girando i, .sxr-final-b.is-girando i { animation: sxr-giro .7s linear infinite; }
+.sxr-recargar.is-listo, .sxr-final-b.is-listo { color: #34d399; }
+@keyframes sxr-giro { to { transform: rotate(360deg); } }
+
+/* Botón flotante: subir + recargar. Más discreto que antes; al pasar el mouse asoma el ↻ */
+.sxr-arriba { width: 2.6rem; height: 2.6rem; background: rgb(16 12 32 / .78); border-color: rgb(255 255 255 / .1); color: #d6dbe7; overflow: hidden; }
+.sxr-arriba > i { grid-area: 1 / 1; transition: transform .25s var(--sxr-e), opacity .2s ease; }
+.sxr-arriba-giro { opacity: 0; transform: translateY(110%); }
+.sxr-arriba:hover > i:first-child, .sxr-arriba.is-girando > i:first-child, .sxr-arriba.is-listo > i:first-child { opacity: 0; transform: translateY(-110%); }
+.sxr-arriba:hover .sxr-arriba-giro, .sxr-arriba.is-girando .sxr-arriba-giro, .sxr-arriba.is-listo .sxr-arriba-giro { opacity: 1; transform: none; }
+.sxr-arriba.is-girando .sxr-arriba-giro { animation: sxr-giro .7s linear infinite; }
+.sxr-arriba.is-listo { color: #34d399; }
+.sxr-arriba:hover { background: linear-gradient(135deg, #fb923c, #f43f5e); color: #fff; border-color: transparent; }
+
+/* Final del feed */
+.sxr-final { display: grid; justify-items: center; gap: .45rem; margin-top: 1.4rem; padding: 2rem 1rem 1.5rem; text-align: center; border-top: 1px solid var(--sxr-linea); }
+.sxr-final img { width: 2.75rem; height: 2.75rem; border-radius: 50%; box-shadow: 0 0 0 2px rgb(255 255 255 / .1), 0 8px 24px -8px #f43f5e; }
+.sxr-final b { font: 700 1.05rem var(--font-display); color: #fff; }
+.sxr-final p { margin: 0; max-width: 26rem; font-size: 13.5px; color: var(--sxr-tx2); line-height: 1.5; }
+.sxr-final-acc { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: .4rem; }
+.sxr-final-b { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.4rem; padding: 0 1rem; border-radius: 99px; font-size: 13px; font-weight: 700; color: #dfe4ee;
+  background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .1); transition: background-color .2s ease, transform .16s var(--sxr-e); }
+.sxr-final-b:hover { background: rgb(255 255 255 / .1); }
+.sxr-final-b:active { transform: scale(.96); }
+.sxr-final-b.is-fuego { color: #fff; border-color: transparent; background: linear-gradient(135deg, #fb923c, #f43f5e); }
+@media (prefers-reduced-motion: reduce) { .sxr-recargar.is-girando i, .sxr-arriba.is-girando .sxr-arriba-giro, .sxr-final-b.is-girando i { animation: none; } .sxr-arriba > i { transition: none; } }
+@media (max-width: 479.98px) { .sxr-recargar { width: 2.1rem; } }   /* celular: la barra va justa */

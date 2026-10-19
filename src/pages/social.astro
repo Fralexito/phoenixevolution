@@ -27,6 +27,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
     </aside>
 
     <div class="sxr-centro">
+      <header class="sxr-saludo" data-sxr-saludo hidden></header>
       <section id="sx-hist" hidden aria-label="Historias" class="sxr-hist"></section>
       <section id="sx-compositor" aria-label="Publicar"></section>
       <!-- 19-oct-2026 (Fralex: «que el muro no se vea tan cargado… minimalista pero completo»): UNA barra pegada arriba —
@@ -34,6 +35,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
       <div class="sxr-orden">
         <p class="sxr-titulo" data-sxr-titulo></p>
         <div id="sx-vistas" role="tablist" aria-label="Qué ver en el feed" class="sxr-vistas"></div>
+        <button type="button" class="sxr-recargar" data-sxr-recargar aria-label="Recargar las publicaciones" title="Recargar"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
         <a class="sxr-reels" href={`${base}jugadas/`} data-sxr-reels title="Jugadas: videos en vertical (o desliza a la izquierda)" aria-label="Jugadas: videos de la comunidad en vertical"><i class="fa-solid fa-clapperboard" aria-hidden="true"></i><span>Jugadas</span></a>
         <div class="sxr-filtros">
           <button type="button" class="sxr-filtros-btn" data-sxr-filtros aria-expanded="false" aria-controls="sx-pop" aria-label="Ordenar y filtrar" title="Ordenar y filtrar"><i class="fa-solid fa-sliders" aria-hidden="true"></i><span class="sxr-filtros-punto" data-sxr-punto hidden></span></button>
@@ -70,7 +72,7 @@ const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-g
       </details>
     </aside>
   </div>
-  <button type="button" class="sxr-arriba" data-sxr-arriba hidden aria-label="Volver arriba"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+  <button type="button" class="sxr-arriba" data-sxr-arriba hidden aria-label="Subir y recargar las publicaciones" title="Subir y recargar"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i><i class="fa-solid fa-rotate-right sxr-arriba-giro" aria-hidden="true"></i></button>
 </Layout>
 <script>
   import '../js/pages/social.js';

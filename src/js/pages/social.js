@@ -107,7 +107,7 @@ const tarjeta = (it) => { const so = S.social[String(it.id)] ?? null;   // fase 
   return tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), puedeBorrar: isAdmin(), extra: originalHTML(so?.original), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id), social: so }) }); };
 let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
 function pintar() {
-  feedEl.innerHTML = S.items.length ? ordenarFeed(S.items, S.orden).map(tarjeta).join('')
+  feedEl.innerHTML = S.items.length ? ordenarFeed(S.items, S.orden).map(tarjeta).join('') + (S.hayMas ? '' : finalHTML())
     : `<div class="sxr-vacio"><span class="sxr-vacio-ic" aria-hidden="true"><i class="fa-solid fa-fire"></i></span><b>${escapeHTML(textoVacio(S.vista, { juego: S.juego, conSesion: !!S.yo }))}</b><p>Sé quien abre la conversación: una foto de tu último partido, un golazo o una pregunta para la comunidad.</p><button type="button" class="sxr-crear" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Crear publicación</button></div>`;
   for (const id of S.abiertas) pintarHilo(id);
   finEl.hidden = !S.hayMas;
@@ -115,6 +115,12 @@ function pintar() {
   if (S.items.length) entrada(feedEl, continuacion ? pintados : 0);
   pintados = S.items.length; primero = idPrimero;
   pintarLado();
+}
+// Final del feed (19-oct-2026, más personalidad): en vez de cortarse en seco, el logo de Phoenix y qué hacer ahora.
+function finalHTML() {
+  return `<div class="sxr-final"><img src="${escapeHTML(href('logo.webp'))}" alt="" width="44" height="44" loading="lazy" decoding="async"><b>Estás al día 🔥</b>
+    <p>Ya viste todo lo nuevo de la comunidad. Vuelve en un rato o enciende tú la conversación.</p>
+    <div class="sxr-final-acc">${S.yo ? '<button type="button" class="sxr-final-b is-fuego" data-sxr-crear><i class="fa-solid fa-plus" aria-hidden="true"></i> Publicar algo</button>' : ''}<button type="button" class="sxr-final-b" data-sxr-recargar><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Recargar</button></div></div>`;
 }
 /** Repinta SOLO una tarjeta (reaccionar no debe reiniciar los videos ni mover el scroll de las demás). */
 function repintar(id) {
@@ -221,11 +227,25 @@ function pintarNav() {
   if (navJuegos) navJuegos.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" class="sxr-item" data-j="${id}" aria-current="${S.vista === 'recientes' && S.juego === id ? 'true' : 'false'}">${id ? icJuegoHTML(id) : '<span class="sxr-ic sxr-ic-juego"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></span>'}<span>${escapeHTML(n)}</span></button>`).join('');
 }
 const nombreJuego = (id) => SEGMENTOS.find((s) => s[0] === id)?.[1] ?? null;
+// Saludo (19-oct-2026, más personalidad): según la hora, con tu nombre, una frase Phoenix del día y el pulso de la comunidad.
+const FRASES_DIA = ['La cancha está caliente', 'Hoy se juega, hoy se publica', '¿Quién se anima a un reto?', 'Aquí se viene a ganar', 'El balón no descansa', 'Golazos, revanchas y buena onda', 'Que hable el marcador'];
+function pintarSaludo() {
+  const el = document.querySelector('[data-sxr-saludo]'); if (!el) return;
+  const h = new Date().getHours(); const [hola, ic] = h >= 5 && h < 12 ? ['Buenos días', '☀️'] : h >= 12 && h < 19 ? ['Buenas tardes', '⚽'] : ['Buenas noches', '🌙'];
+  const nombre = S.yo ? String(S.perfil?.nombre_display || S.perfil?.username || '').split(' ')[0] : '';
+  const hoy = new Date().toDateString(); const deHoy = S.items.filter((x) => new Date(x.created_at).toDateString() === hoy);
+  const gente = new Set(deHoy.map((x) => x.autor?.id).filter(Boolean)).size;
+  const frase = FRASES_DIA[Math.floor(Date.now() / 864e5) % FRASES_DIA.length];
+  const pulso = deHoy.length ? `<span class="sxr-saludo-pulso"><i aria-hidden="true"></i>${deHoy.length} publicaci${deHoy.length === 1 ? 'ón' : 'ones'} hoy · ${gente} jugador${gente === 1 ? '' : 'es'} activo${gente === 1 ? '' : 's'}</span>` : '';
+  el.innerHTML = `<p class="sxr-saludo-hola"><span aria-hidden="true">${ic}</span> ${escapeHTML(hola)}${nombre ? `, <b>${escapeHTML(nombre)}</b>` : ''}</p><p class="sxr-saludo-frase">${escapeHTML(frase)}${S.yo ? '' : ' · Bienvenido a Phoenix Social'}</p>${pulso}`;
+  el.hidden = false;
+}
 function pintarLado() {
   const cifras = document.querySelector('[data-sxr-cifras]'); const activos = document.querySelector('[data-sxr-activos]'); const top = document.querySelector('[data-sxr-top]');
   if (!cifras) return;
   const autores = new Set(S.items.map((x) => x.autor?.id).filter(Boolean)).size;
   cifras.innerHTML = `<div><b>${S.circulos.length}</b><small>historias hoy</small></div><div><b>${autores}</b><small>autores en el feed</small></div>`;
+  pintarSaludo();
   pintarTendencias();
   const porJuego = new Map(); for (const it of S.items) if (nombreJuego(it.juego)) porJuego.set(it.juego, (porJuego.get(it.juego) || 0) + 1);
   const lista = [...porJuego].sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -365,10 +385,27 @@ document.addEventListener('keydown', (e) => {
   else if (k === 'n') { e.preventDefault(); document.querySelector('.sxr-der [data-sxr-crear]')?.click(); }
 });
 
-// Botón «volver arriba» cuando ya se bajó bastante.
-const arribaEl = document.querySelector('[data-sxr-arriba]'); let arribaPend = false;
-window.addEventListener('scroll', () => { if (arribaPend) return; arribaPend = true; requestAnimationFrame(() => { arribaPend = false; if (arribaEl) arribaEl.hidden = window.scrollY < 1400; }); }, { passive: true });
-arribaEl?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+// RECARGAR (19-oct-2026, Fralex: «un botón de recargar sutil tanto para recargar las publicaciones y también para subir hasta arriba rápidamente»):
+// el ↻ de la barra pegada, el del final del feed y el botón flotante (aparece al bajar un poco) hacen lo mismo: suben arriba y traen lo nuevo.
+// Mientras carga, el icono gira; al terminar se pone verde un momento.
+const arribaEl = document.querySelector('[data-sxr-arriba]'); let arribaPend = false; let refrescando = false;
+window.addEventListener('scroll', () => { if (arribaPend) return; arribaPend = true; requestAnimationFrame(() => { arribaPend = false; if (arribaEl) arribaEl.hidden = window.scrollY < 500; }); }, { passive: true });
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+async function refrescar() {
+  if (refrescando) return; refrescando = true;
+  const botones = () => document.querySelectorAll('[data-sxr-recargar], [data-sxr-arriba]');
+  botones().forEach((b) => { b.classList.remove('is-listo'); b.classList.add('is-girando'); });
+  if (nuevasEl) nuevasEl.hidden = true;
+  window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  const t0 = performance.now(); reiniciarFeed(); cargarHistorias().catch(() => {});
+  while (S.cargando && performance.now() - t0 < 10000) await esperar(120);
+  await esperar(Math.max(0, 550 - (performance.now() - t0)));   // un giro mínimo: que se note que pasó algo
+  botones().forEach((b) => { b.classList.remove('is-girando'); b.classList.add('is-listo'); });
+  setTimeout(() => botones().forEach((b) => b.classList.remove('is-listo')), 1100);
+  refrescando = false;
+}
+arribaEl?.addEventListener('click', refrescar);
+document.addEventListener('click', (e) => { if (e.target.closest('[data-sxr-recargar]')) refrescar(); });
 pintarOrdenes();
 
 // «Ordenar y filtrar» (19-oct-2026): orden, juego y vista viven en un panel que se abre con un botón; se cierra al tocar fuera o con Esc.
