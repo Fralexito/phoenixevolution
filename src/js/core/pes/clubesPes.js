@@ -95,6 +95,8 @@ const PUESTO = new Map(GRANDES.map((id, i) => [id, i]));
 export const ordenarPorPrestigio = (lista = []) => [...lista].sort((a, b) =>
   (PUESTO.get(a.id) ?? 1e9) - (PUESTO.get(b.id) ?? 1e9) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
 
-// Logos de las ligas (de crests.football-data.org, igual que los escudos; guardados en public/ligas/). Liga Máster = logo de Phoenix.
+// Logos ACTUALES de las ligas, guardados en public/ligas/ (revisado 19-oct-2026): LaLiga (doble L, 2023), Serie A (la «A» azul, 2019; el patrocinador
+// cambia, el emblema no) y Ligue 1 (2024) de Wikimedia Commons (dominio público); Premier (león, 2016) y Bundesliga (2017) de crests.football-data.org.
+// Si una liga cambia de logo, sustituye su PNG con el mismo nombre. Liga Máster = logo de Phoenix.
 const LOGO_LIGA = { 'Premier League': 'ligas/PL.png', LaLiga: 'ligas/PD.png', 'Serie A': 'ligas/SA.png', Bundesliga: 'ligas/BL1.png', 'Ligue 1': 'ligas/FL1.png', 'Liga Máster': 'logo.webp' };
 export const logoLigaUrl = (liga) => (LOGO_LIGA[liga] ? `${import.meta.env?.BASE_URL ?? '/'}${LOGO_LIGA[liga]}` : null);
