@@ -11,7 +11,7 @@ import '../styles/salaFichajes.css';
 import '../styles/perfilJugador.css';
 // 19-oct-2026 (Fralex: «Mi club es lo más exclusivo que tengo… merece todo un ecosistema diferente… que se disfrute entrar ahí»):
 // «El Estadio»: entrada con el escudo de tu club bajo las luces y teñida con su color, UNA barra propia (Resumen · Vestuario · Plantilla ·
-// Fichajes · Oficina · Movimientos · Conectar juego) y un Resumen del club. La lógica de siempre (manager.js, clubUnificado.js) no cambia:
+// Fichajes · Diario · Administrar la liga [staff]) y un Resumen del club. La lógica de siempre (manager.js, clubUnificado.js) no cambia:
 // la barra usa las mismas direcciones (#plantilla, #vestuario…). Estilos en miClubEstadio.css; comportamiento en features/miClub/estadio.js.
 import '../styles/miClubEstadio.css';
 import { FX } from '../data/experimento.js';
@@ -68,6 +68,7 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       <a href="#mercado" data-mcx="mercado" data-mcx-club><i class="fa-solid fa-handshake" aria-hidden="true"></i><span>Fichajes</span><b class="mcx-dock-n" data-mcx-ofertas hidden></b></a>
       {FX.clubUnificado && <a href="#vestuario" data-mcx="vestuario" data-modo="vestuario"><i class="fa-solid fa-shirt" aria-hidden="true"></i><span>Vestuario del juego</span><em>PES</em></a>}
       <a href="#movimientos" data-mcx="movimientos" data-mcx-club><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>Diario</span></a>
+      <a href="#admin" data-mcx="admin" data-mcx-staff><i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Administrar la liga</span></a>
       <button type="button" class="mcx-dock-ayuda" data-mcx-guia-abrir aria-label="Cómo funciona Mi club" title="Cómo funciona Mi club"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></button>
     </nav>
 
@@ -104,7 +105,9 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </nav>
       <!-- Resumen del club (19-oct-2026): lo pinta manager.js (pintarResumen) con los datos de siempre. -->
       <section data-panel="resumen" class="mcx-resumen" hidden aria-live="polite"><div id="mcx-resumen" class="mcx-bento"></div></section>
-      <section data-panel="plantilla" hidden class="space-y-5"><div class="mg-herr"><div class="mg-lineas" role="group" aria-label="Ver solo una línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Mediocampo</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas grandes"><i class="fa-solid fa-table-cells-large"></i><span>Grandes</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista compacta"><i class="fa-solid fa-list"></i><span>Compactas</span></button></div></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
+      <!-- PLANTILLA (19-oct-2026): arriba, tu equipo por líneas (cuántos y su media; tocar una filtra). Tres formas de verlo: Cancha (todo el equipo
+           en una pantalla, como en la pizarra), Cartas y Lista. En el celular las cartas van de a 3 por fila (antes 2). -->
+      <section data-panel="plantilla" hidden class="space-y-4 mcx-plantilla"><div class="mg-lineas mcx-fuerza" role="group" aria-label="Tu equipo por líneas: toca una para ver solo esa" data-mcx-fuerza></div><div class="mg-herr"><div class="mg-vista" role="group" aria-label="Cómo ver a tus jugadores"><button type="button" data-vista="cancha" aria-pressed="false" title="Todo el equipo en la cancha"><i class="fa-solid fa-futbol"></i><span>Cancha</span></button><button type="button" data-vista="grande" aria-pressed="true" title="Cartas"><i class="fa-solid fa-table-cells-large"></i><span>Cartas</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista"><i class="fa-solid fa-list"></i><span>Lista</span></button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div></div></div><div id="mg-plantilla" class="space-y-6"></div></section>
       <!-- FICHAJES (19-oct-2026): primero la sala (la forma principal de fichar), luego tus ofertas (antes estaban en otra pestaña, «Oficina»)
            y al final la lista completa del mercado, plegada: antes era un muro de 60 cartas que ocupaba casi seis pantallas. -->
       <section data-panel="mercado" hidden class="mcx-fichajes">
@@ -124,7 +127,7 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
           <select id="mg-pos" class="field w-32"><option value="">Posición</option>{['PT','DEC','LD','LI','MCD','MC','MO','MD','MI','ED','EI','SD','DC'].map((p) => <option>{p}</option>)}</select>
           <label class="mg-toggle"><input id="mg-libres" type="checkbox"><span><i class="fa-solid fa-unlock"></i> Solo libres</span></label>
         </div>
-        <div class="mg-herr"><div class="mg-lineas" role="group" aria-label="Ver solo una línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Mediocampo</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas grandes"><i class="fa-solid fa-table-cells-large"></i><span>Grandes</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista compacta"><i class="fa-solid fa-list"></i><span>Compactas</span></button></div></div></div>
+        <div class="mg-herr"><div class="mg-lineas" role="group" aria-label="Ver solo una línea"><button type="button" data-linea="" aria-pressed="true">Todos</button><button type="button" data-linea="por" aria-pressed="false">Porteros</button><button type="button" data-linea="def" aria-pressed="false">Defensas</button><button type="button" data-linea="med" aria-pressed="false">Mediocampo</button><button type="button" data-linea="del" aria-pressed="false">Delanteros</button></div><div class="mg-herr-der"><label class="mg-orden" title="Ordenar"><i class="fa-solid fa-arrow-down-wide-short"></i><select data-orden aria-label="Ordenar por"><option value="media">Mejor media</option><option value="valor">Más caros</option><option value="edad">Más jóvenes</option><option value="nombre">Nombre (A-Z)</option></select></label><div class="mg-tam" role="group" aria-label="Tamaño de las cartas"><button type="button" data-tam="-1" aria-label="Cartas más pequeñas" title="Alejar"><i class="fa-solid fa-magnifying-glass-minus"></i></button><button type="button" data-tam="1" aria-label="Cartas más grandes" title="Agrandar"><i class="fa-solid fa-magnifying-glass-plus"></i></button></div><div class="mg-vista" role="group" aria-label="Cómo ver las cartas"><button type="button" data-vista="grande" aria-pressed="true" title="Cartas"><i class="fa-solid fa-table-cells-large"></i><span>Cartas</span></button><button type="button" data-vista="compacta" aria-pressed="false" title="Lista"><i class="fa-solid fa-list"></i><span>Lista</span></button></div></div></div>
         <div id="mg-mercado"></div>
         </div>
         </details>
@@ -134,66 +137,70 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       <div data-panel="resumen" hidden class="mcx-pie"><button type="button" id="mg-dejar" class="mcx-dejar"><i class="fa-solid fa-door-open" aria-hidden="true"></i> Dejar mi club</button></div>
     </div>
 
-    <!-- Staff: todo se guarda al instante (sin botón Guardar) -->
-    <section id="mg-staff" hidden class="mg-staff">
-      <header class="flex flex-wrap items-center gap-3">
-        <h2 class="mg-staff-tit"><i class="fa-solid fa-shield-halved"></i> Centro de control</h2>
-        <span class="text-[12px] text-gray-500">Staff · los cambios se guardan solos</span>
+    <!-- ADMINISTRAR LA LIGA (antes «Centro de control», 19-oct-2026; Fralex: «no entiendo para nada la parte de centro de control»).
+         Solo staff, con su propia pestaña (#admin) y en 3 pasos explicados: la temporada · clubes que juegan · herramientas avanzadas (plegadas).
+         Mismos ids de siempre: la lógica sigue en manager.js, managerEquivalencias.js y managerTraspasosReales.js. Todo se guarda solo. -->
+    <section id="mg-staff" hidden class="mg-staff mcx-admin" aria-labelledby="mcx-admin-t">
+      <div class="mcx-admin-cab">
+        <div class="min-w-0"><h2 id="mcx-admin-t">Administrar la liga</h2><p>Solo lo ve el staff. Aquí decides cuándo se puede fichar, con cuánto dinero empieza cada DT y qué clubes juegan. No hay botón Guardar: cada cambio se guarda solo.</p></div>
         <span id="mg-guardado" class="mg-guardado" aria-live="polite"></span>
-      </header>
-
-      <div class="mg-ctrl-grid">
-        <!-- Ventana -->
-        <label class="mg-ctrl mg-ctrl-ventana" for="mg-c-ventana">
-          <span class="mg-ctrl-ic"><i class="fa-solid fa-door-open"></i></span>
-          <span class="flex-1"><b>Ventana de fichajes</b><small id="mg-c-ventana-txt">—</small></span>
-          <input id="mg-c-ventana" type="checkbox" class="mg-switch">
-        </label>
-        <!-- Exigir código -->
-        <label class="mg-ctrl" for="mg-exigir">
-          <span class="mg-ctrl-ic"><i class="fa-solid fa-key"></i></span>
-          <span class="flex-1"><b>Exigir código manager</b><small>Phoenix Link no podrá usar su propia vinculación</small></span>
-          <input id="mg-exigir" type="checkbox" class="mg-switch">
-        </label>
-        <!-- Presupuesto -->
-        <div class="mg-ctrl mg-ctrl-col">
-          <div class="flex items-center gap-3 w-full"><span class="mg-ctrl-ic"><i class="fa-solid fa-wallet"></i></span>
-            <span class="flex-1"><b>Presupuesto inicial</b><small>Lo recibe cada DT al elegir club</small></span><output id="mg-c-presu-v" class="mg-ctrl-num">—</output></div>
-          <input id="mg-c-presu" type="range" min="5000000" max="300000000" step="5000000" class="mg-range">
-          <div class="flex flex-wrap gap-1.5">{[25, 50, 100, 200].map((m) => <button type="button" class="mg-chip" data-presu={m * 1e6}>€{m} M</button>)}</div>
-        </div>
-        <!-- Máx plantilla -->
-        <div class="mg-ctrl">
-          <span class="mg-ctrl-ic"><i class="fa-solid fa-people-group"></i></span>
-          <span class="flex-1"><b>Máx. plantilla</b><small>Jugadores por club</small></span>
-          <div class="mg-stepper"><button type="button" data-max="-1" aria-label="Menos">−</button><output id="mg-c-max">30</output><button type="button" data-max="1" aria-label="Más">+</button></div>
-        </div>
       </div>
+      <div id="mcx-admin-estado" class="mcx-admin-estado" aria-live="polite"></div>
 
-      <!-- Importar catálogo -->
-      <label id="mg-drop" class="mg-drop" for="mg-json">
-        <input id="mg-json" type="file" accept=".json,application/json" class="sr-only">
-        <i class="fa-solid fa-file-import"></i>
-        <b>Arrastra aquí el catálogo (JSON del programa)</b>
-        <small>o haz clic para elegirlo · los clubes entran sin aprobar</small>
-      </label>
-      <div id="mg-prev" hidden class="mg-prev"></div>
+      <section class="mcx-admin-paso" aria-labelledby="mcx-admin-1">
+        <h3 id="mcx-admin-1"><span class="mcx-admin-n">1</span> La temporada</h3>
+        <p class="mcx-admin-ayuda">Abre la ventana cuando quieras que los DT fichen y ciérrala para congelar las plantillas. El presupuesto y el máximo de jugadores valen para todos los clubes.</p>
+        <div class="mg-ctrl-grid">
+          <label class="mg-ctrl mg-ctrl-ventana" for="mg-c-ventana">
+            <span class="mg-ctrl-ic"><i class="fa-solid fa-door-open"></i></span>
+            <span class="flex-1"><b>Ventana de fichajes</b><small id="mg-c-ventana-txt">—</small></span>
+            <input id="mg-c-ventana" type="checkbox" class="mg-switch">
+          </label>
+          <div class="mg-ctrl mg-ctrl-col">
+            <div class="flex items-center gap-3 w-full"><span class="mg-ctrl-ic"><i class="fa-solid fa-wallet"></i></span>
+              <span class="flex-1"><b>Dinero con el que empieza cada DT</b><small>Lo recibe al elegir su club</small></span><output id="mg-c-presu-v" class="mg-ctrl-num">—</output></div>
+            <input id="mg-c-presu" type="range" min="5000000" max="300000000" step="5000000" class="mg-range" aria-label="Dinero con el que empieza cada DT">
+            <div class="flex flex-wrap gap-1.5">{[25, 50, 100, 200].map((m) => <button type="button" class="mg-chip" data-presu={m * 1e6}>€{m} M</button>)}</div>
+          </div>
+          <div class="mg-ctrl">
+            <span class="mg-ctrl-ic"><i class="fa-solid fa-people-group"></i></span>
+            <span class="flex-1"><b>Máximo de jugadores</b><small>Por club; nadie puede fichar por encima</small></span>
+            <div class="mg-stepper"><button type="button" data-max="-1" aria-label="Menos">−</button><output id="mg-c-max">30</output><button type="button" data-max="1" aria-label="Más">+</button></div>
+          </div>
+          <label class="mg-ctrl" for="mg-exigir">
+            <span class="mg-ctrl-ic"><i class="fa-solid fa-key"></i></span>
+            <span class="flex-1"><b>Vincular solo con código de mánager</b><small>Encendido: Phoenix Link ya no puede usar su propia vinculación</small></span>
+            <input id="mg-exigir" type="checkbox" class="mg-switch">
+          </label>
+        </div>
+      </section>
 
-      <!-- Clubes -->
-      <div class="space-y-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-shield-halved"></i> Clubes</h3>
+      <section class="mcx-admin-paso" aria-labelledby="mcx-admin-2">
+        <h3 id="mcx-admin-2"><span class="mcx-admin-n">2</span> Clubes que juegan</h3>
+        <p class="mcx-admin-ayuda">Enciende los clubes que participan. Un club encendido y sin DT lo maneja la IA: cualquier DT le puede fichar al momento. Si la lista está vacía, primero sube el catálogo que genera Phoenix Sync (los clubes entran apagados).</p>
+        <label id="mg-drop" class="mg-drop" for="mg-json">
+          <input id="mg-json" type="file" accept=".json,application/json" class="sr-only">
+          <i class="fa-solid fa-file-import"></i>
+          <b>Subir el catálogo de clubes y jugadores</b>
+          <small>Arrastra aquí el archivo JSON de Phoenix Sync o haz clic para elegirlo</small>
+        </label>
+        <div id="mg-prev" hidden class="mg-prev"></div>
+        <div class="mcx-admin-clubes-cab">
           <span id="mg-c-resumen" class="text-xs text-gray-400"></span>
-          <label class="relative ml-auto"><i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-[12px]"></i><input id="mg-c-buscar" type="search" placeholder="Buscar club…" class="field !min-h-8 !py-1 !pl-7 !text-xs w-44"></label>
-          <button type="button" class="mg-chip" data-todos="1">Aprobar todos</button><button type="button" class="mg-chip" data-todos="0">Ninguno</button>
+          <label class="relative ml-auto"><i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-[12px]"></i><input id="mg-c-buscar" type="search" placeholder="Buscar club…" class="field !min-h-9 !py-1 !pl-7 !text-xs w-44"></label>
+          <button type="button" class="mg-chip" data-todos="1">Encender todos</button><button type="button" class="mg-chip" data-todos="0">Apagar todos</button>
         </div>
         <div id="mg-staff-clubes" class="mg-clubes-grid"></div>
-      </div>
+      </section>
 
+      <details class="mcx-admin-paso mcx-admin-avanzado">
+        <summary><span class="mcx-admin-n">3</span><span class="min-w-0"><b>Herramientas avanzadas</b><small>Equivalencias entre parches y traspasos de la vida real. Solo hacen falta de vez en cuando.</small></span></summary>
+        <div class="mcx-admin-avanzado-cuerpo">
       <!-- Equivalencias entre parches (informe de Phoenix Sync) -->
       <div id="eq" class="space-y-3">
+        <p class="mcx-admin-ayuda">Cada parche de PES numera distinto a jugadores y clubes. Phoenix Sync informa a quién corresponde cada uno en cada parche; aquí confirmas los que quedaron «A revisar».</p>
         <div class="flex flex-wrap items-center gap-2">
-          <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-link"></i> Equivalencias entre parches</h3>
+          <h4 class="mg-caja-tit !mb-0"><i class="fa-solid fa-link"></i> Equivalencias entre parches</h4>
           <select id="eq-perfil" class="field !min-h-8 !py-1 !text-xs w-auto" aria-label="Parche"></select>
           <div class="flex gap-1">
             <button type="button" class="mg-chip" data-eq-tipo="jugadores" aria-pressed="true">Jugadores</button>
@@ -208,8 +215,9 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
 
       <!-- Capa 1: traspasos reales por ventana -->
       <div id="tr" class="space-y-3">
+        <p class="mcx-admin-ayuda">Los fichajes de verdad del fútbol (traspasos, cesiones, llegadas libres y retiros), agrupados por ventana, para aplicarlos en el juego. Se cargan con el ID del jugador y de los equipos en PES.</p>
         <div class="flex flex-wrap items-center gap-2">
-          <h3 class="mg-caja-tit !mb-0"><i class="fa-solid fa-right-left"></i> Traspasos reales (Capa 1)</h3>
+          <h4 class="mg-caja-tit !mb-0"><i class="fa-solid fa-right-left"></i> Traspasos de la vida real</h4>
           <select id="tr-ventana" class="field !min-h-8 !py-1 !text-xs w-auto" aria-label="Ventana"></select>
           <button id="tr-nueva" type="button" class="mg-chip"><i class="fa-solid fa-plus"></i> Nueva ventana</button>
           <div id="tr-estado" class="flex gap-1 ml-auto"></div>
@@ -226,6 +234,8 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
         </form>
         <div id="tr-lista" class="space-y-2"></div>
       </div>
+        </div>
+      </details>
     </section>
     </div>
 

@@ -36,10 +36,11 @@ const carta = (j, pie = '', extra = '') => { filas.set(j.id, j); return `<articl
   <p class="mg-meta">${j.edad ? `${j.edad} años · ` : ''}<b>${millones(j.valor)}</b></p>${extra}
   ${pie ? `<div class="mg-carta-pie">${pie}</div>` : ''}</article>`; };
 // Pulsar una carta (menos sus botones y enlaces) abre la ficha rápida con todo lo del juego; las flechas pasan al jugador anterior o siguiente de esa lista.
+// Las fichas de la vista Cancha (botones .mcx-ficha) también la abren.
 document.addEventListener('click', (e) => {
-  const c = e.target.closest('.mg-carta[data-ficha]'); if (!c) return;
-  if (e.target.closest('a, button:not(.mg-ver)')) return;
-  const lista = [...c.closest('#mg-plantilla, #mg-mercado, body').querySelectorAll('.mg-carta[data-ficha]')].map((x) => filas.get(Number(x.dataset.jid))).filter(Boolean);
+  const c = e.target.closest('[data-ficha][data-jid]'); if (!c) return;
+  const otro = e.target.closest('a, button'); if (otro && otro !== c && !otro.classList.contains('mg-ver')) return;
+  const lista = [...c.closest('#mg-plantilla, #mg-mercado, body').querySelectorAll('[data-ficha][data-jid]')].map((x) => filas.get(Number(x.dataset.jid))).filter(Boolean);
   const indice = lista.findIndex((j) => j.id === Number(c.dataset.jid));
   if (indice >= 0) abrirFichaJugador({ lista, indice, clubDe: (j) => (j.club_id === undefined ? club : clubes.get(j.club_id)) ?? null });
 });
@@ -102,12 +103,38 @@ const fila = (j, acciones) => `<tr class="border-t border-galaxy-border/60"><td 
   <td class="pr-2 text-right">${plata(j.valor)}</td><td class="text-right">${acciones.btn}</td></tr>`;
 const tabla = (filas, conClub = false) => `<div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[12px] text-gray-500 uppercase tracking-wider"><tr><th class="text-left">Pos</th><th class="text-left">Jugador</th><th>Media</th><th class="hidden sm:table-cell">Edad</th><th class="hidden md:table-cell text-left">${conClub ? 'Club' : ''}</th><th class="text-right">Valor</th><th></th></tr></thead><tbody>${filas}</tbody></table></div>`;
 
+let plantillaDatos = null;   // la última plantilla leída: cambiar de vista o de línea no vuelve a pedirla
 async function pintarPlantilla() {
   const { data, error } = await supabase.from('lm_jugadores').select('id, nombre, posicion, media, edad, valor, pes_id').eq('club_id', club.id).order('media', { ascending: false });
   if (error) { $('mg-plantilla').innerHTML = vacio('fa-triangle-exclamation', 'No se pudo cargar la plantilla', 'Recarga la página.'); return; }
   const xi = data.slice(0, 11);
   resumen = { n: data.length, valor: data.reduce((s, j) => s + Number(j.valor || 0), 0), mediaXI: xi.length ? Math.round(xi.reduce((s, j) => s + (j.media || 0), 0) / xi.length) : null };
+  plantillaDatos = data;
   pintarCabecera();
+  await dibujarPlantilla();
+}
+const apellido = (n) => { const p = String(n ?? '').trim().split(/\s+/); return p.length > 1 ? p.slice(1).join(' ') : p[0] ?? ''; };
+// Tu equipo por líneas (19-oct-2026): cuántos hay y su media, con una barra; tocar una línea filtra (mismo data-linea de siempre).
+function pintarFuerza(data) {
+  const caja = document.querySelector('[data-mcx-fuerza]'); if (!caja) return;
+  const prom = (g) => (g.length ? Math.round(g.reduce((s, j) => s + (j.media || 0), 0) / g.length) : 0);
+  const barra = (m) => Math.max(6, Math.min(100, Math.round(((m - 50) / 45) * 100)));
+  const boton = (id, t, g, m) => `<button type="button" data-linea="${id}" ${id ? `data-linea-color="${id}"` : ''} aria-pressed="${herr.linea === id}"><span class="mcx-fz-t">${t}</span><span class="mcx-fz-n"><b>${g}</b>${m ? `<small>media ${m}</small>` : ''}</span><span class="mcx-fz-barra" style="--p:${barra(m)}%"><i></i></span></button>`;
+  caja.innerHTML = boton('', 'Todos', data.length, resumen.mediaXI ?? 0) + LINEAS.filter(([id]) => id !== 'otros').map(([id, t]) => { const g = data.filter((j) => linea(j.posicion) === id); return boton(id, t, g.length, prom(g)); }).join('');
+}
+// La cancha: todo el equipo en una pantalla, por líneas (delanteros arriba, portero abajo). Los 11 de mejor media llevan aro dorado.
+function htmlCancha(data) {
+  const xi = new Set(data.slice(0, 11).map((j) => j.id));
+  const ficha = (j) => { filas.set(j.id, j); return `<button type="button" class="mcx-ficha${xi.has(j.id) ? ' es-xi' : ''}" data-ficha data-jid="${j.id}" data-linea="${linea(j.posicion)}" title="${esc(j.nombre)} · ${esc(j.posicion ?? '')} · ${j.media ?? '—'}">
+      <span class="mcx-ficha-cara" data-foto="${esc(j.nombre)}" data-pes="${j.pes_id ?? ''}" data-club="${esc(club?.nombre ?? '')}" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+      <b class="mcx-ficha-media">${j.media ?? '—'}</b><span class="mcx-ficha-pos">${esc(j.posicion ?? '')}</span><span class="mcx-ficha-nom">${esc(apellido(j.nombre))}</span></button>`; };
+  const bandas = [['del', 'Delanteros'], ['med', 'Mediocampo'], ['def', 'Defensas'], ['por', 'Porteros'], ['otros', 'Sin posición']];
+  return `<div class="mcx-cancha"${herr.linea ? ` data-foco="${herr.linea}"` : ''}><span class="mcx-cancha-lineas" aria-hidden="true"></span>${bandas.map(([id, t]) => { const g = ordenar(data.filter((j) => linea(j.posicion) === id)); return g.length ? `<div class="mcx-banda" data-linea="${id}"><p class="mcx-banda-t">${t} <small>${g.length}</small></p><div class="mcx-fichas">${g.map(ficha).join('')}</div></div>` : ''; }).join('')}</div>
+    <p class="mcx-cancha-ayuda"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Toca a un jugador para ver su ficha. Con aro dorado: tus 11 de mejor media. Para vender o liberar, usa la vista Cartas.</p>`;
+}
+async function dibujarPlantilla() {
+  const data = plantillaDatos; if (!data) return;
+  pintarFuerza(data);
   if (!data.length) {
     // Ronda 282: si la liga entera no tiene jugadores todavía, el problema no es tu club: falta el catálogo del parche.
     const { count } = await supabase.from('lm_jugadores').select('id', { count: 'exact', head: true }).eq('liga', LIGA);
@@ -118,6 +145,7 @@ async function pintarPlantilla() {
   const off = cfg.ventana_abierta ? '' : 'disabled';
   // Ronda 292: las acciones van ABAJO de la carta (antes tapaban la posición), con su palabra.
   const btn = (j) => `<div class="mg-acciones"><button type="button" class="mg-mini" data-vender="${j.id}" data-nombre="${esc(j.nombre)}" data-valor="${j.valor}" ${off} title="Vender a un club CPU por su valor"><i class="fa-solid fa-hand-holding-dollar"></i><span>Vender</span></button><button type="button" class="mg-mini" data-liberar="${j.id}" ${off} title="Liberar (queda agente libre)"><i class="fa-solid fa-user-minus"></i><span>Liberar</span></button></div>`;
+  if ($('mg-panel')?.dataset.vista === 'cancha') { $('mg-plantilla').innerHTML = htmlCancha(data); montarFotos($('mg-plantilla')); return; }
   const vistos = ordenar(data.filter((j) => !herr.linea || linea(j.posicion) === herr.linea));
   if (!vistos.length) { $('mg-plantilla').innerHTML = vacio('fa-filter', 'No tienes jugadores en esa línea', 'Elige «Todos» para ver toda tu plantilla.'); return; }
   $('mg-plantilla').innerHTML = LINEAS.map(([id, t]) => { const g = vistos.filter((j) => linea(j.posicion) === id); return g.length ? `<div class="mg-linea" data-linea="${id}">
@@ -127,15 +155,21 @@ async function pintarPlantilla() {
 
 // Dos formas de ver las cartas (ronda 290, pedido de Fralex): «Grandes» (foto grande al centro) o «Compactas» (fila: foto pequeña,
 // nombre y media; caben más). Se recuerda en este navegador.
+// 19-oct-2026: tercera vista, «Cancha» (solo en Plantilla; en el mercado se ven como Cartas). Sin preferencia guardada, el celular empieza
+// en Cancha (todo el equipo en una pantalla) y la PC en Cartas.
 const CLAVE_VISTA = 'pes-mg-vista';
 function ponerVista(v) {
-  const vista = v === 'compacta' ? 'compacta' : 'grande';
+  const vista = ['compacta', 'cancha'].includes(v) ? v : 'grande';
   $('mg-panel')?.setAttribute('data-vista', vista);
   document.querySelectorAll('.mg-vista [data-vista]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === vista)));
-  try { localStorage.setItem(CLAVE_VISTA, vista); } catch { /* no se recuerda */ }
+  return vista;
 }
-{ let v = 'grande'; try { v = localStorage.getItem(CLAVE_VISTA) || 'grande'; } catch { /* sin almacenamiento */ } ponerVista(v); }
-document.addEventListener('click', (e) => { const b = e.target.closest('.mg-vista [data-vista]'); if (b) ponerVista(b.dataset.vista); });
+{ let v = null; try { v = localStorage.getItem(CLAVE_VISTA); } catch { /* sin almacenamiento */ } ponerVista(v || (matchMedia('(max-width: 640px)').matches ? 'cancha' : 'grande')); }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.mg-vista [data-vista]'); if (!b) return;
+  const vista = ponerVista(b.dataset.vista); try { localStorage.setItem(CLAVE_VISTA, vista); } catch { /* no se recuerda */ }
+  if (tabActual() === 'plantilla') dibujarPlantilla();
+});
 
 // Herramientas de las cartas (ronda 292, pedido de Fralex): ver solo una línea, ordenar a gusto y agrandar/alejar.
 const CLAVE_HERR = 'pes-mg-herr';
@@ -151,7 +185,7 @@ function pintarHerr() {
   document.querySelectorAll('.mg-tam [data-tam]').forEach((b) => { b.disabled = (b.dataset.tam === '-1' && herr.tam <= 1) || (b.dataset.tam === '1' && herr.tam >= 4); });
   try { localStorage.setItem(CLAVE_HERR, JSON.stringify({ orden: herr.orden, tam: herr.tam })); } catch { /* no se recuerda */ }
 }
-const repintarCartas = () => { pintarHerr(); if (tabActual() === 'mercado') pintarMercado(); else pintarPlantilla(); };
+const repintarCartas = () => { pintarHerr(); if (tabActual() === 'mercado') pintarMercado(); else if (plantillaDatos) dibujarPlantilla(); else pintarPlantilla(); };
 document.addEventListener('click', (e) => {
   const l = e.target.closest('.mg-lineas [data-linea]'); if (l) { herr.linea = l.dataset.linea; repintarCartas(); return; }
   const t = e.target.closest('.mg-tam [data-tam]'); if (t && !t.disabled) { herr.tam = Math.max(1, Math.min(4, herr.tam + Number(t.dataset.tam))); pintarHerr(); }   // solo cambia el tamaño: no hace falta volver a pedir datos
@@ -231,16 +265,26 @@ function pintarControles() {
   $('mg-c-presu').value = cfg?.presupuesto_inicial ?? 50e6; $('mg-c-presu-v').textContent = millones(cfg?.presupuesto_inicial);
   document.querySelectorAll('[data-presu]').forEach((b) => b.classList.toggle('activo', Number(b.dataset.presu) === Number(cfg?.presupuesto_inicial)));
   $('mg-c-max').textContent = cfg?.max_plantilla ?? 40;
+  pintarEstadoLiga();
 }
 function pintarClubesStaff() {
   const lista = [...clubes.values()]; const q = filtroClub.toLowerCase();
   const ap = lista.filter((c) => c.aprobado).length; const dts = lista.filter((c) => c.dueno).length;
-  $('mg-c-resumen').innerHTML = `<b class="text-white">${ap}</b>/${lista.length} aprobados · <b class="text-galaxy-400">${dts}</b> con DT`;
+  $('mg-c-resumen').innerHTML = `<b class="text-white">${ap}</b> de ${lista.length} encendidos · <b class="text-galaxy-400">${dts}</b> con DT`;
   const vis = lista.filter((c) => !q || c.nombre.toLowerCase().includes(q));
   $('mg-staff-clubes').innerHTML = !lista.length ? vacio('fa-file-import', 'Sin clubes todavía', 'Importa el catálogo para verlos aquí.')
     : !vis.length ? '<p class="text-xs text-gray-500 col-span-full">Ningún club coincide.</p>'
-    : vis.map((c) => `<label class="mg-club-t ${c.aprobado ? 'activo' : ''}">${escudo(c, 'w-8 h-8')}<span class="flex-1 min-w-0"><b>${esc(c.nombre)}</b><small>${c.dueno ? '<i class="fa-solid fa-user-tie"></i> Tiene DT · ' + millones(c.presupuesto) : c.aprobado ? '<i class="fa-solid fa-microchip"></i> CPU · sin DT' : 'No participa'}</small></span>
+    : vis.map((c) => `<label class="mg-club-t ${c.aprobado ? 'activo' : ''}">${escudo(c, 'w-8 h-8')}<span class="flex-1 min-w-0"><b>${esc(c.nombre)}</b><small>${c.dueno ? '<i class="fa-solid fa-user-tie"></i> Tiene DT · ' + millones(c.presupuesto) : c.aprobado ? '<i class="fa-solid fa-microchip"></i> Juega · lo maneja la IA' : 'Apagado · no juega'}</small></span>
         <input type="checkbox" class="mg-switch" data-aprobar-club="${c.id}" ${c.aprobado ? 'checked' : ''}></label>`).join('');
+  pintarEstadoLiga();
+}
+// Cómo está la liga, de un vistazo (arriba de «Administrar la liga»).
+function pintarEstadoLiga() {
+  const el = $('mcx-admin-estado'); if (!el) return;
+  const lista = [...clubes.values()]; const ap = lista.filter((c) => c.aprobado).length; const conDt = lista.filter((c) => c.dueno).length;
+  const chip = (cls, ic, txt) => `<span class="mcx-admin-chip ${cls}"><i class="fa-solid ${ic}" aria-hidden="true"></i>${txt}</span>`;
+  el.innerHTML = chip(cfg?.ventana_abierta ? 'ok' : '', cfg?.ventana_abierta ? 'fa-door-open' : 'fa-lock', cfg?.ventana_abierta ? 'Ventana abierta' : 'Ventana cerrada')
+    + chip(ap ? '' : 'alerta', 'fa-shield-halved', `${ap} de ${lista.length} clubes juegan`) + chip('', 'fa-user-tie', `${conDt} con DT`) + chip('', 'fa-wallet', `Empiezan con ${millones(cfg?.presupuesto_inicial)}`);
 }
 function pintarStaff() { pintarControles(); pintarClubesStaff(); }
 
@@ -285,19 +329,21 @@ async function pintarResumen() {
   caja.innerHTML = `
     <article class="mcx-b mcx-b-presu"><p class="mcx-b-t"><i class="fa-solid fa-wallet" aria-hidden="true"></i> Presupuesto</p><p class="mcx-b-grande"><span data-mcx-contar>€0</span></p><p class="mcx-b-sub">Valor de tu plantilla: <b>${millones(resumen.valor)}</b></p></article>
     <article class="mcx-b mcx-b-ventana" data-abierta="${abierta}"><p class="mcx-b-t"><i class="fa-solid ${abierta ? 'fa-door-open' : 'fa-lock'}" aria-hidden="true"></i> Ventana de fichajes</p><p class="mcx-b-grande mcx-b-estado">${abierta ? 'Abierta' : 'Cerrada'}</p><p class="mcx-b-sub">${abierta ? 'Ficha a agentes libres y a clubes de la IA, o haz ofertas a otros DT.' : 'Puedes mirar plantillas y preparar a quién fichar.'}</p><button type="button" class="mcx-b-boton" data-mcx-sala><i class="fa-solid fa-handshake" aria-hidden="true"></i> Abrir la sala de fichajes</button></article>
-    <a class="mcx-b mcx-b-plantilla" href="#plantilla"><p class="mcx-b-t"><i class="fa-solid fa-people-group" aria-hidden="true"></i> Plantilla</p><p class="mcx-b-grande">${resumen.n}<small>/${max}</small></p><span class="mcx-barra" style="--p:${lleno}%"><i></i></span><p class="mcx-b-sub">Media del XI <b>${resumen.mediaXI ?? '—'}</b></p><span class="mcx-b-ir">Ver plantilla</span></a>
-    <a class="mcx-b mcx-b-ofertas" href="#oficina"><p class="mcx-b-t"><i class="fa-solid fa-inbox" aria-hidden="true"></i> Tus ofertas</p><p class="mcx-b-grande">${recibidas}<small> recibida${recibidas === 1 ? '' : 's'}</small></p><p class="mcx-b-sub">${enviadas} oferta${enviadas === 1 ? '' : 's'} tuya${enviadas === 1 ? '' : 's'} esperando respuesta</p><span class="mcx-b-ir">${recibidas ? 'Responder' : 'Ver mis ofertas'}</span></a>
+    <a class="mcx-b mcx-b-plantilla" href="#plantilla"><p class="mcx-b-t"><i class="fa-solid fa-people-group" aria-hidden="true"></i> Plantilla</p><p class="mcx-b-grande"><span data-mcx-num="${resumen.n}">${resumen.n}</span><small>/${max}</small></p><span class="mcx-barra" style="--p:${lleno}%"><i></i></span><p class="mcx-b-sub">Media del XI <b>${resumen.mediaXI ?? '—'}</b></p><span class="mcx-b-ir">Ver plantilla</span></a>
+    <a class="mcx-b mcx-b-ofertas" href="#oficina"><p class="mcx-b-t"><i class="fa-solid fa-inbox" aria-hidden="true"></i> Tus ofertas</p><p class="mcx-b-grande"><span data-mcx-num="${recibidas}">${recibidas}</span><small> recibida${recibidas === 1 ? '' : 's'}</small></p><p class="mcx-b-sub">${enviadas} oferta${enviadas === 1 ? '' : 's'} tuya${enviadas === 1 ? '' : 's'} esperando respuesta</p><span class="mcx-b-ir">${recibidas ? 'Responder' : 'Ver mis ofertas'}</span></a>
     <a class="mcx-b mcx-b-juego" data-sync="${esc(sync)}" href="${FX.clubUnificado ? '#vestuario' : href('mercado/')}"><p class="mcx-b-t"><i class="fa-solid fa-plug" aria-hidden="true"></i> Tu PES</p><p class="mcx-b-grande mcx-b-estado"><i class="mcx-punto" aria-hidden="true"></i>${syncTxt[0]}</p><p class="mcx-b-sub">${syncTxt[1]}</p><span class="mcx-b-ir">${FX.clubUnificado ? 'Vestuario del juego' : 'Conectar juego'}</span></a>
     <article class="mcx-b mcx-b-movs"><p class="mcx-b-t"><i class="fa-solid fa-right-left" aria-hidden="true"></i> Últimos movimientos de la liga</p>
       ${ms.length ? `<ol class="mcx-movs">${ms.map((m) => `<li class="${m.a_club === club.id || m.de_club === club.id ? 'es-mio' : ''}"><b>${nj(m.jugador_id)}</b><span>${nomClub(m.de_club)} → ${nomClub(m.a_club)}</span>${m.monto ? `<em>${millones(m.monto)}</em>` : ''}</li>`).join('')}</ol>` : '<p class="mcx-b-sub">Aún no hubo fichajes en esta ventana.</p>'}
       <a class="mcx-b-ir" href="#movimientos">Ver el diario completo</a></article>`;
   const n = caja.querySelector('[data-mcx-contar]'); if (n) contarHastaDinero(n, Number(club.presupuesto || 0));
+  caja.querySelectorAll('[data-mcx-num]').forEach((el) => contarHasta(el, Number(el.dataset.mcxNum), String));
 }
 // El presupuesto sube contando (como un marcador). Respeta «menos movimiento».
-function contarHastaDinero(el, total) {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !total) { el.textContent = millones(total); return; }
+function contarHastaDinero(el, total) { contarHasta(el, total, millones); }
+function contarHasta(el, total, fmt) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !total) { el.textContent = fmt(total); return; }
   const t0 = performance.now(); const dur = 900;
-  const paso = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = millones(Math.round(total * (1 - (1 - k) ** 3))); if (k < 1) requestAnimationFrame(paso); };
+  const paso = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = fmt(Math.round(total * (1 - (1 - k) ** 3))); if (k < 1) requestAnimationFrame(paso); };
   requestAnimationFrame(paso);
 }
 document.addEventListener('click', (e) => { if (e.target.closest('[data-mcx-sala]')) $('mg-abrir-sala')?.click(); });
@@ -306,19 +352,19 @@ document.addEventListener('click', (e) => { if (e.target.closest('[data-mcx-sala
 function mostrarTab(id) {
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== id; });
-  ({ resumen: pintarResumen, plantilla: pintarPlantilla, mercado: () => { pintarMercado(); pintarOficina(); }, movimientos: pintarMovimientos })[id]?.();
+  ({ resumen: pintarResumen, plantilla: () => (plantillaDatos ? dibujarPlantilla() : pintarPlantilla()), mercado: () => { pintarMercado(); pintarOficina(); }, movimientos: pintarMovimientos })[id]?.();
   if (location.hash === '#oficina') requestAnimationFrame(() => $('mcx-ofertas')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
 }
-const tabActual = () => { const h = location.hash.slice(1); if (h === 'oficina') return 'mercado'; return ['resumen', 'plantilla', 'mercado', 'movimientos'].includes(h) ? h : 'resumen'; };   // «oficina» ahora vive dentro de Fichajes
+const tabActual = () => { const h = location.hash.slice(1); if (h === 'oficina') return 'mercado'; return ['resumen', 'plantilla', 'mercado', 'movimientos', 'admin'].includes(h) ? h : 'resumen'; };   // «admin»: solo staff (Administrar la liga, fuera de #mg-panel)   // «oficina» ahora vive dentro de Fichajes
 window.addEventListener('hashchange', () => club && mostrarTab(tabActual()));
 
 async function refrescar() {
   try { await cargarBase(); } catch (e) { console.error('[manager]', e); toast('No se pudo cargar la Liga Máster.', 'error'); return; }
   $('mg-sin-sesion').hidden = !!yo; $('mg-elegir').hidden = !yo || !!club; $('mg-panel').hidden = !club;
   pintarCabecera(); if (yo && !club) pintarElegir();
-  if (club) { if (tabActual() !== 'plantilla') pintarPlantilla(); mostrarTab(tabActual()); }   // la plantilla alimenta las cifras de la cabecera
+  if (club) { plantillaDatos = null; if (tabActual() !== 'plantilla') pintarPlantilla(); mostrarTab(tabActual()); }   // tras fichar o vender, la plantilla se vuelve a leer   // la plantilla alimenta las cifras de la cabecera
   $('mg-staff').hidden = !(yo && can('resolverReportes')); if (!$('mg-staff').hidden) pintarStaff();
-  window.dispatchEvent(new CustomEvent('mg:refrescado', { detail: { miClub: club, cfg } }));   // la sala de fichajes (si está abierta) se pone al día
+  window.dispatchEvent(new CustomEvent('mg:refrescado', { detail: { miClub: club, cfg, staff: !$('mg-staff').hidden } }));   // la sala de fichajes (si está abierta) se pone al día
 }
 
 const rpc = async (fn, args) => { const { data, error } = await supabase.rpc(fn, args); if (error) throw error; return data; };

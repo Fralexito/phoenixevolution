@@ -46,7 +46,7 @@
 .mcx-dock::-webkit-scrollbar { display: none; }
 .mcx-dock a { position: relative; flex: none; display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: 0 1rem; border-radius: .85rem; color: #b6bdd0; font: 700 .82rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; transition: color .2s, background-color .2s; }
 .mcx-dock a:hover { color: #fff; background: rgb(255 255 255 / .06); }
-.mcx-dock a[aria-current='page'] { color: #1a1205; background: linear-gradient(135deg, var(--oro2), var(--oro) 55%, #f59e0b); box-shadow: 0 6px 20px -6px rgb(251 191 36 / .7); }
+.mcx-dock a[aria-current='page'] { color: #1a1205; }   /* el fondo dorado lo pone la pastilla que se desliza (estadio.js) */
 .mcx-dock a em { font-style: normal; font-size: 10px; padding: .1rem .35rem; border-radius: .35rem; background: color-mix(in srgb, var(--club) 40%, transparent); color: #fff; letter-spacing: .08em; }
 .mcx-dock a[aria-current='page'] em { background: rgb(0 0 0 / .2); color: #1a1205; }
 .mcx-dock-n { min-width: 1.25rem; height: 1.25rem; display: inline-grid; place-items: center; padding: 0 .3rem; border-radius: 9999px; background: #f43f5e; color: #fff; font: 800 11px var(--font-sans, inherit); }
@@ -162,3 +162,148 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 .mcx-vest-intro { padding: 1rem 1.15rem; border-radius: 1.1rem; background: rgb(0 0 0 / .3); border: 1px solid color-mix(in srgb, var(--club) 40%, var(--mcx-linea)); }
 .mcx-vest-intro h2 { font: 800 1.05rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; }
 .mcx-vest-intro p { margin-top: .3rem; font-size: 13.5px; line-height: 1.55; color: #c3cad8; max-width: 75ch; }
+
+/* Las luces del estadio salían 22 px por la derecha en el celular (la página se movía de lado): se recortan sin romper la barra pegada. */
+.mcx { overflow-x: clip; }
+
+/* ── Mi club interactivo (19-oct-2026, Fralex: «quiero que todo sea interactivo y muy visual… más intuitivo… que en el celular abarquen más») ── */
+.mcx { --ease-out: cubic-bezier(.23, 1, .32, 1); }
+
+/* Barra: pastilla dorada que se desliza hasta la pestaña activa */
+.mcx-dock > a, .mcx-dock > button { position: relative; z-index: 1; }
+.mcx-dock a { transition: color .2s ease, background-color .2s ease, transform .16s var(--ease-out); }
+.mcx-dock a:active { transform: scale(.96); }
+.mcx-dock a[aria-current='page']:hover { background: transparent; color: #1a1205; }
+.mcx-dock-pastilla { position: absolute; z-index: 0; top: .35rem; left: 0; height: calc(100% - .7rem); width: 0; border-radius: .85rem; pointer-events: none; opacity: 0;
+  background: linear-gradient(135deg, var(--oro2), var(--oro) 55%, #f59e0b); box-shadow: 0 6px 20px -6px rgb(251 191 36 / .7);
+  transition: transform .34s var(--ease-out), width .34s var(--ease-out), opacity .2s ease; }
+@media (prefers-reduced-motion: reduce) { .mcx-dock-pastilla { transition: opacity .2s ease; } }
+.mcx:not([data-staff='true']) .mcx-dock [data-mcx-staff] { display: none; }
+.mcx-dock [data-mcx-staff]:not([aria-current]) { color: #fcd34d; }
+
+/* Cada sección entra con un desliz corto (solo al cambiar de pestaña) y las tarjetas aparecen en cascada */
+@media (prefers-reduced-motion: no-preference) {
+  .mcx[data-entra] :is([data-panel]:not([hidden]), #cu-vestuario:not([hidden]), #mg-staff:not([hidden])) { animation: mcx-entra .28s var(--ease-out) backwards; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > * { animation: mcx-entra .32s var(--ease-out) backwards; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(2) { animation-delay: 30ms; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(3) { animation-delay: 60ms; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(4) { animation-delay: 90ms; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(5) { animation-delay: 120ms; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(6) { animation-delay: 150ms; }
+  :is(.mcx-bento, .mcx-plantilla .mg-grid, .mcx-fichas) > :nth-child(n+7) { animation-delay: 180ms; }
+  .mcx-admin-avanzado[open] .mcx-admin-avanzado-cuerpo, .mcx-lista[open] .mcx-lista-cuerpo { animation: mcx-entra .26s var(--ease-out) backwards; }
+}
+@keyframes mcx-entra { from { opacity: 0; transform: translateY(8px); } }
+
+/* Pulsar se siente: lo que se toca se hunde un poco */
+.mcx :is(.mcx-b-boton, .mcx-guia-ok, .mg-lineas button, .mg-vista button, .mcx-dejar, .mg-chip, .mg-mini, .cfx-sala) { transition: transform .16s var(--ease-out), background-color .2s ease, color .2s ease, border-color .2s ease; }
+.mcx :is(.mcx-b-boton, .mcx-guia-ok, .mg-lineas button, .mg-vista button, .mcx-dejar, .mg-chip, .mg-mini, .cfx-sala, a.mcx-b, .mcx-ficha):active { transform: scale(.97); }
+
+/* Tarjetas que se inclinan hacia el mouse (estadio.js), con un brillo que sigue al puntero */
+.mcx-inclina { transition: border-color .2s ease, box-shadow .2s ease !important; will-change: transform; }
+.mcx .mcx-b::after, .mcx .mg-carta:not([data-efecto-carta])::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .25s ease;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / .1), transparent 60%); }
+.mcx .mcx-b.mcx-inclina::after, .mcx .mg-carta.mcx-inclina:not([data-efecto-carta])::after { opacity: 1; }
+
+/* ── Plantilla: tu equipo por líneas (tocar una filtra) ── */
+.mcx-fuerza { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; overflow: visible; max-width: none; }
+.mcx-fuerza button { display: grid; gap: .3rem; align-content: start; min-height: 0; height: auto; padding: .7rem .8rem; border-radius: 1rem; text-align: left; text-transform: none; letter-spacing: 0;
+  --lc: 0 229 255; background: linear-gradient(160deg, rgb(var(--lc) / .1), rgb(0 0 0 / .3)); border: 1px solid rgb(var(--lc) / .22); }
+.mcx-fuerza [data-linea-color='por'] { --lc: 251 191 36; } .mcx-fuerza [data-linea-color='def'] { --lc: 56 189 248; }
+.mcx-fuerza [data-linea-color='med'] { --lc: 52 211 153; } .mcx-fuerza [data-linea-color='del'] { --lc: 251 113 133; }
+/* pasada.css convierte los botones de línea en píldoras con un punto: aquí son tarjetas */
+.mcx .mcx-fuerza button { display: grid !important; } .mcx .mcx-fuerza button::before { content: none !important; }
+.mcx-fuerza button:hover { border-color: rgb(var(--lc) / .55); color: inherit; }
+.mcx-fuerza button[aria-pressed='true'] { background: linear-gradient(160deg, rgb(var(--lc) / .28), rgb(var(--lc) / .08)); border-color: rgb(var(--lc) / .8); box-shadow: 0 10px 26px -14px rgb(var(--lc) / .9); }
+.mcx-fz-t { font: 800 11px var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: rgb(var(--lc)); }
+.mcx-fz-n { display: flex; align-items: baseline; gap: .45rem; }
+.mcx-fz-n b { font: 900 1.5rem/1 var(--font-display); color: #fff; }
+.mcx-fz-n small { font-size: 12px; color: #a3acbf; white-space: nowrap; }
+.mcx-fz-barra { display: block; height: 4px; border-radius: 99px; background: rgb(255 255 255 / .08); overflow: hidden; }
+.mcx-fz-barra i { display: block; height: 100%; width: var(--p); border-radius: inherit; background: rgb(var(--lc)); box-shadow: 0 0 10px rgb(var(--lc) / .7); transform-origin: left; }
+@media (prefers-reduced-motion: no-preference) { .mcx-fz-barra i { animation: mcx-crece .7s var(--ease-out) .1s both; } }
+@keyframes mcx-crece { from { transform: scaleX(0); } }
+@media (max-width: 640px) {
+  .mcx-fuerza { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 6.6rem; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .mcx-fuerza::-webkit-scrollbar { display: none; }
+  .mcx-fuerza button { padding: .55rem .6rem; }
+  .mcx-fz-n { flex-direction: column; align-items: flex-start; gap: .1rem; } .mcx-fz-n b { font-size: 1.25rem; } .mcx-fz-n small { font-size: 11px; }
+}
+
+/* ── Vista Cancha: todo el equipo en una pantalla, como en la pizarra ── */
+.mcx-cancha { position: relative; display: grid; gap: .3rem; padding: .9rem .5rem; border-radius: 1.3rem; overflow: hidden; isolation: isolate;
+  background: repeating-linear-gradient(180deg, rgb(16 185 129 / .09) 0 3.2rem, rgb(16 185 129 / .04) 3.2rem 6.4rem), radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--club) 22%, transparent), transparent 70%), #07140f;
+  border: 1px solid rgb(52 211 153 / .25); box-shadow: inset 0 0 60px rgb(0 0 0 / .55); }
+.mcx-cancha-lineas { position: absolute; inset: .5rem; z-index: -1; border: 1.5px solid rgb(255 255 255 / .13); border-radius: .8rem; pointer-events: none;
+  background: linear-gradient(transparent calc(50% - .75px), rgb(255 255 255 / .13) calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px)),
+    radial-gradient(circle at 50% 50%, transparent 3.2rem, rgb(255 255 255 / .13) 3.2rem calc(3.2rem + 1.5px), transparent calc(3.2rem + 2px)); }
+.mcx-cancha-lineas::before, .mcx-cancha-lineas::after { content: ''; position: absolute; left: 30%; right: 30%; height: 2.6rem; border: 1.5px solid rgb(255 255 255 / .13); }
+.mcx-cancha-lineas::before { top: -1.5px; border-top: 0; } .mcx-cancha-lineas::after { bottom: -1.5px; border-bottom: 0; }
+.mcx-banda { display: grid; gap: .35rem; padding: .4rem 0; transition: opacity .25s ease, filter .25s ease; }
+.mcx-cancha[data-foco='por'] .mcx-banda:not([data-linea='por']), .mcx-cancha[data-foco='def'] .mcx-banda:not([data-linea='def']),
+.mcx-cancha[data-foco='med'] .mcx-banda:not([data-linea='med']), .mcx-cancha[data-foco='del'] .mcx-banda:not([data-linea='del']) { opacity: .25; filter: saturate(.4); }
+.mcx-banda-t { text-align: center; font: 800 10.5px var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: rgb(var(--lc)); text-shadow: 0 1px 6px rgb(0 0 0 / .8); }
+.mcx-banda-t small { color: #9aa6bd; letter-spacing: 0; }
+.mcx-fichas { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem .25rem; }
+.mcx-ficha { position: relative; width: 4.5rem; display: grid; justify-items: center; gap: .1rem; padding: .25rem .1rem .3rem; border-radius: .9rem; cursor: pointer; transition: transform .16s var(--ease-out), background-color .2s ease; }
+@media (hover: hover) and (pointer: fine) { .mcx-ficha:hover { background: rgb(255 255 255 / .06); } }
+.mcx-ficha:focus-visible { outline: 2px solid var(--oro); outline-offset: 2px; }
+.mcx-ficha-cara { display: grid; place-items: center; width: 3.1rem; height: 3.1rem; border-radius: 99px; overflow: hidden; font-size: 1.15rem; color: rgb(var(--lc) / .55);
+  background: radial-gradient(circle at 50% 35%, rgb(var(--lc) / .28), rgb(0 0 0 / .6) 75%); border: 2px solid rgb(var(--lc) / .55); box-shadow: 0 6px 14px -6px rgb(0 0 0 / .9); }
+.mcx-ficha-cara img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
+.mcx-ficha.es-xi .mcx-ficha-cara { border-color: var(--oro); box-shadow: 0 0 0 3px rgb(251 191 36 / .18), 0 0 16px -2px rgb(251 191 36 / .55); }
+.mcx-ficha-media { position: absolute; top: 0; right: .3rem; min-width: 1.5rem; padding: .05rem .25rem; border-radius: .45rem; font: 900 .78rem/1.2 var(--font-display); color: #0b0d1c; background: rgb(var(--lc)); box-shadow: 0 2px 8px rgb(0 0 0 / .5); }
+.mcx-ficha.es-xi .mcx-ficha-media { background: linear-gradient(135deg, var(--oro2), var(--oro)); }
+.mcx-ficha-pos { font: 800 9.5px var(--font-display); letter-spacing: .08em; color: rgb(var(--lc)); }
+.mcx-ficha-nom { max-width: 100%; font: 700 11px/1.15 var(--font-display); text-transform: uppercase; letter-spacing: .02em; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 4px rgb(0 0 0 / .9); }
+.mcx-cancha-ayuda { display: flex; gap: .5rem; align-items: flex-start; margin-top: .6rem; font-size: 12.5px; line-height: 1.5; color: #9aa6bd; }
+#mg-panel[data-vista='cancha'] .mcx-plantilla .mg-tam { display: none; }   /* en la cancha no hace falta la lupa */
+@media (min-width: 768px) { .mcx-ficha { width: 5.6rem; } .mcx-ficha-cara { width: 3.9rem; height: 3.9rem; } .mcx-ficha-nom { font-size: 12px; } .mcx-fichas { gap: .8rem .7rem; } .mcx-cancha { padding: 1.2rem 1rem; } }
+
+/* ── Celular: más jugadores por pantalla en Cartas (3 por fila; con la lupa, de 4 a 1) ── */
+@media (max-width: 640px) {
+  #mg-panel { --mg-cap: calc(33.333% - .35rem); --mg-min: 6rem; --mg-foto: 3.6rem; }
+  #mg-panel[data-tam='1'] { --mg-cap: calc(25% - .35rem); --mg-min: 4.5rem; --mg-foto: 2.8rem; }
+  #mg-panel[data-tam='3'] { --mg-cap: calc(50% - .3rem); --mg-min: 9rem; --mg-foto: 5.5rem; }
+  #mg-panel[data-tam='4'] { --mg-cap: 100%; --mg-min: 14rem; --mg-foto: 8rem; }
+  #mg-panel .mg-grid { gap: .45rem; }
+  #mg-panel:not([data-vista='compacta']):not([data-tam='3']):not([data-tam='4']) .mg-carta { padding: .5rem .4rem; border-radius: .8rem; }
+  #mg-panel:not([data-vista='compacta']):not([data-tam='3']):not([data-tam='4']) .mg-media { font-size: 1.2rem; }
+  #mg-panel:not([data-vista='compacta']):not([data-tam='3']):not([data-tam='4']) .mg-pos { font-size: .6rem; padding: .1rem .3rem; }
+  #mg-panel:not([data-vista='compacta']):not([data-tam='3']):not([data-tam='4']) .mg-nombre { font-size: .68rem; margin-top: .15rem; }
+  #mg-panel:not([data-vista='compacta']):not([data-tam='3']):not([data-tam='4']) .mg-meta { font-size: .62rem; }
+  #mg-panel:not([data-vista='compacta']):not([data-tam='3']):not([data-tam='4']) .mg-ver { display: none; }
+  /* Vender y Liberar: solo el icono, uno al lado del otro */
+  #mg-panel .mg-acciones { display: flex; gap: .3rem; }
+  #mg-panel .mg-acciones .mg-mini { position: static; flex: 1; justify-content: center; width: auto; min-height: 2rem; padding: 0 .3rem; } #mg-panel .mg-acciones .mg-mini:not(:disabled) { opacity: 1; }
+  #mg-panel:not([data-tam='4']) .mg-acciones .mg-mini span { display: none; }
+  .mg-linea-tit { margin-bottom: .45rem; }
+  .mcx-plantilla .mg-herr, .mcx-plantilla .mg-herr-der { flex-wrap: nowrap; }
+  .mcx-plantilla .mg-orden select { max-width: 7rem; }
+}
+
+/* ── Administrar la liga (antes «Centro de control»): su propia pestaña y 3 pasos ── */
+.mcx:not([data-seccion='admin']) #mg-staff { display: none !important; }
+.mcx[data-seccion='admin'] :is(#mg-panel, #mg-elegir, #mg-sin-sesion, .mcx-guia) { display: none !important; }
+.mcx-admin { gap: 1rem; }
+.mcx-admin-cab { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+.mcx-admin-cab h2 { font: 900 1.15rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.mcx-admin-cab p { margin-top: .25rem; font-size: 13.5px; line-height: 1.55; color: #c3cad8; max-width: 70ch; }
+.mcx-admin-estado { display: flex; flex-wrap: wrap; gap: .4rem; }
+.mcx-admin-chip { display: inline-flex; align-items: center; gap: .4rem; min-height: 2rem; padding: 0 .75rem; border-radius: 99px; font-size: 12.5px; color: #dbe1ec; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .1); }
+.mcx-admin-chip i { color: #9aa6bd; }
+.mcx-admin-chip.ok { color: #a7f3d0; border-color: rgb(52 211 153 / .4); } .mcx-admin-chip.ok i { color: #34d399; }
+.mcx-admin-chip.alerta { color: #fecdd3; border-color: rgb(244 63 94 / .45); }
+.mcx-admin-paso { display: grid; gap: .8rem; padding: 1rem 1.1rem; border-radius: 1.1rem; background: rgb(0 0 0 / .25); border: 1px solid rgb(255 255 255 / .08); }
+.mcx-admin-paso h3, .mcx-admin-avanzado summary b { display: flex; align-items: center; gap: .6rem; font: 800 .98rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fff; }
+.mcx-admin-n { flex: none; display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 99px; font: 900 .85rem var(--font-display); color: #1a1205; background: linear-gradient(135deg, var(--oro2), var(--oro)); }
+.mcx-admin-ayuda { font-size: 13px; line-height: 1.55; color: #aeb7c8; max-width: 75ch; }
+.mcx-admin-clubes-cab { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.mcx-admin-avanzado { padding: 0; }
+.mcx-admin-avanzado > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .6rem; padding: 1rem 1.1rem; min-height: 3.5rem; }
+.mcx-admin-avanzado > summary::-webkit-details-marker { display: none; }
+.mcx-admin-avanzado > summary > span:last-child { display: grid; gap: .15rem; }
+.mcx-admin-avanzado > summary small { font-size: 12.5px; color: #9aa6bd; }
+.mcx-admin-avanzado > summary::after { content: '+'; margin-left: auto; font: 700 1.3rem/1 var(--font-display); color: var(--oro); }
+.mcx-admin-avanzado[open] > summary::after { content: '−'; }
+.mcx-admin-avanzado-cuerpo { display: grid; gap: 1.5rem; padding: 0 1.1rem 1.1rem; }
