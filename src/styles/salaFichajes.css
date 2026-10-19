@@ -175,10 +175,32 @@ html[data-tema='sudario'] .sf { --a: #f5c542; }
 .sf-jug[data-con-dt] .sf-dueno { flex: none; max-width: 9.5rem; padding-right: .55rem; }
 .sf-jug[data-con-dt] { box-shadow: inset 3px 0 0 var(--a); }
 /* En la cabecera de la plantilla */
-.sf-pl-cab .sf-dueno { margin-left: auto; }
+.sf-pl-cab { flex-wrap: wrap; }   /* la etiqueta del DT baja a su propia línea: el panel es estrecho y el nombre se cortaba */
+.sf-pl-cab .sf-dueno { flex: none; order: 9; margin-left: 3.2rem; }
 @media (max-width: 960px) { .sf-liga-logo { --px: 18px; } .sf-jug[data-con-dt] .sf-dueno { max-width: 7rem; } }
 /* El cuadro entero (.sf-buscar:focus-within) ya muestra el foco: sin el segundo contorno dentro. */
 .sf .sf-buscar input:focus-visible { outline: none; }
 /* Fila del buscador con DT: 4 columnas (cara, nombre, DT, escudo). «.sf-jug span:not(.sf-av)» ponía la etiqueta en vertical. */
 .sf-jug[data-con-dt] { grid-template-columns: auto minmax(0, 1fr) auto auto; }
 .sf-jug span.sf-dueno { display: inline-flex; } .sf-jug span.sf-dueno-av { display: grid; }
+
+/* Sala en el Modo Mánager (modo mercado, features/mercado/salaMercado.js). */
+.mg-sala { --a: #00e5ff; --curva: cubic-bezier(.16, 1, .3, 1); --tx2: #aab0c6; }
+.mg-sala .cfx-sala-escudos { width: 2.6rem; height: 2.6rem; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--a) 14%, transparent); color: var(--a); font-size: 1.1rem; }
+.sf-mk-cifras { display: flex; gap: .5rem; margin-left: auto; margin-right: .6rem; }
+.sf-mk-cifra { display: grid; padding: .3rem .75rem; border-radius: 12px; border: 1px solid var(--linea); background: rgba(255,255,255,.04); line-height: 1.15; }
+.sf-mk-cifra small { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--tx2); }
+.sf-mk-cifra b { font-size: 14px; color: #fff; font-variant-numeric: tabular-nums; }
+.sf-mk-cifra[data-abierta='true'] b { color: #34d399; } .sf-mk-cifra[data-abierta='false'] b { color: #fb7185; }
+.sf-mk-esc { flex: none; width: 30px; height: 30px; display: grid; place-items: center; }
+.sf-mk-jug { grid-template-columns: auto minmax(0, 1fr) auto auto; cursor: default; }
+.sf-mk-valor { font-size: 12.5px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sf-mk-btn { display: inline-flex; align-items: center; gap: .35rem; padding: .4rem .75rem; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: #04121a; background: var(--a); white-space: nowrap; transition: transform .2s, opacity .2s; }
+.sf-mk-btn[data-directo='0'] { color: #fff; background: transparent; border: 1px solid var(--a); }
+.sf-mk-btn:disabled { opacity: .4; cursor: not-allowed; }
+@media (hover: hover) { .sf-mk-btn:hover:not(:disabled) { transform: translateY(-1px); } }
+.sf-mk-nota { font-style: normal; font-size: 12px; color: var(--tx2); white-space: nowrap; }
+.sf-mk-jug span.sf-mk-valor { display: block; }   /* .sf-jug span:not(.sf-av) lo volvía rejilla */
+@media (max-width: 960px) { .sf-mk-cifras { display: none; } .sf-mk-jug { gap: .5rem; } .sf-mk-jug span.sf-mk-valor { font-size: 11.5px; } .sf-mk-btn { padding: .4rem .6rem; } }
+.sf-jug .sf-mk-btn span.sf-mk-btn-tx { display: inline; }   /* .sf-jug span:not(.sf-av) lo volvía rejilla */
+@media (max-width: 420px) { .sf-jug .sf-mk-btn span.sf-mk-btn-tx { display: none; } .sf-mk-btn { padding: .5rem .6rem; } }   /* celular estrecho: solo el icono (aria-label dice qué hace) */

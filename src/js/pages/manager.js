@@ -271,6 +271,7 @@ async function refrescar() {
   pintarCabecera(); if (yo && !club) pintarElegir();
   if (club) { if (tabActual() !== 'plantilla') pintarPlantilla(); mostrarTab(tabActual()); }   // la plantilla alimenta las cifras de la cabecera
   $('mg-staff').hidden = !(yo && can('resolverReportes')); if (!$('mg-staff').hidden) pintarStaff();
+  window.dispatchEvent(new CustomEvent('mg:refrescado', { detail: { miClub: club, cfg } }));   // la sala de fichajes (si está abierta) se pone al día
 }
 
 const rpc = async (fn, args) => { const { data, error } = await supabase.rpc(fn, args); if (error) throw error; return data; };
@@ -343,4 +344,6 @@ document.addEventListener('click', async (ev) => {
   }
 });
 
+// Sala de fichajes (modo mercado): solo muestra; «Fichar» / «Ofertar» los atiende el manejador de arriba (data-ofertar).
+$('mg-abrir-sala')?.addEventListener('click', () => import('../features/mercado/salaMercado.js').then((m) => m.abrirSalaMercado({ clubes, dts, miClub: club, cfg })).catch((e) => { console.error('[manager] sala:', e); toast('No se pudo abrir la sala.', 'error'); }));
 onSession((st) => { yo = st?.session?.user?.id ?? null; refrescar(); });
