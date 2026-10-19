@@ -1,16 +1,8 @@
 ---
 // Barra fija de abajo SOLO en celular (patrón de las apps de apuestas: navegación al alcance del pulgar). FX.barraInferior = false la quita.
+import { BARRA_INFERIOR as ITEMS } from '../data/site.js';   // la misma lista la usa la Red de enlaces para no repetir estos accesos
 const { active } = Astro.props;
 const base = import.meta.env.BASE_URL;
-// 19-oct-2026 (Fralex): por lo que más importa en la web. MI CLUB en el centro y destacado (la joya: gestionar a los jugadores de tu PES),
-// a sus lados la red social y jugar (duelos y partidas en vivo). Las ligas siguen en el menú y en Inicio.
-const ITEMS = [
-  { id: ['central'], t: 'Inicio', path: '', ph: 'house' },
-  { id: ['social', 'chatgeneral', 'noticias'], t: 'Social', path: 'social/', ph: 'globe-hemisphere-west' },
-  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true },
-  { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts'], t: 'Jugar', path: 'duelos/', ph: 'game-controller' },
-  { id: ['muro', 'perfil'], t: 'Yo', path: 'perfil/', ph: 'user' },
-];
 ---
 <nav class="barra-inf" aria-label="Navegación rápida">
   {ITEMS.map((n) => (

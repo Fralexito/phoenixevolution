@@ -28,6 +28,16 @@ export const NAV_EXTRA = [
   { id: 'hosts', label: 'Alquilar host', path: 'alquilar-host/', icon: 'fa-server' },
 ];
 
+// Barra fija de abajo en el celular (components/BarraInferior.astro). 19-oct-2026 (Fralex): por lo que más importa en la web. MI CLUB en el centro
+// y destacado (la joya: gestionar a los jugadores de tu PES), a sus lados la red social y jugar. La Red de enlaces del celular NO repite estos accesos.
+export const BARRA_INFERIOR = [
+  { id: ['central'], t: 'Inicio', path: '', ph: 'house' },
+  { id: ['social', 'chatgeneral', 'noticias'], t: 'Social', path: 'social/', ph: 'globe-hemisphere-west' },
+  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true },
+  { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts'], t: 'Jugar', path: 'duelos/', ph: 'game-controller' },
+  { id: ['muro', 'perfil'], t: 'Yo', path: 'perfil/', ph: 'user' },
+];
+
 // Apoyo voluntario a la comunidad (tipo «invítanos un café»). Vacío = no se muestra el botón. Pon aquí el enlace cuando lo tengas (solo https).
 export const APOYO = { href: '', texto: 'Apoya la comunidad' };
 
