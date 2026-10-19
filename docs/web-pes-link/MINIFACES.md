@@ -29,6 +29,7 @@ Base de datos del juego: `download\CGP_database.cpk` → `common/etc/pesdb/`.
 - `tools/minifaces/cpk.py`: lector **de solo lectura** de .cpk de CRI (tablas @UTF, cifrado XOR, CRILAYLA). `python3 cpk.py listar <cpk> [filtro]` / `sacar <cpk> <ruta> <salida>`.
 - `tools/minifaces/mejorar.py`: agranda con **Real-ESRGAN** (pesos BSD-3 de github.com/xinntao/Real-ESRGAN/releases). Con `RealESRGAN_x2plus.pth` tarda ~3 s por cara en CPU; con x4plus ~25 s. Rellena el color de los bordes transparentes (quita el halo blanco) y la transparencia se agranda con Lanczos. Salida `.webp` de 320 px.
   `python3 tools/minifaces/mejorar.py <entrada> <salida> --pesos RealESRGAN_x2plus.pth --px 320` (necesita `torch` y `pillow`).
+- **`tools/minifaces/suavizar.py` (ronda 340, la que se usa ahora):** pedido de Fralex, las caras con Real-ESRGAN se veían "muy retocadas con IA" (ojos sobreafilados, piel de cera) y el pelo mal recortado. Agranda con Lanczos + afilado leve (sin red neuronal) y rehace el contorno: color del borde = color del interior (sin halo), transparencia alisada y supermuestreada x2 (borde con antialiasing, sin escalera), motas sueltas fuera. Entrada: las .dds originales (180 px de `livecpkLogos`, 128 px de `dt14`); salida `.webp` 320 px. `python3 tools/minifaces/suavizar.py <entrada> <salida>` (necesita `pillow numpy opencv-python-headless`). `mejorar.py` queda solo como referencia: no usar para las caras finales.
 
 ## 5. En la web
 - Caras: `public/minifaces/<pes_id>.webp` (254 archivos, 4,9 MB; las sirve GitHub Pages, no gastan Supabase).
@@ -42,7 +43,7 @@ Base de datos del juego: `download\CGP_database.cpk` → `common/etc/pesdb/`.
 1. Enlazar el chat con la PC y dar acceso a `D:\Frank\Games_\Conmegol Patch` (solo lectura).
 2. Listar caras de las 3 fuentes con `cpk.py` y la carpeta Logos.
 3. Sacar Player/Team/PlayerAssignment de `CGP_database.cpk` y cruzar (los jugadores con `pes_id` ya están cruzados: usar ese número directo).
-4. Empaquetar las .dds en un zip, pasarlo a la nube, correr `mejorar.py`, copiar a `public/minifaces/<pid>.webp` y regenerar `src/data/minifaces.js`.
+4. Juntar las .dds originales en una carpeta y correr `suavizar.py` (ya no hace falta nube ni GPU), copiar a `public/minifaces/<pid>.webp` y regenerar `src/data/minifaces.js`.
 5. `npm test`, build, ronda en MAPA.md, push a `borrador`.
 
 ## 7. Pendiente
