@@ -45,7 +45,8 @@
 @import './barraInferior.css';
 @import './sinIconosWeb.css';
 @import './uplot.css';
-@import '@phosphor-icons/web/bold';
+/* Phosphor Bold RECORTADO a los iconos de data/iconosFinos.js (147 KB → ~20 KB). Icono nuevo: node tools/iconos/recortar-iconos.mjs */
+@import './iconos/phosphor-bold.css';
 @import './perfilJugador.css';
 @import './modoLigero.css';
 @import './diario.css';

@@ -37,5 +37,8 @@
     "sortablejs": "^1.15.7",
     "tailwindcss": "4.3.3",
     "uplot": "^1.6.32"
+  },
+  "devDependencies": {
+    "subset-font": "^2.9.0"
   }
 }
