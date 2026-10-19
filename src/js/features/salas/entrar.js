@@ -6,7 +6,12 @@ import { escapeHTML, safeUrl, parsecDirecto } from '../../core/sistema/dom.js';
 import { textoErrorUnirse } from '../../core/competicion/salas.js';
 import { avatarHTML } from '../../core/sistema/avatar.js';
 
-const DESCARGA_PARSEC = 'https://parsec.app/downloads';
+// Android (19-oct-2026, Fralex: «¿será posible unirse por Parsec de Android?»): la app de Parsec para Android solo se conecta como invitado
+// (no hostea), Parsec la llama «experimental» y para PES hace falta un mando (Bluetooth o USB). Phoenix Link la ve como a cualquier invitado.
+// No está documentado que abra el enlace directo parsec:// → en Android el plan B pone primero la invitación web y lleva a Google Play.
+const ANDROID = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+const DESCARGA_PARSEC = ANDROID ? 'https://play.google.com/store/apps/details?id=tv.parsec.client' : 'https://parsec.app/downloads';
+const NOTA_ANDROID = ANDROID ? '<br><small class="sve-nota"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> En Android conecta un mando (Bluetooth o USB) antes de entrar: la pantalla táctil no sirve para jugar PES.</small>' : '';
 const PASOS = [['reserva', 'Reservando tu puesto'], ['parsec', 'Abriendo Parsec'], ['listo', '¡Dentro!']];
 
 /**
@@ -39,7 +44,7 @@ export function entrarASala({ sala, rol, pedir, alTerminar = () => {} }) {
   // Intenta abrir Parsec; si la pestaña no pierde el foco en ~2,5 s, asumimos que no se abrió y mostramos el plan B.
   function abrir(directo, respaldo) {
     paso('parsec', 'activo'); paso('listo', 'espera'); dlg.dataset.fase = 'abriendo';
-    msg('Si tu navegador pregunta, elige <b>Abrir Parsec</b>.'); acciones('');
+    msg(`Si tu navegador pregunta, elige <b>Abrir Parsec</b>.${NOTA_ANDROID}`); acciones('');
     let abierto = false; const marca = () => { abierto = true; };
     window.addEventListener('blur', marca, { once: true }); document.addEventListener('visibilitychange', marca, { once: true });
     try { window.location.href = directo; } catch { /* el navegador lo bloqueó: plan B */ }
@@ -48,16 +53,16 @@ export function entrarASala({ sala, rol, pedir, alTerminar = () => {} }) {
       window.removeEventListener('blur', marca); document.removeEventListener('visibilitychange', marca); if (!vivo) return;
       if (abierto) { listo(); return; }
       paso('parsec', 'error'); dlg.dataset.fase = 'planb';
-      msg('Parsec no se abrió. ¿Lo tienes instalado?');
+      msg(ANDROID ? `Si Parsec no se abrió, usa la <b>invitación web</b>: el celular te ofrecerá abrirla con la app.${NOTA_ANDROID}` : 'Parsec no se abrió. ¿Lo tienes instalado?');
       acciones(`<button type="button" class="sve-btn sve-btn-pri" data-sve-otra><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Abrir de nuevo</button>
         ${respaldo ? `<a class="sve-btn" href="${escapeHTML(respaldo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-globe" aria-hidden="true"></i> Invitación web</a>` : ''}
-        <a class="sve-btn" href="${DESCARGA_PARSEC}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-download" aria-hidden="true"></i> Descargar Parsec</a>`);
+        <a class="sve-btn" href="${DESCARGA_PARSEC}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-download" aria-hidden="true"></i> ${ANDROID ? 'Parsec en Google Play' : 'Descargar Parsec'}</a>`);
       $('[data-sve-otra]')?.addEventListener('click', () => abrir(directo, respaldo));
     }, 2600);
   }
   function listo() {
     paso('parsec', 'ok'); paso('listo', 'ok'); dlg.dataset.fase = 'listo';
-    msg(rol === 'rival' ? '¡Listo! En Parsec, el anfitrión te da el <b>mando 2</b>. ¡A jugar!' : '¡Listo! Mira el partido en Parsec. El anfitrión te acepta dentro de la app.');
+    msg((rol === 'rival' ? '¡Listo! En Parsec, el anfitrión te da el <b>mando 2</b>. ¡A jugar!' : '¡Listo! Mira el partido en Parsec. El anfitrión te acepta dentro de la app.') + (rol === 'rival' ? NOTA_ANDROID : ''));
     acciones('<button type="button" class="sve-btn sve-btn-pri" data-sve-cerrar>Entendido</button>');
   }
 

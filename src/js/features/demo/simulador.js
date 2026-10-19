@@ -174,6 +174,8 @@ export async function rpcDemo(nombre, args, real) {
     const r = await real(); return { data: { ...(r.data ?? {}), ...extras(args) }, error: null };
   }
   if (Object.values(args ?? {}).some((v) => Number(v) >= ID0 && Number(v) < ID0 + 1e6)) return { data: null, error: null };   // acción sobre algo inventado
+  // Entrar a una sala inventada: se reserva el puesto pero sin enlace (así no se abre Parsec hacia ningún equipo real).
+  if ((nombre === 'ver_sala' || nombre === 'aceptar_sala') && String(args?.p_sala ?? '').startsWith('00000000-0000-4000-8000-9000')) return { data: { rol: nombre === 'ver_sala' ? 'espectador' : 'rival', enlace: null }, error: null };
   const r = await real();
   if (SI_FALTA[nombre] && (r.error || !r.data || r.data.visible !== true)) return { data: SI_FALTA[nombre](), error: null };
   return r;

@@ -166,3 +166,4 @@ li[data-estado='error'] .sve-ic { border-color: transparent; } li[data-estado='e
 @media (prefers-reduced-motion: reduce) { .sv-card.sv-gol::after { opacity: 0; } }
 @keyframes sv-gol { 0% { opacity: 0; transform: scale(.6); } 18% { opacity: 1; transform: scale(1.08); } 30% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: scale(1.05); } }
 @keyframes sv-golpe { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.sve-nota { display: inline-flex; gap: .4rem; margin-top: .45rem; font-size: 12.5px; color: #fde68a; }   /* aviso de Android en «Entrando a la sala» (19-oct-2026) */
