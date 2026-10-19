@@ -27,7 +27,8 @@ import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js'
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { initMencionAuto } from '../features/social/mencionAuto.js';
-import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar, montarDeslizarA, marcarDesliza } from '../features/social/gestos.js';
+import { montarVisorFotos } from '../features/social/visorFotos.js';
+import { montarDobleToque, montarTirarParaRecargar, montarDeslizarA, marcarDesliza } from '../features/social/gestos.js';
 import { originalHTML, abrirCompartir, abrirQuienReacciono, abrirTarjetaPerfil, vigilarVistas } from '../features/social/fase2.js';
 import { openAuthModal } from '../features/auth.js';
 import { stickerHTML, abrirSelectorStickers } from '../features/social/stickers.js';
@@ -462,7 +463,19 @@ function pintarTendencias() {
   tendMovil.innerHTML = top.length ? `<span class="sxr-tend-t"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Tendencias</span>${top.map(([t]) => `<button type="button" data-sxr-tag="${escapeHTML(t)}">#${escapeHTML(t)}</button>`).join('')}` : '';
 }
 // Gestos: visor de fotos, doble toque = 🔥 (si ya reaccionaste no lo quita: solo celebra) y tirar hacia abajo para recargar.
-montarVisorFotos(feedEl);
+// Visor de fotos con dos estilos (Instagram / Facebook, botón para cambiar). Reaccionar y responder desde el visor actualizan el feed.
+montarVisorFotos(feedEl, {
+  datos: (id) => S.items.find((x) => Number(x.id) === Number(id)) ?? null,
+  respuestas: (id) => api.respuestasDe(id),
+  responder: (id, texto) => api.responder(id, texto),
+  reaccionar: async (id) => { const it = S.items.find((x) => Number(x.id) === Number(id)); await reaccionar(id, it?.mia || REACCION_RAPIDA); },
+  yo: () => S.yo,
+  alCambiar: async (id) => {
+    S.resp.set(id, (await api.respuestasDe(id).catch(() => S.resp.get(id))) ?? []);
+    S.items = S.items.map((x) => (Number(x.id) === id ? { ...x, respuestas: (S.resp.get(id) ?? []).length } : x));
+    repintar(id); pintarHilo(id); window.dispatchEvent(new Event('social:actividad'));
+  },
+});
 montarDobleToque(feedEl, (id) => { const it = S.items.find((x) => Number(x.id) === id); if (!it?.mia) reaccionar(id, REACCION_RAPIDA); });
 montarTirarParaRecargar(document.querySelector('.sxr-centro') ?? feedEl, () => refrescar());
 // Jugadas como los Reels de Instagram (19-oct-2026): el botón de la barra o deslizar hacia la izquierda en cualquier parte del muro

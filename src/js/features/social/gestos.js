@@ -1,5 +1,5 @@
 // GESTOS de /social/ (19-oct-2026, Fralex: «métele todo lo que tiene una red social… la máxima experiencia dopamínica, dinámica, inmersiva»).
-//   · Visor de fotos: tocar una foto la abre a pantalla completa (deslizar o flechas para pasar; Esc o tocar fuera cierra).
+//   · (El visor de fotos se mudó a features/social/visorFotos.js: estilos Instagram y Facebook.)
 //   · Doble toque / doble clic en una publicación: reacciona con 🔥 y suelta una llamarada donde tocaste (como el corazón de Instagram).
 //   · Tirar hacia abajo en lo alto del feed (celular): recarga con un aro que gira.
 // Solo DOM: las acciones (reaccionar, recargar) las pasa pages/social.js.
@@ -7,38 +7,7 @@
 const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.ajMovEfectivo === 'reducido';
 const vibrar = (ms) => { try { navigator.vibrate?.(ms); } catch { /* sin vibración */ } };
 
-/* ---------- Visor de fotos ---------- */
-export function montarVisorFotos(feed) {
-  const dlg = document.createElement('dialog'); dlg.className = 'gx-visor'; dlg.setAttribute('aria-label', 'Foto a pantalla completa');
-  dlg.innerHTML = `<button type="button" class="gx-x" data-gx-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-    <button type="button" class="gx-flecha gx-ant" data-gx-paso="-1" aria-label="Foto anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
-    <div class="gx-pista"></div>
-    <button type="button" class="gx-flecha gx-sig" data-gx-paso="1" aria-label="Foto siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
-    <p class="gx-cuenta" aria-live="polite"></p>`;
-  document.body.append(dlg);
-  const pista = dlg.querySelector('.gx-pista'); let fotos = []; let i = 0;
-  const pintar = () => {
-    pista.innerHTML = `<img src="${fotos[i].src}" alt="${fotos[i].alt}" class="gx-foto">`;
-    dlg.querySelector('.gx-cuenta').textContent = fotos.length > 1 ? `${i + 1} / ${fotos.length}` : '';
-    dlg.querySelectorAll('.gx-flecha').forEach((b) => { b.hidden = fotos.length < 2; });
-  };
-  const pasar = (d) => { if (fotos.length < 2) return; i = (i + d + fotos.length) % fotos.length; pista.dataset.dir = d > 0 ? 'sig' : 'ant'; pintar(); };
-  feed.addEventListener('click', (e) => {
-    const a = e.target.closest('.sx-post-cuerpo a'); const img = a?.querySelector(':scope > img'); if (!img || e.ctrlKey || e.metaKey) return;
-    e.preventDefault();
-    const todas = [...a.closest('.sx-post-cuerpo').querySelectorAll('a > img')];
-    fotos = todas.map((x) => ({ src: x.closest('a').getAttribute('href'), alt: x.getAttribute('alt') || 'Foto' })); i = Math.max(0, todas.indexOf(img));
-    delete pista.dataset.dir; pintar(); dlg.showModal();
-  });
-  dlg.addEventListener('click', (e) => {
-    const p = e.target.closest('[data-gx-paso]'); if (p) { pasar(Number(p.dataset.gxPaso)); return; }
-    if (e.target.closest('[data-gx-cerrar]') || e.target === dlg || e.target === pista) dlg.close();
-  });
-  dlg.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') pasar(1); if (e.key === 'ArrowLeft') pasar(-1); });
-  let x0 = null;
-  dlg.addEventListener('pointerdown', (e) => { x0 = e.clientX; });
-  dlg.addEventListener('pointerup', (e) => { if (x0 == null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 50) pasar(dx < 0 ? 1 : -1); });
-}
+/* ---------- Visor de fotos: ahora en features/social/visorFotos.js (estilos Instagram y Facebook, 19-oct-2026) ---------- */
 
 /* ---------- Doble toque para reaccionar ---------- */
 export function montarDobleToque(feed, alReaccionar) {

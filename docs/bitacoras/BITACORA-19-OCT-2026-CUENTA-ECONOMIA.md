@@ -93,6 +93,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 17:48 | (ver REGISTRO) | **Beta 1.11.0**: stickers en los comentarios (**migración 137**) |
 | 18:05 | (ver REGISTRO) | **Beta 1.12.0**: interruptor Demo/Real y stickers desde las apps de WhatsApp/Telegram (**migración 138**) |
 | 18:22 | (ver REGISTRO) | **Beta 1.12.1**: la rueda del mouse baja las columnas de Social (y cualquier zona con scroll propio) |
+| 18:31 | (ver REGISTRO) | **Beta 1.13.0**: visor de fotos con estilo Instagram y estilo Facebook |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -312,6 +313,12 @@ Pedido: «haz todos los comentarios que tengan stickers, e incluso pueda subir s
 - **Paquetes .wastickers/.zip**: se abren en el navegador (`core/sistema/zip.js`, sin librerías) y se suben todos sus stickers.
 - **Telegram**: .webp (estáticos) y .webm (video; migración 138). Los .tgs (animados Lottie) todavía no.
 - **Límites**: iPhone no deja a las webs recibir lo compartido (allí: guardar en Archivos y subir). Máx. 1 MB por sticker, 100 archivos y 60 en «Mis stickers».
+
+### 5.26 Visor de fotos: estilo Instagram y estilo Facebook (1.13.0)
+Al tocar una foto en Social se abre el visor; arriba hay un botón **Instagram | Facebook** que cambia el estilo y se recuerda.
+- **Instagram**: foto a pantalla completa en negro, autor arriba, puntitos, 🔥 y 💬 abajo con el texto; doble toque = 🔥; deslizar de lado = otra foto; deslizar hacia abajo o tocar el fondo = cerrar.
+- **Facebook**: foto a la izquierda con flechas y contador; a la derecha (abajo en celular) autor, texto, reacciones, respuestas y caja para responder sin salir.
+- Archivo: `js/features/social/visorFotos.js` (estilos `.gxv` en socialHilo.css).
 
 ---
 
