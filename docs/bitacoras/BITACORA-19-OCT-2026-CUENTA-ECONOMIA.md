@@ -81,8 +81,8 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 14:17 | `e45a5d8` | **Beta 1.5.1**: esta bitácora y la guía paso a paso |
 | 14:40 | (ver REGISTRO) | **Beta 1.6.0**: Social fase 2 (**migraciones 135 y 135b**) |
 | 15:15 | (ver REGISTRO) | **Beta 1.7.0**: **Jugadas** (feed vertical de videos, **migración 136**) + la beta abre con la demostración encendida |
-| 16:03 | (ver REGISTRO) | **Beta 1.8.1**: Social más aireado (publicaciones separadas, columna izquierda angosta) |
 | 15:58 | (ver REGISTRO) | **Beta 1.8.0**: web más ligera (cinta, scroll, animaciones, estrellas, iconos), Jugadas como Reels (botón + deslizar), eliminar en Social y Jugadas |
+| 16:03 | (ver REGISTRO) | **Beta 1.8.1**: Social más aireado (publicaciones separadas, columna izquierda angosta) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
