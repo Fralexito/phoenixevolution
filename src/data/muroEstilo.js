@@ -26,6 +26,11 @@ export const REACCION_ANTIGUA = { fuego: '🔥', gg: '🤝', aplauso: '👏', ri
 
 /** Segmentos por juego (opcionales). El id lo valida la BD (muro_publicaciones.juego / muro_clips.juego, migración 027). Sin segmento = «general». */
 export const SEGMENTOS = [['pes', 'PES 2021'], ['sp', 'SP Football Life'], ['fifa', 'FIFA'], ['eafc', 'EA FC'], ['efootball', 'eFootball']];
+// Logo de cada juego (19-oct-2026): archivo dentro de public/juegos/. Si el archivo no está, la web muestra la letra (P, SP, F, FC, eF).
+// Para cambiar un logo: reemplaza el archivo (mismo nombre) o cambia aquí la ruta. Mejor PNG/WebP/SVG con fondo transparente.
+// Por ahora solo Football Life (logo que dio Fralex, recortado a la placa «FL26»). Los demás se agregan al tener el archivo: pes → 'juegos/pes2021.png',
+// fifa → 'juegos/fifa.svg', eafc → 'juegos/ea-sports-fc.svg', efootball → 'juegos/efootball.svg' (así no se pide un archivo que no existe).
+export const LOGOS_JUEGO = { sp: 'juegos/sp-football-life.png' };
 
 // ── Publicar como en una red social (19-oct-2026, migración 133: muro_publicaciones.extra) ──
 /** Fondos para textos cortos (como los de Facebook). El id lo guarda la BD (solo a-z, 0-9 y guion); el dibujo vive aquí. */

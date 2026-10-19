@@ -15,7 +15,7 @@ import * as amigosApi from '../features/amigos/api.js';
 import { marcarVistas, indiceInicial } from '../core/comunidad/historias.js';
 import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../core/comunidad/feed.js';
 import { REACCION_RAPIDA, circulosHistorias, mapaMisReacciones, conMisReacciones, totalReacciones, ORDENES, ordenValido, ordenarFeed, contarNuevas } from '../core/comunidad/feedSocial.js';
-import { SEGMENTOS } from '../../data/muroEstilo.js';
+import { SEGMENTOS, LOGOS_JUEGO } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { reproductorYT } from '../features/muro/render.js';
 import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
@@ -211,11 +211,14 @@ if ('IntersectionObserver' in window) new IntersectionObserver((es) => { if (es.
 /* ---------- Columnas de foro (19-oct-2026): navegación a la izquierda, la comunidad a la derecha ---------- */
 const navFeeds = document.querySelector('[data-sxr-feeds]'); const navJuegos = document.querySelector('[data-sxr-juegos]');
 const LETRA = { pes: 'P', sp: 'SP', fifa: 'F', eafc: 'FC', efootball: 'eF' };
+// Icono de un juego: su logo (data/muroEstilo.js → LOGOS_JUEGO) sobre la letra; si el logo no carga, se quita y queda la letra.
+const icJuegoHTML = (id) => `<span class="sxr-ic sxr-ic-juego${LOGOS_JUEGO[id] ? ' con-logo' : ''}" data-logo="${escapeHTML(id)}">${escapeHTML(LETRA[id] ?? '?')}${LOGOS_JUEGO[id] ? `<img src="${escapeHTML(href(LOGOS_JUEGO[id]))}" alt="" loading="lazy" decoding="async" data-logo-juego>` : ''}</span>`;
+document.addEventListener('error', (e) => { const im = e.target; if (im instanceof HTMLImageElement && im.hasAttribute('data-logo-juego')) { im.parentElement?.classList.remove('con-logo'); im.remove(); } }, true);
 function pintarNav() {
   const tit = document.querySelector('[data-sxr-titulo]');   // en PC el feed se elige a la izquierda; aquí solo se nombra
   if (tit) tit.innerHTML = `<b>${escapeHTML(vistaInfo(S.vista).texto)}</b>${S.vista === 'recientes' ? ` · ${escapeHTML(S.juego ? nombreJuego(S.juego) ?? 'Todos los juegos' : 'Todos los juegos')}` : ''}`;
   if (navFeeds) navFeeds.innerHTML = VISTAS.map((v) => `<button type="button" class="sxr-item" data-v="${v.id}" aria-current="${S.vista === v.id ? 'page' : 'false'}"><span class="sxr-ic"><i class="fa-solid ${v.icono}" aria-hidden="true"></i></span><span>${escapeHTML(v.texto)}</span></button>`).join('');
-  if (navJuegos) navJuegos.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" class="sxr-item" data-j="${id}" aria-current="${S.vista === 'recientes' && S.juego === id ? 'true' : 'false'}"><span class="sxr-ic sxr-ic-juego">${id ? escapeHTML(LETRA[id] ?? n[0]) : '<i class="fa-solid fa-gamepad" aria-hidden="true"></i>'}</span><span>${escapeHTML(n)}</span></button>`).join('');
+  if (navJuegos) navJuegos.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" class="sxr-item" data-j="${id}" aria-current="${S.vista === 'recientes' && S.juego === id ? 'true' : 'false'}">${id ? icJuegoHTML(id) : '<span class="sxr-ic sxr-ic-juego"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></span>'}<span>${escapeHTML(n)}</span></button>`).join('');
 }
 const nombreJuego = (id) => SEGMENTOS.find((s) => s[0] === id)?.[1] ?? null;
 function pintarLado() {
@@ -226,7 +229,7 @@ function pintarLado() {
   pintarTendencias();
   const porJuego = new Map(); for (const it of S.items) if (nombreJuego(it.juego)) porJuego.set(it.juego, (porJuego.get(it.juego) || 0) + 1);
   const lista = [...porJuego].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  activos.innerHTML = lista.length ? lista.map(([id, n]) => `<button type="button" class="sxr-fila" data-j="${id}"><span class="sxr-ic sxr-ic-juego">${escapeHTML(LETRA[id] ?? '?')}</span><span class="sxr-fila-tx"><b>${escapeHTML(nombreJuego(id))}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'} en el feed</small></span></button>`).join('')
+  activos.innerHTML = lista.length ? lista.map(([id, n]) => `<button type="button" class="sxr-fila" data-j="${id}">${icJuegoHTML(id)}<span class="sxr-fila-tx"><b>${escapeHTML(nombreJuego(id))}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'} en el feed</small></span></button>`).join('')
     : '<p class="sxr-nada">Cuando haya publicaciones con juego, aparecen aquí.</p>';
   const mejores = [...S.items].filter((x) => totalReacciones(x) > 0).sort((a, b) => totalReacciones(b) - totalReacciones(a)).slice(0, 4);
   top.innerHTML = mejores.length ? mejores.map((it) => { const a = it.autor ?? {}; const txt = String(it.texto ?? '').replace(/\s+/g, ' ').trim();
