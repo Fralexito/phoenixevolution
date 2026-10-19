@@ -25,7 +25,7 @@ const demoAdmin = api.esDemo() && new URLSearchParams(location.search).get('admi
 const esAdmin = () => demoAdmin || can('administrarTienda');
 
 function carteraHTML() {
-  const e = S.eco; if (!e) return '<p class="text-xs text-gray-400">Inicia sesión para ver tu nivel y tus tokens.</p>';
+  const e = S.eco; if (!e) return '<p class="text-xs text-gray-400">Inicia sesión para ver tu nivel, tus ascuas y tus gemas.</p>';
   return `<div class="flex flex-wrap items-center gap-4"><div><p class="text-[12px] uppercase tracking-widest text-gray-400 font-display">Nivel</p><p class="font-display font-extrabold text-3xl text-white">${e.nivel}</p></div>
     <div class="flex-1 min-w-[10rem]"><div class="h-2 rounded-full bg-galaxy-800 overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(e.progreso * 100)}" aria-label="Progreso al siguiente nivel"><div class="h-full bg-gradient-to-r from-galaxy-400 to-cyan-300" style="width:${Math.round(e.progreso * 100)}%"></div></div>
       <p class="text-[12px] text-gray-400 mt-1">${formatoTokens(e.xp)} / ${formatoTokens(e.xpSiguiente)} XP para el nivel ${e.nivel + 1}</p></div>

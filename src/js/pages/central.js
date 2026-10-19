@@ -137,7 +137,7 @@ function quitarDuplicado(n, m) {
   const filas = $('matches-container')?.querySelectorAll('[data-detalle]') ?? [];
   if (filas.length !== 1 || filas[0].dataset.detalle !== `${n}|${m.l}|${m.v}`) return;
   const aviso = document.createElement('p'); aviso.className = 'text-xs text-gray-400 py-2';
-  aviso.textContent = `Es el único partido que falta de la fecha ${n}: lo tienes destacado arriba.`;
+  aviso.textContent = `Último partido por jugar de la fecha ${n} · es el destacado de arriba.`;
   filas[0].replaceWith(aviso);
 }
 

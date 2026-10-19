@@ -116,7 +116,11 @@ const datos = LIGAS.map((l) => ({
             <div class="grid gap-8 lg:gap-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)] lg:items-start">
             <!-- TABLA -->
             <section class="space-y-3" aria-label="Tabla de posiciones">
-              <h2 class="font-display font-bold text-lg sm:text-xl text-white uppercase tracking-widest">Tabla de posiciones</h2>
+              <div class="flex items-baseline justify-between gap-3">
+                <h2 class="font-display font-bold text-lg sm:text-xl text-white uppercase tracking-widest">Tabla de posiciones</h2>
+                <!-- 19-oct-2026: en celular la columna «Últimos» queda fuera y no se notaba que la tabla se desliza. -->
+                <span class="sm:hidden text-[12px] text-gray-400 whitespace-nowrap" aria-hidden="true">Desliza <i class="fa-solid fa-arrow-right"></i></span>
+              </div>
               <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto" role="region" tabindex="0" aria-label="Tabla de posiciones, desplazable">
                 <table class="liga-tabla w-full">
                   <thead><tr>

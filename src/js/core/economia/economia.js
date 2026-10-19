@@ -149,7 +149,7 @@ export function vistaPrevia(item) {
   if (item.categoria === 'efecto_carta') return `<span class="ec-demo inline-flex w-12 h-16 rounded-lg bg-galaxy-800 border border-galaxy-600/50" data-efecto-carta="${escapeHTML(s.efecto ?? 'holografico')}" aria-hidden="true"></span>`;
   if (item.categoria === 'banner') return `<span class="inline-block w-24 h-10 rounded-lg" style="${estiloBanner(s)}"></span>`;
   if (item.categoria === 'sonido_chat') return `<button type="button" data-sonido="${escapeHTML(s.sonido ?? '')}" class="btn btn-ghost !min-h-9 !px-3 !text-[12px]" aria-label="Escuchar ${escapeHTML(SONIDOS_CHAT[s.sonido]?.etiqueta ?? 'sonido')}"><i class="fa-solid fa-play"></i><span>Escuchar</span></button>`;
-  if (item.categoria === 'color_clan') return `<span class="font-display font-extrabold" style="${estiloColor(s)}">[ABC]</span>`;
+  if (item.categoria === 'color_clan') return `<span class="font-display font-extrabold" style="${estiloColor(s)}">[PHX]</span>`;   // muestra de etiqueta de clan (antes «[ABC]» parecía texto de relleno)
   return `<i class="fa-solid ${escapeHTML(s.icono ?? 'fa-star')} text-xl" style="${estiloColor(s)}"></i>`;
 }
 

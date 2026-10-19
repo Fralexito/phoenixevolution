@@ -18,6 +18,9 @@
   --color-galaxy-dark: #03010f;  /* fondo base */
   --color-galaxy-deep: #07020d;
   --color-galaxy-card: #0a051c;
+  /* 19-oct-2026 (revisión de diseño): el gris-500 de Tailwind (#6b7280) daba 4.2:1 sobre el fondo oscuro, por debajo del 4.5 que pide el texto pequeño.
+     Un poco más claro y del mismo tono: 5.3:1 sobre el fondo y 4.65 sobre los paneles. Afecta a todos los textos «text-gray-500». */
+  --color-gray-500: #7c8392;
   --color-galaxy-panel: #0a0514;
   --color-galaxy-border: #2a1660;
   --color-galaxy-line: #1a0b36;
