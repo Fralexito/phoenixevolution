@@ -25,6 +25,7 @@ import { openStatLegend } from '../features/statLegend.js';
 import { crearReplica } from '../features/replicaCarta.js';
 import { construirIndice, opcionesFiltro, filtrarJugadores, divisionActual } from '../core/jugadores/participaciones.js';
 import { SISTEMA } from '../../data/temporada.js';
+import { COLUMNAS_LISTA } from '../core/jugadores/columnas.js';
 
 document.body.classList.add('pg-jugadores');   // overflow-x: clip (components.css; antes era body:has(#players-container))
 
@@ -122,7 +123,7 @@ function fillClubs(historicos = []) {
 let reconMontado = false;
 async function load() {
   try {
-    const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false });
+    const { data, error } = await supabase.from('jugadores').select(COLUMNAS_LISTA).order('ovr', { ascending: false });
     if (error) throw error;
     all = data ?? []; ligaStats = statsLiga(all, edicionActual());
     let filas = [];

@@ -9,6 +9,7 @@ import { escudoHTML } from '../core/sistema/escudos.js';
 import { LIGAS } from '../../data/ligas.js';
 import { EDICIONES } from '../../data/ligaResultados.js';
 import { montarVotoSemana } from '../features/reconocimientos.js';
+import { COLUMNAS_LISTA } from '../core/jugadores/columnas.js';
 
 const $ = (id) => document.getElementById(id);
 const edicionDe = (lid) => { const eds = EDICIONES[lid] ?? []; return eds.find((e) => e.estado === 'en_curso') ?? eds.at(-1) ?? null; };
@@ -59,7 +60,7 @@ document.querySelector('.pr-ligas')?.addEventListener('click', (e) => {
 pintar();   // primero con los resultados (no esperan a la base); las fotos llegan después
 (async () => {
   try {
-    const { data, error } = await supabase.from('jugadores').select('*');
+    const { data, error } = await supabase.from('jugadores').select(COLUMNAS_LISTA);
     if (error) throw error;
     jugadores = data ?? []; pintar();
     montarVotoSemana($('pr-voto'), jugadores);

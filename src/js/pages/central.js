@@ -21,6 +21,7 @@ import { borrarFilas } from '../features/escritura.js';
 import { estadoLiga, selloPartido, clubesMasUsados, ESTADOS_ESPECIALES } from '../core/competicion/pulso.js';
 import { contarHasta } from '../features/dopamina.js';
 import { cifra, ordenPodio, jornadasCentral, visualClub, rachas, resultadosNuevos, tablaTrasFecha, movimientosTabla, estadisticasFecha, destacadoFinal } from '../core/competicion/central.js';
+import { COLUMNAS_LISTA } from '../core/jugadores/columnas.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -181,7 +182,7 @@ function renderDemo() {
 async function renderFeatured() {
   const box = $('featured-players-container');
   try {
-    const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false }).limit(3);
+    const { data, error } = await supabase.from('jugadores').select(COLUMNAS_LISTA).order('ovr', { ascending: false }).limit(3);
     if (error) throw error;
     if (!data?.length) throw new Error('vacío');
     // Podio: 2.º izquierda, 1.º centro, 3.º derecha. El número de puesto sigue al jugador (no a la posición en pantalla).
@@ -261,7 +262,7 @@ renderCartas();
 async function renderCartas() {
   const box = $('cartas-carrusel'); if (!box || !FX.cartasPortada) return;
   try {
-    const { data, error } = await supabase.from('jugadores').select('*').order('ovr', { ascending: false }).limit(16);
+    const { data, error } = await supabase.from('jugadores').select(COLUMNAS_LISTA).order('ovr', { ascending: false }).limit(16);
     if (error) throw error;
     if (!data?.length) throw new Error('vacío');
     box.innerHTML = data.map((j, i) => `<a class="carta-slot" href="${href(`jugador/?id=${encodeURIComponent(j.id)}`)}" aria-label="${escapeHTML(j.nombre)}: ver perfil">${playerCardHTML(j, i, { sizeClass: 'w-full' })}</a>`).join('');
