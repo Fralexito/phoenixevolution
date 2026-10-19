@@ -109,3 +109,62 @@
 @keyframes cfg-aparece { from { opacity: 0; transform: translateY(6px); } }
 /* El estilo e-sports del sitio (sinIA.css) pone una «mira» de esquinas en los encabezados de sección: aquí tapaba la flecha de volver. Se quedan las rayas y el borde cian. */
 main[data-sia] .cfg-panel-cab::after { content: none; }
+
+/* ── Tono premium (19-oct-2026, Fralex: «más visualización, dinamismo y tono premium… ordenado, limpio, bien distribuido») ── */
+/* Íconos con relieve y el color de acento: cambian solos cuando eliges otro color */
+.cfg-ic { background: linear-gradient(145deg, color-mix(in srgb, var(--color-galaxy-400) 22%, transparent), color-mix(in srgb, var(--color-galaxy-400) 6%, transparent)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08); }
+.cfg-ic-grande { color: #04121a; background: linear-gradient(145deg, var(--color-galaxy-400), color-mix(in srgb, var(--color-galaxy-400) 55%, #1b0b3a)); box-shadow: 0 10px 26px -10px var(--color-galaxy-400), inset 0 1px 0 rgb(255 255 255 / .35); }
+/* La sección abierta lleva un halo suave del color de acento arriba */
+.cfg-panel > section { position: relative; isolation: isolate; }
+.cfg-panel > section::before { content: ''; position: absolute; inset: 0 0 auto; height: 9rem; z-index: -1; pointer-events: none; background: radial-gradient(80% 100% at 15% 0%, color-mix(in srgb, var(--color-galaxy-400) 14%, transparent), transparent 70%); }
+.cfg-h1 { display: flex; align-items: center; gap: .6rem; }
+.cfg-h1::after { content: ''; width: .5rem; height: .5rem; border-radius: 99px; background: var(--color-galaxy-400); box-shadow: 0 0 12px var(--color-galaxy-400); }
+
+/* Estilos rápidos */
+.cfg-estilos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.cfg-estilo { position: relative; display: grid; justify-items: start; gap: .1rem; min-height: 5.6rem; padding: .7rem .8rem; border-radius: 1rem; text-align: left; overflow: hidden; isolation: isolate;
+  background: var(--cfg-fondo); border: 1px solid var(--cfg-borde); transition: transform .16s var(--cfg-ease), border-color .2s ease, box-shadow .2s ease; }
+.cfg-estilo::before { content: ''; position: absolute; inset: auto -30% -70% auto; width: 75%; aspect-ratio: 1; border-radius: 50%; z-index: -1; background: var(--muestra); opacity: .28; filter: blur(18px); transition: opacity .25s ease; }
+.cfg-estilo:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 0; }
+.cfg-estilo-m { width: 1.9rem; height: 1.9rem; margin-bottom: .35rem; border-radius: .6rem; background: var(--muestra); box-shadow: inset 0 1px 0 rgb(255 255 255 / .3), 0 6px 14px -6px rgb(0 0 0 / .8); transition: transform .3s var(--cfg-ease); }
+.cfg-estilo b { font-size: 13.5px; font-weight: 700; color: #fff; }
+.cfg-estilo small { font-size: 11.5px; line-height: 1.35; color: #94a0b6; }
+.cfg-estilo:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .cfg-estilo:hover { border-color: rgb(255 255 255 / .2); } .cfg-estilo:hover::before { opacity: .45; } .cfg-estilo:hover .cfg-estilo-m { transform: rotate(-8deg) scale(1.06); } }
+.cfg-estilo[aria-checked='true'] { border-color: var(--color-galaxy-400); box-shadow: 0 0 0 1px var(--color-galaxy-400), 0 12px 28px -14px var(--color-galaxy-400); }
+.cfg-estilo[aria-checked='true']::after { content: ''; position: absolute; top: .65rem; right: .65rem; width: 1.15rem; height: 1.15rem; border-radius: 99px;
+  background: var(--color-galaxy-400) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%2304121a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 80% no-repeat; }
+
+/* Contador de cambios en cada fila y «Restablecer» en la sección */
+.cfg-cambios { flex: none; display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 .35rem; border-radius: 99px; font-size: 11.5px; font-weight: 800; color: #04121a; background: var(--color-galaxy-400); }
+.cfg-cambios[hidden] { display: none; }
+.cfg-reset { flex: none; display: inline-flex; align-items: center; gap: .4rem; min-height: 2.4rem; padding: 0 .9rem; border-radius: 99px; font-size: 12.5px; font-weight: 600; color: #e5e9f2; background: rgb(255 255 255 / .06); border: 1px solid var(--cfg-borde); transition: background-color .2s ease, transform .16s var(--cfg-ease); }
+.cfg-reset[hidden] { display: none; }
+.cfg-reset:active { transform: scale(.96); }
+@media (hover: hover) and (pointer: fine) { .cfg-reset:hover { background: rgb(255 255 255 / .1); } }
+@media (max-width: 480px) { .cfg-reset span { display: none; } .cfg-reset { width: 2.4rem; justify-content: center; padding: 0; } }
+
+/* Opciones con muestra de color (acento, fondo) */
+.cfg-op-con-muestra span { gap: .5rem; padding-left: .45rem; }
+.cfg-muestra { display: inline-block; width: 1.6rem; height: 1.6rem; border-radius: 99px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .18), 0 2px 6px rgb(0 0 0 / .5); transition: transform .25s var(--cfg-ease); }
+.cfg-op input:checked + span .cfg-muestra { transform: scale(1.12); box-shadow: 0 0 0 2px #04121a, 0 0 0 3.5px rgb(255 255 255 / .9); }
+
+/* Pastilla flotante «Guardado» */
+.cfg-toast { position: fixed; left: 50%; bottom: 1.5rem; z-index: 70; display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1rem; border-radius: 99px; font-size: 13.5px; font-weight: 600; color: #fff;
+  background: rgb(14 10 34 / .92); border: 1px solid color-mix(in srgb, var(--color-galaxy-400) 45%, transparent); box-shadow: 0 14px 34px -12px rgb(0 0 0 / .8); backdrop-filter: blur(12px);
+  transform: translate(-50%, 140%); opacity: 0; pointer-events: none; transition: transform .3s var(--cfg-ease), opacity .2s ease; }
+.cfg-toast i { color: var(--color-galaxy-400); }
+.cfg-toast.ver { transform: translate(-50%, 0); opacity: 1; }
+html[data-barra-inf] .cfg-toast { bottom: 5.2rem; }
+@media (min-width: 768px) { html[data-barra-inf] .cfg-toast { bottom: 1.5rem; } }
+
+/* Entrada en cascada de las filas y de los ajustes al abrir una sección */
+@media (prefers-reduced-motion: no-preference) {
+  .cfg-filas > *, .cfg-estilos > *, .cfg-panel > section:not([hidden]) .cfg-aj { animation: cfg-aparece .32s var(--cfg-ease) backwards; }
+  :is(.cfg-filas, .cfg-estilos) > :nth-child(2), .cfg-panel > section:not([hidden]) .cfg-aj:nth-child(2) { animation-delay: 35ms; }
+  :is(.cfg-filas, .cfg-estilos) > :nth-child(3), .cfg-panel > section:not([hidden]) .cfg-aj:nth-child(3) { animation-delay: 70ms; }
+  :is(.cfg-filas, .cfg-estilos) > :nth-child(4), .cfg-panel > section:not([hidden]) .cfg-aj:nth-child(4) { animation-delay: 105ms; }
+  :is(.cfg-filas, .cfg-estilos) > :nth-child(n+5), .cfg-panel > section:not([hidden]) .cfg-aj:nth-child(n+5) { animation-delay: 140ms; }
+}
+/* El estado en texto queda para lectores de pantalla: a la vista ya está la pastilla «Guardado». */
+.cfg-estado { position: absolute; width: 1px; height: 1px; min-height: 0; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

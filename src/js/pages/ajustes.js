@@ -11,9 +11,16 @@ import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { iniciarVistas } from '../features/ajustesVista.js';
 import { pintarDerechos } from '../features/derechos.js';
 import { avatarHTML } from '../core/sistema/avatar.js';
+import { SECCIONES, ESTILOS } from '../../data/ajustes.js';
 
 const estado = document.getElementById('aj-estado');
-const avisar = (t) => { if (estado) estado.textContent = t; };
+// Cada cambio se confirma con una pastilla flotante «Guardado» (y el texto queda para lectores de pantalla).
+const toast0 = document.getElementById('cfg-toast'); let tToast = 0;
+const avisar = (t) => {
+  if (estado) estado.textContent = t;
+  if (!toast0) return; toast0.querySelector('span').textContent = /no permite|no se pudo|no es|demasiado/i.test(t) ? t : 'Guardado';
+  toast0.classList.remove('ver'); void toast0.offsetWidth; toast0.classList.add('ver'); clearTimeout(tToast); tToast = setTimeout(() => toast0.classList.remove('ver'), 1800);
+};
 const controles = () => [...document.querySelectorAll('[data-clave]')];
 
 function pintar() {
@@ -123,3 +130,23 @@ q?.addEventListener('input', () => {
   }));
 });
 iniciarVistas();
+
+// ── Extras (19-oct-2026): cuántos cambios tiene cada sección, «Restablecer» por sección y estilos rápidos ──
+function pintarExtras() {
+  const a = leerAjustes();
+  for (const s of SECCIONES) {
+    const n = s.ajustes.filter((x) => a[x.clave] !== x.defecto).length;
+    document.querySelectorAll(`[data-cambios-de="${s.id}"]`).forEach((b) => { b.hidden = !n; b.textContent = String(n); b.title = `${n} ajuste${n === 1 ? '' : 's'} cambiado${n === 1 ? '' : 's'}`; });
+    document.querySelectorAll(`[data-reset-seccion="${s.id}"]`).forEach((b) => { b.hidden = !n; });
+  }
+  const activo = ESTILOS.find((e) => Object.entries(e.ajustes).every(([k, v]) => a[k] === v));
+  document.querySelectorAll('[data-estilo]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.estilo === activo?.id)));
+}
+document.addEventListener('click', (e) => {
+  const est = e.target.closest('[data-estilo]');
+  if (est) { const x = ESTILOS.find((s) => s.id === est.dataset.estilo); if (x) { reemplazarAjustes({ ...leerAjustes(), ...x.ajustes }); pintar(); avisar(`Estilo «${x.titulo}» aplicado.`); } return; }
+  const rs = e.target.closest('[data-reset-seccion]');
+  if (rs) { const s = SECCIONES.find((x) => x.id === rs.dataset.resetSeccion); if (s) { reemplazarAjustes({ ...leerAjustes(), ...Object.fromEntries(s.ajustes.map((x) => [x.clave, x.defecto])) }); pintar(); avisar(`«${s.titulo}» volvió a como venía.`); } }
+});
+window.addEventListener('ajustes:cambio', pintarExtras);
+pintarExtras();

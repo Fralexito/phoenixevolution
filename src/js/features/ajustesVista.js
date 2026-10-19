@@ -18,7 +18,7 @@ const LIGA = `<table class="liga-tabla w-full text-xs"><thead><tr><th>#</th><th 
   <tr><td>3</td><td class="!text-left">Jugador C</td><td>12</td></tr><tr class="tmp-fila tmp-baja"><td>4</td><td class="!text-left">Jugador D</td><td>6</td></tr></tbody></table>
   <p class="aj-nota"><span class="tmp-dot" style="background:#00e5ff"></span>copa <span class="tmp-dot" style="background:#34d399"></span>ascenso <span class="tmp-dot" style="background:#fb7185"></span>descenso</p>`;
 const ACCESIBILIDAD = `<div class="rounded-lg border border-galaxy-border p-3 bg-galaxy-card space-y-2"><main class="!block !w-auto">
-  <p class="text-sm text-gray-400">Así se lee un texto secundario. <a href="#accesibilidad" class="text-galaxy-400">Y este es un enlace</a> dentro de una frase.</p></main>
+  <p class="text-sm text-gray-400">Así se lee un texto secundario. <a href="#texto" class="text-galaxy-400">Y este es un enlace</a> dentro de una frase.</p></main>
   <div class="flex items-center gap-3"><button type="button" class="btn btn-ghost !min-h-9 !text-xs">Pulsa Tab hasta aquí</button><i class="fa-solid fa-satellite-dish text-galaxy-400 text-xl animate-float" title="Animación"></i></div></div>`;
 
 const reloj = () => {
@@ -63,7 +63,7 @@ function cartas() {
 /** Pinta TODAS las vistas. Se llama al cargar y cada vez que cambia un ajuste. */
 export function pintarVistas() {
   const set = (id, html) => { const e = $(id); if (e) e.innerHTML = html; };
-  set('vp-apariencia', APARIENCIA); set('vp-liga', LIGA); set('vp-accesibilidad', ACCESIBILIDAD);
+  set('vp-apariencia', APARIENCIA); set('vp-liga', LIGA); set('vp-texto', ACCESIBILIDAD);
   set('vp-idioma', reloj()); set('vp-privacidad', privacidad()); set('vp-datos', datos());
   cartas(); notificaciones();
 }

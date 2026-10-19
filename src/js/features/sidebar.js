@@ -33,7 +33,7 @@ export function initSidebar() {
     menu.querySelectorAll('[data-no-staff]').forEach((el) => { el.hidden = can(el.dataset.noStaff); });
     // Red de enlaces: si a un grupo le queda un número impar de cuadros visibles, el último ocupa el ancho entero (nada queda «cojo»).
     menu.querySelectorAll('.red-items').forEach((g) => {
-      const conBarra = matchMedia('(max-width: 767.98px)').matches;   // ahí se esconden los que ya están en la barra de abajo
+      const conBarra = matchMedia('(max-width: 767.98px)').matches && document.documentElement.hasAttribute('data-barra-inf');   // ahí se esconden los que ya están en la barra de abajo
       const vis = [...g.children].filter((a) => !a.hidden && !(conBarra && a.hasAttribute('data-en-barra'))); g.querySelectorAll('[data-ancho]').forEach((a) => a.removeAttribute('data-ancho'));
       if (vis.length % 2) vis.at(-1).dataset.ancho = '';
     });

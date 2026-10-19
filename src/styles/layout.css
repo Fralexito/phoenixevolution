@@ -89,6 +89,18 @@ html[data-aj-foco='si'] :focus-visible { outline: 3px solid #fff !important; out
 html[data-aj-cartas-insignia='no'] .div-badge { display: none; }
 html[data-aj-liga-zonas='no'] .tmp-fila, html[data-aj-liga-zonas='no'] .liga-tabla tbody tr.tmp-fila { box-shadow: none; background: none; }
 html[data-aj-liga-compacta='si'] .liga-tabla td { padding-top: .3rem; padding-bottom: .3rem; }
+/* 19-oct-2026 · ajustes nuevos (Fralex: «super personalizable»). Cada uno cambia algo real de toda la web. */
+html[data-aj-acento='azul'] { --color-galaxy-400: #60a5fa; --color-galaxy-500: #3b82f6; --color-galaxy-50: #dbeafe; }
+html[data-aj-acento='rosa'] { --color-galaxy-400: #f472b6; --color-galaxy-500: #ec4899; --color-galaxy-50: #fce7f3; }
+html[data-aj-fondo='sobrio'] body { background-image: none; }
+html[data-aj-fondo='negro'], html[data-aj-fondo='negro'] body { background: #000; }
+html[data-aj-letra='simple'] { --font-display: var(--font-sans); }
+html[data-aj-esquinas='rectas'] :is(main, #sidebar-menu, .barra-inf, footer) :is(.glass-panel, .premium-glass, .btn, .field, .chip, .card, .rounded, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl,
+  .mg-carta, .mcx-b, .mcx-dock, .mcx-guia, .cfg-filas, .cfg-cuenta, .cfg-op span, .cfg-panel > section, .red-fila, .red-item, .red-club, .red-grupo > summary, .tuclub-caja, .mg-caja) { border-radius: .2rem; }
+@media (min-width: 1024px) {
+  html[data-fx-marco][data-aj-ancho='amplio'] main > :is(div, section)[class*='max-w-'].mx-auto,
+  html[data-fx-marco][data-aj-ancho='amplio'] main > header > .relative.z-10[class*='max-w-'] { max-width: 100rem; }
+}
 
 /* Menú lateral: en pantallas bajas se compacta el alto de cada ítem para que quepan Mi cuenta, Configuración y Salir sin tapar nada */
 @media (min-width: 1024px) and (max-height: 900px) {   /* solo PC: en móvil el menú usa fichas de 2 columnas */

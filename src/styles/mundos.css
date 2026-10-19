@@ -14,7 +14,7 @@ main[data-mundo] .pilar-tabs-lista { border-color: rgb(var(--mundo) / .35); }
 main[data-mundo] .pilar-tabs-lista a[aria-current='page'] { background: rgb(var(--mundo)); box-shadow: 0 0 16px rgb(var(--mundo) / .5); }
 main[data-mundo='competir'] .pilar-tabs-lista a[aria-current='page'] { background: var(--color-galaxy-400); }
 /* Los mundos con color propio también tiñen los acentos cian de sus páginas. */
-html:not([data-tema='sudario']):not([data-aj-acento='violeta']):not([data-aj-acento='dorado']):not([data-aj-acento='verde']):not([data-aj-acento='rojo']) {
+html:not([data-tema='sudario']):not([data-aj-acento='violeta']):not([data-aj-acento='dorado']):not([data-aj-acento='verde']):not([data-aj-acento='rojo']):not([data-aj-acento='azul']):not([data-aj-acento='rosa']) {
   & main[data-mundo='jugadores'] { --color-galaxy-400: #a78bfa; --color-galaxy-500: #8b5cf6; --color-galaxy-50: #ede9fe; }
   & main[data-mundo='jugar'] { --color-galaxy-400: #ff3d8b; --color-galaxy-500: #e11d74; --color-galaxy-50: #ffe4f0; }
   & main[data-mundo='miclub'] { --color-galaxy-400: #34d399; --color-galaxy-500: #10b981; --color-galaxy-50: #d1fae5; }

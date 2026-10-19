@@ -15,6 +15,9 @@ export function aplicarAjustes(a) {
   r.setAttribute('data-aj-mov-efectivo', movimientoReducido(a, sistemaReduce(), lig) ? 'reducido' : 'normal');
   if (lig) r.setAttribute('data-rend-ligero', '1'); else r.removeAttribute('data-rend-ligero');
   r.style.fontSize = a.escala === '100' ? '' : `${a.escala}%`;
+  // Barra de abajo y columna de contactos: su CSS cuelga de estos atributos; el ajuste los quita o los devuelve (solo si la web los trae: data-base-*).
+  r.toggleAttribute('data-barra-inf', r.hasAttribute('data-base-barra-inf') && a.barraInferior !== false);
+  r.toggleAttribute('data-fx-contactos', r.hasAttribute('data-base-contactos') && a.contactos !== false);
 }
 /** Guarda UN cambio, lo aplica al instante y avisa a las demás piezas (evento «ajustes:cambio»). */
 export function cambiarAjuste(clave, valor) { return reemplazarAjustes({ ...leerAjustes(), [clave]: valor }); }

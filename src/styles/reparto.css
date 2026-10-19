@@ -63,4 +63,4 @@
 @media (max-width: 1023.98px) { #sidebar-menu { width: min(88vw, 22rem); } }
 .red-item[data-ancho] { grid-column: 1 / -1; min-height: 0; }
 /* En el celular, lo que ya está en la barra de abajo no se repite aquí (Sidebar.astro marca data-en-barra) */
-@media (max-width: 767.98px) { .red [data-en-barra] { display: none; } }
+@media (max-width: 767.98px) { html[data-barra-inf] .red [data-en-barra] { display: none; } }   /* si apagas la barra (Configuración), vuelven */

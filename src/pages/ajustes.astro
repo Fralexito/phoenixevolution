@@ -9,12 +9,9 @@
 // Las opciones, sus valores y cómo se guardan NO cambian: salen de data/ajustes.js y las guarda js/pages/ajustes.js.
 import Layout from '../layouts/Layout.astro';
 import '../styles/configuracion.css';
-import { SECCIONES } from '../data/ajustes.js';
-const porId = Object.fromEntries(SECCIONES.map((s) => [s.id, s]));
-const GRUPOS = [
-  ['Preferencias', 'Cómo se ve y se comporta la web para ti', ['apariencia', 'cartas', 'liga', 'notificaciones', 'idioma', 'accesibilidad']],
-  ['Privacidad y datos', 'Qué recuerda este navegador y qué puedes llevarte', ['privacidad', 'datos']],
-].map(([titulo, texto, ids]) => ({ titulo, texto, secciones: ids.map((id) => porId[id]).filter(Boolean) }));
+import { SECCIONES, GRUPOS_AJUSTES, ESTILOS } from '../data/ajustes.js';
+// Cada sección dice a qué grupo pertenece (data/ajustes.js): aquí solo se reparten.
+const GRUPOS = GRUPOS_AJUSTES.map((g) => ({ ...g, secciones: SECCIONES.filter((s) => s.grupo === g.id) })).filter((g) => g.secciones.length);
 const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
 ---
 <Layout title="Configuración" active="ajustes" description="Tu cuenta, cómo se ve la web, notificaciones, privacidad y tus datos.">
@@ -29,6 +26,13 @@ const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
           <span class="cfg-txt"><b id="cfg-nombre">Tu cuenta</b><small id="cfg-usuario">Perfil, sesión y tus datos</small></span>
           <span class="cfg-flecha" aria-hidden="true"></span>
         </a>
+        <!-- Estilos rápidos: con un toque cambian color, fondo, brillo, esquinas y letra a la vez (data/ajustes.js ESTILOS). -->
+        <section class="cfg-grupo cfg-estilos-grupo" aria-labelledby="cfg-estilos-t">
+          <h2 id="cfg-estilos-t">Estilos rápidos</h2><p>Un toque y la web cambia entera. Después puedes afinar cada detalle.</p>
+          <div class="cfg-estilos" role="radiogroup" aria-label="Estilos rápidos">
+            {ESTILOS.map((e) => (<button type="button" class="cfg-estilo" role="radio" aria-checked="false" data-estilo={e.id} style={`--muestra: ${e.muestra}`}><span class="cfg-estilo-m" aria-hidden="true"></span><b>{e.titulo}</b><small>{e.texto}</small></button>))}
+          </div>
+        </section>
         {GRUPOS.map((g) => (
           <section class="cfg-grupo">
             <h2>{g.titulo}</h2><p>{g.texto}</p>
@@ -37,6 +41,7 @@ const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
                 <a class="cfg-fila" href={`#${s.id}`} data-tab={s.id}>
                   <span class="cfg-ic" aria-hidden="true"><i class={`fa-solid ${s.icono}`}></i></span>
                   <span class="cfg-txt"><b>{s.titulo}</b><small>{s.texto}</small></span>
+                  <span class="cfg-cambios" data-cambios-de={s.id} hidden></span>
                   <span class="cfg-flecha" aria-hidden="true"></span>
                 </a>
               ))}
@@ -53,7 +58,8 @@ const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
           <header class="cfg-panel-cab">
             <a class="cfg-volver" href="#" data-cfg-volver aria-label="Volver a la configuración"><span class="cfg-flecha cfg-flecha-atras" aria-hidden="true"></span></a>
             <span class="cfg-ic cfg-ic-grande" aria-hidden="true"><i class={`fa-solid ${s.icono}`}></i></span>
-            <div class="min-w-0"><h2 id={`cfg-t-${s.id}`}>{s.titulo}</h2><p>{s.texto}</p></div>
+            <div class="min-w-0 flex-1"><h2 id={`cfg-t-${s.id}`}>{s.titulo}</h2><p>{s.texto}</p></div>
+            {s.ajustes.length > 0 && <button type="button" class="cfg-reset" data-reset-seccion={s.id} hidden><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Restablecer</span></button>}
           </header>
           <div class:list={['cfg-cuerpo', s.vista && 'cfg-con-vista']}>
             <div class="cfg-ajustes">
@@ -66,7 +72,7 @@ const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
                 <fieldset class="cfg-aj" data-busca={busca(a.etiqueta, a.ayuda, s.titulo, ...a.opciones.map((o) => o.etiqueta))} data-busca-t={a.etiqueta} data-busca-s={s.id}>
                   <legend class="cfg-txt"><b>{a.etiqueta}</b><small>{a.ayuda}</small></legend>
                   <div class="cfg-ops">
-                    {a.opciones.map((o) => (<label class="cfg-op"><input type="radio" name={`aj-${a.clave}`} value={String(o.valor)} data-clave={a.clave} data-tipo="radio"><span>{o.etiqueta}</span></label>))}
+                    {a.opciones.map((o) => (<label class:list={['cfg-op', o.muestra && 'cfg-op-con-muestra']}><input type="radio" name={`aj-${a.clave}`} value={String(o.valor)} data-clave={a.clave} data-tipo="radio"><span>{o.muestra && <i class="cfg-muestra" style={`background: ${o.muestra}`} aria-hidden="true"></i>}{o.etiqueta}</span></label>))}
                   </div>
                 </fieldset>
               ))}
@@ -92,6 +98,7 @@ const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
         </section>
       ))}
       <p id="aj-estado" class="cfg-estado" role="status" aria-live="polite"></p>
+      <div class="cfg-toast" id="cfg-toast" aria-hidden="true"><i class="fa-solid fa-circle-check"></i><span>Guardado</span></div>
     </div>
   </div>
 </Layout>
