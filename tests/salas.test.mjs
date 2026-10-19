@@ -52,3 +52,27 @@ test('pildoraSemaforo y textoErrorUnirse (067)', () => {
   assert.match(textoErrorUnirse('SALA_OCUPADA'), /antes que tú/);
   assert.match(textoErrorUnirse('algo raro'), /Reintenta/);
 });
+
+// ── Tarjeta viva (19-oct-2026) ──
+import { estadoTarjeta, barrasSenal, mandosDe } from '../src/js/core/competicion/salas.js';
+test('salas: estado visible de la tarjeta', () => {
+  assert.equal(estadoTarjeta({ estado: 'en_partida', rival: { nombre: 'B' } }).id, 'en_partido');
+  assert.equal(estadoTarjeta({ estado: 'abierta', rival: { nombre: 'B' } }).id, 'rival_listo');
+  assert.equal(estadoTarjeta({ estado: 'abierta' }).id, 'esperando');
+  assert.equal(estadoTarjeta(null).id, 'esperando');
+});
+test('salas: barras de señal', () => {
+  assert.equal(barrasSenal({ color: 'verde', ping_ms: 20 }), 4);
+  assert.equal(barrasSenal({ color: 'verde', ping_ms: 60 }), 3);
+  assert.equal(barrasSenal({ color: 'ambar' }), 2);
+  assert.equal(barrasSenal({ color: 'rojo' }), 1);
+  assert.equal(barrasSenal({ ping_ms: null }), 0);
+  assert.equal(barrasSenal({ ping_ms: 100 }), 2);
+  assert.equal(barrasSenal(undefined), 0);
+});
+test('salas: mandos llenos y libres', () => {
+  assert.deepEqual(mandosDe({ plazas_total: 4, plazas_libres: 1 }).map((m) => m.lleno), [true, true, true, false]);
+  assert.equal(mandosDe({ plazas_total: 20, plazas_libres: 0 }).length, 8);
+  assert.deepEqual(mandosDe({ plazas_total: 2, plazas_libres: 5 }).map((m) => m.lleno), [false, false]);
+  assert.deepEqual(mandosDe({}), []);
+});

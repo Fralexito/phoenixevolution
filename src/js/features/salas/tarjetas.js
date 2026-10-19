@@ -1,86 +1,77 @@
-// Tarjetas de salas Smash Soda (migración 067): «Retos en el radar» (aceptar = rival, mando 2) y «Salas en vivo» (Ver = espectador).
+// Tarjetas de salas Phoenix Link (migración 067): «Retos en el radar» (Entrar = rival, mando 2) y «Salas en vivo» (Ver = espectador).
 // Se recarga sola: al cambiar cualquier sala (Realtime, con espera de 1 s para agrupar) y cada 25 s mientras la pestaña está visible.
 // Si la migración 067 no está aplicada, el bloque se queda oculto sin romper la página.
+// 19-oct-2026 (Fralex: «Hazlo… dinámico, estético, visual, muy animado»): tarjeta viva — anfitrión VS rival en grande (el puesto libre
+// te llama con un latido), mandos dibujados, señal en barras, brillo en el botón; las salas nuevas entran animadas y la que cambia de
+// estado destella. Al tocar Entrar/Ver se abre «Entrando a la sala» (features/salas/entrar.js), paso a paso.
 import { supabase } from '../../core/sistema/supabase.js';
 import { onSession } from '../../core/sistema/session.js';
-import { toast } from '../../core/sistema/toast.js';
-import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/sistema/dom.js';
-import { pildoraSemaforo, textoErrorUnirse } from '../../core/competicion/salas.js';
+import { escapeHTML, safeUrl } from '../../core/sistema/dom.js';
+import { pildoraSemaforo, estadoTarjeta, barrasSenal, mandosDe } from '../../core/competicion/salas.js';
 import { haceCuanto } from '../../core/sistema/notifs.js';
 import { NOMBRE_APP } from '../../../data/site.js';
 import { radarSalas, salasEnVivo, aceptarSala, verSala } from './api.js';
+import { entrarASala } from './entrar.js';
 
 const SONDEO_MS = 25_000;
 const juegoTxt = (s) => [s.juego, s.parche ? `(${s.parche})` : ''].filter(Boolean).join(' ') || 'Juego por definir';
-
-function pildora(sem) {
-  const p = pildoraSemaforo(sem);
-  return `<span class="text-[12px] font-bold px-2 py-0.5 rounded-full border ${p.clase}" title="${escapeHTML(p.titulo)}"><i class="fa-solid fa-signal"></i> ${escapeHTML(p.texto)}</span>`;
-}
-function avatar(h) {
-  const url = safeUrl(h?.avatar_url);
-  return url ? `<img src="${escapeHTML(url)}" alt="" class="w-9 h-9 rounded-full object-cover shrink-0" loading="lazy">`
-             : '<span class="w-9 h-9 rounded-full bg-galaxy-800 grid place-items-center shrink-0"><i class="fa-solid fa-user text-gray-500"></i></span>';
-}
-
 const MODO = { amistoso: 'Amistoso', torneo_privado: 'Torneo', oficial: 'Oficial' };
-const chip = (html, cls = 'text-gray-300 border-galaxy-border bg-black/20') => `<span class="inline-flex items-center gap-1 text-[12px] px-1.5 py-0.5 rounded-md border ${cls}">${html}</span>`;
 const fuenteTxt = { par: 'tu ping real con este host', host: 'promedio histórico del host', diagnostico: 'autodiagnóstico del host', sin_datos: 'sin mediciones aún' };
 
-/** Una sola tarjeta para radar y «En vivo»: chips compactos arriba y los detalles en un desplegable. */
+function avatar(p, extra = '') {
+  const url = safeUrl(p?.avatar_url); const ini = escapeHTML(String(p?.nombre ?? '?').trim().charAt(0).toUpperCase() || '?');
+  return `<span class="sv-av ${extra}">${url ? `<img src="${escapeHTML(url)}" alt="" loading="lazy">` : `<b>${ini}</b>`}</span>`;
+}
+function senal(sem) {
+  const n = barrasSenal(sem); const p = pildoraSemaforo(sem);
+  return `<span class="sv-senal" data-barras="${n}" title="${escapeHTML(p.titulo)}"><span class="sv-barras" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>${escapeHTML(p.texto === 'Ping ?' ? 'Sin ping' : p.texto)}</b></span>`;
+}
+const chip = (ic, t) => `<span class="sv-chip"><i class="fa-solid ${ic}" aria-hidden="true"></i>${t}</span>`;
+
+/** Una sola tarjeta para radar y «En vivo». */
 function tarjeta(s, tipo) {
-  const enPartido = s.estado === 'en_partida';
-  const estado = enPartido ? chip('<i class="fa-solid fa-circle text-[7px] text-rose-400 animate-pulse"></i> En partido', 'text-rose-200 border-rose-400/40 bg-rose-500/10')
-    : s.rival ? chip('<i class="fa-solid fa-user-check"></i> Rival listo', 'text-emerald-200 border-emerald-400/40 bg-emerald-500/10')
-    : chip('<i class="fa-solid fa-hourglass-half"></i> Esperando rival', 'text-amber-200 border-amber-400/40 bg-amber-500/10');
-  const espect = s.acepta_espectadores && s.limite_espectadores > 0 ? chip(`<i class="fa-solid fa-eye"></i> ${Number(s.espectadores) || 0}/${s.limite_espectadores}`) : '';
+  const est = estadoTarjeta(s); const sem = s.semaforo ?? {}; const dg = sem.diagnostico;
+  const espect = s.acepta_espectadores && s.limite_espectadores > 0;
   const lleno = espect && s.espectadores >= s.limite_espectadores;
-  const accion = tipo === 'radar'
-    ? (s.mia ? '<span class="text-[12px] text-gray-400 uppercase font-bold">Tu sala</span>'
-             : `<button type="button" class="btn btn-primary !min-h-9 !text-xs" data-aceptar="${escapeHTML(s.sala_id)}"><i class="fa-solid fa-handshake"></i> Aceptar</button>`)
-    : `<button type="button" class="btn ${s.soy_espectador ? '' : 'btn-primary'} !min-h-9 !text-xs" data-ver="${escapeHTML(s.sala_id)}" ${lleno && !s.soy_espectador ? 'disabled' : ''}>
-        <i class="fa-solid ${s.soy_espectador ? 'fa-arrow-up-right-from-square' : 'fa-eye'}"></i> ${s.soy_espectador ? 'Abrir' : lleno ? 'Lleno' : 'Ver'}</button>`;
-  const sem = s.semaforo ?? {}; const dg = sem.diagnostico;
-  const titulo = tipo === 'vivo' ? `${escapeHTML(s.host?.nombre ?? 'Host')} <span class="text-galaxy-400 mx-1">vs</span> ${escapeHTML(s.rival?.nombre ?? (s.reto_id ? 'reto' : '—'))}`
-    : `${escapeHTML(s.host?.nombre ?? 'Host')} ${s.host?.amigo ? '<i class="fa-solid fa-user-group text-galaxy-400 text-[12px]" title="Amigo"></i>' : ''}`;
-  return `<article class="bg-galaxy-panel rounded-xl border ${tipo === 'radar' ? 'border-galaxy-400/30' : 'border-galaxy-border'} p-3">
-    <div class="flex items-center gap-3">
-      ${avatar(s.host)}
-      <div class="min-w-0 flex-1">
-        <p class="text-sm text-white font-bold truncate">${titulo}
-          <span class="ml-1 text-[12px] uppercase tracking-wider text-galaxy-400 bg-galaxy-600/20 px-1.5 py-0.5 rounded">${NOMBRE_APP}</span></p>
-        <div class="mt-1 flex flex-wrap gap-1">
-          ${estado}${pildora(sem)}
-          ${s.parche || s.juego ? chip(`<i class="fa-solid fa-futbol"></i> ${escapeHTML(s.parche || s.juego)}`) : ''}
-          ${s.region ? chip(`<i class="fa-solid fa-location-dot"></i> ${escapeHTML(s.region)}`) : ''}
-          ${espect}
-        </div>
-      </div>
-      ${accion}
+  const mandos = mandosDe(s);
+  let accion;
+  if (tipo === 'radar') {
+    accion = s.mia ? '<span class="sv-tuya"><i class="fa-solid fa-house" aria-hidden="true"></i> Tu sala</span>'
+      : `<button type="button" class="sv-cta" data-aceptar="${escapeHTML(s.sala_id)}"><i class="fa-solid fa-circle-play" aria-hidden="true"></i><span>Entrar como rival</span></button>`;
+  } else {
+    accion = `<button type="button" class="sv-cta ${s.soy_espectador ? 'sv-cta-sec' : ''}" data-ver="${escapeHTML(s.sala_id)}" ${lleno && !s.soy_espectador ? 'disabled' : ''}>
+      <i class="fa-solid ${s.soy_espectador ? 'fa-arrow-up-right-from-square' : 'fa-tv'}" aria-hidden="true"></i><span>${s.soy_espectador ? 'Volver a abrir' : lleno ? 'Sala llena' : 'Ver el partido'}</span></button>`;
+  }
+  const rival = !s.rival
+    ? `<div class="sv-lado sv-lado-libre">${tipo === 'radar' && !s.mia ? '<span class="sv-av sv-av-libre"><i class="fa-solid fa-circle-plus" aria-hidden="true"></i></span><b>¿Tú?</b><small>Puesto libre</small>' : `<span class="sv-av sv-av-libre"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span><b>${s.reto_id ? 'Reto' : 'Por definir'}</b><small>Rival</small>`}</div>`
+    : `<div class="sv-lado">${avatar(s.rival)}<b>${escapeHTML(s.rival?.nombre ?? 'Rival')}</b><small>Rival</small></div>`;
+  return `<article class="sv-card" data-sala="${escapeHTML(s.sala_id)}" data-estado="${est.id}" data-tipo="${tipo}">
+    <header class="sv-top"><span class="sv-estado"><i class="sv-punto" aria-hidden="true"></i>${escapeHTML(est.texto)}</span><span class="sv-app">${NOMBRE_APP}</span>${senal(sem)}</header>
+    <div class="sv-vs">
+      <div class="sv-lado">${avatar(s.host, 'sv-av-host')}<b>${escapeHTML(s.host?.nombre ?? 'Host')}${s.host?.amigo ? ' <i class="fa-solid fa-user-group sv-amigo" title="Amigo" aria-label="Amigo"></i>' : ''}</b><small>Anfitrión</small></div>
+      <span class="sv-vs-t" aria-hidden="true">VS</span>
+      ${rival}
     </div>
-    <details class="mt-2 group">
-      <summary class="text-[12px] text-gray-400 cursor-pointer select-none list-none flex items-center gap-1"><i class="fa-solid fa-chevron-down text-[12px] transition-transform group-open:rotate-180"></i> Detalles</summary>
-      <dl class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[12px]">
-        <dt class="text-gray-500">Juego</dt><dd class="text-gray-200">${escapeHTML(juegoTxt(s))}</dd>
-        <dt class="text-gray-500">Modo</dt><dd class="text-gray-200">${escapeHTML(MODO[s.modo] ?? s.modo ?? '—')}</dd>
-        <dt class="text-gray-500">Plazas libres</dt><dd class="text-gray-200">${Number(s.plazas_libres) || 0}/${Number(s.plazas_total) || 0}</dd>
-        <dt class="text-gray-500">Espectadores</dt><dd class="text-gray-200">${s.acepta_espectadores && s.limite_espectadores > 0 ? `${Number(s.espectadores) || 0}/${s.limite_espectadores}` : 'No admite'}</dd>
-        <dt class="text-gray-500">Abierta</dt><dd class="text-gray-200">${escapeHTML(haceCuanto(s.abierta_en) ?? 'hace más de una semana')}</dd>
-        <dt class="text-gray-500">Ping estimado</dt><dd class="text-gray-200">${sem.ping_ms != null ? `${Math.round(sem.ping_ms)} ms` : '—'} <span class="text-gray-500">(${escapeHTML(fuenteTxt[sem.fuente] ?? '—')})</span></dd>
-        ${dg ? `<dt class="text-gray-500">Red del host</dt><dd class="text-gray-200">${dg.latencia_ms != null ? `${Math.round(dg.latencia_ms)} ms` : '—'}${dg.jitter_ms != null ? ` · jitter ${Math.round(dg.jitter_ms)}` : ''}${dg.subida_kbps ? ` · subida ${(dg.subida_kbps / 1000).toFixed(1)} Mbps` : ''}</dd>` : ''}
+    <div class="sv-info">
+      ${mandos.length ? `<span class="sv-mandos" title="${mandos.filter((m) => m.lleno).length} de ${mandos.length} mandos ocupados">${mandos.map((m) => `<i class="fa-solid fa-gamepad ${m.lleno ? 'lleno' : ''}" aria-hidden="true"></i>`).join('')}</span>` : ''}
+      ${s.parche || s.juego ? chip('fa-futbol', escapeHTML(s.parche || s.juego)) : ''}
+      ${s.region ? chip('fa-location-dot', escapeHTML(s.region)) : ''}
+      ${espect ? chip('fa-tv', `${Number(s.espectadores) || 0}/${s.limite_espectadores}`) : ''}
+    </div>
+    <div class="sv-accion">${accion}</div>
+    <details class="sv-detalles">
+      <summary>Detalles de la sala</summary>
+      <dl>
+        <dt>Juego</dt><dd>${escapeHTML(juegoTxt(s))}</dd>
+        <dt>Modo</dt><dd>${escapeHTML(MODO[s.modo] ?? s.modo ?? '—')}</dd>
+        <dt>Plazas libres</dt><dd>${Number(s.plazas_libres) || 0}/${Number(s.plazas_total) || 0}</dd>
+        <dt>Espectadores</dt><dd>${espect ? `${Number(s.espectadores) || 0}/${s.limite_espectadores}` : 'No admite'}</dd>
+        <dt>Abierta</dt><dd>${escapeHTML(haceCuanto(s.abierta_en) ?? 'hace más de una semana')}</dd>
+        <dt>Ping estimado</dt><dd>${sem.ping_ms != null ? `${Math.round(sem.ping_ms)} ms` : '—'} <span>(${escapeHTML(fuenteTxt[sem.fuente] ?? '—')})</span></dd>
+        ${dg ? `<dt>Red del host</dt><dd>${dg.latencia_ms != null ? `${Math.round(dg.latencia_ms)} ms` : '—'}${dg.jitter_ms != null ? ` · jitter ${Math.round(dg.jitter_ms)}` : ''}${dg.subida_kbps ? ` · subida ${(dg.subida_kbps / 1000).toFixed(1)} Mbps` : ''}</dd>` : ''}
       </dl>
     </details>
   </article>`;
-}
-const tarjetaRadar = (s) => tarjeta(s, 'radar');
-const tarjetaVivo = (s) => tarjeta(s, 'vivo');
-
-/** Abre el enlace de Parsec/Smash Soda que entregó el servidor. */
-function abrirEnlace(r, rol) {
-  const url = safeUrl(r?.enlace, { allowParsec: true });
-  if (!url) { toast(rol === 'rival' ? 'Eres el rival. El host aún no compartió el enlace: te llegará en la app.' : 'Quedaste como espectador. El host aún no compartió el enlace.', 'info'); return; }
-  const directo = parsecDirecto(url);
-  if (directo) abrirParsec(directo, url); else window.open(url, '_blank', 'noopener');
 }
 
 /**
@@ -90,11 +81,18 @@ function abrirEnlace(r, rol) {
 export function montarTarjetasSalas({ contenedor, tipo, alContar = () => {} }) {
   if (!contenedor) return () => {};
   let conSesion = false; let vivo = true; let espera = null; let canal = null;
+  let lista = []; const vistos = new Map();   // sala_id → estado ya dibujado (para animar solo lo nuevo o lo que cambió)
   const cargar = async () => {
     if (!vivo || !conSesion || document.hidden) return;
     try {
-      const lista = tipo === 'radar' ? await radarSalas() : await salasEnVivo();
-      contenedor.innerHTML = lista.map(tipo === 'radar' ? tarjetaRadar : tarjetaVivo).join('');
+      lista = tipo === 'radar' ? await radarSalas() : await salasEnVivo();
+      contenedor.innerHTML = lista.map((s) => tarjeta(s, tipo)).join('');
+      contenedor.querySelectorAll('.sv-card').forEach((el, i) => {
+        const id = el.dataset.sala; const antes = vistos.get(id);
+        if (antes === undefined) { el.classList.add('sv-nueva'); el.style.setProperty('--i', String(Math.min(i, 6))); }
+        else if (antes !== el.dataset.estado) el.classList.add('sv-cambio');
+        vistos.set(id, el.dataset.estado);
+      });
       contenedor.hidden = !lista.length;
       alContar(lista.length);
     } catch (e) {
@@ -104,17 +102,17 @@ export function montarTarjetasSalas({ contenedor, tipo, alContar = () => {} }) {
   };
   const pronto = () => { clearTimeout(espera); espera = setTimeout(cargar, 1000); };
 
-  contenedor.addEventListener('click', async (ev) => {
+  contenedor.addEventListener('click', (ev) => {
     const b = ev.target.closest('[data-aceptar], [data-ver]');
     if (!b || b.disabled) return;
     const id = b.dataset.aceptar ?? b.dataset.ver; const rival = 'aceptar' in b.dataset;
-    b.disabled = true;
-    try {
-      const r = rival ? await aceptarSala(id) : await verSala(id);
-      if (rival) toast('¡Reto aceptado! Eres el jugador 2 de esta sala.', 'ok');
-      abrirEnlace(r, r?.rol);
-    } catch (e) { toast(textoErrorUnirse(e.message), 'error'); }
-    finally { b.disabled = false; cargar(); }
+    const sala = lista.find((s) => String(s.sala_id) === String(id)) ?? {};
+    entrarASala({ sala, rol: rival ? 'rival' : 'espectador', pedir: () => (rival ? aceptarSala(id) : verSala(id)), alTerminar: cargar });
+  });
+  // Brillo que sigue al puntero en la tarjeta (solo con mouse; el CSS lo apaga con «menos movimiento»).
+  contenedor.addEventListener('pointermove', (ev) => {
+    const c = ev.target.closest('.sv-card'); if (!c || ev.pointerType !== 'mouse') return;
+    const r = c.getBoundingClientRect(); c.style.setProperty('--mx', `${((ev.clientX - r.left) / r.width) * 100}%`); c.style.setProperty('--my', `${((ev.clientY - r.top) / r.height) * 100}%`);
   });
 
   const intervalo = setInterval(cargar, SONDEO_MS);

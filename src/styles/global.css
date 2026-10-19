@@ -47,3 +47,4 @@
    «saltaba» hacia abajo (Lighthouse medía hasta 0.5 de CLS). Con el main al menos de una pantalla, el pie ya nace fuera de la vista. */
 main.flex-grow { min-height: 100vh; }
 @import './publicacionExtras.css';   /* fondo, galería y «se siente…» de las publicaciones (migración 133) */
+@import './salasVivo.css';   /* tarjetas de salas de Phoenix Link y «Entrando a la sala» (En vivo, Ahora, Duelos) */

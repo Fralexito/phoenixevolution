@@ -69,3 +69,26 @@ export function textoErrorUnirse(msg) {
   const k = Object.keys(ERROR_UNIRSE).find((x) => String(msg ?? '').includes(x));
   return k ? ERROR_UNIRSE[k] : 'No se pudo entrar a la sala. Reintenta.';
 }
+
+// ── Tarjeta viva de una sala (19-oct-2026, «entrar con un toque»): cómo se dibuja, sin DOM ──────────────────────────────
+/** Estado visible de la tarjeta: en partido · rival listo · esperando rival. */
+export function estadoTarjeta(s) {
+  if (s?.estado === 'en_partida') return { id: 'en_partido', texto: 'En partido' };
+  if (s?.rival) return { id: 'rival_listo', texto: 'Rival listo' };
+  return { id: 'esperando', texto: 'Esperando rival' };
+}
+/** Barras de señal 0–4 según el semáforo del servidor (color) o, si no hay color, según el ping. */
+export function barrasSenal(sem) {
+  const c = sem?.color; const ping = Number(sem?.ping_ms);
+  if (c === 'verde') return Number.isFinite(ping) && ping < 40 ? 4 : 3;
+  if (c === 'ambar') return 2;
+  if (c === 'rojo') return 1;
+  if (!Number.isFinite(ping) || sem?.ping_ms === null) return 0;
+  return ping < 40 ? 4 : ping < 80 ? 3 : ping < 140 ? 2 : 1;
+}
+/** Mandos de la sala → [{ lleno }] (máx. 8 para dibujar). Plazas ocupadas = total − libres. */
+export function mandosDe(s) {
+  const total = Math.max(0, Math.min(8, Math.round(Number(s?.plazas_total) || 0)));
+  const libres = Math.max(0, Math.min(total, Math.round(Number(s?.plazas_libres) || 0)));
+  return Array.from({ length: total }, (_, i) => ({ lleno: i < total - libres }));
+}
