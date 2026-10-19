@@ -64,9 +64,12 @@ Medido con Lighthouse móvil (Edge, sin caché) sobre la web publicada en `borra
 | Página | Nota antes | Nota después | Qué pesaba |
 |---|---|---|---|
 | Cambios oficiales | 39 | 67 | JS de arranque |
-| Tienda | 20 | 58 | JS de arranque |
-| Noticias | 11 | 45 | JS de arranque + chat flotante |
-| Inicio | 35 (llegó a 20) | 40–43 | salto arreglado (CLS 0,36 → 0,09) y sin :has() en html/body (bloqueo 2,7 s → 1,5 s) |
+| Tienda | 20 | 66 | JS de arranque |
+| Noticias | 11 | 60 | JS de arranque + chat flotante + salto al mostrarse (CLS 0,14 → 0,04) |
+| Inicio | 35 (llegó a 20) | 49–62 | salto (CLS 0,36 → 0), :has() en html/body, foto de 207 KB, CSS común 713 → 562 KB, título visible desde el inicio |
+
+Segunda tanda (19-oct): CSS partido por página (14 archivos fuera de global.css, comparado elemento por elemento en 20 páginas: 0 diferencias),
+Noticias sin saltos, listas de jugadores sin la columna `foto` (migración 131), y `tools/humo/abrir-paginas.mjs` (abre las 57 páginas en cada subida).
 
 Arreglos (commits 2c58153, 0e78171, 007fe2b):
 - `src/js/boot.js`: lo que no hace falta para VER la página (cinta, en vivo, buscador, efectos, chat flotante…) arranca en `requestIdleCallback`; cada pieza va envuelta para que un error no tumbe las demás.
