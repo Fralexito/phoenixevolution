@@ -174,3 +174,32 @@
 .pf3-carnet-av b { font: 900 1.6rem var(--font-display); color: #fff; width: auto !important; height: auto !important; }
 .pf3-mas-paises { min-height: 2.25rem; padding: 0 .8rem; border-radius: 99px; font-size: 12.5px; font-weight: 700; color: var(--color-galaxy-400); border: 1px dashed color-mix(in srgb, var(--color-galaxy-400) 50%, transparent); }
 .pf3-paises button[hidden] { display: none; }
+/* País: lista desplegable propia con banderas (19-oct-2026; perfilVivo.js) */
+.pf3-flag { flex: none; width: 1.6rem; height: 1.07rem; border-radius: .22rem; box-shadow: 0 0 0 1px rgb(255 255 255 / .15), 0 2px 6px rgb(0 0 0 / .35); }
+.pf3-dd { position: relative; }
+.pf3-dd-btn { display: flex; align-items: center; gap: .65rem; width: 100%; min-height: 2.9rem; padding: 0 .9rem; border-radius: .75rem; text-align: left; font-size: 14.5px; color: #fff;
+  background: rgb(0 0 0 / .3); border: 1px solid var(--color-galaxy-border); transition: border-color .2s ease, box-shadow .2s ease; }
+.pf3-dd-btn span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf3-dd-btn:hover { border-color: rgb(255 255 255 / .25); }
+.pf3-dd.abierto .pf3-dd-btn, .pf3-dd-btn:focus-visible { border-color: var(--color-galaxy-400); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-galaxy-400) 18%, transparent); outline: none; }
+.pf3-dd-v { width: .5rem; height: .5rem; border-right: 2px solid #8e98ad; border-bottom: 2px solid #8e98ad; transform: rotate(45deg) translateY(-2px); transition: transform .25s cubic-bezier(.23, 1, .32, 1); }
+.pf3-dd.abierto .pf3-dd-v { transform: rotate(-135deg); border-color: var(--color-galaxy-400); }
+.pf3-dd-menu { position: absolute; z-index: 6; left: 0; right: 0; top: calc(100% + .35rem); display: grid; gap: .3rem; padding: .4rem; border-radius: 1rem;
+  background: rgb(14 10 34 / .98); border: 1px solid var(--color-galaxy-border); box-shadow: 0 22px 46px -18px rgb(0 0 0 / .95); transform-origin: top center; }
+.pf3-dd-menu[hidden] { display: none; }
+@media (prefers-reduced-motion: no-preference) { .pf3-dd-menu:not([hidden]) { animation: pf3-dd-abre .2s cubic-bezier(.23, 1, .32, 1); } }
+@keyframes pf3-dd-abre { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+.pf3-dd-buscar { position: relative; display: flex; align-items: center; }
+.pf3-dd-buscar i { position: absolute; left: .75rem; font-size: .8rem; color: #8e98ad; pointer-events: none; }
+.pf3-dd-buscar input { width: 100%; min-height: 2.5rem; padding: 0 .75rem 0 2.1rem; border-radius: .65rem; font-size: 14px; color: #fff; background: rgb(255 255 255 / .06); border: 1px solid transparent; outline: none; }
+.pf3-dd-buscar input:focus { border-color: color-mix(in srgb, var(--color-galaxy-400) 60%, transparent); }
+.pf3-dd-menu ul { display: grid; max-height: 16.5rem; overflow-y: auto; margin: 0; padding: 0; list-style: none; scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .18) transparent; }
+.pf3-dd-menu li { display: flex; align-items: center; gap: .65rem; min-height: 2.6rem; padding: 0 .6rem; border-radius: .6rem; font-size: 14px; color: #e2e7ef; cursor: pointer; outline: none; transition: background-color .15s ease; }
+.pf3-dd-menu li[hidden] { display: none; }
+.pf3-dd-menu li span { flex: 1; }
+.pf3-dd-menu li:hover, .pf3-dd-menu li:focus { background: rgb(255 255 255 / .07); }
+.pf3-dd-ok { color: var(--color-galaxy-400); opacity: 0; transform: scale(.6); transition: opacity .2s ease, transform .25s cubic-bezier(.23, 1, .32, 1); }
+.pf3-dd-menu li[aria-selected='true'] { color: #fff; background: color-mix(in srgb, var(--color-galaxy-400) 12%, transparent); }
+.pf3-dd-menu li[aria-selected='true'] .pf3-dd-ok { opacity: 1; transform: none; }
+.pf3-dd-nada { padding: .5rem .6rem; font-size: 12.5px; color: #8e98ad; }
+.pf3-chip .pf3-flag { width: 1.1rem; height: .74rem; }

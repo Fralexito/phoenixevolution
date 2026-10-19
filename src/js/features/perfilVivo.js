@@ -2,17 +2,18 @@
 // dentro de su ventana (FX.perfilNuevo). No guarda nada por su cuenta: solo hace visible lo que escribes y te ayuda a llenarlo.
 //   · «Así te ven»: tarjeta con tu foto, apodo, @usuario, país, club (con escudo), biografía y redes, que cambia mientras escribes.
 //   · Medidor «Perfil al N %» (anillo animado) + lo que falta, en botones que te llevan a ese campo.
-//   · País en insignias para tocar (sin menú desplegable; el <select> original sigue para guardar).
+//   · País en una lista desplegable propia con banderas, buscador y teclado (el <select> original sigue, oculto, para guardar).
 //   · Club favorito con sugerencias del catálogo y su escudo.
 //   · El botón dice cuántos cambios vas a guardar.
 import { escapeHTML, toUsername } from '../core/sistema/dom.js';
 import { PAISES } from '../../data/paises.js';
 import { buscarClubes, clubExacto, escudoUrl } from '../core/pes/clubesPes.js';
+import { banderaSVG } from '../../data/banderas.js';
 
 const nombrePais = (c) => PAISES.find(([k]) => k === c)?.[1] ?? '';
 const CAMPOS = [
   ['foto', 'Foto', 'identidad', '#p-file'], ['apodo', 'Apodo', 'identidad', '#p-name'], ['usuario', '@usuario', 'identidad', '#p-user'],
-  ['pais', 'País', 'identidad', '#pf3-paises button'], ['club', 'Club favorito', 'identidad', '#p-club'],
+  ['pais', 'País', 'identidad', '#pf3-dd-btn'], ['club', 'Club favorito', 'identidad', '#p-club'],
   ['bio', 'Biografía', 'social', '#p-bio'], ['redes', 'Discord o stream', 'social', '#p-disc'],
 ];
 
@@ -36,19 +37,37 @@ export function montarPerfilVivo(m, { prof }) {
       </div>
     </article>`;
 
-  // ── País en insignias ──
+  // ── País: lista desplegable con banderas (Fralex: «que los países estén en una lista desplegable con sus banderas») ──
   sel.classList.add('pf3-oculto'); sel.setAttribute('tabindex', '-1'); sel.setAttribute('aria-hidden', 'true');
-  const caja = document.createElement('div'); caja.className = 'pf3-paises'; caja.id = 'pf3-paises'; caja.setAttribute('role', 'radiogroup'); caja.setAttribute('aria-label', 'País');
-  const VISIBLES = 9;   // los demás aparecen con «+N países» (en el celular 23 insignias ocupaban media pantalla)
-  caja.innerHTML = PAISES.map(([c, n], i) => `<button type="button" role="radio" data-pais="${c}" aria-checked="${c === sel.value}"${i >= VISIBLES && c !== sel.value ? ' data-extra hidden' : ''}><span class="pf3-cod">${c}</span>${escapeHTML(n)}</button>`).join('')
-    + `<button type="button" class="pf3-mas-paises" data-pf3-mas>+${PAISES.length - VISIBLES} países</button>`;
-  sel.after(caja);
-  caja.addEventListener('click', (e) => {
-    if (e.target.closest('[data-pf3-mas]')) { caja.querySelectorAll('[data-extra]').forEach((x) => { x.hidden = false; }); e.target.closest('[data-pf3-mas]').remove(); return; }
-    const b = e.target.closest('[data-pais]'); if (!b) return;
-    sel.value = b.dataset.pais; sel.dispatchEvent(new Event('change', { bubbles: true }));
-    caja.querySelectorAll('[data-pais]').forEach((x) => x.setAttribute('aria-checked', String(x === b))); pintar();
+  const dd = document.createElement('div'); dd.className = 'pf3-dd'; dd.id = 'pf3-paises';
+  dd.innerHTML = `<button type="button" class="pf3-dd-btn" id="pf3-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="País"></button>
+    <div class="pf3-dd-menu" hidden>
+      <label class="pf3-dd-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" placeholder="Buscar país" aria-label="Buscar país" autocomplete="off"></label>
+      <ul role="listbox" aria-label="País">${PAISES.map(([c, n]) => `<li role="option" data-pais="${c}" data-nombre="${escapeHTML(n.toLowerCase())}" tabindex="-1">${banderaSVG(c, 'pf3-flag')}<span>${escapeHTML(n)}</span><i class="fa-solid fa-circle-check pf3-dd-ok" aria-hidden="true"></i></li>`).join('')}</ul>
+      <p class="pf3-dd-nada" hidden>No encontramos ese país. Elige «Otro».</p>
+    </div>`;
+  sel.after(dd);
+  const ddBtn = dd.querySelector('.pf3-dd-btn'); const ddMenu = dd.querySelector('.pf3-dd-menu'); const ddBus = dd.querySelector('input'); const ops = [...dd.querySelectorAll('[data-pais]')];
+  const pintarBtn = () => { const c = sel.value; ddBtn.innerHTML = `${banderaSVG(c, 'pf3-flag')}<span>${escapeHTML(nombrePais(c) || 'Elige tu país')}</span><i class="pf3-dd-v" aria-hidden="true"></i>`; ops.forEach((o) => o.setAttribute('aria-selected', String(o.dataset.pais === c))); };
+  const visibles = () => ops.filter((o) => !o.hidden);
+  const abrirDd = (si) => {
+    ddMenu.hidden = !si; ddBtn.setAttribute('aria-expanded', String(si)); dd.classList.toggle('abierto', si);
+    if (si) { ddBus.value = ''; filtrar(); requestAnimationFrame(() => { (ops.find((o) => o.dataset.pais === sel.value) ?? ops[0])?.scrollIntoView({ block: 'nearest' }); ddBus.focus(); }); }
+  };
+  const filtrar = () => { const q = ddBus.value.trim().toLowerCase(); ops.forEach((o) => { o.hidden = !!q && !o.dataset.nombre.includes(q) && !o.dataset.pais.toLowerCase().startsWith(q); }); dd.querySelector('.pf3-dd-nada').hidden = visibles().length > 0; };
+  const elegir = (o) => { if (!o) return; sel.value = o.dataset.pais; sel.dispatchEvent(new Event('change', { bubbles: true })); pintarBtn(); abrirDd(false); ddBtn.focus(); pintar(); };
+  ddBtn.addEventListener('click', () => abrirDd(ddMenu.hidden));
+  ddBus.addEventListener('input', filtrar);
+  dd.addEventListener('click', (e) => { const o = e.target.closest('[data-pais]'); if (o) elegir(o); });
+  dd.addEventListener('keydown', (e) => {
+    const v = visibles(); const i0 = v.indexOf(document.activeElement);
+    if (e.key === 'Escape' && !ddMenu.hidden) { e.preventDefault(); e.stopPropagation(); abrirDd(false); ddBtn.focus(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); if (ddMenu.hidden) abrirDd(true); else v[Math.min(v.length - 1, i0 + 1)]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (i0 <= 0) ddBus.focus(); else v[i0 - 1]?.focus(); }
+    else if (e.key === 'Enter' && !ddMenu.hidden) { e.preventDefault(); elegir(i0 >= 0 ? v[i0] : v[0]); }
   });
+  document.addEventListener('click', (e) => { if (!dd.contains(e.target) && !ddMenu.hidden) abrirDd(false); });
+  pintarBtn();
 
   // ── Club favorito con escudos ──
   const club = $('#p-club'); const sug = document.createElement('div'); sug.className = 'pf3-clubes'; sug.hidden = true; sug.setAttribute('role', 'listbox');
@@ -100,7 +119,7 @@ export function montarPerfilVivo(m, { prof }) {
     $('#pf3-user').textContent = `@${v.usuario || 'usuario'}`;
     const clubCat = v.club ? clubExacto(v.club) : null;
     $('#pf3-chips').innerHTML = [
-      v.pais ? `<span class="pf3-chip"><span class="pf3-cod">${escapeHTML(v.pais)}</span>${escapeHTML(nombrePais(v.pais))}</span>` : '',
+      v.pais ? `<span class="pf3-chip">${banderaSVG(v.pais, 'pf3-flag')}${escapeHTML(nombrePais(v.pais))}</span>` : '',
       v.club ? `<span class="pf3-chip">${clubCat ? `<img src="${escapeHTML(escudoUrl(clubCat))}" alt="" width="16" height="16">` : '<i class="fa-solid fa-shield-halved" aria-hidden="true"></i>'}${escapeHTML(v.club)}</span>` : '',
       v.disc ? '<span class="pf3-chip"><i class="fa-brands fa-discord" aria-hidden="true"></i>Discord</span>' : '',
       v.stream ? '<span class="pf3-chip"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>En directo</span>' : '',
