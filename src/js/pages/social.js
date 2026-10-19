@@ -11,7 +11,7 @@ import { href } from '../core/sistema/config.js';
 import { segmentoParaGuardar, urlCompartir, aplicarReaccion } from '../core/comunidad/muro.js';
 import { marcarVistas, indiceInicial } from '../core/comunidad/historias.js';
 import { VISTAS, vistaInfo, vistaValida, paginaSiguiente, textoVacio } from '../core/comunidad/feed.js';
-import { REACCION_RAPIDA, circulosHistorias, mapaMisReacciones, conMisReacciones } from '../core/comunidad/feedSocial.js';
+import { REACCION_RAPIDA, circulosHistorias, mapaMisReacciones, conMisReacciones, totalReacciones } from '../core/comunidad/feedSocial.js';
 import { SEGMENTOS } from '../../data/muroEstilo.js';
 import * as api from '../features/muro/api.js';
 import { reproductorYT } from '../features/muro/render.js';
@@ -54,6 +54,7 @@ function pintarHistorias() {
   const lista = S.circulos.map(circuloHTML).join('');
   histEl.hidden = !(nueva || crear || lista);
   histEl.innerHTML = `<div class="sx-hist-fila" role="list" aria-label="Historias de las últimas 24 horas">${nueva}${crear}${lista}</div>`;
+  pintarLado();
 }
 async function cargarHistorias() {
   try {
@@ -77,12 +78,14 @@ function abrirCirculo(i) {
 function pintarVistas() {
   vistasEl.innerHTML = VISTAS.map((v) => `<button type="button" data-v="${v.id}" role="tab" aria-selected="${S.vista === v.id}" class="sx-tab ${S.vista === v.id ? 'is-on' : ''}"><i class="fa-solid ${v.icono}" aria-hidden="true"></i>${escapeHTML(v.texto)}</button>`).join('');
   $('sx-filtro-wrap').hidden = !vistaInfo(S.vista).filtraJuego;
+  pintarNav();
 }
 function pintarFiltro() {
   filtroEl.innerHTML = [['', 'Todo'], ...SEGMENTOS].map(([id, n]) => `<button type="button" data-j="${id}" aria-pressed="${S.juego === id}" class="rounded-full border border-galaxy-border/70 px-2.5 py-1 text-gray-400 aria-pressed:text-white aria-pressed:border-galaxy-400 aria-pressed:bg-galaxy-600/25">${escapeHTML(n)}</button>`).join('');
   const r = $('sx-filtro-res'); if (r) r.textContent = S.juego ? (SEGMENTOS.find((s) => s[0] === S.juego)?.[1] ?? '') : 'Todos los juegos';
+  pintarNav();
 }
-const tarjeta = (it) => tarjetaComunidadHTML(it, { yo: S.yo, puedeOcultar: can('resolverReportes'), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id) }) });
+const tarjeta = (it) => tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id) }) });
 let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
 function pintar() {
   feedEl.innerHTML = S.items.length ? S.items.map(tarjeta).join('')
@@ -91,6 +94,7 @@ function pintar() {
   const idPrimero = S.items[0]?.id ?? null; const continuacion = pintados > 0 && idPrimero !== null && idPrimero === primero && S.items.length > pintados;
   if (S.items.length) entrada(feedEl, continuacion ? pintados : 0);
   pintados = S.items.length; primero = idPrimero;
+  pintarLado();
 }
 /** Repinta SOLO una tarjeta (reaccionar no debe reiniciar los videos ni mover el scroll de las demás). */
 function repintar(id) {
@@ -163,6 +167,54 @@ filtroEl.addEventListener('click', (e) => {
 $('sx-mas')?.addEventListener('click', () => cargar({ mas: true }));
 // Scroll infinito: cuando el aviso del final entra en pantalla se pide la siguiente página (el botón «Cargar más» queda como respaldo).
 if ('IntersectionObserver' in window) new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting) && S.hayMas && !S.cargando) cargar({ mas: true }); }, { rootMargin: '600px 0px' }).observe(finEl);
+
+/* ---------- Columnas de foro (19-oct-2026): navegación a la izquierda, la comunidad a la derecha ---------- */
+const navFeeds = document.querySelector('[data-sxr-feeds]'); const navJuegos = document.querySelector('[data-sxr-juegos]');
+const LETRA = { pes: 'P', sp: 'SP', fifa: 'F', eafc: 'FC', efootball: 'eF' };
+function pintarNav() {
+  const tit = document.querySelector('[data-sxr-titulo]');   // en PC el feed se elige a la izquierda; aquí solo se nombra
+  if (tit) tit.innerHTML = `<b>${escapeHTML(vistaInfo(S.vista).texto)}</b>${S.vista === 'recientes' ? ` · ${escapeHTML(S.juego ? nombreJuego(S.juego) ?? 'Todos los juegos' : 'Todos los juegos')}` : ''}`;
+  if (navFeeds) navFeeds.innerHTML = VISTAS.map((v) => `<button type="button" class="sxr-item" data-v="${v.id}" aria-current="${S.vista === v.id ? 'page' : 'false'}"><span class="sxr-ic"><i class="fa-solid ${v.icono}" aria-hidden="true"></i></span><span>${escapeHTML(v.texto)}</span></button>`).join('');
+  if (navJuegos) navJuegos.innerHTML = [['', 'Todos los juegos'], ...SEGMENTOS].map(([id, n]) => `<button type="button" class="sxr-item" data-j="${id}" aria-current="${S.vista === 'recientes' && S.juego === id ? 'true' : 'false'}"><span class="sxr-ic sxr-ic-juego">${id ? escapeHTML(LETRA[id] ?? n[0]) : '<i class="fa-solid fa-gamepad" aria-hidden="true"></i>'}</span><span>${escapeHTML(n)}</span></button>`).join('');
+}
+const nombreJuego = (id) => SEGMENTOS.find((s) => s[0] === id)?.[1] ?? null;
+function pintarLado() {
+  const cifras = document.querySelector('[data-sxr-cifras]'); const activos = document.querySelector('[data-sxr-activos]'); const top = document.querySelector('[data-sxr-top]');
+  if (!cifras) return;
+  const autores = new Set(S.items.map((x) => x.autor?.id).filter(Boolean)).size;
+  cifras.innerHTML = `<div><b>${S.circulos.length}</b><small>historias hoy</small></div><div><b>${autores}</b><small>autores en el feed</small></div>`;
+  const porJuego = new Map(); for (const it of S.items) if (nombreJuego(it.juego)) porJuego.set(it.juego, (porJuego.get(it.juego) || 0) + 1);
+  const lista = [...porJuego].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  activos.innerHTML = lista.length ? lista.map(([id, n]) => `<button type="button" class="sxr-fila" data-j="${id}"><span class="sxr-ic sxr-ic-juego">${escapeHTML(LETRA[id] ?? '?')}</span><span class="sxr-fila-tx"><b>${escapeHTML(nombreJuego(id))}</b><small>${n} publicaci${n === 1 ? 'ón' : 'ones'} en el feed</small></span></button>`).join('')
+    : '<p class="sxr-nada">Cuando haya publicaciones con juego, aparecen aquí.</p>';
+  const mejores = [...S.items].filter((x) => totalReacciones(x) > 0).sort((a, b) => totalReacciones(b) - totalReacciones(a)).slice(0, 4);
+  top.innerHTML = mejores.length ? mejores.map((it) => { const a = it.autor ?? {}; const txt = String(it.texto ?? '').replace(/\s+/g, ' ').trim();
+    return `<a class="sxr-fila" href="#" data-sxr-ir="${Number(it.id)}"><span class="sxr-fila-av">${avatarHTML(a.avatar_url, a.nombre_display, 28)}</span><span class="sxr-fila-tx"><b>${escapeHTML(txt ? (txt.length > 70 ? txt.slice(0, 70) + '…' : txt) : 'Publicación con foto o video')}</b><small>${escapeHTML(a.nombre_display ?? 'Jugador')} · ${totalReacciones(it)} reacciones</small></span></a>`; }).join('')
+    : '<p class="sxr-nada">Aún nadie ha reaccionado a lo que hay en el feed.</p>';
+}
+// Clics de las columnas: cambiar de feed, filtrar por juego, ir a una publicación, crear publicación.
+function irAVista(v, juego) {
+  const cambia = v !== S.vista || (juego !== undefined && juego !== S.juego); if (!cambia) return;
+  S.vista = vistaValida(v); if (juego !== undefined) S.juego = juego;
+  pintarVistas(); pintarFiltro(); history.replaceState(null, '', urlActual()); reiniciarFeed();
+}
+document.querySelector('.sxr')?.addEventListener('click', (e) => {
+  if (e.target.closest('#sx-feed, #sx-vistas, #sx-filtro, #sx-hist, #sx-compositor')) return;   // esas zonas tienen su propio manejador
+  const v = e.target.closest('[data-v]'); if (v) { irAVista(v.dataset.v); return; }
+  const j = e.target.closest('[data-j]'); if (j) { irAVista('recientes', j.dataset.j); return; }
+  const ir = e.target.closest('[data-sxr-ir]');
+  if (ir) { e.preventDefault(); const el = feedEl.querySelector(`[data-pub="${Number(ir.dataset.sxrIr)}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('sxr-resalta'); setTimeout(() => el.classList.remove('sxr-resalta'), 1600); } return; }
+  if (e.target.closest('[data-sxr-crear]')) { compEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => compEl.querySelector('textarea, [contenteditable], input, button')?.focus({ preventScroll: true }), 400); }
+});
+// Vista «Tarjetas» o «Compacta» (como el selector de vista de los foros); se recuerda en este navegador.
+const KEY_MODO = 'pes-social-modo';
+function aplicarModo(m) {
+  const modo = m === 'compacta' ? 'compacta' : 'tarjeta'; feedEl.dataset.modo = modo;
+  document.querySelectorAll('[data-sxr-modo]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sxrModo === modo)));
+  try { localStorage.setItem(KEY_MODO, modo); } catch { /* sin almacenamiento: solo no se recuerda */ }
+}
+document.querySelectorAll('[data-sxr-modo]').forEach((b) => b.addEventListener('click', () => aplicarModo(b.dataset.sxrModo)));
+try { aplicarModo(localStorage.getItem(KEY_MODO)); } catch { aplicarModo('tarjeta'); }
 
 /* ---------- Arranque ---------- */
 initMencionAuto();

@@ -18,11 +18,23 @@ function botonesHTML(it, { yo, puedeOcultar }) {
     + (!mia && puedeOcultar ? `<button type="button" data-ocultar="${Number(it.id)}" title="Ocultar (moderación)" aria-label="Ocultar publicación (moderación)" class="w-8 h-8 rounded-lg text-gray-400 hover:text-orange-300 shrink-0"><i class="fa-solid fa-eye-slash"></i></button>` : '');
 }
 
-/** `opciones`: { yo: id de quien mira | null, puedeOcultar: boolean, extra: HTML opcional bajo el contenido }. */
+/** `opciones`: { yo: id de quien mira | null, puedeOcultar: boolean, extra: HTML opcional bajo el contenido, variante: 'hilo' (estilo foro de /social/) }. */
 export function tarjetaComunidadHTML(it, opciones = {}) {
   const a = it.autor ?? {}; const perfil = `${href('perfil/')}?u=${encodeURIComponent(a.username ?? '')}`; const urlMuro = `${perfil}#p-${Number(it.id)}`;
   const rx = resumenReacciones(it.reacciones).map((x) => `<span class="rx"><span>${escapeHTML(x.tipo)}</span><b>${x.n}</b></span>`).join('');
   const n = Number(it.respuestas) || 0;
+  // Variante «hilo» (solo /social/, 19-oct-2026, estilo foro tipo Reddit): cabecera en una línea (cara · nombre · hace cuánto · juego),
+  // sin caja de cristal: las publicaciones van separadas por una línea y se iluminan al pasar el mouse. Los estilos están en socialHilo.css.
+  if (opciones.variante === 'hilo') {
+    return `<article class="sx-post" data-pub="${Number(it.id)}">
+    <header class="sx-post-cab">
+      <a href="${escapeHTML(perfil)}" class="sx-post-av" tabindex="-1" aria-hidden="true">${avatarHTML(a.avatar_url, a.nombre_display, 24)}</a>
+      <a href="${escapeHTML(perfil)}" class="sx-post-autor">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
+      <span class="sx-post-punto" aria-hidden="true">•</span><span class="sx-post-hace">${tiempoRelativo(it.created_at)}</span>${segmentoChipHTML(it.juego)}
+      <span class="sx-post-acc">${botonesHTML(it, opciones)}</span></header>
+    <div class="sx-post-cuerpo">${contenidoHTML(it)}${encuestaHTML(it.id)}${opciones.extra ?? ''}</div>
+    ${opciones.pie ?? ''}</article>`;
+  }
   return `<article class="glass-panel rounded-2xl p-3 sm:p-4" data-pub="${Number(it.id)}">
     <header class="flex items-center gap-2.5 mb-2">
       <a href="${escapeHTML(perfil)}" class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-galaxy-card border border-galaxy-border shrink-0">${avatarHTML(a.avatar_url, a.nombre_display, 36)}</a>
