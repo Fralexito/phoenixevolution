@@ -110,3 +110,8 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 .mcx[data-con-club='true'] .mcg-sub { display: none; }
 .mcx[data-con-club='true'] .mcg-titulo { font-size: clamp(1.6rem, 3.4vw, 2.4rem); }
 @media (max-width: 1400px) { .mcx-dock a { padding: 0 .75rem; } }
+
+/* Celular (19-oct-2026, Fralex: «siento más lento en mi celular»): las luces quietas y con menos desenfoque; animar un desenfoque grande cuesta mucho en celulares modestos. */
+@media (max-width: 767.98px) { .mcx-luces i { animation: none !important; filter: blur(14px); opacity: .4; } }
+/* Las etiquetas de arriba (beta, ventana, Phoenix Sync) en UNA fila que se desliza: su texto llega después y antes hacía crecer la portada (salto). */
+@media (max-width: 767.98px) { .mcx .mcg-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(90deg, #000 85%, transparent); } .mcx .mcg-chips::-webkit-scrollbar { display: none; } .mcx .mcg-chips > * { flex: none; } }

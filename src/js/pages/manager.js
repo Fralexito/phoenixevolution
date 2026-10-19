@@ -51,7 +51,7 @@ async function cargarBase() {
     supabase.from('lm_config').select('*').eq('liga', LIGA).maybeSingle(),
     supabase.from('lm_clubes').select('id, nombre, escudo_url, aprobado, dueno, presupuesto').eq('liga', LIGA).order('nombre'),
   ]);
-  cfg = c; clubes = new Map((cl ?? []).map((x) => [x.id, x])); club = (cl ?? []).find((x) => x.dueno === yo) ?? null;
+  cfg = c; clubes = new Map((cl ?? []).map((x) => [x.id, x])); club = yo ? (cl ?? []).find((x) => x.dueno === yo) ?? null : null;   // sin sesión no hay club (antes «dueno === null» encontraba un club de la IA como si fuera tuyo)
   const ids = [...new Set((cl ?? []).map((x) => x.dueno).filter(Boolean))];
   if (ids.length) { const { data: pf } = await supabase.from('perfiles').select('id, username, nombre_display, avatar_url').in('id', ids); dts = new Map((pf ?? []).map((p) => [p.id, p])); }
 }

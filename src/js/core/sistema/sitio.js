@@ -2,7 +2,8 @@
 // Forma: { portada: { titulo, sub, orden: [ids], ventanas: { <id>: { on, vista, principal:{titulo,href}, extra:[{titulo,href}] } } },
 //          menu: { ocultos: [idNav] }, lateral: { ocultos: [idNav] },
 //          textos: { <idPagina>: 'Título nuevo (h1)' }, enlaces: [{ titulo, href }] (botones nuevos en barra lateral y pie) }
-export const VENTANAS = ['social', 'competencia', 'duelos', 'club'];
+// 19-oct-2026: mismo orden que la portada (index.astro): Mi Club primero. Si no coincidieran, al llegar la config las ventanas cambiaban de sitio y la página saltaba.
+export const VENTANAS = ['club', 'social', 'duelos', 'competencia'];
 export const VISTAS = ['vivo', 'mosaico', 'grande'];
 export const MAX_EXTRA = 3;
 export const MAX_ENLACES = 4;

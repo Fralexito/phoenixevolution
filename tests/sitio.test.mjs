@@ -10,7 +10,7 @@ test('normalizar: basura → config completa y segura', () => {
   assert.ok(esBase(normalizar({ portada: 5, menu: 'x' })));
 });
 test('normalizar: orden sin repetidos ni ids raros y completa los que faltan', () => {
-  assert.deepEqual(normalizar({ portada: { orden: ['duelos', 'duelos', 'xx', 'social'] } }).portada.orden, ['duelos', 'social', 'competencia', 'club']);
+  assert.deepEqual(normalizar({ portada: { orden: ['duelos', 'duelos', 'xx', 'social'] } }).portada.orden, ['duelos', 'social', 'club', 'competencia']);
 });
 test('normalizar: vista inválida se ignora y los extras se limitan', () => {
   const c = normalizar({ portada: { ventanas: { social: { vista: 'raro', on: false, extra: [1, 2, 3, 4].map((n) => ({ titulo: 'T' + n, href: 'liga/' })) } } } });
