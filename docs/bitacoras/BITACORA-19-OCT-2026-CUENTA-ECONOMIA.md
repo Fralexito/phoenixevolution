@@ -89,6 +89,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 17:15 | (ver REGISTRO) | **Beta 1.10.0**: auditoría completa de Social (errores, redundancias, inconsistencias) |
 | 17:22 | (ver REGISTRO) | **Beta 1.10.1**: Social menos saturado |
 | 17:27 | (ver REGISTRO) | **Beta 1.10.2**: Social como en la 1.10.0, sin saludo ni días de racha |
+| 17:36 | (ver REGISTRO) | **Beta 1.10.3**: Mi club, cancha de la plantilla sin líneas encima de los jugadores |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -291,6 +292,9 @@ Pedido: «la estoy sintiendo saturada… solo mejora un poco eso». Ninguna func
 
 ### 5.22 Social como estaba, sin saludo ni días (1.10.2)
 Fralex prefirió el aspecto de la 1.10.0: se deshizo la 1.10.1 y se quitaron el saludo con el nombre y los días de racha. Queda arriba la frase del día y el pulso de la comunidad.
+
+### 5.23 Mi club: la cancha de la plantilla (1.10.3)
+Las marcas del campo (línea del medio, círculo central, áreas) iban fijas y tapaban jugadores y títulos. Ahora la línea del medio separa Mediocampo y Defensas con un punto central, y las áreas son bajitas. El foco de la ficha es un aro dorado en la cara (antes un recuadro cuadrado). Archivo: `styles/miClubEstadio.css`.
 
 ---
 
