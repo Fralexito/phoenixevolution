@@ -4,6 +4,7 @@
 // 19-oct-2026 (Fralex: «Hazlo… dinámico, estético, visual, muy animado»): tarjeta viva — anfitrión VS rival en grande (el puesto libre
 // te llama con un latido), mandos dibujados, señal en barras, brillo en el botón; las salas nuevas entran animadas y la que cambia de
 // estado destella. Al tocar Entrar/Ver se abre «Entrando a la sala» (features/salas/entrar.js), paso a paso.
+// Migración 134: marcador real en el centro (liga_vivo, de Sider) con ¡GOL! al cambiar, cronómetro de «jugando hace…» y quién está conectado.
 import { supabase } from '../../core/sistema/supabase.js';
 import { onSession } from '../../core/sistema/session.js';
 import { escapeHTML, safeUrl } from '../../core/sistema/dom.js';
@@ -25,6 +26,26 @@ function avatar(p, extra = '') {
 function senal(sem) {
   const n = barrasSenal(sem); const p = pildoraSemaforo(sem);
   return `<span class="sv-senal" data-barras="${n}" title="${escapeHTML(p.titulo)}"><span class="sv-barras" aria-hidden="true"><i></i><i></i><i></i><i></i></span><b>${escapeHTML(p.texto === 'Ping ?' ? 'Sin ping' : p.texto)}</b></span>`;
+}
+const tonoPing = (ms) => (ms == null ? '' : ms < 60 ? 'ok' : ms < 120 ? 'medio' : 'mal');
+/** Centro de la tarjeta: marcador real (Sider → liga_vivo), cronómetro si se juega sin marcador, o «VS». */
+function centro(s) {
+  const m = s.marcador;
+  if (m && Number.isFinite(Number(m.goles_local))) {
+    const gl = Number(m.goles_local) || 0; const gv = Number(m.goles_visita) || 0;
+    return `<div class="sv-marcador" data-goles="${gl}-${gv}" aria-label="Marcador ${gl} a ${gv}${m.minuto != null ? `, minuto ${Number(m.minuto)}` : ''}">
+      <span class="sv-goles"><b>${gl}</b><i>-</i><b>${gv}</b></span>${m.minuto != null ? `<em class="sv-min"><i class="sv-punto" aria-hidden="true"></i>${Number(m.minuto)}'</em>` : ''}</div>`;
+  }
+  if (s.estado === 'en_partida' && s.en_partida_desde) return `<div class="sv-crono"><span class="sv-vs-t" aria-hidden="true">VS</span><em data-desde="${escapeHTML(s.en_partida_desde)}" title="Tiempo jugando">0:00</em></div>`;
+  return '<span class="sv-vs-t" aria-hidden="true">VS</span>';
+}
+/** «4 en la sala» con las caras de quienes tienen cuenta en la web (lo informa Phoenix Link en cada latido). */
+function conectados(c) {
+  const total = Number(c?.total) || 0; if (!total) return '';
+  const caras = (Array.isArray(c.jugadores) ? c.jugadores : []).slice(0, 4);
+  const resto = total - caras.length;
+  return `<div class="sv-conectados" title="Conectados ahora a la sala (Phoenix Link)"><span class="sv-pila">${caras.map((j) => `<span class="sv-pila-av" data-ping="${tonoPing(j.ping_ms)}" title="${escapeHTML(j.nombre ?? '')}${j.ping_ms != null ? ` · ${Math.round(j.ping_ms)} ms` : ''}">${avatar(j)}</span>`).join('')}${resto > 0 ? `<span class="sv-pila-mas">+${resto}</span>` : ''}</span>
+    <span class="sv-conectados-t"><b>${total}</b> en la sala ahora</span></div>`;
 }
 const chip = (ic, t) => `<span class="sv-chip"><i class="fa-solid ${ic}" aria-hidden="true"></i>${t}</span>`;
 
@@ -49,9 +70,11 @@ function tarjeta(s, tipo) {
     <header class="sv-top"><span class="sv-estado"><i class="sv-punto" aria-hidden="true"></i>${escapeHTML(est.texto)}</span><span class="sv-app">${NOMBRE_APP}</span>${senal(sem)}</header>
     <div class="sv-vs">
       <div class="sv-lado">${avatar(s.host, 'sv-av-host')}<b>${escapeHTML(s.host?.nombre ?? 'Host')}${s.host?.amigo ? ' <i class="fa-solid fa-user-group sv-amigo" title="Amigo" aria-label="Amigo"></i>' : ''}</b><small>Anfitrión</small></div>
-      <span class="sv-vs-t" aria-hidden="true">VS</span>
+      ${centro(s)}
       ${rival}
     </div>
+    ${s.marcador?.local || s.marcador?.visitante ? `<p class="sv-equipos">${escapeHTML(s.marcador.local ?? '')} <span>vs</span> ${escapeHTML(s.marcador.visitante ?? '')}</p>` : ''}
+    ${conectados(s.conectados)}
     <div class="sv-info">
       ${mandos.length ? `<span class="sv-mandos" title="${mandos.filter((m) => m.lleno).length} de ${mandos.length} mandos ocupados">${mandos.map((m) => `<i class="fa-solid fa-gamepad ${m.lleno ? 'lleno' : ''}" aria-hidden="true"></i>`).join('')}</span>` : ''}
       ${s.parche || s.juego ? chip('fa-futbol', escapeHTML(s.parche || s.juego)) : ''}
@@ -82,6 +105,7 @@ export function montarTarjetasSalas({ contenedor, tipo, alContar = () => {} }) {
   if (!contenedor) return () => {};
   let conSesion = false; let vivo = true; let espera = null; let canal = null;
   let lista = []; const vistos = new Map();   // sala_id → estado ya dibujado (para animar solo lo nuevo o lo que cambió)
+  const goles = new Map();   // sala_id → marcador ya visto (para celebrar el gol)
   const cargar = async () => {
     if (!vivo || !conSesion || document.hidden) return;
     try {
@@ -92,6 +116,7 @@ export function montarTarjetasSalas({ contenedor, tipo, alContar = () => {} }) {
         if (antes === undefined) { el.classList.add('sv-nueva'); el.style.setProperty('--i', String(Math.min(i, 6))); }
         else if (antes !== el.dataset.estado) el.classList.add('sv-cambio');
         vistos.set(id, el.dataset.estado);
+        const g = el.querySelector('.sv-marcador')?.dataset.goles; if (g && goles.has(id) && goles.get(id) !== g) el.classList.add('sv-gol'); if (g) goles.set(id, g);
       });
       contenedor.hidden = !lista.length;
       alContar(lista.length);
@@ -116,6 +141,15 @@ export function montarTarjetasSalas({ contenedor, tipo, alContar = () => {} }) {
   });
 
   const intervalo = setInterval(cargar, SONDEO_MS);
+  // Cronómetro de «jugando hace…»: se mueve cada segundo solo si hay alguno a la vista.
+  const reloj = setInterval(() => {
+    if (document.hidden) return;
+    contenedor.querySelectorAll('[data-desde]').forEach((el) => {
+      const s = Math.max(0, Math.floor((Date.now() - Date.parse(el.dataset.desde)) / 1000)); if (!Number.isFinite(s)) return;
+      const h = Math.floor(s / 3600); const mm = Math.floor((s % 3600) / 60); const ss = String(s % 60).padStart(2, '0');
+      el.textContent = h ? `${h}:${String(mm).padStart(2, '0')}:${ss}` : `${mm}:${ss}`;
+    });
+  }, 1000);
   const alVer = () => { if (!document.hidden) cargar(); };
   document.addEventListener('visibilitychange', alVer);
   try {
@@ -125,7 +159,7 @@ export function montarTarjetasSalas({ contenedor, tipo, alContar = () => {} }) {
   onSession((st) => { conSesion = !!st?.session; if (conSesion) cargar(); else { contenedor.hidden = true; alContar(0); } });
 
   return () => {
-    vivo = false; clearInterval(intervalo); clearTimeout(espera);
+    vivo = false; clearInterval(intervalo); clearInterval(reloj); clearTimeout(espera);
     document.removeEventListener('visibilitychange', alVer);
     if (canal) supabase.removeChannel(canal);
   };

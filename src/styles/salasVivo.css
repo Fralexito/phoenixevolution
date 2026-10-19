@@ -135,3 +135,34 @@ li[data-estado='error'] .sve-ic { border-color: transparent; } li[data-estado='e
 @keyframes sve-salta { to { transform: translateY(-5px) rotate(-8deg); } }
 @keyframes sve-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.18); } }
 .sve-caja:focus { outline: none; }
+
+/* ── En vivo dentro de la tarjeta (migración 134): marcador real, cronómetro, quién está conectado y el gol ── */
+.sv-marcador { display: grid; justify-items: center; gap: .3rem; }
+.sv-goles { display: inline-flex; align-items: center; gap: .35rem; padding: .25rem .8rem; border-radius: .9rem; font: 900 2rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums;
+  background: rgb(0 0 0 / .45); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sv-c) 45%, transparent), 0 10px 26px -12px var(--sv-c); }
+.sv-goles i { font-style: normal; color: #8e98ad; font-size: .7em; }
+.sv-min { display: inline-flex; align-items: center; gap: .35rem; font: 800 12px var(--font-display); font-style: normal; letter-spacing: .08em; color: var(--sv-c); }
+.sv-crono { display: grid; justify-items: center; gap: .3rem; }
+.sv-crono em { font: 800 13px var(--font-display); font-style: normal; letter-spacing: .06em; color: var(--sv-c); font-variant-numeric: tabular-nums; padding: .15rem .55rem; border-radius: 99px; background: color-mix(in srgb, var(--sv-c) 12%, transparent); }
+.sv-equipos { margin: -.35rem 0 0; text-align: center; font-size: 12px; font-weight: 600; color: #c9d1de; } .sv-equipos span { color: #6f7a90; margin: 0 .25rem; }
+.sv-conectados { display: flex; align-items: center; justify-content: center; gap: .6rem; font-size: 12.5px; color: #a3acbf; }
+.sv-conectados-t b { color: #fff; }
+.sv-pila { display: inline-flex; align-items: center; }
+.sv-pila-av { position: relative; margin-left: -.45rem; } .sv-pila-av:first-child { margin-left: 0; }
+.sv-pila-av .sv-av { width: 1.9rem; height: 1.9rem; font-size: .75rem; box-shadow: 0 0 0 2px #0b0a1a; }
+.sv-pila-av::after { content: ''; position: absolute; right: -1px; bottom: -1px; width: .55rem; height: .55rem; border-radius: 99px; background: #6f7a90; box-shadow: 0 0 0 2px #0b0a1a; }
+.sv-pila-av[data-ping='ok']::after { background: #34d399; } .sv-pila-av[data-ping='medio']::after { background: #fbbf24; } .sv-pila-av[data-ping='mal']::after { background: #fb7185; }
+.sv-pila-mas { display: grid; place-items: center; min-width: 1.9rem; height: 1.9rem; margin-left: -.45rem; padding: 0 .3rem; border-radius: 99px; font-size: 11px; font-weight: 800; color: #fff; background: rgb(255 255 255 / .12); box-shadow: 0 0 0 2px #0b0a1a; }
+/* ¡GOL! cuando cambia el marcador */
+.sv-card.sv-gol::after { content: '¡GOL!'; position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; pointer-events: none;
+  font: 900 clamp(2.5rem, 9vw, 4rem) var(--font-display); font-style: italic; letter-spacing: .04em; color: #fff; text-shadow: 0 0 30px var(--sv-c), 0 6px 20px rgb(0 0 0 / .6);
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--sv-c) 40%, transparent), rgb(0 0 0 / .55) 70%); opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .sv-card.sv-gol::after { animation: sv-gol 1.9s var(--sv-e) both; }
+  .sv-card.sv-gol .sv-goles { animation: sv-golpe .6s var(--sv-e) .2s; }
+  .sv-min .sv-punto::after { animation: sv-latido 1.6s ease-out infinite; }
+  .sv-pila-av { animation: sv-entra .4s var(--sv-e) backwards; } .sv-pila-av:nth-child(2) { animation-delay: 60ms; } .sv-pila-av:nth-child(3) { animation-delay: 120ms; } .sv-pila-av:nth-child(4) { animation-delay: 180ms; }
+}
+@media (prefers-reduced-motion: reduce) { .sv-card.sv-gol::after { opacity: 0; } }
+@keyframes sv-gol { 0% { opacity: 0; transform: scale(.6); } 18% { opacity: 1; transform: scale(1.08); } 30% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: scale(1.05); } }
+@keyframes sv-golpe { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
