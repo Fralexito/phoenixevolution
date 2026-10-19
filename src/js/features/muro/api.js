@@ -117,3 +117,14 @@ export const likesRespuestas = (ids) => rpc('muro_likes_respuestas', { p_respues
 export const reaccionesDe = (idPublicacion, limite = 60) => rpc('muro_reacciones_de', { p_publicacion: idPublicacion, p_limite: limite });
 /** Mi racha de actividad (días seguidos). → { dias, hoy } */
 export const rachaSocial = () => rpc('mi_racha_social');
+
+/* ---------- Jugadas: el feed vertical de videos (migración 136, 19-oct-2026) ---------- */
+/** → { items: [ { id, titulo, video_url, juego, categoria, created_at, autor, reacciones, total, mia, vistas } ], hay_mas } */
+export const jugadasFeed = ({ categoria = null, orden = 'recientes', antes = null, desplazamiento = 0, limite = 12 } = {}) =>
+  rpc('jugadas_feed', { p_categoria: categoria, p_orden: orden, p_antes: antes, p_desplazamiento: desplazamiento, p_limite: limite });
+/** Publicar una jugada (mismas reglas que un clip) con categoría. → id */
+export const jugadaPublicar = (titulo, video, juego = null, categoria = null) => rpc('jugada_publicar', { p_titulo: titulo ?? '', p_video: video, p_juego: juego, p_categoria: categoria });
+/** Reaccionar (mismo emoji otra vez = quitar). → emoji final o null */
+export const jugadaReaccionar = (idClip, tipo) => rpc('jugada_reaccionar', { p_clip: idClip, p_tipo: tipo });
+/** Vista (1 por persona; sin sesión no cuenta). */
+export const jugadaVista = (idClip) => rpc('jugadas_registrar_vista', { p_clip: idClip });

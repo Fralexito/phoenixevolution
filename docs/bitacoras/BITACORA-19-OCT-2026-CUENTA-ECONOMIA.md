@@ -80,6 +80,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 14:02 | `3cfb4e3` | **Beta 1.5.0**: Social fase 1 (red social completa) |
 | 14:17 | `e45a5d8` | **Beta 1.5.1**: esta bitácora y la guía paso a paso |
 | 14:40 | (ver REGISTRO) | **Beta 1.6.0**: Social fase 2 (**migraciones 135 y 135b**) |
+| 15:15 | (ver REGISTRO) | **Beta 1.7.0**: **Jugadas** (feed vertical de videos, **migración 136**) + la beta abre con la demostración encendida |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -91,7 +92,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
    - cambio normal → `1.5.0` → `1.5.1`;
    - algo grande terminado (sección rehecha o sistema nuevo) → `1.5.3` → `1.6.0`;
    - la cinta «Fase beta» (Layout.astro) muestra la versión y la hora de Lima en que se compiló; la URL `/fase-beta-1-0/` **no** cambia.
-   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1 · 1.5.1 documentación · 1.6.0 Social fase 2.
+   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1 · 1.5.1 documentación · 1.6.0 Social fase 2 · 1.7.0 Jugadas y demostración visible en la beta.
 2. **Nada de `html:has(…)` ni `body:has(…)` en CSS** (hacía recalcular toda la página ~15 veces al cargar). Poner una marca en `<html>` desde el JS (`data-ticker-oculto`, `data-duelos-plegado`, `data-reto-asistente`…).
 3. **Iconos recortados**: si usas un icono «fa-…» o «ph-…» nuevo, ejecuta `node tools/iconos/recortar-iconos.mjs` y sube `src/styles/iconos/*`. Si el icono de Font Awesome no tiene equivalente fino en `src/data/iconosFinos.js`, **añádelo** (si no, con «Sin íconos web» se oculta o sale como cuadro). Hoy se añadieron: `icons→smiley-wink`, `circle-notch`, `caret-up`, `caret-down`.
 4. **CSS por página**: 14 CSS salieron de `global.css`; cada página los importa DESPUÉS de Layout. Si una página nueva usa clases de uno de ellos, impórtalo ahí. CSS nuevos de hoy por página: `perfilPublico.css` (perfil), `retoAsistente.css` (duelos), `ahoraPortada.css` (inicio), `ligaTabla.css` (liga), `publicar.css` y `socialHilo.css` (social), `configuracion.css` (ajustes), `miClubEstadio.css` (manager). Globales nuevos: `salasVivo.css`, `publicacionExtras.css`, `modoDemo.css`.
@@ -203,6 +204,23 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 
 ### 5.11 Liga — tablas visuales (1.4.0)
 - `pages/liga.astro` + `styles/ligaTabla.css`: ▲▼ puestos ganados o perdidos desde la fecha anterior, corona del líder, «Últimos 5» como fichas (la más reciente destacada), zonas con brillo, en celular la tabla entra sin deslizar. `tablaViva.js` ya no borra ▲▼ al reordenar.
+
+### 5.12 Jugadas — feed vertical de videos (1.7.0) — migración 136
+Pedido de Fralex: «una especie de reels o feed, shorts estilo TikTok, YouTube e Instagram, pero quiero que tenga identidad propia».
+- **Base (136_jugadas.sql, aplicada y probada):** usa los clips que ya existían (`muro_clips`, migraciones 025/027/032) y les añade `categoria`. Tablas nuevas `jugadas_reacciones` (1 por persona, cualquier emoji) y `jugadas_vistas` (1 por persona, las propias no cuentan), con RLS sin políticas (solo por funciones). Funciones: `jugadas_feed(categoria, orden, antes, desplazamiento, limite)` → `{items, hay_mas}` (orden «recientes» por id o «top» = más reacciones de los últimos 7 días), `jugada_publicar` (mismas reglas que `clip_publicar`: ≤ 80 letras, 10 por hora, video propio o enlace de YouTube/TikTok/Kick/Twitch), `jugada_reaccionar` (mismo emoji otra vez = quitar; máx. 60 por minuto), `jugadas_registrar_vista`. Respeta la privacidad del muro y los bloqueos. Cómo deshacer: en la cabecera del archivo.
+- **Página `/jugadas/`** (`pages/jugadas.astro`, `js/pages/jugadas.js`, `styles/jugadas.css`):
+  - pantalla completa, una jugada por pantalla; se pasa deslizando (o ↑ ↓, j/k, rueda, flechas en PC). En PC es un marco vertical 9:16 con la portada desenfocada de fondo;
+  - **solo se reproduce el video que se ve**: los videos propios se pausan al salir; YouTube carga el reproductor SOLO en la jugada activa (las demás muestran la miniatura) y llena el marco recortando los lados como un short. TikTok/Kick/Twitch muestran una tarjeta «Ver en…» (no permiten incrustar en vertical);
+  - **identidad Phoenix**: categoría futbolera con su color (⚽ Golazo · 🧤 Atajada · ✨ Skill · 🔁 Remontada · 😂 Fail), **doble toque = 🔥 con llamarada**, **mantener pulsado el fuego = reacciones Phoenix** (Fuego, Golazo, Atajada, GG, Crack, Risa), el **Calorímetro** (termómetro de fuego: cuánto fuego tiene esa jugada frente a las demás del feed), **Retar** al autor (abre el asistente de Duelos con él elegido), tocar el autor abre su tarjeta rápida (fase 2);
+  - pestañas: Para ti · Top semana · Golazos · Atajadas · Skills · Remontadas · Fails (quedan en la dirección: `?ver=fail`);
+  - «Subir» abre una hoja en 3 pasos: tipo de jugada → video (archivo de hasta 15 s o enlace) → título y juego;
+  - carga infinita (10 en 10) y la vista se cuenta a los 2 s de verla. En Jugadas se esconden la barra de abajo y la cinta «en vivo» (inmersivo; se sale con ←).
+- **Accesos:** círculo «Jugadas» con anillo de fuego, primero en la fila de historias de Social; «Tu espacio» (Social); barra lateral → Comunidad; menú de cuenta (grupo Social); la pestaña «Social» de la barra de abajo se ilumina en Jugadas.
+- **Demostración:** `demo/simulador.js` trae 24 jugadas inventadas (los 3 videos de `data/demo.js`) cuyas reacciones y vistas suben con el tiempo; reaccionar y publicar en demo no escriben nada, y el video que elijas en demo no se sube (se ve solo en tu navegador).
+
+### 5.13 La demostración se ve sola en la beta (1.7.0)
+Pedido de Fralex: «necesito que en la página misma se me muestre la simulación de todas las actividades, para ver cómo se vería».
+- `core/sistema/modoDemo.js`: en la **vista previa** (`PUBLIC_PREVIEW`) la demostración viene **encendida la primera vez** que alguien abre la beta (marca `pes-demo-beta-v1` en el navegador). Si la apagas («Salir» o Configuración) queda apagada. `?demo=1` / `?demo=0` siguen funcionando. **La web oficial no cambia.**
 
 ---
 

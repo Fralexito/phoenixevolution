@@ -1,0 +1,32 @@
+---
+// «JUGADAS» (19-oct-2026, Fralex: «una especie de reels o feed, shorts estilo TikTok, YouTube e Instagram, pero con identidad propia»).
+// Feed vertical a pantalla completa con los clips de la comunidad: un video a la vez, se pasa deslizando. Identidad Phoenix:
+// categorías de fútbol (Golazos, Atajadas, Skills, Remontadas, Fails), reacciones Phoenix, el «Calorímetro» (cuánto fuego tiene cada jugada)
+// y «Retar» al autor. Datos: migración 136 (jugadas_feed…). Lógica en js/pages/jugadas.js; estilos en styles/jugadas.css (solo esta página).
+import Layout from '../layouts/Layout.astro';
+import '../styles/jugadas.css';
+import { PESTANAS_JUGADAS, CATEGORIAS_JUGADA } from '../data/jugadas.js';
+const base = import.meta.env.BASE_URL;
+---
+<Layout title="Jugadas" active="jugadas" description="Las mejores jugadas de la comunidad de Phoenix Evolution Series: golazos, atajadas, skills y remontadas, en vertical.">
+  <h1 class="sr-only">Jugadas</h1>
+  <div class="jg" data-jg>
+    <div class="jg-fondo" aria-hidden="true"></div>
+    <header class="jg-cab">
+      <a class="jg-volver" href={`${base}social/`} aria-label="Volver a Social"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+      <nav class="jg-tabs" aria-label="Qué jugadas ver">
+        {PESTANAS_JUGADAS.map((p, i) => <button type="button" data-jg-tab={p.id} aria-pressed={i === 0 ? 'true' : 'false'}><span aria-hidden="true">{p.emoji}</span>{p.nombre}</button>)}
+      </nav>
+      <button type="button" class="jg-subir" data-jg-subir aria-label="Subir una jugada"><i class="fa-solid fa-plus" aria-hidden="true"></i><span>Subir</span></button>
+    </header>
+    <div class="jg-pista" data-jg-pista aria-live="polite" tabindex="-1"></div>
+    <div class="jg-flechas" aria-hidden="true">
+      <button type="button" data-jg-paso="-1" tabindex="-1" title="Anterior (↑)"><i class="fa-solid fa-chevron-up"></i></button>
+      <button type="button" data-jg-paso="1" tabindex="-1" title="Siguiente (↓)"><i class="fa-solid fa-chevron-down"></i></button>
+    </div>
+  </div>
+  <template id="jg-cats">{CATEGORIAS_JUGADA.map((c) => <span data-id={c.id} data-nombre={c.corto} data-emoji={c.emoji} data-color={c.color}></span>)}</template>
+</Layout>
+<script>
+  import '../js/pages/jugadas.js';
+</script>

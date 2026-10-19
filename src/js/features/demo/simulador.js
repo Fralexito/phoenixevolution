@@ -196,10 +196,45 @@ export async function tablaDemo(tabla, ops, real) {
 const estadisticas = () => ({ visible: true, jugados: 48, victorias: 29, empates: 8, derrotas: 11, gf: 97, gc: 61, efectividad: 69 });
 const elo = () => ({ visible: true, elo: 1386, jugados: 31, delta: 12 });
 
+/* ---------- Jugadas (migración 136): el feed vertical. 24 clips inventados; las reacciones y vistas suben con el tiempo ---------- */
+const VIDEOS_DEMO = ['d9815MC-efg', '9fLuppybBQE', 'Bi-8fdt5bg8'];   // los mismos videos de data/demo.js
+const JUGADAS_DEMO = [['golazo', 'Chilena al ángulo en el 89′ 🚀'], ['atajada', 'Le gané el mano a mano al Matador'], ['skill', 'Elástica + caño: el defensa sigue buscando el balón'],
+  ['remontada', 'De 0-3 a 4-3 en veinte minutos'], ['fail', 'Autogol de taco. Sí, de taco 😂'], ['golazo', 'Tiro libre con una comba imposible'], ['atajada', 'Triple atajada en la misma jugada'],
+  ['skill', 'Ruleta en el área chica y a guardarla'], ['golazo', 'Gol olímpico en la final del sábado'], ['remontada', 'Perdíamos 2-0 en penales… y ganamos'], ['fail', 'Fallé sin arquero. Sin. Arquero.'], ['skill', 'Sombrero al portero y gol de cabeza']];
+const MIS_JUGADAS = [];   // lo que «publicas» en demo (solo en esta pestaña; no se sube nada)
+const rxJugadas = new Map();
+function jugada(k) {
+  const [categoria, titulo] = JUGADAS_DEMO[k % JUGADAS_DEMO.length]; const g = GENTE[(k * 5 + 2) % GENTE.length]; const sube = Math.floor(seg() / 25);
+  const r = { '🔥': 4 + Math.floor(azar(k + 11) * 60) + (k < 6 ? sube : 0), '⚽': Math.floor(azar(k + 12) * 18), '🐐': Math.floor(azar(k + 13) * 10), '😂': categoria === 'fail' ? 25 + Math.floor(azar(k) * 30) : Math.floor(azar(k + 14) * 4) };
+  return conMia({ id: ID0 + 3000 + (99 - k), titulo, video_url: `https://www.youtube.com/watch?v=${VIDEOS_DEMO[k % VIDEOS_DEMO.length]}`, juego: 'pes', categoria, created_at: hace(9 + k * 53),
+    autor: { id: g.id, username: g.username, nombre_display: g.nombre, avatar_url: null }, reacciones: r, vistas: 180 + Math.floor(azar(k + 20) * 3200) + Math.floor(seg() / 4) });
+}
+function conMia(it) {
+  const mia = rxJugadas.get(it.id) ?? null; const r = { ...it.reacciones }; if (mia) r[mia] = (r[mia] || 0) + 1;
+  for (const e of Object.keys(r)) if (!r[e]) delete r[e];
+  return { ...it, reacciones: r, mia, total: Object.values(r).reduce((s, n) => s + n, 0) };
+}
+function jugadasFeedDemo(a = {}) {
+  const top = a.p_orden === 'top'; const n = Math.min(Math.max(Number(a.p_limite) || 12, 1), 30);
+  let todas = [...MIS_JUGADAS.map(conMia), ...Array.from({ length: 24 }, (_, k) => jugada(k))].filter((x) => !a.p_categoria || x.categoria === a.p_categoria);
+  if (top) todas.sort((x, y) => y.total - x.total || y.id - x.id); else todas.sort((x, y) => y.id - x.id);
+  if (!top && a.p_antes) todas = todas.filter((x) => x.id < Number(a.p_antes));
+  const d = top ? Number(a.p_desplazamiento) || 0 : 0;
+  return { items: todas.slice(d, d + n), hay_mas: todas.length > d + n };
+}
+function jugadaReaccionarDemo(a = {}) { const id = Number(a.p_clip); const t = String(a.p_tipo ?? ''); if (rxJugadas.get(id) === t) { rxJugadas.delete(id); return null; } rxJugadas.set(id, t); return t; }
+function jugadaPublicarDemo(a = {}) {
+  const id = ID0 + 3100 + MIS_JUGADAS.length;
+  MIS_JUGADAS.push({ id, titulo: String(a.p_titulo ?? '').slice(0, 80), video_url: String(a.p_video ?? ''), juego: a.p_juego ?? null, categoria: a.p_categoria ?? null, created_at: new Date().toISOString(),
+    autor: { id: 'yo', username: 'tu_usuario', nombre_display: 'Tú', avatar_url: null }, reacciones: {}, vistas: 0 });
+  return id;
+}
+
 const SIMULADAS = {
   salas_en_vivo: salasEnVivo, radar_salas: radarSalas, ticker_comunidad: ticker,
   muro_comunidad: (a) => muro(a), muro_siguiendo: (a) => muro(a), muro_destacado: (a) => muro(a, 'destacado'),
   historias_recientes: historias, chat_global_listar: chatListar, chat_global_enviar: chatEnviar,
+  jugadas_feed: jugadasFeedDemo, jugada_publicar: jugadaPublicarDemo,
   buscar_publicaciones: (a) => { const q = String(a.p_q ?? '').toLowerCase(); const r = publicaciones().filter((p) => p.texto.toLowerCase().includes(q)); const d = Number(a.p_desplazamiento) || 0; return { items: r.slice(d, d + (Number(a.p_limite) || 20)).map(sinExtra), hay_mas: false }; },
 };
 const SI_FALTA = { estadisticas_de: estadisticas, elo_de: elo };   // primero la base; si no hay datos visibles, lo simulado
@@ -222,6 +257,7 @@ export async function rpcDemo(nombre, args, real) {
   if (nombre === 'muro_extras_de') {
     const r = await real(); return { data: { ...(r.data ?? {}), ...extras(args) }, error: null };
   }
+  if (nombre === 'jugada_reaccionar' && esDemo(args?.p_clip)) return { data: jugadaReaccionarDemo(args), error: null };
   if (nombre === 'muro_reaccionar' && Number(args?.p_publicacion) >= ID0) return { data: args?.p_tipo ?? null, error: null };   // reaccionar a algo inventado: se ve marcado, no se guarda
   if (Object.values(args ?? {}).some((v) => Number(v) >= ID0 && Number(v) < ID0 + 1e6)) return { data: null, error: null };   // acción sobre algo inventado
   // Entrar a una sala inventada: se reserva el puesto pero sin enlace (así no se abre Parsec hacia ningún equipo real).

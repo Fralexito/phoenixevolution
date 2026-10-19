@@ -59,8 +59,10 @@ function pintarHistorias() {
   const nueva = S.yo && !mio ? `<button type="button" data-hist-nueva class="sx-hist-item" aria-label="Crear una historia"><span class="sx-anillo sx-anillo-nuevo"><span class="sx-anillo-in"><i class="fa-solid fa-plus text-galaxy-400 text-xl" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Tu historia</span></button>` : '';
   const crear = S.yo && mio ? `<button type="button" data-hist-nueva class="sx-hist-item" aria-label="Añadir otra historia"><span class="sx-anillo sx-anillo-nuevo"><span class="sx-anillo-in"><i class="fa-solid fa-plus text-galaxy-400 text-xl" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Añadir</span></button>` : '';
   const lista = S.circulos.map(circuloHTML).join('');
-  histEl.hidden = !(nueva || crear || lista);
-  histEl.innerHTML = `<div class="sx-hist-fila" role="list" aria-label="Historias de las últimas 24 horas">${nueva}${crear}${lista}</div>`;
+  // Jugadas (19-oct-2026): el feed vertical de videos, siempre primero en la fila
+  const jugadas = `<a href="${href('jugadas/')}" class="sx-hist-item sx-hist-jugadas" aria-label="Ver Jugadas: videos de la comunidad en vertical"><span class="sx-anillo"><span class="sx-anillo-in"><i class="fa-solid fa-clapperboard" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Jugadas</span></a>`;
+  histEl.hidden = false;
+  histEl.innerHTML = `<div class="sx-hist-fila" role="list" aria-label="Jugadas e historias de las últimas 24 horas">${jugadas}${nueva}${crear}${lista}</div>`;
   pintarLado();
 }
 async function cargarHistorias() {

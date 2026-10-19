@@ -486,3 +486,12 @@ button.sx-pie-total:hover { background: rgb(255 255 255 / .07); }
   .sx-pie-emojis span + span { margin-left: -.45rem; }
 }
 @media (max-width: 359.98px) { .sx-pie-vistas { display: none; } }
+
+/* Jugadas (19-oct-2026): el círculo que abre el feed vertical, primero en la fila de historias. Anillo de fuego que gira despacio. */
+.sx-hist-jugadas { color: inherit; text-decoration: none; }
+.sx-hist-jugadas .sx-anillo { position: relative; background: conic-gradient(from var(--jg-giro, 0deg), #fde047, #fb923c, #f43f5e, #c084fc, #fde047); box-shadow: 0 0 16px -2px #fb923c99; animation: sx-jg-giro 6s linear infinite; }
+.sx-hist-jugadas .sx-anillo-in { background: radial-gradient(circle at 50% 35%, #3b1a2e, #12081f); color: #fff; font-size: 1.35rem; }
+.sx-hist-jugadas .sx-hist-nombre { font-weight: 700; }
+@property --jg-giro { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes sx-jg-giro { to { --jg-giro: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .sx-hist-jugadas .sx-anillo { animation: none; } }

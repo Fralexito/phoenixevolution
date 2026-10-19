@@ -32,7 +32,7 @@ export const NAV_EXTRA = [
 // y destacado (la joya: gestionar a los jugadores de tu PES), a sus lados la red social y jugar. La Red de enlaces del celular NO repite estos accesos.
 export const BARRA_INFERIOR = [
   { id: ['central'], t: 'Inicio', path: '', ph: 'house' },
-  { id: ['social', 'chatgeneral', 'noticias'], t: 'Social', path: 'social/', ph: 'globe-hemisphere-west' },
+  { id: ['social', 'chatgeneral', 'noticias', 'jugadas'], t: 'Social', path: 'social/', ph: 'globe-hemisphere-west' },
   { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true },
   { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts'], t: 'Jugar', path: 'duelos/', ph: 'game-controller' },
   { id: ['muro', 'perfil'], t: 'Yo', path: 'perfil/', ph: 'user' },
@@ -52,6 +52,7 @@ const ACCOUNT_NAV_BASE = [
   { id: 'missalas', label: 'Phoenix Link', path: 'mis-salas/',    icon: 'fa-desktop', grupo: 'jugar' },
   { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments', grupo: 'social' },
   { id: 'chatgeneral', label: 'Chat general', path: 'chat-general/', icon: 'fa-comments', grupo: 'social' },
+  { id: 'jugadas',  label: 'Jugadas',      path: 'jugadas/',       icon: 'fa-clapperboard', grupo: 'social' },
   { id: 'amigos',   label: 'Amigos',       path: 'amigos/',        icon: 'fa-user-group', grupo: 'social' },
   { id: 'buscar',   label: 'Buscar',       path: 'buscar/',        icon: 'fa-magnifying-glass', grupo: 'social', menu: false },
   { id: 'guardados', label: 'Guardados',   path: 'guardados/',     icon: 'fa-bookmark', grupo: 'tu' },

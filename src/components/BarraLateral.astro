@@ -16,7 +16,7 @@ const item = (n, id = n.id) => ({ ...n, actual: active === id });
 const busca = (ids) => ids.map((id) => todosMas.find((n) => n.id === id && n.path)).filter(Boolean);
 // Ronda 310: 4 grupos, lo MÁS usado primero (pedido de Fralex): Comunidad (noticias y social, lo principal) · Jugar · Competir · Mi cuenta.
 const SECCIONES = [
-  { tit: 'Comunidad', items: busca(['noticias', 'social', 'chatgeneral']) },
+  { tit: 'Comunidad', items: busca(['noticias', 'social', 'jugadas', 'chatgeneral']) },
   { tit: 'Jugar', items: busca(['duelos', 'ahora', 'manager']).map((n) => n.id === 'ahora' ? { ...n, label: 'En vivo' } : n) },
 ];
 const extraLigas = busca(['torneos', 'ranking']);
