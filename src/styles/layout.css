@@ -146,4 +146,8 @@ html { scrollbar-gutter: stable; }
 .fase-beta-cinta { position: fixed; left: .75rem; bottom: .75rem; z-index: 60; pointer-events: none; display: inline-flex; align-items: center; gap: .4rem;
   padding: .3rem .7rem; border-radius: 999px; font: 700 12px/1 var(--font-display, sans-serif); letter-spacing: .14em; text-transform: uppercase;
   color: #fff; background: linear-gradient(90deg, rgb(168 85 247 / .9), rgb(0 229 255 / .85)); box-shadow: 0 0 18px rgb(0 229 255 / .35); }
-@media (max-width: 640px) { .fase-beta-cinta { bottom: auto; top: .5rem; left: 50%; transform: translateX(-50%); font-size: 11px; opacity: .92; } }
+.fase-beta-cinta b { font-weight: inherit; }
+/* 19-oct-2026: en PC la cápsula de abajo solo dice «Fase beta 1.0» (la larga tapaba el pie); el texto completo queda en el título accesible. */
+@media (min-width: 641px) { .fase-beta-cinta .fbc-largo { display: none; } }
+/* En celular era una cápsula FIJA encima de la cabecera y tapaba el logo y «Entrar / Registrarse»: ahora es una franja fina arriba del todo, en el flujo de la página (se va al bajar). */
+@media (max-width: 640px) { .fase-beta-cinta { position: static; display: flex; justify-content: center; width: 100%; border-radius: 0; padding: .3rem .75rem; font-size: 10.5px; letter-spacing: .1em; box-shadow: none; } }

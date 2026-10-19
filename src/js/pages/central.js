@@ -129,6 +129,16 @@ function pintarDestacado() {
     <div class="relative z-10 p-4 sm:p-6 pt-9 sm:pt-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">${lado(m.l, false)}
       <div class="flex flex-col items-center">${centro}<span class="text-[12px] sm:text-[12px] text-gray-500 uppercase tracking-widest mt-1 text-center">Fecha ${n} · ${jugado ? 'Final' : 'Parsec'}</span></div>${lado(m.v, true)}</div>
     ${d.nota ? `<p class="relative z-10 px-4 sm:px-6 pb-4 -mt-1 text-center text-xs sm:text-sm text-gray-300 italic">“${escapeHTML(d.nota)}”</p>` : ''}`;
+  quitarDuplicado(n, m);
+}
+/** En «Próximos», si el único partido de la lista es el mismo del destacado, salía dos veces seguidas (19-oct-2026): se cambia por una línea. */
+function quitarDuplicado(n, m) {
+  if (pestana !== 'proximos') return;
+  const filas = $('matches-container')?.querySelectorAll('[data-detalle]') ?? [];
+  if (filas.length !== 1 || filas[0].dataset.detalle !== `${n}|${m.l}|${m.v}`) return;
+  const aviso = document.createElement('p'); aviso.className = 'text-xs text-gray-400 py-2';
+  aviso.textContent = `Es el único partido que falta de la fecha ${n}: lo tienes destacado arriba.`;
+  filas[0].replaceWith(aviso);
 }
 
 /** Editor del partido destacado (solo staff): elegir el cruce de la fecha + una nota corta, o volver al automático. */
@@ -348,7 +358,8 @@ function ocultarCifra(id) {
 }
 async function contar(consulta, id) {
   const t0 = performance.now();
-  try { const { count, error } = await consulta; if (error) throw error; { const t = cifra(count); if (t === '—') { if (!ocultarCifra(id)) $(`pulso-${id}`).textContent = t; } else contarHasta($(`pulso-${id}`), Number(t)); } if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
+  // Un contador en cero («0 retos abiertos») se oculta: al estrenar transmitía «aquí no hay nadie» (19-oct-2026).
+  try { const { count, error } = await consulta; if (error) throw error; { const t = cifra(count); if (t === '—' || Number(count) === 0) { if (!ocultarCifra(id)) $(`pulso-${id}`).textContent = t; } else contarHasta($(`pulso-${id}`), Number(t)); } if (pingMs === null) { pingMs = Math.round(performance.now() - t0); mostrarPing(); } }
   catch (e) { console.error(`[central] pulso ${id}:`, e?.message ?? e); ocultarCifra(id); }
 }
 const head = { count: 'exact', head: true };

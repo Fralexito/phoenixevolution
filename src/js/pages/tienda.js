@@ -41,7 +41,7 @@ function botonCompra(i, moneda) {
   const precio = moneda === 'gemas' ? i.precioGemas : i.precioAscuas; if (precio == null) return '';
   const razon = S.eco ? motivoNoComprable(i, S.eco, moneda) : 'Inicia sesión', gem = moneda === 'gemas';
   return `<button type="button" data-comprar="${i.id}" data-moneda="${moneda}" title="${razon ? escapeHTML(razon) : 'Comprar con ' + moneda}" class="btn ${gem ? 'btn-primary' : 'btn-ghost'} !min-h-8 !px-3 !text-[12px] w-full justify-center ${razon ? 'opacity-60' : ''}" ${razon ? 'disabled' : ''}>
-    <i class="fa-solid ${gem ? 'fa-gem text-cyan-200' : 'fa-fire text-amber-300'}"></i> ${formatoTokens(precio)}${razon ? ` · <span class="font-normal">${escapeHTML(razon)}</span>` : ''}</button>`;
+    <i class="fa-solid ${gem ? 'fa-gem text-cyan-200' : 'fa-fire text-amber-300'}"></i> ${formatoTokens(precio)}${razon && S.eco ? ` · <span class="font-normal">${escapeHTML(razon)}</span>` : ''}</button>`;   // sin sesión ya lo dice el aviso de arriba: no se repite «Inicia sesión» en cada botón (19-oct-2026)
 }
 function itemHTML(i) {
   const r = RAREZAS[i.rareza] ?? RAREZAS.comun, lim = i.limitadaHasta ? textoLimitada(i.limitadaHasta) : '';
