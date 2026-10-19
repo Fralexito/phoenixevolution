@@ -145,13 +145,15 @@ export function destacadoFinal(fecha, tablaPrevia, manual) {
  */
 export function rachas(fechas, nombres, min = 2) {
   const res = { victorias: [], invicto: [], derrotas: [] };
+  // Una sola pasada por los partidos (antes se recorrían TODOS por cada jugador: jugadores × partidos, se notaba al cargar Inicio).
+  const porJugador = new Map((nombres ?? []).map((x) => [x, []]));
+  const anotar = (quien, a, b) => porJugador.get(quien)?.push(a > b ? 'G' : a < b ? 'P' : 'E');
+  for (const f of fechas ?? []) for (const m of f.partidos ?? []) {
+    if (!esJugado(m)) continue;
+    anotar(m.l, m.gl, m.gv); if (m.v !== m.l) anotar(m.v, m.gv, m.gl);
+  }
   for (const nombre of nombres ?? []) {
-    const rs = [];
-    for (const f of fechas ?? []) for (const m of f.partidos ?? []) {
-      if (!esJugado(m) || (m.l !== nombre && m.v !== nombre)) continue;
-      const a = m.l === nombre ? m.gl : m.gv; const b = m.l === nombre ? m.gv : m.gl; rs.push(a > b ? 'G' : a < b ? 'P' : 'E');
-    }
-    rs.reverse();
+    const rs = porJugador.get(nombre).slice().reverse();
     const cuenta = (ok) => { let k = 0; for (const r of rs) { if (!ok(r)) break; k += 1; } return k; };
     const g = cuenta((r) => r === 'G'), i = cuenta((r) => r !== 'P'), d = cuenta((r) => r === 'P');
     if (g >= min) res.victorias.push({ nombre, n: g });

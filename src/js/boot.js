@@ -2,22 +2,13 @@
 import { initSession } from './core/sistema/session.js';
 import { initSidebar } from './features/sidebar.js';
 import { initNavbar } from './features/navbar.js';
-import { initTicker } from './features/ticker.js';
-import { initLiveFeed } from './features/liveFeed.js';
-import { initLiveDock } from './features/liveDock.js';
 import { initWelcome } from './features/welcome.js';
 import { initEdad } from './features/edad.js';
 import { initAjustes } from './features/ajustes.js';
 import { initModoLigero } from './features/modoLigero.js';
 import { initAvatarFallback } from './core/sistema/avatar.js';
-import { initBuscadorGlobal } from './features/buscadorGlobal.js';
 import { initReveal } from './features/reveal.js';
-import { initDopamina } from './features/dopamina.js';
-import { initProf3d } from './features/prof3d.js';
 import { initCarruseles } from './features/carruseles.js';
-import { initCartasEfecto } from './features/cartasEfecto.js';
-import { initEfectosCarta } from './features/efectosCarta.js';
-import { initPremium } from './features/premium.js';
 import { initSinIconosWeb } from './features/sinIconosWeb.js';
 import { initPwa } from './features/pwa.js';
 import { initScrollSuave } from './features/scrollSuave.js';
@@ -40,11 +31,14 @@ initCarruseles();
 // Lo que no se necesita para ver la página arranca cuando ya se mostró (antes se hacía en plena carga y frenaba la primera vista,
 // sobre todo en celulares). Medido el 18-oct-2026 con Lighthouse y perfiles de CPU: ver docs/bitacoras/REVISION-GENERAL-18-OCT.md §7.
 const despues = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 2000 }) : setTimeout(f, 800));
-const seguro = (nombre, f) => () => { try { f(); } catch (e) { console.error("[boot] " + nombre + ":", e); } };
-despues(seguro('ticker', initTicker));
-despues(seguro('en vivo', () => { initLiveFeed(); initLiveDock(); }));
-despues(seguro('buscador', initBuscadorGlobal));
-despues(seguro('efectos', () => { initDopamina(); initProf3d(); initCartasEfecto(); initEfectosCarta(); initPremium(); }));
+// Y su CÓDIGO también se descarga después (import() = archivo aparte): así no se descarga ni se ejecuta junto con lo visible
+// (el buscador, por ejemplo, trae fuse.js, 26 KB). Medido el 19-oct-2026.
+const luego = (nombre, cargar) => despues(() => cargar().catch((e) => console.error("[boot] " + nombre + ":", e)));
+luego('ticker', () => import('./features/ticker.js').then((m) => m.initTicker()));
+luego('en vivo', () => Promise.all([import('./features/liveFeed.js'), import('./features/liveDock.js')]).then(([a, b]) => { a.initLiveFeed(); b.initLiveDock(); }));
+luego('buscador', () => import('./features/buscadorGlobal.js').then((m) => m.initBuscadorGlobal()));
+luego('efectos', () => Promise.all([import('./features/dopamina.js'), import('./features/prof3d.js'), import('./features/cartasEfecto.js'), import('./features/efectosCarta.js'), import('./features/premium.js')])
+  .then(([d, p3, ce, ec, pr]) => { for (const [n, f] of [['dopamina', d.initDopamina], ['3d', p3.initProf3d], ['cartas', ce.initCartasEfecto], ['efectos carta', ec.initEfectosCarta], ['premium', pr.initPremium]]) { try { f(); } catch (e) { console.error("[boot] " + n + ":", e); } } }));
 if (FX.sinIconosWeb) initSinIconosWeb();
 if (FX.pwa) initPwa();
 if (FX.scrollSuave) initScrollSuave();

@@ -6,10 +6,12 @@ export function initMarco() {
   if (!FX.marco) return;
   try {
     const html = document.documentElement;
-    let ultimo = window.scrollY; let raf = 0;
+    // «ultimo» se lee en el primer scroll, NO al arrancar: leer scrollY en plena carga obligaba a calcular el diseño de toda la página
+    // antes de tiempo (2,1 s de bloqueo en un celular lento, medido el 19-oct-2026).
+    let ultimo = null; let raf = 0;
     const revisar = () => {
       raf = 0;
-      const y = window.scrollY; const dy = y - ultimo;
+      const y = window.scrollY; if (ultimo === null) ultimo = y; const dy = y - ultimo;
       if (y < 120) html.removeAttribute('data-cab-compacta');
       else if (dy > 6) html.setAttribute('data-cab-compacta', '');
       else if (dy < -6) html.removeAttribute('data-cab-compacta');
