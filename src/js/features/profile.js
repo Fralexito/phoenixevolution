@@ -17,6 +17,7 @@ import { NOMBRE_APP } from '../../data/site.js';
 import { catalogoDe } from '../core/competicion/hostCatalogo.js';
 import { guardarHost } from './muro/api.js';
 import { FX } from '../../data/experimento.js';
+import { montarPerfilVivo } from './perfilVivo.js';   // 19-oct-2026: «Así te ven», medidor, país y club visuales
 
 const PLATAFORMAS = ['Ambos', 'Smash Soda', 'Parsec'];
 
@@ -60,7 +61,7 @@ export function openProfileModal() {
   const fDisc = `<div><label class="label" for="p-disc">Discord</label>${ico('fa-brands fa-discord', `<input id="p-disc" class="field" maxlength="40" value="${escapeHTML(prof.discord_tag)}">`)}</div>`;
   const fStream = `<div><label class="label" for="p-stream">Enlace de stream (https://…)</label>${ico('fa-solid fa-tower-broadcast', `<input id="p-stream" class="field" maxlength="200" value="${escapeHTML(prof.stream_url)}">`)}</div>`;
   const fSpeed = `<div>
-            <span class="label">Velocidad de subida (Mbps)</span>
+            <span class="label">Velocidad de subida (Mbps)${N ? ' <span class="sv-senal pf3-senal" id="pf3-senal" data-barras="0" aria-hidden="true"><span class="sv-barras"><i></i><i></i><i></i><i></i></span></span>' : ''}</span>
             <div class="seg" id="p-speed" role="group" aria-label="Velocidad de subida en Mbps">
               ${SPEED_BUCKETS.map((b) => `<button type="button" data-v="${b.v}" aria-pressed="${b.v === speed}">${b.label}</button>`).join('')}
             </div>
@@ -79,7 +80,7 @@ export function openProfileModal() {
         <h2 class="font-display font-bold text-2xl text-white uppercase tracking-widest">Mi perfil</h2>
         <button type="button" data-close aria-label="Cerrar" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      ${N ? `${tabsHTML}</div><div class="pf2-cuerpo"><div class="pf2-tarjeta">${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user, cabecera: yo })}</div>`
+      ${N ? `${tabsHTML}</div><div class="pf2-cuerpo"><div class="pf2-tarjeta">${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user, cabecera: yo })}</div><div class="pf3-vivo" id="pf3-vivo" data-nivel="bajo"></div>`
           : `${avatarPickerHTML({ avatarUrl: prof.avatar_url, name: prof.nombre_display, user: session.user })}${tabsHTML}`}
 
       <div data-pane="identidad" role="tabpanel" class="space-y-4">
@@ -146,10 +147,13 @@ export function openProfileModal() {
     const cat = juegos.get();
     $('#pf2-res-jue').textContent = cat.length ? cat.map((e) => e.opciones.length ? `${e.juego} (${e.opciones.length})` : e.juego).join(' · ') : 'Ninguno aún';
   };
-  bindSeg($('#p-speed'), (v) => { speed = Number(v); resumir(); });
+  // Barras de señal según la velocidad elegida (las mismas de las salas en vivo)
+  const senalVel = () => { const el = $('#pf3-senal'); if (!el) return; const i = SPEED_BUCKETS.findIndex((x) => x.v === speed); el.dataset.barras = String(i < 0 ? 0 : Math.min(4, 1 + Math.floor((i * 4) / SPEED_BUCKETS.length))); };
+  bindSeg($('#p-speed'), (v) => { speed = Number(v); resumir(); senalVel(); }); senalVel();
   bindSeg($('#p-soft'), (v) => { soft = v; resumir(); });
   $('#p-hjuegos').addEventListener('click', () => setTimeout(resumir, 0));
   resumir();
+  const vivoPf = N ? montarPerfilVivo(m, { prof }) : null;
 
   /* ---- Guardar ---- */
   $('#prof-form').addEventListener('submit', async (ev) => {
@@ -183,11 +187,12 @@ export function openProfileModal() {
       if (error) throw error;
       await guardarHost(soft, juegos.get(), prof.host_visible !== false);
       await refreshProfile();
+      if (vivoPf) { btn.classList.add('pf3-ok'); btn.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> ¡Guardado!'; await new Promise((r) => setTimeout(r, 700)); }
       closeModal('profile-modal');
       toast('Perfil actualizado.', 'ok');
     } catch (ex) {
       console.error('[perfil] guardar:', ex);
       err.textContent = identityError(ex);
-    } finally { btn.disabled = false; }
+    } finally { btn.disabled = false; vivoPf?.pintar(); }
   });
 }
