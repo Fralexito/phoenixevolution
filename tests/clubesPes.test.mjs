@@ -64,3 +64,16 @@ test('emparejarClubesLm: los 12 clubes de la Liga Máster encuentran su club del
   assert.equal(r.size, 12);
   assert.equal(r.get(119).nombre, 'Inter'); assert.equal(r.get(101).nombre, 'Arsenal'); assert.equal(r.get(114).nombre, 'Paris Saint-Germain'); assert.equal(r.get(108).nombre, 'FC Barcelona');
 });
+
+import { ordenarPorPrestigio, logoLigaUrl } from '../src/js/core/pes/clubesPes.js';
+test('sala: los grandes de cada liga primero, el resto alfabético', () => {
+  const premier = ordenarPorPrestigio(CLUBES_PES.filter((c) => c.liga === 'Premier League')).map((c) => c.nombre);
+  assert.equal(premier[0], 'Manchester City FC');
+  assert.deepEqual(premier.slice(0, 3), ['Manchester City FC', 'Arsenal FC', 'Liverpool FC']);
+  assert.equal(premier.at(-1), 'Sunderland AFC');                      // los que no están en la lista de grandes: alfabéticos al final
+  assert.equal(ordenarPorPrestigio(CLUBES_PES.filter((c) => c.liga === 'LaLiga'))[0].nombre, 'Real Madrid CF');
+  assert.equal(ordenarPorPrestigio(CLUBES_PES.filter((c) => c.liga === 'Ligue 1'))[0].nombre, 'París Saint-Germain FC');
+  assert.equal(ordenarPorPrestigio(CLUBES_PES).length, CLUBES_PES.length);   // no pierde ni duplica clubes
+  assert.match(logoLigaUrl('LaLiga'), /ligas\/PD\.png$/);
+  assert.equal(logoLigaUrl('Otra'), null);
+});

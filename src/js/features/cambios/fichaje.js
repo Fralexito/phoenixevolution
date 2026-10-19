@@ -58,6 +58,8 @@ registrarTipo({
         <span class="cfx-sala-texto"><b>Abrir la sala de fichajes</b><small>Elige el club, el jugador y su destino mirando escudos y plantillas.</small></span>
         <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
       </button>
+      <!-- 19-oct-2026 (Fralex): con la sala, escribir a mano es la excepción (agente libre, otra liga, otro parche): va plegado. Lo elegido en la sala rellena estos campos igual. -->
+      <details class="cf-avanzado cf-amano" id="cf-amano"><summary>¿No está en la sala o es agente libre? Escríbelo a mano</summary>
       <div class="cf-rejilla">
         ${campo('jugador', 'Jugador', { ph: 'Ej.: Lamine Yamal', ayuda: 'Escríbelo como sale en el PES. Si está en la Liga Máster de la web, elígelo de la lista.', lista: 'sugerencias', ancho: true })}
         ${campo('desde', 'Sale de (equipo)', { ph: 'Ej.: FC Barcelona', ayuda: 'Su club, no su selección. Escribe y elige de la lista (5 grandes ligas).', lista: 'clubes-desde' })}
@@ -67,6 +69,7 @@ registrarTipo({
       <details class="cf-avanzado"><summary>Ids de PES (opcional)</summary>
         <p class="cf-ayuda">Si no los sabes, déjalos vacíos: cada PC lo busca por el nombre en su propia base.</p>
         <div class="cf-rejilla">${campo('jugador_id', 'Id del jugador', { modo: 'numeric', max: 8 })}${campo('desde_id', 'Id del equipo de origen', { modo: 'numeric', max: 8 })}${campo('hasta_id', 'Id del equipo de destino', { modo: 'numeric', max: 8 })}</div>
+      </details>
       </details>
       <div id="cf-lm" class="cf-lm" ${incluyeLm(ctx.destino) ? '' : 'hidden'}>
         <p class="cf-subtitulo">Liga Máster</p>
@@ -117,11 +120,16 @@ registrarTipo({
   leer(ctx) {
     const lm = incluyeLm(ctx.destino);
     if (lm && !v('lm_club_id').value) throw new Error('Elige el club de Liga Máster al que va.');
-    return validarFichaje({
-      jugador: v('jugador').value, desde: v('desde').value, hasta: v('hasta').value, libre: v('libre').checked,
-      jugador_id: v('jugador_id').value, desde_id: v('desde_id').value, hasta_id: v('hasta_id').value,
-      lm_jugador_id: lm ? v('lm_jugador_id').value : '', lm_club_id: lm ? v('lm_club_id').value : '',
-    });
+    if (!v('jugador').value.trim()) throw new Error('Abre la sala de fichajes y elige al jugador (o escríbelo a mano).');
+    try { return leerCampos(lm); } catch (e) { v('amano').open = true; throw e; }   // el error habla de un campo: que se vea
   },
   limpiar() { if (!raiz) return; for (const el of raiz.querySelectorAll('input:not([type=checkbox]), select')) el.value = ''; v('libre').checked = false; v('desde').disabled = false; v('desde_id').disabled = false; },
 });
+
+function leerCampos(lm) {
+  return validarFichaje({
+    jugador: v('jugador').value, desde: v('desde').value, hasta: v('hasta').value, libre: v('libre').checked,
+    jugador_id: v('jugador_id').value, desde_id: v('desde_id').value, hasta_id: v('hasta_id').value,
+    lm_jugador_id: lm ? v('lm_jugador_id').value : '', lm_club_id: lm ? v('lm_club_id').value : '',
+  });
+}

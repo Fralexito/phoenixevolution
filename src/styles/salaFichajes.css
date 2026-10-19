@@ -21,8 +21,8 @@ html[data-tema='sudario'] .sf { --a: #f5c542; }
 .sf-pasos li[data-hecho='true'] { color: var(--a); } .sf-pasos li[data-hecho='true']::before { background: var(--a); border-color: var(--a); }
 .sf-x { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: grid; place-items: center; color: var(--tx2); border: 1px solid var(--linea); transition: color .2s, border-color .2s, transform .3s var(--curva); }
 @media (hover: hover) { .sf-x:hover { color: #fff; border-color: var(--a); transform: rotate(90deg); } }
-.sf-cuerpo { display: grid; grid-template-columns: 14.5rem minmax(0, 1fr) 23rem; min-height: 0; }
-.sf-riel { display: grid; align-content: start; gap: 1rem; padding: 1.1rem; border-right: 1px solid var(--linea); overflow-y: auto; }
+.sf-cuerpo { display: grid; grid-template-columns: 15.5rem minmax(0, 1fr) 23rem; min-height: 0; }
+.sf-riel { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 1rem; padding: 1.1rem; border-right: 1px solid var(--linea); overflow-y: auto; overflow-x: hidden; }
 .sf-buscar { display: flex; align-items: center; gap: .6rem; padding: 0 .85rem; min-height: 2.8rem; border-radius: 12px; border: 1px solid var(--linea); background: rgba(0,0,0,.28); color: var(--tx2); transition: border-color .2s, box-shadow .2s; }
 .sf-buscar:focus-within { border-color: var(--a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--a) 20%, transparent); }
 .sf-buscar input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: #fff; font-size: 14px; caret-color: var(--a); }
@@ -148,3 +148,37 @@ html[data-tema='sudario'] .sf { --a: #f5c542; }
 .sf-jug[data-linea] small { color: var(--lc); font-weight: 600; }
 .sf-bloque[data-linea] small { background: color-mix(in srgb, var(--lc) 20%, transparent); color: #fff; }
 @media (hover: hover) { .sf-bloque[data-linea]:hover, .sf-jug[data-linea]:hover { border-color: var(--lc); } .sf-jug[data-linea]:hover:not(.sf-bloque) { background: color-mix(in srgb, var(--lc) 12%, transparent); } }
+
+/* 19-oct-2026 (Fralex): sin desplazamiento lateral en la columna de ligas; logo de cada liga; el dueño (DT) bien visible; los grandes primero (JS). */
+/* El buscador heredaba el borde y el relleno de los campos de la web y se salía de la columna. */
+.sf-buscar input { width: 100%; padding: 0; border: 0; box-shadow: none; background: transparent; min-height: 0; }
+.sf-buscar input:focus { box-shadow: none; outline: none; border: 0; }
+.sf-liga { justify-content: flex-start; }
+.sf-liga-nombre { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf-liga-logo { flex: none; width: calc(var(--px) + 8px); height: calc(var(--px) + 8px); display: grid; place-items: center; border-radius: 8px; background: #f4f5fb; box-shadow: 0 1px 0 rgba(255,255,255,.15) inset, 0 2px 6px rgba(0,0,0,.35); }
+.sf-liga-logo img { width: var(--px); height: var(--px); object-fit: contain; }
+.sf-liga[aria-pressed='true'] .sf-liga-logo { box-shadow: 0 0 0 2px var(--a), 0 2px 8px rgba(0,0,0,.4); }
+
+/* Etiqueta del DT (usuario dueño del club) */
+.sf-dueno { display: inline-flex; align-items: center; gap: .45rem; max-width: 100%; padding: .2rem .6rem .2rem .2rem; border-radius: 999px; background: color-mix(in srgb, var(--a) 16%, rgba(10,8,30,.9)); border: 1px solid color-mix(in srgb, var(--a) 55%, transparent); color: #fff; }
+.sf-dueno-av { flex: none; width: 1.65rem; height: 1.65rem; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: #2a2150; font-size: 10px; font-weight: 700; }
+.sf-dueno-av img { width: 100%; height: 100%; object-fit: cover; } .sf-dueno-av em { font-style: normal; }
+.sf-dueno-tx { display: grid; min-width: 0; line-height: 1.1; text-align: left; }
+.sf-dueno-tx small { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--a); }
+.sf-dueno-tx b { font-size: 12.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf-dueno[data-tuyo='true'] { background: color-mix(in srgb, #34d399 18%, rgba(10,8,30,.9)); border-color: color-mix(in srgb, #34d399 60%, transparent); }
+.sf-dueno[data-tuyo='true'] .sf-dueno-tx small { color: #34d399; }
+/* En la tarjeta del club: abajo, a todo lo ancho, y la tarjeta se marca */
+.sf-club .sf-dueno { margin-top: .25rem; }
+.sf-club[data-con-dt] { border-color: color-mix(in srgb, var(--a) 35%, var(--linea)); }
+/* En la lista del buscador: el jugador de un club con DT se nota */
+.sf-jug[data-con-dt] .sf-dueno { flex: none; max-width: 9.5rem; padding-right: .55rem; }
+.sf-jug[data-con-dt] { box-shadow: inset 3px 0 0 var(--a); }
+/* En la cabecera de la plantilla */
+.sf-pl-cab .sf-dueno { margin-left: auto; }
+@media (max-width: 960px) { .sf-liga-logo { --px: 18px; } .sf-jug[data-con-dt] .sf-dueno { max-width: 7rem; } }
+/* El cuadro entero (.sf-buscar:focus-within) ya muestra el foco: sin el segundo contorno dentro. */
+.sf .sf-buscar input:focus-visible { outline: none; }
+/* Fila del buscador con DT: 4 columnas (cara, nombre, DT, escudo). «.sf-jug span:not(.sf-av)» ponía la etiqueta en vertical. */
+.sf-jug[data-con-dt] { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+.sf-jug span.sf-dueno { display: inline-flex; } .sf-jug span.sf-dueno-av { display: grid; }

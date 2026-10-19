@@ -80,3 +80,21 @@ export function emparejarClubesLm(clubesLm, lista = CLUBES_PES) {
   }
   return r;
 }
+
+// Los «grandes» de cada liga primero (Fralex, 19-oct-2026: «que los clubes más tops de cada liga aparezcan primero»). Orden por
+// peso deportivo reciente (títulos y Champions); el resto va detrás en orden alfabético. Ids del catálogo src/data/clubesPes.js.
+const GRANDES = [
+  173, 101, 103, 102, 100, 179, 106, 107,             // Premier: City, Arsenal, Liverpool, Chelsea, United, Tottenham, Newcastle, Villa
+  109, 108, 172, 258, 267, 196, 194, 265, 110,        // LaLiga: Madrid, Barça, Atleti, Athletic, Villarreal, Real Sociedad, Betis, Sevilla, Valencia
+  119, 327, 120, 121, 234, 125, 122, 124, 186,        // Serie A: Inter, Napoli, Juve, Milan, Atalanta, Roma, Lazio, Fiorentina, Bologna
+  127, 126, 128, 226,                                 // Bundesliga: Bayern, Dortmund, Leverkusen, Frankfurt
+  114, 113, 112, 213, 181, 217, 182, 218,             // Ligue 1: PSG, Marsella, Mónaco, Lille, Lyon, Niza, Lens, Rennes
+];
+const PUESTO = new Map(GRANDES.map((id, i) => [id, i]));
+/** Copia de la lista con los grandes primero (en su orden) y el resto alfabético. */
+export const ordenarPorPrestigio = (lista = []) => [...lista].sort((a, b) =>
+  (PUESTO.get(a.id) ?? 1e9) - (PUESTO.get(b.id) ?? 1e9) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+
+// Logos de las ligas (de crests.football-data.org, igual que los escudos; guardados en public/ligas/). Liga Máster = logo de Phoenix.
+const LOGO_LIGA = { 'Premier League': 'ligas/PL.png', LaLiga: 'ligas/PD.png', 'Serie A': 'ligas/SA.png', Bundesliga: 'ligas/BL1.png', 'Ligue 1': 'ligas/FL1.png', 'Liga Máster': 'logo.webp' };
+export const logoLigaUrl = (liga) => (LOGO_LIGA[liga] ? `${import.meta.env?.BASE_URL ?? '/'}${LOGO_LIGA[liga]}` : null);

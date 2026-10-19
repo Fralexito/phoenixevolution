@@ -3,7 +3,8 @@
 // Liga Máster: quien pierde al jugador y quien lo recibe. No guarda nada: devuelve la elección y el formulario rellena sus campos.
 // Datos: src/data/clubesPes.js (clubes) · plantillasPes.js (plantillas, del parche) · datosSala.js (Liga Máster de la web).
 import { CLUBES_PES } from '../../../data/clubesPes.js';
-import { buscarClubes, escudoImg, escudoUrl, paisDe, agruparPlantilla, buscarJugadoresPes, lineaDe } from '../../core/pes/clubesPes.js';
+import { buscarClubes, escudoImg, escudoUrl, paisDe, agruparPlantilla, buscarJugadoresPes, lineaDe, ordenarPorPrestigio, logoLigaUrl } from '../../core/pes/clubesPes.js';
+import { getState } from '../../core/sistema/session.js';
 import { escapeHTML as esc } from '../../core/sistema/dom.js';
 import { minifaceUrl, montarFotos } from '../fotoFutbolista.js';
 import { cargarPlantillas, cargarLm } from './datosSala.js';
@@ -24,6 +25,14 @@ function insigniaDt(lm) {
   const a = lm.dt.avatar ? `<img src="${esc(lm.dt.avatar)}" alt="" referrerpolicy="no-referrer">` : `<em>${esc(iniciales(lm.dt.nombre))}</em>`;
   return `<span class="sf-dt" title="DT: ${esc(lm.dt.nombre)}">${a}</span>`;
 }
+/** Etiqueta GRANDE con el usuario que dirige el club (Fralex: «que sea más evidente qué usuario es dueño del club»). Si eres tú: «Tu club». */
+function chipDueno(lm, { corto = false } = {}) {
+  if (!lm?.dt) return '';
+  const tuyo = Boolean(lm.dt.id) && lm.dt.id === getState().user?.id;
+  const cara = lm.dt.avatar ? `<img src="${esc(lm.dt.avatar)}" alt="" referrerpolicy="no-referrer">` : `<em>${esc(iniciales(lm.dt.nombre))}</em>`;
+  return `<span class="sf-dueno" data-tuyo="${tuyo}" title="DT: ${esc(lm.dt.nombre)}"><span class="sf-dueno-av">${cara}</span><span class="sf-dueno-tx">${corto ? '' : '<small>DT</small>'}<b>${tuyo ? 'Tu club' : esc(lm.dt.nombre)}</b></span></span>`;
+}
+const logoLiga = (liga, px = 22) => { const u = logoLigaUrl(liga); return u ? `<span class="sf-liga-logo" style="--px:${px}px"><img src="${u}" alt="" loading="lazy" decoding="async"></span>` : ''; };
 
 /** Abre la sala. Devuelve una promesa con { jugador, destino, lm, dtOrigen, dtDestino } o null si se cierra sin elegir.
  *  Opciones: soloLm = el destino tiene que ser un club de la Liga Máster; jugador/etapa = empezar con alguien ya elegido. */
@@ -67,15 +76,15 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
     function pintarLigas() {
       const n = (l) => CLUBES_PES.filter((c) => c.liga === l).length;
       const items = [...LIGAS.map((l) => ({ id: l, n: n(l) })), { id: LM, n: st.lm.clubes.size }];
-      $('[data-ligas]').innerHTML = items.map((l) => `<button type="button" class="sf-liga" data-liga="${esc(l.id)}" aria-pressed="${l.id === st.liga && !st.texto}"><span>${esc(l.id)}</span><em>${l.n}</em></button>`).join('');
+      $('[data-ligas]').innerHTML = items.map((l) => `<button type="button" class="sf-liga" data-liga="${esc(l.id)}" aria-pressed="${l.id === st.liga && !st.texto}">${logoLiga(l.id)}<span class="sf-liga-nombre">${esc(l.id)}</span><em>${l.n}</em></button>`).join('');
     }
     function tarjetaClub(c, i) {
       const lm = lmDe(c.id);
       const bloqueado = st.etapa === 'destino' && (c.id === st.jugador?.clubId || (soloLm && !lm));
       const sel = (st.etapa === 'jugador' && st.clubVer === c.id) || (st.etapa === 'destino' && st.destino === c.id);
       const motivo = c.id === st.jugador?.clubId && st.etapa === 'destino' ? 'Aquí juega ahora' : bloqueado ? 'No está en la Liga Máster' : '';
-      return `<button type="button" class="sf-club" data-club="${c.id}" style="--i:${Math.min(i, 30)}" aria-pressed="${sel}" ${bloqueado ? 'disabled' : ''}${motivo ? ` title="${motivo}"` : ''}>
-        <span class="sf-esc">${escudoImg(c, 56)}</span><b>${esc(c.nombre)}</b><small>${esc(c.liga)}</small>${insigniaDt(lm)}${motivo === 'Aquí juega ahora' ? '<span class="sf-aqui">Origen</span>' : ''}</button>`;
+      return `<button type="button" class="sf-club" data-club="${c.id}"${lm?.dt ? ' data-con-dt' : ''} style="--i:${Math.min(i, 30)}" aria-pressed="${sel}" ${bloqueado ? 'disabled' : ''}${motivo ? ` title="${motivo}"` : ''}>
+        <span class="sf-esc">${escudoImg(c, 56)}</span><b>${esc(c.nombre)}</b><small>${esc(c.liga)}</small>${lm?.dt ? chipDueno(lm) : insigniaDt(lm)}${motivo === 'Aquí juega ahora' ? '<span class="sf-aqui">Origen</span>' : ''}</button>`;
     }
     function pintarCentro() {
       const c = $('[data-centro]');
@@ -85,10 +94,10 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
         const clubes = buscarClubes(texto, { max: 6 });
         const jugs = st.etapa === 'jugador' ? buscarJugadoresPes(texto, st.plantillas, { max: 18 }) : [];
         html += clubes.length ? `<h3 class="sf-h">Clubes</h3><div class="sf-rejilla">${clubes.map(tarjetaClub).join('')}</div>` : '';
-        html += jugs.length ? `<h3 class="sf-h">Jugadores</h3><ul class="sf-lista">${jugs.map((j, i) => `<li><button type="button" class="sf-jug" data-linea="${lineaDe(j.pos)}" data-pid="${j.pid}" data-club="${j.clubId}" style="--i:${i}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)} · ${esc(porId.get(j.clubId)?.nombre ?? '')}</small></span>${escudoImg(porId.get(j.clubId), 26)}</button></li>`).join('')}</ul>` : '';
+        html += jugs.length ? `<h3 class="sf-h">Jugadores</h3><ul class="sf-lista">${jugs.map((j, i) => { const dl = lmDe(j.clubId); return `<li><button type="button" class="sf-jug" data-linea="${lineaDe(j.pos)}" data-pid="${j.pid}" data-club="${j.clubId}"${dl?.dt ? ' data-con-dt' : ''} style="--i:${i}">${avatar(j, 44)}<span><b>${esc(j.nombre)}</b><small>${esc(j.pos)} · ${esc(porId.get(j.clubId)?.nombre ?? '')}</small></span>${chipDueno(dl)}${escudoImg(porId.get(j.clubId), 26)}</button></li>`; }).join('')}</ul>` : '';
         if (!clubes.length && !jugs.length) html = `<p class="sf-vacio">Nada con «${esc(texto)}». Prueba con otra parte del nombre.</p>`;
       } else {
-        const lista = st.liga === LM ? CLUBES_PES.filter((x) => st.lm.clubes.has(x.id)) : CLUBES_PES.filter((x) => x.liga === st.liga);
+        const lista = ordenarPorPrestigio(st.liga === LM ? CLUBES_PES.filter((x) => st.lm.clubes.has(x.id)) : CLUBES_PES.filter((x) => x.liga === st.liga));
         html = `<h3 class="sf-h">${st.etapa === 'jugador' ? 'Elige el club del jugador' : 'Elige el club al que va'}</h3>
           ${lista.length ? `<div class="sf-rejilla">${lista.map(tarjetaClub).join('')}</div>` : '<p class="sf-vacio">Ningún club de la Liga Máster cargó todavía.</p>'}
           ${st.liga === 'Bundesliga' ? '<p class="sf-nota">Tu parche solo trae 4 clubes de la Bundesliga: PES no la licencia entera.</p>' : ''}`;
@@ -114,7 +123,7 @@ export function abrirSala({ soloLm = false, jugador = null } = {}) {
             <div class="sf-vista" role="group" aria-label="Forma de ver la plantilla"><button type="button" data-vista="lista" aria-pressed="${st.vista === 'lista'}" aria-label="Ver en lista" title="Lista"><i class="fa-solid fa-list" aria-hidden="true"></i></button><button type="button" data-vista="bloques" aria-pressed="${st.vista === 'bloques'}" aria-label="Ver en bloques" title="Bloques"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button></div></div>` : '';
         l.dataset.abierto = '1';
         l.innerHTML = `<div class="sf-plantilla"><div class="sf-pl-cab"><button type="button" class="sf-atras" data-atras aria-label="Volver a los clubes"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button>${escudoImg(club, 48)}
-          <div><h3>${esc(club.nombre)}</h3><p>${esc(club.liga)} · ${esc(paisDe(club))}${lm ? ` · ${lm.dt ? `DT ${esc(lm.dt.nombre)}` : 'lo lleva la IA'}` : ''}</p></div></div>${filtros}
+          <div><h3>${esc(club.nombre)}</h3><p>${esc(club.liga)} · ${esc(paisDe(club))}${lm && !lm.dt ? ' · lo lleva la IA' : ''}</p></div>${chipDueno(lm)}</div>${filtros}
           <div class="sf-pl-cuerpo" data-vista-actual="${st.vista}">${visibles.map((g) => `<h4 class="sf-h" data-linea="${esc(g.linea)}">${esc(g.nombre)}</h4><ul class="sf-lista ${st.vista === 'bloques' ? 'sf-lista-bloques' : ''}">${g.jugadores.map(fila).join('')}</ul>`).join('') || '<p class="sf-vacio">Este club no tiene plantilla en tu parche.</p>'}</div></div>`;
         return;
       }
