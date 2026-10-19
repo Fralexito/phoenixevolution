@@ -15,8 +15,9 @@
 /* ── Luz de fondo (colores del club) ── */
 .esc-luz { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 .esc-luz i { position: absolute; width: 62vmax; height: 62vmax; border-radius: 999px; opacity: .5; }
-.esc-luz i:nth-child(1) { left: -12%; top: -38%; background: radial-gradient(circle, color-mix(in srgb, var(--esc-c1) 34%, transparent), transparent 62%); }
-.esc-luz i:nth-child(2) { right: -16%; bottom: -46%; background: radial-gradient(circle, color-mix(in srgb, var(--esc-c2) 34%, transparent), transparent 62%); }
+/* Anclados a la pantalla (vmax/svh), no a la altura de la portada: si la portada crece al cargar, las luces no se mueven (eso era un «salto» CLS de 0,36). */
+.esc-luz i:nth-child(1) { left: -12%; top: -24vmax; background: radial-gradient(circle, color-mix(in srgb, var(--esc-c1) 34%, transparent), transparent 62%); }
+.esc-luz i:nth-child(2) { right: -16%; top: calc(100svh - 34vmax); background: radial-gradient(circle, color-mix(in srgb, var(--esc-c2) 34%, transparent), transparent 62%); }
 
 /* ── Escenario ── */
 .esc { position: relative; z-index: 1; display: grid; justify-items: center; gap: 1.75rem; width: 100%; max-width: 64rem; margin-inline: auto; padding-block: 1.5rem; text-align: center; }
