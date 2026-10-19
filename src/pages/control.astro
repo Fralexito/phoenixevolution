@@ -1,0 +1,53 @@
+---
+// Centro de control del staff (Fralex, 19-oct-2026). Lógica: js/pages/control.js (solo lee) · core/sistema/centroControl.js (puro, con pruebas).
+// Estilos SOLO de esta página (no se suman a global.css).
+import Layout from '../layouts/Layout.astro';
+import '../styles/control.css';
+---
+<Layout title="Centro de control" active="control">
+  <div class="cc max-w-6xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-5">
+    <header class="glass-panel px-4 py-3 rounded-2xl cc-cab">
+      <div class="min-w-0">
+        <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Staff · <span id="cc-rol">—</span></span>
+        <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-gauge-high text-galaxy-400 mr-2"></i>Centro de control</h1>
+        <p class="text-gray-300 text-xs mt-0.5">Todo lo que espera al staff, con su plazo y un enlace al sitio donde se resuelve. Esta página solo mira: no cambia nada.</p>
+      </div>
+      <div class="cc-cab-der"><span id="cc-hora" class="text-[12px] text-gray-400"></span><button type="button" id="cc-actualizar" class="btn btn-ghost !min-h-9 !text-xs"><i class="fa-solid fa-rotate"></i> Actualizar</button></div>
+    </header>
+
+    <div id="cc-sinsesion" hidden class="glass-panel rounded-2xl p-8 text-center text-gray-400 text-sm">Inicia sesión para continuar.</div>
+    <div id="cc-denegado" hidden class="glass-panel rounded-2xl p-8 text-center text-sm">
+      <p class="text-white font-display font-bold uppercase tracking-wider"><i class="fa-solid fa-lock text-galaxy-400 mr-2"></i>Esta página es para el staff</p>
+      <p class="text-gray-400 mt-1">Si eres árbitro, tus partidos están en <a class="text-galaxy-400 underline" href={`${import.meta.env.BASE_URL}mis-partidos/`}>Mis partidos</a>.</p>
+    </div>
+
+    <div id="cc-app" hidden class="space-y-6">
+      <section id="cc-resumen" class="cc-resumen" data-nivel="cargando" aria-live="polite">
+        <p data-frase>Revisando lo pendiente…</p>
+        <div data-cifras class="cc-cifras"></div>
+      </section>
+
+      <div id="cc-tarjetas" class="space-y-5"></div>
+
+      <div class="cc-org">
+        <section class="glass-panel rounded-2xl p-4 space-y-3" aria-labelledby="cc-h-hoy">
+          <h2 id="cc-h-hoy" class="cc-h2"><i class="fa-solid fa-list-check text-galaxy-400 mr-2"></i>Hoy toca · <span id="cc-hoy-dia"></span></h2>
+          <p class="text-[12px] text-gray-400">La semana tipo del staff. Lo que marques se recuerda solo hoy y solo en este navegador.</p>
+          <ul id="cc-hoy" class="cc-hoy"></ul>
+        </section>
+        <section class="glass-panel rounded-2xl p-4 space-y-3" aria-labelledby="cc-h-acc">
+          <h2 id="cc-h-acc" class="cc-h2"><i class="fa-solid fa-bolt text-galaxy-400 mr-2"></i>Herramientas de tu rol</h2>
+          <div id="cc-accesos" class="cc-accesos"></div>
+        </section>
+      </div>
+
+      <section class="space-y-3" aria-labelledby="cc-h-eq">
+        <h2 id="cc-h-eq" class="cc-h2"><i class="fa-solid fa-people-group text-galaxy-400 mr-2"></i>El equipo</h2>
+        <div id="cc-equipo" class="cc-equipo"><p class="text-xs text-gray-400">Cargando el equipo…</p></div>
+      </section>
+    </div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/control.js';
+</script>

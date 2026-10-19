@@ -28,7 +28,7 @@ function insigniaDt(lm) {
 /** Etiqueta GRANDE con el usuario que dirige el club (Fralex: «que sea más evidente qué usuario es dueño del club»). Si eres tú: «Tu club». */
 function chipDueno(lm, { corto = false } = {}) {
   if (!lm?.dt) return '';
-  const tuyo = Boolean(lm.dt.id) && lm.dt.id === getState().user?.id;
+  const tuyo = Boolean(lm.dt.id) && lm.dt.id === getState().session?.user?.id;
   const cara = lm.dt.avatar ? `<img src="${esc(lm.dt.avatar)}" alt="" referrerpolicy="no-referrer">` : `<em>${esc(iniciales(lm.dt.nombre))}</em>`;
   return `<span class="sf-dueno" data-tuyo="${tuyo}" title="DT: ${esc(lm.dt.nombre)}"><span class="sf-dueno-av">${cara}</span><span class="sf-dueno-tx">${corto ? '' : '<small>DT</small>'}<b>${tuyo ? 'Tu club' : esc(lm.dt.nombre)}</b></span></span>`;
 }

@@ -55,6 +55,7 @@ const ACCOUNT_NAV_BASE = [
   { id: 'torneos',  label: 'Torneos',      path: 'torneos/',       icon: 'fa-trophy', grupo: 'comunidad' },
   { id: 'miclub',   label: 'Mi club',      path: 'mi-club/',       icon: 'fa-shirt', grupo: 'jugar', ...(FX.clubUnificado ? { menu: false } : {}) },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/sistema/roles.js); se muestra u oculta al iniciar sesión.
+  { id: 'control', label: 'Centro de control', path: 'control/', icon: 'fa-gauge-high', staff: 'verReportes', grupo: 'staff' },   // 19-oct-2026: lo pendiente del staff de un vistazo (js/pages/control.js)
   { id: 'moderacion', label: 'Moderación', path: 'moderacion/',    icon: 'fa-shield-halved',  staff: 'verReportes', grupo: 'staff' },
   { id: 'panel', label: 'Panel del sitio', path: 'panel/', icon: 'fa-sliders', staff: 'verAuditoriaCompleta', grupo: 'staff' },
   { id: 'auditoria', label: 'Auditoría',   path: 'auditoria/',     icon: 'fa-clipboard-list', staff: 'verAuditoria', grupo: 'staff' },
