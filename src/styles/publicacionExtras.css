@@ -1,0 +1,15 @@
+/* EXTRAS de una publicación (19-oct-2026, migración 133; lo dibuja js/features/muro/extras.js). Global: se ven en Social, Comunidad,
+   Guardados, Buscar y Perfil. Fondo de color para textos cortos (Facebook), galería de 2–4 fotos (Instagram) y «se siente…» (Facebook). */
+.px-siente { display: flex; align-items: center; gap: .35rem; margin-bottom: .35rem; font-size: 13px; color: #a3acbf; }
+.px-siente b { color: #e8ecf3; font-weight: 600; }
+.px-siente-e { font-size: 1.05rem; line-height: 1; }
+.px-fondo { display: grid; place-items: center; min-height: 13rem; margin-top: .25rem; padding: 2rem 1.5rem; border-radius: 1rem; text-align: center; overflow: hidden; }
+.px-fondo p { max-width: 32ch; font: 800 clamp(1.25rem, 3.2vw, 1.65rem)/1.3 var(--font-sans); color: #fff; text-shadow: 0 2px 14px rgb(0 0 0 / .45); overflow-wrap: anywhere; }
+.px-fondo a { color: #fff; text-decoration: underline; }
+.px-galeria { display: grid; gap: 3px; margin-top: .5rem; border-radius: 1rem; overflow: hidden; grid-template-columns: 1fr 1fr; }
+.px-galeria a { display: block; position: relative; aspect-ratio: 1; background: #0b0a1a; }
+.px-galeria img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s cubic-bezier(.23, 1, .32, 1), filter .2s ease; }
+@media (hover: hover) and (pointer: fine) { .px-galeria a:hover img { transform: scale(1.03); filter: brightness(1.06); } }
+.px-galeria[data-n='2'] a { aspect-ratio: 4 / 5; }
+.px-galeria[data-n='3'] a:first-child { grid-row: span 2; aspect-ratio: auto; }
+.px-galeria[data-n='4'] a { aspect-ratio: 1; }

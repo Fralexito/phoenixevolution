@@ -208,7 +208,7 @@ document.querySelector('.sxr')?.addEventListener('click', (e) => {
   const j = e.target.closest('[data-j]'); if (j) { irAVista('recientes', j.dataset.j); return; }
   const ir = e.target.closest('[data-sxr-ir]');
   if (ir) { e.preventDefault(); const el = feedEl.querySelector(`[data-pub="${Number(ir.dataset.sxrIr)}"]`); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('sxr-resalta'); setTimeout(() => el.classList.remove('sxr-resalta'), 1600); } return; }
-  if (e.target.closest('[data-sxr-crear]')) { compEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => compEl.querySelector('textarea, [contenteditable], input, button')?.focus({ preventScroll: true }), 400); }
+  if (e.target.closest('[data-sxr-crear]')) { S.compositor?.abrir?.(); }
 });
 // Vista «Tarjetas» o «Compacta» (como el selector de vista de los foros); se recuerda en este navegador.
 const KEY_MODO = 'pes-social-modo';
@@ -267,7 +267,7 @@ feedEl.addEventListener('click', (e) => {
   const mas = e.target.closest('[data-leer-mas]');
   if (mas) { e.stopPropagation(); const cuerpo = mas.parentElement.querySelector('.sx-post-cuerpo'); const abierto = cuerpo.dataset.largo === 'abierto'; cuerpo.dataset.largo = abierto ? '1' : 'abierto'; mas.setAttribute('aria-expanded', String(!abierto)); mas.textContent = abierto ? 'Leer más' : 'Leer menos'; return; }
   if (e.target.closest('[data-sxr-entrar]')) { e.stopPropagation(); openAuthModal('login'); return; }
-  if (e.target.closest('[data-sxr-crear]')) { e.stopPropagation(); compEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => compEl.querySelector('textarea, [contenteditable], input, button')?.focus({ preventScroll: true }), 400); }
+  if (e.target.closest('[data-sxr-crear]')) { e.stopPropagation(); S.compositor?.abrir?.(); }
 }, true);
 feedEl.addEventListener('submit', (e) => { const form = e.target.closest('[data-responder]'); if (form) { e.preventDefault(); enviarRespuesta(form); } });
 

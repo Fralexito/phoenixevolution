@@ -46,3 +46,4 @@
 /* Rendimiento (18-oct-2026): el contenido de muchas páginas llega por JS; sin esto el pie de página aparecía arriba y luego
    «saltaba» hacia abajo (Lighthouse medía hasta 0.5 de CLS). Con el main al menos de una pantalla, el pie ya nace fuera de la vista. */
 main.flex-grow { min-height: 100vh; }
+@import './publicacionExtras.css';   /* fondo, galería y «se siente…» de las publicaciones (migración 133) */

@@ -3,6 +3,7 @@
 import { escapeHTML, safeImg } from '../../core/sistema/dom.js';
 import { href } from '../../core/sistema/config.js';
 import { analizarVideo, PROVEEDOR_ETIQUETA, resumenReto, tiempoRelativo, textoAHTML, etiquetaSegmento } from '../../core/comunidad/muro.js';
+import { extraDe, llevaFondo, sentimientoHTML, textoConFondoHTML, galeriaHTML } from './extras.js';   // fondo, sentimiento y varias fotos (migración 133)
 
 /** Etiqueta pequeña del segmento (juego) de una publicación o clip; '' si es general. */
 export const segmentoChipHTML = (id) => (etiquetaSegmento(id) ? `<span class="inline-block text-[12px] leading-none rounded-full border border-galaxy-border/80 text-gray-400 px-2 py-1">${escapeHTML(etiquetaSegmento(id))}</span>` : '');
@@ -26,8 +27,8 @@ export function retoHTML(reto) {
 }
 
 /** Foto y/o video de una publicación. YouTube: miniatura que carga el reproductor al tocarla (no se carga nada de YouTube hasta que quieras). Resto: tarjeta con enlace. */
-export function mediosHTML(it) {
-  const img = safeImg(it.imagen_url) ? `<a href="${escapeHTML(safeImg(it.imagen_url))}" target="_blank" rel="noopener noreferrer" class="block mt-2"><img src="${escapeHTML(safeImg(it.imagen_url))}" alt="Foto de la publicación" loading="lazy" referrerpolicy="no-referrer" class="rounded-xl w-full max-h-[28rem] object-cover border border-galaxy-border"></a>` : '';
+export function mediosHTML(it, ex = extraDe(it.id)) {
+  const img = galeriaHTML(it.imagen_url, ex) || (safeImg(it.imagen_url) ? `<a href="${escapeHTML(safeImg(it.imagen_url))}" target="_blank" rel="noopener noreferrer" class="block mt-2"><img src="${escapeHTML(safeImg(it.imagen_url))}" alt="Foto de la publicación" loading="lazy" referrerpolicy="no-referrer" class="rounded-xl w-full max-h-[28rem] object-cover border border-galaxy-border"></a>` : '');
   const v = it.video_url ? analizarVideo(it.video_url) : null;
   let vid = '';
   if (v?.ok && v.proveedor === 'propio') {
@@ -44,7 +45,11 @@ export function mediosHTML(it) {
 }
 
 /** Todo el contenido de una publicación (texto + foto + video + duelo). */
-export const contenidoHTML = (it) => `${it.texto ? `<p class="text-sm text-gray-100 leading-relaxed">${textoAHTML(it.texto)}</p>` : ''}${mediosHTML(it)}${retoHTML(it.reto)}`;
+export const contenidoHTML = (it) => {
+  const ex = extraDe(it.id); const txt = it.texto ? textoAHTML(it.texto) : '';
+  const cuerpo = llevaFondo(it, ex) ? textoConFondoHTML(txt, ex) : (txt ? `<p class="text-sm text-gray-100 leading-relaxed">${txt}</p>` : '');
+  return `${sentimientoHTML(ex)}${cuerpo}${mediosHTML(it, ex)}${retoHTML(it.reto)}`;
+};
 
 /** Reproductor de YouTube que reemplaza a la miniatura (solo ids válidos de 11 caracteres). */
 export function reproductorYT(el) {

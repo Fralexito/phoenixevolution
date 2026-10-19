@@ -4,6 +4,7 @@ import { toast } from '../../core/sistema/toast.js';
 import { porcentajes, textoCierre } from '../../core/comunidad/encuesta.js';
 import { onSession } from '../../core/sistema/session.js';
 import * as api from './api.js';
+import { cargarExtras } from '../muro/extras.js';
 
 const cache = new Map();            // id de publicación → encuesta
 let hayVoto = false;                // ¿hay sesión? (sin sesión se muestran las opciones sin poder votar)
@@ -11,7 +12,8 @@ onSession(({ session }) => { hayVoto = !!session; });
 
 export const encuestaDe = (postId) => cache.get(Number(postId)) ?? null;
 /** Pide el estado de estas publicaciones (se suma a lo conocido). Nunca lanza. */
-export async function cargarEncuestas(ids) { const m = await api.encuestasDe(ids); for (const [k, v] of m) cache.set(k, v); }
+// Los EXTRAS de cada publicación (fondo, sentimiento, varias fotos; migración 133) viajan aquí: las mismas páginas que piden encuestas los necesitan.
+export async function cargarEncuestas(ids) { const [m] = await Promise.all([api.encuestasDe(ids), cargarExtras(ids)]); for (const [k, v] of m) cache.set(k, v); }
 
 /** HTML de la encuesta de esa publicación ('' si no tiene). */
 export function encuestaHTML(postId) {

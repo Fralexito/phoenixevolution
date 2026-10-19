@@ -7,6 +7,7 @@
 import Layout from '../layouts/Layout.astro';
 // CSS propio de esta página (no va en global.css). DESPUÉS de Layout: así gana a global.css.
 import '../styles/socialHilo.css';
+import '../styles/publicar.css';   // la ventana «Crear publicación» (features/muro/compositor.js)
 import Plegable from '../components/Plegable.astro';
 const base = import.meta.env.BASE_URL;
 const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-group', 'Amigos'], ['mensajes/', 'fa-comments', 'Mensajes'], ['guardados/', 'fa-bookmark', 'Guardados'], ['buscar/', 'fa-magnifying-glass', 'Buscar']];

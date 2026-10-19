@@ -26,3 +26,31 @@ export const REACCION_ANTIGUA = { fuego: '🔥', gg: '🤝', aplauso: '👏', ri
 
 /** Segmentos por juego (opcionales). El id lo valida la BD (muro_publicaciones.juego / muro_clips.juego, migración 027). Sin segmento = «general». */
 export const SEGMENTOS = [['pes', 'PES 2021'], ['sp', 'SP Football Life'], ['fifa', 'FIFA'], ['eafc', 'EA FC'], ['efootball', 'eFootball']];
+
+// ── Publicar como en una red social (19-oct-2026, migración 133: muro_publicaciones.extra) ──
+/** Fondos para textos cortos (como los de Facebook). El id lo guarda la BD (solo a-z, 0-9 y guion); el dibujo vive aquí. */
+export const FONDOS_POST = [
+  { id: 'galaxia', label: 'Galaxia', css: 'radial-gradient(120% 120% at 20% 10%, #7c3aed 0%, #2a0a5e 50%, #070314 100%)' },
+  { id: 'neon', label: 'Neón', css: 'linear-gradient(135deg, #00e5ff 0%, #7c3aed 100%)' },
+  { id: 'atardecer', label: 'Atardecer', css: 'linear-gradient(135deg, #f97316 0%, #db2777 55%, #7c3aed 100%)' },
+  { id: 'cesped', label: 'Césped', css: 'repeating-linear-gradient(90deg, #15803d 0 34px, #166534 34px 68px)' },
+  { id: 'estadio', label: 'Estadio de noche', css: 'radial-gradient(90% 70% at 50% 0%, #fef9c3 0%, #0f766e 30%, #022c22 100%)' },
+  { id: 'fuego', label: 'Fuego', css: 'linear-gradient(135deg, #7f1d1d 0%, #ea580c 55%, #fbbf24 100%)' },
+  { id: 'hielo', label: 'Hielo', css: 'linear-gradient(135deg, #0c4a6e 0%, #0ea5e9 60%, #bae6fd 100%)' },
+  { id: 'oro', label: 'Trofeo', css: 'linear-gradient(135deg, #451a03 0%, #b45309 50%, #fcd34d 100%)' },
+  { id: 'carmesi', label: 'Carmesí', css: 'linear-gradient(135deg, #1c0a14 0%, #9f1239 60%, #f43f5e 100%)' },
+  { id: 'medianoche', label: 'Medianoche', css: 'linear-gradient(160deg, #020617 0%, #1e1b4b 60%, #4338ca 100%)' },
+];
+/** Con fondo, el texto va grande y centrado: solo para textos cortos (como en Facebook). */
+export const FONDO_MAX_TEXTO = 200;
+/** «¿Cómo te sientes / qué estás haciendo?» (Facebook). `t` = cómo se lee: «Ana está emocionado/a 🤩». */
+export const SENTIMIENTOS = [
+  { id: 'emocionado', emoji: '🤩', t: 'emocionado' }, { id: 'feliz', emoji: '😄', t: 'feliz' }, { id: 'motivado', emoji: '💪', t: 'motivado' },
+  { id: 'orgulloso', emoji: '😎', t: 'orgulloso' }, { id: 'nervioso', emoji: '😬', t: 'nervioso' }, { id: 'picado', emoji: '😤', t: 'picado' },
+  { id: 'triste', emoji: '😢', t: 'triste' }, { id: 'agradecido', emoji: '🙏', t: 'agradecido' },
+  { id: 'jugando', emoji: '🎮', t: 'jugando', actividad: true }, { id: 'celebrando', emoji: '🏆', t: 'celebrando un triunfo', actividad: true },
+  { id: 'entrenando', emoji: '⚽', t: 'entrenando', actividad: true }, { id: 'viendo', emoji: '📺', t: 'viendo un partido', actividad: true },
+  { id: 'buscando-rival', emoji: '🎯', t: 'buscando rival', actividad: true }, { id: 'fichando', emoji: '✍️', t: 'fichando jugadores', actividad: true },
+];
+/** Fotos por publicación: la primera es la principal (imagen_url) y hasta 3 más van en extra.fotos. */
+export const FOTOS_MAX = 4;

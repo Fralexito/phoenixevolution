@@ -14,6 +14,15 @@ export const perfilPublico = (username) => rpc('perfil_publico', { p_usuario: us
 export const cargarMuro = (id, antes = null, limite = 20, juego = null) => rpc('muro_de', { p_usuario: id, p_antes: antes, p_limite: limite, ...(juego ? { p_juego: juego } : {}) });
 // Solo se envían p_imagen / p_video si existen (así sigue funcionando con la firma anterior de la función).
 export const publicar = (texto, imagen = null, video = null, reto = null, juego = null) => rpc('muro_publicar', { p_texto: texto, ...(imagen ? { p_imagen: imagen } : {}), ...(video ? { p_video: video } : {}), ...(reto ? { p_reto: reto } : {}), ...(juego ? { p_juego: juego } : {}) });
+/** Igual que publicar, más el «extra» (fondo, sentimiento, fotos adicionales; migración 133). La BD lo sanea y aplica las mismas reglas. */
+export const publicarCompleto = ({ texto, imagen = null, video = null, reto = null, juego = null, extra = null }) => rpc('muro_publicar_completo', {
+  p_texto: texto, ...(imagen ? { p_imagen: imagen } : {}), ...(video ? { p_video: video } : {}), ...(reto ? { p_reto: reto } : {}), ...(juego ? { p_juego: juego } : {}), ...(extra ? { p_extra: extra } : {}) });
+/** Extras de estas publicaciones → { "id": { fondo, sentimiento, fotos } }. Nunca lanza: sin extras, la publicación se ve como siempre. */
+export async function extrasDe(ids) {
+  const lista = [...new Set((ids ?? []).map(Number).filter((n) => Number.isInteger(n) && n > 0))].slice(0, 200); if (!lista.length) return {};
+  try { const { data, error } = await supabase.rpc('muro_extras_de', { p_publicaciones: lista }); if (error) { console.warn('[muro] extras:', error.message); return {}; } return data ?? {}; }
+  catch (e) { console.warn('[muro] extras:', e); return {}; }
+}
 export const misPartidos = () => rpc('muro_mis_partidos');   // mis duelos que puedo adjuntar (aceptados o finalizados)
 export const editar = (id, texto) => rpc('muro_editar', { p_id: id, p_texto: texto });
 /** Borra la publicación; el servidor devuelve la lista de archivos propios (foto y/o video subido) y aquí los limpio del Storage. */
