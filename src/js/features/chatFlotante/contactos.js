@@ -54,11 +54,12 @@ const leerCompacto = () => { try { return localStorage.getItem(CLAVE_COMPACTO) =
 const guardarCompacto = (v) => { try { localStorage.setItem(CLAVE_COMPACTO, v ? '1' : '0'); } catch { /* no se recuerda */ } };
 
 /** Repinta la lista SIN mover el scroll (y sin tocar el DOM si nada cambió). */
+const ultimoHTML = new WeakMap();   // lo último pintado en cada lista (antes iba en data-h: copiar todo el HTML a un atributo era lo más caro de la carga)
 function repintar(lista) {
   const html = filasHTML();
-  if (lista.dataset.h === html) return;
+  if (ultimoHTML.get(lista) === html) return;
   const top = lista.scrollTop;
-  lista.innerHTML = html; lista.dataset.h = html;
+  lista.innerHTML = html; ultimoHTML.set(lista, html);
   lista.scrollTop = top;
 }
 

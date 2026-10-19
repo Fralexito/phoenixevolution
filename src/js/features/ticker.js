@@ -25,7 +25,11 @@ function initMarquee() {
   if (!view || !base) return;
   let items; try { items = JSON.parse(view.dataset.items ?? '[]'); } catch { items = []; }
   if (!items.length) return;
-  const movil = () => window.matchMedia('(max-width: 639px)').matches;
+  const mqMovil = window.matchMedia('(max-width: 639px)');   // una sola consulta (antes se creaba una nueva en cada cuadro)
+  const movil = () => mqMovil.matches;
+  const leerFactor = () => factorTicker(document.documentElement.getAttribute('data-aj-ticker-vel'));
+  let factor = leerFactor();
+  new MutationObserver(() => { factor = leerFactor(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-aj-ticker-vel'] });
   const vivas = []; let i = 0; let pausa = false; let previo = 0; let vw = view.clientWidth;
   base.remove();                                                          // la noticia estática de respaldo (sin JS) ya no hace falta
   // Actividad real de la comunidad (FX.tickerVivo): se mezcla con las noticias fijas y se renueva cada 60 s. Si falla, quedan solo las noticias.
@@ -68,7 +72,7 @@ function initMarquee() {
   const cuadro = (t) => {
     const dt = Math.min((t - previo) / 1000, 0.1); previo = t;
     if (!pausa && vw) {
-      const vel = (movil() ? VEL_MOVIL : VEL_PC) * factorTicker(document.documentElement.getAttribute('data-aj-ticker-vel'));
+      const vel = (movil() ? VEL_MOVIL : VEL_PC) * factor;
       for (const n of vivas) { n.x -= vel * dt; n.el.style.transform = `translateX(${n.x}px)`; }
       while (vivas.length && vivas[0].x + vivas[0].w < -MARGEN_ATRAS) vivas.shift().el.remove();   // se conserva un tramo ya pasado para poder retroceder
       const u = vivas[vivas.length - 1];

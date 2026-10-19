@@ -31,21 +31,20 @@ initModoLigero();
 initSitio();
 initSidebar();
 initNavbar();
-initTicker();
 initAvatarFallback();
 initEdad();
 initWelcome();
-initLiveFeed();
-initLiveDock();
 initAvisoSancion();
-initBuscadorGlobal();
 initReveal();
-initDopamina();
-initProf3d();
 initCarruseles();
-initCartasEfecto();
-initEfectosCarta();
-initPremium();
+// Lo que no se necesita para ver la página arranca cuando ya se mostró (antes se hacía en plena carga y frenaba la primera vista,
+// sobre todo en celulares). Medido el 18-oct-2026 con Lighthouse y perfiles de CPU: ver docs/bitacoras/REVISION-GENERAL-18-OCT.md §7.
+const despues = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 2000 }) : setTimeout(f, 800));
+const seguro = (nombre, f) => () => { try { f(); } catch (e) { console.error("[boot] " + nombre + ":", e); } };
+despues(seguro('ticker', initTicker));
+despues(seguro('en vivo', () => { initLiveFeed(); initLiveDock(); }));
+despues(seguro('buscador', initBuscadorGlobal));
+despues(seguro('efectos', () => { initDopamina(); initProf3d(); initCartasEfecto(); initEfectosCarta(); initPremium(); }));
 if (FX.sinIconosWeb) initSinIconosWeb();
 if (FX.pwa) initPwa();
 if (FX.scrollSuave) initScrollSuave();
@@ -57,9 +56,11 @@ if (FX.barraLateral && document.getElementById('barra-lat')) {
   montar(); ancha.addEventListener('change', montar);
 }
 // Chat flotante (experimento): contactos + ventanitas. Se descarga aparte para no frenar la primera carga.
-if (FX.contactos) import('./features/chatFlotante/index.js').then((m) => m.initChatFlotante()).catch((e) => console.error('[boot] chat flotante:', e));
-import('./features/tirasDeslizables.js').then((m) => m.initTirasDeslizables()).catch((e) => console.error('[boot] tiras:', e));
-import('./features/pausaFueraDePantalla.js').then((m) => m.initPausaFueraDePantalla()).catch((e) => console.error('[boot] pausa fuera:', e));
+despues(() => {
+  if (FX.contactos) import('./features/chatFlotante/index.js').then((m) => m.initChatFlotante()).catch((e) => console.error('[boot] chat flotante:', e));
+  import('./features/tirasDeslizables.js').then((m) => m.initTirasDeslizables()).catch((e) => console.error('[boot] tiras:', e));
+  import('./features/pausaFueraDePantalla.js').then((m) => m.initPausaFueraDePantalla()).catch((e) => console.error('[boot] pausa fuera:', e));
+  if (FX.proximoPartido) import('./features/proximoPartido.js').then((m) => m.initProximoPartido()).catch((e) => console.error('[boot] próximo partido:', e));
+});
 if (FX.pilares) import('./features/pilares.js').then((m) => m.montarPilares()).catch((e) => console.error('[boot] pilares:', e));
-if (FX.proximoPartido) import('./features/proximoPartido.js').then((m) => m.initProximoPartido()).catch((e) => console.error('[boot] próximo partido:', e));
 initSession().catch((e) => console.error('[boot] sesión:', e));

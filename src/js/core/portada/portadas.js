@@ -12,8 +12,10 @@ const texto = (v, max = 300) => String(v ?? '').trim().slice(0, max);
 const lista = (v, n) => (Array.isArray(v) ? v : []).slice(0, n);
 
 /** Día de hoy en Lima como 'AAAA-MM-DD' (la liga vive en hora de Lima). */
+// Perú usa UTC−5 todo el año (sin horario de verano desde 1994): restar 5 h es exacto y evita cargar los datos de zonas horarias del navegador,
+// que era lo más lento de la portada de Noticias al abrirla.
 export function hoyLima(d = new Date()) {
-  try { return d.toLocaleDateString('en-CA', { timeZone: 'America/Lima' }); }
+  try { return new Date(d.getTime() - 5 * 3600e3).toISOString().slice(0, 10); }
   catch { return d.toISOString().slice(0, 10); }
 }
 

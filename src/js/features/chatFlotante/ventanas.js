@@ -141,7 +141,11 @@ export function montarVentanas() {
   alCambiar((m) => { if (m !== 'enLinea' || S.ventanas.length) pintar(); });
   // Aviso suave de mensaje nuevo en una ventana minimizada (una vez por conversación, sin sonido extra).
   alCambiar((m) => { if (m.startsWith('nuevo:')) dock.querySelector(`[data-cf-burbuja="${CSS.escape(m.slice(6))}"] .cf-burbuja`)?.animate?.([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' }); });
-  window.addEventListener('resize', () => { recalcularCaben(); medirReserva(); });
-  recalcularCaben(); pintar();
+  // Medir anchos obliga al navegador a calcular toda la página: se hace cuando ya terminó de cargar y, al cambiar el tamaño, una vez por cuadro.
+  let pendiente = 0;
+  window.addEventListener('resize', () => { if (!pendiente) pendiente = requestAnimationFrame(() => { pendiente = 0; recalcularCaben(); medirReserva(); }); });
+  pintar();
+  const tarde = window.requestIdleCallback ?? ((f) => setTimeout(f, 300));
+  tarde(() => { recalcularCaben(); pintar(); });
   // Silenciar o salir de un grupo no está aquí a propósito: se hace en Mensajes (enlace en la cabecera). Así la ventanita queda simple.
 }
