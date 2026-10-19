@@ -60,11 +60,14 @@ const enlaces = [['perfil/', 'fa-user', 'Mi muro'], ['guardados/', 'fa-bookmark'
     <aside class="sxr-der" aria-label="Sobre la comunidad">
       <section class="sxr-caja sxr-sobre">
         <div class="sxr-sobre-cab"><span class="sxr-sobre-logo" aria-hidden="true"><img src={`${base}logo.webp`} alt="" width="44" height="44" loading="lazy" decoding="async" /></span><div><h2>Phoenix Social</h2><p>La comunidad de Phoenix Evolution Series</p></div></div>
+        <p class="sxr-sobre-tx">Fotos, videos, resultados y debates de los jugadores de la liga. Publica lo tuyo, reacciona y sigue a quien quieras.</p>
       </section>
       <section class="sxr-caja" data-sxr-tend hidden><h2 class="sxr-caja-t"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Tendencias</h2><div data-sxr-tend-lista></div></section>
       <section class="sxr-caja" data-sxr-seguir-caja hidden><h2 class="sxr-caja-t">A quién seguir</h2><div data-sxr-seguir></div></section>
       <section class="sxr-caja"><h2 class="sxr-caja-t">Lo más reaccionado</h2><div data-sxr-top></div></section>
-      <p class="sxr-atajos-pie">Atajos: <kbd>J</kbd><kbd>K</kbd> moverse · <kbd>R</kbd> reaccionar · <kbd>C</kbd> respuestas · <kbd>N</kbd> publicar</p>
+      <details class="sxr-caja sxr-atajos"><summary class="sxr-caja-t">Atajos de teclado</summary>
+        <ul><li><kbd>J</kbd> <kbd>K</kbd><span>Siguiente / anterior publicación</span></li><li><kbd>R</kbd><span>Reaccionar a la elegida</span></li><li><kbd>C</kbd><span>Abrir sus respuestas</span></li><li><kbd>N</kbd><span>Crear publicación</span></li></ul>
+      </details>
     </aside>
   </div>
   <button type="button" class="sxr-arriba" data-sxr-arriba hidden aria-label="Subir y recargar las publicaciones" title="Subir y recargar"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i><i class="fa-solid fa-rotate-right sxr-arriba-giro" aria-hidden="true"></i></button>

@@ -88,6 +88,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 16:55 | (ver REGISTRO) | **Beta 1.9.1**: logos de los 5 juegos en Social (los más recientes) |
 | 17:15 | (ver REGISTRO) | **Beta 1.10.0**: auditoría completa de Social (errores, redundancias, inconsistencias) |
 | 17:22 | (ver REGISTRO) | **Beta 1.10.1**: Social menos saturado |
+| 17:27 | (ver REGISTRO) | **Beta 1.10.2**: Social como en la 1.10.0, sin saludo ni días de racha |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -287,6 +288,9 @@ Pedido: «verifica función por función y apartado por apartado y corrige todo,
 
 ### 5.21 Social menos saturado (1.10.1)
 Pedido: «la estoy sintiendo saturada… solo mejora un poco eso». Ninguna función fuera; menos cosas compitiendo: saludo en dos líneas (pulso y racha como texto), racha fuera de la barra, «Jugadas» discreto, íconos del compositor en gris, logos atenuados, sin fila de Tendencias en celular, tarjeta Phoenix sin párrafo, 3 en «Lo más reaccionado», atajos en una línea al pie.
+
+### 5.22 Social como estaba, sin saludo ni días (1.10.2)
+Fralex prefirió el aspecto de la 1.10.0: se deshizo la 1.10.1 y se quitaron el saludo con el nombre y los días de racha. Queda arriba la frase del día y el pulso de la comunidad.
 
 ---
 

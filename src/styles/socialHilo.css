@@ -152,6 +152,10 @@
 .sxr-descartar:hover { background: var(--sxr-hover); color: #fff; }
 
 /* Atajos */
+.sxr-atajos ul { display: grid; gap: .45rem; }
+.sxr-atajos li { display: flex; align-items: center; gap: .3rem; font-size: 12.5px; color: var(--sxr-tx2); }
+.sxr-atajos li span { margin-left: .35rem; }
+.sxr-atajos kbd { min-width: 1.5rem; height: 1.5rem; display: inline-grid; place-items: center; padding: 0 .35rem; border-radius: .4rem; border: 1px solid var(--sxr-linea); border-bottom-width: 2px; background: rgb(255 255 255 / .05); color: #fff; font: 700 11px var(--font-sans, inherit); }
 
 /* Cajas de la derecha: aparecen con un pequeño escalón; el feed elegido se marca con una barra */
 .sxr-der .sxr-caja { animation: sxr-sube .5s cubic-bezier(.16, 1, .3, 1) both; transition: border-color .2s; }
@@ -266,6 +270,11 @@
 .sxr-feed[data-modo='compacta'] .sx-post-av { width: 1.9rem; height: 1.9rem; }
 
 /* Atajos de teclado plegados (no ocupan la columna si no se abren) */
+.sxr-atajos > summary { list-style: none; cursor: pointer; margin: 0; display: flex; justify-content: space-between; align-items: center; }
+.sxr-atajos > summary::-webkit-details-marker { display: none; }
+.sxr-atajos > summary::after { content: ''; width: .45rem; height: .45rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s ease; }
+.sxr-atajos[open] > summary::after { transform: rotate(-135deg); }
+.sxr-atajos[open] > summary { margin-bottom: .5rem; }
 @media (prefers-reduced-motion: reduce) { .sxr-vistas-pastilla, .sx-pie .sx-btn, .sxr-filtros-btn { transition: none; } }
 /* Altura del encabezado: 98 px; en PC, al bajar, la barra de última hora se esconde y queda en 66 px (data-ticker-oculto, js/features/ticker.js). */
 @media (min-width: 768px) { html[data-cab-compacta][data-ticker-oculto] .sxr { --sxr-arriba: 4.125rem; } }
@@ -286,7 +295,14 @@
 .sxr-tag small { font-size: 12px; color: #a3acbf; }
 .sxr-tag button { flex: none; display: inline-flex; align-items: center; gap: .35rem; min-height: 2.2rem; padding: 0 .85rem; border-radius: 99px; font-size: 12.5px; font-weight: 700; color: #fff; background: rgb(255 255 255 / .1); }
 .sxr-tag button:hover { background: rgb(255 255 255 / .16); }
-/* Tendencias: lista numerada en la columna derecha (PC) */
+/* Tendencias: cápsulas en el celular, lista numerada en PC */
+.sxr-tend-movil { display: flex; align-items: center; gap: .4rem; overflow-x: auto; scrollbar-width: none; padding: .1rem 0; }
+.sxr-tend-movil[hidden] { display: none; }
+.sxr-tend-movil::-webkit-scrollbar { display: none; }
+.sxr-tend-t { flex: none; display: inline-flex; align-items: center; gap: .35rem; font: 800 .7rem var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #fb923c; }
+.sxr-tend-movil button { flex: none; min-height: 2rem; padding: 0 .8rem; border-radius: 99px; font-size: 12.5px; font-weight: 700; color: #e6eaf2; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); transition: background-color .2s ease, border-color .2s ease, transform .16s var(--sxr-e); }
+.sxr-tend-movil button:hover { border-color: var(--color-galaxy-400); } .sxr-tend-movil button:active { transform: scale(.95); }
+@media (min-width: 1200px) { .sxr-tend-movil { display: none !important; } }
 .sxr-tend-n { flex: none; width: 1.75rem; text-align: center; font: 900 1rem var(--font-display); color: #5c6478; }
 .sxr-tend:first-child .sxr-tend-n { color: #fb923c; }
 .sxr-tend .sxr-fila-tx { flex: 1; }
@@ -491,10 +507,12 @@ button.sx-pie-total:hover { background: rgb(255 255 255 / .07); }
 /* Saludo: según la hora, con tu nombre, la frase Phoenix del día y el pulso de la comunidad */
 .sxr-saludo { display: grid; gap: .15rem; padding: .35rem .15rem .1rem; }
 .sxr-saludo[hidden] { display: none; }
-.sxr-saludo-hola { margin: 0; font: 700 1.15rem/1.25 var(--font-display); color: #fff; letter-spacing: .01em; }
-.sxr-saludo-hola b { color: #fdba74; }   /* tu nombre en el naranja de Phoenix */
 .sxr-saludo-frase { margin: 0; font-size: 13px; color: var(--sxr-tx2); }
-@media (prefers-reduced-motion: no-preference) { .sxr-vivo i::after { animation: sxr-pulso 2s ease-out infinite; } .sxr-saludo { animation: sxr-sube .45s var(--sxr-e) both; } }
+.sxr-saludo-pulso { justify-self: start; display: inline-flex; align-items: center; gap: .45rem; margin-top: .35rem; padding: .25rem .65rem; border-radius: 99px; font-size: 12px; font-weight: 600; color: #fed7aa;
+  background: linear-gradient(100deg, rgb(251 146 60 / .14), rgb(244 63 94 / .1)); border: 1px solid rgb(251 146 60 / .22); }
+.sxr-saludo-pulso i { position: relative; width: .45rem; height: .45rem; border-radius: 50%; background: #fb923c; }
+.sxr-saludo-pulso i::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #fb923c; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) { .sxr-saludo-pulso i::after { animation: sxr-pulso 2s ease-out infinite; } .sxr-saludo { animation: sxr-sube .45s var(--sxr-e) both; } }
 @keyframes sxr-pulso { 0% { opacity: .6; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(2.6); } }
 
 /* Acentos de fuego (la identidad de Phoenix, igual que Jugadas y la racha): pestaña activa y lo elegido a la izquierda */
@@ -534,27 +552,5 @@ button.sx-pie-total:hover { background: rgb(255 255 255 / .07); }
 .sxr-vacio-ic.is-error { background: rgb(251 113 133 / .14); color: #fb7185; box-shadow: none; }
 a.sxr-final-b, a.sxr-crear { text-decoration: none; }
 @media (max-width: 479.98px) { .sxr-vistas .sx-tab { min-height: 1.85rem; } }   /* celular: pestañas del mismo alto (2.25rem con su borde) que ↻, Jugadas y filtros */
-
-/* ===== Menos saturado (19-oct-2026, Fralex: «la estoy sintiendo saturada… solo mejora un poco eso») ===== */
-/* Saludo: dos líneas; el pulso y la racha son texto gris con un punto vivo, sin cápsulas */
-.sxr-saludo { padding-bottom: .2rem; }
-.sxr-saludo-frase { display: flex; flex-wrap: wrap; align-items: center; column-gap: .45rem; row-gap: .1rem; }
-.sxr-sep { color: rgb(255 255 255 / .2); }
-.sxr-vivo { display: inline-flex; align-items: center; gap: .4rem; }
-.sxr-vivo i { position: relative; width: .4rem; height: .4rem; border-radius: 50%; background: #fb923c; }
-.sxr-vivo i::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #fb923c; opacity: 0; }
-.sxr-racha-tx.is-pendiente { color: #fbbf24; }
-/* Barra pegada: «Jugadas» discreto (solo el icono en color); la racha ya no está aquí */
-.sxr-reels { background: transparent; box-shadow: none; color: #d6dbe7; border: 1px solid rgb(255 255 255 / .1); }
-.sxr-reels i { color: #fb923c; }
-.sxr-reels:hover { filter: none; background: rgb(255 255 255 / .06); color: #fff; }
-/* Compositor: los accesos rápidos en gris; toman su color al pasar el mouse */
-.sxr #sx-compositor .px-rapidos button i { color: var(--sxr-tx2); transition: color .2s ease; }
-.sxr #sx-compositor .px-rapidos button:hover i, .sxr #sx-compositor .px-rapidos button:focus-visible i { color: var(--c); }
-/* Logos de los juegos: algo atenuados; se iluminan al pasar o al elegir el juego */
-.sxr-ic-juego.con-logo { opacity: .72; transition: opacity .2s ease; }
-.sxr-item:hover .sxr-ic-juego.con-logo, .sxr-item[aria-current='true'] .sxr-ic-juego.con-logo { opacity: 1; }
-/* Columna derecha: tarjeta Phoenix compacta y atajos en una línea al pie */
-.sxr-atajos-pie { margin: .1rem .25rem 0; font-size: 11.5px; line-height: 1.9; color: rgb(154 163 184 / .75); }
-.sxr-atajos-pie kbd { display: inline-grid; place-items: center; min-width: 1.15rem; height: 1.15rem; margin-right: .15rem; padding: 0 .2rem; border-radius: .3rem; border: 1px solid rgb(255 255 255 / .12); font: 600 10px var(--font-sans, inherit); color: #c9d1de; }
-@media (hover: none) { .sxr-atajos-pie { display: none; } }   /* sin teclado no sirven */
+.sxr-saludo-fila { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .35rem; }
+.sxr-saludo-fila .sxr-saludo-pulso { margin-top: 0; }
