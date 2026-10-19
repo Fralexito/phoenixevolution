@@ -29,9 +29,20 @@ function initMarquee() {
   const movil = () => mqMovil.matches;
   const leerFactor = () => factorTicker(document.documentElement.getAttribute('data-aj-ticker-vel'));
   let factor = leerFactor();
-  new MutationObserver(() => { factor = leerFactor(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-aj-ticker-vel'] });
-  const vivas = []; let i = 0; let pausa = false; let previo = 0; let vw = view.clientWidth;
+  // RENDIMIENTO (19-oct-2026, Fralex: «siento la web más pesada»): antes JavaScript movía CADA noticia 60 veces por segundo en todas las
+  // páginas (era lo que más gastaba con la página quieta). Ahora las noticias quedan QUIETAS dentro de una «pista» y lo que avanza es la pista,
+  // con Web Animations: la mueve la tarjeta gráfica y el procesador solo revisa 4 veces por segundo si cabe otra noticia.
+  // La animación avanza 1 px por cada segundo de su reloj; playbackRate = velocidad en px/s (así pausar, retroceder y cambiar la velocidad es directo).
+  let vw = view.clientWidth; let i = 0; const vivas = [];
   base.remove();                                                          // la noticia estática de respaldo (sin JS) ya no hace falta
+  const pista = document.createElement('div'); pista.className = 'ticker-pista'; view.prepend(pista);
+  const LARGO = 1e6;                                                      // px que puede recorrer antes de «rebobinar» (ver revisar): a 75 px/s, casi 4 horas
+  const anim = pista.animate([{ transform: 'translateX(0)' }, { transform: `translateX(-${LARGO}px)` }], { duration: LARGO * 1000, fill: 'forwards' });
+  const ajustarVel = () => { anim.playbackRate = (movil() ? VEL_MOVIL : VEL_PC) * factor; };
+  ajustarVel(); mqMovil.addEventListener?.('change', ajustarVel);
+  new MutationObserver(() => { factor = leerFactor(); ajustarVel(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-aj-ticker-vel'] });
+  const avance = () => (Number(anim.currentTime) || 0) / 1000;           // px que ya recorrió la pista
+  const xDe = (n) => n.tx - avance();                                     // posición en pantalla de una noticia
   // Actividad real de la comunidad (FX.tickerVivo): se mezcla con las noticias fijas y se renueva cada 60 s. Si falla, quedan solo las noticias.
   if (FX.tickerVivo) {
     const fijas = [...items];
@@ -57,43 +68,45 @@ function initMarquee() {
       a.className = 'underline decoration-rose-400/60 hover:text-white pointer-events-auto'; a.textContent = it.texto;
       el.append(d, a);
     } else el.append(d, document.createTextNode(typeof it === 'object' ? String(it?.texto ?? '') : it));
-    view.append(el); const w = el.offsetWidth;
-    if (!w) { el.remove(); i -= 1; return; }                              // aún sin medidas (fuentes cargando): reintenta en el siguiente cuadro
-    vivas.push({ el, x: vw, w, hueco: huecoIrregular(movil() ? HUECO_MOVIL : HUECO_PC, Math.random()) });   // cada noticia trae su propio hueco de salida
+    pista.append(el); const w = el.offsetWidth;
+    if (!w) { el.remove(); i -= 1; return false; }                        // aún sin medidas (fuentes cargando): reintenta en la siguiente revisión
+    const n = { el, tx: vw + avance(), w, hueco: huecoIrregular(movil() ? HUECO_MOVIL : HUECO_PC, Math.random()) };   // cada noticia trae su propio hueco de salida
+    el.style.transform = `translateX(${n.tx}px)`; vivas.push(n); return true;
   };
-  const pintar = () => { for (const n of vivas) n.el.style.transform = `translateX(${n.x}px)`; };
+  const revisar = () => {
+    if (document.hidden) return;
+    if (avance() > LARGO / 2) { const a = avance(); for (const n of vivas) { n.tx -= a; n.el.style.transform = `translateX(${n.tx}px)`; } anim.currentTime = 0; }   // rebobina sin que se note
+    while (vivas.length && xDe(vivas[0]) + vivas[0].w < -MARGEN_ATRAS) vivas.shift().el.remove();   // se conserva un tramo ya pasado para poder retroceder
+    for (let k = 0; k < 4; k += 1) {
+      const u = vivas[vivas.length - 1];
+      if (!puedeEntrar(u ? xDe(u) : null, u?.w, vw, u?.hueco ?? (movil() ? HUECO_MOVIL : HUECO_PC)) || !crear()) break;
+    }
+  };
+  revisar(); setInterval(revisar, 250);
   /** Mueve todas las noticias `dx` px (dx > 0 = retroceder). Al retroceder no deja un hueco vacío a la izquierda: se frena en la noticia más antigua conservada. */
   const desplazar = (dx) => {
     if (!vivas.length || !dx) return 0;
-    const d = dx > 0 ? Math.min(dx, Math.max(0, 24 - vivas[0].x)) : dx;
-    for (const n of vivas) n.x += d; pintar(); return d;
+    const d = dx > 0 ? Math.min(dx, Math.max(0, 24 - xDe(vivas[0])), avance()) : dx;
+    anim.currentTime = (avance() - d) * 1000; return d;
   };
-  let restante = 0;                                                       // empuje de los botones ‹ ›, repartido en varios cuadros para que sea suave
-  const cuadro = (t) => {
-    const dt = Math.min((t - previo) / 1000, 0.1); previo = t;
-    if (!pausa && vw) {
-      const vel = (movil() ? VEL_MOVIL : VEL_PC) * factor;
-      for (const n of vivas) { n.x -= vel * dt; n.el.style.transform = `translateX(${n.x}px)`; }
-      while (vivas.length && vivas[0].x + vivas[0].w < -MARGEN_ATRAS) vivas.shift().el.remove();   // se conserva un tramo ya pasado para poder retroceder
-      const u = vivas[vivas.length - 1];
-      if (puedeEntrar(u?.x, u?.w, vw, u?.hueco ?? (movil() ? HUECO_MOVIL : HUECO_PC))) crear();
-    }
-    if (Math.abs(restante) > 0.5) { const paso = restante * 0.2; const hecho = desplazar(paso); restante = hecho === paso ? restante - paso : 0; } else restante = 0;
-    requestAnimationFrame(cuadro);
+  let restante = 0; let rafBoton = 0;                                     // empuje de los botones ‹ ›: un bucle corto que SOLO corre mientras empuja
+  const empujar = () => {
+    rafBoton = 0; if (Math.abs(restante) <= 0.5) { restante = 0; return; }
+    const paso = restante * 0.2; const hecho = desplazar(paso); restante = hecho === paso ? restante - paso : 0;
+    rafBoton = requestAnimationFrame(empujar);
   };
-  requestAnimationFrame((t) => { previo = t; cuadro(t); });
   // Pausa al pasar el mouse o tocar para poder leer; sigue al soltar.
   let arrastre = null;                                                    // { x: última posición del mouse } mientras se arrastra con el botón pulsado
-  view.addEventListener('pointerenter', () => { pausa = true; });
-  view.addEventListener('pointerleave', () => { if (!arrastre) pausa = false; });
+  view.addEventListener('pointerenter', () => anim.pause());
+  view.addEventListener('pointerleave', () => { if (!arrastre) anim.play(); });
   // PC: arrastra con el mouse para retroceder o avanzar; al soltar y sacar el mouse, sigue solo. (En táctil, el toque solo pausa como antes.)
   // (los botones ‹ › no inician un arrastre: se excluyen con closest('.ticker-ctl'))
-  view.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('.ticker-ctl')) return;  arrastre = { x: e.clientX }; pausa = true; restante = 0; try { view.setPointerCapture(e.pointerId); } catch { /* sin captura: el arrastre igual funciona dentro de la barra */ } view.classList.add('ticker-arrastrando'); });
+  view.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('.ticker-ctl')) return; arrastre = { x: e.clientX }; anim.pause(); restante = 0; try { view.setPointerCapture(e.pointerId); } catch { /* sin captura: igual funciona dentro de la barra */ } view.classList.add('ticker-arrastrando'); });
   view.addEventListener('pointermove', (e) => { if (!arrastre) return; desplazar(e.clientX - arrastre.x); arrastre.x = e.clientX; });
-  const soltar = () => { if (!arrastre) return; arrastre = null; view.classList.remove('ticker-arrastrando'); pausa = view.matches(':hover'); };   // sigue pausado solo si el mouse aún está encima
+  const soltar = () => { if (!arrastre) return; arrastre = null; view.classList.remove('ticker-arrastrando'); if (!view.matches(':hover')) anim.play(); revisar(); };   // sigue pausado solo si el mouse aún está encima
   view.addEventListener('pointerup', soltar); view.addEventListener('pointercancel', soltar);
   // Botones ‹ › (solo PC, aparecen al pasar el mouse): retroceden o adelantan un tramo.
-  document.querySelectorAll('[data-ticker-paso]').forEach((b) => b.addEventListener('click', () => { restante += Number(b.dataset.tickerPaso) * 260; }));
+  document.querySelectorAll('[data-ticker-paso]').forEach((b) => b.addEventListener('click', () => { restante += Number(b.dataset.tickerPaso) * 260; if (!rafBoton) rafBoton = requestAnimationFrame(empujar); }));
   new ResizeObserver(() => { vw = view.clientWidth; }).observe(view);     // también cuando el ticker cambia a su versión sutil (la etiqueta desaparece y la zona se ensancha)
 }
 

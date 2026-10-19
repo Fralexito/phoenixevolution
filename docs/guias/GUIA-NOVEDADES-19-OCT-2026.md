@@ -159,20 +159,33 @@ Sirve para ver cómo se ve cada sistema **con actividad**, aunque todavía no ha
 
 ## 12. Jugadas — los videos de la comunidad en vertical
 
-1. Entra desde **Social** (el primer círculo, con anillo de fuego, se llama «Jugadas») o desde el menú.
+1. Entra desde **Social** con el botón naranja **«Jugadas»** (la claqueta, en la barra de arriba del muro) o **desliza el dedo hacia la izquierda** en cualquier parte del muro, como los Reels de Instagram. También está en el menú.
 2. **Desliza hacia arriba** para pasar a la siguiente jugada (en PC: flechas ↑ ↓ o la rueda del ratón). Solo suena/se mueve la que estás viendo.
 3. **Toca dos veces** el video para darle 🔥. **Mantén pulsado** el botón de fuego para elegir otra reacción (Golazo, Atajada, GG, Crack, Risa).
 4. El **termómetro** debajo del fuego es el **Calorímetro**: mientras más lleno, más fuego tiene esa jugada comparada con las demás.
 5. **Retar** te lleva a lanzarle un duelo al autor. **Compartir** copia o comparte el enlace. El altavoz activa el sonido (en PC también la tecla **M**).
 6. Arriba eliges qué ver: **Para ti** (lo nuevo), **Top semana** (lo que más fuego tuvo en 7 días) o una categoría (Golazos, Atajadas, Skills, Remontadas, Fails).
 7. **Subir** (botón naranja): elige el tipo de jugada, el video (archivo de tu celular o PC de hasta 15 segundos, o un enlace de YouTube/TikTok/Kick/Twitch) y ponle título y juego.
-8. Para salir, la flecha **←** de arriba a la izquierda.
+8. Para volver a Social, **desliza hacia la derecha** o toca la flecha **←** de arriba a la izquierda.
+9. Si el video es tuyo, en la columna derecha aparece **Eliminar** (pregunta antes).
 
 **Modo demostración:** la beta ahora abre con la demostración encendida la primera vez, así ves todo con actividad. El aviso amarillo «Modo demostración · Salir» la apaga; lo que hagas sobre lo simulado no se guarda.
 
 ---
 
-## 13. Si algo no se ve bien
+## 13. Eliminar publicaciones y respuestas
+
+- **Tu publicación**: toca **⋯** arriba a la derecha → **Eliminar** (en rojo). Te pregunta antes; se borra para todos con sus respuestas y reacciones.
+- **Una respuesta**: debajo de la respuesta aparece **Eliminar** si es tuya o si está en una publicación tuya.
+- Los administradores pueden eliminar cualquiera.
+
+## 14. La web más ligera (1.8.0)
+
+La cinta de «Última hora», el desplazamiento suave, los puntos que laten y las estrellas de Inicio gastaban procesador aunque no tocaras nada. Ahora casi no gastan: la web debería sentirse más fluida y el celular calentarse menos. Si notas alguna página lenta, di cuál y en qué aparato.
+
+---
+
+## 15. Si algo no se ve bien
 
 1. Mira la versión de la cinta (paso 1) y recarga.
 2. Prueba con `?demo=1` para ver si es por falta de datos.

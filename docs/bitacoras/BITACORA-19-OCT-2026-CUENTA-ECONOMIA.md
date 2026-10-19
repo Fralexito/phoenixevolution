@@ -81,6 +81,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 14:17 | `e45a5d8` | **Beta 1.5.1**: esta bitácora y la guía paso a paso |
 | 14:40 | (ver REGISTRO) | **Beta 1.6.0**: Social fase 2 (**migraciones 135 y 135b**) |
 | 15:15 | (ver REGISTRO) | **Beta 1.7.0**: **Jugadas** (feed vertical de videos, **migración 136**) + la beta abre con la demostración encendida |
+| 15:58 | (ver REGISTRO) | **Beta 1.8.0**: web más ligera (cinta, scroll, animaciones, estrellas, iconos), Jugadas como Reels (botón + deslizar), eliminar en Social y Jugadas |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -92,7 +93,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
    - cambio normal → `1.5.0` → `1.5.1`;
    - algo grande terminado (sección rehecha o sistema nuevo) → `1.5.3` → `1.6.0`;
    - la cinta «Fase beta» (Layout.astro) muestra la versión y la hora de Lima en que se compiló; la URL `/fase-beta-1-0/` **no** cambia.
-   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1 · 1.5.1 documentación · 1.6.0 Social fase 2 · 1.7.0 Jugadas y demostración visible en la beta.
+   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1 · 1.5.1 documentación · 1.6.0 Social fase 2 · 1.7.0 Jugadas y demostración visible en la beta · 1.8.0 rendimiento, Jugadas como Reels y eliminar.
 2. **Nada de `html:has(…)` ni `body:has(…)` en CSS** (hacía recalcular toda la página ~15 veces al cargar). Poner una marca en `<html>` desde el JS (`data-ticker-oculto`, `data-duelos-plegado`, `data-reto-asistente`…).
 3. **Iconos recortados**: si usas un icono «fa-…» o «ph-…» nuevo, ejecuta `node tools/iconos/recortar-iconos.mjs` y sube `src/styles/iconos/*`. Si el icono de Font Awesome no tiene equivalente fino en `src/data/iconosFinos.js`, **añádelo** (si no, con «Sin íconos web» se oculta o sale como cuadro). Hoy se añadieron: `icons→smiley-wink`, `circle-notch`, `caret-up`, `caret-down`.
 4. **CSS por página**: 14 CSS salieron de `global.css`; cada página los importa DESPUÉS de Layout. Si una página nueva usa clases de uno de ellos, impórtalo ahí. CSS nuevos de hoy por página: `perfilPublico.css` (perfil), `retoAsistente.css` (duelos), `ahoraPortada.css` (inicio), `ligaTabla.css` (liga), `publicar.css` y `socialHilo.css` (social), `configuracion.css` (ajustes), `miClubEstadio.css` (manager). Globales nuevos: `salasVivo.css`, `publicacionExtras.css`, `modoDemo.css`.
@@ -221,6 +222,37 @@ Pedido de Fralex: «una especie de reels o feed, shorts estilo TikTok, YouTube e
 ### 5.13 La demostración se ve sola en la beta (1.7.0)
 Pedido de Fralex: «necesito que en la página misma se me muestre la simulación de todas las actividades, para ver cómo se vería».
 - `core/sistema/modoDemo.js`: en la **vista previa** (`PUBLIC_PREVIEW`) la demostración viene **encendida la primera vez** que alguien abre la beta (marca `pes-demo-beta-v1` en el navegador). Si la apagas («Salir» o Configuración) queda apagada. `?demo=1` / `?demo=0` siguen funcionando. **La web oficial no cambia.**
+
+### 5.14 Rendimiento: «siento la web más pesada» (1.8.0)
+**Cómo se midió** (para repetirlo): navegador de prueba con la página QUIETA 4 s, métricas de Chrome (CPU, recálculos de estilo, layouts) y el perfilador; scripts en el scratchpad (`medir.mjs`, `aislar*.mjs`, `bucles.mjs`, `perfilar.mjs`). Ojo: `?demo=1` y `?demo=0` cambian mucho el resultado.
+| Página (celular, demo encendida) | Antes | Después |
+|---|---|---|
+| Duelos | 2574 ms | 22 ms |
+| Social | 1094 ms | 18 ms |
+| Liga | ~3300 ms | 69 ms |
+| Perfil | ~960 ms | 132 ms |
+| Inicio | ~3350 ms | ~2400 ms (casi todo dibujo de capas que en un aparato real hace la tarjeta gráfica; el trabajo de la página bajó a ~25 ms) |
+
+**Qué fallaba y qué se hizo:**
+1. **La cinta «Última hora»** (`features/ticker.js`): JavaScript movía CADA noticia 60 veces por segundo en todas las páginas. Ahora las noticias van quietas dentro de una «pista» que avanza con Web Animations (la mueve la tarjeta gráfica); JavaScript solo revisa 4 veces por segundo si cabe otra noticia. Pausa, arrastre y botones ‹ › siguen igual.
+2. **Scroll suave de PC** (`features/scrollSuave.js`, Lenis): su bucle corría siempre y frenaba en 1,05 s (sensación «pesada»). Ahora solo corre mientras te desplazas y frena en 0,7 s.
+3. **Animaciones infinitas caras**: 10 latidos/brillos animaban `box-shadow`, `text-shadow` o `filter` (se repintan en cada cuadro). Pasaron a `transform`/`opacity` (aro que crece en un `::after`, resplandor que se enciende con opacidad). El peor era el **punto del aviso «Modo demostración»**, presente en todas las páginas con la demo encendida. Lista: `pxd-late`, `ah-late`, `mcx-late`, `sv-llama`, `sv-vs`, `sxr-latido`, `pcw-aura`, `brilla`, `nt-late` (neón de noticias, ahora fijo), `cmp-glow` (fijo). Quedan 7 «caras» pero solo corren un momento (esqueletos de carga), al pasar el mouse o en pantallas poco usadas.
+4. **Estrellas de la portada** (`features/estrellas.js`): medían la portada en cada cuadro (forzaba recalcular la página) y pedían cuadros en cada refresco aunque dibujaran 30. Ahora usan la posición guardada, esperan con un temporizador, y en celular van a ~24 fps y resolución 1.
+5. **Iconos**: `fontawesome.min.css` traía ~2.000 nombres en CADA página. `tools/iconos/recortar-iconos.mjs` genera `styles/iconos/fontawesome.recortado.css` con los 281 usados (el CSS global bajó de 606 a 566 KB). **Si un icono nuevo sale en blanco: ejecutar ese script.**
+- Pendiente para otra ronda: el CSS global sigue siendo grande (≈566 KB, 110 KB comprimido) porque carga los estilos de todas las secciones; separarlo por página es un trabajo más largo.
+
+### 5.15 Jugadas como los Reels (1.8.0)
+Pedido: «no pongas ahí las jugadas, quería algo como en Instagram, que dándole click en el botón o jalando hacia un lado cargue la parte de reels».
+- Fuera el círculo de Jugadas de las historias y el enlace de «Tu espacio».
+- **Botón «Jugadas»** (naranja, con claqueta) en la barra pegada del muro de Social; en celular solo el icono.
+- **Deslizar con el dedo**: hacia la izquierda en Social abre Jugadas; hacia la derecha en Jugadas vuelve a Social. Mientras arrastras asoma una pastilla con el destino (se pone naranja cuando ya basta); un tirón rápido también vale. No se activa sobre cosas que se deslizan en horizontal (historias, pestañas, carruseles), campos de texto ni diálogos, ni en los bordes de la pantalla (gestos del sistema).
+- **Transición**: la página sale hacia el lado del gesto y la nueva entra por el otro (`styles/deslizar.css`; `pagereveal` + tipos de transición de vista). Jugadas se precarga al abrir Social.
+- Código: `features/social/gestos.js` → `montarDeslizarA(zona, { lado, url, etiqueta, icono })` y `marcarDesliza(lado)`.
+
+### 5.16 Eliminar publicaciones y comentarios (1.8.0)
+Pedido: «verifica la opción de eliminar post o comentarios».
+- **Lo que se encontró**: la base SÍ lo permitía (`muro_borrar`: el autor o el admin; `muro_borrar_respuesta`: el autor de la respuesta, el dueño de la publicación o el admin; `muro_respuestas_de` ya devolvía `puedo_borrar`), y en **tu perfil** ya se podía. Pero en **Social** no había ningún botón para hacerlo.
+- **Ahora**: «Eliminar» (rojo, con papelera) en el menú ⋯ de tus publicaciones (el admin lo ve en todas) y «Eliminar» bajo cada respuesta que puedes borrar. Siempre pregunta antes. En **Jugadas**, «Eliminar» en el riel de tus propios videos (`clip_borrar`, que ya existía).
 
 ---
 

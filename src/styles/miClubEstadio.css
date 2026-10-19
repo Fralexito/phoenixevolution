@@ -88,8 +88,11 @@ a.mcx-b:hover .mcx-b-ir::after, .mcx-b-ir:hover::after { margin-left: .25rem; }
 .mcx-punto { width: .7rem; height: .7rem; border-radius: 50%; background: #64748b; flex: none; }
 .mcx-b-juego[data-sync='on'] .mcx-punto { background: #34d399; box-shadow: 0 0 0 4px rgb(52 211 153 / .2); }
 .mcx-b-juego[data-sync='off'] .mcx-punto { background: #fb7185; box-shadow: 0 0 0 4px rgb(251 113 133 / .18); }
-@media (prefers-reduced-motion: no-preference) { .mcx-b-juego[data-sync='on'] .mcx-punto { animation: mcx-late 2s ease-in-out infinite; } }
-@keyframes mcx-late { 50% { box-shadow: 0 0 0 8px rgb(52 211 153 / .05); } }
+/* Rendimiento (19-oct-2026): el latido es un aro (::after) que crece y se desvanece con transform/opacity; antes animaba box-shadow y repintaba en cada cuadro. */
+.mcx-b-juego[data-sync='on'] .mcx-punto { position: relative; }
+.mcx-b-juego[data-sync='on'] .mcx-punto::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgb(52 211 153 / .35); opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) { .mcx-b-juego[data-sync='on'] .mcx-punto::after { animation: mcx-late 2s ease-in-out infinite; } }
+@keyframes mcx-late { 0%, 100% { opacity: 0; transform: scale(1); } 50% { opacity: .5; transform: scale(2.2); } }
 .mcx-movs { display: grid; gap: .1rem; margin-top: .25rem; }
 .mcx-movs li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto; gap: .75rem; align-items: center; padding: .55rem .65rem; border-radius: .7rem; font-size: 13.5px; }
 .mcx-movs li:nth-child(odd) { background: rgb(255 255 255 / .03); }

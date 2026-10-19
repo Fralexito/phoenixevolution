@@ -10,6 +10,7 @@ import { escapeHTML } from '../core/sistema/dom.js';
 import { href } from '../core/sistema/config.js';
 import { avatarHTML } from '../core/sistema/avatar.js';
 import { toast } from '../core/sistema/toast.js';
+import { confirmar } from '../core/sistema/dialogo.js';
 import { onSession } from '../core/sistema/session.js';
 import { analizarVideo, etiquetaSegmento, tiempoRelativo } from '../core/comunidad/muro.js';
 import * as api from '../features/muro/api.js';
@@ -21,6 +22,7 @@ import { prepararVideo } from '../features/muro/media.js';
 import { PESTANAS_JUGADAS, CATEGORIAS_JUGADA, categoriaJugada } from '../../data/jugadas.js';
 import { SEGMENTOS } from '../../data/muroEstilo.js';
 import { demoActivo } from '../core/sistema/modoDemo.js';
+import { montarDeslizarA, marcarDesliza } from '../features/social/gestos.js';
 
 const raiz = document.querySelector('[data-jg]'); const pista = document.querySelector('[data-jg-pista]');
 const S = { yo: null, tab: PESTANAS_JUGADAS[0], items: [], hayMas: false, cargando: false, req: 0, actual: -1, sonido: false, paleta: null };
@@ -57,6 +59,7 @@ function slideHTML(it, i, maxCalor) {
       <div class="jg-calor" style="--k:${k.toFixed(3)}" title="Calorímetro: cuánto fuego tiene esta jugada" aria-label="Calorímetro ${Math.round(k * 100)} %"><i aria-hidden="true"></i><span aria-hidden="true">🔥</span></div>
       <button type="button" class="jg-b" data-jg-compartir aria-label="Compartir"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><small>Compartir</small></button>
       ${yo ? '' : `<a class="jg-b" href="${escapeHTML(`${href('duelos/')}?retar=${encodeURIComponent(a.id ?? '')}`)}" aria-label="Retar a duelo a ${escapeHTML(nombreDe(a))}"><i class="fa-solid fa-bolt" aria-hidden="true"></i><small>Retar</small></a>`}
+      ${yo ? '<button type="button" class="jg-b" data-jg-borrar aria-label="Eliminar mi jugada"><i class="fa-solid fa-trash-can" aria-hidden="true"></i><small>Eliminar</small></button>' : ''}
       <button type="button" class="jg-b" data-jg-sonido aria-label="${S.sonido ? 'Silenciar' : 'Activar sonido'}"><i class="fa-solid ${S.sonido ? 'fa-volume-high' : 'fa-volume-xmark'}" aria-hidden="true"></i></button>
     </aside>
     <div class="jg-progreso" aria-hidden="true"><i></i></div>
@@ -157,6 +160,7 @@ pista.addEventListener('click', (e) => {
   if (e.target.closest('[data-jg-compartir]')) { const it = S.items[i]; compartir({ url: new URL(`${perfilUrl(it?.autor?.username)}#c-${Number(it?.id)}`, location.href).href, titulo: it?.titulo || 'Jugada en Phoenix Evolution Series' }); return; }
   if (e.target.closest('[data-jg-sonido]')) { S.sonido = !S.sonido; const prev = S.actual; S.actual = -1; pista.querySelectorAll('.jg-yt iframe').forEach((f) => f.remove()); activar(prev); S.items.forEach((_, k) => repintarSlide(k)); return; }
   if (e.target.closest('[data-jg-subir]')) { abrirSubir(); return; }
+  if (e.target.closest('[data-jg-borrar]')) { borrarJugada(i); return; }
   const au = e.target.closest('[data-jg-u]'); if (au && !e.ctrlKey && !e.metaKey) { e.preventDefault(); abrirTarjetaPerfil({ username: au.dataset.jgU, ancla: au, yo: S.yo }); return; }
   if (S.paleta != null && !e.target.closest('.jg-paleta')) { cerrarPaleta(); return; }
   // Doble toque (o doble clic) sobre el video = 🔥
@@ -184,6 +188,14 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'm') document.querySelector('.jg-slide.is-activa [data-jg-sonido]')?.click();
   else if (e.key === 'Escape') cerrarPaleta();
 });
+
+/* ---------- Eliminar tu jugada ---------- */
+async function borrarJugada(i) {
+  const it = S.items[i]; if (!it || !S.yo || it.autor?.id !== S.yo) return;
+  if (!(await confirmar('¿Eliminar esta jugada? Se borra el video para todos y no se puede deshacer.', { titulo: 'Eliminar jugada', aceptar: 'Eliminar', peligro: true }))) return;
+  try { await api.borrarClip(Number(it.id)); } catch (e) { toast(String(e?.message ?? 'No se pudo eliminar.'), 'error'); return; }
+  S.items.splice(i, 1); pintarTodo(); toast('Jugada eliminada.', 'ok');
+}
 
 /* ---------- Subir una jugada ---------- */
 function abrirSubir() {
@@ -227,6 +239,10 @@ function abrirSubir() {
     } catch (err) { toast(String(err?.message ?? 'No se pudo publicar.'), 'error'); b.disabled = false; b.innerHTML = '<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Publicar jugada'; }
   });
 }
+
+/* ---------- Volver a Social: deslizar a la derecha o la flecha ← (sale hacia la derecha, como Reels → Inicio) ---------- */
+montarDeslizarA(raiz, { lado: 'der', url: href('social/'), etiqueta: 'Social', icono: 'fa-earth-americas' });
+document.querySelector('.jg-volver')?.addEventListener('click', () => marcarDesliza('der'));
 
 /* ---------- Arranque ---------- */
 { const ver = new URLSearchParams(location.search).get('ver'); const t = PESTANAS_JUGADAS.find((p) => p.id === ver); if (t) { S.tab = t; document.querySelectorAll('[data-jg-tab]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.jgTab === t.id))); } }

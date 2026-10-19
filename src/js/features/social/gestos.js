@@ -88,3 +88,44 @@ export function montarTirarParaRecargar(zona, alRecargar) {
     try { await alRecargar(); } finally { setTimeout(() => { aro.classList.remove('gx-ve', 'gx-girando'); cargando = false; }, 400); }
   });
 }
+
+/* ---------- Deslizar hacia un lado = cambiar de sección (como Inicio ↔ Reels en Instagram). 19-oct-2026 (Fralex: «que dándole click en el botón
+   o jalando hacia un lado cargue la parte de reels»). Solo con el dedo (en PC está el botón). Mientras arrastras asoma una pastilla con el destino;
+   si sueltas pasado el umbral (o con un tirón rápido) cambia de página con una transición que se desliza hacia ese lado.
+   No se activa si empiezas sobre algo que se desliza en horizontal (historias, pestañas, carruseles), en un campo de texto o en un diálogo. ---------- */
+/** Marca hacia dónde se va: la página actual sale hacia ese lado y la nueva entra por el otro (styles/deslizar.css + el script de pagereveal de la página nueva). */
+export function marcarDesliza(lado) { document.documentElement.dataset.desliza = lado; try { sessionStorage.setItem('px-desliza', lado); } catch { /* sin almacenamiento: solo sale la vieja */ } }
+const deslizaEnX = (el) => { for (let n = el; n && n !== document.body; n = n.parentElement) { if (n.scrollWidth > n.clientWidth + 2 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true; } return false; };
+export function montarDeslizarA(zona, { lado = 'izq', url, etiqueta, icono = 'fa-clapperboard' }) {
+  if (!zona || !url) return;
+  const signo = lado === 'izq' ? -1 : 1;   // izq = el dedo va hacia la izquierda (el destino entra por la derecha)
+  try { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = url; document.head.append(l); } catch { /* sin prefetch: igual navega */ }
+  const pastilla = document.createElement('div'); pastilla.className = `px-desliza px-desliza-${lado}`; pastilla.setAttribute('aria-hidden', 'true');
+  pastilla.innerHTML = `<i class="fa-solid ${icono}"></i><span>${etiqueta}</span>`; document.body.append(pastilla);
+  let ini = null;
+  zona.addEventListener('touchstart', (e) => {
+    const t = e.touches[0]; ini = null;
+    if (e.touches.length > 1 || t.clientX < 24 || t.clientX > innerWidth - 24) return;   // bordes: los gestos del sistema (atrás)
+    if (e.target.closest('input, textarea, select, dialog, [contenteditable], .px-sin-deslizar') || deslizaEnX(e.target)) return;
+    ini = { x: t.clientX, y: t.clientY, t: performance.now(), eje: null };
+  }, { passive: true });
+  zona.addEventListener('touchmove', (e) => {
+    if (!ini) return; const t = e.touches[0]; const dx = t.clientX - ini.x; const dy = t.clientY - ini.y;
+    if (!ini.eje && Math.hypot(dx, dy) > 12) ini.eje = Math.abs(dx) > Math.abs(dy) * 1.6 && Math.sign(dx) === signo ? 'x' : 'y';
+    if (ini.eje !== 'x') return;
+    const k = Math.min(1, Math.abs(dx) / 110); ini.dx = dx;
+    pastilla.style.setProperty('--k', k.toFixed(3)); pastilla.classList.add('is-viva'); pastilla.classList.toggle('is-lista', k >= 1);
+  }, { passive: true });
+  const soltar = () => {
+    if (!ini) return; const { dx = 0, t } = ini; ini = null;
+    const rapido = Math.abs(dx) / Math.max(1, performance.now() - t) > 0.55 && Math.abs(dx) > 45;
+    pastilla.classList.remove('is-viva', 'is-lista');
+    if (Math.sign(dx) === signo && (Math.abs(dx) >= 110 || rapido)) {
+      try { navigator.vibrate?.(10); } catch { /* sin vibración */ }
+      marcarDesliza(lado);
+      location.href = url;
+    }
+  };
+  zona.addEventListener('touchend', soltar, { passive: true }); zona.addEventListener('touchcancel', () => { ini = null; pastilla.classList.remove('is-viva', 'is-lista'); }, { passive: true });
+  addEventListener('pageshow', () => { delete document.documentElement.dataset.desliza; });   // al volver con «atrás» (caché del navegador)
+}

@@ -81,9 +81,9 @@
 @keyframes sv-entra { from { opacity: 0; transform: translateY(16px) scale(.97); } }
 @keyframes sv-destello { 0%, 25% { box-shadow: 0 0 0 2px var(--sv-c), 0 0 40px -6px var(--sv-c); } }
 @keyframes sv-latido { from { transform: scale(1); opacity: .8; } to { transform: scale(3); opacity: 0; } }
-@keyframes sv-llama { 0%, 100% { transform: scale(1); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--sv-c) 55%, transparent); } 50% { transform: scale(1.06); box-shadow: inset 0 0 0 2px var(--sv-c), 0 0 18px -4px var(--sv-c); } }
+@keyframes sv-llama { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }   /* rendimiento: sin animar box-shadow (repintaba en cada cuadro) */
 @keyframes sv-brillo { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
-@keyframes sv-vs { 0%, 100% { opacity: .75; } 50% { opacity: 1; text-shadow: 0 0 18px var(--sv-c); } }
+@keyframes sv-vs { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }   /* rendimiento: sin animar text-shadow */
 @keyframes sv-mando { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
 /* ── Ventana «Entrando a la sala» ── */

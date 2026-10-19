@@ -5,7 +5,8 @@
 import { vacioHTML } from '../core/sistema/vacio.js';
 import { escapeHTML } from '../core/sistema/dom.js';
 import { toast } from '../core/sistema/toast.js';
-import { onSession, can, getState } from '../core/sistema/session.js';
+import { onSession, can, getState, isAdmin } from '../core/sistema/session.js';
+import { confirmar } from '../core/sistema/dialogo.js';
 import { avatarHTML } from '../core/sistema/avatar.js';
 import { href } from '../core/sistema/config.js';
 import { segmentoParaGuardar, urlCompartir, aplicarReaccion, tiempoRelativo, validarRespuesta, textoAHTML } from '../core/comunidad/muro.js';
@@ -28,7 +29,7 @@ import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { initMencionAuto } from '../features/social/mencionAuto.js';
 import { etiquetasDe } from '../core/comunidad/muro.js';
-import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar } from '../features/social/gestos.js';
+import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar, montarDeslizarA, marcarDesliza } from '../features/social/gestos.js';
 import { originalHTML, abrirCompartir, abrirQuienReacciono, abrirTarjetaPerfil, vigilarVistas } from '../features/social/fase2.js';
 import { openAuthModal } from '../features/auth.js';
 
@@ -59,10 +60,8 @@ function pintarHistorias() {
   const nueva = S.yo && !mio ? `<button type="button" data-hist-nueva class="sx-hist-item" aria-label="Crear una historia"><span class="sx-anillo sx-anillo-nuevo"><span class="sx-anillo-in"><i class="fa-solid fa-plus text-galaxy-400 text-xl" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Tu historia</span></button>` : '';
   const crear = S.yo && mio ? `<button type="button" data-hist-nueva class="sx-hist-item" aria-label="Añadir otra historia"><span class="sx-anillo sx-anillo-nuevo"><span class="sx-anillo-in"><i class="fa-solid fa-plus text-galaxy-400 text-xl" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Añadir</span></button>` : '';
   const lista = S.circulos.map(circuloHTML).join('');
-  // Jugadas (19-oct-2026): el feed vertical de videos, siempre primero en la fila
-  const jugadas = `<a href="${href('jugadas/')}" class="sx-hist-item sx-hist-jugadas" aria-label="Ver Jugadas: videos de la comunidad en vertical"><span class="sx-anillo"><span class="sx-anillo-in"><i class="fa-solid fa-clapperboard" aria-hidden="true"></i></span></span><span class="sx-hist-nombre">Jugadas</span></a>`;
-  histEl.hidden = false;
-  histEl.innerHTML = `<div class="sx-hist-fila" role="list" aria-label="Jugadas e historias de las últimas 24 horas">${jugadas}${nueva}${crear}${lista}</div>`;
+  histEl.hidden = !(nueva || crear || lista);
+  histEl.innerHTML = `<div class="sx-hist-fila" role="list" aria-label="Historias de las últimas 24 horas">${nueva}${crear}${lista}</div>`;
   pintarLado();
 }
 async function cargarHistorias() {
@@ -105,7 +104,7 @@ function pintarFiltro() {
   pintarNav(); marcarFiltros();
 }
 const tarjeta = (it) => { const so = S.social[String(it.id)] ?? null;   // fase 2: la publicación original dentro de una compartida, vistas y veces compartida
-  return tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), extra: originalHTML(so?.original), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id), social: so }) }); };
+  return tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), puedeBorrar: isAdmin(), extra: originalHTML(so?.original), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id), social: so }) }); };
 let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
 function pintar() {
   feedEl.innerHTML = S.items.length ? ordenarFeed(S.items, S.orden).map(tarjeta).join('')
@@ -172,10 +171,27 @@ feedEl.addEventListener('click', (e) => {
   }
   const yt = e.target.closest('[data-act=video-yt]'); if (yt) { reproductorYT(yt); return; }
   const gu = e.target.closest('[data-guardar]'); if (gu) { alternar(gu); return; }
+  const bp = e.target.closest('[data-borrar-pub]'); if (bp) { borrarPublicacion(Number(bp.dataset.borrarPub)); return; }
+  const br = e.target.closest('[data-borrar-resp]'); if (br) { borrarRespuesta(Number(br.dataset.borrarResp), Number(br.dataset.pub)); return; }
   const rp = e.target.closest('[data-reportar]'); if (rp) { abrirReportar({ tipo: 'publicacion', objetivo: rp.dataset.reportar, titulo: 'Publicación en la comunidad' }); return; }
   const oc = e.target.closest('[data-ocultar]');
   if (oc) { const id = Number(oc.dataset.ocultar); abrirOcultar({ tipo: 'publicacion', id, titulo: 'Publicación en la comunidad', onListo: () => { S.items = S.items.filter((x) => Number(x.id) !== id); pintar(); } }); }
 });
+// Eliminar (19-oct-2026): tu publicación (o cualquiera si eres admin) y las respuestas que la base marca con puedo_borrar
+// (la tuya, o cualquiera bajo TU publicación, o el admin). Siempre se pregunta antes: no se puede deshacer.
+async function borrarPublicacion(id) {
+  feedEl.querySelector(`[data-pub="${id}"] .sx-post-menu`)?.removeAttribute('open');
+  if (!(await confirmar('¿Eliminar esta publicación? Se borra para todos, con sus respuestas y reacciones. No se puede deshacer.', { titulo: 'Eliminar publicación', aceptar: 'Eliminar', peligro: true }))) return;
+  try { await api.borrar(id); } catch (e) { toast(String(e?.message ?? 'No se pudo eliminar.'), 'error'); return; }
+  S.items = S.items.filter((x) => Number(x.id) !== id); S.abiertas.delete(id); S.resp.delete(id); pintar(); toast('Publicación eliminada.', 'ok');
+}
+async function borrarRespuesta(idResp, idPub) {
+  if (!(await confirmar('¿Eliminar esta respuesta? No se puede deshacer.', { titulo: 'Eliminar respuesta', aceptar: 'Eliminar', peligro: true }))) return;
+  try { await api.borrarRespuesta(idResp); } catch (e) { toast(String(e?.message ?? 'No se pudo eliminar.'), 'error'); return; }
+  const lista = (await api.respuestasDe(idPub).catch(() => null)) ?? (S.resp.get(idPub) ?? []).filter((r) => Number(r.id) !== idResp);
+  S.resp.set(idPub, lista); S.items = S.items.map((x) => (Number(x.id) === idPub ? { ...x, respuestas: lista.length } : x));
+  repintar(idPub); pintarHilo(idPub); toast('Respuesta eliminada.', 'ok');
+}
 histEl.addEventListener('click', (e) => {
   if (e.target.closest('[data-hist-nueva]')) { if (S.yo) abrirNuevaHistoria({ uid: S.yo, onListo: cargarHistorias }); return; }
   const b = e.target.closest('[data-hist]'); if (b) abrirCirculo(Number(b.dataset.hist));
@@ -259,7 +275,7 @@ function pintarHilo(id) {
   if (!abierto) { caja.innerHTML = ''; return; }
   const lista = S.resp.get(Number(id));
   const filas = lista === undefined ? '<p class="sxr-hilo-nota">Cargando respuestas…</p>'
-    : lista.length ? lista.map((r) => `<div class="sxr-resp"><span class="sxr-resp-av">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span><div class="sxr-resp-cuerpo"><p class="sxr-resp-cab"><a href="${escapeHTML(href('perfil/'))}?u=${encodeURIComponent(r.username ?? '')}">${escapeHTML(r.nombre_display ?? 'Jugador')}</a> <time data-t="${escapeHTML(r.created_at ?? '')}">${tiempoRelativo(r.created_at)}</time></p><p class="sxr-resp-tx">${textoAHTML(r.texto)}</p>${likeRespHTML(r.id)}</div></div>`).join('')
+    : lista.length ? lista.map((r) => `<div class="sxr-resp"><span class="sxr-resp-av">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span><div class="sxr-resp-cuerpo"><p class="sxr-resp-cab"><a href="${escapeHTML(href('perfil/'))}?u=${encodeURIComponent(r.username ?? '')}">${escapeHTML(r.nombre_display ?? 'Jugador')}</a> <time data-t="${escapeHTML(r.created_at ?? '')}">${tiempoRelativo(r.created_at)}</time></p><p class="sxr-resp-tx">${textoAHTML(r.texto)}</p>${likeRespHTML(r.id)}${r.puedo_borrar ? `<button type="button" class="sxr-resp-borrar" data-borrar-resp="${Number(r.id)}" data-pub="${Number(id)}" aria-label="Eliminar esta respuesta"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Eliminar</button>` : ''}</div></div>`).join('')
       : '<p class="sxr-hilo-nota">Aún no hay respuestas. Sé el primero.</p>';
   const form = S.yo ? `<form class="sxr-responder" data-responder="${Number(id)}"><input data-menciones maxlength="600" placeholder="Escribe una respuesta…" aria-label="Escribe una respuesta" autocomplete="off"><button type="submit" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></form>`
     : '<button type="button" class="sxr-hilo-nota sxr-hilo-entrar" data-sxr-entrar>Inicia sesión para responder.</button>';
@@ -391,6 +407,9 @@ function pintarTendencias() {
 montarVisorFotos(feedEl);
 montarDobleToque(feedEl, (id) => { const it = S.items.find((x) => Number(x.id) === id); if (!it?.mia) reaccionar(id, REACCION_RAPIDA); });
 montarTirarParaRecargar(document.querySelector('.sxr-centro') ?? feedEl, async () => { reiniciarFeed(); await cargarHistorias(); });
+// Jugadas como los Reels de Instagram (19-oct-2026): el botón de la barra o deslizar hacia la izquierda en cualquier parte del muro
+montarDeslizarA(document.body, { lado: 'izq', url: href('jugadas/'), etiqueta: 'Jugadas' });
+document.querySelector('[data-sxr-reels]')?.addEventListener('click', () => marcarDesliza('izq'));
 // Mantener pulsado «Reaccionar» medio segundo abre las reacciones Phoenix (como en Facebook).
 {
   let t = 0; let abrio = false;

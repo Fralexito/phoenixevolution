@@ -5,15 +5,17 @@
   backdrop-filter: blur(10px); }
 .pxd b { font: 800 11.5px var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #fbbf24; }
 .pxd-txt { overflow: hidden; text-overflow: ellipsis; color: #e7d9b5; }
-.pxd-punto { flex: none; width: .55rem; height: .55rem; border-radius: 99px; background: #fbbf24; box-shadow: 0 0 0 0 rgb(251 191 36 / .6); }
+/* Rendimiento (19-oct-2026): el latido es un aro (::after) que crece y se desvanece con transform/opacity; antes animaba box-shadow y repintaba en cada cuadro. */
+.pxd-punto { position: relative; flex: none; width: .55rem; height: .55rem; border-radius: 99px; background: #fbbf24; }
+.pxd-punto::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #fbbf24; opacity: 0; pointer-events: none; }
 .pxd-salir { flex: none; min-height: 1.9rem; padding: 0 .85rem; border-radius: 99px; font: 800 11.5px var(--font-display); letter-spacing: .08em; text-transform: uppercase;
   color: #1a1203; background: #fbbf24; transition: transform .16s cubic-bezier(.23, 1, .32, 1), background-color .2s ease; }
 .pxd-salir:hover { background: #fcd34d; } .pxd-salir:active { transform: scale(.96); }
 @media (prefers-reduced-motion: no-preference) {
   .pxd { animation: pxd-entra .45s cubic-bezier(.23, 1, .32, 1) backwards .3s; }
-  .pxd-punto { animation: pxd-late 1.8s ease-out infinite; }
+  .pxd-punto::after { animation: pxd-late 1.8s ease-out infinite; }
 }
 @keyframes pxd-entra { from { opacity: 0; transform: translateY(8px) scale(.97); } }
-@keyframes pxd-late { 70%, 100% { box-shadow: 0 0 0 8px rgb(251 191 36 / 0); } }
+@keyframes pxd-late { 0% { opacity: .6; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(2.4); } }
 @media (max-width: 639.98px) { .pxd-txt { display: none; } .pxd b { font-size: 10.5px; } }
 @media (min-width: 768px) { .pxd { left: 6.25rem; bottom: 1.25rem; } }

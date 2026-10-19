@@ -5,9 +5,11 @@
 .ah-titulo { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: .6rem; }
 .ah-titulo h2 { font: 800 1.3rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #fff; }
 .ah-titulo p { grid-column: 2; font-size: 13px; color: #94a0b6; }
-.ah-punto { width: .7rem; height: .7rem; border-radius: 99px; background: #ef4444; box-shadow: 0 0 0 0 rgb(239 68 68 / .6); }
-@media (prefers-reduced-motion: no-preference) { .ah-punto { animation: ah-late 1.8s ease-out infinite; } }
-@keyframes ah-late { 70%, 100% { box-shadow: 0 0 0 9px rgb(239 68 68 / 0); } }
+/* Rendimiento (19-oct-2026): el latido es un aro (::after) que crece y se desvanece con transform/opacity; antes animaba box-shadow y repintaba en cada cuadro. */
+.ah-punto { position: relative; width: .7rem; height: .7rem; border-radius: 99px; background: #ef4444; }
+.ah-punto::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #ef4444; opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) { .ah-punto::after { animation: ah-late 1.8s ease-out infinite; } }
+@keyframes ah-late { 0% { opacity: .6; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(2.6); } }
 
 .ah-franja { display: grid; gap: .55rem; }
 .ah-cab { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }

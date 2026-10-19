@@ -118,7 +118,7 @@
 .sxr-vacio b { font-size: 16px; color: #fff; margin-top: .5rem; }
 .sxr-vacio p { max-width: 26rem; font-size: 13.5px; line-height: 1.55; color: var(--sxr-tx2); }
 .sxr-vacio .sxr-crear { width: auto; padding: 0 1.4rem; }
-@keyframes sxr-latido { 50% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--color-galaxy-600) 8%, transparent); } }
+@keyframes sxr-latido { 50% { transform: scale(1.14); } }   /* rendimiento: antes animaba box-shadow */
 
 /* Publicaciones: la elegida con J/K se marca, los textos largos se pliegan */
 .sx-post { scroll-margin-top: 8rem; }
@@ -313,7 +313,7 @@
 .sxr-tend-n { flex: none; width: 1.75rem; text-align: center; font: 900 1rem var(--font-display); color: #5c6478; }
 .sxr-tend:first-child .sxr-tend-n { color: #fb923c; }
 .sxr-tend .sxr-fila-tx { flex: 1; }
-.sxr-tend-fuego { color: #fb923c; }
+.sxr-tend-fuego { display: inline-block; color: #fb923c; }
 @media (prefers-reduced-motion: no-preference) { .sxr-tend-fuego { animation: sxr-latido 1.6s ease-in-out infinite; } }
 /* «Retar a duelo» en el menú ⋯ (es un enlace: mismo aspecto que los botones del menú) */
 .sx-post-menu-lista a { width: 100% !important; height: auto !important; min-height: 2.4rem; display: flex !important; align-items: center; gap: .65rem; padding: 0 .7rem; border-radius: .6rem; font-size: 13.5px; }
@@ -487,11 +487,16 @@ button.sx-pie-total:hover { background: rgb(255 255 255 / .07); }
 }
 @media (max-width: 359.98px) { .sx-pie-vistas { display: none; } }
 
-/* Jugadas (19-oct-2026): el círculo que abre el feed vertical, primero en la fila de historias. Anillo de fuego que gira despacio. */
-.sx-hist-jugadas { color: inherit; text-decoration: none; }
-.sx-hist-jugadas .sx-anillo { position: relative; background: conic-gradient(from var(--jg-giro, 0deg), #fde047, #fb923c, #f43f5e, #c084fc, #fde047); box-shadow: 0 0 16px -2px #fb923c99; animation: sx-jg-giro 6s linear infinite; }
-.sx-hist-jugadas .sx-anillo-in { background: radial-gradient(circle at 50% 35%, #3b1a2e, #12081f); color: #fff; font-size: 1.35rem; }
-.sx-hist-jugadas .sx-hist-nombre { font-weight: 700; }
-@property --jg-giro { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-@keyframes sx-jg-giro { to { --jg-giro: 360deg; } }
-@media (prefers-reduced-motion: reduce) { .sx-hist-jugadas .sx-anillo { animation: none; } }
+/* Botón «Jugadas» en la barra pegada del muro (como el de Reels): abre el feed vertical. En celular solo el icono. 19-oct-2026. */
+.sxr-reels { flex: none; display: inline-flex; align-items: center; gap: .4rem; height: 2.25rem; padding: 0 .8rem; border-radius: 999px; color: #fff; font-size: .8rem; font-weight: 700;
+  background: linear-gradient(135deg, #fb923c, #f43f5e); box-shadow: 0 6px 18px -8px #f43f5e; transition: transform .16s cubic-bezier(.23, 1, .32, 1), filter .2s ease; }
+.sxr-reels:hover { filter: brightness(1.08); }
+.sxr-reels:active { transform: scale(.95); }
+@media (max-width: 479px) { .sxr-reels { width: 2.25rem; padding: 0; justify-content: center; } .sxr-reels span { display: none; } }
+
+/* «Eliminar» en una respuesta (19-oct-2026): discreto, se ilumina en rojo al pasar o enfocar */
+.sxr-resp-borrar { margin-left: .5rem; display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .35rem; border-radius: .4rem; font-size: 12px; color: #8b93a7; background: none; border: 0; cursor: pointer; transition: color .15s ease, background .15s ease; }
+.sxr-resp-borrar:hover, .sxr-resp-borrar:focus-visible { color: #fb7185; background: rgb(251 113 133 / .1); }
+
+/* «Eliminar» del menú ⋯ en rojo suave: se distingue de lo demás (19-oct-2026) */
+.sx-post-menu-lista [data-borrar-pub], .sx-post-menu-lista [data-borrar-pub]::after { color: #fb7185; }

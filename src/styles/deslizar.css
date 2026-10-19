@@ -1,0 +1,24 @@
+/* DESLIZAR ENTRE SECCIONES (19-oct-2026): Social ↔ Jugadas como Inicio ↔ Reels en Instagram. Lo usan pages/social.astro y pages/jugadas.astro
+   (la lógica está en features/social/gestos.js → montarDeslizarA). --k = cuánto llevas arrastrado (0 a 1). */
+.px-desliza { position: fixed; z-index: 90; top: 50%; display: flex; align-items: center; gap: .45rem; padding: .65rem 1rem; border-radius: 999px; pointer-events: none;
+  color: #fff; font-size: .85rem; font-weight: 700; background: #120a24e6; border: 1px solid #ffffff2a; box-shadow: 0 12px 30px -8px #000; opacity: 0;
+  transition: opacity .2s ease, transform .28s cubic-bezier(.23, 1, .32, 1), background .2s ease; }
+.px-desliza-izq { right: .6rem; transform: translate(calc((1 - var(--k, 0)) * 130%), -50%) scale(calc(.85 + var(--k, 0) * .15)); }
+.px-desliza-der { left: .6rem; transform: translate(calc((var(--k, 0) - 1) * 130%), -50%) scale(calc(.85 + var(--k, 0) * .15)); }
+.px-desliza.is-viva { opacity: calc(.35 + var(--k, 0) * .65); transition: opacity .1s linear, background .2s ease; }   /* sigue al dedo sin retraso */
+.px-desliza:not(.is-viva) { --k: 0; }
+.px-desliza.is-lista { background: linear-gradient(135deg, #fb923c, #f43f5e); border-color: transparent; }
+
+/* Transición de página hacia el lado del gesto (navegadores con transiciones entre páginas; los demás cambian de página normal) */
+:root[data-desliza='izq']::view-transition-old(root), :root[data-fx-3d][data-desliza='izq']::view-transition-old(root) { animation: px-sale-izq .26s cubic-bezier(.4, 0, 1, 1) both; }
+:root[data-desliza='der']::view-transition-old(root), :root[data-fx-3d][data-desliza='der']::view-transition-old(root) { animation: px-sale-der .26s cubic-bezier(.4, 0, 1, 1) both; }
+:root:active-view-transition-type(desliza-izq)::view-transition-new(root), :root[data-fx-3d]:active-view-transition-type(desliza-izq)::view-transition-new(root) { animation: px-entra-der .34s cubic-bezier(.23, 1, .32, 1) both; }
+:root:active-view-transition-type(desliza-der)::view-transition-new(root), :root[data-fx-3d]:active-view-transition-type(desliza-der)::view-transition-new(root) { animation: px-entra-izq .34s cubic-bezier(.23, 1, .32, 1) both; }
+@keyframes px-sale-izq { to { transform: translateX(-28%); opacity: 0; } }
+@keyframes px-sale-der { to { transform: translateX(28%); opacity: 0; } }
+@keyframes px-entra-der { from { transform: translateX(35%); opacity: 0; } }
+@keyframes px-entra-izq { from { transform: translateX(-35%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .px-desliza { transition: opacity .1s linear; }
+  :root[data-desliza]::view-transition-old(root), :root:active-view-transition-type(desliza-izq, desliza-der)::view-transition-new(root) { animation: none; }
+}

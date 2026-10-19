@@ -39,6 +39,13 @@ const solid = fs.readFileSync(path.join(faDir, 'css/solid.min.css'), 'utf8').rep
 if (!solid.includes('fa-solid-900.recortado.woff2')) throw new Error('No encontré la @font-face de solid.min.css: ¿cambió Font Awesome?');
 fs.writeFileSync(path.join(salida, 'fa-solid.css'), `/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Font Awesome ${JSON.parse(fs.readFileSync(path.join(faDir, 'package.json'), 'utf8')).version} sólido, recortado a ${faUsados.length} iconos. */\n${solid}\n`);
 
+// 2b) Nombres de Font Awesome: fontawesome.css trae ~2.000 reglas «.fa-x { --fa: código }» (unos 70 KB en CADA página); se dejan solo las usadas.
+//     (19-oct-2026, rendimiento.) Si un icono sale en blanco tras añadirlo, vuelve a ejecutar esto; los que vienen de la base van en extra.txt.
+const faUsadosSet = new Set(faUsados);
+const faNombres = faCss.replace(/((?:\.fa-[a-z0-9-]+,?\s*)+)\{\s*--fa:\s*"[^"]+";?\s*\}\s*/g, (bloque, sels) => ([...sels.matchAll(/\.fa-([a-z0-9-]+)/g)].some((n) => faUsadosSet.has(n[1])) ? bloque : ''));
+if (faNombres.length > faCss.length * 0.6) throw new Error('El recorte de fontawesome.css no quitó casi nada: ¿cambió su formato?');
+fs.writeFileSync(path.join(salida, 'fontawesome.recortado.css'), `/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los ${faUsados.length} nombres que usa la web. */\n${faNombres}`);
+
 // 3) Phosphor Bold: los del mapa de iconosFinos.js + los «ph-…» del código; CSS solo con esos iconos.
 const phDir = path.join(raiz, 'node_modules/@phosphor-icons/web/src/bold');
 const phCss = fs.readFileSync(path.join(phDir, 'style.css'), 'utf8');

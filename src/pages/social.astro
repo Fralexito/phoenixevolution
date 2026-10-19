@@ -7,11 +7,13 @@
 import Layout from '../layouts/Layout.astro';
 // CSS propio de esta página (no va en global.css). DESPUÉS de Layout: así gana a global.css.
 import '../styles/socialHilo.css';
+import '../styles/deslizar.css';
 import '../styles/publicar.css';   // la ventana «Crear publicación» (features/muro/compositor.js)
 const base = import.meta.env.BASE_URL;
-const enlaces = [['jugadas/', 'fa-clapperboard', 'Jugadas'], ['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-group', 'Amigos'], ['mensajes/', 'fa-comments', 'Mensajes'], ['guardados/', 'fa-bookmark', 'Guardados'], ['buscar/', 'fa-magnifying-glass', 'Buscar']];
+const enlaces = [['comunidad/', 'fa-users', 'Comunidad'], ['amigos/', 'fa-user-group', 'Amigos'], ['mensajes/', 'fa-comments', 'Mensajes'], ['guardados/', 'fa-bookmark', 'Guardados'], ['buscar/', 'fa-magnifying-glass', 'Buscar']];
 ---
 <Layout title="Social" active="social" description="Lo que publican los jugadores de Phoenix Evolution Series: historias, fotos, videos y resultados de toda la comunidad.">
+  <script is:inline>addEventListener('pagereveal', (e) => { try { const d = sessionStorage.getItem('px-desliza'); sessionStorage.removeItem('px-desliza'); if (d && e.viewTransition) e.viewTransition.types.add('desliza-' + d); } catch {} });</script>
   <div class="sxr w-full">
     <h1 class="sr-only">Social</h1>
     <aside class="sxr-izq" aria-label="Navegación de Social">
@@ -32,6 +34,7 @@ const enlaces = [['jugadas/', 'fa-clapperboard', 'Jugadas'], ['comunidad/', 'fa-
       <div class="sxr-orden">
         <p class="sxr-titulo" data-sxr-titulo></p>
         <div id="sx-vistas" role="tablist" aria-label="Qué ver en el feed" class="sxr-vistas"></div>
+        <a class="sxr-reels" href={`${base}jugadas/`} data-sxr-reels title="Jugadas: videos en vertical (o desliza a la izquierda)" aria-label="Jugadas: videos de la comunidad en vertical"><i class="fa-solid fa-clapperboard" aria-hidden="true"></i><span>Jugadas</span></a>
         <div class="sxr-filtros">
           <button type="button" class="sxr-filtros-btn" data-sxr-filtros aria-expanded="false" aria-controls="sx-pop" aria-label="Ordenar y filtrar" title="Ordenar y filtrar"><i class="fa-solid fa-sliders" aria-hidden="true"></i><span class="sxr-filtros-punto" data-sxr-punto hidden></span></button>
           <div id="sx-pop" class="sxr-pop" hidden>

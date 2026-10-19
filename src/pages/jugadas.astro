@@ -5,10 +5,12 @@
 // y «Retar» al autor. Datos: migración 136 (jugadas_feed…). Lógica en js/pages/jugadas.js; estilos en styles/jugadas.css (solo esta página).
 import Layout from '../layouts/Layout.astro';
 import '../styles/jugadas.css';
+import '../styles/deslizar.css';
 import { PESTANAS_JUGADAS, CATEGORIAS_JUGADA } from '../data/jugadas.js';
 const base = import.meta.env.BASE_URL;
 ---
 <Layout title="Jugadas" active="jugadas" description="Las mejores jugadas de la comunidad de Phoenix Evolution Series: golazos, atajadas, skills y remontadas, en vertical.">
+  <script is:inline>addEventListener('pagereveal', (e) => { try { const d = sessionStorage.getItem('px-desliza'); sessionStorage.removeItem('px-desliza'); if (d && e.viewTransition) e.viewTransition.types.add('desliza-' + d); } catch {} });</script>
   <h1 class="sr-only">Jugadas</h1>
   <div class="jg" data-jg>
     <div class="jg-fondo" aria-hidden="true"></div>

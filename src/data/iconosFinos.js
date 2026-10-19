@@ -175,6 +175,7 @@ export const FA_A_PH = {
   'timeline': 'git-branch',
   'tower-broadcast': 'broadcast',
   'trash': 'trash',
+  'trash-can': 'trash',
   'triangle-exclamation': 'warning',
   'trophy': 'trophy',
   'tv': 'television',

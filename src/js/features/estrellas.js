@@ -17,7 +17,9 @@ export function montarEstrellas(canvas = document.querySelector('[data-vt-estrel
   const quieto = hayMovimientoReducido();
   let w = 0, h = 0, dpr = 1, estrellas = [], fugaz = null, proximaFugaz = performance.now() + 6000;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-  let corriendo = false, visible = true, raf = 0, ultimo = 0;
+  let espera = 0;
+  let corriendo = false, visible = true, raf = 0, ultimo = 0, arribaHeader = 0;   // arribaHeader: posición de la portada en la página (se mide al cambiar el tamaño, no en cada cuadro)
+  const mqMovil = window.matchMedia('(max-width: 767px)'); const movil = () => mqMovil.matches;   // una sola consulta (no una nueva en cada cuadro)
 
   const crear = () => {
     const n = window.matchMedia('(max-width: 767px)').matches ? 45 : 90;
@@ -30,7 +32,8 @@ export function montarEstrellas(canvas = document.querySelector('[data-vt-estrel
   };
   const medir = () => {
     const r = header.getBoundingClientRect();
-    dpr = Math.min(window.matchMedia('(max-width: 767px)').matches ? 1.5 : 2, window.devicePixelRatio || 1);
+    dpr = Math.min(movil() ? 1 : 2, window.devicePixelRatio || 1);   // en celular 1: son puntitos, no se nota y dibuja la mitad
+    arribaHeader = r.top + window.scrollY;
     w = Math.max(1, r.width); h = Math.max(1, r.height);
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -40,7 +43,7 @@ export function montarEstrellas(canvas = document.querySelector('[data-vt-estrel
   const dibujar = (t, dt) => {
     ctx.clearRect(0, 0, w, h);
     mouse.x += (mouse.tx - mouse.x) * .05; mouse.y += (mouse.ty - mouse.y) * .05;   // el paralaje llega suave, no de golpe
-    const scroll = Math.min(h, Math.max(0, -header.getBoundingClientRect().top));
+    const scroll = Math.min(h, Math.max(0, window.scrollY - arribaHeader));   // rendimiento (19-oct-2026): antes getBoundingClientRect en cada cuadro forzaba recalcular la página
     for (const s of estrellas) {
       const prof = [6, 16, 34][s.z];
       if (!quieto) { s.y -= [2, 4, 7][s.z] * dt; s.x += [1, 2, 3][s.z] * dt; s.tw += s.tv * dt; }
@@ -67,13 +70,14 @@ export function montarEstrellas(canvas = document.querySelector('[data-vt-estrel
 
   const cuadro = (t) => {
     if (!corriendo) return;
-    if (ultimo && t - ultimo < 30) { raf = requestAnimationFrame(cuadro); return; }   // ~30 fps: se ve igual de suave (todo es lento) y gasta la mitad
     const dt = Math.min(.05, (t - (ultimo || t)) / 1000); ultimo = t;
     dibujar(t, dt);
-    raf = requestAnimationFrame(cuadro);
+    // ~30 fps en PC y ~24 en celular (todo es lento: se ve igual de suave). Rendimiento (19-oct-2026): se ESPERA con un temporizador y solo entonces
+    // se pide el cuadro; antes se pedía un cuadro en cada refresco (60+/s) y se saltaba, y cada uno obligaba a revisar toda la portada.
+    espera = setTimeout(() => { raf = requestAnimationFrame(cuadro); }, movil() ? 34 : 24);
   };
   const arrancar = () => { if (corriendo || quieto || !visible || document.hidden) return; corriendo = true; ultimo = 0; raf = requestAnimationFrame(cuadro); };
-  const parar = () => { corriendo = false; cancelAnimationFrame(raf); };
+  const parar = () => { corriendo = false; cancelAnimationFrame(raf); clearTimeout(espera); };
 
   medir();
   dibujar(performance.now(), 0);
