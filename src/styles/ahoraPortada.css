@@ -1,0 +1,67 @@
+/* «AHORA EN PHOENIX» en la portada (19-oct-2026; js/features/portada/ahora.js). Solo lo importa src/pages/index.astro.
+   Tres franjas que se deslizan de lado (con imán): salas en juego, historias de hoy y lo más reaccionado de Social. */
+.ahora { --ah-e: cubic-bezier(.23, 1, .32, 1); max-width: 80rem; margin: 1.5rem auto 0; padding: 0 1rem; display: grid; gap: 1.1rem; }
+.ahora[hidden] { display: none; }
+.ah-titulo { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: .6rem; }
+.ah-titulo h2 { font: 800 1.3rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.ah-titulo p { grid-column: 2; font-size: 13px; color: #94a0b6; }
+.ah-punto { width: .7rem; height: .7rem; border-radius: 99px; background: #ef4444; box-shadow: 0 0 0 0 rgb(239 68 68 / .6); }
+@media (prefers-reduced-motion: no-preference) { .ah-punto { animation: ah-late 1.8s ease-out infinite; } }
+@keyframes ah-late { 70%, 100% { box-shadow: 0 0 0 9px rgb(239 68 68 / 0); } }
+
+.ah-franja { display: grid; gap: .55rem; }
+.ah-cab { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.ah-cab h3 { display: flex; align-items: center; gap: .5rem; font: 800 .8rem var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #d6dbe5; }
+.ah-cab h3 i { color: var(--color-galaxy-400); }
+.ah-n { display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 .35rem; border-radius: 99px; font-size: .7rem; color: #04121a; background: var(--color-galaxy-400); letter-spacing: 0; }
+.ah-cab a { display: inline-flex; align-items: center; gap: .35rem; font-size: 12.5px; font-weight: 700; color: var(--color-galaxy-400); white-space: nowrap; }
+.ah-cab a:hover { color: #fff; }
+.ah-carril { display: flex; gap: .65rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: .15rem .1rem .45rem; margin: 0 -.1rem;
+  -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); }
+.ah-carril::-webkit-scrollbar { display: none; }
+.ah-carril > * { flex: none; scroll-snap-align: start; transition: transform .2s var(--ah-e), border-color .2s ease, background-color .2s ease; }
+.ah-carril > *:active { transform: scale(.97); }
+@media (prefers-reduced-motion: no-preference) {
+  .ah-carril > * { animation: ah-entra .45s var(--ah-e) backwards; }
+  .ah-carril > :nth-child(2) { animation-delay: .05s; } .ah-carril > :nth-child(3) { animation-delay: .1s; } .ah-carril > :nth-child(4) { animation-delay: .15s; } .ah-carril > :nth-child(n+5) { animation-delay: .2s; }
+}
+@keyframes ah-entra { from { opacity: 0; transform: translateX(14px); } }
+
+/* Salas en juego: dos caras, marcador grande y minuto */
+.ah-sala { width: 16.5rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .3rem .4rem; padding: .85rem .8rem .7rem; border-radius: 1.1rem; text-align: center;
+  background: linear-gradient(160deg, rgb(255 255 255 / .05), rgb(255 255 255 / .015)); border: 1px solid rgb(255 255 255 / .08); }
+.ah-sala.en-juego { border-color: rgb(239 68 68 / .35); background: linear-gradient(160deg, rgb(239 68 68 / .1), rgb(255 255 255 / .015)); }
+.ah-sala:hover { border-color: rgb(255 255 255 / .2); transform: translateY(-2px); }
+.ah-eq { display: grid; justify-items: center; gap: .3rem; min-width: 0; }
+.ah-eq > :first-child { width: 2.5rem; height: 2.5rem; border-radius: 99px; overflow: hidden; box-shadow: 0 0 0 2px rgb(255 255 255 / .1); }
+.ah-eq b { max-width: 100%; font-size: 12px; color: #e6eaf2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ah-libre { display: grid; place-items: center; color: #7c869b; background: rgb(255 255 255 / .04); border: 1.5px dashed rgb(255 255 255 / .2); }
+.ah-centro { display: grid; justify-items: center; gap: .15rem; }
+.ah-marc { display: flex; align-items: center; gap: .25rem; font: 900 1.5rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.ah-marc i { font-style: normal; color: #5c6478; font-size: 1rem; }
+.ah-vs { font: 900 1rem var(--font-display); color: #7c869b; letter-spacing: .1em; }
+.ah-min { font: 700 .7rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #fca5a5; white-space: nowrap; }
+.ah-sala:not(.en-juego) .ah-min { color: #94a0b6; }
+.ah-clubes { grid-column: 1 / -1; font-size: 11.5px; color: #8e98ad; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Historias: anillos de color */
+.ah-hist { width: 5.2rem; display: grid; justify-items: center; gap: .3rem; text-align: center; }
+.ah-anillo { display: grid; place-items: center; width: 4.1rem; height: 4.1rem; border-radius: 99px; padding: 3px; background: conic-gradient(from 200deg, #f43f5e, #f59e0b, #a855f7, var(--color-galaxy-400), #f43f5e); transition: transform .25s var(--ah-e); }
+.ah-anillo > span { width: 100%; height: 100%; border-radius: 99px; overflow: hidden; display: grid; place-items: center; background: #0d0920; box-shadow: 0 0 0 3px #0d0920; }
+.ah-hist:hover .ah-anillo { transform: scale(1.05); }
+.ah-hist b { max-width: 100%; font-size: 12px; color: #e6eaf2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ah-hist small { margin-top: -.25rem; font-size: 11px; color: #7c869b; }
+
+/* Lo más reaccionado: tarjetas de texto */
+.ah-post { width: 15.5rem; display: grid; align-content: start; gap: .45rem; padding: .8rem .85rem .7rem; border-radius: 1.1rem; background: rgb(255 255 255 / .035); border: 1px solid rgb(255 255 255 / .08); }
+.ah-post:hover { border-color: rgb(255 255 255 / .2); transform: translateY(-2px); }
+.ah-post-cab { display: flex; align-items: center; gap: .45rem; min-width: 0; }
+.ah-post-av { flex: none; display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 99px; overflow: hidden; background: #1b1830; font-size: 12px; }
+.ah-post-av > * { width: 100%; height: 100%; display: grid; place-items: center; }
+.ah-post-cab b { min-width: 0; font-size: 12.5px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ah-post-cab small { margin-left: auto; flex: none; font-size: 11px; color: #7c869b; }
+.ah-post p { font-size: 13.5px; line-height: 1.45; color: #dfe3ec; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 3.9em; }
+.ah-post-pie { display: flex; gap: .9rem; font-size: 12px; color: #a3acbf; }
+.ah-post-pie span { display: inline-flex; align-items: center; gap: .3rem; font-variant-numeric: tabular-nums; }
+.ah-post-pie .fa-fire { color: #fb923c; }
+@media (min-width: 1024px) { .ah-titulo h2 { font-size: 1.5rem; } }

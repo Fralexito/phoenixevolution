@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 // CSS propio de la banda «Tu club» (19-oct-2026). DESPUÉS de Layout: así gana a global.css.
 import '../styles/tuClub.css';
+import '../styles/ahoraPortada.css';   // «Ahora en Phoenix» (js/features/portada/ahora.js)
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
@@ -378,6 +379,10 @@ const VENTANAS = [
        con sesión sin club: invitación a elegir uno; sin sesión: qué puedes hacer con tu club de PES. Lo pinta js/features/portada/tuClub.js. -->
   <section class="tuclub" data-tuclub aria-label="Tu club"></section>
 
+  <!-- AHORA EN PHOENIX (19-oct-2026): historias del día, salas en juego y lo más reaccionado de Social, en franjas que se deslizan.
+       La pinta js/features/portada/ahora.js; si no hay nada, queda oculta. -->
+  <section class="ahora" data-ahora hidden aria-labelledby="ahora-t"></section>
+
   <div class:list={["max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full", FX.limpio ? "space-y-12 sm:space-y-16" : "space-y-8 sm:space-y-10"]}>
 
     {FX.cartasPortada && (<Fragment>
@@ -607,6 +612,7 @@ const VENTANAS = [
   import('../js/features/estrellas.js').then((m) => m.montarEstrellas()).catch((e) => console.warn('[central] estrellas:', e));
   import('../js/features/ventanas.js').then((m) => m.montarVentanas()).catch((e) => console.warn('[central] ventanas:', e));
   import('../js/features/portada/tuClub.js').then((m) => m.montarTuClub()).catch((e) => console.warn('[central] tu club:', e));
+  import('../js/features/portada/ahora.js').then((m) => m.montarAhora()).catch((e) => console.warn('[central] ahora:', e));
   import('../js/features/escenario.js').then((m) => m.montarEscenario()).catch((e) => console.warn('[central] escenario:', e));
   import('../js/features/transmision.js').then((m) => m.montarTransmision()).catch((e) => console.warn('[central] transmisión:', e));
   document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));
