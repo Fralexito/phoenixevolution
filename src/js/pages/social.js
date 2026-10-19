@@ -79,14 +79,24 @@ function abrirCirculo(i) {
 
 /* ---------- Feed ---------- */
 function pintarVistas() {
-  vistasEl.innerHTML = VISTAS.map((v) => `<button type="button" data-v="${v.id}" role="tab" aria-selected="${S.vista === v.id}" class="sx-tab ${S.vista === v.id ? 'is-on' : ''}"><i class="fa-solid ${v.icono}" aria-hidden="true"></i>${escapeHTML(v.texto)}</button>`).join('');
+  vistasEl.innerHTML = `<span class="sxr-vistas-pastilla" aria-hidden="true"></span>${VISTAS.map((v) => `<button type="button" data-v="${v.id}" role="tab" aria-selected="${S.vista === v.id}" class="sx-tab ${S.vista === v.id ? 'is-on' : ''}"><i class="fa-solid ${v.icono}" aria-hidden="true"></i>${escapeHTML(v.texto)}</button>`).join('')}`;
+  requestAnimationFrame(moverPastilla);   // la pastilla se desliza desde la pestaña anterior hasta la nueva
   $('sx-filtro-wrap').hidden = !vistaInfo(S.vista).filtraJuego;
   pintarNav();
 }
+/** Pastilla de las pestañas (celular): se coloca bajo la elegida; el CSS la desliza. */
+function moverPastilla() {
+  const b = vistasEl.querySelector('[aria-selected="true"]'); if (!b) return;
+  vistasEl.style.setProperty('--x', `${b.offsetLeft}px`); vistasEl.style.setProperty('--w', `${b.offsetWidth}px`);
+}
+/** Punto en el botón «Ordenar y filtrar» si algo no está como viene (orden, juego o vista compacta): se sabe sin abrirlo. */
+function marcarFiltros() {
+  const p = document.querySelector('[data-sxr-punto]'); if (!p) return;
+  p.hidden = !(S.orden !== 'nuevos' || (S.vista === 'recientes' && S.juego) || feedEl.dataset.modo === 'compacta');
+}
 function pintarFiltro() {
-  filtroEl.innerHTML = [['', 'Todo'], ...SEGMENTOS].map(([id, n]) => `<button type="button" data-j="${id}" aria-pressed="${S.juego === id}" class="rounded-full border border-galaxy-border/70 px-2.5 py-1 text-gray-400 aria-pressed:text-white aria-pressed:border-galaxy-400 aria-pressed:bg-galaxy-600/25">${escapeHTML(n)}</button>`).join('');
-  const r = $('sx-filtro-res'); if (r) r.textContent = S.juego ? (SEGMENTOS.find((s) => s[0] === S.juego)?.[1] ?? '') : 'Todos los juegos';
-  pintarNav();
+  filtroEl.innerHTML = [['', 'Todo'], ...SEGMENTOS].map(([id, n]) => `<button type="button" data-j="${id}" aria-pressed="${S.juego === id}" class="sxr-chip">${escapeHTML(n)}</button>`).join('');
+  pintarNav(); marcarFiltros();
 }
 const tarjeta = (it) => tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id) }) });
 let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
@@ -216,6 +226,7 @@ function aplicarModo(m) {
   const modo = m === 'compacta' ? 'compacta' : 'tarjeta'; feedEl.dataset.modo = modo;
   document.querySelectorAll('[data-sxr-modo]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sxrModo === modo)));
   try { localStorage.setItem(KEY_MODO, modo); } catch { /* sin almacenamiento: solo no se recuerda */ }
+  marcarFiltros();
 }
 document.querySelectorAll('[data-sxr-modo]').forEach((b) => b.addEventListener('click', () => aplicarModo(b.dataset.sxrModo)));
 try { aplicarModo(localStorage.getItem(KEY_MODO)); } catch { aplicarModo('tarjeta'); }
@@ -223,7 +234,7 @@ try { aplicarModo(localStorage.getItem(KEY_MODO)); } catch { aplicarModo('tarjet
 /* ---------- Más vida (19-oct-2026): ordenar, respuestas en el feed, nuevas en vivo, a quién seguir, atajos ---------- */
 // Ordenar lo cargado (Nuevos · Más reacciones · Más comentados): no pide nada a la base, solo reordena.
 const ordenesEl = document.querySelector('[data-sxr-ordenes]');
-function pintarOrdenes() { if (ordenesEl) ordenesEl.innerHTML = ORDENES.map((o) => `<button type="button" data-sxr-orden="${o.id}" aria-pressed="${S.orden === o.id}" title="Ordenar: ${escapeHTML(o.texto)}"><i class="fa-solid ${o.icono}" aria-hidden="true"></i><span>${escapeHTML(o.texto)}</span></button>`).join(''); }
+function pintarOrdenes() { marcarFiltros(); if (ordenesEl) ordenesEl.innerHTML = ORDENES.map((o) => `<button type="button" data-sxr-orden="${o.id}" aria-pressed="${S.orden === o.id}" title="Ordenar: ${escapeHTML(o.texto)}"><i class="fa-solid ${o.icono}" aria-hidden="true"></i><span>${escapeHTML(o.texto)}</span></button>`).join(''); }
 ordenesEl?.addEventListener('click', (e) => {
   const b = e.target.closest('[data-sxr-orden]'); if (!b || b.dataset.sxrOrden === S.orden) return;
   S.orden = ordenValido(b.dataset.sxrOrden); pintarOrdenes(); history.replaceState(null, '', urlActual()); pintados = 0; pintar();
@@ -320,6 +331,14 @@ const arribaEl = document.querySelector('[data-sxr-arriba]'); let arribaPend = f
 window.addEventListener('scroll', () => { if (arribaPend) return; arribaPend = true; requestAnimationFrame(() => { arribaPend = false; if (arribaEl) arribaEl.hidden = window.scrollY < 1400; }); }, { passive: true });
 arribaEl?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 pintarOrdenes();
+
+// «Ordenar y filtrar» (19-oct-2026): orden, juego y vista viven en un panel que se abre con un botón; se cierra al tocar fuera o con Esc.
+const filtrosBtn = document.querySelector('[data-sxr-filtros]'); const popEl = $('sx-pop');
+function abrirFiltros(abrir) { if (!popEl || !filtrosBtn) return; popEl.hidden = !abrir; filtrosBtn.setAttribute('aria-expanded', String(abrir)); }
+filtrosBtn?.addEventListener('click', (e) => { e.stopPropagation(); abrirFiltros(popEl.hidden); });
+document.addEventListener('click', (e) => { if (popEl && !popEl.hidden && !e.target.closest('.sxr-filtros')) abrirFiltros(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && popEl && !popEl.hidden) { abrirFiltros(false); filtrosBtn?.focus(); } });
+window.addEventListener('resize', () => requestAnimationFrame(moverPastilla), { passive: true });
 
 /* ---------- Arranque ---------- */
 initMencionAuto();

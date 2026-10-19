@@ -27,12 +27,15 @@ export function tarjetaComunidadHTML(it, opciones = {}) {
   // Variante «hilo» (solo /social/, 19-oct-2026, estilo foro tipo Reddit): cabecera en una línea (cara · nombre · hace cuánto · juego),
   // sin caja de cristal: las publicaciones van separadas por una línea y se iluminan al pasar el mouse. Los estilos están en socialHilo.css.
   if (opciones.variante === 'hilo') {
+    // 19-oct-2026 (Fralex: «que el muro no se vea tan cargado… minimalista pero completo»): cara más grande con nombre y «hace cuánto · juego»
+    // en dos líneas, y guardar/reportar/ocultar dentro de un solo menú «⋯» (antes eran tres iconos sueltos en cada publicación).
+    const acc = botonesHTML(it, opciones);
     return `<article class="sx-post" data-pub="${Number(it.id)}">
     <header class="sx-post-cab">
-      <a href="${escapeHTML(perfil)}" class="sx-post-av" tabindex="-1" aria-hidden="true">${avatarHTML(a.avatar_url, a.nombre_display, 24)}</a>
-      <a href="${escapeHTML(perfil)}" class="sx-post-autor">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
-      <span class="sx-post-punto" aria-hidden="true">•</span><time class="sx-post-hace" datetime="${escapeHTML(it.created_at ?? '')}" data-t="${escapeHTML(it.created_at ?? '')}">${tiempoRelativo(it.created_at)}</time>${segmentoChipHTML(it.juego)}
-      <span class="sx-post-acc">${botonesHTML(it, opciones)}</span></header>
+      <a href="${escapeHTML(perfil)}" class="sx-post-av" tabindex="-1" aria-hidden="true">${avatarHTML(a.avatar_url, a.nombre_display, 36)}</a>
+      <span class="sx-post-id"><a href="${escapeHTML(perfil)}" class="sx-post-autor">${escapeHTML(a.nombre_display ?? 'Jugador')}</a>
+        <span class="sx-post-meta"><time class="sx-post-hace" datetime="${escapeHTML(it.created_at ?? '')}" data-t="${escapeHTML(it.created_at ?? '')}">${tiempoRelativo(it.created_at)}</time>${segmentoChipHTML(it.juego)}</span></span>
+      ${acc ? `<details class="sx-post-menu" name="sx-menu"><summary aria-label="Más opciones" title="Más opciones"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></summary><div class="sx-post-menu-lista">${acc}</div></details>` : ''}</header>
     <div class="sx-post-cuerpo"${esLargo(it.texto) ? ' data-largo="1"' : ''}>${contenidoHTML(it)}${encuestaHTML(it.id)}${opciones.extra ?? ''}</div>
     ${esLargo(it.texto) ? `<button type="button" class="sx-post-mas" data-leer-mas="${Number(it.id)}" aria-expanded="false">Leer más</button>` : ''}
     ${opciones.pie ?? ''}<div class="sx-post-hilo" data-hilo="${Number(it.id)}" hidden></div></article>`;

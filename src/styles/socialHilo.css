@@ -34,7 +34,6 @@
 .sxr-vista button { width: 2.1rem; height: 2.1rem; display: grid; place-items: center; border-radius: 9999px; color: var(--sxr-tx2); font-size: 13px; }
 .sxr-vista button:hover { color: #fff; }
 .sxr-vista button[aria-pressed='true'] { background: rgb(255 255 255 / .12); color: #fff; }
-@media (min-width: 768px) { .sxr-filtro-movil { display: none; } }
 
 /* Publicaciones en hilo: sin caja, separadas por una línea, se iluminan al pasar el mouse */
 .sxr-feed { display: grid; grid-template-columns: minmax(0, 1fr); }   /* sin esto la columna crecía al ancho del encabezado más largo y desbordaba en celular (19-oct) */
@@ -47,33 +46,18 @@
 .sx-post-av { flex: none; width: 1.5rem; height: 1.5rem; border-radius: 9999px; overflow: hidden; display: grid; place-items: center; background: #1b1830; }
 .sx-post-autor { font-weight: 700; color: #e8ebf4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 14rem; }
 .sx-post-autor:hover { color: var(--color-galaxy-400); text-decoration: underline; }
-.sx-post-punto { color: #5c6478; }
 .sx-post-hace { white-space: nowrap; }
-.sx-post-acc { margin-left: auto; display: flex; align-items: center; gap: .1rem; }
-.sx-post-acc button { width: 2rem; height: 2rem; border-radius: 9999px; }
-.sx-post-acc button:hover { background: rgb(255 255 255 / .08); }
 .sx-post-cuerpo { margin-top: .3rem; }
 .sx-post-cuerpo > p:first-child { font-size: 15px; line-height: 1.55; color: #eef0f6; }
 .sx-post-cuerpo img, .sx-post-cuerpo video, .sx-post-cuerpo iframe { border-radius: 1rem; }
 .sxr-resalta { background: color-mix(in srgb, var(--color-galaxy-600) 22%, transparent) !important; }
 
-/* Acciones: en una fila de cápsulas (las reacciones funcionan igual que antes) */
-.sx-post [data-pie] { margin-top: .5rem; }
-.sx-post [data-pie] > p { border: 0 !important; padding-bottom: .35rem !important; }
-.sx-post [data-pie] > .border-t { display: none; }
-.sx-post [data-pie] > .grid { display: flex !important; flex-wrap: wrap; gap: .5rem; padding-top: 0 !important; }
-.sx-post [data-pie] .sx-btn { min-height: 2rem; padding: 0 .85rem; border-radius: 9999px; background: rgb(255 255 255 / .07); color: #d6dae6; font: 600 12.5px var(--font-sans, inherit); letter-spacing: 0; }
-.sx-post [data-pie] .sx-btn:hover { background: rgb(255 255 255 / .13); color: #fff; }
-.sx-post [data-pie] .sx-btn.is-on { background: color-mix(in srgb, var(--color-galaxy-600) 40%, transparent); color: #fff; }
-.sx-post [data-pie] > .flex.justify-end { justify-content: flex-start; }
 
 /* Vista compacta: más publicaciones a la vista (medios más bajos, menos aire) */
 .sxr-feed[data-modo='compacta'] .sx-post { padding: .45rem .75rem .35rem; }
 .sxr-feed[data-modo='compacta'] .sx-post-cuerpo > p:first-child { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .sxr-feed[data-modo='compacta'] .sx-post-cuerpo :is(img, video) { max-height: 11rem; width: auto; max-width: 100%; object-fit: cover; }
 .sxr-feed[data-modo='compacta'] .sx-post-cuerpo iframe { max-height: 11rem; }
-.sxr-feed[data-modo='compacta'] [data-pie] > p { display: none; }
-.sxr-feed[data-modo='compacta'] [data-pie] .sx-btn { min-height: 1.8rem; }
 
 /* Columna derecha: la comunidad, pegada al bajar */
 .sxr-der { display: none; }
@@ -116,7 +100,6 @@
 .sxr-ordenar button { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.1rem; padding: 0 .7rem; border-radius: 9999px; color: var(--sxr-tx2); font-size: 12.5px; font-weight: 600; transition: background-color .15s, color .15s; }
 .sxr-ordenar button:hover { color: #fff; }
 .sxr-ordenar button[aria-pressed='true'] { background: rgb(255 255 255 / .12); color: #fff; }
-@media (max-width: 640px) { .sxr-ordenar button span { display: none; } .sxr-ordenar button { padding: 0 .6rem; } }
 
 /* Aviso «N publicaciones nuevas»: cápsula que baja suavemente y se queda arriba mientras se lee */
 .sxr-nuevas { position: sticky; top: 7.2rem; z-index: 5; justify-self: center; display: inline-flex; align-items: center; gap: .45rem; min-height: 2.4rem; padding: 0 1.1rem; border-radius: 9999px; background: var(--color-galaxy-600); color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 8px 24px rgb(0 0 0 / .45), 0 0 0 1px rgb(255 255 255 / .15) inset; animation: sxr-baja .45s cubic-bezier(.16, 1, .3, 1) both; }
@@ -143,8 +126,6 @@
 .sx-post-cuerpo[data-largo='1'] { max-height: 13rem; overflow: hidden; -webkit-mask-image: linear-gradient(#000 65%, transparent); mask-image: linear-gradient(#000 65%, transparent); }
 .sx-post-mas { margin-top: .25rem; padding: .2rem .1rem; font-size: 13px; font-weight: 700; color: var(--color-galaxy-400); }
 .sx-post-mas:hover { text-decoration: underline; }
-.sx-post [data-pie] a.sx-btn[aria-expanded='true'] { background: color-mix(in srgb, var(--color-galaxy-600) 35%, transparent); color: #fff; }
-.sx-post [data-pie] .sx-btn:active { transform: scale(.95); }
 
 /* Respuestas dentro del feed (hilo con línea a la izquierda, como los comentarios de un foro) */
 .sx-post-hilo { margin: .4rem 0 .2rem .7rem; padding-left: .9rem; border-left: 2px solid var(--sxr-linea); animation: sxr-abre .3s cubic-bezier(.16, 1, .3, 1) both; }
@@ -199,5 +180,110 @@
 @media (prefers-reduced-motion: reduce) {
   .sxr-nuevas, .sxr-esq span, .sxr-vacio-ic, .sx-post-hilo, .sxr-der .sxr-caja, .sxr-item::before, .sxr-arriba { animation: none !important; }
 }
-/* Celular: pestañas del feed en su propia fila; debajo, ordenar y la vista (antes se apretaban en una sola fila). */
-@media (max-width: 767.98px) { .sxr-orden { flex-wrap: wrap; row-gap: .4rem; } .sxr-vistas { flex: 1 1 100%; } .sxr-ordenar { margin-right: auto; } }
+
+/* ───── Muro minimalista (19-oct-2026, Fralex: «que no se vea tan cargado… estético, dinámico e inmersivo, minimalista pero completo») ─────
+   Una sola barra pegada arriba (pestañas + «Ordenar y filtrar»), «Publicar» en una línea, publicaciones con más aire, el menú «⋯»
+   en lugar de tres iconos y el pie en una sola fila. --sxr-e = salida rápida y suave (ease-out fuerte). */
+.sxr { --sxr-e: cubic-bezier(.23, 1, .32, 1); }
+
+/* «Publicar» en una sola línea: cara · «¿Qué está pasando?» · atajos solo con icono */
+.sxr #sx-compositor .px-disparador { grid-template-columns: auto minmax(0, 1fr) auto; padding: .35rem .15rem .75rem; border: 0; border-radius: 0; background: none; border-bottom: 1px solid var(--sxr-linea); }
+.sxr #sx-compositor .px-av { width: 2.5rem; height: 2.5rem; }
+.sxr #sx-compositor .px-abrir { min-height: 2.5rem; font-size: 14.5px; }
+.sxr #sx-compositor .px-rapidos { grid-column: auto; display: flex; gap: .1rem; padding: 0; border: 0; }
+.sxr #sx-compositor .px-rapidos button { width: 2.5rem; min-height: 2.5rem; padding: 0; border-radius: 99px; }
+.sxr #sx-compositor .px-rapidos button span { display: none; }
+.sxr #sx-compositor .px-rapidos button i { font-size: 1.05rem; }
+@media (max-width: 560px) { .sxr #sx-compositor .px-rapidos button:nth-child(n+3) { display: none; } }
+
+/* Barra pegada arriba con cristal */
+.sxr-orden { position: sticky; top: var(--sxr-arriba, 6.125rem); z-index: 8; gap: .5rem; padding: .4rem 0; margin: 0 -.25rem; padding-inline: .25rem; border-bottom: 1px solid var(--sxr-linea);
+  background: color-mix(in srgb, #0a0716 90%, transparent); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); }
+.sxr-vistas { position: relative; flex: 1; gap: 0; padding: .2rem; border-radius: 99px; background: var(--sxr-caja); }
+.sxr-vistas .sx-tab { position: relative; z-index: 1; flex: 1 0 auto; justify-content: center; gap: .4rem; min-height: 2.15rem; padding: 0 .8rem; transition: color .2s ease; }
+.sxr-vistas .sx-tab:hover { background: none; }
+.sxr-vistas .sx-tab.is-on { background: none; color: #fff; }
+.sxr-vistas-pastilla { position: absolute; top: .2rem; left: 0; height: calc(100% - .4rem); width: var(--w, 0); transform: translateX(var(--x, 0)); border-radius: 99px;
+  background: rgb(255 255 255 / .12); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); transition: transform .35s var(--sxr-e), width .35s var(--sxr-e); }
+.sxr-filtros { position: relative; flex: none; margin-left: auto; }
+.sxr-filtros-btn { position: relative; width: 2.55rem; height: 2.55rem; display: grid; place-items: center; border-radius: 99px; color: #c9d1de; background: var(--sxr-caja);
+  transition: background-color .2s ease, color .2s ease, transform .16s var(--sxr-e); }
+.sxr-filtros-btn:hover, .sxr-filtros-btn[aria-expanded='true'] { background: rgb(255 255 255 / .12); color: #fff; }
+.sxr-filtros-btn:active { transform: scale(.94); }
+.sxr-filtros-punto { position: absolute; top: .45rem; right: .45rem; width: .5rem; height: .5rem; border-radius: 99px; background: var(--color-galaxy-400); box-shadow: 0 0 0 2px #0a0716; }
+.sxr-pop { position: absolute; z-index: 20; right: 0; top: calc(100% + .5rem); width: min(19rem, calc(100vw - 2rem)); display: grid; gap: .45rem; padding: .85rem; border-radius: 1.1rem;
+  background: rgb(16 12 34 / .97); border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 24px 50px -18px rgb(0 0 0 / .95); transform-origin: top right; }
+.sxr-pop[hidden] { display: none; }
+@media (prefers-reduced-motion: no-preference) { .sxr-pop:not([hidden]) { animation: sxr-pop .2s var(--sxr-e); } }
+@keyframes sxr-pop { from { opacity: 0; transform: translateY(-4px) scale(.97); } }
+.sxr-pop-t { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sxr-tx2); }
+.sxr-pop-t:not(:first-child), .sxr-pop-juego { margin-top: .3rem; }
+.sxr-pop-juego { display: grid; gap: .45rem; }
+@media (min-width: 768px) { .sxr-pop-juego { display: none; } }   /* en PC el juego se elige en la columna izquierda */
+.sxr-pop .sxr-ordenar, .sxr-pop .sxr-vista { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: .2rem; padding: .2rem; border-radius: .9rem; }
+.sxr-pop .sxr-ordenar button, .sxr-pop .sxr-vista button { width: auto; height: auto; min-height: 2.3rem; justify-content: center; gap: .4rem; padding: 0 .5rem; border-radius: .7rem; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; }
+.sxr-pop .sxr-ordenar button span, .sxr-pop .sxr-vista button span { display: inline; }
+.sxr-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.sxr-chip { min-height: 2rem; padding: 0 .8rem; border-radius: 99px; font-size: 12.5px; font-weight: 600; color: #c3cad8; background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+.sxr-chip:hover { color: #fff; border-color: rgb(255 255 255 / .2); }
+.sxr-chip[aria-pressed='true'] { color: #fff; background: color-mix(in srgb, var(--color-galaxy-600) 40%, transparent); border-color: var(--color-galaxy-400); }
+.sxr-nuevas { top: calc(var(--sxr-arriba, 6.125rem) + 3.6rem); }
+
+/* Publicación: más aire, cara más grande, nombre y «hace cuánto · juego» en dos líneas */
+.sx-post { padding: 1rem .9rem .6rem; }
+.sx-post-cab { gap: .65rem; align-items: center; }
+.sx-post-av { width: 2.35rem; height: 2.35rem; box-shadow: 0 0 0 2px rgb(255 255 255 / .06); }
+.sx-post-id { display: grid; min-width: 0; line-height: 1.25; }
+.sx-post-autor { font-size: 14px; max-width: 100%; }
+.sx-post-meta { display: flex; align-items: center; gap: .4rem; font-size: 12px; color: var(--sxr-tx2); white-space: nowrap; overflow: hidden; }
+.sx-post-meta > span { padding: 0; border: 0; border-radius: 0; font-size: 12px; color: var(--sxr-tx2); }
+.sx-post-meta > span::before { content: '·'; margin-right: .4rem; color: #5c6478; }
+.sx-post-cuerpo { margin-top: .55rem; }
+/* Menú «⋯»: guardar, reportar y ocultar con su nombre */
+.sx-post-menu { position: relative; margin-left: auto; flex: none; }
+.sx-post-menu > summary { list-style: none; width: 2.2rem; height: 2.2rem; display: grid; place-items: center; border-radius: 99px; color: var(--sxr-tx2); cursor: pointer; transition: background-color .2s ease, color .2s ease; }
+.sx-post-menu > summary::-webkit-details-marker { display: none; }
+.sx-post-menu > summary:hover, .sx-post-menu[open] > summary { background: rgb(255 255 255 / .08); color: #fff; }
+.sx-post-menu-lista { position: absolute; z-index: 15; right: 0; top: calc(100% + .3rem); min-width: 12rem; display: grid; padding: .35rem; border-radius: .9rem;
+  background: rgb(16 12 34 / .97); border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 18px 40px -14px rgb(0 0 0 / .9); transform-origin: top right; }
+@media (prefers-reduced-motion: no-preference) { .sx-post-menu[open] .sx-post-menu-lista { animation: sxr-pop .18s var(--sxr-e); } }
+.sx-post-menu-lista button { width: 100% !important; height: auto !important; min-height: 2.4rem; display: flex; align-items: center; gap: .65rem; padding: 0 .7rem; border-radius: .6rem; font-size: 13.5px; text-align: left; }
+.sx-post-menu-lista button::after { content: attr(title); color: #e4e7f0; }
+.sx-post-menu-lista button:hover { background: rgb(255 255 255 / .07); }
+
+/* Pie en UNA fila: reaccionar · emojis · respuestas · compartir … resumen a la derecha */
+.sx-pie { margin-top: .6rem; }
+.sx-pie-fila { display: flex; align-items: center; gap: .3rem; }
+.sx-pie .sx-btn { min-height: 2.1rem; padding: 0 .8rem; gap: .4rem; border-radius: 99px; background: transparent; color: #b8c0d0; font: 600 13px var(--font-sans, inherit); letter-spacing: 0;
+  transition: background-color .2s ease, color .2s ease, transform .16s var(--sxr-e); }
+.sx-pie .sx-btn:hover { background: rgb(255 255 255 / .08); color: #fff; }
+.sx-pie .sx-btn:active { transform: scale(.94); }
+.sx-pie .sx-ico { width: 2.1rem; padding: 0; }
+.sx-pie .sx-rx { background: rgb(255 255 255 / .06); }
+.sx-pie .sx-btn.is-on { background: color-mix(in srgb, var(--color-galaxy-600) 40%, transparent); color: #fff; }
+.sx-pie a.sx-btn[aria-expanded='true'], .sx-pie [data-sx='paleta'][aria-expanded='true'] { background: color-mix(in srgb, var(--color-galaxy-600) 32%, transparent); color: #fff; }
+.sx-pie-total { margin-left: auto; display: inline-flex; align-items: center; gap: .35rem; font-size: 12.5px; color: var(--sxr-tx2); white-space: nowrap; }
+.sx-pie-emojis { display: inline-flex; }
+.sx-pie-emojis span { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 99px; font-size: .78rem; background: #1a1530; box-shadow: 0 0 0 2px #0d0a1c; }
+.sx-pie-emojis span + span { margin-left: -.35rem; }
+.sx-pie-total b { color: #d6dbe5; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sx-paleta { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .15rem; margin-top: .45rem; padding: .35rem; border-radius: 1rem; background: rgb(0 0 0 / .35); border: 1px solid var(--sxr-linea); }
+@media (prefers-reduced-motion: no-preference) { .sx-paleta { animation: sxr-pop .2s var(--sxr-e); transform-origin: top left; } }
+.sx-paleta button { height: 2.3rem; border-radius: .6rem; font-size: 1.15rem; transition: background-color .15s ease, transform .16s var(--sxr-e); }
+.sx-paleta button:hover { background: rgb(255 255 255 / .08); transform: scale(1.15); }
+.sx-paleta button[aria-pressed='true'] { background: color-mix(in srgb, var(--color-galaxy-600) 40%, transparent); }
+@media (max-width: 380px) { .sx-pie .sx-btn-tx { display: none; } .sx-pie .sx-rx { width: 2.1rem; padding: 0; } }
+.sxr-feed[data-modo='compacta'] .sx-pie { margin-top: .3rem; }
+.sxr-feed[data-modo='compacta'] .sx-post-av { width: 1.9rem; height: 1.9rem; }
+
+/* Atajos de teclado plegados (no ocupan la columna si no se abren) */
+.sxr-atajos > summary { list-style: none; cursor: pointer; margin: 0; display: flex; justify-content: space-between; align-items: center; }
+.sxr-atajos > summary::-webkit-details-marker { display: none; }
+.sxr-atajos > summary::after { content: ''; width: .4rem; height: .4rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s ease; }
+.sxr-atajos[open] > summary::after { transform: rotate(-135deg); }
+.sxr-atajos[open] > summary { margin-bottom: .5rem; }
+@media (prefers-reduced-motion: reduce) { .sxr-vistas-pastilla, .sx-pie .sx-btn, .sxr-filtros-btn { transition: none; } }
+/* Altura del encabezado: 98 px; en PC, al bajar, la barra de última hora se esconde y queda en 66 px (data-ticker-oculto, js/features/ticker.js). */
+@media (min-width: 768px) { html[data-cab-compacta][data-ticker-oculto] .sxr { --sxr-arriba: 4.125rem; } }
+/* Celular: las tres pestañas caben sin iconos */
+@media (max-width: 479.98px) { .sxr-vistas .sx-tab i { display: none; } .sxr-vistas .sx-tab { padding: 0 .55rem; font-size: 12.5px; } }
