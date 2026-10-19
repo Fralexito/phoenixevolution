@@ -58,12 +58,19 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 | Documento | Antes estaba en |
 |---|---|
 | [`BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md) | `docs/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md` |
+| [`BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md`](bitacoras/BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md) | (nuevo, 19-oct: rendimiento, reestructuración, Mi club, Social, Link en la web, modo demostración, versiones beta) |
 | [`BITACORA-16-OCT-2026-CUENTA-OPUS.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-OPUS.md) | `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` |
 | [`BITACORA-16-OCT-2026-CUENTA-WEB.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-WEB.md) | `docs/BITACORA-16-OCT-2026-CUENTA-WEB.md` |
 | [`INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`](bitacoras/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md) | `docs/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md` |
 | [`MAPA-HISTORIAL.md`](bitacoras/MAPA-HISTORIAL.md) | `docs/MAPA-HISTORIAL.md` |
 | [`REVISION-GENERAL-18-OCT.md`](bitacoras/REVISION-GENERAL-18-OCT.md) | `docs/REVISION-GENERAL-18-OCT.md` |
 | [`TRASPASO-NOTICIAS-DIARIO-16-OCT-2026.md`](bitacoras/TRASPASO-NOTICIAS-DIARIO-16-OCT-2026.md) | `docs/TRASPASO-NOTICIAS-DIARIO-16-OCT-2026.md` |
+
+## `docs/guias/` — Guías paso a paso para usar la web (para Fralex y testers)
+
+| Documento | Qué explica |
+|---|---|
+| [`GUIA-NOVEDADES-19-OCT-2026.md`](guias/GUIA-NOVEDADES-19-OCT-2026.md) | Cómo usar todo lo nuevo del 19-oct: versión beta, modo demostración, Inicio, Mi club, Social (reacciones, #etiquetas, publicar), chat Amigos/General, Lanzar reto, salas de Link y Android, tablas de liga, perfil y configuración |
 
 ## `docs/trabajo-en-equipo/` — Cómo se trabaja con varias cuentas/chats a la vez y resúmenes de relevo
 

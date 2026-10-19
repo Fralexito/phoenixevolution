@@ -5,4 +5,4 @@
 // Anótalo en REGISTRO.md. Se ve en la cinta «Fase beta» de abajo a la izquierda (Layout.astro), junto a la hora en que se generó la web.
 // La dirección de la vista previa (/fase-beta-1-0/) NO cambia con este número: así los enlaces que ya se compartieron siguen sirviendo.
 // Historia: 1.0.1 (cinta con número) · 1.1.0 (19-oct: muro minimalista, modo demostración, chat Amigos|General, publicar descriptivo) · 1.2.0 («Lanzar reto» por pasos) · 1.3.0 (portada: «Ahora en Phoenix») · 1.4.0 (tablas de liga visuales) · 1.5.0 (Social: red social completa, fase 1).
-export const VERSION_BETA = '1.5.0';
+export const VERSION_BETA = '1.5.1';

@@ -1,0 +1,237 @@
+# Bitácora e informe · Cuenta ECONOMÍA (chat «D:\Frank\IA\CLAUDE») · 19 de octubre de 2026
+
+Para la **otra cuenta** (o cualquier IA o persona) que continúe. Escrito para entender **todo lo que se hizo el 19-oct** sin haber visto el chat.
+Complementa `REGISTRO.md` (una línea por cambio, la más nueva al final) y la guía de uso `docs/guias/GUIA-NOVEDADES-19-OCT-2026.md`.
+Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`, `REVISION-GENERAL-18-OCT.md`.
+
+> **Norma de Fralex:** todo se anota en GitHub. **Drive sigue pendiente** (no hay acceso): cuando vuelva, copiar esta bitácora y la guía a la carpeta de Drive «Phoenix Link — Guías y logros» (ver §9).
+
+---
+
+## 0. Cómo retomar en 5 minutos
+
+1. Repo de la web: `C:\dev\pes-liga-automatica`, rama **`borrador`** (se publica sola en la vista previa).
+2. Vista previa: **https://fralexito.github.io/phoenixevolution/fase-beta-1-0/** — la cinta de abajo a la izquierda dice la versión, p. ej. «FASE BETA 1.5.0 · 19 oct 14:02».
+3. Lee el final de `REGISTRO.md`, este archivo y `docs/guias/GUIA-NOVEDADES-19-OCT-2026.md`.
+4. Comprobaciones antes de cada subida (todas deben pasar):
+   ```bash
+   npm test                 # 639 pruebas, 0 fallos (al cierre del 19-oct)
+   npm run build            # 57 páginas
+   npm run test:paginas     # abre las 57 páginas en Chrome: 57/57
+   C:/Users/WinterOS/.claude/skills/impeccable/scripts/impeccable.cmd detect --json <archivos>   # detector de diseño
+   ```
+5. **Versión beta:** en CADA subida, sube `VERSION_BETA` en `src/data/versionWeb.js` (cambio normal: último número; algo grande: el del medio). Ver §3.
+6. **Migraciones de esta cuenta hoy:** 131, 132, 133, 134 (todas aplicadas). La siguiente libre es la **135** (mira antes el final de `REGISTRO.md` por si otra cuenta la tomó).
+7. Para ver todo con datos y actividad aunque la base esté vacía: añade **`?demo=1`** a cualquier página (ver §4).
+
+---
+
+## 1. Quién es Fralex y cómo trabajar con él (recordatorio)
+
+- **Todo en español**, frases simples, poco texto técnico; **SÍ/NO primero**. Lo pidió tres veces el 19-oct.
+- Quiere todo **«dinámico, estético, visual, muy animado, interactivo, fresco, novedoso, premium y profesional»**, pero también **limpio, ordenado, minimalista y entendible** («no entiendo qué es cada cosa» = falla de diseño).
+- **No pedirle pruebas dentro del juego** (pausa desde el 15-oct). Probar con el navegador automático y datos simulados.
+- **Lo que la IA no pueda ejecutar → SQL listo para pegar** en el SQL Editor de Supabase.
+- **Nunca** cambiar ajustes de seguridad por él; borrar cosas irreversibles solo con su permiso.
+- **Phoenix Link:** mejorar dentro de su diseño, subir `kVersion` en cada cambio, compilar sin `--force`. Hoy **no se tocó Link** (todo fue web + base de datos).
+- Cada cambio: **verificar en celular (390 px) y PC (1440 px)**, anotar en `REGISTRO.md`, commit con rutas explícitas y push a `borrador`.
+
+---
+
+## 2. Resumen del día (orden cronológico)
+
+| Hora (Lima) | Commit | Qué |
+|---|---|---|
+| 00:11 | `cd7c281` | Noticias sin saltos al cargar + prueba que abre las 57 páginas en Chrome (`npm run test:paginas`, también en GitHub Actions) |
+| 00:11 | `f33473d` | **Migración 131**: foto vieja de jugadores a una copia privada (reversible) |
+| 00:37 | `0147b31` | Rendimiento: 14 CSS de página fuera de `global.css` (713 → 562 KB comunes) y título de portada visible desde el inicio |
+| 00:46 | `c5dccee` | Informe de velocidad con números finales |
+| 01:05 | `f8d768a` | **Migración 132**: borrar la copia vieja `backup_20261003` (con permiso de Fralex) |
+| 01:24 | `c001a1e` | Social con distribución de foro en tres columnas (estructura tipo Reddit, identidad Phoenix) |
+| 01:51 | `ffc962f` | Social: respuestas en el feed, ordenar, nuevas en vivo, a quién seguir, atajos J/K |
+| 07:35 | `1f9fb5b` | Menú por importancia: Mi club primero; barra inferior con Mi club al centro |
+| 07:46 | `cb20228` | Mi club como ecosistema propio («El Estadio») |
+| 07:52 | `865f512` | Inicio por importancia: banda «Tu club» |
+| 08:17 | `fb4b37e` | Celular más fluido (sin saltos en Inicio y Mi club) |
+| 08:35 | `2c0ffd7` | Mi club: secciones en orden de uso + guía «Cómo funciona» |
+| 08:56 | `a32fc76` | Mi club: vista Cancha, «Administrar la liga» en 3 pasos |
+| 09:10 | `7d32794` | Mi club sin controles viejos; «Mi partida de PES» explicada |
+| 09:34 | `ba1db08` | Red de enlaces del celular ordenada en grupos |
+| 09:49 | `7bdc207` | Red de enlaces sin repetir la barra de abajo |
+| 10:10 | `53d6d1b` | Configuración al estilo de Meta |
+| 10:28 | `6a4a33c` | Configuración premium: 30 ajustes, estilos rápidos |
+| 10:48 | `fd0d8be` | Publicar como red social + **migración 133** |
+| 11:02 | `63af9c2` | Salas de Phoenix Link: tarjetas vivas y «Entrando a la sala» |
+| 11:14 | `eed86ee` | Salas en vivo: marcador real, cronómetro, conectados, ¡GOL! (**migración 134**) |
+| 11:23 | `7aaad4e` | Mi perfil vivo: «Así te ven», medidor de perfil |
+| 11:28 | `e8aa4d3` | País en lista desplegable con banderas SVG |
+| 11:42 | `a3e1f46` | Perfil público dinámico |
+| 11:57 | `f395542` | **Modo demostración** (datos simulados con actividad) |
+| 12:09 | `028b3a2` | Social: muro minimalista |
+| 12:14 | `734b64b` | Modo demostración: historias, chat general, notificaciones |
+| 12:23 | `1d70c18` | Chat: pestañas Amigos | General (PC y celular) |
+| 12:33 | `4416e25` | Publicar: cada opción con nombre y explicación |
+| 12:39 | `c3b7c54` | **Beta 1.0.1**: número de versión en la cinta |
+| 12:48 | `560c0af` | **Beta 1.1.0**: regla de versiones |
+| 13:10 | `e66a03d` | **Beta 1.2.0**: «Lanzar reto» como asistente por pasos |
+| 13:33 | `57a2a40` | **Beta 1.3.0**: portada con «Ahora en Phoenix» |
+| 13:40 | `f37e82a` | **Beta 1.3.1**: entrar a una sala desde Android |
+| 13:48 | `c1ad81c` | **Beta 1.4.0**: tablas de liga visuales |
+| 14:02 | `3cfb4e3` | **Beta 1.5.0**: Social fase 1 (red social completa) |
+
+(Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
+
+---
+
+## 3. Reglas NUEVAS para todas las sesiones (importante)
+
+1. **Versión beta en cada subida** — `src/data/versionWeb.js`:
+   - cambio normal → `1.5.0` → `1.5.1`;
+   - algo grande terminado (sección rehecha o sistema nuevo) → `1.5.3` → `1.6.0`;
+   - la cinta «Fase beta» (Layout.astro) muestra la versión y la hora de Lima en que se compiló; la URL `/fase-beta-1-0/` **no** cambia.
+   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1.
+2. **Nada de `html:has(…)` ni `body:has(…)` en CSS** (hacía recalcular toda la página ~15 veces al cargar). Poner una marca en `<html>` desde el JS (`data-ticker-oculto`, `data-duelos-plegado`, `data-reto-asistente`…).
+3. **Iconos recortados**: si usas un icono «fa-…» o «ph-…» nuevo, ejecuta `node tools/iconos/recortar-iconos.mjs` y sube `src/styles/iconos/*`. Si el icono de Font Awesome no tiene equivalente fino en `src/data/iconosFinos.js`, **añádelo** (si no, con «Sin íconos web» se oculta o sale como cuadro). Hoy se añadieron: `icons→smiley-wink`, `circle-notch`, `caret-up`, `caret-down`.
+4. **CSS por página**: 14 CSS salieron de `global.css`; cada página los importa DESPUÉS de Layout. Si una página nueva usa clases de uno de ellos, impórtalo ahí. CSS nuevos de hoy por página: `perfilPublico.css` (perfil), `retoAsistente.css` (duelos), `ahoraPortada.css` (inicio), `ligaTabla.css` (liga), `publicar.css` y `socialHilo.css` (social), `configuracion.css` (ajustes), `miClubEstadio.css` (manager). Globales nuevos: `salasVivo.css`, `publicacionExtras.css`, `modoDemo.css`.
+5. **Columnas de rejilla**: hijos de una rejilla necesitan `min-width: 0` o `grid-template-columns: minmax(0, 1fr)` (hoy dos desbordes en celular se debían a eso: Fichajes y el feed de Social). Ojo también con `col-span-2` en una rejilla de una columna: crea una columna fantasma (pasó en el asistente de reto).
+6. **Modo demostración**: lo inventado tiene ids ≥ 900 000 000 (y uuid `00000000-0000-4000-8000-9000…`); cualquier acción sobre ellos se «acepta» sin escribir. Si agregas un sistema nuevo que lee con `supabase.rpc`, puedes simularlo en `src/js/features/demo/simulador.js` (`SIMULADAS`).
+7. **Probar sin escribir en la base**: scripts de puppeteer del scratchpad (ver §7) simulan sesión y bloquean escrituras.
+
+---
+
+## 4. Modo demostración (sistema nuevo)
+
+**Para qué:** ver cada sistema funcionando con datos y actividad aunque la base esté vacía (pedido: «por ahora en la página simula datos y actividad para ver cómo funcionaría cada sistema»).
+
+**Cómo se enciende / apaga:**
+- Configuración → «Notificaciones y en vivo» → **«Modo demostración»** (interruptor; recarga sola), o
+- añadir **`?demo=1`** a la dirección (`?demo=0` para salir), o el botón **«Salir»** de la píldora amarilla de abajo a la izquierda.
+- Es **por navegador** (se guarda en `pes-ajustes-v1`, clave `demo`). No toca la base.
+
+**Piezas:**
+- `src/js/core/sistema/modoDemo.js` — decide si está activo (`demoActivo()`, `window.__pxDemo`) y `salirDeDemo()`.
+- `src/js/core/sistema/supabase.js` — si está activo, envuelve `supabase.rpc` (y `.from('notificaciones')`) y carga `features/demo/simulador.js` con `import()`; apagado no carga nada.
+- `src/js/features/demo/simulador.js` — datos que cambian con el tiempo (desde que abriste la pestaña):
+  - **salas en vivo** (`salas_en_vivo`, `radar_salas`): 3–4 salas, partido de 90' cada 9 minutos reales, goles, ping de conectados que varía, una sala que aparece y desaparece; entrar reserva puesto sin enlace (no abre Parsec hacia nadie);
+  - **última hora** (`ticker_comunidad`);
+  - **muro** (`muro_comunidad/siguiendo/destacado`, `muro_extras_de`, `buscar_publicaciones`): publicación nueva cada 75 s con #etiquetas, fondos y «se siente…», reacciones que suben; reaccionar se marca pero no se guarda;
+  - **historias** (`historias_recientes`): una persona más cada 2 min;
+  - **chat general** (`chat_global_listar/enviar`): mensaje cada 12 s; lo que escribes sale como «Tú» y no se envía;
+  - **campana** (tabla `notificaciones`): aviso nuevo cada 90 s; marcar leída/descartar funcionan;
+  - **estadísticas/ELO** de perfiles sin datos (`estadisticas_de`, `elo_de`).
+- `src/js/features/demo/aviso.js` + `src/styles/modoDemo.css` — la píldora «Modo demostración · Datos simulados con actividad · lo que hagas sobre ellos no se guarda · Salir».
+
+**Límites:** lo real que hagas estando en demo (publicar de verdad, editar tu perfil…) SÍ se guarda. Las salas solo se ven con sesión (igual que con datos reales). Aún no se simulan: tablas de liga, Tienda, mensajes privados.
+
+---
+
+## 5. Detalle por área
+
+### 5.1 Rendimiento (madrugada)
+- Lighthouse móvil antes: inicio 35, tienda 20, noticias 11; TBT hasta 5,9 s; CLS hasta 0,53.
+- `boot.js`: lo que no hace falta para ver la página arranca y **se descarga después** (`requestIdleCallback` + `import()`): JS común 88 → 46 KB.
+- Fuentes de iconos recortadas (`tools/iconos/recortar-iconos.mjs`): ~220 KB menos por visita.
+- Fuera los `:has()` sobre html/body: recálculo de estilos al cargar Inicio 13 s → 4,4 s (móvil lento simulado).
+- 14 CSS de página fuera de `global.css` (713 → 562 KB), comprobado con 0 diferencias de estilo calculado en 20 páginas.
+- Consulta de los 3 mejores jugadores 207 KB → <1 KB (`core/jugadores/columnas.js`, sin la columna `foto`).
+- **Migración 131**: la foto vieja guardada como texto (269 KB) → `private.jugadores_foto_respaldo`. **Migración 132**: borrada la copia `backup_20261003` (solo 5 fichas de prueba).
+- Nueva prueba `npm run test:paginas` (`tools/humo/abrir-paginas.mjs`): abre las 57 páginas y falla si hay error de JS, archivo que no carga o página en blanco. Va en `.github/workflows/pruebas.yml`.
+
+### 5.2 Sala de fichajes y Centro de control
+- Sala de fichajes: campos manuales plegados, logos de liga actuales (`public/ligas/*.png`), DT en grande, grandes de cada liga primero (`ordenarPorPrestigio`).
+- Sala también en el Modo Mánager (`features/mercado/salaMercado.js`) **con límites** (solo lectura + los mismos botones de ofertar).
+- **/control/** (staff): tarjetas de pendientes por área con semáforo de plazos 24/48/72 h, «Hoy toca», herramientas por rol. `core/sistema/centroControl.js` + pruebas. **Pendiente: probar con sesión de staff real.**
+
+### 5.3 Reestructuración por importancia
+- Menú: **Mi club primero** (dorado), Comunidad, Jugar, Competiciones, Jugadores. «Central» → «Inicio»; «Mercado» → «Conectar juego». Barra inferior del celular: Inicio · Social · **MI CLUB** (centro) · Jugar · Yo.
+- **Mi club = «El Estadio»** (`/manager/`): luces de estadio, la página se tiñe con el color del escudo (`features/miClub/estadio.js`), barra propia Resumen · Plantilla · Fichajes · Mi partida de PES · Diario (+ Administrar la liga para staff) · «?». Guía «Cómo funciona Mi club» en 3 pasos. Vista **Cancha**. «Explorar el mercado» de 12 en 12. «Vestuario del juego» → **«Mi partida de PES»** con dibujo Tu PES ⇄ Phoenix Sync ⇄ esta pantalla.
+- Inicio: banda **«Tu club»** (con club / sin club / visitante) y las 4 ventanas por importancia.
+- **Red de enlaces** (menú lateral del celular): grupos que se abren uno a la vez; en celular no repite lo de la barra inferior (`BARRA_INFERIOR` en `data/site.js`).
+
+### 5.4 Configuración (`/ajustes/`)
+- Forma de «Configuración y privacidad» de Meta: buscador sin tildes, tarjeta de cuenta, grupos de filas; en celular la sección entra desde la derecha.
+- 30 ajustes en 3 grupos (`data/ajustes.js`), estilos rápidos (Phoenix, Torneo, Minimalista, Nocturno, Lectura cómoda), contador de cambios, restablecer por sección, «Guardado».
+- Sin parpadeo: el script temprano de Layout escribe todos los `data-aj-*` antes de pintar.
+- Nuevo ajuste **«Modo demostración»** (§4).
+
+### 5.5 Social (`/social/`)
+- **Estructura**: tres columnas en PC (feeds y juegos · feed · comunidad), una en celular. Reacciones e historias se mantuvieron por decisión de Fralex.
+- **Más vida**: respuestas dentro del feed, ordenar, «N publicaciones nuevas», a quién seguir, atajos J/K/R/C/N, volver arriba, «Leer más».
+- **Muro minimalista**: una sola barra pegada con cristal (pestañas con pastilla + botón «Ordenar y filtrar» con punto), «Publicar» en una línea, menú «⋯» (guardar, reportar, ocultar, **retar a duelo**), pie en una fila.
+- **Publicar** (`features/muro/compositor.js`, **migración 133**: `muro_publicaciones.extra` con fondo, sentimiento y fotos extra; `muro_publicar_completo`, `muro_extras_de`): fondos de color, «cómo te sientes», hasta 4 fotos o 1 video, enlace, encuesta, duelo, juego, emojis, @ y #, anillo de caracteres, borrador, pegar/arrastrar. Después: **cada opción con nombre y frase**, motivo cuando no se puede, resumen «Vas a publicar: …», opción **Historia**.
+- **Fase 1 de «red social completa» (1.5.0)**:
+  - **#etiquetas** clicables (`textoAHTML` en `core/comunidad/muro.js`, una sola pasada con enlaces y @menciones) → `/social/?tag=X` (usa `buscar_publicaciones`), cabecera con «Quitar».
+  - **Tendencias** (`etiquetasDe`): columna derecha en PC, cápsulas en celular.
+  - **Doble toque / doble clic** = 🔥 con llamarada y vibración (con «menos movimiento» no hay llamarada, la reacción sí).
+  - **Reacciones Phoenix** al mantener pulsado «Reaccionar» o con 😊: 🔥 Fuego · ⚽ Golazo · 🧤 Atajada · 🤝 GG · 🐐 Crack · 😂 Risa (la base acepta cualquier emoji: `CHECK tipo ~ '^[^ -~]{1,16}$'`).
+  - **Visor de fotos** a pantalla completa (`features/social/gestos.js`).
+  - **Retar a duelo** desde el menú ⋯ → `/duelos/?retar=<id>`.
+  - **Tirar hacia abajo** para recargar (celular).
+  - Pruebas: `tests/etiquetas.test.mjs` (4).
+
+### 5.6 Chat
+- Columna de contactos (PC) y hoja «Chats» (celular): pestañas **Amigos | General** (`features/chatFlotante/general.js`): el chat general en pequeño, pide mensajes cada 6 s solo mientras se ve.
+
+### 5.7 Phoenix Link en la web (sin tocar Link)
+- **Tarjetas de sala vivas** (`features/salas/tarjetas.js`, `styles/salasVivo.css`): estado con latido, anfitrión VS rival, mandos, señal en 4 barras, entrada en cascada.
+- **«Entrando a la sala»** (`features/salas/entrar.js`): Reservando tu puesto → Abriendo Parsec → ¡Dentro!; plan B si Parsec no abre.
+- **Migración 134**: `salas.en_partida_desde` + disparador; `private.tarjeta_sala` suma rival.avatar_url, en_partida_desde, marcador (`liga_vivo` ≤ 5 min) y conectados (`muestras_calidad` ≤ 2 min). La tarjeta muestra marcador y minuto, cronómetro, caras de conectados y ¡GOL!.
+- **Android (1.3.1)**: ver §6.
+
+### 5.8 Perfil
+- «Mi perfil» vivo (`features/perfilVivo.js`): tarjeta «Así te ven» en vivo, medidor «Perfil al N %», club con sugerencias y escudo, «Guardar N cambios».
+- País en **lista desplegable con banderas SVG** (`data/banderas.js`, 23 países).
+- **Perfil público** (`js/pages/perfil.js`, `styles/perfilPublico.css`): luces de estadio, bandera y escudo, cifras que cuentan, «Duelos» con anillo y barra G/E/P, pestañas deslizantes.
+
+### 5.9 Duelos — «Lanzar reto» por pasos (1.2.0)
+- `features/duelos/asistente.js` + `styles/retoAsistente.css`: el formulario de siempre (`form.js` sin cambios) se mueve a una ventana con 4 pasos **Rival · Equipos · Hora · Sala** y un **boleto** final con «Emitir reto».
+- Rival en tarjetas con cara, «en línea» y «tiene host»; no deja avanzar sin rival o con hora inválida.
+- Todo «Lanzar reto», el radar y `?retar=` abren la ventana.
+
+### 5.10 Inicio — «Ahora en Phoenix» (1.3.0)
+- `features/portada/ahora.js` + `styles/ahoraPortada.css`: salas en juego (con sesión), historias de hoy y lo más reaccionado; se oculta si no hay nada (hoy con datos reales está oculta; con `?demo=1` llena).
+
+### 5.11 Liga — tablas visuales (1.4.0)
+- `pages/liga.astro` + `styles/ligaTabla.css`: ▲▼ puestos ganados o perdidos desde la fecha anterior, corona del líder, «Últimos 5» como fichas (la más reciente destacada), zonas con brillo, en celular la tabla entra sin deslizar. `tablaViva.js` ya no borra ▲▼ al reordenar.
+
+---
+
+## 6. Parsec en Android (pregunta de Fralex)
+
+- **Sí se puede unir desde Android**: la app oficial de Parsec para Android se conecta como invitado (no puede hostear).
+- **Phoenix Link lo detecta igual que a cualquier invitado**: los invitados llegan por el SDK de Parsec sin importar el aparato; salen en «conectados» con su ping y el anfitrión le da el mando.
+- **Condición**: un **mando** (Bluetooth o USB). Parsec llama «experimental» a su app de Android y dice que funciona mejor con mando; no documenta controles táctiles en pantalla.
+- **Sin confirmar**: si la app de Android abre directamente el enlace `parsec://` de la web. Por eso, en Android, «Entrando a la sala» (1.3.1): avisa del mando, pone primero la **invitación web** y «Descargar» lleva a Google Play (`tv.parsec.client`).
+- Fuentes: <https://support.parsec.app/hc/en-us/articles/32381582866452-Install-Parsec-App-on-Android> · <https://parsec.app/blog/link-sharing-for-gaming-over-the-internet-with-friends-e97769822373>
+- **Prueba definitiva**: con un celular Android real (cuando Fralex quiera; no es urgente ni se le pide).
+
+---
+
+## 7. Cómo se probó (para repetirlo)
+
+- Scripts de puppeteer en el scratchpad de la sesión (`C:\Temp\claude\D--Frank-IA-CLAUDE\7b44792d-…\scratchpad\perfil\`), con Edge sin ventana:
+  - el encabezado de `miClubInteractivo.mjs` (primeras 46 líneas) sirve la carpeta `dist/`, **simula una sesión** (usuario de prueba con rol admin), rehace las lecturas a Supabase con la clave pública y **bloquea toda escritura**;
+  - uso: `node script.mjs C:/dev/pes-liga-automatica/dist 390 844 carpeta/prefijo` (celular) y `… 1440 900 …` (PC);
+  - con `?demo=1` se prueba con actividad simulada; con `p.emulateMediaFeatures([{name:'prefers-reduced-motion', value:'no-preference'}])` se ven las animaciones (el navegador de pruebas trae «menos movimiento»).
+- Cada cambio se miró en capturas de celular y PC, se midió el ancho (sin desborde horizontal) y se revisaron errores de consola.
+
+---
+
+## 8. Pendientes y decisiones abiertas
+
+1. **Social fase 2** (siguiente, con migración 135): compartir en tu muro con comentario, «me gusta» en respuestas, vistas por publicación, «quién reaccionó», tarjeta rápida de perfil (nivel, club, Seguir, Retar), racha diaria.
+2. **Modo demo**: simular tablas de liga, Tienda y mensajes privados.
+3. **Quitar controles «arcaicos»** del resto del sitio (listas largas, barras de desplazamiento, selectores viejos) — ya hecho en Mi club y Social.
+4. **Velocidad en celular**: volver a medir con Lighthouse tras las animaciones nuevas.
+5. **Centro de control**: probar con sesión de staff real.
+6. **Seguridad (lo hace Fralex)**: activar «Leaked password protection» en Supabase.
+7. Frase de una ficha de usuario que sale en la portada (dato del usuario; no se tocó).
+8. Fralex mejorará Inicio más adelante («me encanta mucho como está… lo mejoraré a futuro»).
+
+---
+
+## 9. Para copiar a Drive cuando vuelva el acceso
+
+- Esta bitácora (`docs/bitacoras/BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md`).
+- La guía de uso (`docs/guias/GUIA-NOVEDADES-19-OCT-2026.md`).
+- Carpeta de destino: «Phoenix Link — Guías y logros».
