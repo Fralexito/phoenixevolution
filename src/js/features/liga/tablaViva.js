@@ -42,7 +42,7 @@ function pintarTabla(bloque, ligaId, tabla) {
     if (!tr) return;
     const td = tr.children;
     if (td.length < 10) return;
-    td[0].textContent = String(i + 1);
+    (td[0].querySelector('.lf-pos') ?? td[0]).textContent = String(i + 1);   // .lf-pos: no borrar la flecha ▲▼ ni la corona (19-oct-2026)
     td[0].classList.remove(...PUESTO, 'text-gray-500');
     td[0].classList.add(PUESTO[i] ?? 'text-gray-500');
     const valores = [f.pts, f.pj, f.g, f.e, f.p, f.gf, f.gc];

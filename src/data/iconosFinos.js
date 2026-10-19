@@ -25,6 +25,8 @@ export const FA_A_PH = {
   'calendar-days': 'calendar',
   'camera': 'camera',
   'chart-column': 'chart-bar',
+  'caret-up': 'caret-up',          // ▲ subió en la tabla de la liga (19-oct-2026)
+  'caret-down': 'caret-down',      // ▼ bajó en la tabla de la liga (19-oct-2026)
   'chart-line': 'chart-line',
   'chart-pie': 'chart-pie',
   'chart-simple': 'chart-bar',

@@ -1,0 +1,48 @@
+/* TABLA DE LA LIGA más visual (19-oct-2026, Fralex: «sigue» → tablas de liga). Solo la importa src/pages/liga.astro.
+   ▲▼ cuántos puestos subió o bajó desde la fecha anterior · corona del líder · «Últimos 5» como fichas (la más reciente destacada) ·
+   zonas de copa/descenso con franja y brillo · filas compactas en el celular (el club en una línea). */
+.liga-tabla tbody tr { transition: background-color .2s ease; }
+.liga-tabla tbody tr:hover { background-color: rgb(255 255 255 / .035); }
+.liga-tabla td:first-child { white-space: nowrap; }
+.lf-pos { display: inline-block; min-width: 1.1rem; font-variant-numeric: tabular-nums; }
+.lf-mov { display: inline-flex; align-items: center; gap: .05rem; margin-left: .25rem; font: 800 .68rem var(--font-display); vertical-align: middle; }
+.lf-mov i { font-size: .8rem; }
+.lf-sube { color: #34d399; } .lf-baja { color: #fb7185; } .lf-igual { color: #5c6478; font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) { .js .lf-sube i { animation: lf-sube 1.4s ease-in-out 3 .6s; } .js .lf-baja i { animation: lf-baja 1.4s ease-in-out 3 .6s; } }
+@keyframes lf-sube { 50% { transform: translateY(-2px); } }
+@keyframes lf-baja { 50% { transform: translateY(2px); } }
+.lf-corona { margin-left: .3rem; font-size: .75rem; color: #fbbf24; filter: drop-shadow(0 0 6px rgb(251 191 36 / .6)); }
+.liga-tabla .liga-lider { background: linear-gradient(90deg, rgb(251 191 36 / .12), transparent 70%); box-shadow: inset 3px 0 0 #fbbf24; }
+
+/* Últimos 5: fichas limpias; la más reciente un poco más grande y con brillo */
+.lf-forma { display: inline-flex; align-items: center; gap: 3px; }
+.lf-f { width: 1.2rem; height: 1.2rem; display: inline-grid; place-items: center; border-radius: .35rem; font: 800 .68rem var(--font-display); color: #04121a; transition: transform .2s cubic-bezier(.23, 1, .32, 1); }
+.lf-G { background: #34d399; } .lf-E { background: #fbbf24; } .lf-P { background: #fb7185; color: #fff; }
+.lf-ult { width: 1.4rem; height: 1.4rem; font-size: .75rem; box-shadow: 0 0 0 2px #0d0920, 0 0 0 3px currentColor; }
+.lf-G.lf-ult { color: #04121a; box-shadow: 0 0 0 2px #0d0920, 0 0 10px rgb(52 211 153 / .6); }
+.lf-E.lf-ult { box-shadow: 0 0 0 2px #0d0920, 0 0 10px rgb(251 191 36 / .6); }
+.lf-P.lf-ult { box-shadow: 0 0 0 2px #0d0920, 0 0 10px rgb(251 113 133 / .6); }
+.lf-f:hover { transform: translateY(-2px) scale(1.12); }
+
+/* Zonas: franja más gruesa y un brillo suave de su color */
+.liga-tabla tbody tr.tmp-fila { box-shadow: inset 4px 0 0 var(--zona, transparent); background: linear-gradient(90deg, color-mix(in srgb, var(--zona, transparent) 14%, transparent), transparent 55%); }
+
+/* Celular: filas bajas (el club en una línea con «…») y las fichas en puntos para que «Últimos 5» quepa sin deslizar */
+@media (max-width: 639.98px) {
+  .liga-tabla td, .liga-tabla th { padding-left: .3rem !important; padding-right: .3rem !important; }
+  .liga-tabla td:nth-child(2) { max-width: 8.5rem; }
+  .liga-tabla .lf-club { max-width: 8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+  .liga-tabla td:nth-child(2) .inline-flex > span:last-child { display: inline-block; max-width: 6.2rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+  .lf-forma { gap: 2px; }
+  .lf-f { width: .62rem; height: .62rem; border-radius: 99px; font-size: 0; }
+  .lf-ult { width: .8rem; height: .8rem; font-size: 0; }
+}
+html[data-aj-liga-zonas='no'] .liga-tabla tbody tr.tmp-fila { box-shadow: none; background: none; }
+@media (prefers-reduced-motion: reduce) { .lf-f { transition: none; } }
+/* Celular: la flecha ▲▼ va debajo del número (la columna del puesto pasa de 60 a ~32 px y «Últimos 5» entra entera) */
+@media (max-width: 639.98px) {
+  .liga-tabla td:first-child { line-height: 1.05; }
+  .liga-tabla .lf-pos { display: block; }
+  .liga-tabla .lf-mov { display: flex; margin: .1rem 0 0; font-size: .6rem; }
+  .liga-tabla .lf-corona { display: block; margin: .15rem 0 0; font-size: .65rem; }
+}

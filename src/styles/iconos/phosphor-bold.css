@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Phosphor Bold recortado a 173 iconos. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Phosphor Bold recortado a 175 iconos. */
 @font-face { font-family: "Phosphor-Bold"; src: url("./phosphor-bold.recortado.woff2") format("woff2"); font-weight: normal; font-style: normal; font-display: block; }
 .ph-bold {
   /* use !important to prevent issues with browser extensions that change fonts */
@@ -44,6 +44,8 @@
 .ph-bold.ph-calendar-check:before { content: "\e712"; }
 .ph-bold.ph-camera:before { content: "\e10e"; }
 .ph-bold.ph-cards:before { content: "\e0f8"; }
+.ph-bold.ph-caret-down:before { content: "\e136"; }
+.ph-bold.ph-caret-up:before { content: "\e13c"; }
 .ph-bold.ph-cell-signal-full:before { content: "\e142"; }
 .ph-bold.ph-chart-bar:before { content: "\e150"; }
 .ph-bold.ph-chart-line:before { content: "\e154"; }

@@ -4,6 +4,7 @@
 import Layout from '../layouts/Layout.astro';
 // CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
 import '../styles/uplot.css';
+import '../styles/ligaTabla.css';   // tabla más visual: ▲▼, corona, «Últimos 5» y zonas (19-oct-2026)
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
 import { EDICIONES } from '../data/ligaResultados.js';
 import { calcularTabla, tablaEdicion } from '../js/core/competicion/tabla.js';
@@ -25,10 +26,20 @@ const tablaCompleta = (e) => {
   const faltan = [...new Set([...(e.jugadores ?? []), ...e.fechas.flatMap((f) => f.partidos.flatMap((m) => [m.l, m.v]))])].filter((n) => !hay.has(n)).sort((a, b) => a.localeCompare(b, 'es'));
   return [...t, ...faltan.map((nombre) => ({ nombre, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }))];
 };
+// Movimiento en la tabla (19-oct-2026): puesto ahora vs. puesto antes de la última fecha con resultados (↑ subió · ↓ bajó). Con tabla oficial no se calcula.
+const movimientos = (e) => {
+  if (e.tablaOficial?.length) return {};
+  const conJuego = e.fechas.filter((f) => estadoFecha(f) !== 'pendiente');
+  if (conJuego.length < 2) return {};
+  const ult = conJuego[conJuego.length - 1].n;
+  const antes = calcularTabla(e.fechas.filter((f) => f.n !== ult).flatMap((f) => f.partidos)).tabla;
+  const pos = new Map(antes.map((f, i) => [f.nombre, i]));
+  return Object.fromEntries(tablaCompleta(e).map((f, i) => [f.nombre, pos.has(f.nombre) ? pos.get(f.nombre) - i : 0]));
+};
 const datos = LIGAS.map((l) => ({
   liga: l,
   ediciones: (EDICIONES[l.id] ?? []).map((e) => ({
-    ...e, tabla: tablaCompleta(e), actual: fechaActual(e.fechas),
+    ...e, tabla: tablaCompleta(e), actual: fechaActual(e.fechas), mov: movimientos(e),
     formas: Object.fromEntries(tablaCompleta(e).map((f) => [f.nombre, historial(e.fechas, f.nombre)])),
     total: totalFechas(e), jugadas: e.fechas.filter((f) => estadoFecha(f) === 'jugada').length,
     zonas: e.estado === 'en_curso' && SISTEMAS_LIGA[l.id] ? zonasLiga(tablaCompleta(e).map((f) => f.nombre), SISTEMAS_LIGA[l.id]) : e.estado === 'en_curso' && divisionDe(l.id) ? zonasDivision(tablaCompleta(e).map((f) => f.nombre), divisionDe(l.id).nivel, { ...SISTEMA.inicial, suben: SISTEMA.inicial.suben }) : null,   // zonas de copa/descenso (beta)
@@ -126,28 +137,23 @@ const datos = LIGAS.map((l) => ({
               <div class="glass-panel rounded-2xl px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto" role="region" tabindex="0" aria-label="Tabla de posiciones, desplazable">
                 <table class="liga-tabla w-full">
                   <thead><tr>
-                    <th class="text-left w-8">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
+                    <th class="text-left w-8" title="Puesto y cuánto subió o bajó desde la fecha anterior">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
                     <th class="hidden sm:table-cell">G</th><th class="hidden sm:table-cell">E</th><th class="hidden sm:table-cell">P</th>
-                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th>Últimos</th>
+                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th title="Últimos 5 partidos; el de la derecha es el más reciente">Últimos 5</th>
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
                       <tr data-jug={f.nombre} style={`--i:${i}`} class:list={['liga-fila', i === 0 && f.pj > 0 ? 'liga-lider' : '', e.zonas?.get(f.nombre)?.includes('baja') ? 'tmp-fila tmp-baja' : e.zonas?.get(f.nombre)?.includes('sube') ? 'tmp-fila tmp-sube' : e.zonas?.get(f.nombre)?.includes('copa') ? 'tmp-fila tmp-copa' : '']}>
-                        <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}>{i + 1}</td>
-                        <td class="text-left"><span class="inline-flex items-center gap-2">{escudoDe(e.clubes?.[f.nombre]) && <img src={escudoDe(e.clubes[f.nombre])} alt="" width="22" height="22" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:22px;height:22px" onerror="this.style.display='none'" />}<span class="font-display font-bold text-white tracking-wide">{f.nombre}</span></span>{e.clubes?.[f.nombre] && <span class="block text-[12px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
+                        <td class:list={['text-left font-display font-bold', PUESTO[i] ?? 'text-gray-500']}><span class="lf-pos">{i + 1}</span>{(e.mov[f.nombre] ?? 0) !== 0 ? <span class:list={['lf-mov', e.mov[f.nombre] > 0 ? 'lf-sube' : 'lf-baja']} title={e.mov[f.nombre] > 0 ? `Subió ${e.mov[f.nombre]} desde la fecha anterior` : `Bajó ${-e.mov[f.nombre]} desde la fecha anterior`}><i class={`fa-solid ${e.mov[f.nombre] > 0 ? 'fa-caret-up' : 'fa-caret-down'}`} aria-hidden="true"></i>{Math.abs(e.mov[f.nombre])}</span> : (e.mov[f.nombre] === 0 && Object.keys(e.mov).length ? <span class="lf-mov lf-igual" title="Mismo puesto que en la fecha anterior">–</span> : null)}{i === 0 && f.pj > 0 && <i class="fa-solid fa-crown lf-corona" aria-label="Líder"></i>}</td>
+                        <td class="text-left"><span class="inline-flex items-center gap-2">{escudoDe(e.clubes?.[f.nombre]) && <img src={escudoDe(e.clubes[f.nombre])} alt="" width="22" height="22" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:22px;height:22px" onerror="this.style.display='none'" />}<span class="font-display font-bold text-white tracking-wide">{f.nombre}</span></span>{e.clubes?.[f.nombre] && <span class="lf-club block text-[12px] text-gray-400 leading-tight mt-0.5 uppercase">{e.clubes[f.nombre]}</span>}</td>
                         <td class="font-display font-extrabold text-white text-base">{f.pts}</td><td>{f.pj}</td>
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
                         <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
                         <td class:list={[f.dg > 0 ? 'text-emerald-400' : f.dg < 0 ? 'text-rose-400' : 'text-gray-400']}>{f.dg > 0 ? `+${f.dg}` : f.dg}</td>
                         <td>
                           {e.formas[f.nombre].length === 0 ? <span class="text-gray-600">—</span> : (
-                            <div class="forma" data-forma>
-                              <button type="button" class="forma-flecha" data-forma-paso="-1" aria-label={`Partidos anteriores de ${f.nombre}`}><i class="fa-solid fa-chevron-left"></i></button>
-                              <div class="forma-strip" data-forma-strip tabindex="0" aria-label={`Resultados de ${f.nombre}, del más antiguo al más reciente`}>
-                                {e.formas[f.nombre].map((h) => <span class:list={['liga-forma', CHIP[h.r]]} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
-                              </div>
-                              <button type="button" class="forma-flecha" data-forma-paso="1" aria-label={`Partidos más recientes de ${f.nombre}`}><i class="fa-solid fa-chevron-right"></i></button>
-                              <span class="forma-cont" data-forma-cont data-total={e.formas[f.nombre].length} title="Partidos que se ven, sobre el total jugado">{Math.min(5, e.formas[f.nombre].length)}/{e.formas[f.nombre].length}</span>
+                            <div class="lf-forma" aria-label={`Últimos resultados de ${f.nombre}, del más antiguo al más reciente`}>
+                              {e.formas[f.nombre].slice(-5).map((h, k, arr) => <span class:list={['lf-f', `lf-${h.r}`, k === arr.length - 1 && 'lf-ult']} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
                             </div>
                           )}
                         </td>
@@ -171,7 +177,7 @@ const datos = LIGAS.map((l) => ({
               )}
               <details class="liga-guia">
                 <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none inline-flex items-center gap-1.5 min-h-9"><i class="fa-solid fa-circle-info"></i>¿Cómo se lee la tabla?</summary>
-                <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · Últimos: flechas, rueda o arrastre para ver partidos anteriores. Toca un jugador para resaltar sus partidos en Resultados.</p>
+                <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · ▲▼: cuántos puestos subió o bajó desde la fecha anterior · Últimos 5: G ganó, E empató, P perdió (el de la derecha es el más reciente; pasa el dedo o el mouse para ver el marcador). Toca un jugador para resaltar sus partidos en Resultados.</p>
               </details>
             </section>
 
