@@ -3,17 +3,19 @@
    separadas por una línea, acciones en cápsulas) con los colores y letras de Phoenix. Lo importa solo src/pages/social.astro. */
 .sxr { --sxr-linea: rgb(255 255 255 / .08); --sxr-caja: rgb(255 255 255 / .035); --sxr-hover: rgb(255 255 255 / .045); --sxr-tx2: #9aa3b8;
   max-width: 82rem; margin: 0 auto; padding: .75rem .75rem 2rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
-@media (min-width: 768px) { .sxr { grid-template-columns: 15rem minmax(0, 1fr); padding: 1rem 1rem 2rem; } }
-@media (min-width: 1200px) { .sxr { grid-template-columns: 15rem minmax(0, 46rem) 19rem; justify-content: center; } }
+@media (min-width: 768px) { .sxr { grid-template-columns: 12.5rem minmax(0, 1fr); padding: 1rem 1rem 2rem; } }
+/* 19-oct-2026 (Fralex: «esa barra abarca demasiado espacio, ponla más a la izquierda»): columna izquierda más angosta y pegada al borde;
+   el muro queda centrado en su espacio (máx. 46rem). */
+@media (min-width: 1200px) { .sxr { max-width: 90rem; grid-template-columns: 12.5rem minmax(0, 1fr) 19rem; } .sxr-centro { width: 100%; max-width: 46rem; justify-self: center; } }
 
 /* Columna izquierda: navegación pegada al subir/bajar */
 .sxr-izq { display: none; }
 @media (min-width: 768px) { .sxr-izq { display: block; } }
-.sxr-nav { position: sticky; top: 7.5rem; display: grid; gap: .25rem; padding-right: 1rem; border-right: 1px solid var(--sxr-linea); max-height: calc(100vh - 8.5rem); overflow-y: auto; scrollbar-width: thin; }
-.sxr-item { width: 100%; display: flex; align-items: center; gap: .7rem; min-height: 2.6rem; padding: .35rem .75rem; border-radius: .75rem; color: #d4d9e6; font-size: 14px; font-weight: 500; text-align: left; transition: background-color .15s, color .15s; }
+.sxr-nav { position: sticky; top: 7.5rem; display: grid; gap: .2rem; padding-right: .6rem; border-right: 1px solid var(--sxr-linea); max-height: calc(100vh - 8.5rem); overflow-y: auto; scrollbar-width: thin; }
+.sxr-item { width: 100%; display: flex; align-items: center; gap: .6rem; min-height: 2.35rem; padding: .3rem .6rem; border-radius: .7rem; color: #d4d9e6; font-size: 13.5px; font-weight: 500; text-align: left; transition: background-color .15s, color .15s; }
 .sxr-item:hover { background: var(--sxr-hover); color: #fff; }
 .sxr-item[aria-current='page'], .sxr-item[aria-current='true'] { background: rgb(255 255 255 / .09); color: #fff; font-weight: 600; }
-.sxr-ic { flex: none; width: 1.75rem; height: 1.75rem; display: grid; place-items: center; border-radius: 9999px; color: #c8cede; font-size: 14px; }
+.sxr-ic { flex: none; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; border-radius: 9999px; color: #c8cede; font-size: 14px; }
 .sxr-ic-juego { background: color-mix(in srgb, var(--color-galaxy-600) 35%, #12101f); color: #fff; font: 700 10.5px var(--font-display); letter-spacing: .02em; }
 .sxr-grupo { margin-top: .5rem; padding-top: .5rem; border-top: 1px solid var(--sxr-linea); }
 .sxr-grupo > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; min-height: 2.4rem; padding: 0 .75rem; border-radius: .75rem; font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--sxr-tx2); }
@@ -38,8 +40,9 @@
 /* Publicaciones en hilo: sin caja, separadas por una línea, se iluminan al pasar el mouse */
 .sxr-feed { display: grid; grid-template-columns: minmax(0, 1fr); }   /* sin esto la columna crecía al ancho del encabezado más largo y desbordaba en celular (19-oct) */
 .sx-post { position: relative; padding: .75rem .9rem .5rem; border-radius: 1rem; transition: background-color .15s; }
-.sx-post + .sx-post { margin-top: 1px; }
-.sx-post + .sx-post::before { content: ''; position: absolute; left: .9rem; right: .9rem; top: -1px; height: 1px; background: var(--sxr-linea); }
+/* 19-oct-2026 (Fralex: «cada publicación un poquito más separada»): aire entre una y otra, con la línea a la mitad del espacio */
+.sx-post + .sx-post { margin-top: .9rem; }
+.sx-post + .sx-post::before { content: ''; position: absolute; left: .9rem; right: .9rem; top: calc(-.45rem - .5px); height: 1px; background: var(--sxr-linea); }
 .sx-post:hover { background: var(--sxr-hover); }
 .sx-post:hover::before, .sx-post:hover + .sx-post::before { opacity: 0; }
 .sx-post-cab { display: flex; align-items: center; gap: .4rem; min-height: 2rem; font-size: 12.5px; color: var(--sxr-tx2); }
@@ -55,6 +58,7 @@
 
 /* Vista compacta: más publicaciones a la vista (medios más bajos, menos aire) */
 .sxr-feed[data-modo='compacta'] .sx-post { padding: .45rem .75rem .35rem; }
+.sxr-feed[data-modo='compacta'] .sx-post + .sx-post { margin-top: .35rem; } .sxr-feed[data-modo='compacta'] .sx-post + .sx-post::before { top: calc(-.175rem - .5px); }   /* en Compacta, menos aire */
 .sxr-feed[data-modo='compacta'] .sx-post-cuerpo > p:first-child { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .sxr-feed[data-modo='compacta'] .sx-post-cuerpo :is(img, video) { max-height: 11rem; width: auto; max-width: 100%; object-fit: cover; }
 .sxr-feed[data-modo='compacta'] .sx-post-cuerpo iframe { max-height: 11rem; }
@@ -230,7 +234,7 @@
 .sxr-nuevas { top: calc(var(--sxr-arriba, 6.125rem) + 3.6rem); }
 
 /* Publicación: más aire, cara más grande, nombre y «hace cuánto · juego» en dos líneas */
-.sx-post { padding: 1rem .9rem .6rem; }
+.sx-post { padding: 1.1rem .9rem .8rem; }
 .sx-post-cab { gap: .65rem; align-items: center; }
 .sx-post-av { width: 2.35rem; height: 2.35rem; box-shadow: 0 0 0 2px rgb(255 255 255 / .06); }
 .sx-post-id { display: grid; min-width: 0; line-height: 1.25; }
