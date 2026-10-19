@@ -56,3 +56,23 @@ Hay varias sesiones editando el mismo repositorio a la vez (visual, Link, Sync, 
 - **CSS:** medido. De 588 KB de CSS propio, solo ~12 KB son reglas cuyas clases no aparecen en ningún archivo (la mayoría de uPlot, que las crea la librería). No vale la pena borrar a ciegas; lo que más pesaría menos sería cargar el CSS por página en vez de todo en `global.css`, y eso se hará junto a la pasada visual (hay estilos compartidos entre páginas, como el campo de fútbol).
 - **Carpetas de trabajo:** web solo con `borrador` y `pes-rediseno` (propuesta de portada del 9-oct, sin fusionar a propósito). Link y Sync solo con sus dos carpetas principales; retiradas ws-actualizar-link, ws-amistosos-link, ws-lm-link, ws-lm-sync, ws-stats-link y ws-stats-sync (todo su contenido ya estaba en rediseño-phoenix-portal / mercado-fase0; ramas conservadas).
 - **Sin tocar a propósito:** las carpetas principales de Link (`_phoenix-link`, 4 archivos sin subir) y Sync (`smash-soda-fork`, 13 archivos sin subir) tienen trabajo en curso de otras sesiones.
+
+## 7. Velocidad de carga (18/19-oct, noche)
+
+Medido con Lighthouse móvil (Edge, sin caché) sobre la web publicada en `borrador`.
+
+| Página | Nota antes | Nota después | Qué pesaba |
+|---|---|---|---|
+| Cambios oficiales | 39 | 67 | JS de arranque |
+| Tienda | 20 | 58 | JS de arranque |
+| Noticias | 11 | 45 | JS de arranque + chat flotante |
+| Inicio | 35 | (ver REGISTRO) | salto de las luces de la portada (CLS 0,36) |
+
+Arreglos (commits 2c58153, 0e78171, 007fe2b):
+- `src/js/boot.js`: lo que no hace falta para VER la página (cinta, en vivo, buscador, efectos, chat flotante…) arranca en `requestIdleCallback`; cada pieza va envuelta para que un error no tumbe las demás.
+- Chat flotante, cinta y `hoyLima`: menos trabajo por repintado.
+- `main { min-height: 100vh }`: el pie ya no salta.
+- Fuentes de iconos recortadas (`tools/iconos/recortar-iconos.mjs`): ~220 KB menos por visita. **Si añades un icono nuevo, vuelve a ejecutar el script y sube lo que genera.** Iconos que vienen de la base de datos → `tools/iconos/extra.txt`.
+- Luces de la portada (`escenario.css`) ancladas a la pantalla, no a la altura de la portada.
+
+Siguiente, si se quiere más: el script de `Layout.astro` sigue siendo lo más pesado (~0,5 s de CPU en móvil lento); dividirlo por página es el próximo paso grande.
