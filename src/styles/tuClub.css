@@ -1,0 +1,56 @@
+/* INICIO · banda «Tu club» (19-oct-2026): lo más exclusivo de la web, en dorado (la misma familia que «Mi club» del menú y El Estadio).
+   Lo importa solo src/pages/index.astro; lo pinta js/features/portada/tuClub.js. */
+.tuclub { max-width: 80rem; margin: 1.5rem auto 0; padding: 0 1rem; }
+.tuclub:empty { display: none; }
+.tuclub-caja { position: relative; overflow: hidden; display: flex; align-items: center; gap: 1.25rem; padding: 1.1rem 1.25rem; border-radius: 1.4rem; text-decoration: none;
+  background: radial-gradient(120% 160% at 0% 0%, rgb(251 191 36 / .16), transparent 55%), linear-gradient(160deg, rgb(26 18 6 / .85), rgb(12 10 26 / .9));
+  border: 1px solid rgb(251 191 36 / .35); box-shadow: 0 0 0 1px rgb(255 255 255 / .04) inset, 0 20px 50px -24px rgb(251 191 36 / .45); }
+.tuclub-caja::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / .07) 50%, transparent 60%); transform: translateX(-100%); }
+@media (prefers-reduced-motion: no-preference) { .tuclub-caja::after { animation: tuclub-brillo 8s ease-in-out 1.5s infinite; } .tuclub-caja { animation: tuclub-entra .6s cubic-bezier(.16, 1, .3, 1) both; } }
+@keyframes tuclub-brillo { 0%, 80% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes tuclub-entra { from { opacity: 0; transform: translateY(10px); } }
+.tuclub-kicker { display: block; font: 700 11px var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: #fbbf24; }
+.tuclub-escudo { flex: none; width: 4.5rem; height: 4.5rem; display: grid; place-items: center; border-radius: 1.1rem; background: radial-gradient(circle at 50% 35%, rgb(251 191 36 / .22), rgb(0 0 0 / .5)); border: 1px solid rgb(251 191 36 / .45); color: #fbbf24; font-size: 1.8rem; }
+.tuclub-escudo img { width: 3.6rem; height: 3.6rem; object-fit: contain; filter: drop-shadow(0 6px 12px rgb(0 0 0 / .5)); }
+.tuclub-escudo-vacio { color: rgb(251 191 36 / .7); }
+.tuclub-txt { display: grid; gap: .1rem; min-width: 0; }
+.tuclub-txt b { font: 800 clamp(1.2rem, 2.6vw, 1.7rem)/1.1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tuclub-txt small { font-size: 13px; color: #c7cddb; }
+.tuclub-btn { flex: none; display: inline-flex; align-items: center; min-height: 2.6rem; padding: 0 1.2rem; border-radius: 9999px; font: 800 .8rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #1a1205; background: linear-gradient(135deg, #fde68a, #fbbf24 55%, #f59e0b); box-shadow: 0 8px 22px -8px rgb(251 191 36 / .75); transition: transform .15s, filter .15s; }
+.tuclub-btn:hover { transform: translateY(-1px); filter: brightness(1.07); }
+.tuclub-sin .tuclub-btn { margin-left: auto; }
+.tuclub-sin:hover { border-color: rgb(251 191 36 / .6); }
+
+/* Con club */
+.tuclub-con { flex-wrap: wrap; }
+.tuclub-id { display: flex; align-items: center; gap: 1rem; min-width: 0; flex: 1 1 18rem; text-decoration: none; }
+.tuclub-id:hover .tuclub-txt b { color: #fde68a; }
+.tuclub-cifras { display: flex; gap: 1.6rem; flex-wrap: wrap; }
+.tuclub-cifras div { display: grid; }
+.tuclub-cifras dt { font: 700 10.5px var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: #9aa6bd; }
+.tuclub-cifras dd { font: 800 1.3rem var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.tuclub-cifras .tuclub-alerta { color: #fb7185; } .tuclub-cifras .tuclub-ok { color: #34d399; } .tuclub-cifras .tuclub-no { color: #94a3b8; }
+.tuclub-atajos { display: flex; flex-wrap: wrap; gap: .45rem; flex-basis: 100%; }
+.tuclub-atajo { display: inline-flex; align-items: center; min-height: 2.2rem; padding: 0 .9rem; border-radius: 9999px; font: 700 .75rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: #fde68a; background: rgb(251 191 36 / .1); border: 1px solid rgb(251 191 36 / .3); transition: background-color .15s, color .15s; }
+.tuclub-atajo:hover { background: rgb(251 191 36 / .22); color: #fff; }
+.tuclub-atajo:first-child { color: #1a1205; background: linear-gradient(135deg, #fde68a, #fbbf24); border-color: transparent; }
+
+/* Sin sesión: la vitrina de lo exclusivo */
+.tuclub-pitch { align-items: stretch; gap: 1.5rem; padding: 1.5rem; }
+.tuclub-pitch-txt { flex: 1 1 22rem; display: grid; gap: .55rem; align-content: center; }
+.tuclub-pitch h2 { font: 800 clamp(1.5rem, 3.4vw, 2.3rem)/1.05 var(--font-display); text-transform: uppercase; letter-spacing: .03em; color: #fff; }
+.tuclub-pitch h2 span { background: linear-gradient(95deg, #fde68a, #fbbf24 60%, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.tuclub-pitch-txt > p:not(.tuclub-kicker) { font-size: 14px; line-height: 1.55; color: #c9cfdc; max-width: 46ch; }
+.tuclub-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: .9rem; margin-top: .35rem; }
+.tuclub-link { font: 700 .8rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #fde68a; }
+.tuclub-link:hover { text-decoration: underline; }
+.tuclub-puntos { flex: 1 1 18rem; display: grid; gap: .55rem; align-content: center; }
+.tuclub-puntos li { display: grid; gap: .1rem; padding: .7rem .9rem; border-radius: .9rem; background: rgb(0 0 0 / .3); border: 1px solid rgb(251 191 36 / .18); }
+.tuclub-puntos b { font: 700 .85rem var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fde68a; }
+.tuclub-puntos span { font-size: 13px; color: #b8bfcf; }
+@media (max-width: 640px) {
+  .tuclub-caja { flex-wrap: wrap; padding: 1rem; gap: .9rem; }
+  .tuclub-sin .tuclub-btn { margin-left: 0; }
+  .tuclub-cifras { gap: 1.1rem; }
+  .tuclub-escudo { width: 3.75rem; height: 3.75rem; } .tuclub-escudo img { width: 3rem; height: 3rem; }
+}
