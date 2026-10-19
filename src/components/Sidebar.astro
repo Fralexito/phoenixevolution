@@ -1,6 +1,6 @@
 ---
 import SocialIcon from './SocialIcon.astro';
-import { NAV, NAV_EXTRA, ACCOUNT_NAV, GRUPOS_CUENTA, SOCIALS, PILARES } from '../data/site.js';
+import { NAV, NAV_EXTRA, ACCOUNT_NAV, GRUPOS_CUENTA, SOCIALS, PILARES, esDe } from '../data/site.js';
 import { FX } from '../data/experimento.js';
 // Panel «Mi cuenta» en bloques con mosaico de 3 columnas: todo cabe sin scroll y cada cosa tiene su lugar.
 const grupos = GRUPOS_CUENTA.map((g) => ({ ...g, items: ACCOUNT_NAV.filter((n) => n.grupo === g.id && !n.abajo && n.menu !== false) })).filter((g) => g.items.length);
@@ -18,21 +18,40 @@ const { active } = Astro.props;
       <i class="fa-solid fa-xmark text-xl"></i>
     </button>
   </div>
-  <nav class="flex-1 p-4 flex flex-col gap-1.5 font-display text-base uppercase tracking-wider overflow-y-auto">
+  <nav class="red-nav flex-1 p-4 flex flex-col gap-1.5 font-display text-base uppercase tracking-wider overflow-y-auto">
     <!-- «Explorar» repite la barra superior: en PC se oculta (lg:hidden); en móvil es el menú completo. -->
     <div class="flex flex-col gap-1.5 lg:hidden">
     {FX.pilares ? (<>
-      <a href={base} aria-current={active === 'central' ? 'page' : undefined} class="cuenta-tile !flex-row !justify-start !min-h-0 !py-3 !px-3 !gap-3 !text-[.8rem]"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
-      {PILARES.map((p) => (
-        <section class="cuenta-grupo">
-          <p class="cuenta-tit"><i class={`fa-solid ${p.icon} mr-1`}></i> {p.label}</p>
-          {(p.bloques ?? [{ titulo: '', items: p.items }]).map((b) => (<Fragment>
-          {b.titulo && <p class="cuenta-bloque">{b.titulo}</p>}
-          <div class="cuenta-mosaico">{b.items.map((n) => (<a href={`${base}${n.path}`} aria-current={active === n.id ? 'page' : undefined} class="cuenta-tile"><i class={`fa-solid ${n.icon}`}></i><span>{n.label}</span></a>))}</div>
-          </Fragment>))}
-        </section>
-      ))}
-      <div class="flex gap-3 px-1 pt-2 text-[12px] tracking-widest text-gray-500"><a href={`${base}organizadores/`} class="hover:text-white">Quiénes somos</a><a href={`${base}unirme/`} class="hover:text-galaxy-400">Unirme a la liga</a></div>
+      <!-- RED DE ENLACES del celular (19-oct-2026, Fralex: «se ve todo desordenado, desorganizado y amontonado… algo dinámico, visual e intuitivo»).
+           Antes: subtítulos sueltos, cuadros de 3 tamaños, «Crear» dos veces y «Unirme» / «Quiénes somos» repetidos abajo.
+           Ahora: Mi club como tarjeta dorada; cada grupo es UNA fila que se abre (uno a la vez; el de la página actual ya viene abierto)
+           con sus enlaces en cuadros iguales de 2 columnas y una línea que dice para qué sirve cada uno. Los datos son los mismos (PILARES, site.js). -->
+      <div class="red">
+        {PILARES.filter((p) => p.destacado).map((p) => { const [pri, ...resto] = p.items; return (
+          <div class="red-club">
+            <a class="red-club-link" href={`${base}${pri.path}`} aria-current={esDe(pri, active) ? 'page' : undefined}>
+              <span class="red-club-ic" aria-hidden="true"><i class={`fa-solid ${p.icon}`}></i></span>
+              <span class="red-club-txt"><b>{p.label}</b><small>{p.lema}</small></span>
+            </a>
+            {resto.map((n) => (<a class="red-club-sec" href={`${base}${n.path}`} aria-current={esDe(n, active) ? 'page' : undefined}><i class={`fa-solid ${n.icon}`} aria-hidden="true"></i>{n.label}</a>))}
+          </div>); })}
+        <a class="red-fila" href={base} aria-current={active === 'central' ? 'page' : undefined}><span class="red-ic" aria-hidden="true"><i class="fa-solid fa-house"></i></span><span class="red-fila-txt"><b>Inicio</b></span></a>
+        {PILARES.filter((p) => !p.destacado).map((p) => {
+          const clave = (n) => `${n.path}|${n.staff ?? ''}|${n.noStaff ?? ''}`; const vistos = new Set();
+          const items = p.items.filter((n) => !vistos.has(clave(n)) && vistos.add(clave(n)));
+          const aqui = items.some((n) => esDe(n, active));
+          return items.length === 1 ? (
+            <a class="red-fila" href={`${base}${items[0].path}`} aria-current={aqui ? 'page' : undefined}><span class="red-ic" aria-hidden="true"><i class={`fa-solid ${p.icon}`}></i></span><span class="red-fila-txt"><b>{p.label}</b>{p.lema && <small>{p.lema}</small>}</span></a>
+          ) : (
+            <details class="red-grupo" name="red-enlaces" open={aqui ? true : undefined}>
+              <summary><span class="red-ic" aria-hidden="true"><i class={`fa-solid ${p.icon}`}></i></span><span class="red-fila-txt"><b>{p.label}</b>{p.lema && <small>{p.lema}</small>}</span><span class="red-flecha" aria-hidden="true"></span></summary>
+              <div class="red-items">
+                {items.map((n) => (<a class="red-item" href={`${base}${n.path}`} data-solo-staff={n.staff} data-no-staff={n.noStaff} hidden={n.staff ? true : undefined} aria-current={esDe(n, active) ? 'page' : undefined}><i class={`fa-solid ${n.icon}`} aria-hidden="true"></i><b>{n.label}</b>{n.desc && <small>{n.desc}</small>}</a>))}
+              </div>
+            </details>
+          );
+        })}
+      </div>
     </>) : (<>
     <div class="px-3 pt-1 pb-1 text-[12px] text-gray-500 tracking-[0.25em]">Explorar</div>
     {NAV.map((n) => (

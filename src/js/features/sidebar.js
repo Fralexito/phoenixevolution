@@ -29,6 +29,13 @@ export function initSidebar() {
     if (account) account.hidden = !session;
     // Enlaces solo para el staff (p. ej. Auditoría, Moderación): cada uno declara su permiso en data-solo-staff. La página y la BD vuelven a comprobarlo.
     menu.querySelectorAll('[data-solo-staff]').forEach((el) => { el.hidden = !can(el.dataset.soloStaff || 'verAuditoria'); });
+    // …y su contrario: lo que el staff NO necesita ver (p. ej. «Crear» de torneos, porque el staff tiene «Crear» de ligas). Antes salían los dos.
+    menu.querySelectorAll('[data-no-staff]').forEach((el) => { el.hidden = can(el.dataset.noStaff); });
+    // Red de enlaces: si a un grupo le queda un número impar de cuadros visibles, el último ocupa el ancho entero (nada queda «cojo»).
+    menu.querySelectorAll('.red-items').forEach((g) => {
+      const vis = [...g.children].filter((a) => !a.hidden); g.querySelectorAll('[data-ancho]').forEach((a) => a.removeAttribute('data-ancho'));
+      if (vis.length % 2) vis.at(-1).dataset.ancho = '';
+    });
   });
   menu.addEventListener('click', (e) => {
     const act = e.target.closest('[data-action]')?.dataset.action;

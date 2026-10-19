@@ -17,7 +17,6 @@ import '../styles/miClubEstadio.css';
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 const base = import.meta.env.BASE_URL;
-const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-magnifying-glass-dollar', 'Mercado'], ['oficina', 'fa-envelope-open-text', 'Oficina'], ['movimientos', 'fa-right-left', 'Movimientos']];
 ---
 <Layout title="Liga Máster" active="manager" description="Tu carrera de DT en la Galaxy League: club, presupuesto y fichajes que llegan al juego.">
   <div class={`mcx max-w-6xl mx-auto px-4 sm:px-8 py-6 w-full space-y-6${FX.ligaMasterGalaxia ? ' lmg' : ''}`} data-mcx>
@@ -83,12 +82,7 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
       </ol>
     </section>
 
-    {FX.clubUnificado && (
-      <nav class="cu-modos" role="tablist" aria-label="Mi club">
-        <button type="button" role="tab" data-modo="carrera" aria-selected="true"><i class="fa-solid fa-user-tie"></i><span><b>Carrera de DT</b><small>Club, fichajes y ofertas</small></span></button>
-        <button type="button" role="tab" data-modo="vestuario" aria-selected="false"><i class="fa-solid fa-gamepad"></i><span><b>Mi partida de PES</b><small>El club de tu partida de PES</small></span></button>
-      </nav>
-    )}
+    <!-- (19-oct-2026) Fuera las dos navegaciones viejas (Carrera/Vestuario y las pestañas de la carrera): las ocultaba la barra de Mi club. -->
     <div id="cu-carrera" class="space-y-6">
     <!-- Sin club: elegir uno -->
     <section id="mg-elegir" hidden class="space-y-3">
@@ -100,9 +94,6 @@ const TABS = [['plantilla', 'fa-people-group', 'Plantilla'], ['mercado', 'fa-mag
 
     <!-- Con club -->
     <div id="mg-panel" hidden class="space-y-4">
-      <nav class="mg-tabs" role="tablist">
-        {TABS.map(([id, ic, t], i) => <a href={`#${id}`} role="tab" data-tab={id} aria-current={i === 0 ? 'page' : undefined}><i class={`fa-solid ${ic}`}></i>{t}</a>)}
-      </nav>
       <!-- Resumen del club (19-oct-2026): lo pinta manager.js (pintarResumen) con los datos de siempre. -->
       <section data-panel="resumen" class="mcx-resumen" hidden aria-live="polite"><div id="mcx-resumen" class="mcx-bento"></div></section>
       <!-- PLANTILLA (19-oct-2026): arriba, tu equipo por líneas (cuántos y su media; tocar una filtra). Dos formas de verlo: Cancha (todo el equipo

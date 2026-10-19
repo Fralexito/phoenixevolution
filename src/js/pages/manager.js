@@ -69,18 +69,14 @@ function pintarCabecera() {
   const chip = $('lmg-ventana');
   if (chip) { chip.dataset.abierta = cfg?.ventana_abierta ? '1' : '0'; chip.querySelector('b').textContent = cfg?.ventana_abierta ? 'Ventana de fichajes abierta' : 'Ventana cerrada'; }
   if (!club) { $('mg-club').innerHTML = chip ? '' : `<div class="mt-1">${ventana}</div>`; return; }
-  const stat = (lbl, val, ic) => `<div class="mg-stat"><i class="fa-solid ${ic}"></i><span><small>${lbl}</small><b>${val}</b></span></div>`;
+  // 19-oct-2026: en la entrada solo lo que hace falta en TODAS las secciones (dinero y cupo), en una línea. Valor y media ya están en Resumen y Plantilla.
+  const cifra = (lbl, val, ic) => `<span class="mcx-cifra" title="${lbl}"><i class="fa-solid ${ic}" aria-hidden="true"></i><b>${val}</b><small>${lbl}</small></span>`;
   const local = escudoLocal(club);   // 19-oct-2026: el escudo del catálogo (alta calidad y mismo origen: el estadio toma su color)
   $('mg-club').innerHTML = `<div class="mg-club mcx-club">
       <div class="mg-escudo mcx-escudo">${local ? `<img src="${esc(local)}" alt="" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" data-mcx-escudo>` : escudo(club, 'w-16 h-16 sm:w-20 sm:h-20')}</div>
       <div class="min-w-0"><p class="mg-club-tit">${esc(club.nombre)}</p><p class="text-xs text-gray-400 flex items-center gap-2"><i class="fa-solid fa-user-tie text-galaxy-400"></i> Eres el DT${chip ? '' : ` · ${ventana}`}</p></div>
     </div>
-    <div class="mg-stats">
-      ${stat('Presupuesto', millones(club.presupuesto), 'fa-wallet')}
-      ${stat('Valor plantilla', millones(resumen.valor), 'fa-chart-line')}
-      ${stat('Media XI', resumen.mediaXI ?? '—', 'fa-star')}
-      ${stat('Plantilla', `${resumen.n}/${cfg?.max_plantilla ?? 40}`, 'fa-people-group')}
-    </div>`;
+    <div class="mg-stats mcx-cifras">${cifra('para fichar', millones(club.presupuesto), 'fa-wallet')}${cifra('jugadores', `${resumen.n}/${cfg?.max_plantilla ?? 40}`, 'fa-people-group')}</div>`;
   if (tabActual() === 'resumen') pintarResumen();
 }
 const escudoLocal = (c) => { const [idCat] = [...emparejarClubesLm([{ id: c.id, nombre: c.nombre }], CLUBES_PES).keys()]; const cat = CLUBES_PES.find((x) => x.id === idCat); return cat ? escudoUrl(cat) : null; };
@@ -352,7 +348,6 @@ document.addEventListener('click', (e) => { if (e.target.closest('[data-mcx-sala
 
 // ── Tabs ──
 function mostrarTab(id) {
-  document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== id; });
   ({ resumen: pintarResumen, plantilla: () => (plantillaDatos ? dibujarPlantilla() : pintarPlantilla()), mercado: () => { pintarMercado(); pintarOficina(); }, movimientos: pintarMovimientos })[id]?.();
   if (location.hash === '#oficina') requestAnimationFrame(() => $('mcx-ofertas')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));

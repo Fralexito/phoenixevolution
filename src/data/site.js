@@ -123,6 +123,7 @@ const DESC = {
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores', premios: 'La Paliza, Matagigantes, La Muralla y más, con cada resultado',
   tienda: 'Estética y mejoras para tu perfil', hosts: 'Catálogo de hosts: precios, ping y contacto',
+  unirme: 'Guía en 5 pasos para tu primer partido', organizadores: 'Quiénes organizan la liga y por qué',   // 19-oct-2026: salían sin descripción en la Red de enlaces
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
 const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas', competiciones: 'Todas las ligas' } : {}) };
