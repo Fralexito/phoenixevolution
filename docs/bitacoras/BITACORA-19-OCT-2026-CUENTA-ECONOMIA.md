@@ -21,7 +21,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
    C:/Users/WinterOS/.claude/skills/impeccable/scripts/impeccable.cmd detect --json <archivos>   # detector de diseño
    ```
 5. **Versión beta:** en CADA subida, sube `VERSION_BETA` en `src/data/versionWeb.js` (cambio normal: último número; algo grande: el del medio). Ver §3.
-6. **Migraciones de esta cuenta hoy:** 131, 132, 133, 134 (todas aplicadas). La siguiente libre es la **135** (mira antes el final de `REGISTRO.md` por si otra cuenta la tomó).
+6. **Migraciones de esta cuenta hoy:** 131, 132, 133, 134, 135 y 135b (todas aplicadas). La siguiente libre es la **136** (mira antes el final de `REGISTRO.md` por si otra cuenta la tomó).
 7. Para ver todo con datos y actividad aunque la base esté vacía: añade **`?demo=1`** a cualquier página (ver §4).
 
 ---
@@ -78,6 +78,8 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 | 13:40 | `f37e82a` | **Beta 1.3.1**: entrar a una sala desde Android |
 | 13:48 | `c1ad81c` | **Beta 1.4.0**: tablas de liga visuales |
 | 14:02 | `3cfb4e3` | **Beta 1.5.0**: Social fase 1 (red social completa) |
+| 14:17 | `e45a5d8` | **Beta 1.5.1**: esta bitácora y la guía paso a paso |
+| 14:40 | (ver REGISTRO) | **Beta 1.6.0**: Social fase 2 (**migraciones 135 y 135b**) |
 
 (Los textos completos de cada cambio, con archivos y pruebas, están en `REGISTRO.md`, líneas del 2026-10-19 «Cuenta ECONOMÍA».)
 
@@ -89,7 +91,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
    - cambio normal → `1.5.0` → `1.5.1`;
    - algo grande terminado (sección rehecha o sistema nuevo) → `1.5.3` → `1.6.0`;
    - la cinta «Fase beta» (Layout.astro) muestra la versión y la hora de Lima en que se compiló; la URL `/fase-beta-1-0/` **no** cambia.
-   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1.
+   - Historia: 1.0.1 cinta con número · 1.1.0 muro minimalista, demo, chat dual, publicar descriptivo · 1.2.0 Lanzar reto por pasos · 1.3.0 portada «Ahora en Phoenix» · 1.3.1 Android · 1.4.0 tablas de liga · 1.5.0 Social fase 1 · 1.5.1 documentación · 1.6.0 Social fase 2.
 2. **Nada de `html:has(…)` ni `body:has(…)` en CSS** (hacía recalcular toda la página ~15 veces al cargar). Poner una marca en `<html>` desde el JS (`data-ticker-oculto`, `data-duelos-plegado`, `data-reto-asistente`…).
 3. **Iconos recortados**: si usas un icono «fa-…» o «ph-…» nuevo, ejecuta `node tools/iconos/recortar-iconos.mjs` y sube `src/styles/iconos/*`. Si el icono de Font Awesome no tiene equivalente fino en `src/data/iconosFinos.js`, **añádelo** (si no, con «Sin íconos web» se oculta o sale como cuadro). Hoy se añadieron: `icons→smiley-wink`, `circle-notch`, `caret-up`, `caret-down`.
 4. **CSS por página**: 14 CSS salieron de `global.css`; cada página los importa DESPUÉS de Layout. Si una página nueva usa clases de uno de ellos, impórtalo ahí. CSS nuevos de hoy por página: `perfilPublico.css` (perfil), `retoAsistente.css` (duelos), `ahoraPortada.css` (inicio), `ligaTabla.css` (liga), `publicar.css` y `socialHilo.css` (social), `configuracion.css` (ajustes), `miClubEstadio.css` (manager). Globales nuevos: `salasVivo.css`, `publicacionExtras.css`, `modoDemo.css`.
@@ -169,6 +171,14 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
   - **Tirar hacia abajo** para recargar (celular).
   - Pruebas: `tests/etiquetas.test.mjs` (4).
 
+### 5.5b Social, fase 2 (1.6.0) — migraciones 135 y 135b
+- **Base de datos (135, aditiva)**: `muro_publicaciones.compartida_de`; tablas `muro_respuesta_likes` y `muro_vistas` (RLS sin políticas: solo por funciones); funciones `muro_compartir` (mismas reglas que publicar: ≤1000 letras, 10 por hora; compartir algo compartido apunta a la ORIGINAL; avisa al autor con el aviso nuevo `MURO_COMPARTIDA`, que amplía la lista de tipos permitidos), `muro_like_respuesta` / `muro_likes_respuestas`, `muro_registrar_vistas` (1 por persona; las propias no cuentan; sin sesión no cuenta), `muro_social_de` (vistas, veces compartida y la original solo si quien mira puede ver el muro de su autor; si no → `no_disponible`), `muro_reacciones_de` (sin bloqueados), `mi_racha_social` (días seguidos con publicación/respuesta/reacción, hora de Lima).
+- **135b**: al probar en la base apareció que compartir SIN comentario chocaba con la regla `muro_publicaciones_contenido_ok` y que borrar la original iba a fallar (la compartida quedaba vacía y sin referencia). Arreglo: columna fija `es_compartida` y la regla acepta «contenido O es compartida».
+- **Prueba en la base** (dos usuarios simulados, todo deshecho al final): cadena → original, «me gusta» on/off, vistas 1 por persona, reacciones, racha 1 día, 2 avisos, sin sesión ve lo público, borrar la original deja «no disponible».
+- **Web** (`features/social/fase2.js` nuevo, `features/muro/api.js`, `features/muro/pieSocial.js`, `pages/social.js`, `socialHilo.css`): ventana **Compartir** (en tu muro con comentario, o fuera); la **original dentro** de la compartida; pie con **veces compartida** (↻) y **vistas** (👁); el total de reacciones abre **quién reaccionó** por pestañas de emoji; **«me gusta» en respuestas** (❤️); **tarjeta rápida** al tocar cara o nombre (bandera, club con escudo, lema, duelos, Seguir, Retar, Ver perfil); **vistas** que se cuentan al verse 1 s; **racha 🔥 N** en la barra (dice «¡hoy!» si aún no hiciste nada hoy).
+- **Modo demo**: todo lo anterior simulado (compartir queda solo en la pestaña).
+- Arreglos tras probar: en celular la fila de acciones y la barra se compactan (antes 432 px en 390); iconos nuevos en `iconosFinos.js` (retweet, eye, eye-slash, arrow-up-from-bracket, spinner).
+
 ### 5.6 Chat
 - Columna de contactos (PC) y hoja «Chats» (celular): pestañas **Amigos | General** (`features/chatFlotante/general.js`): el chat general en pequeño, pide mensajes cada 6 s solo mientras se ve.
 
@@ -219,7 +229,7 @@ Bitácoras anteriores: `docs/bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`,
 
 ## 8. Pendientes y decisiones abiertas
 
-1. **Social fase 2** (siguiente, con migración 135): compartir en tu muro con comentario, «me gusta» en respuestas, vistas por publicación, «quién reaccionó», tarjeta rápida de perfil (nivel, club, Seguir, Retar), racha diaria.
+1. ~~Social fase 2~~ **hecha (1.6.0)**. Ideas para una fase 3: avisos de «me gusta» en respuestas, encuestas y duelos dentro de compartidas, «Para ti» (orden por interés), menciones con autocompletar en respuestas.
 2. **Modo demo**: simular tablas de liga, Tienda y mensajes privados.
 3. **Quitar controles «arcaicos»** del resto del sitio (listas largas, barras de desplazamiento, selectores viejos) — ya hecho en Mi club y Social.
 4. **Velocidad en celular**: volver a medir con Lighthouse tras las animaciones nuevas.

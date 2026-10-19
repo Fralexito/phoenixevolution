@@ -79,11 +79,47 @@ function publicacion(i) {
   return { id: ID0 + i, texto, imagen_url: null, video_url: null, juego: 'pes', reto: null, created_at: hace(edadMin), respuestas: Math.floor(azar(i + 4) * 6 * crece),
     reacciones, autor: { id: a.id, username: a.username, nombre_display: a.nombre, avatar_url: a.avatar_url }, _extra: fondo || sentimiento ? { ...(fondo ? { fondo } : {}), ...(sentimiento ? { sentimiento } : {}) } : null };
 }
+const MIS_COMPARTIDAS = [];   // lo que compartes en tu muro estando en demo (solo en esta pestaña)
 function publicaciones() {
   const nuevas = Math.min(20, Math.floor(seg() / 75));
-  return [...Array.from({ length: nuevas }, (_, k) => publicacion(100 + nuevas - 1 - k)), ...Array.from({ length: 9 }, (_, i) => publicacion(8 - i))];
+  return [...MIS_COMPARTIDAS, ...Array.from({ length: nuevas }, (_, k) => publicacion(100 + nuevas - 1 - k)), ...Array.from({ length: 9 }, (_, i) => publicacion(8 - i))];
 }
-const sinExtra = ({ _extra, ...p }) => p;
+const sinExtra = ({ _extra, _original, ...p }) => p;
+
+/* ---------- Social fase 2 (migración 135): vistas, compartidas, quién reaccionó, respuestas con «me gusta», racha ---------- */
+const pubDe = (id) => publicaciones().find((p) => p.id === Number(id)) ?? (Number(id) >= ID0 && Number(id) < ID0 + 200 ? publicacion(Number(id) - ID0) : null);
+const origDe = (p) => { if (!p) return null; const { _extra, _original, ...o } = p; return { id: o.id, texto: o.texto, imagen_url: null, video_url: null, juego: o.juego, created_at: o.created_at, extra: _extra, autor: o.autor }; };
+function socialDe(a = {}) {
+  const r = {};
+  for (const raw of a.p_publicaciones ?? []) {
+    const id = Number(raw); if (id < ID0) continue; const i = id - ID0; const p = pubDe(id);
+    const original = p?._original ? origDe(pubDe(p._original)) : i === 5 ? origDe(publicacion(2)) : null;   // la n.º 5 «compartió» la n.º 2 (para verlo en demo)
+    r[String(id)] = { vistas: Math.floor(18 + azar(i + 11) * 120 + seg() / 8), compartidas: Math.floor(azar(i + 21) * 6), original };
+  }
+  return r;
+}
+function reaccionesDeDemo(a = {}) {
+  const p = pubDe(a.p_publicacion); if (!p) return [];
+  const out = []; let k = 0;
+  for (const [tipo, n] of Object.entries(p.reacciones ?? {})) for (let j = 0; j < n; j += 1) { const g = GENTE[(k * 5 + j) % GENTE.length]; out.push({ tipo, cuando: hace(3 + k * 7), usuario: { id: g.id, username: g.username, nombre_display: g.nombre, avatar_url: null } }); k += 1; }
+  return out.slice(0, 60);
+}
+const FRASES_RESP = ['Golazo, sin duda 🔥', 'Jajaja te pasaste', 'GG, revancha cuando quieras', 'Ese penal no era 😤', 'Nivelazo hermano'];
+const likesDemo = new Map();
+function respuestasDeDemo(a = {}) {
+  const id = Number(a.p_publicacion); const i = id - ID0; const n = 2 + Math.floor(azar(i + 4) * 3);
+  return Array.from({ length: n }, (_, k) => { const g = GENTE[(i + k * 3 + 1) % GENTE.length]; return { id: ID0 + 5000 + i * 10 + k, autor_id: g.id, texto: FRASES_RESP[(i + k) % FRASES_RESP.length], created_at: hace(30 - k * 6), nombre_display: g.nombre, username: g.username, avatar_url: null, puedo_borrar: false }; });
+}
+const likeDe = (id) => likesDemo.get(id) ?? { n: Math.floor(azar(id) * 9), mio: false };
+function likesRespuestasDemo(a = {}) { const r = {}; for (const raw of a.p_respuestas ?? []) { const id = Number(raw); if (id >= ID0) r[String(id)] = likeDe(id); } return r; }
+function likeRespuestaDemo(a = {}) { const id = Number(a.p_respuesta); const l = likeDe(id); const nuevo = { n: l.n + (l.mio ? -1 : 1), mio: !l.mio }; likesDemo.set(id, nuevo); return { mio: nuevo.mio, total: nuevo.n }; }
+function compartirDemo(a = {}) {
+  const orig = pubDe(a.p_publicacion); const raiz = orig?._original ?? orig?.id ?? null;
+  const id = ID0 + 800 + MIS_COMPARTIDAS.length;
+  MIS_COMPARTIDAS.unshift({ id, texto: String(a.p_texto ?? '').slice(0, 1000), imagen_url: null, video_url: null, juego: 'pes', reto: null, created_at: new Date().toISOString(), respuestas: 0, reacciones: {},
+    autor: { id: '00000000-0000-4000-8000-0000000000aa', username: 'tu', nombre_display: 'Tú', avatar_url: null }, _extra: null, _original: raiz });
+  return id;
+}
 function muro(a = {}, orden = 'recientes') {
   let lista = publicaciones();
   if (orden === 'destacado') lista = [...lista].sort((x, y) => Object.values(y.reacciones).reduce((s, v) => s + v, 0) - Object.values(x.reacciones).reduce((s, v) => s + v, 0));
@@ -171,6 +207,18 @@ const SI_FALTA = { estadisticas_de: estadisticas, elo_de: elo };   // primero la
 /** Sustituto de supabase.rpc en modo demostración. `real()` hace la llamada de verdad. → { data, error } */
 export async function rpcDemo(nombre, args, real) {
   if (SIMULADAS[nombre]) return { data: await SIMULADAS[nombre](args ?? {}), error: null };
+  // Fase 2 (migración 135): lo inventado se simula; lo real (ids menores) va a la base
+  const esDemo = (v) => Number(v) >= ID0 && Number(v) < ID0 + 1e6;
+  if (nombre === 'muro_social_de') { const ids = args?.p_publicaciones ?? []; const r = ids.some((x) => !esDemo(x)) ? (await real()).data ?? {} : {}; return { data: { ...r, ...socialDe(args) }, error: null }; }
+  if (nombre === 'muro_reacciones_de' && esDemo(args?.p_publicacion)) return { data: reaccionesDeDemo(args), error: null };
+  if (nombre === 'muro_respuestas_de' && esDemo(args?.p_publicacion)) return { data: respuestasDeDemo(args), error: null };
+  if (nombre === 'muro_likes_respuestas') { const ids = args?.p_respuestas ?? []; const r = ids.some((x) => !esDemo(x)) ? (await real()).data ?? {} : {}; return { data: { ...r, ...likesRespuestasDemo(args) }, error: null }; }
+  if (nombre === 'muro_like_respuesta' && esDemo(args?.p_respuesta)) return { data: likeRespuestaDemo(args), error: null };
+  if (nombre === 'muro_compartir' && esDemo(args?.p_publicacion)) return { data: compartirDemo(args), error: null };
+  if (nombre === 'muro_registrar_vistas' && (args?.p_publicaciones ?? []).every(esDemo)) return { data: null, error: null };
+  if (nombre === 'perfil_publico') { const g = GENTE.find((x) => x.username === String(args?.p_usuario ?? '')); if (g) { const k = GENTE.indexOf(g);
+    return { data: { id: g.id, username: g.username, nombre_display: g.nombre, avatar_url: null, pais_codigo: ['PE', 'AR', 'CO', 'MX', 'CL', 'EC'][k % 6], club_favorito: ['AC Milan', 'Real Madrid', 'Boca Juniors', 'Liverpool', 'Barcelona', 'Inter'][k % 6], puede_hostear: k % 2 === 0, muro_lema: ['Juego para ganar', 'El toque fino nunca falla', 'Del barrio a la Galaxy'][k % 3], soy_yo: false, puede_ver_muro: true, visible: true, items: [], hay_mas: false }, error: null }; } }
+  if (nombre === 'mi_racha_social') { const r = await real(); return { data: (r.data?.dias ?? 0) > 0 ? r.data : { dias: 4, hoy: true }, error: null }; }
   if (nombre === 'muro_extras_de') {
     const r = await real(); return { data: { ...(r.data ?? {}), ...extras(args) }, error: null };
   }

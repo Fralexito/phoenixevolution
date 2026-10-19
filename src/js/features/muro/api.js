@@ -101,3 +101,19 @@ export const misReacciones = (ids) => rpc('mis_reacciones', { p_ids: ids });    
 export const destacado = (desplazamiento = 0, limite = 20) => rpc('muro_destacado', { p_desplazamiento: desplazamiento, p_limite: limite });
 /** Hosting con varios juegos/parches y visibilidad (migración 026). */
 export const guardarHost = (software, catalogo, visible) => rpc('muro_guardar_host', { p_software: software, p_catalogo: catalogo, p_visible: visible });
+
+/* ---------- Social, fase 2 (migración 135 + 135b, 19-oct-2026) ---------- */
+/** Compartir una publicación en tu muro, con comentario opcional (si ya era compartida, apunta a la original). → id nuevo */
+export const compartirEnMuro = (idPublicacion, texto = '') => rpc('muro_compartir', { p_publicacion: idPublicacion, p_texto: texto || null });
+/** Vistas, veces compartida y la original (si es compartida) de varias publicaciones. → { "<id>": { vistas, compartidas, original } } */
+export const socialDe = (ids) => rpc('muro_social_de', { p_publicaciones: ids });
+/** Marca como vistas (1 por persona; las propias no cuentan; sin sesión no hace nada). */
+export const registrarVistas = (ids) => rpc('muro_registrar_vistas', { p_publicaciones: ids });
+/** «Me gusta» en una respuesta (alterna). → { mio, total } */
+export const likeRespuesta = (idRespuesta) => rpc('muro_like_respuesta', { p_respuesta: idRespuesta });
+/** «Me gusta» de varias respuestas. → { "<id>": { n, mio } } */
+export const likesRespuestas = (ids) => rpc('muro_likes_respuestas', { p_respuestas: ids });
+/** Quién reaccionó. → [ { tipo, cuando, usuario } ] */
+export const reaccionesDe = (idPublicacion, limite = 60) => rpc('muro_reacciones_de', { p_publicacion: idPublicacion, p_limite: limite });
+/** Mi racha de actividad (días seguidos). → { dias, hoy } */
+export const rachaSocial = () => rpc('mi_racha_social');

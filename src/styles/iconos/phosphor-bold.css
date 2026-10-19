@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Phosphor Bold recortado a 175 iconos. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Phosphor Bold recortado a 179 iconos. */
 @font-face { font-family: "Phosphor-Bold"; src: url("./phosphor-bold.recortado.woff2") format("woff2"); font-weight: normal; font-style: normal; font-display: block; }
 .ph-bold {
   /* use !important to prevent issues with browser extensions that change fonts */
@@ -80,6 +80,9 @@
 .ph-bold.ph-envelope-open:before { content: "\e216"; }
 .ph-bold.ph-equals:before { content: "\e21c"; }
 .ph-bold.ph-eraser:before { content: "\e21e"; }
+.ph-bold.ph-export:before { content: "\eaf0"; }
+.ph-bold.ph-eye:before { content: "\e220"; }
+.ph-bold.ph-eye-slash:before { content: "\e224"; }
 .ph-bold.ph-file-arrow-down:before { content: "\e232"; }
 .ph-bold.ph-film-slate:before { content: "\e8c2"; }
 .ph-bold.ph-film-strip:before { content: "\e792"; }
@@ -166,6 +169,7 @@
 .ph-bold.ph-soccer-ball:before { content: "\e716"; }
 .ph-bold.ph-sort-descending:before { content: "\e446"; }
 .ph-bold.ph-speaker-slash:before { content: "\e45a"; }
+.ph-bold.ph-spinner:before { content: "\e66a"; }
 .ph-bold.ph-squares-four:before { content: "\e464"; }
 .ph-bold.ph-stack:before { content: "\e466"; }
 .ph-bold.ph-stairs:before { content: "\e8ec"; }

@@ -23,20 +23,20 @@ import { montarCompositor } from '../features/muro/compositor.js';
 import { rafaga, salto, entrada } from '../features/dopamina.js';
 import { abrirNuevaHistoria } from '../features/muro/historiasUI.js';
 import { abrirHistorias } from '../features/muro/visor.js';
-import { compartir } from '../features/muro/compartir.js';
 import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
 import { initMencionAuto } from '../features/social/mencionAuto.js';
 import { etiquetasDe } from '../core/comunidad/muro.js';
 import { montarVisorFotos, montarDobleToque, montarTirarParaRecargar } from '../features/social/gestos.js';
+import { originalHTML, abrirCompartir, abrirQuienReacciono, abrirTarjetaPerfil, vigilarVistas } from '../features/social/fase2.js';
 import { openAuthModal } from '../features/auth.js';
 
 const $ = (id) => document.getElementById(id);
 const feedEl = $('sx-feed'); const histEl = $('sx-hist'); const vistasEl = $('sx-vistas'); const filtroEl = $('sx-filtro'); const compEl = $('sx-compositor'); const finEl = $('sx-fin');
 const KEY_VISTAS = 'pes-historias-vistas';   // la misma clave que usa /perfil/: «ya vista» se comparte entre las dos páginas
 const q = new URLSearchParams(location.search);
-const S = { yo: null, perfil: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0, paleta: null, crudos: [], circulos: [], vistas: leerVistas(), compositor: null, orden: ordenValido(q.get('o')), abiertas: new Set(), resp: new Map(), foco: null, tag: tagValido(q.get('tag')) };
+const S = { yo: null, perfil: null, vista: vistaValida(q.get('v')), juego: segmentoParaGuardar(q.get('j')) ?? '', items: [], hayMas: false, cargando: false, req: 0, paleta: null, crudos: [], circulos: [], vistas: leerVistas(), compositor: null, orden: ordenValido(q.get('o')), abiertas: new Set(), resp: new Map(), foco: null, tag: tagValido(q.get('tag')), social: {}, likesResp: new Map() };
 // #etiqueta elegida (?tag=Liga): el feed muestra solo las publicaciones con ella (buscar_publicaciones). Letras, números y _ (máx. 30).
 function tagValido(t) { const s = String(t ?? '').replace(/^#/, '').trim(); return /^[0-9]*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9_]{0,29}$/.test(s) ? s : ''; }
 
@@ -102,7 +102,8 @@ function pintarFiltro() {
   filtroEl.innerHTML = [['', 'Todo'], ...SEGMENTOS].map(([id, n]) => `<button type="button" data-j="${id}" aria-pressed="${S.juego === id}" class="sxr-chip">${escapeHTML(n)}</button>`).join('');
   pintarNav(); marcarFiltros();
 }
-const tarjeta = (it) => tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id) }) });
+const tarjeta = (it) => { const so = S.social[String(it.id)] ?? null;   // fase 2: la publicación original dentro de una compartida, vistas y veces compartida
+  return tarjetaComunidadHTML(it, { variante: 'hilo', yo: S.yo, puedeOcultar: can('resolverReportes'), extra: originalHTML(so?.original), pie: pieSocialHTML(it, { paleta: S.paleta === Number(it.id), social: so }) }); };
 let pintados = 0; let primero = null;   // cuántas tarjetas hay en pantalla y cuál va primera: sirve para animar SOLO las nuevas al cargar más
 function pintar() {
   feedEl.innerHTML = S.items.length ? ordenarFeed(S.items, S.orden).map(tarjeta).join('')
@@ -138,6 +139,7 @@ async function cargar({ mas = false } = {}) {
     if (S.yo && nuevos.length) { try { nuevos = conMisReacciones(nuevos, mapaMisReacciones(await api.misReacciones(nuevos.map((x) => x.id)))); } catch (e) { console.warn('[social] mis reacciones:', e?.message); } }   // sin esto solo se pierde el resaltado
     S.items = mas ? [...S.items, ...nuevos] : nuevos; S.hayMas = !!m.hay_mas;
     await cargarEncuestas(S.items.map((x) => x.id));
+    try { Object.assign(S.social, (await api.socialDe(S.items.map((x) => x.id))) ?? {}); } catch (e) { console.warn('[social] datos sociales:', e?.message); }   // sin esto solo faltan vistas y compartidas
     if (S.yo) await cargarEstado('publicacion', S.items.map((x) => x.id));
     if (req === S.req) pintar();
   } catch (e) {
@@ -151,7 +153,7 @@ function reiniciarFeed() { S.items = []; S.hayMas = false; S.cargando = false; S
 async function reaccionar(id, tipo) {
   if (!S.yo) { toast('Inicia sesión para reaccionar.', 'info'); openAuthModal('login'); return; }
   let final; try { final = await api.reaccionar(id, tipo); } catch (e) { toast(String(e?.message ?? 'No se pudo reaccionar.'), 'error'); return; }   // null = quité mi reacción
-  S.paleta = null; S.items = S.items.map((x) => (Number(x.id) === Number(id) ? aplicarReaccion(x, final) : x)); repintar(id);
+  S.paleta = null; S.items = S.items.map((x) => (Number(x.id) === Number(id) ? aplicarReaccion(x, final) : x)); repintar(id); window.dispatchEvent(new Event('social:actividad'));
   if (final) { const b = feedEl.querySelector(`[data-pie="${Number(id)}"] [data-sx="reaccionar"]`); if (b) { salto(b.querySelector('span')); rafaga(b, [final, '✨'], { n: 7 }); } }   // pequeña celebración al reaccionar (no al quitar)
 }
 const baseAbsoluta = () => new URL(href(''), location.href).href;
@@ -162,7 +164,8 @@ feedEl.addEventListener('click', (e) => {
     if (sx.dataset.sx === 'reaccionar') { const it = S.items.find((x) => Number(x.id) === id); reaccionar(id, it?.mia || REACCION_RAPIDA); }   // si ya reaccioné, repetir mi emoji lo quita (así lo resuelve la BD)
     else if (sx.dataset.sx === 'emoji') reaccionar(id, sx.dataset.tipo);
     else if (sx.dataset.sx === 'paleta') { const antes = S.paleta; S.paleta = antes === id ? null : id; if (antes) repintar(antes); repintar(id); }
-    else if (sx.dataset.sx === 'compartir') compartir({ url: urlCompartir({ base: baseAbsoluta(), usuario: sx.dataset.user, tipo: 'p', id }), titulo: 'Publicación en Phoenix Evolution Series' });
+    else if (sx.dataset.sx === 'compartir') { const it = S.items.find((x) => Number(x.id) === id); if (it) abrirCompartir({ it, url: urlCompartir({ base: baseAbsoluta(), usuario: sx.dataset.user, tipo: 'p', id }), conSesion: !!S.yo, alCompartir: () => { reiniciarFeed(); pintarRacha(); } }); }
+    else if (sx.dataset.sx === 'quien') abrirQuienReacciono(id);
     return;
   }
   const yt = e.target.closest('[data-act=video-yt]'); if (yt) { reproductorYT(yt); return; }
@@ -254,17 +257,26 @@ function pintarHilo(id) {
   if (!abierto) { caja.innerHTML = ''; return; }
   const lista = S.resp.get(Number(id));
   const filas = lista === undefined ? '<p class="sxr-hilo-nota">Cargando respuestas…</p>'
-    : lista.length ? lista.map((r) => `<div class="sxr-resp"><span class="sxr-resp-av">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span><div class="sxr-resp-cuerpo"><p class="sxr-resp-cab"><a href="${escapeHTML(href('perfil/'))}?u=${encodeURIComponent(r.username ?? '')}">${escapeHTML(r.nombre_display ?? 'Jugador')}</a> <time data-t="${escapeHTML(r.created_at ?? '')}">${tiempoRelativo(r.created_at)}</time></p><p class="sxr-resp-tx">${textoAHTML(r.texto)}</p></div></div>`).join('')
+    : lista.length ? lista.map((r) => `<div class="sxr-resp"><span class="sxr-resp-av">${avatarHTML(r.avatar_url, r.nombre_display, 28)}</span><div class="sxr-resp-cuerpo"><p class="sxr-resp-cab"><a href="${escapeHTML(href('perfil/'))}?u=${encodeURIComponent(r.username ?? '')}">${escapeHTML(r.nombre_display ?? 'Jugador')}</a> <time data-t="${escapeHTML(r.created_at ?? '')}">${tiempoRelativo(r.created_at)}</time></p><p class="sxr-resp-tx">${textoAHTML(r.texto)}</p>${likeRespHTML(r.id)}</div></div>`).join('')
       : '<p class="sxr-hilo-nota">Aún no hay respuestas. Sé el primero.</p>';
   const form = S.yo ? `<form class="sxr-responder" data-responder="${Number(id)}"><input data-menciones maxlength="600" placeholder="Escribe una respuesta…" aria-label="Escribe una respuesta" autocomplete="off"><button type="submit" aria-label="Enviar respuesta"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></form>`
     : '<button type="button" class="sxr-hilo-nota sxr-hilo-entrar" data-sxr-entrar>Inicia sesión para responder.</button>';
   caja.innerHTML = `<div class="sxr-hilo-lista">${filas}</div>${form}`;
 }
+// «Me gusta» en respuestas (fase 2): corazón con su número; se alterna al tocarlo.
+function likeRespHTML(idResp) {
+  const l = S.likesResp.get(Number(idResp)) ?? { n: 0, mio: false };
+  return `<button type="button" class="sxr-like${l.mio ? ' is-on' : ''}" data-sxr-like="${Number(idResp)}" aria-pressed="${l.mio}" aria-label="${l.mio ? 'Quitar me gusta' : 'Me gusta'}${l.n ? ` (${l.n})` : ''}"><i class="fa-${l.mio ? 'solid' : 'regular'} fa-heart" aria-hidden="true"></i>${l.n ? `<span>${l.n}</span>` : ''}</button>`;
+}
+async function cargarLikes(idPost) {
+  const lista = S.resp.get(Number(idPost)) ?? []; if (!lista.length) return;
+  try { const m = (await api.likesRespuestas(lista.map((r) => r.id))) ?? {}; for (const [k, v] of Object.entries(m)) S.likesResp.set(Number(k), { n: Number(v.n) || 0, mio: !!v.mio }); pintarHilo(idPost); } catch { /* sin «me gusta» se ve igual */ }
+}
 async function alternarHilo(id) {
   id = Number(id);
   if (S.abiertas.has(id)) { S.abiertas.delete(id); pintarHilo(id); return; }
   S.abiertas.add(id); pintarHilo(id);
-  if (!S.resp.has(id)) { try { S.resp.set(id, (await api.respuestasDe(id)) ?? []); } catch { S.resp.set(id, []); toast('No se pudieron cargar las respuestas.', 'error'); } pintarHilo(id); }
+  if (!S.resp.has(id)) { try { S.resp.set(id, (await api.respuestasDe(id)) ?? []); } catch { S.resp.set(id, []); toast('No se pudieron cargar las respuestas.', 'error'); } pintarHilo(id); cargarLikes(id); }
   feedEl.querySelector(`[data-hilo="${id}"] input`)?.focus({ preventScroll: true });
 }
 async function enviarRespuesta(form) {
@@ -275,7 +287,7 @@ async function enviarRespuesta(form) {
     await api.responder(id, v.texto);
     S.resp.set(id, (await api.respuestasDe(id).catch(() => S.resp.get(id))) ?? []);
     S.items = S.items.map((x) => (Number(x.id) === id ? { ...x, respuestas: (S.resp.get(id) ?? []).length } : x));
-    repintar(id); pintarHilo(id); toast('Respuesta publicada.', 'ok');
+    repintar(id); pintarHilo(id); cargarLikes(id); toast('Respuesta publicada.', 'ok'); window.dispatchEvent(new Event('social:actividad'));
   } catch (e) { toast(String(e?.message ?? 'No se pudo responder.'), 'error'); boton.disabled = false; }
 }
 // Estos clics se atienden ANTES que el manejador general del feed (fase de captura).
@@ -387,14 +399,46 @@ montarTirarParaRecargar(document.querySelector('.sxr-centro') ?? feedEl, async (
   feedEl.addEventListener('contextmenu', (e) => { if (e.target.closest('[data-sx="reaccionar"]')) e.preventDefault(); });
 }
 
+/* ---------- Social, fase 2 (19-oct-2026; migraciones 135 y 135b) ---------- */
+// «Me gusta» en una respuesta
+feedEl.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-sxr-like]'); if (!b) return;
+  e.stopPropagation();
+  if (!S.yo) { toast('Inicia sesión para dar «me gusta».', 'info'); openAuthModal('login'); return; }
+  const idResp = Number(b.dataset.sxrLike); b.disabled = true;
+  try { const r = await api.likeRespuesta(idResp); S.likesResp.set(idResp, { n: Number(r?.total) || 0, mio: !!r?.mio }); if (r?.mio) { salto(b.querySelector('i')); rafaga(b, ['❤️'], { n: 5 }); } }
+  catch (err) { toast(String(err?.message ?? 'No se pudo.'), 'error'); }
+  const post = b.closest('[data-hilo]')?.dataset.hilo; if (post) pintarHilo(post);
+}, true);
+// Tarjeta rápida al tocar la cara o el nombre (Ctrl/⌘ + clic sigue abriendo el perfil)
+feedEl.addEventListener('click', (e) => {
+  const a = e.target.closest('a.sx-post-av, a.sx-post-autor, .sxr-resp-cab a'); if (!a || e.ctrlKey || e.metaKey) return;
+  const u = new URL(a.href, location.href).searchParams.get('u'); if (!u) return;
+  e.preventDefault(); e.stopPropagation(); abrirTarjetaPerfil({ username: u, ancla: a, yo: S.yo });
+}, true);
+// Vistas: cuenta una por persona cuando la publicación se ve 1 segundo
+vigilarVistas(feedEl, { conSesion: () => !!S.yo });
+// Racha de actividad: 🔥 N días seguidos (en la barra de arriba); se pone al día al reaccionar, responder o publicar
+const rachaEl = document.createElement('span'); rachaEl.className = 'sxr-racha'; rachaEl.hidden = true; document.querySelector('.sxr-filtros')?.before(rachaEl);
+async function pintarRacha() {
+  if (!S.yo) { rachaEl.hidden = true; return; }
+  let r = null; try { r = await api.rachaSocial(); } catch { r = null; }
+  const n = Number(r?.dias) || 0; const antes = Number(rachaEl.dataset.n) || 0;
+  rachaEl.hidden = n < 1; rachaEl.dataset.n = String(n); rachaEl.dataset.hoy = String(!!r?.hoy);
+  rachaEl.title = r?.hoy ? `${n} día${n === 1 ? '' : 's'} seguidos con actividad en Social` : `Racha de ${n} día${n === 1 ? '' : 's'}: reacciona, responde o publica hoy para no perderla`;
+  rachaEl.innerHTML = `<span aria-hidden="true">🔥</span><b>${n}</b><small>${r?.hoy ? 'días' : '¡hoy!'}</small>`;
+  if (n > antes && antes > 0) { rachaEl.classList.remove('sxr-racha-sube'); void rachaEl.offsetWidth; rachaEl.classList.add('sxr-racha-sube'); }
+}
+window.addEventListener('social:actividad', () => setTimeout(pintarRacha, 600));
+
 /* ---------- Arranque ---------- */
 initMencionAuto();
 pintarVistas(); pintarFiltro(); pintarTag(); feedEl.innerHTML = cargandoHTML; cargar(); cargarHistorias();
 onSession(({ session, profile }) => {
   const id = session?.user?.id ?? null; const cambio = id !== S.yo; S.yo = id; S.perfil = profile ?? getState().profile ?? null;
   if (cambio || !S.compositor) {   // solo se monta de nuevo si cambió la persona: un refresco de sesión no debe borrar lo que está escribiendo
-    S.compositor?.destruir(); S.compositor = montarCompositor(compEl, { yo: S.yo, perfil: S.perfil, onLogin: () => openAuthModal('login'), onHistoria: () => abrirNuevaHistoria({ uid: S.yo, onListo: cargarHistorias }), onPublicado: () => { if (S.vista !== 'recientes') { S.vista = 'recientes'; pintarVistas(); history.replaceState(null, '', urlActual()); } reiniciarFeed(); rafaga(compEl, ['🔥', '✨', '⚽', '🏆'], { n: 14 }); } });
+    S.compositor?.destruir(); S.compositor = montarCompositor(compEl, { yo: S.yo, perfil: S.perfil, onLogin: () => openAuthModal('login'), onHistoria: () => abrirNuevaHistoria({ uid: S.yo, onListo: cargarHistorias }), onPublicado: () => { if (S.vista !== 'recientes') { S.vista = 'recientes'; pintarVistas(); history.replaceState(null, '', urlActual()); } reiniciarFeed(); rafaga(compEl, ['🔥', '✨', '⚽', '🏆'], { n: 14 }); window.dispatchEvent(new Event('social:actividad')); } });
   }
   if (!cambio) return;
-  cargarSugerencias(); cargarHistorias(); if (vistaInfo(S.vista).requiereSesion || S.items.length) reiniciarFeed();
+  cargarSugerencias(); cargarHistorias(); pintarRacha(); if (vistaInfo(S.vista).requiereSesion || S.items.length) reiniciarFeed();
 });

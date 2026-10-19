@@ -1,6 +1,12 @@
 // Equivalencias icono «Font Awesome» → icono Phosphor LIGHT (trazo fino, menos «típico de IA»). Lo usa js/features/sinIconosWeb.js.
 // Para cambiar un icono: edita el valor (nombres en https://phosphoricons.com ). Los que no están aquí y van pegados a un texto se ocultan.
 export const FA_A_PH = {
+  // Social fase 2 (19-oct-2026): compartir en tu muro, vistas, enviar fuera y cargando
+  'retweet': 'repeat',
+  'eye': 'eye',
+  'eye-slash': 'eye-slash',
+  'arrow-up-from-bracket': 'export',
+  'spinner': 'spinner',
   'globe': 'globe',
   'earth-americas': 'globe-hemisphere-west',
   'arrow-down-wide-short': 'sort-descending',

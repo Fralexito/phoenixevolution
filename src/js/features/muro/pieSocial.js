@@ -13,7 +13,9 @@ export const REACCIONES_PHX = [['🔥', 'Fuego'], ['⚽', 'Golazo'], ['🧤', 'A
 const PALETA_RAPIDA = PALETA_EMOJIS.filter((e) => !REACCIONES_PHX.some(([x]) => x === e)).slice(0, 16);
 
 /** @param {object} it publicación (con `mia` si ya se cruzó con mis reacciones) @param {{paleta?: boolean}} o `paleta`: ¿está abierta la paleta de esta publicación? */
-export function pieSocialHTML(it, { paleta = false } = {}) {
+/** `social` (fase 2, migración 135): { vistas, compartidas } de muro_social_de; sin él, el pie se ve como antes. */
+export function pieSocialHTML(it, { paleta = false, social = null } = {}) {
+  const veces = Number(social?.compartidas) || 0; const vistas = Number(social?.vistas) || 0;
   const id = Number(it.id); const mia = it.mia ?? null; const total = totalReacciones(it); const n = Math.max(0, Math.trunc(Number(it.respuestas) || 0));
   const resumen = resumenReacciones(it.reacciones).slice(0, 3).map((x) => `<span>${escapeHTML(x.tipo)}</span>`).join('');
   const usuario = String(it.autor?.username ?? '');
@@ -23,8 +25,8 @@ export function pieSocialHTML(it, { paleta = false } = {}) {
       <button type="button" data-sx="reaccionar" data-id="${id}" aria-pressed="${mia ? 'true' : 'false'}" aria-label="${mia ? 'Quitar mi reacción' : 'Reaccionar con fuego'}" class="sx-btn sx-rx ${mia ? 'is-on' : ''}"><span aria-hidden="true">${escapeHTML(mia ?? REACCION_RAPIDA)}</span><span class="sx-btn-tx">${mia ? 'Reaccionaste' : 'Reaccionar'}</span></button>
       <button type="button" data-sx="paleta" data-id="${id}" aria-expanded="${paleta}" aria-label="${paleta ? 'Cerrar reacciones' : 'Más reacciones (o mantén pulsado Reaccionar)'}" title="${paleta ? 'Cerrar reacciones' : 'Más reacciones (o mantén pulsado Reaccionar)'}" class="sx-btn sx-ico"><i class="fa-solid ${paleta ? 'fa-xmark' : 'fa-face-smile'}" aria-hidden="true"></i></button>
       <a href="${escapeHTML(hilo)}" class="sx-btn" aria-label="${escapeHTML(textoRespuestas(n))}" title="${escapeHTML(textoRespuestas(n))}"><i class="fa-regular fa-comment" aria-hidden="true"></i>${n ? `<span>${n}</span>` : ''}</a>
-      <button type="button" data-sx="compartir" data-id="${id}" data-user="${escapeHTML(usuario)}" aria-label="Compartir" title="Compartir" class="sx-btn sx-ico"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></button>
-      ${total ? `<span class="sx-pie-total" aria-label="${total} reacciones"><span class="sx-pie-emojis" aria-hidden="true">${resumen}</span><b>${total}</b></span>` : ''}
+      <button type="button" data-sx="compartir" data-id="${id}" data-user="${escapeHTML(usuario)}" aria-label="Compartir${veces ? ` (compartida ${veces} ${veces === 1 ? 'vez' : 'veces'})` : ''}" title="Compartir" class="sx-btn ${veces ? '' : 'sx-ico'}"><i class="fa-solid fa-retweet" aria-hidden="true"></i>${veces ? `<span>${veces}</span>` : ''}</button>
+      <span class="sx-pie-der">${vistas ? `<span class="sx-pie-vistas" title="${vistas} ${vistas === 1 ? 'persona la vio' : 'personas la vieron'}"><i class="fa-regular fa-eye" aria-hidden="true"></i>${vistas}</span>` : ''}${total ? `<button type="button" class="sx-pie-total" data-sx="quien" data-id="${id}" aria-label="${total} reacciones: ver quién reaccionó" title="Ver quién reaccionó"><span class="sx-pie-emojis" aria-hidden="true">${resumen}</span><b>${total}</b></button>` : ''}</span>
     </div>
     ${paleta ? `<div class="sx-paleta" role="group" aria-label="Elige cómo reaccionar"><div class="sx-rx-phx">${REACCIONES_PHX.map(([e, n], k) => `<button type="button" data-sx="emoji" data-id="${id}" data-tipo="${e}" aria-pressed="${e === mia}" style="--k:${k}"><span aria-hidden="true">${e}</span><small>${n}</small></button>`).join('')}</div><div class="sx-rx-mas">${PALETA_RAPIDA.map((e) => `<button type="button" data-sx="emoji" data-id="${id}" data-tipo="${escapeHTML(e)}" aria-pressed="${e === mia}">${escapeHTML(e)}</button>`).join('')}</div></div>` : ''}
   </div>`;

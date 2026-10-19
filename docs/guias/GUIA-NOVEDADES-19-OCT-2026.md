@@ -83,6 +83,14 @@ Sirve para ver cómo se ve cada sistema **con actividad**, aunque todavía no ha
 - Toca una **foto** para verla en grande; desliza para pasar a la siguiente; Esc o tocar fuera para cerrar.
 - Toca una **#etiqueta** para ver todas las publicaciones con ella; «Quitar» para volver.
 
+### 5.3b Lo nuevo de la fase 2 (versión 1.6.0)
+- **Compartir en tu muro**: toca **↻** en una publicación → «En tu muro» (añade un comentario si quieres) → **Compartir en mi muro**. La publicación de la otra persona aparece dentro de la tuya y a ella le llega un aviso. «Fuera de Phoenix» envía o copia el enlace.
+- **↻ con número**: cuántas veces la compartieron. **👁 con número**: cuántas personas la vieron.
+- **¿Quién reaccionó?**: toca los emojis con el número (a la derecha del pie). Hay pestañas por emoji.
+- **❤️ en las respuestas**: toca el corazón para dar «me gusta» a una respuesta.
+- **Tarjeta rápida**: toca la cara o el nombre de alguien → ves su país, club, lema y duelos, y puedes **Seguir**, **Retar** o **Ver perfil**.
+- **Racha 🔥**: arriba, junto a ⚙, ves cuántos días seguidos llevas activo en Social. Si dice **«¡hoy!»**, reacciona, responde o publica hoy para no perderla.
+
 ### 5.4 Publicar
 1. Toca **«¿Qué está pasando?»**.
 2. Escribe. Debajo, **«Añade a tu publicación»**: cada opción dice qué hace:
