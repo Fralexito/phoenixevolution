@@ -25,6 +25,7 @@ export const NAV_EXTRA = [
   { id: 'historial', label: 'Historial', path: 'historial/', icon: 'fa-clock-rotate-left' },
   { id: 'premios', label: 'Premios', path: 'premios/', icon: 'fa-award' },
   { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
+  { id: 'ligaamigos', label: 'Liga de amigos', path: 'liga-amigos/', icon: 'fa-people-group' },   // 21-oct-2026: liga oficial armada desde la web (migración 142)
   { id: 'hosts', label: 'Alquilar host', path: 'alquilar-host/', icon: 'fa-server' },
 ];
 
@@ -134,7 +135,7 @@ const DESC = {
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores', premios: 'La Paliza, Matagigantes, La Muralla y más, con cada resultado',
   tienda: 'Estética y mejoras para tu perfil', hosts: 'Catálogo de hosts: precios, ping y contacto',
-  unirme: 'Guía en 5 pasos para tu primer partido', organizadores: 'Quiénes organizan la liga y por qué',   // 19-oct-2026: salían sin descripción en la Red de enlaces
+  unirme: 'Guía en 5 pasos para tu primer partido', ligaamigos: 'Inscríbete y juega con Phoenix Link', organizadores: 'Quiénes organizan la liga y por qué',   // 19-oct-2026: salían sin descripción en la Red de enlaces
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
 const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas', competiciones: 'Todas las ligas' } : {}) };
@@ -165,7 +166,7 @@ const PILARES_REPARTO = [
   // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
   // Ronda 302: el menú muestra solo 3 entradas (cada una abre un GRUPO) y las pestañas de abajo enseñan las páginas de ese grupo.
   conBloques('competir', 'Competiciones', 'fa-trophy', [
-    ['Ligas', ['liga', 'competiciones', 'unirme'], { compacto: true, icon: 'fa-crown', desc: 'Tablas, todas las ligas y cómo unirte' }],
+    ['Ligas', ['liga', 'ligaamigos', 'competiciones', 'unirme'], { compacto: true, icon: 'fa-crown', desc: 'Tablas, todas las ligas y cómo unirte' }],
     ['Torneos', ['torneos>formatos',
       { id: 'crearliga', label: 'Crear', path: 'crear-liga/', icon: 'fa-circle-plus', desc: 'Tu liga lista en 30 segundos', staff: 'editarLiga' },
       { id: 'crear', label: 'Crear', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos', noStaff: 'editarLiga' }], { compacto: true, icon: 'fa-sitemap', desc: 'Juega uno, crea el tuyo o mira los formatos' }],
