@@ -122,7 +122,7 @@ export const siguienteNivelPos = (actual) => ({ '': '2', 2: '1', 1: '0', 0: '' }
 export const deltaTexto = (antes, despues) => (Number.isFinite(antes) && Number.isFinite(despues) && antes !== despues ? `${despues > antes ? '+' : '−'}${Math.abs(despues - antes)}` : '');
 
 /** Dónde vive cada campo dentro del registro de Player.bin: [bit de inicio, ancho en bits, suma que da el valor que muestra el juego]. Mismos números que Link (Fichas.cpp)
- *  y que docs/web-pes-link/PROMPT-SISTEMA-DATOS-WEB-PES.md. Lo usan tools/plantillas/generar-fichas.mjs (leer) y core/pes/fichaJuego.js (decodificar). */
+ *  y que docs/web-pes-link/WEB-PES-LINK.md («PROMPT-SISTEMA-DATOS-WEB-PES»). Lo usan tools/plantillas/generar-fichas.mjs (leer) y core/pes/fichaJuego.js (decodificar). */
 export const BITS_PLAYER = {
   ataque: [370, 6, 40], control: [281, 6, 40], regate: [352, 6, 40], regate_ajustado: [416, 6, 40], pase_raso: [263, 6, 40], pase_bombeado: [402, 6, 40],
   finalizacion: [396, 6, 40], cabezazo: [288, 6, 40], balon_parado: [250, 6, 40], efecto: [332, 6, 40], velocidad: [306, 6, 40], aceleracion: [344, 6, 40],

@@ -1,4 +1,4 @@
-// Edge Function «ayuda-ia» (ronda 345): chat de ayuda con IA para la comunidad. Plan: docs/comunidad/PLAN-IA-WEB.md
+// Edge Function «ayuda-ia» (ronda 345): chat de ayuda con IA para la comunidad. Plan: docs/comunidad/COMUNIDAD.md («PLAN-IA-WEB»)
 // SEGURIDAD:
 //   · La clave de la API vive SOLO aquí, en Supabase → Edge Functions → Secrets → ANTHROPIC_API_KEY. Nunca en la web ni en GitHub.
 //   · El chat NO TIENE PODERES: no llama herramientas, no lee ni escribe la base (salvo su propio contador de uso). Solo responde dudas.

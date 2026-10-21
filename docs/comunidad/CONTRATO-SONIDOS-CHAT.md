@@ -48,7 +48,7 @@ Cada sonido es una **partitura** (lista de tonos: tipo, frecuencia, duración, v
 
 ## 8. Cómo añadir un sonido nuevo (receta)
 1. Añadir la clave y su partitura en `SONIDOS_CHAT` (`src/js/core/comunidad/sonidosChat.js`).
-2. Nueva migración: añadir la clave a la lista de `private.estilo_valido` (caso `sonido`) e insertar el objeto en `tienda_items` con su rareza y precio (`docs/economia/DISENO-ECONOMIA-COMPLETA.md` §5).
+2. Nueva migración: añadir la clave a la lista de `private.estilo_valido` (caso `sonido`) e insertar el objeto en `tienda_items` con su rareza y precio (`docs/economia/ECONOMIA.md («DISENO-ECONOMIA-COMPLETA»)` §5).
 3. Ejecutar `node --test tests/*.test.mjs`: la prueba «la lista blanca de la web coincide con la de la migración 121» avisa si algo quedó a medias (si la nueva migración redefine la función, actualizar esa prueba para leer la última).
 4. (Cuando Link los use) generar `<clave>.wav` y subir `version` del catálogo.
 

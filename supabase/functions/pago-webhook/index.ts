@@ -2,7 +2,7 @@
 // Secretos (solo en Supabase → Edge Functions → Secrets, nunca en el código): MP_WEBHOOK_SECRET (clave secreta de la aplicación → Webhooks),
 // MP_ACCESS_TOKEN (credencial de la aplicación). SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY las inyecta Supabase.
 // Flujo: firma → (si falla: se registra y 401) → se consulta el pago a la API oficial (no se confía en el cuerpo del aviso) → public.pasarela_procesar
-// (idempotente, registra todo en pagos_eventos y acredita con procesar_pago_evento). Guía: docs/economia/GUIA-PASARELA.md
+// (idempotente, registra todo en pagos_eventos y acredita con procesar_pago_evento). Guía: docs/economia/ECONOMIA.md («GUIA-PASARELA»)
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { firmaValida } from "../_shared/mp.mjs";
 import { consultarPago, leerModo, procesarPagoMP } from "../_shared/proceso.mjs";

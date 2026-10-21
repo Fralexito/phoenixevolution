@@ -1,4 +1,4 @@
-// Motor de FORMATOS de torneo (puro, sin DOM → se prueba con `npm test`). Documentación: docs/liga-y-torneos/FORMATOS.md
+// Motor de FORMATOS de torneo (puro, sin DOM → se prueba con `npm test`). Documentación: docs/liga-y-torneos/LIGA-Y-TORNEOS.md («FORMATOS»)
 // Un «slot» (lado de un partido) puede ser: un nombre (texto) · null (descanso/bye) · { ganadorDe: id } · { perdedorDe: id } · { puesto: { grupo, pos } }.
 // Todas las funciones son deterministas: el mismo orden de jugadores da siempre los mismos cruces (el sorteo usa una semilla).
 

@@ -1,5 +1,5 @@
 // Lógica de TORNEOS PROPIOS (pura → se prueba con `npm test`). Convierte lo que arma core/competicion/formatos.js en filas para la base,
-// calcula tablas, cierra grupos, empareja el suizo y sugiere campeón. Guía: docs/liga-y-torneos/TORNEOS-LIBRES.md
+// calcula tablas, cierra grupos, empareja el suizo y sugiere campeón. Guía: docs/liga-y-torneos/LIGA-Y-TORNEOS.md («TORNEOS-LIBRES»)
 // Fila de partido (como viene de la base): { clave, ronda, grupo, orden, a_slot, b_slot, a_nombre, b_nombre, ga, gb, ganador, jugado, eliminatoria }.
 import { calcularTabla } from './tabla.js';
 import { emparejarSuizo, rondasSuizo, acumularCircuito, BAREMO_CIRCUITO } from './formatos.js';

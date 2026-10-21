@@ -10,7 +10,7 @@
 //                              el staff o el árbitro designado (nunca el host). Borra el «en vivo» de la sala.
 // Interruptor del staff: phoenix_config clave «liga_resultados» = false → todo responde LIGA_PAUSADA (503).
 // Seguridad: service_role salta RLS → toda regla se valida aquí. Host = dispositivo vinculado de un perfil aprobado (como «phoenix»).
-// Hecho por el chat LINK (Claude) con autorización de Fralex (11-oct-2026). Documento: docs/liga-y-torneos/LIGA-AUTOMATICA.md.
+// Hecho por el chat LINK (Claude) con autorización de Fralex (11-oct-2026). Documento: docs/liga-y-torneos/LIGA-Y-TORNEOS.md («LIGA-AUTOMATICA»).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });

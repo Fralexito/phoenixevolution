@@ -12,7 +12,7 @@
 //   (1.1.0, migración 125) GET /v1/traspasos también trae los lotes OFICIALES de Phoenix a todo PC vinculado (&solo_oficial=1: solo esos);
 //   GET /v1/cambios?desde=&destino=base|lm → cambios oficiales; POST /v1/pc/informe → registro de cada PC. Contrato: docs/web-pes-link/CONTRATO-WEB-PES.md.
 // Solo viajan ids y nombres de jugador/equipo: ningún dato personal ni ninguna base de datos. Tablas con RLS y sin permisos para anon/authenticated.
-// Hecho por el chat LINK (Claude) con autorización de Fralex (12-oct-2026). Documento: docs/web-pes-link/TRASPASOS-EN-VIVO.md.
+// Hecho por el chat LINK (Claude) con autorización de Fralex (12-oct-2026). Documento: docs/web-pes-link/WEB-PES-LINK.md («TRASPASOS-EN-VIVO»).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
