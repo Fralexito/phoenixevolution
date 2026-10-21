@@ -31,7 +31,7 @@ Riesgo menor, aparte: el alquiler con gemas deja que una persona **gane gemas** 
 
 1. **Gemas = solo cosmético y pase.** Nunca dan ascuas, nunca se apuestan, nunca se retiran.
 2. **Ascuas = solo gratis.** Únicas fuentes permitidas: jugar, retos, rachas, misiones, logros, pista **gratis** del pase, premio o devolución de un pozo, ajuste del administrador.
-3. **Pista premium del pase:** sus premios en ascuas pasan a ser gemas (misma cantidad de valor: 5 ascuas = 1 gema). La compensación por objeto repetido en premium da gemas, no ascuas.
+3. **Pista premium del pase:** sus 18 premios de 60 ascuas pasan a ser objetos cosméticos comunes y raros de la tienda. No pueden ser gemas: el pase cuesta 150 gemas, ya devuelve 60, y la regla de la migración 123 exige que lo devuelto en gemas sea menor que el precio. Si el objeto ya se tiene, en premium no se compensa con ascuas.
 4. **Candado en la base de datos** (lo que impide mezclar aunque alguien se equivoque en el futuro): un trigger en `movimientos_tokens` rechaza cualquier entrada de ascuas cuyo tipo no esté en la lista de fuentes gratis, y rechaza `recompensa_pase` en ascuas si no viene de la pista gratis. Si un día se añade una forma nueva de ganar ascuas, hay que añadirla a la lista a propósito.
 5. **Premios sin dinero:** los pozos y torneos solo reparten ascuas u objetos. Nada se cambia por soles, gemas ni productos.
 6. **Opcional:** alquiler de host solo con pago por fuera (quitar el pago con gemas), para que nadie gane gemas de otra persona.
