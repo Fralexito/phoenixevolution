@@ -111,18 +111,16 @@ export async function montarOfertaHost(caja) {
   caja.innerHTML = `<form id="f-oferta" class="grid sm:grid-cols-2 gap-2 text-xs">
     <label class="flex items-center gap-2 sm:col-span-2 text-sm text-white"><input type="checkbox" name="activa" ${o?.activa !== false ? 'checked' : ''} class="w-4 h-4 accent-cyan-400"> Ofrecer mi host en alquiler</label>
     <input name="ph" inputmode="decimal" class="field" placeholder="S/ por hora" value="${soles(o?.precio_hora_centimos)}"><input name="pp" inputmode="decimal" class="field" placeholder="S/ por partido" value="${soles(o?.precio_partido_centimos)}">
-    <label class="flex items-center gap-2 sm:col-span-2 text-white"><input type="checkbox" name="gemas" ${o?.acepta_gemas ? 'checked' : ''} class="w-4 h-4 accent-cyan-400"> También acepto gemas</label>
-    <input name="gh" type="number" min="1" class="field" placeholder="💎 por hora" value="${o?.gemas_hora ?? ''}"><input name="gp" type="number" min="1" class="field" placeholder="💎 por partido" value="${o?.gemas_partido ?? ''}">
+    <p class="sm:col-span-2 text-white/60">El pago se acuerda por fuera (Yape, etc.). Phoenix no cobra comisión ni acepta gemas en alquileres.</p>
     <input name="contacto" maxlength="120" class="field sm:col-span-2" placeholder="Cómo contactarte (Discord, WhatsApp… lo ven los usuarios con sesión)" value="${escapeHTML(o?.contacto ?? '')}">
     <input name="notas" maxlength="300" class="field sm:col-span-2" placeholder="Notas (horarios, reglas…)" value="${escapeHTML(o?.notas ?? '')}">
     <button class="btn btn-primary sm:col-span-2 !min-h-9 !text-xs">Guardar oferta</button></form>`;
   caja.querySelector('#f-oferta').addEventListener('submit', async (ev) => {
     ev.preventDefault(); const d = new FormData(ev.target);
     const cent = (v) => { const n = parseFloat(String(v).replace(',', '.')); return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : null; };
-    const ent = (v) => { const n = parseInt(String(v), 10); return Number.isFinite(n) && n > 0 ? n : null; };
     try {
-      await rpc('guardar_oferta_host', { p_activa: !!d.get('activa'), p_precio_hora: cent(d.get('ph')), p_precio_partido: cent(d.get('pp')), p_acepta_gemas: !!d.get('gemas'),
-        p_gemas_hora: ent(d.get('gh')), p_gemas_partido: ent(d.get('gp')), p_contacto: d.get('contacto'), p_notas: d.get('notas') });
+      await rpc('guardar_oferta_host', { p_activa: !!d.get('activa'), p_precio_hora: cent(d.get('ph')), p_precio_partido: cent(d.get('pp')), p_acepta_gemas: false,
+        p_gemas_hora: null, p_gemas_partido: null, p_contacto: d.get('contacto'), p_notas: d.get('notas') });
       toast('Oferta guardada.', 'ok');
     } catch (e) { toast(e.message, 'error'); }
   });

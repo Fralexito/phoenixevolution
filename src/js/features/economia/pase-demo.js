@@ -16,7 +16,7 @@ function recompensas() {
   const out = [];
   for (let n = 1; n <= NIVELES; n++) {
     const g = OBJ[n] ? { tipo: 'item', cantidad: null, item: OBJ[n] } : { tipo: 'ascuas', cantidad: 40 * (1 + Math.floor((n - 1) / 10)), item: null };
-    const pr = PREM[n] ? { tipo: 'item', cantidad: null, item: PREM[n] } : GEMAS.has(n) ? { tipo: 'gemas', cantidad: 10, item: null } : { tipo: 'ascuas', cantidad: 60, item: null };
+    const pr = PREM[n] ? { tipo: 'item', cantidad: null, item: PREM[n] } : GEMAS.has(n) ? { tipo: 'gemas', cantidad: 10, item: null } : { tipo: 'item', cantidad: null, item: ITEM(200 + n, 'demo_premium_' + n, 'Título nivel ' + n, 'titulo', 'comun', { texto: 'Nivel ' + n, color: '#00e5ff' }) }; // la pista premium nunca da ascuas (migración 140)
     out.push({ nivel: n, pista: 'gratis', ...g, reclamada: P.reclamados.has(n + ':gratis') }, { nivel: n, pista: 'premium', ...pr, reclamada: P.reclamados.has(n + ':premium') });
   }
   return out;

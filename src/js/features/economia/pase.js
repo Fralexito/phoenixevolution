@@ -92,7 +92,7 @@ export function click(ev) {
   if (b.dataset.paseComprar !== undefined) { modalComprar(); return true; }
   if (b.dataset.paseReclamar) {
     const nivel = Number(b.dataset.paseReclamar), pista = b.dataset.pista === 'premium' ? 'premium' : 'gratis';
-    C.hacer(() => api.paseReclamar(nivel, pista), (r) => (r?.tipo === 'item' ? `¡Objeto añadido a tu inventario: ${r.objeto}!` : r?.compensado ? 'Ya tenías ese objeto: te dimos 100 ascuas.' : `¡Premio reclamado: ${textoPremio({ tipo: r?.tipo, cantidad: Number(r?.cantidad) || 0 })}!`));
+    C.hacer(() => api.paseReclamar(nivel, pista), (r) => (r?.repetido ? `Ya tenías ${r.objeto ?? 'ese objeto'}: queda reclamado.` : r?.tipo === 'item' ? `¡Objeto añadido a tu inventario: ${r.objeto}!` : r?.compensado ? 'Ya tenías ese objeto: te dimos 100 ascuas.' : `¡Premio reclamado: ${textoPremio({ tipo: r?.tipo, cantidad: Number(r?.cantidad) || 0 })}!`));
     return true;
   }
   return false;
