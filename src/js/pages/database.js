@@ -26,6 +26,8 @@ import { crearReplica } from '../features/replicaCarta.js';
 import { construirIndice, opcionesFiltro, filtrarJugadores, divisionActual } from '../core/jugadores/participaciones.js';
 import { SISTEMA } from '../../data/temporada.js';
 import { COLUMNAS_LISTA } from '../core/jugadores/columnas.js';
+import { filtrarGrupo } from '../core/jugadores/riel.js';
+import { montarRiel } from '../features/jugadoresRiel.js';
 
 document.body.classList.add('pg-jugadores');   // overflow-x: clip (components.css; antes era body:has(#players-container))
 
@@ -36,7 +38,8 @@ let fLiga = ''; let fTorneo = ''; let fTemp = '';   // filtros de participación
 let indice = new Map();                           // jugadorId → participaciones (core/jugadores/participaciones.js)
 let hitsPorId = new Map(); let divPorId = new Map();
 let term = '';
-let vista = 'plano';      // 'plano' | 'estilo' | 'nivel'
+let fGrupo = '';          // posición del panel lateral (FX.jugadoresRiel): '' | portero | defensa | medio | delantero
+let vista = 'plano';      // 'plano' | 'estilo' | 'nivel' | 'carrusel' | 'lista'
 let orden = 'media';      // criterio del orden «Todos» (ver CRITERIOS)
 const semilla = Math.floor(Math.random() * 1e9);   // «Aleatorio» se mantiene estable mientras no recargues
 let ligaStats = new Map();
@@ -65,10 +68,24 @@ function tarjeta(p, i, extra = '') {
         </div>` : ''}</div>`;
 }
 
+/** Vista «Lista» (FX.jugadoresRiel): una fila por jugador. Tocar la fila abre su perfil; la balanza sigue marcando para comparar. */
+function fila(p, i) {
+  const pi = posInfo(p.posicion); const url = href(`jugador/?id=${encodeURIComponent(p.id)}`);
+  return `<div data-pcw="${escapeHTML(p.id)}" style="--aura:${pi.color}; --i:${Math.min(i, 24)}" class="pcw jr-fila ${sel.includes(p.id) ? 'cmp-sel' : ''}">
+    <span class="jr-n">${i + 1}</span><span class="jr-posc" title="${escapeHTML(pi.nombre)}">${escapeHTML(pi.cod)}</span>
+    <a class="jr-nombre" href="${url}"><b>${escapeHTML(p.nombre ?? '')}</b>${p.apodo ? `<small>${escapeHTML(p.apodo)}</small>` : ''}</a>
+    <span class="jr-club">${escapeHTML(p.club ?? '—')}</span><span class="jr-media" title="Media">${Number(p.ovr) || '—'}</span>
+    <button type="button" data-cmp="${escapeHTML(p.id)}" aria-pressed="${sel.includes(p.id)}" aria-label="Comparar a ${escapeHTML(p.nombre)}" title="Comparar" class="jr-cmp"><i class="fa-solid fa-scale-balanced"></i></button></div>`;
+}
+
 function paint() {
   try { fijarFoco(null); } catch { $('players-container').dataset.foco = 'false'; }   // al repintar (filtros, orden…) se quita el foco y la réplica
   const res = filtrarJugadores(all, indice, { liga: fLiga, torneo: fTorneo, temporada: fTemp, club: club === 'ALL' ? '' : club, term });
-  hitsPorId = new Map(res.map((r) => [r.p.id, r.hits])); const list = res.map((r) => r.p);
+  hitsPorId = new Map(res.map((r) => [r.p.id, r.hits])); const base = res.map((r) => r.p); const list = filtrarGrupo(base, fGrupo);
+  if (riel) {
+    const sinClub = club === 'ALL' ? base : filtrarJugadores(all, indice, { liga: fLiga, torneo: fTorneo, temporada: fTemp, club: '', term }).map((r) => r.p);
+    riel.pintar({ base, sinClub: filtrarGrupo(sinClub, fGrupo), grupo: fGrupo, club });
+  }
   paintResumenHist();
   const box = $('players-container');
   if (adv) {
@@ -77,6 +94,9 @@ function paint() {
     box.innerHTML = r.length ? r.map((f, i) => tarjeta(f.p, i, `<span class="rank-badge" title="Puesto ${f.rank}">#${f.rank}</span>`)
       .replace(/<\/div>$/, `<div class="adv-strip">${adv.keys.map((k) => `<span>${k === 'ovr' ? 'MEDIA' : k.toUpperCase()} <b>${f.vals[k]}</b></span>`).join('')}${adv.keys.length > 1 ? `<span class="adv-prom">prom <b>${Math.round(f.score * 10) / 10}</b></span>` : ''}</div></div>`)).join('')
       : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">Ningún jugador cumple ese mínimo en todas las stats elegidas.</div>`;
+  } else if (vista === 'lista') {
+    const lista = ordenar(list, orden, { liga: ligaStats, semilla });
+    box.innerHTML = lista.length ? lista.map(fila).join('') : `<div class="col-span-full text-center py-10 text-gray-500 text-sm">No hay jugadores que coincidan.</div>`;
   } else if (vista === 'carrusel' && $('players-carrusel')) {
     // Vista «Carrusel» (FX.carruseles, ronda 253): las cartas en fila 3D, con el orden elegido. Toca una → su perfil.
     const lista = ordenar(list, orden, { liga: ligaStats, semilla });
@@ -93,7 +113,7 @@ function paint() {
   }
   const enCarrusel = vista === 'carrusel' && !adv && !!$('carrusel-zona');
   if ($('carrusel-zona')) $('carrusel-zona').hidden = !enCarrusel;
-  box.hidden = enCarrusel;
+  box.hidden = enCarrusel; box.dataset.vista = adv ? 'ranking' : vista;
   paintBar();
 }
 
@@ -119,6 +139,12 @@ function fillClubs(historicos = []) {
   sel.innerHTML = `<option value="ALL">Todos los Equipos</option>` + clubs.map((c) => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
   sel.value = clubs.includes(club) ? club : 'ALL'; club = sel.value;
 }
+
+// Panel lateral (FX.jugadoresRiel): posición y equipo. El equipo usa el mismo desplegable de la barra, así todo queda sincronizado.
+const riel = montarRiel({
+  alGrupo: (g) => { fGrupo = g; paint(); },
+  alClub: (c) => { const s = $('player-filter-select'); s.value = [...s.options].some((o) => o.value === c) ? c : 'ALL'; club = s.value; paint(); },
+});
 
 let reconMontado = false;
 async function load() {
@@ -151,7 +177,7 @@ $('orden-select').addEventListener('change', (e) => { orden = e.target.value; pa
 $('vista-seg').addEventListener('click', (e) => {
   const b = e.target.closest('[data-vista]'); if (!b) return; vista = b.dataset.vista;
   $('vista-seg').querySelectorAll('[data-vista]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-  $('orden-wrap').hidden = !['plano', 'carrusel'].includes(vista); paint();
+  $('orden-wrap').hidden = !['plano', 'carrusel', 'lista'].includes(vista); paint();
 });
 
 // ---- Zoom: el usuario elige el TAMAÑO de tarjeta; la cuadrícula (auto-fill) decide cuántas caben y las reparte parejas. ----
@@ -208,6 +234,7 @@ document.addEventListener('click', (e) => { if (!e.target.closest('#players-cont
 $('players-container').addEventListener('click', async (e) => {
   const w = e.target.closest('.pcw');
   // Con una carta ampliada, cualquier clic en OTRA carta solo la minimiza (no abre la nueva): hace falta un segundo clic para ampliar.
+  if (w && vista === 'lista' && !adv && !e.target.closest('button, a')) { location.assign(href(`jugador/?id=${encodeURIComponent(w.dataset.pcw)}`)); return; }
   if (w && !e.target.closest('button, a, .card-menu')) { fijarFoco(focoId === null ? w.dataset.pcw : null); return; }
   const menu = e.target.closest('[data-menu]')?.dataset.menu;
   if (menu) { const el = document.querySelector(`.card-menu[data-menu-for="${menu}"]`); const abrir = el.hidden; cerrarMenus(); el.hidden = !abrir; return; }

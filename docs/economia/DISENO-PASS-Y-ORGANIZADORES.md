@@ -114,4 +114,6 @@ Existe un experimento en `C:\dev\smash-soda-fork\_phoenix-link\tools\tiktok-expe
 6. **¿Seguimos con el overlay para TikTok como extra de pago?** SÍ / NO. Si SÍ, antes hay que decidir cómo entregarlo sin subirlo a GitHub público.
 7. **¿Quieres los 7 días de gracia** para reclamar al terminar la temporada? SÍ / NO.
 
+**Respuestas de Fralex (21-oct-2026, «SÍ a todo» lo recomendado):** 1 SÍ (150 gemas) · 2 SÍ (60 días, 30 niveles) · 3 SÍ (300 gemas para todos) · 4 SÍ (propinas solo en ascuas) · 5 NO por ahora (la lista de patrocinadores espera a que haya más gente) · 6 NO por ahora (el overlay de TikTok de pago queda solo en papel) · 7 SÍ (7 días de gracia). Lo construido en la migración 123 ya era exactamente esto: no cambia nada en el código ni en la base de datos.
+
 Pendiente: **copiar este documento a Drive** cuando el usuario vuelva a tener acceso.

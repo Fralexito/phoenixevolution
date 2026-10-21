@@ -47,6 +47,7 @@ import { FX } from '../data/experimento.js';
         <button type="button" data-vista="plano" aria-pressed="true" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Todos</button>
         <button type="button" data-vista="estilo" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por estilo</button>
         <button type="button" data-vista="nivel" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors">Por nivel</button>
+        {FX.jugadoresRiel && <button type="button" data-vista="lista" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-list mr-1"></i>Lista</button>}
         {FX.carruseles && <button type="button" data-vista="carrusel" aria-pressed="false" class="toggle-btn px-3 py-1.5 rounded text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-layer-group mr-1"></i>Carrusel</button>}
       </div>
       <label id="orden-wrap" class="flex items-center gap-2 text-xs text-gray-400">Ordenar por
