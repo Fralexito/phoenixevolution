@@ -39,8 +39,8 @@ Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sud
 - Mismos colores/tema (Galaxy/Sudario), mismas clases (`glass-panel`, `btn-primary`), texto ≥12 px y las reglas de movimiento de este archivo.
 - No reescribir páginas existentes a React sin que el usuario lo pida. Primera isla de prueba: `src/islas/CentroPartido.jsx` en `/laboratorio/` (datos inventados; sin enlace en el menú).
 
-## Anotaciones e informes (norma desde 20-oct-2026)
-- Subir las anotaciones y avances importantes a GitHub (`docs/`, `MAPA.md`, `REGISTRO.md`) **y también a Drive** (Fralex, 20-oct-2026). Del 16 al 19-oct no hubo Drive y solo se subía a GitHub.
+## Anotaciones e informes (norma desde 21-oct-2026)
+- **Solo se documenta lo relevante, en pocos documentos largos** (Fralex, 21-oct). Un documento por tema en `docs/<carpeta>/<TEMA>.md`, que crece con cada logro e incluye: qué se logró, paso a paso para replicarlo, errores e intentos fallidos, cosas a tener en cuenta, y cómo comprobar y revertir. **Ya no** se hace bitácora + guía de cada día ni documentos cortos. Antes de crear un archivo, buscar si ya existe el del tema y ampliarlo. Un cambio pequeño solo lleva su línea en `REGISTRO.md`.
 - **Desde el 21-oct, GitHub es la fuente y Drive solo un respaldo.** No se sube nada a Drive a mano ni por el conector. Al cerrar el día se ejecuta `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1`, que copia `docs/`, `MAPA.md`, `REGISTRO.md` y las migraciones. Índice de todo el proyecto: `D:\Frank\IA\CLAUDE\INDICE_MAESTRO.md`.
 
 ## Diferido por el usuario
