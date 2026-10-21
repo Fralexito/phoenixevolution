@@ -131,6 +131,7 @@ function cuerpoEnCurso() {
 
 // ── Inscripción ────────────────────────────────────────────────────────────────────────────────────────────────────────
 function cuerpoInscripcion() {
+  if (oficialId()) return '';
   const t = st.t; const cupo = t.cupo;
   const lista = st.insc.map((i) => `<li><i class="fa-solid ${i.usuario ? 'fa-user' : 'fa-user-pen'}" aria-hidden="true"></i>${esc(i.nombre)}${gestiona() ? `<button type="button" class="to-x" data-quitar-j="${i.id}" aria-label="Quitar a ${esc(i.nombre)}"><i class="fa-solid fa-xmark"></i></button>` : ''}</li>`).join('') || '<li class="tn-vacio">Todavía no hay nadie.</li>';
   let accion = '';
@@ -154,7 +155,19 @@ function cabecera() {
     ${t.descripcion ? `<p class="to-desc">${esc(t.descripcion)}</p>` : ''}
     ${t.config?.premio ? `<p class="to-premio"><i class="fa-solid fa-gift" aria-hidden="true"></i> Premio: ${esc(t.config.premio)}</p>` : ''}
     <div data-patro="torneo:${t.id}"></div>
+    ${oficialHTML()}
     <div class="to-cab-acc"><button type="button" class="btn btn-ghost" data-copiar><i class="fa-solid fa-link"></i> Copiar enlace</button>${enlace ? `<a class="btn btn-ghost" href="${esc(enlace)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-video"></i> Sala / transmisión</a>` : ''}</div></header>`;
+}
+// Un solo creador (migración 143): el staff hace OFICIAL una liga todos contra todos; desde ahí la inscripción, el calendario y
+// los resultados (que manda Phoenix Link) viven en la Liga de amigos. Las casuales siguen aquí con resultados a mano.
+const oficialId = () => st.t?.meta?.oficial ?? null;
+function oficialHTML() {
+  const ed = oficialId();
+  if (ed) return `<p class="to-premio"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <b>Liga oficial:</b> Phoenix Link manda los resultados solos. Inscripción, calendario y tabla en <a class="underline" href="${esc(href(`liga-amigos/?liga=${encodeURIComponent(ed)}`))}">Liga de amigos</a>.</p>`;
+  if (st.yo && can('editarLiga') && ['liguilla', 'idavuelta'].includes(st.t.formato) && st.t.estado === 'inscripcion') {
+    return '<p class="tn-ayuda"><button type="button" class="btn btn-ghost" data-hacer-oficial><i class="fa-solid fa-shield-halved"></i> Hacer oficial (resultados por Phoenix Link)</button></p>';
+  }
+  return '';
 }
 function bloqueCampeon() {
   const t = st.t; const s = campeonSugerido(t, st.partidos);
@@ -316,6 +329,7 @@ raiz.addEventListener('click', async (e) => {
   else if (b.dataset.copiarOverlay) { try { await navigator.clipboard.writeText(b.dataset.copiarOverlay); toast('Enlace del overlay copiado.', 'ok'); } catch { toast('No se pudo copiar: selecciónalo y cópialo a mano.', 'info'); } }
   else if (b.dataset.hacerPremium !== undefined) { if (await confirmar(`¿Hacer premium este torneo por ${st.prem?.precioGemas ?? ''} gemas? Se paga una sola vez y no se devuelve automáticamente.`, { aceptar: 'Hacer premium', cancelar: 'Volver' })) await hacer(() => api.hacerPremium(id), '¡Tu torneo ahora es premium!'); }
   else if (b.dataset.cancelarTorneo !== undefined) { if (await confirmar('¿Cancelar el torneo? Ya no se podrá seguir jugando.', { aceptar: 'Cancelar torneo', cancelar: 'Volver', peligro: true })) await hacer(() => api.cancelar(id), 'Torneo cancelado.'); }
+  else if (b.dataset.hacerOficial !== undefined) { if (await confirmar('Se pasa a la liga oficial con sus inscritos. Desde ahí sigue la inscripción, se genera el calendario y Phoenix Link manda los resultados (los valida el staff). Aquí ya no se podrá empezar ni anotar.', { titulo: 'Hacer oficial', aceptar: 'Hacer oficial' })) await hacer(() => api.hacerOficial(id), 'Ahora es oficial. Sigue en Liga de amigos.'); }
   else if (b.dataset.copiar !== undefined) { try { await navigator.clipboard.writeText(location.href); toast('Enlace copiado.', 'ok'); } catch { toast('No se pudo copiar. Copia la dirección de la barra.', 'warn'); } }
 });
 raiz.addEventListener('submit', async (e) => {

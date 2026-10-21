@@ -66,7 +66,7 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 ## 3. Lista del anfitrión (Fralex)
 
 **Una vez, días antes**
-1. Aplicar la migración 142 en Supabase (SQL Editor, o la aplica Claude con tu SÍ).
+1. Aplicar en Supabase la migración 142 y después la 143 (SQL Editor › pegar cada archivo › Run; en ese orden).
 2. En la web: Competiciones › Ligas › **Liga de amigos** › «Crear una liga» (nombre y, si quieres, ida y vuelta) › **Copiar enlace** › mándalo junto con la sección 2.
 3. Comprueba que tu cuenta está aprobada como host y que el interruptor de resultados de liga está encendido:
    ```sql
@@ -195,8 +195,17 @@ Plan:
 - La página «Liga de amigos» pasa a ser la vista de las ligas oficiales de ese creador único.
 - No se empieza durante la congelación, porque los torneos de eliminación directa exigen cambios en Link (llaves) y en la función «liga». Las ligas «todos contra todos» sí pueden hacerse oficiales sin tocar Link.
 
+**Paso 1, hecho el 21-oct-2026 (beta 1.16.1; migración 143, pendiente de aplicar después de la 142):**
+- `staff_torneo_hacer_oficial(torneo)` toma una liga creada en `/torneos/` con formato «Liga» o «Ida y vuelta» que siga en inscripción. La copia a `liga_ediciones` (`amigos:t<id>-<nombre>`) con sus inscritos, cada uno con su cuenta si la tiene.
+- El torneo casual queda con la inscripción cerrada y guarda en `meta.oficial` el id de la edición.
+- En la página del torneo (`src/js/pages/torneo.js`), el staff ve el botón «Hacer oficial (resultados por Phoenix Link)». Una vez oficial, todos ven el aviso «Liga oficial» con el enlace a la Liga de amigos, y el panel de inscripción del torneo desaparece.
+- **Cómo se usa:** cualquiera crea su liga en Torneos › Crear. Si Fralex la quiere oficial, entra al torneo y pulsa «Hacer oficial». Después, en la Liga de amigos, pulsa «Generar calendario y empezar».
+- **Límite conocido:** el organizador casual podría volver a abrir la inscripción del torneo desde «Editar». Quien se apunte ahí no entra en la liga oficial. Para evitarlo, los amigos deben inscribirse en la Liga de amigos.
+- **Paso 2 (después de la congelación):** torneos por llaves oficiales, que exigen cambios en Link, y quitar el formulario «Crear una liga» de la Liga de amigos para que quede un único creador.
+
 ## 9. Historial de este documento
 
 | Fecha | Qué se logró | Notas de la noche (medidas de la sección 5) |
 |---|---|---|
 | 21-oct-2026 | Revisión de todo el recorrido. Migración 142 y página «Liga de amigos». Guía para amigos y guion de la noche. | Aún sin jugar. |
+| 21-oct-2026 | Un solo creador, paso 1: botón «Hacer oficial» en las ligas de /torneos/ (migración 143). Ninguna de las dos migraciones está aplicada todavía: Fralex las pega desde su PC. El instalador nuevo queda en espera porque Fralex decidió no mover la caducidad por ahora. | — |

@@ -101,3 +101,6 @@ export const premiumInfo = async (id) => { try { return normalizarTorneoPremium(
 export const hacerPremium = (id) => rpc('torneo_hacer_premium', { p_torneo: id });
 export const staffModerar = (id, accion, motivo = null) => rpc('staff_torneo_moderar', { p_id: id, p_accion: accion, p_motivo: motivo });
 export const staffTopes = (t) => rpc('staff_torneos_config', { p_habilitado: t.habilitado, p_max_activos: t.max_activos, p_max_jugadores: t.max_jugadores });
+
+/** Staff: convierte una liga todos contra todos (aún en inscripción) en OFICIAL (migración 143). Devuelve el id de la edición. */
+export const hacerOficial = (id) => rpc('staff_torneo_hacer_oficial', { p_torneo: id });
