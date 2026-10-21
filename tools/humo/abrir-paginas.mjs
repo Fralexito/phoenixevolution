@@ -47,7 +47,8 @@ for (const ruta of paginas) {
   const p = await b.newPage(); await p.setViewport({ width: 1366, height: 900 });
   const errores = [];
   p.on('pageerror', (e) => errores.push(`error JS: ${String(e.message).split('\n')[0]}`));
-  p.on('requestfailed', (q) => { if (esPropio(q.url())) errores.push(`no cargó: ${q.url().slice(origen.length)}`); });
+  // net::ERR_ABORTED = el navegador canceló la descarga porque la página se fue (redirecciones de /mi-club/ y /comunidad/): no es un fallo
+  p.on('requestfailed', (q) => { if (esPropio(q.url()) && q.failure()?.errorText !== 'net::ERR_ABORTED') errores.push(`no cargó: ${q.url().slice(origen.length)}`); });
   p.on('response', (r) => { if (esPropio(r.url()) && r.status() >= 400 && !/favicon|\.map$/.test(r.url())) errores.push(`${r.status()}: ${r.url().slice(origen.length)}`); });
   p.on('console', (m) => { if (m.type() === 'error' && /Failed to fetch dynamically imported module|Importing a module script failed|is not defined|Cannot read properties of (undefined|null)/.test(m.text())) errores.push(`consola: ${m.text().split('\n')[0].slice(0, 160)}`); });
   try {

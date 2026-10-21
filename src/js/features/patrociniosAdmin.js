@@ -1,4 +1,4 @@
-// Sección «Patrocinadores» de Moderación (migración 139, ronda 363). Solo admin: crear, editar, pausar y borrar.
+// Sección «Patrocinadores» de Moderación (migración 139, ronda 363). Solo admin: crear, editar, pausar y quitar (archiva, no borra).
 import { supabase } from '../core/sistema/supabase.js';
 import { onSession, isAdmin } from '../core/sistema/session.js';
 import { toast } from '../core/sistema/toast.js';
@@ -35,7 +35,7 @@ async function pintar() {
       <div class="min-w-0 flex-1"><p class="text-sm text-white font-bold break-words">${esc(p.nombre)}</p>
       <p class="text-xs text-gray-400"><a class="hover:underline" href="${ruta}">${esc(TIPOS[p.tipo] ?? p.tipo)} ${esc(p.objetivo_id)}</a> · ${esc(p.desde)}${p.hasta ? ` → ${esc(p.hasta)}` : ''} · ${estado}${p.nota ? ` · ${esc(p.nota)}` : ''}</p></div>
       <button type="button" class="btn btn-ghost !min-h-9 !text-xs" data-pat-editar="${p.id}">Editar</button>
-      <button type="button" class="btn btn-ghost !min-h-9 !text-xs" data-pat-borrar="${p.id}">Borrar</button></div>`;
+      <button type="button" class="btn btn-ghost !min-h-9 !text-xs" data-pat-borrar="${p.id}">Quitar</button></div>`;
   }).join('') || '<p class="text-xs text-gray-400">Todavía no hay patrocinadores.</p>';
 }
 
@@ -59,8 +59,8 @@ document.addEventListener('click', async (e) => {
     $('pat-nuevo').hidden = false; $('pat-guardar').textContent = 'Guardar cambios'; $('pat-form').scrollIntoView({ block: 'nearest' });
   }
   if (bo) {
-    if (!(await confirmar('¿Borrar este patrocinador? Su logo deja de verse.', { aceptar: 'Borrar', peligro: true }))) return;
-    try { await rpc('patrocinio_borrar', { p_id: Number(bo.dataset.patBorrar) }); toast('Borrado.', 'ok'); olvidarPatrocinios(); await pintar(); } catch (er) { toast(er.message, 'error'); }
+    if (!(await confirmar('¿Quitar este patrocinador? Su logo deja de verse en la web. El registro queda guardado en la base como historial.', { aceptar: 'Quitar', peligro: true }))) return;
+    try { await rpc('patrocinio_borrar', { p_id: Number(bo.dataset.patBorrar) }); toast('Patrocinador quitado.', 'ok'); olvidarPatrocinios(); await pintar(); } catch (er) { toast(er.message, 'error'); }
   }
 });
 onSession(() => { const c = $('pat-card'); if (!c) return; c.hidden = !isAdmin(); if (!c.hidden) { limpiar(); pintar(); } });

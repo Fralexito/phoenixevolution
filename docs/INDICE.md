@@ -63,6 +63,7 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 | [`INFORME-REVISION-GENERAL-21-OCT-2026.md`](bitacoras/INFORME-REVISION-GENERAL-21-OCT-2026.md) | (nuevo, 21-oct: qué hay en Drive, GitHub y Supabase, riesgos y pasos) |
 | [`BITACORA-16-OCT-2026-CUENTA-OPUS.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-OPUS.md) | `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` |
 | [`BITACORA-16-OCT-2026-CUENTA-WEB.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-WEB.md) | `docs/BITACORA-16-OCT-2026-CUENTA-WEB.md` |
+| [`BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md`](bitacoras/BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md) | (nuevo, 21-oct) |
 | [`INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`](bitacoras/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md) | `docs/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md` |
 | [`MAPA-HISTORIAL.md`](bitacoras/MAPA-HISTORIAL.md) | `docs/MAPA-HISTORIAL.md` |
 | [`REVISION-GENERAL-18-OCT.md`](bitacoras/REVISION-GENERAL-18-OCT.md) | `docs/REVISION-GENERAL-18-OCT.md` |
@@ -74,6 +75,7 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 |---|---|
 | [`GUIA-RETOMAR-PROYECTO-21-OCT-2026.md`](guias/GUIA-RETOMAR-PROYECTO-21-OCT-2026.md) | Base para continuar todo el proyecto (21-oct): reglas de Fralex, los 5 límites, estado de cada frente, riesgos y orden de pasos |
 | [`GUIA-NOVEDADES-19-OCT-2026.md`](guias/GUIA-NOVEDADES-19-OCT-2026.md) | Cómo usar todo lo nuevo del 19-oct: versión beta, modo demostración, Inicio, Mi club, Social (reacciones, #etiquetas, publicar), chat Amigos/General, Lanzar reto, salas de Link y Android, tablas de liga, perfil y configuración |
+| [`GUIA-NOVEDADES-21-OCT-2026.md`](guias/GUIA-NOVEDADES-21-OCT-2026.md) | Cómo usar lo nuevo del 21-oct: Jugadores con panel lateral y vista Lista, patrocinadores (admin), overlay de transmisión del torneo premium, caras nuevas |
 
 ## `docs/trabajo-en-equipo/` — Cómo se trabaja con varias cuentas/chats a la vez y resúmenes de relevo
 

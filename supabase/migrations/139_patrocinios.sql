@@ -16,6 +16,7 @@ create table if not exists public.patrocinios (
   creado_por uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  archivado boolean not null default false,
   check (hasta is null or hasta >= desde)
 );
 create index if not exists patrocinios_objetivo on public.patrocinios (tipo, objetivo_id) where activo;
@@ -27,12 +28,12 @@ grant select (id, tipo, objetivo_id, nombre, logo_url, enlace, desde, hasta) on 
 create policy patrocinios_lee on public.patrocinios for select to anon, authenticated
   using (activo and desde <= current_date and (hasta is null or hasta >= current_date));
 
--- Admin: lista completa (con nota y vencidos)
+-- Admin: lista completa (con nota y vencidos; sin los archivados)
 create or replace function public.patrocinios_admin_listar() returns jsonb
 language plpgsql stable security definer set search_path = '' as $$
 begin
   if not private.es_admin() then raise exception 'Solo el administrador.'; end if;
-  return coalesce((select jsonb_agg(to_jsonb(p) - 'creado_por' order by p.activo desc, p.desde desc, p.id desc) from public.patrocinios p), '[]'::jsonb);
+  return coalesce((select jsonb_agg(to_jsonb(p) - 'creado_por' - 'archivado' order by p.activo desc, p.desde desc, p.id desc) from public.patrocinios p where not p.archivado), '[]'::jsonb);
 end $$;
 
 -- Admin: crear (p_id null) o editar
@@ -60,12 +61,14 @@ begin
   return p_id;
 end $$;
 
--- Admin: borrar
+-- Admin: «quitar» = archivar (deja de verse en la web y en la lista del admin, pero la fila queda como historial del acuerdo).
+-- Nota de aplicación (21-oct-2026): por el conector MCP se aplicó en 3 partes (139a tabla, 139b listar+guardar, 139c archivado+quitar);
+-- una sentencia DELETE dentro de la función hacía que el conector pidiera confirmación y se colgara. Este archivo es el resultado final.
 create or replace function public.patrocinio_borrar(p_id bigint) returns void
 language plpgsql security definer set search_path = '' as $$
 begin
   if not private.es_admin() then raise exception 'Solo el administrador.'; end if;
-  delete from public.patrocinios where id = p_id;
+  update public.patrocinios set archivado = true, activo = false, updated_at = now() where id = p_id;
 end $$;
 
 revoke all on function public.patrocinios_admin_listar(), public.patrocinio_guardar(bigint, text, bigint, text, text, text, date, date, boolean, text), public.patrocinio_borrar(bigint) from public, anon;

@@ -485,3 +485,8 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - **Overlay de transmisión** `/overlay-torneo/?id=N` (página suelta sin menú, fondo transparente, 9:16): último resultado grande con destello al cambiar, próximos 3, progreso, campeón, patrocinador; cada 15 s; `?tema=sudario`, `?demo=1`. Solo si el torneo es premium (`torneo_premium`, lectura pública). Enlace y botón Copiar en «Opciones del organizador» del torneo premium. Lógica `core/competicion/overlay.js` (+ `tests/overlay.test.mjs`).
 - **Caras (hilo 8):** 8 recortes buenos de fotos libres de Wikimedia (Alisson, Conor Bradley, Jonas Urbig, Max Dowman, Mika Godts, Myles Lewis-Skelly, Rico Lewis, Rodrigo Mendoza) en `public/minifaces/`, añadidos a `MINIFACES`; `MINIFACES_FOTO` guarda autor, licencia y página, y la carta y la ficha nombran al autor (CC BY / BY-SA). Los otros 15 recortes se descartaron. Origen: carpeta de notas de la sesión de caras en la PC de Fralex.
 - 648 pruebas OK, build 60 páginas.
+
+### Ronda 363b (hilo «Decisiones pendientes de la web», borrador): Beta 1.15.1 · migración 139 completa y documentación
+- 139 aplicada entera por MCP en 3 partes (139a tabla + RLS, 139b `patrocinios_admin_listar` + `patrocinio_guardar`, 139c columna `archivado` + `patrocinio_borrar` que ARCHIVA). Probada en la base (TODO_OK REVERTIDO). El `DELETE` en la función hacía colgar el conector. «Borrar» en Moderación pasa a «Quitar» (archiva).
+- `tools/humo/abrir-paginas.mjs` ignora `net::ERR_ABORTED` (redirecciones de /mi-club/ y /comunidad/): 60/60.
+- Bitácora `docs/bitacoras/BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md` y guía `docs/guias/GUIA-NOVEDADES-21-OCT-2026.md`, enlazadas en `docs/INDICE.md`; copia en Drive («Phoenix Link — Guías y logros»).
