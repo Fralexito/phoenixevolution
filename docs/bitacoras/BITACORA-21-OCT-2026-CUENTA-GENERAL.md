@@ -40,7 +40,7 @@ Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mis
 
 - **Web:**
   - `borrador` está en la **Beta 1.15.0** (ronda 363, patrocinadores y caras nuevas, del hilo «Decisiones pendientes de la web»), más los documentos de hoy.
-  - Migración 139a aplicada; la 139b se entregó a Fralex para pegar en el SQL Editor (ver su línea en `REGISTRO.md`).
+  - Migración 139 aplicada completa por el hilo de la web (139a, 139b y 139c por MCP) y probada; ya no hay que pegar nada. Luego subió a la **Beta 1.15.1**.
   - `main` sigue en la ronda 275 (13-oct).
 - **Link:** 0.3.44 subida (`06a673d`). Ya no depende solo de esta PC.
 - **Mandos 9–16 en PES:**
@@ -51,7 +51,7 @@ Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mis
 - **Sync:** `mercado-fase0` al día (phoenix.lua v0.18c).
 - **Supabase:**
   - Datos: 42 MB, 3 usuarios, 185 tablas con RLS y 10 funciones edge.
-  - Migraciones: 125 registradas hasta la 138, más la 139a aplicada hoy por el hilo de la web.
+  - Migraciones: 125 registradas hasta la 138, más la 139 (en 3 partes: 139a, 139b, 139c) aplicada hoy por el hilo de la web.
   - Avisos: sin novedades frente al 21-oct de `contexto/SUPABASE.md`.
 
 ---
@@ -86,4 +86,4 @@ Unidad `H:\Mi unidad` (Google Drive para escritorio, cuenta frankchoy11). El det
 2. **Repos públicos:** decidir si se pasan a privados. Los 4 lo son.
 3. **Seguridad del panel (lo cambia él):** «Leaked password protection» y `admin_exige_mfa`.
 4. **Mandos 9+:** la prueba en vivo con la fila 13.
-5. **Web:** pegar la 139b en el SQL Editor (si no lo hizo ya) y decidir cuándo «Publícalo» (`borrador` → `main`).
+5. **Web:** decidir cuándo «Publícalo» (`borrador` → `main`). La 139 ya está aplicada.
