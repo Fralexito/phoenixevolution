@@ -40,7 +40,7 @@ Mantener el alma de la página original: Galaxy = cian (#00e5ff) + púrpura; Sud
 
 ## Anotaciones e informes (norma desde 20-oct-2026)
 - Subir las anotaciones y avances importantes a GitHub (`docs/`, `MAPA.md`, `REGISTRO.md`) **y también a Drive** (Fralex, 20-oct-2026). Del 16 al 19-oct no hubo Drive y solo se subía a GitHub.
-- Pendiente: subir a Drive todo lo viejo que solo está en GitHub cuando Fralex dé por terminado el sistema de mandos extra. Ver `docs/bitacoras/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`.
+- **Desde el 21-oct, GitHub es la fuente y Drive solo un respaldo.** No se sube nada a Drive a mano ni por el conector. Al cerrar el día se ejecuta `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1`, que copia `docs/`, `MAPA.md`, `REGISTRO.md` y las migraciones. Índice de todo el proyecto: `D:\Frank\IA\CLAUDE\INDICE_MAESTRO.md`.
 
 ## Diferido por el usuario
 Webhook/bot de Discord, pasarela de pago, pruebas de clanes. El cumplimiento legal de monetización y escudos es responsabilidad del usuario.
