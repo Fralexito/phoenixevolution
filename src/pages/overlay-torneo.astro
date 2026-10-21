@@ -1,0 +1,24 @@
+---
+// OVERLAY DE TRANSMISIÓN de un torneo premium (ronda 363): /overlay-torneo/?id=N como «fuente de navegador» en OBS o TikTok LIVE Studio.
+// Fondo transparente, sin menú. Lee el torneo cada 15 s (lectura pública por RLS). Solo funciona si el torneo es premium (migración 123).
+// Lógica pura: js/core/competicion/overlay.js · Página: js/pages/overlayTorneo.js · Estilos: styles/overlayTorneo.css
+import '@fontsource/rajdhani/600.css';
+import '@fontsource/rajdhani/700.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/600.css';
+import '../styles/overlayTorneo.css';
+import '../styles/patrocinios.css';
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Overlay del torneo</title>
+</head>
+<body class="ov">
+  <main id="ov-raiz" class="ov-lienzo" aria-live="polite"></main>
+  <script>import '../js/pages/overlayTorneo.js';</script>
+</body>
+</html>

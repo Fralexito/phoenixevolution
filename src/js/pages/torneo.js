@@ -10,6 +10,7 @@ import { construirPlan, tablaTorneo, crucesDePuestos, estadoSuizo, siguienteRond
 import { reglaDelPartido, castigoDelPartido } from '../core/competicion/diversion.js';
 import { REGLAS_RULETA } from '../../data/modalidades.js';
 import * as api from '../features/torneos/api.js';
+import { rellenarPatrocinios } from '../features/patrocinios.js';
 import { formatoFicha, guiaFormatoHTML, dinamicasActivasHTML, leyendaHTML, ESTADO_TXT } from '../features/torneos/guia.js';
 import { rafaga } from '../features/dopamina.js';
 
@@ -152,6 +153,7 @@ function cabecera() {
     <h1>${esc(t.nombre)}</h1><p class="to-por">Organiza <b>${esc(st.nombres[t.creador] ?? 'un jugador')}</b>${t.inicia ? ` · Empieza ${esc(new Date(t.inicia).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }))}` : ''}</p>
     ${t.descripcion ? `<p class="to-desc">${esc(t.descripcion)}</p>` : ''}
     ${t.config?.premio ? `<p class="to-premio"><i class="fa-solid fa-gift" aria-hidden="true"></i> Premio: ${esc(t.config.premio)}</p>` : ''}
+    <div data-patro="torneo:${t.id}"></div>
     <div class="to-cab-acc"><button type="button" class="btn btn-ghost" data-copiar><i class="fa-solid fa-link"></i> Copiar enlace</button>${enlace ? `<a class="btn btn-ghost" href="${esc(enlace)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-video"></i> Sala / transmisión</a>` : ''}</div></header>`;
 }
 function bloqueCampeon() {
@@ -163,7 +165,13 @@ function bloqueCampeon() {
 /** Bloque «Torneo premium» del panel del organizador: botón «Hacer premium» (gemas, una vez por torneo) o la lista de lo que ya tiene. */
 function premiumHTML() {
   const p = st.prem; if (!p) return '';
-  if (p.premium) return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b><p class="tn-ayuda">Este torneo ya es premium: overlay de transmisión, llaves, estadísticas y página propia se activan aquí en cuanto estén listos.</p></div>`;
+  if (p.premium) {
+    const ov = new URL(href(`overlay-torneo/?id=${st.t.id}`), location.href).href;
+    return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b>
+    <p class="tn-ayuda"><b>Overlay de transmisión:</b> en OBS o TikTok LIVE Studio añade una «fuente de navegador» de 1080 × 1920 con este enlace. Se actualiza solo cada 15 segundos con el último resultado, los próximos partidos y el campeón.</p>
+    <div class="to-fila"><input class="field" readonly value="${esc(ov)}" aria-label="Enlace del overlay"><button type="button" class="btn btn-ghost" data-copiar-overlay="${esc(ov)}"><i class="fa-solid fa-copy"></i> Copiar</button><a class="btn btn-ghost" href="${esc(ov)}" target="_blank" rel="noopener">Ver</a></div>
+    <p class="tn-ayuda">Llaves de pantalla completa, estadísticas y página propia llegan después.</p></div>`;
+  }
   if (!p.puede) return '';
   return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b>
     <p class="tn-ayuda">Una sola vez por torneo, con gemas. Desbloquea el overlay de transmisión, las llaves de pantalla completa, las estadísticas y una página propia. Es solo presentación: no cambia las reglas ni da ventajas.</p>
@@ -197,6 +205,7 @@ function pintar() {
     ${plegable('¿Cómo funciona este formato?', 'fa-circle-question', formatoFicha(t.formato)?.nombre ?? '', guiaFormatoHTML(t.formato))}
     ${plegable('Dinámicas de este torneo', 'fa-face-grin-squint-tears', `${dins().length} activas`, dinamicasActivasHTML(dins()))}
     ${reglas}${panelOrganizador()}${bit}${plegable('Leyenda', 'fa-book', 'Estados y visibilidad', leyendaHTML())}`;
+  rellenarPatrocinios(raiz);
 }
 
 // ── Carga ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -304,6 +313,7 @@ raiz.addEventListener('click', async (e) => {
   else if (b.dataset.cerrarGrupos !== undefined) await cerrarGrupos();
   else if (b.dataset.sigSuizo !== undefined) await siguienteSuizo();
   else if (b.dataset.cerrarTorneo !== undefined) await cerrarTorneo();
+  else if (b.dataset.copiarOverlay) { try { await navigator.clipboard.writeText(b.dataset.copiarOverlay); toast('Enlace del overlay copiado.', 'ok'); } catch { toast('No se pudo copiar: selecciónalo y cópialo a mano.', 'info'); } }
   else if (b.dataset.hacerPremium !== undefined) { if (await confirmar(`¿Hacer premium este torneo por ${st.prem?.precioGemas ?? ''} gemas? Se paga una sola vez y no se devuelve automáticamente.`, { aceptar: 'Hacer premium', cancelar: 'Volver' })) await hacer(() => api.hacerPremium(id), '¡Tu torneo ahora es premium!'); }
   else if (b.dataset.cancelarTorneo !== undefined) { if (await confirmar('¿Cancelar el torneo? Ya no se podrá seguir jugando.', { aceptar: 'Cancelar torneo', cancelar: 'Volver', peligro: true })) await hacer(() => api.cancelar(id), 'Torneo cancelado.'); }
   else if (b.dataset.copiar !== undefined) { try { await navigator.clipboard.writeText(location.href); toast('Enlace copiado.', 'ok'); } catch { toast('No se pudo copiar. Copia la dirección de la barra.', 'warn'); } }

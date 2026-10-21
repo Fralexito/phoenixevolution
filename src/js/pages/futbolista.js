@@ -7,6 +7,7 @@ import { escapeHTML as esc, safeUrl } from '../core/sistema/dom.js';
 import { href } from '../core/sistema/config.js';
 import { haceCuanto } from '../core/sistema/notifs.js';
 import * as Fotos from '../features/fotoFutbolista.js';
+import { MINIFACES_FOTO } from '../../data/minifaces.js';
 const { fotoFutbolista, tamano, esWikimedia, fotosExtra, minifaceUrl } = Fotos;
 import { hayMovimientoReducido } from '../features/ajustes.js';
 import { FX } from '../../data/experimento.js';
@@ -89,10 +90,13 @@ function pintar(movs, comp) {
       box.innerHTML = `<div class="fb-car" data-no3d role="region" aria-roledescription="carrusel" aria-label="Fotos de ${esc(j.nombre)}" tabindex="0"><div class="fb-car-pista"></div></div>`;
       box.querySelector('.fb-car-pista').append(im);
       if (club) box.insertAdjacentHTML('beforeend', `<span class="fb-mini-escudo">${escudo(club, 30)}</span>`);
-      const cr = $('fb-credito'); cr.hidden = false; cr.textContent = 'Cara del juego · parche Conmegol';
+      const cr = $('fb-credito'); cr.hidden = false; const fo = MINIFACES_FOTO[Number(j.pes_id)];
+      // Ronda 363: si no tiene cara en el juego, la 1.ª foto es un recorte de una foto libre y se nombra a su autor
+      const base = fo ? `Foto: <a href="${esc(fo.pagina)}" target="_blank" rel="noopener noreferrer">${esc(fo.autor)}</a> · ${esc(fo.licencia)} (recorte)` : 'Cara del juego';
+      cr.innerHTML = fo ? base : 'Cara del juego · parche Conmegol';
       fotoFutbolista(j.nombre, club?.nombre).then((f) => {
         if (!f || !esWikimedia(f.url)) return;
-        cr.innerHTML = `Cara del juego · fotos: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(f.titulo)}" target="_blank" rel="noopener noreferrer">Wikipedia</a>`;
+        cr.innerHTML = `${base} · fotos: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(f.titulo)}" target="_blank" rel="noopener noreferrer">Wikipedia</a>`;
         fotosExtra(f.titulo, j.nombre, f.url).then((extra) => carrusel(box, [{ url: tamano(f.url, 500) }, ...extra].slice(0, 5)));
       });
     };

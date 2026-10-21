@@ -116,4 +116,6 @@ Existe un experimento en `C:\dev\smash-soda-fork\_phoenix-link\tools\tiktok-expe
 
 **Respuestas de Fralex (21-oct-2026, «SÍ a todo» lo recomendado):** 1 SÍ (150 gemas) · 2 SÍ (60 días, 30 niveles) · 3 SÍ (300 gemas para todos) · 4 SÍ (propinas solo en ascuas) · 5 NO por ahora (la lista de patrocinadores espera a que haya más gente) · 6 NO por ahora (el overlay de TikTok de pago queda solo en papel) · 7 SÍ (7 días de gracia). Lo construido en la migración 123 ya era exactamente esto: no cambia nada en el código ni en la base de datos.
 
+**Cambio el mismo día (Fralex: «Las dos cosas»):** 5 y 6 pasan a **SÍ**. Hecho en la ronda 363: lista de patrocinadores (migración 139, panel «Patrocinadores» en Moderación, solo admin; logo «Patrocinado por» en torneo y clan) y el **overlay de transmisión** para torneos premium en la web, `/overlay-torneo/?id=N` (fuente de navegador 1080×1920 en OBS o TikTok LIVE Studio: último resultado, próximos, progreso, campeón y patrocinador; se actualiza cada 15 s). El «pago» es la marca premium que ya existía (300 gemas): no hay cobro nuevo. El marcador en vivo desde el juego (`tiktok-experimento` de Link) sigue sin tocarse.
+
 Pendiente: **copiar este documento a Drive** cuando el usuario vuelva a tener acceso.

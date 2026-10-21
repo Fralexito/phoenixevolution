@@ -3,7 +3,7 @@
 // así que se pueden mostrar citando la fuente. Sin migración: nada se guarda en la base.
 // Ligero: máx. 3 consultas a la vez, solo para las cartas que entran en pantalla, y cada resultado se recuerda 14 días en este navegador
 // (si el navegador no deja guardar, simplemente se vuelve a pedir). Si no hay foto, queda el diseño de siempre.
-import { MINIFACES } from '../../data/minifaces.js';
+import { MINIFACES, MINIFACES_FOTO } from '../../data/minifaces.js';
 const CLAVE = 'pes-fotos-lm-v5'; const DIAS = 14 * 864e5; const MAX = 3;
 const DIAS_SIN = 864e5;   // sin foto: se reintenta al día siguiente
 const API = 'https://en.wikipedia.org/w/api.php';
@@ -73,7 +73,7 @@ export function montarFotos(root) {
     const mini = minifaceUrl(el.dataset.pes);
     if (mini) {   // carita del juego: fondo transparente, se ve sobre el círculo de color de la línea
       const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = mini;
-      img.onload = () => { el.replaceChildren(img); el.classList.add('con-foto', 'con-miniface'); el.title = 'Su cara en el juego (parche Conmegol)'; };
+      img.onload = () => { el.replaceChildren(img); el.classList.add('con-foto', 'con-miniface'); const fo = MINIFACES_FOTO[Number(el.dataset.pes)]; el.title = fo ? `Foto: ${fo.autor} · ${fo.licencia} (Wikimedia Commons)` : 'Su cara en el juego (parche Conmegol)'; };
       return;
     }
     const f = await fotoFutbolista(el.dataset.foto, el.dataset.club); const u = f && seguro(f.url); if (!u) return;

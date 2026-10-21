@@ -96,6 +96,24 @@ import '../styles/torneos.css';
         <div id="tls-lista" class="space-y-1.5"></div>
       </section>
 
+      <section id="pat-card" hidden class="space-y-2" aria-labelledby="h-pat">
+        <h2 id="h-pat" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-handshake text-galaxy-400 mr-2"></i>Patrocinadores</h2>
+        <p class="text-xs text-gray-400">Solo tú (admin). El patrocinador te paga por fuera (Yape, transferencia); aquí pones su logo en un torneo o clan con «Patrocinado por». Revisa que el logo sea apto para menores (nada de alcohol ni apuestas) y anota el acuerdo en la nota, que nadie más ve.</p>
+        <form id="pat-form" class="grid gap-2 sm:grid-cols-2" novalidate>
+          <input type="hidden" id="pat-id">
+          <label class="text-xs text-gray-300">Dónde<select id="pat-tipo" class="field"><option value="torneo">Torneo</option><option value="clan">Clan</option></select></label>
+          <label class="text-xs text-gray-300">Número del torneo o clan<input id="pat-obj" type="number" min="1" class="field" placeholder="Ej.: 12 (sale en el enlace ?id=12)"></label>
+          <label class="text-xs text-gray-300">Nombre del patrocinador<input id="pat-nombre" maxlength="80" class="field"></label>
+          <label class="text-xs text-gray-300">Logo (enlace https://)<input id="pat-logo" maxlength="500" class="field" placeholder="https://…/logo.png"></label>
+          <label class="text-xs text-gray-300">Web del patrocinador (opcional)<input id="pat-web" maxlength="500" class="field" placeholder="https://…"></label>
+          <div class="grid grid-cols-2 gap-2"><label class="text-xs text-gray-300">Desde<input id="pat-desde" type="date" class="field"></label><label class="text-xs text-gray-300">Hasta (opcional)<input id="pat-hasta" type="date" class="field"></label></div>
+          <label class="text-xs text-gray-300 sm:col-span-2">Nota privada (precio, acuerdo…)<textarea id="pat-nota" rows="2" maxlength="1000" class="field"></textarea></label>
+          <div class="sm:col-span-2 flex flex-wrap items-center gap-2"><label class="text-xs text-gray-300 flex items-center gap-1.5"><input type="checkbox" id="pat-activo" checked> Activo</label>
+            <button class="btn btn-primary !min-h-10" id="pat-guardar">Guardar</button><button type="button" class="btn btn-ghost !min-h-10" id="pat-nuevo" hidden>Nuevo</button></div>
+        </form>
+        <div id="pat-lista" class="space-y-1.5"></div>
+      </section>
+
       <div id="mod-tabs" class="flex flex-wrap gap-1.5" role="group" aria-label="Estado de los reportes"></div>
       <section id="mod-lista" class="space-y-3" aria-live="polite"></section>
       <div class="text-center"><button type="button" id="mod-mas" hidden class="btn btn-ghost">Cargar más</button></div>
@@ -109,4 +127,5 @@ import '../styles/torneos.css';
   import '../js/features/torneos/staff.js';
   import '../js/features/ultimaHora.js';
   import '../js/pages/moderacionLiga.js';
+  import '../js/features/patrociniosAdmin.js';
 </script>

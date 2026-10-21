@@ -9,6 +9,7 @@ import { toast } from '../core/sistema/toast.js';
 import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/clanes/api.js';
+import { rellenarPatrocinios } from '../features/patrocinios.js';
 import { LIMITES, ROLES, validarClan, puede, restante, textoMotivo } from '../core/comunidad/clan.js';
 
 const $ = (id) => document.getElementById(id);
@@ -59,6 +60,7 @@ function miClanHTML(m) {
       <ul class="divide-y divide-galaxy-border/40 mt-1">${S.encontrados.map((u) => `<li class="flex items-center gap-2 py-2"><span class="flex-1 min-w-0 truncate text-sm text-white">${escapeHTML(u.nombre)} <span class="text-gray-500 text-xs">@${escapeHTML(u.username)}</span></span><button type="button" data-invitar="${escapeHTML(u.id)}" class="btn btn-primary !min-h-8 !px-3 !text-[12px]">Invitar</button></li>`).join('')}</ul></section>` : '';
   const edit = p.editar ? `<form id="cl-editar" class="flex flex-wrap gap-2 mt-3"><input id="cl-desc-e" class="field flex-1 min-w-[10rem]" maxlength="${LIMITES.descripcionMax}" value="${escapeHTML(m.clan.descripcion)}" aria-label="Descripción del clan"><button class="btn btn-ghost !min-h-9 !px-3 !text-xs" type="submit">Guardar descripción</button></form>` : '';
   return `<section class="glass-panel rounded-2xl p-4"><div class="flex flex-wrap items-center gap-2"><h2 class="font-display font-extrabold text-white text-lg">${etiqueta(m.clan.etiqueta)} ${escapeHTML(m.clan.nombre)}</h2>${m.clan.oculto ? '<span class="text-[12px] text-rose-300 border border-rose-400/40 rounded px-1.5 py-0.5">Oculto por moderación</span>' : ''}<span class="text-[12px] text-gray-400 ml-auto">${m.miembros.length}/${m.maximo} miembros · ${m.adultos} adulto${m.adultos === 1 ? '' : 's'}</span></div>
+    <div data-patro="clan:${m.clan.id}"></div>
     <p class="text-xs text-gray-300 mt-1 whitespace-pre-line">${escapeHTML(m.clan.descripcion) || '<span class="text-gray-500">Sin descripción.</span>'}</p>${edit}
     <ul class="divide-y divide-galaxy-border/40 mt-3">${m.miembros.map((x) => miembroHTML(x, m)).join('')}</ul>
     <div class="mt-3 flex flex-wrap gap-2"><button type="button" data-salir class="btn btn-ghost !min-h-8 !px-3 !text-[12px] !text-rose-300"><i class="fa-solid fa-right-from-bracket"></i> Salir del clan</button></div></section>${votacionHTML(m)}${solic}${invitar}`;
@@ -77,7 +79,7 @@ function sinClanHTML(m) {
 }
 function explorarHTML() {
   const filas = S.lista.map((c) => `<article class="glass-panel rounded-2xl p-3 flex flex-wrap items-center gap-2 ${c.oculto ? 'opacity-60' : ''}"><div class="flex-1 min-w-0"><p class="text-sm text-white truncate">${etiqueta(c.etiqueta)} ${escapeHTML(c.nombre)}${c.oculto ? ' <span class="text-[12px] text-rose-300">(oculto)</span>' : ''}</p>
-      <p class="text-[12px] text-gray-400 truncate">${c.miembros} miembro${c.miembros === 1 ? '' : 's'} · capitán @${escapeHTML(c.capitan || '—')}${c.descripcion ? ' · ' + escapeHTML(c.descripcion) : ''}</p></div>
+      <p class="text-[12px] text-gray-400 truncate">${c.miembros} miembro${c.miembros === 1 ? '' : 's'} · capitán @${escapeHTML(c.capitan || '—')}${c.descripcion ? ' · ' + escapeHTML(c.descripcion) : ''}</p><div data-patro="clan:${c.id}"></div></div>
     ${S.yo && S.mi && !S.mi.enClan && !c.oculto ? `<button type="button" data-solicitar="${c.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Solicitar unirme</button>` : ''}
     ${can('gestionarClanes') ? `<button type="button" data-mod="${c.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px] !text-amber-300">${c.oculto ? 'Mostrar' : 'Ocultar'}</button>` : ''}</article>`).join('');
   return `<form id="cl-explorar" class="flex gap-2"><input id="cl-q" class="field flex-1 min-w-0" maxlength="40" value="${escapeHTML(S.busqueda)}" placeholder="Buscar por nombre o etiqueta" aria-label="Buscar clan"><button class="btn btn-ghost !min-h-9 !px-3 !text-xs" type="submit">Buscar</button></form>${filas || vacio('No hay clanes que mostrar.')}`;
@@ -85,9 +87,10 @@ function explorarHTML() {
 function pintar() {
   for (const b of document.querySelectorAll('#cl-tabs [data-tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === S.tab));
   const c = $('cl-contenido');
-  if (S.tab === 'explorar') { c.innerHTML = explorarHTML(); return; }
+  if (S.tab === 'explorar') { c.innerHTML = explorarHTML(); rellenarPatrocinios(c); return; }
   if (!S.yo) { c.innerHTML = vacio('Inicia sesión para ver o crear tu clan.'); return; }
   c.innerHTML = !S.mi ? '<p class="text-gray-400 text-sm py-12 text-center">Cargando…</p>' : S.mi.enClan ? miClanHTML(S.mi) : sinClanHTML(S.mi);
+  rellenarPatrocinios(c);
 }
 async function cargar() {
   const mia = ++S.req;
