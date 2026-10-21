@@ -19,7 +19,7 @@ Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mis
 1. Lee `docs/guias/GUIA-RETOMAR-PROYECTO-21-OCT-2026.md`. Trae las reglas, los 5 límites, el estado de cada frente y el orden de pasos.
 2. La memoria de Claude está en `C:\Users\WinterOS\.claude\projects\D--Frank-IA-CLAUDE\memory\` (37 archivos, índice `MEMORY.md`). Solo se carga sola si la sesión se abre en `D:\Frank\IA\CLAUDE`.
 3. El paquete para proyectos de claude.ai está en `D:\Frank\IA\CLAUDE\para-proyecto`. Se regenera con `ACTUALIZAR_PARA_PROYECTO.ps1`. Hay una copia comprimida en la biblioteca del proyecto: `para-proyecto-21-oct-2026.zip`.
-4. Drive se sube con **Google Drive para escritorio**. Se abre con `C:\Program Files\Google\Drive File Stream\133.0.2.0\GoogleDriveFS.exe` y monta la unidad `H:` (cuenta frankchoy11). Luego se copian los archivos a `H:\Mi unidad\…`.
+4. Drive se sube con **Google Drive para escritorio**. Se abre con `C:\Program Files\Google\Drive File Stream\133.0.2.0\GoogleDriveFS.exe` y monta la unidad `H:` (la cuenta de Google de Fralex). Luego se copian los archivos a `H:\Mi unidad\…`.
 
 ---
 
@@ -78,7 +78,7 @@ Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mis
 
 ## 4. Drive: qué se subió hoy
 
-Unidad `H:\Mi unidad` (Google Drive para escritorio, cuenta frankchoy11). Se copió lo siguiente:
+Unidad `H:\Mi unidad` (Google Drive para escritorio, la cuenta de Google de Fralex). Se copió lo siguiente:
 
 | Carpeta de Drive | Qué lleva | Archivos |
 |---|---|---|

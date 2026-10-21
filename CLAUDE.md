@@ -12,6 +12,7 @@ Sitio de la liga (Galaxy League y Liga Sudario) de eFootball PES 2021 / SP Footb
 - Trabajar SOLO en la rama `borrador` (vista previa privada «FASE BETA 1.0» en `/fase-beta-1-0/`; la antigua `/borrador/` ya no existe).
 - Pasar a `main` (web oficial) ÚNICAMENTE cuando el usuario diga «Súbelo» o «Publícalo».
 - Tras cada cambio: añadir «ronda N» a `MAPA.md`, commit con los trailers de atribución, `git pull --rebase origin borrador`, push a `borrador`.
+- Al empezar y al cerrar cada avance: `powershell -ExecutionPolicy Bypass -File tools\revisar-sin-commit.ps1` (solo lee; avisa en rojo de cambios sin commit de 1 día o más en todos los repos). Si lo rojo es de otro hilo, no se toca: se le avisa (21-oct-2026, `docs/bitacoras/INFORME-SEGURIDAD-21-OCT-2026.md`).
 
 ## Reglas del usuario
 - Idioma: español. Respuestas cortas («modo ligero»). Usuario con poca experiencia en programación: explicar claro, sin asumir nada, y cerrar con una pregunta para confirmar que se entendió.

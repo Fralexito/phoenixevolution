@@ -60,7 +60,7 @@ Fuentes: GitHub (API pública), git local en `C:\dev`, Supabase (MCP, proyecto `
   - Todo esto coincide con `contexto/SUPABASE.md §7`. No hay nada nuevo.
 - **Avisos de rendimiento (solo INFO):** 96 claves foráneas sin índice y 53 índices sin usar. También coincide con el paquete.
 
-### Google Drive (todo de frankchoy11@gmail.com)
+### Google Drive (todo en la cuenta de Google de Fralex)
 | Carpeta | Contenido | Última modificación |
 |---|---|---|
 | Phoenix Link — Guías y logros | 39 docs: guías 01–31 (Link, mandos, cancha), guías beta 1 y 2, prompt Gemini y 2 respaldos Link 16–21 oct. Algunas guías están marcadas [VIEJA] o [Resumen antiguo] | 21-oct (respaldos) / 15-oct (contenido) |

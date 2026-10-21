@@ -61,6 +61,7 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 | [`BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md`](bitacoras/BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md) | (nuevo, 19-oct: rendimiento, reestructuración, Mi club, Social, Link en la web, modo demostración, versiones beta) |
 | [`BITACORA-21-OCT-2026-CUENTA-GENERAL.md`](bitacoras/BITACORA-21-OCT-2026-CUENTA-GENERAL.md) | (nuevo, 21-oct: revisión completa, correcciones de documentación, Link 0.3.44, subida a Drive) |
 | [`INFORME-REVISION-GENERAL-21-OCT-2026.md`](bitacoras/INFORME-REVISION-GENERAL-21-OCT-2026.md) | (nuevo, 21-oct: qué hay en Drive, GitHub y Supabase, riesgos y pasos) |
+| [`INFORME-SEGURIDAD-21-OCT-2026.md`](bitacoras/INFORME-SEGURIDAD-21-OCT-2026.md) | (nuevo, 21-oct: 4 repos sin claves filtradas, Supabase revisado + migración 141, entorno de pruebas, script contra cambios sin commit) |
 | [`BITACORA-16-OCT-2026-CUENTA-OPUS.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-OPUS.md) | `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` |
 | [`BITACORA-16-OCT-2026-CUENTA-WEB.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-WEB.md) | `docs/BITACORA-16-OCT-2026-CUENTA-WEB.md` |
 | [`BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md`](bitacoras/BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md) | (nuevo, 21-oct) |
