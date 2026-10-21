@@ -59,6 +59,8 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 |---|---|
 | [`BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md) | `docs/BITACORA-16-OCT-2026-CUENTA-ECONOMIA.md` |
 | [`BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md`](bitacoras/BITACORA-19-OCT-2026-CUENTA-ECONOMIA.md) | (nuevo, 19-oct: rendimiento, reestructuración, Mi club, Social, Link en la web, modo demostración, versiones beta) |
+| [`BITACORA-21-OCT-2026-CUENTA-GENERAL.md`](bitacoras/BITACORA-21-OCT-2026-CUENTA-GENERAL.md) | (nuevo, 21-oct: revisión completa, correcciones de documentación, Link 0.3.44, subida a Drive) |
+| [`INFORME-REVISION-GENERAL-21-OCT-2026.md`](bitacoras/INFORME-REVISION-GENERAL-21-OCT-2026.md) | (nuevo, 21-oct: qué hay en Drive, GitHub y Supabase, riesgos y pasos) |
 | [`BITACORA-16-OCT-2026-CUENTA-OPUS.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-OPUS.md) | `docs/BITACORA-16-OCT-2026-CUENTA-OPUS.md` |
 | [`BITACORA-16-OCT-2026-CUENTA-WEB.md`](bitacoras/BITACORA-16-OCT-2026-CUENTA-WEB.md) | `docs/BITACORA-16-OCT-2026-CUENTA-WEB.md` |
 | [`INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md`](bitacoras/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md) | `docs/INFORME-16-OCT-2026-REACT-HERRAMIENTAS-Y-ORDEN-VISUAL.md` |
@@ -70,6 +72,7 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 
 | Documento | Qué explica |
 |---|---|
+| [`GUIA-RETOMAR-PROYECTO-21-OCT-2026.md`](guias/GUIA-RETOMAR-PROYECTO-21-OCT-2026.md) | Base para continuar todo el proyecto (21-oct): reglas de Fralex, los 5 límites, estado de cada frente, riesgos y orden de pasos |
 | [`GUIA-NOVEDADES-19-OCT-2026.md`](guias/GUIA-NOVEDADES-19-OCT-2026.md) | Cómo usar todo lo nuevo del 19-oct: versión beta, modo demostración, Inicio, Mi club, Social (reacciones, #etiquetas, publicar), chat Amigos/General, Lanzar reto, salas de Link y Android, tablas de liga, perfil y configuración |
 
 ## `docs/trabajo-en-equipo/` — Cómo se trabaja con varias cuentas/chats a la vez y resúmenes de relevo
