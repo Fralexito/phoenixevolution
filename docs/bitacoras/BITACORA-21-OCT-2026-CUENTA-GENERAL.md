@@ -96,9 +96,7 @@ Antes de subir se revisó que ningún documento tuviera claves (`sb_secret_`, `s
 
 ## 5. Decisiones pendientes de Fralex
 
-1. **Apuestas y dinero real:**
-   - Hay apuestas con comisión y recargas con dinero real (hoy en 0, con `pagos_activos=false`).
-   - Antes de encender los pagos hay que separar las monedas de apuesta de las compradas, o apagar las apuestas.
+1. **Apuestas y dinero real: RESUELTO el mismo 21-oct** con la migración 140 «ascuas solo gratis» (lo comprado ya no puede llegar a un pozo). Ver `docs/economia/BITACORA-DINERO-APUESTAS-Y-LEGAL.md`. Antes de los pagos reales solo falta la revisión legal y los términos de Parsec y Steam.
 2. **Repos públicos:** decidir si se pasan a privados. Los 4 lo son.
 3. **Seguridad del panel (lo cambia él):** «Leaked password protection» y `admin_exige_mfa`.
 4. **Mandos 9+:** la prueba en vivo con la fila 13.

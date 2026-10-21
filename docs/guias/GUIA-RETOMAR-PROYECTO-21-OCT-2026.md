@@ -114,7 +114,7 @@ Todo esto se arregla en un solo paso de documentación cuando lo autorices. No l
 
 ## 5. Riesgos a decidir
 
-1. **Apuestas y dinero real.** Existen apuestas entre jugadores con comisión y recargas con dinero real. Hoy están en 0 y con los pagos apagados. Hay que separar las monedas de apuesta de las compradas, o apagar las apuestas, antes de encender `pagos_activos`.
+1. **Apuestas y dinero real: RESUELTO el 21-oct.** La migración 140 «ascuas solo gratis» hace que lo comprado con dinero ya no pueda llegar a un pozo de apuestas (`docs/economia/BITACORA-DINERO-APUESTAS-Y-LEGAL.md`). Antes de encender los pagos reales solo falta la revisión legal y los términos de Parsec y Steam.
 2. **Repos públicos.** Hay que decidir si se pasan a privados (GitHub → Settings → Change visibility).
 3. **Seguridad del panel (lo cambias tú).** Activar «Leaked password protection» y la verificación en dos pasos para el admin (`admin_exige_mfa`).
 4. **Link 0.3.44 vive solo en esta PC.** Si no se hace el commit, se puede perder.
