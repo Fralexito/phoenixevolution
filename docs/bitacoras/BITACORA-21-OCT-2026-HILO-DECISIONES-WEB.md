@@ -52,7 +52,7 @@ Las preguntas 1–4 y 7 ya eran lo que hacía la migración 123: no cambió cód
 | 362 | `fe13a15` | 1.14.0 | Jugadores con panel lateral (posición y equipo) y vista «Lista» |
 | 363 | `5a12066` | 1.15.0 | Patrocinadores, overlay de transmisión para torneos premium, 8 caras nuevas |
 | 363 | `4632a43` | 1.15.0 | Registro de la migración 139 (aplicación parcial) |
-| 363b | (este commit) | 1.15.1 | 139 completa; «Quitar» patrocinador = archivar; prueba de páginas sin falsos fallos; esta bitácora y la guía |
+| 363b | `b770e13` | 1.15.1 | 139 completa; «Quitar» patrocinador = archivar; prueba de páginas sin falsos fallos; esta bitácora y la guía |
 
 ---
 
@@ -100,6 +100,6 @@ Las preguntas 1–4 y 7 ya eran lo que hacía la migración 123: no cambió cód
 - Llaves de pantalla completa, estadísticas y página propia del torneo premium: siguientes fases del diseño.
 - Pasar a `main` solo con «Súbelo».
 
-## 7. Lista para Drive
-- Esta bitácora → «NN · Bitácora web: decisiones, Jugadores, patrocinadores y overlay (21-oct-2026)».
-- `docs/guias/GUIA-NOVEDADES-21-OCT-2026.md` → «NN · Guía: novedades de la web (21-oct-2026)».
+## 7. En Drive (subido y comprobado el 21-oct, carpeta «Phoenix Link — Guías y logros»)
+- Esta bitácora → «Web · Bitácora 21-oct-2026: decisiones, Jugadores, patrocinadores, overlay y caras» — https://docs.google.com/document/d/1hkB3U7hWIXxgL4EbDSLrvTjrb5_whNREGb1dBKtE-Q4/edit
+- La guía → «Web · Guía de novedades (21-oct-2026)» — https://docs.google.com/document/d/1rQFpnipoxhVMoDp2EEBgO7fQl43vaQxEJ4_sIWnhM7g/edit
