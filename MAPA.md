@@ -496,3 +496,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Migración 140 (aplicada por MCP, probada en transacción deshecha 11/11): premios premium en ascuas → 18 objetos; premium repetido sin compensación; trigger `trg_libro_ascuas_solo_gratis` (ascuas solo de fuentes gratis, pozos solo ascuas, compras con dinero solo gemas); alquiler de host solo pago por fuera.
 - Web: `pase.js` (mensaje «Ya tenías…»), `pase-demo.js`, `alquiler.js` (sin gemas). 648/648 pruebas, build OK.
 - `docs/economia/RIESGOS-LEGALES.md`: apuestas en Perú, venta de gemas, Konami/PES, caras/parches, Parsec (no es asesoría legal).
+- Documentación unificada (regla de Fralex: pocos documentos largos): auditoría + riesgos legales → `docs/economia/BITACORA-DINERO-APUESTAS-Y-LEGAL.md` (paso a paso, errores, medidas).

@@ -1,4 +1,4 @@
--- 140 · Ascuas solo gratis: nada comprado con dinero puede acabar en un reto con pozo. Informe: docs/economia/AUDITORIA-DINERO-Y-APUESTAS-21-OCT-2026.md.
+-- 140 · Ascuas solo gratis: nada comprado con dinero puede acabar en un reto con pozo. Bitácora: docs/economia/BITACORA-DINERO-APUESTAS-Y-LEGAL.md.
 -- Cierra el puente soles → gemas → Phoenix Pass premium → ascuas → pozo, y quita el pago con gemas entre personas (alquiler de host).
 -- No borra datos: al aplicarla había 0 compras del pase, 0 alquileres y 0 pozos.
 
