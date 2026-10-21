@@ -490,3 +490,9 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 139 aplicada entera por MCP en 3 partes (139a tabla + RLS, 139b `patrocinios_admin_listar` + `patrocinio_guardar`, 139c columna `archivado` + `patrocinio_borrar` que ARCHIVA). Probada en la base (TODO_OK REVERTIDO). El `DELETE` en la función hacía colgar el conector. «Borrar» en Moderación pasa a «Quitar» (archiva).
 - `tools/humo/abrir-paginas.mjs` ignora `net::ERR_ABORTED` (redirecciones de /mi-club/ y /comunidad/): 60/60.
 - Bitácora `docs/bitacoras/BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md` y guía `docs/guias/GUIA-NOVEDADES-21-OCT-2026.md`, enlazadas en `docs/INDICE.md`; copia en Drive («Phoenix Link — Guías y logros»).
+
+### Ronda 364 (hilo «Dinero, apuestas y riesgo legal», borrador): Beta 1.15.2 · ascuas solo gratis
+- Auditoría de dinero real: pagos apagados, 0 órdenes, 0 gemas, 0 pozos; hueco soles → gemas → pase premium → ascuas → pozo. Informe `docs/economia/AUDITORIA-DINERO-Y-APUESTAS-21-OCT-2026.md`.
+- Migración 140 (aplicada por MCP, probada en transacción deshecha 11/11): premios premium en ascuas → 18 objetos; premium repetido sin compensación; trigger `trg_libro_ascuas_solo_gratis` (ascuas solo de fuentes gratis, pozos solo ascuas, compras con dinero solo gemas); alquiler de host solo pago por fuera.
+- Web: `pase.js` (mensaje «Ya tenías…»), `pase-demo.js`, `alquiler.js` (sin gemas). 648/648 pruebas, build OK.
+- `docs/economia/RIESGOS-LEGALES.md`: apuestas en Perú, venta de gemas, Konami/PES, caras/parches, Parsec (no es asesoría legal).

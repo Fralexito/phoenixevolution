@@ -2,6 +2,8 @@
 
 Migraciones 111 (integridad), 112 (controles de riesgo) y 113 (vigilancia). Los pagos siguen **apagados** (`pagos_activos = false`) hasta cumplir la lista de abajo.
 
+**Migración 140 (21-oct):** las ascuas solo entran por fuentes gratis (trigger `trg_libro_ascuas_solo_gratis`). Así nada comprado con dinero llega a un reto con pozo. Ver `AUDITORIA-DINERO-Y-APUESTAS-21-OCT-2026.md` y, para lo legal, `RIESGOS-LEGALES.md`.
+
 ## Qué se protege y cómo
 
 | Amenaza | Control |

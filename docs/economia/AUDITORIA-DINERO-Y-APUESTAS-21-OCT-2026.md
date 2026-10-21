@@ -27,7 +27,13 @@ Quien paga el pase recibe hasta 1080 ascuas (y 100 más por cada objeto repetido
 
 Riesgo menor, aparte: el alquiler con gemas deja que una persona **gane gemas** de otra. No toca las apuestas, pero las gemas dejan de ser «solo lo que compraste».
 
-## 3. Modelo propuesto (pendiente del SÍ de Fralex)
+## 3. Modelo aplicado (Fralex: «Corrige todito eso», 21-oct 15:31) · migración 140 · Beta 1.15.2
+
+**Estado: HECHO.** `supabase/migrations/140_ascuas_solo_gratis.sql`, aplicada por MCP y probada antes en una transacción deshecha. Los 11 controles salieron bien: entran las ascuas ganadas y las de la pista gratis; se bloquean las ascuas por `compra_dinero`, la pista premium en ascuas, los pozos con gemas, las ascuas por alquiler y los premios premium en ascuas puestos por el admin. Resultado en la base: 0 premios premium en ascuas y 24 objetos premium. Hay 3 triggers nuevos: `trg_libro_ascuas_solo_gratis`, `trg_oferta_sin_gemas` y `trg_alquiler_sin_gemas`, más la restricción `pase_premium_sin_ascuas`. En la web: mensaje «Ya tenías …» en el pase, formulario de alquiler sin gemas y demo del pase ajustada. 648/648 pruebas y la compilación, bien.
+
+**Cómo añadir en el futuro una fuente nueva de ascuas:** debe ser gratis. Usa uno de los tipos permitidos (`ganado`, …) o añade el tipo nuevo a la lista de `private.libro_ascuas_solo_gratis()` en una migración, explicando por qué no viene del dinero.
+
+Lo que se decidió y aplicó (detalle):
 
 1. **Gemas = solo cosmético y pase.** Nunca dan ascuas, nunca se apuestan, nunca se retiran.
 2. **Ascuas = solo gratis.** Únicas fuentes permitidas: jugar, retos, rachas, misiones, logros, pista **gratis** del pase, premio o devolución de un pozo, ajuste del administrador.

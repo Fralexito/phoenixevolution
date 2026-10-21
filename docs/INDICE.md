@@ -8,6 +8,8 @@ Si una rama tuya nombra un documento con la ruta vieja, ejecuta `node tools/reor
 
 | Documento | Antes estaba en |
 |---|---|
+| [`AUDITORIA-DINERO-Y-APUESTAS-21-OCT-2026.md`](economia/AUDITORIA-DINERO-Y-APUESTAS-21-OCT-2026.md) | (nuevo, 21-oct: migración 140 «ascuas solo gratis») |
+| [`RIESGOS-LEGALES.md`](economia/RIESGOS-LEGALES.md) | (nuevo, 21-oct: apuestas en Perú, Konami, caras, Parsec; no es asesoría legal) |
 | [`DISENO-ECONOMIA-COMPLETA.md`](economia/DISENO-ECONOMIA-COMPLETA.md) | `docs/DISENO-ECONOMIA-COMPLETA.md` |
 | [`DISENO-PASS-Y-ORGANIZADORES.md`](economia/DISENO-PASS-Y-ORGANIZADORES.md) | `docs/DISENO-PASS-Y-ORGANIZADORES.md` |
 | [`DISENO-RECARGAS.md`](economia/DISENO-RECARGAS.md) | `docs/DISENO-RECARGAS.md` |
