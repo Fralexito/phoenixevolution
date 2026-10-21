@@ -5,6 +5,10 @@ Esta bitácora es para la **otra cuenta**, o para cualquier IA o persona que con
 Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mismo día:
 - `docs/bitacoras/INFORME-REVISION-GENERAL-21-OCT-2026.md`: la revisión de Drive, GitHub y Supabase.
 - `docs/guias/GUIA-RETOMAR-PROYECTO-21-OCT-2026.md`: la base para continuar.
+- Lo de la web de ese día (1.14.0 → 1.15.1, migración 139) lo documentó su propio hilo. No se duplica aquí:
+  - `docs/bitacoras/BITACORA-21-OCT-2026-HILO-DECISIONES-WEB.md`;
+  - `docs/guias/GUIA-NOVEDADES-21-OCT-2026.md` (copias en Drive, «Phoenix Link — Guías y logros»).
+- Lo de los mandos 9+ de ese día está en el libro: `PRUEBA_CANCHA\informes\LIBRO_PERSONAL\cap_60_k_estrategia_mas_mandos.md` y `00_BITACORA_VIVA.md`.
 
 > **Norma de Fralex (20-oct, repetida el 21-oct):** todo va a GitHub **y** a Drive, «tal cual lo estaba haciendo», para que «cualquier humano o IA pueda replicar todo a la perfección».
 
@@ -31,7 +35,7 @@ Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mis
 | 14:45 | Corregidos `CONTEXTO_PHOENIX.md` (37 cambios sin commit y copia vieja `C:\dev\pes-rediseno`), `contexto/SUPABASE.md` (406 funciones), `contexto/HILOS.md` (overlay sin release) y los capítulos 02 y 04 del libro (regla de push, `App-galaxy-` vacío) | `D:\Frank\IA\CLAUDE`, `LIBRO_PERSONAL` | HECHO |
 | 14:52 | Guías de Link y Sync al día: rama `plan-ux`, Sync en vez de Mercado, y compilar con `cmake`, nunca con `COMPILAR_PHOENIX.bat` | `plan-ux` `8c444f0`; `mercado-fase0` `c522386` → `053eb84` | HECHO (ver §3, error corregido) |
 | 14:57 | Paquete `para-proyecto` puesto al día y subido comprimido a la biblioteca del proyecto | `para-proyecto-21-oct-2026.zip` | HECHO |
-| 14:46–15:12 | (hilo de la web, en la nube) Beta **1.14.0** (Jugadores con panel lateral y vista Lista), **1.15.0** (patrocinadores, overlay de torneo premium y 8 caras nuevas) y ronda 363: migración **139a aplicada**, **139b entregada** para el SQL Editor | `fe13a15`, `5a12066`, `4632a43` (hilo «Decisiones pendientes de la web»; ya en `borrador`) | HECHO en su hilo |
+| 14:46–15:12 | (hilo de la web, en la nube) Beta **1.14.0** (Jugadores con panel lateral y vista Lista), **1.15.0** (patrocinadores, overlay de torneo premium y 8 caras nuevas) y ronda 363: migración **139** completa (139a, 139b, 139c); luego 1.15.1 | `fe13a15`, `5a12066`, `4632a43` (hilo «Decisiones pendientes de la web»; ya en `borrador`) | HECHO en su hilo |
 | 15:15 | Esta bitácora, el informe y la guía en GitHub, y **subida a Drive de todo lo pendiente desde el 15-oct** | este commit y Drive (§4) | HECHO |
 
 ---
@@ -74,7 +78,19 @@ Complementa `REGISTRO.md` (una línea por cambio) y estos dos documentos del mis
 
 ## 4. Drive: qué se subió hoy
 
-Unidad `H:\Mi unidad` (Google Drive para escritorio, cuenta frankchoy11). El detalle de carpetas y archivos está en el capítulo `cap_15_diario_21_oct.md` del libro y en `LIBRO_PERSONAL\_estado_subida_drive.md`.
+Unidad `H:\Mi unidad` (Google Drive para escritorio, cuenta frankchoy11). Se copió lo siguiente:
+
+| Carpeta de Drive | Qué lleva | Archivos |
+|---|---|---|
+| `Phoenix Link — Guías y logros\LIBRO PERSONAL — …\Originales (.md) — capítulos completos` | Todo el libro al día (capítulos 01–95, cap_15 nuevo, cap_60_j/k/l, cap_62, bitácora viva, `LIBRO_PERSONAL_COMPLETO.md`) | 79 |
+| `Phoenix Link — Guías y logros\Respaldo GitHub y PC — 21-oct-2026\web` | `CLAUDE.md`, `MAPA.md`, `REGISTRO.md`, todo `docs/` y las migraciones `supabase/migrations/*.sql` | 189 |
+| `…\Respaldo GitHub y PC — 21-oct-2026\link` | `CLAUDE.md`, `COORDINACION.md`, `REGISTRO-LINK.md` y todo `docs/` de Link (`plan-ux`) | 77 |
+| `…\Respaldo GitHub y PC — 21-oct-2026\investigacion-pes` | Informes 01–12 de PES, `INFORME_FINAL`, manual M00–M17, investigaciones I01–I06 y Gemini | 45 |
+| `…\Respaldo GitHub y PC — 21-oct-2026\modulo-sider-mandos` | Módulo de mandos 9+ (`phoenix_mandos_fase1.lua` y respaldos), guía y herramientas `.ps1` | 17 |
+| `…\Respaldo GitHub y PC — 21-oct-2026\contexto-claude-para-proyecto` | El paquete `para-proyecto` completo (memorias, contexto, HILOS, SUPABASE, INFORMES) | 65 |
+| `Phoenix Mercado — Base de conocimiento PES 2021\Respaldo GitHub — 21-oct-2026 (Sync)` | `CLAUDE.md`, `COORDINACION.md` y todos los `.md` de `PhoenixSync/` (`mercado-fase0`) | 78 |
+
+Antes de subir se revisó que ningún documento tuviera claves (`sb_secret_`, `service_role` o el sello de la beta). No se encontró ninguna.
 
 ---
 
