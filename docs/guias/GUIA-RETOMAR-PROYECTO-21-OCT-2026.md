@@ -79,7 +79,7 @@ Este documento resume lo que leí: las 37 memorias de Claude de Phoenix, la memo
 
 | Frente | Estado | Siguiente paso |
 |---|---|---|
-| **Web** | Beta 1.13.0 (`abc31fa`) en `borrador`, en GitHub y con la CI en verde. `main` sigue en la ronda 275 (13-oct). Economía A–E montada con los pagos **apagados** y en modo prueba | Cuando lo pidas: «Publícalo» (`borrador` → `main`) |
+| **Web** | Beta 1.15.0 en `borrador` al cierre del 21-oct (1.14.0 Jugadores con panel lateral; 1.15.0 patrocinadores, overlay de torneo premium y 8 caras; migración 139a aplicada y 139b entregada), en GitHub. `main` sigue en la ronda 275 (13-oct). Economía A–E montada con los pagos **apagados** y en modo prueba | Cuando lo pidas: «Publícalo» (`borrador` → `main`) |
 | **Link** | 0.3.44 **sin commit** (37 cambios: conexión de cuenta arreglada y puestos 9–16). En GitHub está la 0.3.40 | Tu visto bueno al commit y al push (lo lleva otro hilo) |
 | **Mandos 9–16 en PES** | Módulo Sider v0.9.x: la pantalla de lados funciona, pero el jugador 9+ no se mueve. Hipótesis: falta el «número de usuario local». Tope 16 por ViGEm | Tu prueba en vivo: partido con la fila 13 en un lado y decir «listo» en su hilo |
 | **Sync** | `mercado-fase0` al día (phoenix.lua v0.18c). Los frentes 125–128 están terminados y aplicados | Probar fichajes en un PES real |
