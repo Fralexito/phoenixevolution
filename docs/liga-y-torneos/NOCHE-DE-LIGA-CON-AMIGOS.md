@@ -16,7 +16,7 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 5. Qué medir
 6. Cómo está hecho (paso a paso para replicarlo)
 7. Errores, hallazgos e intentos fallidos
-8. Cosas a tener en cuenta
+8. Cosas a tener en cuenta (y 8b: siguiente paso, un solo creador)
 9. Historial de este documento
 
 ---
@@ -184,6 +184,16 @@ Recorrido que ya existía, revisado en el código:
 - **Revocar un Link** (si un instalador se filtra): `docs/BETA-PRIVADA.md` del repo de Link.
 
 ---
+
+## 8b. Siguiente paso, después de la noche: un solo creador de ligas y torneos
+
+Fralex lo pidió el 21-oct-2026: «que sea un solo creador de ligas y torneos pero que yo pueda escoger cuáles son oficiales y cuales son así casuales de cualquier personaje».
+
+Plan:
+- Cualquier usuario crea su liga o torneo desde el creador de `/torneos/` (migración 097), como hoy. Esos son los **casuales**: los resultados se cargan a mano.
+- El staff (Fralex) tiene un botón **«Hacer oficial»** en cualquier liga o torneo. Al pulsarlo, se copia a la liga oficial (`liga_ediciones`, `liga_participantes` y `liga_partidos`, las mismas tablas de la Liga de amigos) con sus inscritos y su calendario. Desde ese momento Phoenix Link manda los resultados solo y el staff los valida.
+- La página «Liga de amigos» pasa a ser la vista de las ligas oficiales de ese creador único.
+- No se empieza durante la congelación, porque los torneos de eliminación directa exigen cambios en Link (llaves) y en la función «liga». Las ligas «todos contra todos» sí pueden hacerse oficiales sin tocar Link.
 
 ## 9. Historial de este documento
 
