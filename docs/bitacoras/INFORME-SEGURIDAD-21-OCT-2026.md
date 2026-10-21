@@ -102,7 +102,30 @@ powershell -ExecutionPolicy Bypass -File C:\dev\pes-liga-automatica\tools\revisa
 
 Estado al 21-oct-2026 16:30: ningún repo en rojo. `smash-soda-fork` tiene 13 archivos de ruido (logs de compilación de Link y carpetas `build-*`). **Sugerencia para el hilo de Link**: añadir `log_*.txt`, `build-mercado/`, `build-sync/` y `_mis_cambios/` a su `.gitignore`.
 
-## 7. Qué se cambió (para replicarlo)
+## 7. Paso a paso para repetir esta revisión (otra IA o persona)
+
+1. **Ver qué repos son públicos**: `https://api.github.com/repos/Fralexito/<repo>` → campo `private`. Listar ramas con `/branches`.
+2. **Copia espejo de cada repo** en una carpeta temporal (no en los clones de trabajo): `git clone --mirror https://github.com/Fralexito/<repo>.git`.
+3. **Escanear todo el historial**: listar todos los objetos con `git rev-list --all --objects`, quedarse con los blobs (`git cat-file --batch-check`) y leerlos en lotes con `git cat-file --batch`, buscando con expresiones regulares los patrones del §2.1. Las claves JWT se decodifican (parte central en base64url) para ver su `role`: `anon` es pública, `service_role` sería una filtración grave.
+4. **Datos personales y documentos**: `git grep` en la punta de cada rama (teléfonos, DNI, cuentas) y `git rev-list --all --objects | grep -iE "\.(pdf|docx|xlsx|csv|zip)$"`.
+5. **Supabase**: `get_advisors` (seguridad y rendimiento) y después estas consultas en SQL, que los avisos no cubren: funciones `sistema_*` ejecutables por `anon`/`authenticated` (`has_function_privilege`), funciones SECURITY DEFINER sin `search_path`, tablas de `public` sin RLS, políticas de escritura con `true`, columnas que `authenticated` puede actualizar en `perfiles` (`information_schema.column_privileges`), buckets de Storage y las tablas de `private`.
+6. Corregir lo que sea código **con migración** (`apply_migration` + archivo en `supabase/migrations/`). Comprobar después que lo que usa esas tablas sigue funcionando.
+7. Lo que sea **ajuste de seguridad** (Auth, MFA, contraseñas filtradas) no lo toca Claude: se le dan los pasos a Fralex.
+
+## 8. Errores y tropiezos de esta sesión (para no repetirlos)
+
+| Tropiezo | Qué pasó | Solución |
+|---|---|---|
+| No hay Python | `python` en Windows abre la Microsoft Store | Usar `node` para los scripts |
+| No hay `gh` en la consola Bash | No se podía consultar GitHub con la CLI | API pública de GitHub con `fetch` desde node |
+| No hay gitleaks ni trufflehog | Sin escáner de secretos instalado (instalar = descargar, requiere permiso) | Script propio en node que lee todos los blobs del historial |
+| La salida de `get_advisors` era enorme (195 KB) | No cabía en la conversación | Guardarla en archivo y resumirla con un script (agrupar por tipo de aviso) |
+| **Choque de número de migración** | Otro hilo creó `140_ascuas_solo_gratis.sql` a la vez que se aplicaba `140_rls_tablas_private` | Se renumeró el archivo a `141_…` (en Supabase sigue registrada como `140_rls_tablas_private`). **Lección: justo antes de crear el archivo, volver a hacer `ls supabase/migrations` y `git fetch`; si dos hilos trabajan en la base a la vez, avisar al coordinador del número que se va a usar** |
+| Acentos rotos en el script `.ps1` | Windows PowerShell 5.1 lee los `.ps1` sin BOM como ANSI | Guardar el `.ps1` en UTF-8 **con BOM** |
+| `sed` no cambió la expresión del script | El escapado de `\.` y `|` entre bash y sed falló en silencio | Usar la herramienta de edición exacta y comprobar con `grep` después de cada cambio |
+| `COMPILAR_PHOENIX.bat` salía como cambio «real» sin commit | Es un archivo que a propósito no se versiona | Añadido a la lista de ruido del script |
+
+## 9. Qué se cambió (para replicarlo)
 - Supabase: migración 141 (en remoto se llama `140_rls_tablas_private`; archivo `141_rls_tablas_private.sql`).
 - `docs/bitacoras/BITACORA-21-OCT-2026-CUENTA-GENERAL.md` e `INFORME-REVISION-GENERAL-21-OCT-2026.md`: correo sustituido.
 - `tools/revisar-sin-commit.ps1`: nuevo.
