@@ -25,7 +25,7 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 
 | Pieza | Estado al 21-oct-2026 |
 |---|---|
-| Inscripción en la web | **Hecho en código** (página `/liga-amigos/`, migración 142). Falta aplicar la 142 en Supabase. |
+| Inscripción en la web | **Hecho y en Supabase** (página `/liga-amigos/`, migraciones 142 y 143 aplicadas y probadas el 21-oct). |
 | Calendario | **Hecho en código**: botón «Generar calendario y empezar» (todos contra todos, sorteado). |
 | Tabla en la web | **Hecho en código**: `/liga-amigos/` lee la vista `liga_tabla` y se refresca sola (Realtime). |
 | Partido por Parsec con Link | Funciona desde hace semanas en 1v1 con amigos. **Link 0.3.45 se cuelga al cargar en la PC de Fralex**: lo arregla el hilo «1 · Link». Hasta entonces, usar la última versión que abra bien. |
@@ -209,3 +209,4 @@ Plan:
 |---|---|---|
 | 21-oct-2026 | Revisión de todo el recorrido. Migración 142 y página «Liga de amigos». Guía para amigos y guion de la noche. | Aún sin jugar. |
 | 21-oct-2026 | Un solo creador, paso 1: botón «Hacer oficial» en las ligas de /torneos/ (migración 143). Ninguna de las dos migraciones está aplicada todavía: Fralex las pega desde su PC. El instalador nuevo queda en espera porque Fralex decidió no mover la caducidad por ahora. | — |
+| 21-oct-2026 (noche) | Migraciones 142 y 143 aplicadas por Claude (Fralex añadió el permiso `apply_migration` en su settings.json) y probadas en una transacción que se deshizo: crear, bloqueo a no-staff, inscribirse, calendario, tabla, hacer oficial y finalizar. La base quedó limpia. | — |
