@@ -151,3 +151,10 @@ Conectores opcionales en la Cuenta 2 (solo si un trabajo los necesita): Supabase
 - **A medias:** nada de código. Falta copiar el kit a la PC y actualizar el `00_LEEME_PRIMERO.md` original del hub `D:\Frank\IA\CLAUDE` (el script `ACTUALIZAR_PARA_PROYECTO.ps1` regenera el paquete desde ahí y pisaría la regla nueva).
 - **Siguiente paso:** quien entre con la PC conectada: (1) copiar `traspaso-cuentas/` a `C:\dev\TRASPASO-CUENTAS`; (2) añadir al `00_LEEME_PRIMERO.md` del hub la sección «Dos cuentas» (igual que la de `para-proyecto/`); (3) seguir con el frente que Fralex pida, respetando los candados.
 - **Candados:** todo libre. Si Fralex sigue los mandos o el modo street en la Cuenta 2, esa cuenta toma el candado y la Cuenta 1 deja de tocarlo (sus hilos 4 y «modo street» quedan en pausa hasta que el candado vuelva).
+
+### 2026-10-24 11:58 (Lima) · Cuenta 1 · Kit copiado a la PC
+- Hecho: kit en `C:\dev\TRASPASO-CUENTAS` (LEEME-KIT, instrucciones, primer mensaje, copia de este archivo y el revisor `traspaso-cuentas.ps1`). Sección «Dos cuentas» añadida al `00_LEEME_PRIMERO.md` del hub y de `D:\Frank\IA\CLAUDE\para-proyecto`. `ACTUALIZAR_PARA_PROYECTO.ps1` ahora también copia `TRASPASO.md` al paquete. Respaldos de lo que había: `*.antes-24-oct.*` en el hub.
+- Solo en la PC (sin git): lo de arriba.
+- A medias: la copia de la web en la PC (`C:\dev\pes-liga-automatica`) aún no tiene este archivo: hace falta un `git pull` ahí (desde la nube no se puede correr git en la PC). El revisor `.ps1` no se pudo probar en Windows; la primera cuenta que lo use en la PC, que lo compruebe.
+- Siguiente paso: Fralex monta la Cuenta 2 con `C:\dev\TRASPASO-CUENTAS\LEEME-KIT.txt`.
+- Candados: sin cambios (todo libre).
