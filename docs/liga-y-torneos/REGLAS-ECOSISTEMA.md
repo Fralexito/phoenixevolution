@@ -37,6 +37,7 @@ Un chat que no es dueño **no cambia** la pieza: entrega un prompt al dueño.
 - Un commit de otro chat que rompa algo se revierte primero y se discute después.
 
 ## 7. Protocolo de dos cuentas (A y B trabajan a la vez)
+- **Desde el 24-oct-2026 el traspaso entre cuentas de todo Phoenix (web, Link, Sync, PES) va en `TRASPASO.md` (raíz del repo):** al empezar se lee su última entrada y se corre `tools/traspaso-cuentas.ps1` si hay PC; al terminar o cambiar de cuenta se añade una entrada y se empuja. Los candados por frente están ahí.
 - Al empezar: `git fetch` + `git pull --rebase origin borrador` y leer el final de `REGISTRO.md`.
 - Antes de usar un número de migración o de ronda: revisar el último en `REGISTRO.md`, `MAPA.md` y Supabase (`list_migrations` **y** existencia de tablas, porque lo pegado a mano no aparece en la lista). Escribir primero una línea «RESERVADO N» en `REGISTRO.md` y empujarla.
 - **Número de ronda (regla ronda 295):** el siguiente es el MAYOR número que aparezca en `MAPA.md` **o** `REGISTRO.md`, más 1. Se saca así: `grep -oh "Ronda [0-9]*" MAPA.md REGISTRO.md | sed 's/Ronda //' | sort -n | tail -1`. No te fíes de «la última línea» de un solo archivo (las dos cuentas no escriben en orden y así se repitieron los números 273–275).
