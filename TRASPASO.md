@@ -193,3 +193,8 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 ### 2026-10-25 01:22 (Lima) · Cuenta 2 · Nombre final: «Liga oficial»
 - Hecho: web beta **1.16.4**. `/liga-amigos/` se muestra como «Liga oficial» (dirección igual). Decisión de Fralex: **casual = Torneos** (cualquiera crea, los encargados anotan a mano); **oficial = resultados automáticos con el Lua/Link**. Idea futura: automático como función premium. Guía NOCHE-DE-LIGA actualizada.
 - Candados: Web libre.
+
+### 2026-10-25 01:35 (Lima) · Cuenta 1 · Drive y PC al día
+- Hecho: Fralex corrió en la PC `git pull` en `C:\dev\pes-liga-automatica` (ya tiene `TRASPASO.md` y todo hasta c84f74e) y `RESPALDAR_A_DRIVE.ps1` (331 archivos a «Respaldo automático (GitHub y PC) — no editar»). La Cuenta 2 ya trabajó (beta **1.16.4**, «Liga oficial», reserva de la migración **144**): la entrada de cierre de arriba decía beta 1.16.1; **manda 1.16.4**.
+- A medias: en la PC, `C:\dev\smash-soda-fork\_phoenix-link` aún no tiene e25e1a6 (Parte 13 de MANDOS.md, libro-pes, paquete): hace falta `git pull` allí y repetir el respaldo a Drive.
+- Candados: sin cambios.
