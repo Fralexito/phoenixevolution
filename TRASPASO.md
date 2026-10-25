@@ -185,3 +185,7 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - Solo en la PC (sin git): nada. · Supabase: nada (siguiente libre 144).
 - Pendiente: la guía `docs/liga-y-torneos/NOCHE-DE-LIGA-CON-AMIGOS.md` todavía dice «Liga de amigos» en el texto para los amigos; actualizar si Fralex lo pide.
 - Candados: tomé y solté Web (queda libre).
+
+### 2026-10-25 01:13 (Lima) · Cuenta 2 · «Liga Phoenix» → «Liga casual»
+- Hecho: web beta **1.16.3**, solo texto visible. Dirección `/liga-amigos/` igual. 648 pruebas y build en verde.
+- Candados: Web libre.
