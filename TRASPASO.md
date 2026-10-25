@@ -189,3 +189,7 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 ### 2026-10-25 01:13 (Lima) · Cuenta 2 · «Liga Phoenix» → «Liga casual»
 - Hecho: web beta **1.16.3**, solo texto visible. Dirección `/liga-amigos/` igual. 648 pruebas y build en verde.
 - Candados: Web libre.
+
+### 2026-10-25 01:22 (Lima) · Cuenta 2 · Nombre final: «Liga oficial»
+- Hecho: web beta **1.16.4**. `/liga-amigos/` se muestra como «Liga oficial» (dirección igual). Decisión de Fralex: **casual = Torneos** (cualquiera crea, los encargados anotan a mano); **oficial = resultados automáticos con el Lua/Link**. Idea futura: automático como función premium. Guía NOCHE-DE-LIGA actualizada.
+- Candados: Web libre.

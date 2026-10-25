@@ -44,7 +44,7 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 
 1. **Crea tu cuenta en la web:** https://fralexito.github.io/phoenixevolution/ › botón de cuenta › «Registrarme». Confirma el correo si te lo pide.
 2. **Si la web enseña salas o chats inventados**, es el modo demostración: pulsa «Salir» en el aviso de demo.
-3. **Inscríbete en la liga:** abre el enlace que te paso (es de la página «Liga de amigos») y pulsa **Inscribirme**. Si quieres, escribe el club con el que juegas. Tu nombre en la liga es tu nombre visible de la web.
+3. **Inscríbete en la liga:** abre el enlace que te paso (es de la página «Liga oficial») y pulsa **Inscribirme**. Si quieres, escribe el club con el que juegas. Tu nombre en la liga es tu nombre visible de la web.
 4. **Instala Parsec** (gratis): https://parsec.app. Crea tu cuenta de Parsec.
 5. **Conecta tu mando** (Xbox, PlayStation o genérico) **antes** de entrar a la sala.
 6. **El día de la liga:** abre el enlace de la sala que te mando. Pulsa un botón del mando y te sientas solo.
@@ -53,7 +53,7 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 **Durante la noche**
 - En PES, cada uno elige su equipo con su mando.
 - No pulses Start para pausar: está bloqueado en los partidos oficiales.
-- Al terminar, el resultado sube solo a la web. El anfitrión lo valida y la tabla se actualiza en «Liga de amigos».
+- Al terminar, el resultado sube solo a la web. El anfitrión lo valida y la tabla se actualiza en «Liga oficial».
 - Si un resultado está mal: en la web, **Mis partidos › Mis partidos oficiales › Reclamar**.
 
 **Si no puedes entrar a la sala**
@@ -98,7 +98,7 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 | 0:05 | Entran los amigos, cada uno pulsa un botón y se sienta | Amigos | Todos con puesto y ping en verde o naranja |
 | 0:10 | Partido de calentamiento sin PARTIDO OFICIAL (5 min por tiempo) | Todos | Los mandos responden y la imagen va fluida |
 | 0:20 | **Fecha 1**: elegir PARTIDO OFICIAL, jugar, terminar | Los 2 de turno | Link dice «Resultado enviado a la web» |
-| +1 min | Validar en la web | Fralex | La tabla cambia sola en «Liga de amigos» |
+| +1 min | Validar en la web | Fralex | La tabla cambia sola en «Liga oficial» |
 | … | Repetir por cada partido y fecha | | |
 | Final | (Opcional) un fichaje con Sync y comprobar que se ve en PES | Fralex | El jugador aparece en el nuevo club |
 | Cierre | Encuesta rápida de 3 preguntas por WhatsApp (sección 5) | Todos | Respuestas anotadas aquí |
@@ -118,7 +118,7 @@ Anótalo durante la noche en la tabla de abajo (sección 9) para saber si el sis
 | Ping y fluidez | Ping de cada uno en la sala; ¿hubo cortes? | Verde o naranja, 0 cortes |
 | Resultados que subieron solos | Partidos con «Resultado enviado» ÷ partidos jugados | 100 % |
 | Resultados correctos | Marcador de la web = marcador real | 100 % |
-| Tiempo hasta la tabla | Desde el pitazo final hasta verlo en «Liga de amigos» (con tu validación) | < 2 min |
+| Tiempo hasta la tabla | Desde el pitazo final hasta verlo en «Liga oficial» (con tu validación) | < 2 min |
 | Olvidos del anfitrión | Veces que faltó elegir PARTIDO OFICIAL o «Contarme» | 0 |
 | Fallos y cuelgues | Link, PES, Sider o Parsec | 0 |
 | Fichaje con Sync (opcional) | ¿Se vio el cambio en PES? | Sí |
@@ -192,7 +192,7 @@ Fralex lo pidió el 21-oct-2026: «que sea un solo creador de ligas y torneos pe
 Plan:
 - Cualquier usuario crea su liga o torneo desde el creador de `/torneos/` (migración 097), como hoy. Esos son los **casuales**: los resultados se cargan a mano.
 - El staff (Fralex) tiene un botón **«Hacer oficial»** en cualquier liga o torneo. Al pulsarlo, se copia a la liga oficial (`liga_ediciones`, `liga_participantes` y `liga_partidos`, las mismas tablas de la Liga de amigos) con sus inscritos y su calendario. Desde ese momento Phoenix Link manda los resultados solo y el staff los valida.
-- La página «Liga de amigos» pasa a ser la vista de las ligas oficiales de ese creador único.
+- La página «Liga oficial» pasa a ser la vista de las ligas oficiales de ese creador único.
 - No se empieza durante la congelación, porque los torneos de eliminación directa exigen cambios en Link (llaves) y en la función «liga». Las ligas «todos contra todos» sí pueden hacerse oficiales sin tocar Link.
 
 **Paso 1, hecho el 21-oct-2026 (beta 1.16.1; migración 143, pendiente de aplicar después de la 142):**
@@ -207,6 +207,6 @@ Plan:
 
 | Fecha | Qué se logró | Notas de la noche (medidas de la sección 5) |
 |---|---|---|
-| 21-oct-2026 | Revisión de todo el recorrido. Migración 142 y página «Liga de amigos». Guía para amigos y guion de la noche. | Aún sin jugar. |
+| 21-oct-2026 | Revisión de todo el recorrido. Migración 142 y página «Liga oficial». Guía para amigos y guion de la noche. | Aún sin jugar. |
 | 21-oct-2026 | Un solo creador, paso 1: botón «Hacer oficial» en las ligas de /torneos/ (migración 143). Ninguna de las dos migraciones está aplicada todavía: Fralex las pega desde su PC. El instalador nuevo queda en espera porque Fralex decidió no mover la caducidad por ahora. | — |
 | 21-oct-2026 (noche) | Migraciones 142 y 143 aplicadas por Claude (Fralex añadió el permiso `apply_migration` en su settings.json) y probadas en una transacción que se deshizo: crear, bloqueo a no-staff, inscribirse, calendario, tabla, hacer oficial y finalizar. La base quedó limpia. | — |

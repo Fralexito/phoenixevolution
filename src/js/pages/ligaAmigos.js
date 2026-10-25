@@ -30,7 +30,7 @@ async function cargar() {
     .select('id, nombre, estado, ida_vuelta, creado').eq('liga', 'amigos').order('creado', { ascending: false }).limit(12);
   if (error) { caja.innerHTML = `<p class="text-sm text-red-300">No se pudieron cargar las ligas: ${escapeHTML(error.message)}</p>`; return; }
   if (!eds?.length) {
-    caja.innerHTML = `<div class="glass-panel rounded-2xl p-6 text-center text-gray-300 text-sm">Todavía no hay ninguna liga casual.${staff ? ' Crea la primera arriba.' : ' Cuando el staff abra una, aparecerá aquí para que te inscribas.'}</div>`;
+    caja.innerHTML = `<div class="glass-panel rounded-2xl p-6 text-center text-gray-300 text-sm">Todavía no hay ninguna liga oficial.${staff ? ' Crea la primera arriba.' : ' Cuando el staff abra una, aparecerá aquí para que te inscribas.'}</div>`;
     return;
   }
   const ids = eds.map((e) => e.id);
