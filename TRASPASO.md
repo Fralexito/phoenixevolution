@@ -245,3 +245,9 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   contraseñas filtradas y 2FA del staff (seguridad: lo hace él). Probar con cuentas reales.
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
+
+### 2026-10-25 16:50 (Lima) · Cuenta 1 · Migración 159 aplicada y pedido nuevo de Link 0.3.51
+- **Supabase:** la **159** (`limpieza_diaria`, tarea `limpieza-diaria` a las 04:40 Lima) quedó **APLICADA y verificada** el 25-oct (Fralex pegó el SQL; función y tarea activas). Siguiente migración libre: **160**. La fila de Supabase de la tabla de candados todavía dice «159 sin aplicar»: corregirla al tocar el archivo.
+- **Pedido nuevo de Link 0.3.51** (en `smash-soda-fork`, `docs/PEDIDOS-A-LA-WEB.md`, Parte 15): Link ahora manda `ficha` (estadio, clima, hora, estacion, duracion, dificultad, prorroga, penales, cambios, zona) y `juego.anadido` en `partida_fin`, y `anadido`, `pk_local`/`pk_visita` y `ficha` en `liga/vivo`. Hoy la función de la web los ignora: hay que guardarlos y mostrarlos.
+- **Commits:** solo este `TRASPASO.md`. Web y Link sin otros cambios míos.
+- **Candados:** sin cambios (Web y Supabase libres).
