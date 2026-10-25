@@ -159,7 +159,7 @@ Conectores opcionales en la Cuenta 2 (solo si un trabajo los necesita): Supabase
 - Siguiente paso: Fralex monta la Cuenta 2 con `C:\dev\TRASPASO-CUENTAS\LEEME-KIT.txt`.
 - Candados: sin cambios (todo libre).
 
-### 2026-10-25 00:00 (Lima) · Cuenta 1 · Cierre antes de pasar a la Cuenta 2
+### 2026-10-25 00:55 (Lima) · Cuenta 1 · Cierre antes de pasar a la Cuenta 2
 Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. Lo que sigue es el estado de TODO al cerrar.
 - **Hecho hoy:**
   - Mandos 9–16 en PES: módulo **v0.9.58** CONFIRMADO por Fralex (nombres, L2/R2, □, ○, jugar con su usuario, «Tipo de cursor» y barra de potencia también en 13–16, «Usuario N»). Paquete instalable sin Link: `D:\Frank\Games_\PRUEBA_CANCHA\paquetes\phoenix_mandos_9a16_v0.9.58.zip`.
