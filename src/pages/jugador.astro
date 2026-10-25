@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 // CSS propio de esta página (antes iba en global.css para todas; 19-oct-2026). DESPUÉS de Layout: así gana a global.css como antes.
 import '../styles/perfilJugador.css';
 ---
-<Layout title="Perfil de jugador" active="database">
+<Layout title="Perfil de jugador" active="database" description="Perfil de jugador de Phoenix Evolution Series: estadísticas, logros y partidos.">
   <div id="perfil-root" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
     <a id="perfil-volver" href={`${import.meta.env.BASE_URL}database/`} class="inline-flex items-center gap-2 text-xs font-display font-bold uppercase tracking-widest text-galaxy-400 hover:text-white"><i class="fa-solid fa-arrow-left"></i> Jugadores</a>
     <div id="perfil-contenido" aria-live="polite"><div class="grid lg:grid-cols-[320px_1fr] gap-8 py-8" role="status" aria-label="Cargando perfil"><div class="esqueleto h-96"></div><div class="space-y-4"><div class="esqueleto h-12 w-2/3"></div><div class="esqueleto h-8 w-1/2"></div><div class="esqueleto h-40"></div><div class="esqueleto h-56"></div></div></div></div>

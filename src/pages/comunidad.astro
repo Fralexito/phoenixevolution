@@ -4,7 +4,7 @@
 import Layout from '../layouts/Layout.astro';
 const destino = `${import.meta.env.BASE_URL}social/`;
 ---
-<Layout title="Comunidad" active="social">
+<Layout title="Comunidad" active="social" description="La comunidad de Phoenix Evolution Series: social, noticias, clanes y eventos.">
   <meta http-equiv="refresh" content={`0; url=${destino}`} />
   <div class="max-w-xl mx-auto px-4 py-16 text-center text-gray-400 text-sm">La comunidad ahora vive en <a class="text-galaxy-400 underline" href={destino}>Social</a>…</div>
   <script is:inline define:vars={{ destino }}>location.replace(destino);</script>

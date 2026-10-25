@@ -5,6 +5,6 @@ import PalmaresNuevo from '../components/palmares/PalmaresNuevo.astro';
 import PalmaresClasico from '../components/palmares/PalmaresClasico.astro';
 import PalmaresVitrina from '../components/palmares/PalmaresVitrina.astro';
 ---
-<Layout title="Palmarés" active="palmares">
+<Layout title="Palmarés" active="palmares" description="Campeones y títulos de la historia de Phoenix Evolution Series.">
   {FX.palmaresVitrina ? <PalmaresVitrina /> : FX.palmaresNuevo ? <PalmaresNuevo /> : <PalmaresClasico />}
 </Layout>

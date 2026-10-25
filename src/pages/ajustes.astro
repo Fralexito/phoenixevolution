@@ -14,7 +14,7 @@ import { SECCIONES, GRUPOS_AJUSTES, ESTILOS } from '../data/ajustes.js';
 const GRUPOS = GRUPOS_AJUSTES.map((g) => ({ ...g, secciones: SECCIONES.filter((s) => s.grupo === g.id) })).filter((g) => g.secciones.length);
 const busca = (...t) => t.filter(Boolean).join(' ').toLowerCase();
 ---
-<Layout title="Configuración" active="ajustes" description="Tu cuenta, cómo se ve la web, notificaciones, privacidad y tus datos.">
+<Layout title="Configuración" active="ajustes" description="Tu cuenta, cómo se ve la web, notificaciones, privacidad y tus datos." privada>
   <div class="cfg" data-cfg data-cfg-vista="indice">
     <aside class="cfg-lado" aria-label="Secciones de la configuración">
       <h1 class="cfg-h1">Configuración</h1>

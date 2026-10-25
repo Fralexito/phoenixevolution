@@ -137,7 +137,7 @@ const DESC = {
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
   clanes: 'Únete o arma tu clan', eventos: 'Lo que se viene en el calendario', database: 'Fichas de todos los jugadores', premios: 'La Paliza, Matagigantes, La Muralla y más, con cada resultado',
   tienda: 'Estética y mejoras para tu perfil', hosts: 'Catálogo de hosts: precios, ping y contacto',
-  unirme: 'Guía en 5 pasos para tu primer partido', ligaamigos: 'Inscríbete y juega con Phoenix Link', organizadores: 'Quiénes organizan la liga y por qué',   // 19-oct-2026: salían sin descripción en la Red de enlaces
+  unirme: 'Guía en 5 pasos para tu primer partido', ligaamigos: 'Inscríbete y juega con Phoenix Link', organizadores: 'Quiénes organizan la liga y por qué', prode: 'Adivina marcadores y gana ascuas gratis', draft: 'Elige jugadores o equipos por turnos',   // 19-oct-2026: salían sin descripción en la Red de enlaces
 };
 // En `ids`, 'x>y,z' = la sección x también «adopta» las páginas y,z (sus pestañas se iluminan allí). `RENOMBRE` cambia el texto solo en los pilares.
 const RENOMBRE = { ahora: 'En vivo', ...(FX.reparto ? { liga: 'Ligas', competiciones: 'Todas las ligas' } : {}) };
@@ -163,6 +163,7 @@ const PILARES_REPARTO = [
   ], { lema: 'La gente y lo que se dice' }),
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'hosts', 'missalas']],
+    ['Juegos de la comunidad', ['prode', 'draft']],   // 25-oct-2026: funciones nuevas 6 y 8
   ], { lema: 'Lo que haces tú, ahora' }),
   // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
   // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.

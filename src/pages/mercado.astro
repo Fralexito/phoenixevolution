@@ -7,7 +7,7 @@ import MercadoProximamente from '../components/MercadoProximamente.astro';
 import { FX } from '../data/experimento.js';
 import { href } from '../js/core/sistema/config.js';
 ---
-<Layout title="Mercado" active="mercado">
+<Layout title="Mercado" active="mercado" description="Conecta tu PES con la web: fichajes y cambios que llegan a tu juego.">
   {!FX.mercadoLink ? <MercadoProximamente /> : (
   <div class="max-w-5xl mx-auto px-4 sm:px-8 py-6 w-full space-y-8">
     <header class="glass-panel rounded-2xl px-5 py-4">

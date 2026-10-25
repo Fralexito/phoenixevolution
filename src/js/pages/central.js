@@ -204,7 +204,7 @@ async function renderFeatured() {
     // Centrar al 1.º en el cuadro siguiente: medir justo después de pintar el podio obligaba a calcular el diseño antes de tiempo.
     const c = box.querySelector('[data-puesto="1"]'); if (c) requestAnimationFrame(() => { box.scrollLeft = c.offsetLeft - (box.clientWidth - c.offsetWidth) / 2; });
   } catch (e) {
-    console.error('[central] jugadores destacados:', e);
+    if (e?.message !== 'vacío') console.error('[central] jugadores destacados:', e);   // vacío no es un error: solo no hay datos aún
     box.innerHTML = `<div class="text-center text-gray-500 w-full py-6"><i class="fa-solid fa-users-slash text-2xl mb-2 block text-galaxy-600"></i>Aún no hay jugadores destacados para mostrar.</div>`;
   }
 }
