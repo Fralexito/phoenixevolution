@@ -93,7 +93,9 @@ function botonSocial(act, icono, texto, extra = '', etiqueta = '') {
 const botonesModeracion = (p) => `<button type="button" data-act="reportar" data-tipo="usuario" data-id="${escapeHTML(p.id)}" data-titulo="${escapeHTML(p.nombre_display || p.username)}" class="${BTN_SOC}" aria-label="Reportar cuenta" title="Reportar cuenta"><i class="fa-regular fa-flag"></i></button>${can('sancionar') ? `<button type="button" data-act="mod-sancionar" class="${BTN_SOC} !text-amber-300 !border-amber-400/50" title="Sancionar (moderación)"><i class="fa-solid fa-gavel"></i><span>Sancionar</span></button>` : ''}${can('moderarValoraciones') ? `<button type="button" data-act="mod-valoraciones" class="${BTN_SOC} !text-amber-300 !border-amber-400/50" title="Valoraciones recibidas (moderación)"><i class="fa-solid fa-star"></i><span>Valoraciones</span></button>` : ''}`;
 function botonesSociales(p) {
   const msg = `<a href="${escapeHTML(href('mensajes/'))}?con=${escapeHTML(p.id)}" class="${BTN_SOC} !text-galaxy-400 !border-galaxy-400/50"><i class="fa-solid fa-comment-dots"></i><span>Mensaje</span></a>`;
-  if (!S.red) return msg + botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo');
+  // Rivalidad «tú vs esta persona» (migración 153): solo con sesión y en perfiles ajenos.
+  const vs = S.sesion?.user?.id && !p.soy_yo ? `<a href="${escapeHTML(href(`rivalidad/?a=${encodeURIComponent(S.sesion.user.id)}&b=${encodeURIComponent(p.id)}`))}" class="${BTN_SOC}" title="Tu historial contra esta persona"><i class="fa-solid fa-scale-balanced"></i><span>Rivalidad</span></a>` : '';
+  if (!S.red) return msg + vs + botonSocial('solicitar', 'fa-user-plus', 'Agregar amigo');
   const rel = relacionCon(p); const sigo = S.red.siguiendo.includes(p.id);
   const MAPA = {
     mensaje: msg,
@@ -106,7 +108,7 @@ function botonesSociales(p) {
     bloquear: botonSocial('bloquear', 'fa-ban', '', '!text-bad !border-bad/50', 'Bloquear a esta persona'),
     desbloquear: botonSocial('desbloquear', 'fa-lock-open', 'Desbloquear'),
   };
-  return accionesSociales(rel, sigo).map((k) => MAPA[k] ?? '').join('');
+  return accionesSociales(rel, sigo).map((k) => MAPA[k] ?? '').join('') + (rel === 'bloqueado' ? '' : vs);
 }
 /** Tarjeta de «muro privado»: explica por qué no se ve y ofrece el siguiente paso según la relación (antes solo mostraba un candado). */
 function candadoMuro(p) {

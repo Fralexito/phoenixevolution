@@ -215,3 +215,16 @@ menciones; si la 149 (prode) no está, la parte del prode se salta sola. El webh
 > vez), 152 (avisos de MVP, prode y draft). Todo lo marcado arriba como «SIN APLICAR» ya está activo.
 > Cambio técnico para que Supabase no pida el permiso aparte: `create or replace trigger` en vez de `drop trigger`, y en goleadores
 > los envíos repetidos marcan los goles viejos como `vigente = false` en vez de borrarlos.
+
+---
+
+## 10. Ficha de rivalidad (beta 1.28.0 · migración 153 APLICADA)
+
+**Qué es:** página **/rivalidad/?a=…&b=…**: «A vs B» con victorias, empates, barra de dominio, goles totales, racha actual, mayor
+goleada de cada uno, primer y último duelo y los 10 últimos partidos. Se entra desde el perfil de otra persona (botón **Rivalidad**)
+o desde **Mis partidos → tus rivales de duelos**.
+**Piezas:** `supabase/migrations/153_rivalidad.sql` (`public.rivalidad`, solo lectura) · `src/js/core/competicion/rivalidad.js` +
+`tests/rivalidad.test.mjs` · `src/pages/rivalidad.astro` + `src/js/pages/rivalidad.js` · enlaces en `perfil.js` y `misPartidos.js`.
+**Blindaje:** respeta la privacidad de los DOS perfiles (privado o bloqueo → no se ve); solo duelos confirmados en lados opuestos;
+ids inválidos o iguales → mensaje claro; el botón no sale en tu propio perfil ni si lo bloqueaste.
+**Probado:** 3 pruebas puras; prueba en seco en la base real (5 casos); página en el navegador con datos simulados.

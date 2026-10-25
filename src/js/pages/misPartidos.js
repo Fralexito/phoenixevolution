@@ -43,7 +43,7 @@ const filaRival = (nombre, sub, derecha) => `<div class="flex items-center justi
 function renderRivales(id) {
   const duelos = id ? rivalesDeDuelos(data.historial, partsOf, id) : [];
   $('lista-rivales-duelos').innerHTML = !id ? vacio('Inicia sesión para ver tus rivales.')
-    : duelos.length ? duelos.map((x) => filaRival(nm(x.id), '', `<b class="font-display text-galaxy-400 text-lg">${x.partidos}</b><span class="text-[12px] text-gray-400 block uppercase">${x.partidos === 1 ? 'partido' : 'partidos'}</span>`)).join('')
+    : duelos.length ? duelos.map((x) => `<a class="block hover:brightness-125" href="${escapeHTML(href(`rivalidad/?a=${encodeURIComponent(id)}&b=${encodeURIComponent(x.id)}`))}" title="Ver la rivalidad completa">${filaRival(nm(x.id), 'Ver rivalidad →', `<b class="font-display text-galaxy-400 text-lg">${x.partidos}</b><span class="text-[12px] text-gray-400 block uppercase">${x.partidos === 1 ? 'partido' : 'partidos'}</span>`)}</a>`).join('')
       : vacio('Aún no has terminado duelos contra nadie.');
   const liga = id ? miLiga() : null;
   $('bloque-liga').hidden = !liga;

@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Rivalidad" active="" description="Historial cara a cara entre dos jugadores de Phoenix Evolution Series: victorias, goles, rachas y últimos partidos.">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Cara a cara</span>
+      <h1 id="rv-titulo" class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-scale-balanced text-galaxy-400 mr-2"></i>Rivalidad</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Solo cuentan duelos con marcador confirmado por los dos líderes en los que jugaron en lados opuestos (1v1 o en equipo).</p>
+    </header>
+    <div id="rv-contenido" class="space-y-4" aria-live="polite"><p class="text-center py-10 text-gray-400 text-sm">Cargando…</p></div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/rivalidad.js';
+</script>

@@ -1,4 +1,5 @@
 -- 153 · Ficha de rivalidad «A vs B» (25-oct-2026, Cuenta 2). Solo LECTURA: una función, sin tablas.
+-- ESTADO: APLICADA el 25-oct-2026 (con «username» en a y b, para enlazar al perfil) y probada en seco (5 casos: conteos, goles, racha, mayor goleada, mismo jugador).
 -- Duelos con marcador CONFIRMADO donde A y B jugaron en lados OPUESTOS (1v1 o en equipo). Todo desde el punto de vista de A.
 -- Blindaje / privacidad: hay que poder ver el muro de los DOS (private.puede_ver_muro: perfiles privados o bloqueos → no visible);
 --   A y B distintos; tope de 10 últimos partidos en el detalle; sin sesión también funciona para perfiles públicos (como estadisticas_de).
@@ -26,8 +27,8 @@ begin
            coalesce((select min(n) - 1 from o where sign(ga - gb) <> (select sign(ga - gb) from o where n = 1)), (select count(*) from o)) largo
   )
   select jsonb_build_object('visible', true,
-    'a', jsonb_build_object('id', p_a, 'nombre', private.nombre(p_a), 'avatar_url', (select avatar_url from public.perfiles where id = p_a)),
-    'b', jsonb_build_object('id', p_b, 'nombre', private.nombre(p_b), 'avatar_url', (select avatar_url from public.perfiles where id = p_b)),
+    'a', jsonb_build_object('id', p_a, 'nombre', private.nombre(p_a), 'avatar_url', (select avatar_url from public.perfiles where id = p_a), 'username', (select username from public.perfiles where id = p_a)),
+    'b', jsonb_build_object('id', p_b, 'nombre', private.nombre(p_b), 'avatar_url', (select avatar_url from public.perfiles where id = p_b), 'username', (select username from public.perfiles where id = p_b)),
     'jugados', (select count(*) from o),
     'gana_a', (select count(*) from o where ga > gb), 'empates', (select count(*) from o where ga = gb), 'gana_b', (select count(*) from o where gb > ga),
     'goles_a', (select coalesce(sum(ga), 0) from o), 'goles_b', (select coalesce(sum(gb), 0) from o),
