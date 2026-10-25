@@ -20,6 +20,8 @@ import { abrirCrearEncuesta } from '../features/encuestas/crearUI.js';
 import { nivelDe } from '../core/jugadores/logros.js';
 import { estadisticasDe, eloDe } from '../features/resultados/api.js';
 import { mvpTotalDe, mvpPerfil } from '../features/resultados/mvp.js';
+import { insigniasDe } from '../features/ranking/temporadas.js';
+import { nombreMes, ICONO } from '../core/competicion/temporadas.js';
 import { progresoRango } from '../core/competicion/pulso.js';
 import { rangoBloque } from '../features/rango.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
@@ -202,6 +204,7 @@ function franjaEstadisticas() {
       </div>
     </div>
     ${S.elo ? `<div class="pfx-elo">${rangoBloque(progresoRango(S.elo.elo, S.elo.jugados), S.elo.elo)}<span>ELO de amistosos 1v1 (${S.elo.jugados} jugado${S.elo.jugados === 1 ? '' : 's'}).</span></div>` : ''}
+    ${S.insignias?.length ? `<div class="flex flex-wrap gap-1.5 px-1 pb-1" aria-label="Insignias de temporada">${S.insignias.slice(0, 8).map((x) => `<span class="inline-flex items-center gap-1 text-[12px] rounded-lg border border-amber-400/40 bg-amber-400/10 text-amber-200 px-2 py-0.5" title="${escapeHTML(`${x.insignia} · ${nombreMes(x.mes)}`)}">${ICONO[x.puesto] ?? '🏅'} ${escapeHTML(x.insignia)} <small class="text-amber-300/70">${escapeHTML(nombreMes(x.mes))}</small></span>`).join('')}</div>` : ''}
     <p class="pfx-nota">Solo cuentan marcadores confirmados por los dos líderes.</p></section>`;
 }
 function franjaLogros(p) {
@@ -378,6 +381,7 @@ async function cargar() {
     await marcadoresMuro();
     S.stats = await estadisticasDe(p.id);             // nunca lanza
     S.mvp = await mvpTotalDe(p.id);                   // nunca lanza
+    S.insignias = await insigniasDe(p.id);            // nunca lanza (migración 154)
     S.elo = await eloDe(p.id);                        // nunca lanza: sin ELO simplemente no hay rango
     S.logros = await logrosDe(p.id);                 // nunca lanza: sin logros el perfil se ve igual
     S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;

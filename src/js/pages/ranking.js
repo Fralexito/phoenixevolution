@@ -8,8 +8,10 @@ import { avatarHTML } from '../core/sistema/avatar.js';
 import { toast } from '../core/sistema/toast.js';
 import * as api from '../features/ranking/api.js';
 import { montarGoleadores } from '../features/ranking/goleadores.js';
+import { montarTemporadas } from '../features/ranking/temporadas.js';
 
 const GOLEADORES = montarGoleadores(document.getElementById('rk-goleadores'));
+const TEMPORADAS = montarTemporadas(document.getElementById('rk-temporadas'));
 import { rangoChip } from '../features/rango.js';
 import { mesesDisponibles, mesValido, diferencia, textoFinSemana } from '../core/competicion/rankingComunidad.js';
 
@@ -73,4 +75,4 @@ $('rk-retos-lista').addEventListener('click', async (e) => {
   finally { S.busy = false; pintarRetos(); }
 });
 $('rk-reintentar').addEventListener('click', cargar);
-onSession(({ session }) => { const id = session?.user?.id ?? null; if (S.listo && id === S.yo) return; S.listo = true; S.yo = id; cargar(); if (id) GOLEADORES.cargar(); else document.getElementById('rk-goleadores').hidden = true; });
+onSession(({ session }) => { const id = session?.user?.id ?? null; if (S.listo && id === S.yo) return; S.listo = true; S.yo = id; cargar(); TEMPORADAS.cargar(); if (id) GOLEADORES.cargar(); else document.getElementById('rk-goleadores').hidden = true; });

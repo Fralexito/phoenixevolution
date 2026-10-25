@@ -228,3 +228,19 @@ o desde **Mis partidos → tus rivales de duelos**.
 **Blindaje:** respeta la privacidad de los DOS perfiles (privado o bloqueo → no se ve); solo duelos confirmados en lados opuestos;
 ids inválidos o iguales → mensaje claro; el botón no sale en tu propio perfil ni si lo bloqueaste.
 **Probado:** 3 pruebas puras; prueba en seco en la base real (5 casos); página en el navegador con datos simulados.
+
+---
+
+## 11. Temporadas con premios (beta 1.29.0 · migración 154 APLICADA)
+
+**Qué es:** cada mes (hora de Lima) es una temporada del ranking **competitivo**. El **día 1 a las 00:10** se cierra sola la anterior:
+se guarda el top 10 y se reparten **ascuas gratis** (🥇 300 · 🥈 200 · 🥉 100 · 4.º–10.º 30) e **insignias** (Campeón, Subcampeón, Tercero,
+Top 10) que salen en el perfil. Aviso en la campana a cada premiado y mensaje al canal de Discord (si el webhook está puesto).
+En /ranking/: caja «Premios de la temporada» con los días que faltan y los campeones anteriores.
+**Piezas:** `supabase/migrations/154_temporadas_premios.sql` (tablas `temporadas_cierre`, `temporada_premios`; `private.cerrar_temporada`,
+`staff_cerrar_temporada`, `temporadas_historial`, `insignias_temporada_de`; tarea `cerrar-temporada`) · `supabase/tests/154_…` ·
+`src/js/core/competicion/temporadas.js` + `tests/temporadas.test.mjs` · `src/js/features/ranking/temporadas.js` · insignias en `perfil.js`.
+**Blindaje:** solo cuentan quienes jugaron **3+ duelos confirmados**; con menos de **4** jugadores así no hay premios (nadie se reparte
+el podio entre amigos); cerrar dos veces no paga dos veces (clave única por mes y por pago); ascuas solo gratis (regla 140);
+el mes en curso no se puede cerrar; los perfiles privados cobran pero su nombre no se muestra; el staff puede cerrar a mano si el cron falla.
+**Probado:** 2 pruebas puras; prueba en seco en la base real con un 4.º usuario temporal (8 casos, OK); caja en navegador.
