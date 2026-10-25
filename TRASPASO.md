@@ -226,6 +226,11 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Fralex:** pegar el SQL pendiente y desplegar `torneos` y `goles`; probar con sesión real: prode, MVP (necesita un duelo confirmado con 3+ participantes), clan contra clan y un draft de prueba.
 - **Candados:** solté Web y Supabase (libres). Link y «PES: mandos» siguen con la Cuenta 1.
 
+### 2026-10-25 14:30 (Lima) · Cuenta 2 · Optimización — beta 1.31.1 (commit 9ae4c4d, CI verde)
+- **Hecho:** migración 158 (110 índices de claves foráneas) APLICADA; service worker con tope (400 archivos, 80 páginas, solo respuestas OK, caché `pes-v3`).
+- **Pendiente de Fralex:** pegar la 159 (`limpieza_diaria`) en el SQL Editor; ya se le dio el SQL. Si confirma que la corrió: marcarla APLICADA en el archivo, LEEME, esta tabla y REGISTRO.
+- **Candados:** todos libres. Siguiente migración libre: **160**. Rama `borrador`; nada en `main`.
+
 ### 2026-10-25 14:20 (Lima) · Cuenta 2 · Lanzamiento, Supabase al día y 4 funciones más — beta 1.31.0
 - **Hecho:** rondas 378–384 (betas 1.26.1 → 1.31.0): revisión de lanzamiento; avisos en campana y Discord; pulido; **ficha de rivalidad**
   (/rivalidad/), **temporadas con premios** (cierre mensual automático), **repeticiones + mejor gol** (/repeticiones/), **sala en vivo**
