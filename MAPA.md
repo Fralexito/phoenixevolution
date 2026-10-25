@@ -310,7 +310,7 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Letras nuevas alojadas en la web: @fontsource anton, oswald, permanent-marker, press-start-2p. 577 pruebas, build 53, revisado en PC y celular con datos simulados (0 errores, 0 textos <12 px, descarga PNG ok).
 
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
-> **Actualización 2026-10-25 13:20 (dos cuentas):** el estado vivo de TODO Phoenix está en **`TRASPASO.md`** (raíz). Web: beta **1.26.0**, ronda 377 (8 funciones nuevas, ver `docs/guias/FUNCIONES-NUEVAS-25-OCT-2026.md`); migraciones aplicadas hasta **151** salvo **145, 148 y 149** (SQL para pegar en `docs/sql-pendiente/`); Edge Functions `torneos` y `goles` sin desplegar; siguiente migración libre **153**, siguiente ronda **378**.
+> **Actualización 2026-10-25 14:20 (dos cuentas):** el estado vivo de TODO Phoenix está en **`TRASPASO.md`** (raíz). Web: beta **1.31.0**, ronda 384; guía de todo lo nuevo en `docs/guias/FUNCIONES-NUEVAS-25-OCT-2026.md` (13 partes); revisión de lanzamiento en `docs/lanzamiento/REVISION-25-OCT-2026.md`; Supabase: **todas las migraciones aplicadas hasta 157**, Edge Functions `torneos` y `goles` desplegadas; siguiente migración libre **158**, siguiente ronda **385**.
 > **Actualización 2026-10-16 (cuenta WEB):** rondas 340–347 (React isla, radar FIFA, orden visual, modo ligero, anti-lag) y pendientes en **`docs/bitacoras/HISTORIA-WEB.md («BITACORA-16-OCT-2026-CUENTA-WEB»)`**; siguiente ronda 348.
 > **Actualización 2026-10-16 (cuenta Opus):** esta sección es vieja. Para el estado actual leer **`docs/bitacoras/HISTORIA-WEB.md («BITACORA-16-OCT-2026-CUENTA-OPUS»)`** (cómo retomar, qué se hizo 13–16 oct, pendientes de FRALEX, siguiente migración 119 / ronda 347) y la última línea **TRASPASO** de `REGISTRO.md`.
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/liga-y-torneos/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
@@ -523,4 +523,11 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 373 · 1.22.0 MVP del partido (147 ✔) · 374 · 1.23.0 goleadores automáticos desde Link (148 ✘ sin aplicar + función `goles`)
 - 375 · 1.24.0 prode gratis /prode/ (149 ✘ sin aplicar) · 376 · 1.25.0 clan contra clan (150 ✔) · 377 · 1.26.0 draft en vivo /draft/ (151 ✔)
 - Detalle, piezas, blindaje y pruebas: `docs/guias/FUNCIONES-NUEVAS-25-OCT-2026.md`. SQL pendiente: `docs/sql-pendiente/LEEME.md`.
+
+### Rondas 378–384 (Cuenta 2, borrador): Betas 1.26.1 → 1.31.0 · lanzamiento, avisos y 4 funciones más
+- 378 · 1.26.1 revisión de lanzamiento (63 páginas en 390/1440): Prode y Draft al menú, descripción por página, `noindex` en staff/personales
+- 379 · 1.27.0 avisos en campana y Discord (152) · 380 · 1.27.1 pulido de las 8 funciones con datos simulados
+- (sin ronda) Supabase al día: 145, 148, 149, 152 aplicadas sin DELETE/DROP TRIGGER; `torneos` y `goles` desplegadas
+- 381 · 1.28.0 ficha de rivalidad (153) · 382 · 1.29.0 temporadas con premios (154) · 383 · 1.30.0 repeticiones + mejor gol (155) y arreglo de nulos con host (156)
+- 384 · 1.31.0 sala en vivo: chat + predicción (157)
 
