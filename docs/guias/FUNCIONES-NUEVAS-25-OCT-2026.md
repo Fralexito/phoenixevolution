@@ -103,3 +103,24 @@ sin migración o sin sesión el panel no aparece; botones bloqueados mientras se
 
 **Cómo se probó:** 4 pruebas puras; prueba en seco en la base real (`supabase/tests/147_mvp_partido_test.sql`, 13 casos, OK,
 nada guardado); 61/61 páginas arrancan.
+
+---
+
+## 5. Goleadores automáticos (beta 1.23.0 · migración 148 ESCRITA, SIN APLICAR · Edge Function `goles` SIN DESPLEGAR)
+
+**Qué es:** sección **«Goleadores de los duelos»** en `/ranking/`: futbolistas con más goles y asistencias (últimos 30 días o
+siempre), con los goles que **manda Phoenix Link** al terminar un duelo jugado en su sala. Nadie los escribe a mano.
+
+**Por qué no se aplicó:** Supabase pidió permiso para la 148 y se canceló → regla de Fralex: no se reintenta; él la pega a mano.
+Mientras falte, la sección se oculta sola (la web no se rompe). La parte de Link (leer goles del juego) es de la cuenta con el
+candado de Link: el contrato está en `docs/web-pes-link/CONTRATO-GOLES-LINK.md`.
+
+**Piezas:** `supabase/migrations/148_goleadores_link.sql` (tabla `duelo_goles`; `sistema_duelo_goles_link` solo service_role;
+`goleadores_comunidad`, `goles_de_duelo`) · `supabase/functions/goles/index.ts` (POST `/v1/goles/duelo`) ·
+`src/js/core/competicion/goleadoresLink.js` + `tests/goleadoresLink.test.mjs` (3 pruebas) · `src/js/features/ranking/goleadores.js` ·
+sección `#rk-goleadores` en `src/pages/ranking.astro`.
+
+**Blindaje:** solo cuentan duelos con marcador **confirmado** por los dos líderes **y** cuyos goles cuadran con ese marcador
+(un Link con fallo no ensucia la tabla); Link solo puede mandar goles de un duelo jugado en una sala de **esa** PC; se valida
+3 veces (Link → Edge Function → BD) antes de borrar nada; reenviar reemplaza (idempotente); máx. 40 goles; nombres limpios
+y sin `< >`; los autogoles no suman al goleador; interruptor del staff `phoenix_config.goles_link`.

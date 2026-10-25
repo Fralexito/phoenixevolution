@@ -33,6 +33,15 @@ import Layout from '../layouts/Layout.astro';
       <div id="rk-barras-lista" class="space-y-1.5 mt-2"></div>
     </details>
     <div id="rk-lista" class="space-y-2" aria-live="polite"></div>
+
+    <section id="rk-goleadores" hidden class="glass-panel rounded-2xl p-4 space-y-3" aria-labelledby="rk-goleadores-t">
+      <div class="flex flex-wrap items-center gap-2">
+        <h2 id="rk-goleadores-t" class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-futbol text-galaxy-400 mr-1"></i>Goleadores de los duelos</h2>
+        <div data-periodos class="flex gap-2 ml-auto"></div>
+      </div>
+      <p class="text-[12px] text-gray-400">Los goles los anota Phoenix Link solo. Solo cuentan duelos con marcador confirmado por los dos líderes y cuyos goles cuadran con ese marcador.</p>
+      <div data-cuerpo aria-live="polite"></div>
+    </section>
   </div>
 </Layout>
 <script>
