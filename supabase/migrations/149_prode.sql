@@ -84,7 +84,7 @@ begin
   select * into r from public.retos_matchmaking where id = p_reto;
   if not found then raise exception 'Ese duelo no existe.' using errcode = 'P0001'; end if;
   if not private.prode_abierto(p_reto) then raise exception 'Ese duelo ya no acepta pronósticos (empezó o no está agendado).' using errcode = 'P0001'; end if;
-  if private.lado_en_reto(p_reto, v_yo) is not null or r.host_id = v_yo then raise exception 'No puedes pronosticar un duelo en el que juegas o eres host.' using errcode = '42501'; end if;
+  if private.lado_en_reto(p_reto, v_yo) is not null or coalesce(r.host_id = v_yo, false) then raise exception 'No puedes pronosticar un duelo en el que juegas o eres host.' using errcode = '42501'; end if;
   insert into public.prode_pronosticos (reto_id, usuario, goles_a, goles_b) values (p_reto, v_yo, p_goles_a, p_goles_b)
     on conflict (reto_id, usuario) do update set goles_a = excluded.goles_a, goles_b = excluded.goles_b, actualizado = now()
     where public.prode_pronosticos.liquidado is null;

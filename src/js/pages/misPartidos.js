@@ -12,6 +12,7 @@ import * as act from '../features/duelos/actions.js';
 import { openInviteModal } from '../features/duelos/invite.js';
 import { crearPanelMarcadores } from '../features/resultados/panel.js';
 import { crearPanelMvp } from '../features/resultados/mvp.js';
+import { abrirRepeticiones } from '../features/resultados/repeticiones.js';
 import { resultadoDe } from '../features/resultados/api.js';
 import { datosTarjeta } from '../core/competicion/tarjetaResultado.js';
 import { compartirTarjeta } from '../features/resultados/tarjeta.js';
@@ -102,6 +103,7 @@ $('mp-calendario')?.addEventListener('click', () => {
 // Tarjeta de resultado: solo con marcador CONFIRMADO por ambos líderes (la BD es quien lo dice).
 let generando = false;
 $('lista-historial').addEventListener('click', async (e) => {
+  const rep = e.target.closest('[data-act="repeticion"]'); if (rep) { abrirRepeticiones(Number(rep.dataset.id)); return; }
   const b = e.target.closest('[data-act="tarjeta"]'); if (!b || generando) return;
   const r = data.historial.find((x) => x.id === Number(b.dataset.id)); if (!r) return;
   generando = true; b.disabled = true;

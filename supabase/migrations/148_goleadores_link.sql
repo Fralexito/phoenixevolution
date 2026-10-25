@@ -104,7 +104,7 @@ begin
   if v_yo is null then return null; end if;
   select * into r from public.retos_matchmaking where id = p_reto;
   if not found then return null; end if;
-  if not (private.lado_en_reto(p_reto, v_yo) is not null or v_yo = r.host_id or private.es_moderador()
+  if not (private.lado_en_reto(p_reto, v_yo) is not null or coalesce(v_yo = r.host_id, false) or private.es_moderador()
           or exists (select 1 from public.reto_espectadores e where e.reto_id = p_reto and e.usuario_id = v_yo and e.estado = 'APROBADO')) then return null; end if;
   return jsonb_build_object('reto_id', p_reto,
     'cuadra', exists (select 1 from private.duelos_goles_validos() x where x.reto_id = p_reto),

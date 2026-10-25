@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Mejor gol de la semana" active="repeticiones" description="Vota el mejor gol de la semana en los duelos de Phoenix Evolution Series.">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad · Repeticiones</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-futbol text-amber-300 mr-2"></i>Mejor gol de la semana</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Los goles que los jugadores suben desde <b>Mis partidos → Repeticiones</b>. Tienes 1 voto por semana (lunes a domingo, hora de Lima); lo puedes cambiar, pero no puedes votar tu propio gol.</p>
+    </header>
+    <div id="mg-contenido" class="space-y-4" aria-live="polite"><p class="text-center py-10 text-gray-400 text-sm">Cargando…</p></div>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/repeticiones.js';
+</script>

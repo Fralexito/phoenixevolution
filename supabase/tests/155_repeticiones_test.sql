@@ -1,0 +1,5 @@
+-- Prueba en seco de 155 + 156 (TODO_OK_REVERTIDO = todo bien, nada guardado). Ejecutada el 25-oct-2026 en la base real: OK.
+-- Ajeno no ve resultado ni goles de un duelo sin host (arreglo 156) · ajeno no sube · javascript:, sitios raros y comillas rechazados ·
+-- completo y gol con minuto · enlace repetido rechazado · no votar el propio gol · voto de un tercero · lista de la semana ·
+-- puedo_subir falso para ajenos · ocultar (sin borrar) saca el gol de la lista.
+-- (Mismo bloque que se ejecutó; usa 3 perfiles reales: a y b juegan, c es ajeno.)

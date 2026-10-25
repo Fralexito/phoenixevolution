@@ -244,3 +244,22 @@ En /ranking/: caja «Premios de la temporada» con los días que faltan y los ca
 el podio entre amigos); cerrar dos veces no paga dos veces (clave única por mes y por pago); ascuas solo gratis (regla 140);
 el mes en curso no se puede cerrar; los perfiles privados cobran pero su nombre no se muestra; el staff puede cerrar a mano si el cron falla.
 **Probado:** 2 pruebas puras; prueba en seco en la base real con un 4.º usuario temporal (8 casos, OK); caja en navegador.
+
+---
+
+## 12. Repeticiones y «Mejor gol de la semana» (beta 1.30.0 · migraciones 155 y 156 APLICADAS)
+
+**Qué es:** en **Mis partidos → historial**, cada duelo terminado tiene el botón **Repeticiones**: los jugadores o el host pegan el enlace
+del partido completo o de un gol (con minuto). Página nueva **/repeticiones/** («Mejor gol», menú Jugar → Juegos de la comunidad):
+los goles subidos esta semana compiten; 1 voto por persona y semana (se puede cambiar; no el propio) y se muestra el ganador anterior.
+**Piezas:** `supabase/migrations/155_repeticiones.sql` (`duelo_repeticiones`, `mejor_gol_votos`; `repeticion_agregar`, `repeticion_ocultar`,
+`repeticiones_de`, `mejor_gol_votar`, `mejor_gol_semana`) · `src/js/core/competicion/repeticiones.js` + `tests/repeticiones.test.mjs` ·
+`src/js/features/resultados/repeticiones.js` (ventana) · `src/pages/repeticiones.astro` + `src/js/pages/repeticiones.js` · botón en `features/duelos/cards.js`.
+**Blindaje:** solo enlaces https de sitios de video conocidos (validado en la web y en la BD; nada de `javascript:` ni comillas);
+máx. 6 por persona y duelo; enlace repetido rechazado; los videos NO se incrustan (se abren en su sitio con `noopener`);
+nadie borra: se oculta; privacidad de todos los jugadores del duelo respetada.
+
+**Arreglo de seguridad (156):** en SQL, `yo = host_id` con host vacío da NULO, y `if not (… or NULO …)` dejaba pasar a un ajeno.
+Afectaba a `resultado_de_reto` (036: un ajeno podía ver el marcador propuesto de un duelo sin host), `goles_de_duelo` (148) y las
+repeticiones (155). Se corrigió con `coalesce(…, false)` y se comprobó en la base real que ahora un ajeno no ve nada.
+**Probado:** pruebas puras; prueba en seco 155+156 (12 casos, OK); página y ventana en el navegador.
