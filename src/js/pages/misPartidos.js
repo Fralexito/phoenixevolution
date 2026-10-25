@@ -14,6 +14,10 @@ import { crearPanelMarcadores } from '../features/resultados/panel.js';
 import { resultadoDe } from '../features/resultados/api.js';
 import { datosTarjeta } from '../core/competicion/tarjetaResultado.js';
 import { compartirTarjeta } from '../features/resultados/tarjeta.js';
+import { abrirCalendario } from '../features/calendario.js';
+import { href } from '../core/sistema/config.js';
+
+let ultimosAgendados = [];   // los agendados que se pintaron por última vez (para el botón del calendario)
 import { crearPanelValoraciones } from '../features/valoraciones/panel.js';
 
 const $ = (id) => document.getElementById(id);
@@ -57,6 +61,7 @@ function renderAll() {
   $('lista-agendados').innerHTML = !id ? vacio('Inicia sesión para ver tus partidos.') : agendados.length ? agendados.map((r) => card(r, id)).join('') : vacio('No tienes partidos agendados.');
   $('lista-historial').innerHTML = !id ? '' : hist.length ? hist.map((r) => cardHistorial(r, id, { tarjeta: true })).join('') : vacio('Aún no has terminado ningún partido.');
   $('cnt-agendados').textContent = agendados.length ? `(${agendados.length})` : '';
+  ultimosAgendados = agendados; const cal = $('mp-calendario'); if (cal) cal.hidden = !id || !agendados.some((r) => r.fecha_programada);
   $('cnt-historial').textContent = hist.length ? `(${hist.length})` : '';
   renderRivales(id);
 }
@@ -80,6 +85,18 @@ function onCardClick(e) {
   })[b.dataset.act]?.();
 }
 $('lista-agendados').addEventListener('click', onCardClick);
+// Calendario personal: los duelos agendados con hora fija → Google Calendar o archivo .ics (sin base de datos).
+$('mp-calendario')?.addEventListener('click', () => {
+  const yo = me(); if (!yo) return;
+  const url = new URL(href('mis-partidos/'), location.href).href;
+  const eventos = ultimosAgendados.map((r) => {
+    const rival = r.retador_id === yo ? r.rival_id : r.retador_id;
+    const formato = (r.tam_a ?? 1) > 1 || (r.tam_b ?? 1) > 1 ? ` (${r.tam_a ?? 1}v${r.tam_b ?? 1})` : '';
+    return { uid: `duelo-${r.id}`, titulo: `Duelo${formato}: tú vs ${rival ? nm(rival) : 'rival por confirmar'}`, inicio: r.fecha_programada,
+      descripcion: `${r.plataforma ? `Plataforma: ${r.plataforma}. ` : ''}Phoenix Evolution · Mis partidos`, url };
+  });
+  abrirCalendario(eventos, { titulo: 'Añadir mis partidos a mi calendario', archivo: 'phoenix-mis-partidos' });
+});
 // Tarjeta de resultado: solo con marcador CONFIRMADO por ambos líderes (la BD es quien lo dice).
 let generando = false;
 $('lista-historial').addEventListener('click', async (e) => {

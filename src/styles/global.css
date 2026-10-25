@@ -52,3 +52,4 @@ main.flex-grow { min-height: 100vh; }
 @import './salasVivo.css';   /* tarjetas de salas de Phoenix Link y «Entrando a la sala» (En vivo, Ahora, Duelos) */
 @import './modoDemo.css';   /* píldora «Modo demostración» (js/features/demo/aviso.js) */
 @import './tutorial.css';   /* tutorial de bienvenida (js/features/tutorial.js) */
+@import './calendario.css';   /* ventana «Añadir a mi calendario» */

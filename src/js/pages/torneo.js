@@ -11,6 +11,7 @@ import { reglaDelPartido, castigoDelPartido } from '../core/competicion/diversio
 import { REGLAS_RULETA } from '../../data/modalidades.js';
 import * as api from '../features/torneos/api.js';
 import { rellenarPatrocinios } from '../features/patrocinios.js';
+import { abrirCalendario } from '../features/calendario.js';
 import { formatoFicha, guiaFormatoHTML, dinamicasActivasHTML, leyendaHTML, ESTADO_TXT } from '../features/torneos/guia.js';
 import { rafaga } from '../features/dopamina.js';
 import { ligaApta, vistaCreador, staffVePedido, validarMotivo, limpiarNota, MAX_TEXTO } from '../core/competicion/solicitudOficial.js';
@@ -160,7 +161,7 @@ function cabecera() {
     ${t.config?.premio ? `<p class="to-premio"><i class="fa-solid fa-gift" aria-hidden="true"></i> Premio: ${esc(t.config.premio)}</p>` : ''}
     <div data-patro="torneo:${t.id}"></div>
     ${oficialHTML()}
-    <div class="to-cab-acc"><button type="button" class="btn btn-ghost" data-copiar><i class="fa-solid fa-link"></i> Copiar enlace</button>${enlace ? `<a class="btn btn-ghost" href="${esc(enlace)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-video"></i> Sala / transmisión</a>` : ''}</div></header>`;
+    <div class="to-cab-acc"><button type="button" class="btn btn-ghost" data-copiar><i class="fa-solid fa-link"></i> Copiar enlace</button>${t.inicia && ['inscripcion', 'en_curso'].includes(t.estado) && new Date(t.inicia).getTime() > Date.now() ? '<button type="button" class="btn btn-ghost" data-cal-torneo><i class="fa-solid fa-calendar-plus"></i> Añadir a mi calendario</button>' : ''}${enlace ? `<a class="btn btn-ghost" href="${esc(enlace)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-video"></i> Sala / transmisión</a>` : ''}</div></header>`;
 }
 // Un solo creador (migración 143): el staff hace OFICIAL una liga todos contra todos; desde ahí la inscripción, el calendario y
 // los resultados (que manda Phoenix Link) viven en «Liga oficial» (/liga-amigos/). Las casuales siguen aquí con resultados a mano.
@@ -394,6 +395,8 @@ raiz.addEventListener('click', async (e) => {
   else if (b.dataset.linkOk) await confirmarLink(Number(b.dataset.linkOk));
   else if (b.dataset.linkNo) await rechazarLink(Number(b.dataset.linkNo));
   else if (b.dataset.autoStaff) await autoStaff(b.dataset.autoStaff === 'si');
+  else if (b.dataset.calTorneo !== undefined) abrirCalendario([{ uid: `torneo-${st.t.id}`, titulo: `Torneo: ${st.t.nombre}`, inicio: st.t.inicia, minutos: 120,
+    descripcion: st.t.descripcion ?? '', url: location.href.split('#')[0] }], { titulo: 'Añadir el torneo a mi calendario', archivo: `torneo-${st.t.id}` });
   else if (b.dataset.copiar !== undefined) { try { await navigator.clipboard.writeText(location.href); toast('Enlace copiado.', 'ok'); } catch { toast('No se pudo copiar. Copia la dirección de la barra.', 'warn'); } }
 });
 // ── Resultados de Phoenix Link (migración 145) ─────────────────────────────────────────────────────────────────────────

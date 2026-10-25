@@ -4,6 +4,8 @@ import { onSession, can } from '../core/sistema/session.js';
 import { escapeHTML } from '../core/sistema/dom.js';
 import { toast } from '../core/sistema/toast.js';
 import { listarEventos, marcarInteres, crearEvento, editarEvento, cancelarEvento } from '../features/eventos/api.js';
+import { abrirCalendario } from '../features/calendario.js';
+import { href } from '../core/sistema/config.js';
 import { JUEGOS_EVENTO, ESTADOS, LIMITES, estadoEvento, cuentaRegresiva, formatoLima, isoALima, nombreJuego, validarFormulario, textoVacio } from '../core/comunidad/evento.js';
 
 const $ = (id) => document.getElementById(id);
@@ -36,6 +38,7 @@ function tarjeta(e, ahora) {
     <p class="text-xs text-galaxy-400 font-bold"><i class="fa-regular fa-clock"></i> ${escapeHTML(formatoLima(e.inicia_at))} (Lima)${activo ? ` · <span class="text-gray-300 font-normal">${escapeHTML(cuentaRegresiva(e.inicia_at, ahora))}</span>` : ''}</p>
     ${e.descripcion ? `<p class="text-xs text-gray-300 mt-1.5 whitespace-pre-line">${escapeHTML(e.descripcion)}</p>` : ''}
     ${est === 'cancelado' && e.motivo ? `<p class="text-[12px] text-rose-300 mt-1.5">Motivo: ${escapeHTML(e.motivo)}</p>` : ''}
+    ${activo && est !== 'en_curso' ? `<div class="mt-2"><button type="button" data-cal-evento="${e.id}" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]"><i class="fa-solid fa-calendar-plus"></i> Añadir a mi calendario</button></div>` : ''}
     ${accionesUsuario}${acciones}</article>`;
 }
 function pintar() {
@@ -98,7 +101,13 @@ const aplicarInteres = async (id, interesa, recordar) => {
   finally { S.pend.delete(id); pintar(); }
 };
 $('ev-lista').addEventListener('click', (ev) => {
-  const t = ev.target.closest('[data-interes],[data-editar],[data-cancelar],[data-cancelar-no]'); if (!t) return;
+  const t = ev.target.closest('[data-interes],[data-editar],[data-cancelar],[data-cancelar-no],[data-cal-evento]'); if (!t) return;
+  if (t.dataset.calEvento) {   // calendario personal (sin base de datos): Google Calendar o archivo .ics
+    const e = S.eventos.find((x) => x.id === Number(t.dataset.calEvento)); if (!e) return;
+    abrirCalendario([{ uid: `evento-${e.id}`, titulo: e.titulo, inicio: e.inicia_at, minutos: 120, descripcion: e.descripcion ?? '',
+      url: new URL(href('eventos/'), location.href).href }], { titulo: 'Añadir el evento a mi calendario', archivo: `evento-${e.id}` });
+    return;
+  }
   if (t.dataset.interes) { const e = S.eventos.find((x) => x.id === Number(t.dataset.interes)); if (e) aplicarInteres(e.id, !e.mi_interes, true); }
   else if (t.dataset.editar) { const e = S.eventos.find((x) => x.id === Number(t.dataset.editar)); if (e) formEditar(e); }
   else if (t.dataset.cancelar) { S.cancelando = Number(t.dataset.cancelar); pintar(); }

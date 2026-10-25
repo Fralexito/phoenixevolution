@@ -35,3 +35,29 @@ acción `tutorial` en `src/data/ajustes.js` y `src/js/pages/ajustes.js`. Clave d
 
 **Cómo se probó:** `npm test` (4 pruebas nuevas), build, 61/61 páginas, y capturas reales en 390×844 y 1440×900: arranca solo,
 avanza con flechas, ilumina el botón correcto en cada tamaño, y Esc lo cierra y guarda `saltado`.
+
+---
+
+## 2. Calendario personal (beta 1.20.0 · sin base de datos)
+
+**Qué es:** botón «Añadir a mi calendario» en **Mis partidos** (duelos agendados con hora), en cada **evento** próximo y en la
+**ficha de un torneo** con fecha de inicio. Abre una ventana con un botón de **Google Calendar** por cada partido y
+**«Descargar (.ics)»**: un archivo que abre el calendario del celular o de la PC. Cada uno trae un **aviso 30 minutos antes**.
+
+**Piezas:** `src/js/core/sistema/calendario.js` (archivo .ics y enlace de Google, puro) + `tests/calendario.test.mjs` (6 pruebas) ·
+`src/js/features/calendario.js` (ventana y descarga) · `src/styles/calendario.css` · botones en `src/pages/mis-partidos.astro` +
+`src/js/pages/misPartidos.js`, `src/js/pages/eventos.js` y `src/js/pages/torneo.js`.
+
+**Blindaje:**
+- Horas en UTC (`Z`) → sirven en cualquier zona horaria; el calendario de cada uno las muestra en su hora.
+- Identificador fijo por partido (`duelo-7@phoenixevolution`) → añadirlo dos veces actualiza el mismo evento, no lo duplica.
+- Textos con comas, punto y coma, saltos de línea, comillas o emojis → escapados; líneas plegadas a 75 bytes sin partir caracteres.
+- Partidos sin hora fija o que ya pasaron → no se añaden y se dice cuántos («No se añadieron: 1 sin hora fija y 1 ya pasó.»).
+- Nada válido → aviso, no ventana vacía. Solo enlaces `https` en el archivo.
+- iPhone: se comparte el archivo (abre Calendario); si el navegador no deja descargar, plan B con un enlace `data:` y, si
+  tampoco, aviso de usar Google. Cancelar el menú de compartir no muestra error.
+- Mis partidos: la variable con los agendados se declara arriba (antes podía usarse antes de existir y romper la página).
+
+**Cómo se probó:** 6 pruebas puras; en el navegador real, la página Eventos con un evento simulado (título con «», comas y
+punto y coma, descripción con salto de línea): la ventana sale, el enlace de Google es correcto y el `.ics` descargado tiene
+`UID`, `DTSTART`/`DTEND` en UTC, el texto escapado y el `VALARM` de 30 min.

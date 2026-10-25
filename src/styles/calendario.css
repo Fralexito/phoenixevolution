@@ -1,0 +1,7 @@
+/* Ventana «Añadir a mi calendario» (js/features/calendario.js). */
+.cal-lista { display: grid; gap: .5rem; list-style: none; margin: 0; padding: 0; max-height: 50vh; overflow-y: auto; overscroll-behavior: contain; }
+.cal-fila { display: flex; align-items: center; gap: .75rem; padding: .6rem .75rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .1); background: rgba(255, 255, 255, .04); }
+.cal-txt { display: grid; gap: .1rem; min-width: 0; flex: 1; }
+.cal-txt b { color: #fff; font-size: 14px; overflow-wrap: anywhere; }
+.cal-txt small { color: #a5b4fc; font-size: 12px; }
+.cal-g { flex: none; min-height: 2.5rem; }
