@@ -51,6 +51,7 @@ const ACCOUNT_NAV_BASE = [
   { id: 'ahora',    label: 'Ahora mismo', path: 'ahora/',        icon: 'fa-satellite-dish', grupo: 'jugar' },
   { id: 'envivo',   label: 'Salas en vivo', path: 'en-vivo/',      icon: 'fa-tower-broadcast', grupo: 'jugar' },
   { id: 'missalas', label: 'Phoenix Link', path: 'mis-salas/',    icon: 'fa-desktop', grupo: 'jugar' },
+  { id: 'draft',    label: 'Draft en vivo', path: 'draft/',        icon: 'fa-list-ol', grupo: 'jugar' },   // 25-oct-2026: draft por turnos (migración 151)
   { id: 'mensajes', label: 'Mensajes',     path: 'mensajes/',      icon: 'fa-comments', grupo: 'social' },
   { id: 'chatgeneral', label: 'Chat general', path: 'chat-general/', icon: 'fa-comments', grupo: 'social' },
   { id: 'jugadas',  label: 'Jugadas',      path: 'jugadas/',       icon: 'fa-clapperboard', grupo: 'social' },

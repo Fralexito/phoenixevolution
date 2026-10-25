@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 287 nombres que usa la web. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 288 nombres que usa la web. */
 /*!
  * Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -1396,6 +1396,10 @@
 
 .fa-list-ul {
   --fa: "\f0ca";
+}
+
+.fa-list-ol {
+  --fa: "\f0cb";
 }
 
 .fa-table {

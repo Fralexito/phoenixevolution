@@ -1,0 +1,5 @@
+-- Prueba en seco de la 151 (termina con TODO_OK_REVERTIDO: no guarda nada). Ejecutada el 25-oct-2026 en la base real: OK.
+-- Torneo: un no organizador no crea · pocas opciones → error · opciones sin repetidos ni < > · no dos drafts vivos · iniciar ·
+--   elegir fuera de turno → error · elegir en turno · el reloj vence → el sistema elige solo y termina · disponibles restantes.
+-- Liga Máster: un no staff no crea · elegir pasa el jugador al club y deja movimiento «draft» · no repetir jugador ·
+--   serpiente (la ronda 2 empieza el último) · pausar congela el reloj aunque pase el tiempo · reanudar · vence → elige el de más media.

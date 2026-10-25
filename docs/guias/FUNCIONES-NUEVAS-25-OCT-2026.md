@@ -163,3 +163,29 @@ jugadores que ya estaban en el clan cuando se creó el duelo** (nada de fichar r
 serie; una serie aceptada no se cancela (solo el staff); propuestas caducan solas a los 7 días (sin cron: se calcula al leer).
 
 **Cómo se probó:** 3 pruebas puras; prueba en seco en la base real (13 casos, OK, nada guardado); página en navegador sin errores.
+
+---
+
+## 8. Draft en vivo (beta 1.26.0 · migración 151 APLICADA)
+
+**Qué es:** página nueva **/draft/** (menú Jugar). Elección **por turnos con reloj**, en orden fijo o **serpiente** (1-2-3, 3-2-1…).
+Un solo motor para dos usos:
+- **Liga Máster:** el staff lo crea (entran todos los clubes aprobados con DT). Cada DT elige un **agente libre**; el jugador pasa a su
+  club y queda en `lm_movimientos` con tipo `draft` (para el option file, como cualquier fichaje). Si el club está lleno, su turno se salta.
+- **Torneos:** el organizador escribe la lista de equipos (botón «Draft de equipos» en la ficha del torneo) y cada inscrito con cuenta
+  elige con cuál juega.
+Si a alguien se le acaba el tiempo, **el sistema elige por él** (Liga Máster: el libre de más media; torneo: la primera opción libre).
+El organizador puede empezar, pausar (congela el reloj), reanudar y cancelar (lo ya elegido se queda).
+
+**Piezas:** `supabase/migrations/151_draft_en_vivo.sql` (tablas `drafts`, `draft_participantes`, `draft_opciones`, `draft_picks`;
+`draft_crear_lm`, `draft_crear_torneo`, `draft_control`, `draft_elegir`, `draft_estado`, `draft_disponibles`, `drafts_lista`) ·
+`supabase/tests/151_draft_en_vivo_test.sql` · `src/js/core/competicion/draft.js` + `tests/draft.test.mjs` (4 pruebas) ·
+`src/pages/draft.astro` + `src/js/pages/draft.js` · enlace en `src/js/pages/torneo.js` · entrada en `src/data/site.js`.
+
+**Blindaje:** solo elige quien tiene el turno; un jugador/equipo no se elige dos veces (índices únicos) y la fila del draft se bloquea
+al elegir → dos pantallas a la vez no rompen nada; un draft vivo por liga o torneo; el jugador debe seguir libre al elegirlo;
+**sin cron**: el reloj se revisa cada vez que alguien mira (la sala pregunta cada 3 s) y los turnos vencidos se resuelven en cadena;
+el reloj de la pantalla se corrige con la hora del servidor; confirmación antes de elegir; aviso «¡Te toca!» en la pestaña.
+
+**Cómo se probó:** 4 pruebas puras; prueba en seco en la base real (18 casos, OK, nada guardado); sala en navegador con sesión
+y datos simulados (390 px): reloj, «¡Te toca!», lista para elegir y tablero sin errores.
