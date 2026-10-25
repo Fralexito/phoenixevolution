@@ -21,7 +21,8 @@ export function crearPanelMvp(el, ctx) {
 
   function tarjeta(v) {
     const yo = ctx.yo(); const x = vistaMvp(v, yo); if (x.tipo === 'nada') return '';
-    const cab = `<div class="flex items-center justify-between gap-2"><p class="text-sm text-white font-display font-bold uppercase">Duelo #${Number(v.reto_id)}</p>
+    const quienes = x.candidatos.map((c) => (c.soyYo ? 'tú' : c.nombre ?? 'Jugador')); const titulo = quienes.length ? `${quienes.slice(0, -1).join(', ')}${quienes.length > 1 ? ' y ' : ''}${quienes.at(-1)}` : `Duelo #${Number(v.reto_id)}`;
+    const cab = `<div class="flex items-center justify-between gap-2"><p class="text-sm text-white font-display font-bold uppercase min-w-0 truncate" title="Duelo #${Number(v.reto_id)}">${esc(titulo)}</p>
       <span class="text-[12px] text-gray-400">${esc(cierreTexto(v.cierra))}</span></div>`;
     let cuerpo = '';
     if (x.tipo === 'votar' || x.tipo === 'mirar') {

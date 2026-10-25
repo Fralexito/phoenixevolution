@@ -27,12 +27,12 @@ function tarjeta(v) {
 function formulario(clanes, miId) {
   const opciones = clanes.filter((c) => Number(c.id) !== Number(miId) && !c.oculto).map((c) => `<option value="${Number(c.id)}">[${esc(c.etiqueta)}] ${esc(c.nombre)}</option>`).join('');
   if (!opciones) return '<p class="text-[12px] text-gray-400">No hay otros clanes para retar todavía.</p>';
-  return `<form id="cl-serie-form" class="grid sm:grid-cols-4 gap-2 items-end">
-    <label class="sm:col-span-2 text-[12px] text-gray-400">Clan rival<select name="rival" class="field mt-1 w-full" required><option value="">Elige…</option>${opciones}</select></label>
+  return `<form id="cl-serie-form" class="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end">
+    <label class="col-span-2 text-[12px] text-gray-400">Clan rival<select name="rival" class="field mt-1 w-full" required><option value="">Elige…</option>${opciones}</select></label>
     <label class="text-[12px] text-gray-400">Al mejor de<select name="mejorDe" class="field mt-1 w-full">${MEJOR_DE.map((n) => `<option value="${n}" ${n === 3 ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label class="text-[12px] text-gray-400">Plazo<select name="plazo" class="field mt-1 w-full">${PLAZOS.map((n) => `<option value="${n}" ${n === 14 ? 'selected' : ''}>${n} días</option>`).join('')}</select></label>
-    <label class="sm:col-span-3 text-[12px] text-gray-400">Mensaje (opcional)<input name="mensaje" maxlength="140" class="field mt-1 w-full" autocomplete="off"></label>
-    <button class="btn btn-primary !min-h-9 !text-xs">Retar</button></form>`;
+    <label class="col-span-2 sm:col-span-3 text-[12px] text-gray-400">Mensaje (opcional)<input name="mensaje" maxlength="140" class="field mt-1 w-full" autocomplete="off"></label>
+    <button class="btn btn-primary !min-h-9 !text-xs col-span-2 sm:col-span-1">Retar</button></form>`;
 }
 
 /** @param {HTMLElement} seccion */
