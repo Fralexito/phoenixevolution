@@ -84,3 +84,22 @@ otros fallos → mensaje con «Reintentar»; no se encima un pedido sobre otro.
 
 **Cómo se probó:** 4 pruebas puras; la función se ejecutó en la base real como admin (devolvió el host de Hugo, apagado,
 visto redondeado, sin ping por falta de muestras); la página carga sin errores y sin sesión la sección queda oculta.
+
+---
+
+## 4. MVP del partido (beta 1.22.0 · migración 147 APLICADA)
+
+**Qué es:** cuando un duelo tiene el marcador **confirmado**, se abre 48 h una votación al mejor jugador. Votan los jugadores
+y los espectadores aprobados; se vota a un jugador del duelo, nunca a uno mismo; el voto se puede cambiar mientras siga abierta.
+Al cerrar, el más votado es el **MVP**; si hay empate arriba, no hay MVP. En el perfil sale «MVP ×N» junto a los duelos.
+
+**Piezas:** `supabase/migrations/147_mvp_partido.sql` (tabla `partido_mvp_votos`; `mvp_votar`, `mvp_de`, `mvp_pendientes`,
+`mvp_total_de`) · `src/js/core/competicion/mvp.js` + `tests/mvp.test.mjs` (4 pruebas) · `src/js/features/resultados/mvp.js` ·
+sección `#bloque-mvp` en `src/pages/mis-partidos.astro` · contador en `src/js/pages/perfil.js`.
+
+**Blindaje:** tabla cerrada (solo funciones); la BD valida quién vota, a quién y el plazo; un 1v1 sin espectadores NO abre
+votación (siempre sería 1-1); los conteos solo se ven al cerrar (nadie se sube al carro); un voto por persona y partido;
+sin migración o sin sesión el panel no aparece; botones bloqueados mientras se envía (no hay doble voto).
+
+**Cómo se probó:** 4 pruebas puras; prueba en seco en la base real (`supabase/tests/147_mvp_partido_test.sql`, 13 casos, OK,
+nada guardado); 61/61 páginas arrancan.

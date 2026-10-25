@@ -11,6 +11,7 @@ import { EDICIONES } from '../../data/ligaResultados.js';
 import * as act from '../features/duelos/actions.js';
 import { openInviteModal } from '../features/duelos/invite.js';
 import { crearPanelMarcadores } from '../features/resultados/panel.js';
+import { crearPanelMvp } from '../features/resultados/mvp.js';
 import { resultadoDe } from '../features/resultados/api.js';
 import { datosTarjeta } from '../core/competicion/tarjetaResultado.js';
 import { compartirTarjeta } from '../features/resultados/tarjeta.js';
@@ -21,6 +22,7 @@ let ultimosAgendados = [];   // los agendados que se pintaron por última vez (p
 import { crearPanelValoraciones } from '../features/valoraciones/panel.js';
 
 const $ = (id) => document.getElementById(id);
+const panelMvp = crearPanelMvp($('bloque-mvp'), { yo: me });
 const marcadores = crearPanelMarcadores($('bloque-marcadores'), { yo: me, reto: (id) => data.historial.find((r) => r.id === id) ?? data.retos.find((r) => r.id === id), nombre: nm });
 const valoraciones = crearPanelValoraciones($('bloque-valoraciones'));
 const vacio = (t) => `<div class="text-center py-6 text-gray-500 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
@@ -67,7 +69,7 @@ function renderAll() {
 }
 
 async function fetchAll() {
-  try { await Promise.all([loadPerfiles(), loadRetos()]); renderAll(); marcadores.cargar(); if (me()) valoraciones.cargar(); }
+  try { await Promise.all([loadPerfiles(), loadRetos()]); renderAll(); marcadores.cargar(); panelMvp.cargar(); if (me()) valoraciones.cargar(); }
   catch (e) { console.error('[mis-partidos] carga:', e); $('lista-agendados').innerHTML = '<div class="text-center py-6 text-bad text-xs">No se pudieron cargar tus partidos. Recarga la página.</div>'; }
 }
 act.setRefresh(fetchAll);

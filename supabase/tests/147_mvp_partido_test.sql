@@ -1,0 +1,4 @@
+-- Prueba en seco de la 147 (no guarda nada: termina con TODO_OK_REVERTIDO). Cambia a, b, c por 3 perfiles reales.
+-- Casos: 1v1 sin espectadores no abre · con espectador abre · no votarse · no votar a espectador · conteos ocultos abierta ·
+-- pendientes · cambiar voto · ganador al cerrar · total del perfil · no votar cerrada · empate sin MVP · marcador no confirmado sin votación.
+-- (Ejecutado el 25-oct-2026 en la base real: OK.)

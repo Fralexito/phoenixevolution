@@ -19,6 +19,7 @@ import { cargarEncuestas, encuestaHTML } from '../features/encuestas/estado.js';
 import { abrirCrearEncuesta } from '../features/encuestas/crearUI.js';
 import { nivelDe } from '../core/jugadores/logros.js';
 import { estadisticasDe, eloDe } from '../features/resultados/api.js';
+import { mvpTotalDe, mvpPerfil } from '../features/resultados/mvp.js';
 import { progresoRango } from '../core/competicion/pulso.js';
 import { rangoBloque } from '../features/rango.js';
 import { contenidoHTML, reproductorYT, segmentoChipHTML } from '../features/muro/render.js';
@@ -189,7 +190,7 @@ function franjaEstadisticas() {
   const pct = (n) => Math.round(((Number(n) || 0) * 100) / e.jugados);
   const ef = e.efectividad != null ? Number(e.efectividad) : null;
   return `<section class="pfx-stats glass-panel rounded-2xl" aria-label="Estadísticas de duelos">
-    <header class="pfx-stats-cab"><span><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Duelos</span><b>${e.jugados} jugados</b></header>
+    <header class="pfx-stats-cab"><span><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Duelos</span><b>${e.jugados} jugados${mvpPerfil(S.mvp) ? ` · <span class="text-amber-300"><i class="fa-solid fa-star" aria-hidden="true"></i> ${mvpPerfil(S.mvp)}</span>` : ''}</b></header>
     <div class="pfx-stats-cuerpo">
       ${ef != null ? `<div class="pfx-ef" style="--p:${Math.max(0, Math.min(100, ef))}"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" class="f"/><circle cx="22" cy="22" r="19" class="v"/></svg><b data-contar="${Math.round(ef)}" data-sufijo="%">0%</b><span>Efectividad</span></div>` : ''}
       <div class="pfx-wdl-caja">
@@ -374,6 +375,7 @@ async function cargar() {
     S.visible = m.visible; S.items = m.items ?? []; S.hayMas = !!m.hay_mas; S.juegos = m.juegos ?? []; S.juego = '';
     await marcadoresMuro();
     S.stats = await estadisticasDe(p.id);             // nunca lanza
+    S.mvp = await mvpTotalDe(p.id);                   // nunca lanza
     S.elo = await eloDe(p.id);                        // nunca lanza: sin ELO simplemente no hay rango
     S.logros = await logrosDe(p.id);                 // nunca lanza: sin logros el perfil se ve igual
     S.red = S.sesion && !p.soy_yo ? await cargarRedSegura() : null;
