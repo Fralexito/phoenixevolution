@@ -1,11 +1,15 @@
-// Pedidos para hacer OFICIAL una liga casual (migración 144) — lógica PURA (sin DOM ni red → `npm test`).
+// Pedidos para hacer OFICIAL una liga o torneo casual (migraciones 144 y 145) — lógica PURA (sin DOM ni red → `npm test`).
+// Desde la 145 vale para cualquier formato que Phoenix Link sabe llenar: las ligas (liguilla/idavuelta) pasan a «Liga oficial»;
+// el resto queda oficial DENTRO de Torneos y sus resultados los manda Link y los confirma el staff.
 // Quién decide de verdad es la base (torneo_solicitar_oficial / staff_solicitud_oficial_resolver); esto solo elige qué mostrar.
 //   · Casual  = /torneos/: cualquiera la crea y el creador anota los resultados a mano.
 //   · Oficial = /liga-amigos/ («Liga oficial»): Phoenix Link sube los resultados solo.
 // Guía: docs/liga-y-torneos/LIGA-Y-TORNEOS.md (parte «Pedir que una liga sea oficial»).
 
-/** Formatos que pueden ser oficiales (Phoenix Link solo conoce las ligas todos contra todos). Espejo de la 143/144. */
-export const FORMATOS_OFICIAL = Object.freeze(['liguilla', 'idavuelta']);
+import { FORMATOS_AUTO, esLiga } from './resultadosLink.js';
+
+/** Formatos que pueden ser oficiales (los que Phoenix Link sabe llenar). Espejo de private.tl_formato_auto (145). */
+export const FORMATOS_OFICIAL = FORMATOS_AUTO;
 /** Horas de espera tras un rechazo antes de volver a pedir. Espejo de torneo_solicitar_oficial (144). */
 export const ESPERA_TRAS_RECHAZO_H = 24;
 /** Largo máximo de la nota del pedido y del motivo del rechazo. Espejo de la 144. */
@@ -13,10 +17,15 @@ export const MAX_TEXTO = 300;
 /** Largo mínimo del motivo de rechazo. Espejo de staff_solicitud_oficial_resolver (144). */
 export const MIN_MOTIVO = 5;
 
-/** ¿La liga, por sí misma, puede llegar a ser oficial? (formato todos contra todos, en inscripción, visible y aún no oficial) */
-export function ligaApta(t) {
-  return Boolean(t) && !t.oculto && !t.meta?.oficial && FORMATOS_OFICIAL.includes(t.formato) && t.estado === 'inscripcion';
+/**
+ * ¿El torneo, por sí mismo, puede llegar a ser oficial? (formato automático, en inscripción, visible y aún no oficial).
+ * `autoOrigen` = permiso automático actual ('oficial' | 'premium' | null): si ya es oficial, no.
+ */
+export function ligaApta(t, autoOrigen = null) {
+  return Boolean(t) && !t.oculto && !t.meta?.oficial && autoOrigen !== 'oficial' && FORMATOS_OFICIAL.includes(t.formato) && t.estado === 'inscripcion';
 }
+/** Mismo criterio con un nombre que no confunde (desde la 145 no son solo ligas). */
+export const torneoApto = ligaApta;
 
 /** Horas que faltan para poder volver a pedir tras un rechazo (0 = ya se puede). */
 export function horasParaVolver(solicitud, ahora = new Date()) {
@@ -31,8 +40,8 @@ export function horasParaVolver(solicitud, ahora = new Date()) {
  * @param {{ t: object, yo: string|null, solicitud: object|null, ahora?: Date }} x
  * @returns {{ modo: 'nada'|'pedir'|'pendiente'|'rechazada'|'esperar', texto: string }}
  */
-export function vistaCreador({ t, yo, solicitud, ahora = new Date() }) {
-  if (!t || !yo || t.creador !== yo || !ligaApta(t)) return { modo: 'nada', texto: '' };
+export function vistaCreador({ t, yo, solicitud, ahora = new Date(), autoOrigen = null }) {
+  if (!t || !yo || t.creador !== yo || !ligaApta(t, autoOrigen)) return { modo: 'nada', texto: '' };
   if (solicitud?.estado === 'pendiente') return { modo: 'pendiente', texto: 'Pediste que sea oficial. El staff lo revisará pronto y te llegará un aviso.' };
   const espera = horasParaVolver(solicitud, ahora);
   if (solicitud?.estado === 'rechazada') {
@@ -40,7 +49,9 @@ export function vistaCreador({ t, yo, solicitud, ahora = new Date() }) {
     if (espera > 0) return { modo: 'esperar', texto: `El staff no la aceptó todavía.${motivo} Podrás volver a pedirlo en ${espera} ${espera === 1 ? 'hora' : 'horas'}.` };
     return { modo: 'rechazada', texto: `La última vez el staff no la aceptó.${motivo} Ya puedes volver a pedirlo.` };
   }
-  return { modo: 'pedir', texto: 'Si la haces oficial, Phoenix Link sube los resultados solo y aparece en Liga oficial. El staff tiene que aceptarlo.' };
+  return { modo: 'pedir', texto: esLiga(t.formato)
+    ? 'Si la haces oficial, Phoenix Link sube los resultados solo y aparece en Liga oficial. El staff tiene que aceptarlo.'
+    : 'Si lo haces oficial, Phoenix Link manda los resultados y el staff los confirma. El staff tiene que aceptarlo.' };
 }
 
 /** ¿El staff debe ver la caja «Aceptar / Rechazar» en la página de la liga? */
@@ -63,4 +74,5 @@ export function limpiarNota(nota) {
 }
 
 /** Nombre corto del formato para la lista del staff. */
-export const nombreFormato = (f) => (f === 'idavuelta' ? 'Ida y vuelta' : f === 'liguilla' ? 'Todos contra todos' : String(f ?? ''));
+const NOMBRES = { idavuelta: 'Ida y vuelta', liguilla: 'Todos contra todos', eliminacion: 'Eliminación directa', doble: 'Doble eliminación', grupos: 'Grupos', suizo: 'Suizo' };
+export const nombreFormato = (f) => NOMBRES[f] ?? String(f ?? '');

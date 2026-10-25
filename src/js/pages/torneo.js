@@ -14,10 +14,11 @@ import { rellenarPatrocinios } from '../features/patrocinios.js';
 import { formatoFicha, guiaFormatoHTML, dinamicasActivasHTML, leyendaHTML, ESTADO_TXT } from '../features/torneos/guia.js';
 import { rafaga } from '../features/dopamina.js';
 import { ligaApta, vistaCreador, staffVePedido, validarMotivo, limpiarNota, MAX_TEXTO } from '../core/competicion/solicitudOficial.js';
+import { etiquetaPermiso, puedeConfirmar, vistaPropuesta, porClave, formatoAuto, esLiga, quienConfirma } from '../core/competicion/resultadosLink.js';
 
 const raiz = document.getElementById('to-raiz');
 const id = Number(new URLSearchParams(location.search).get('id'));
-const st = { yo: null, t: null, insc: [], partidos: [], nombres: {}, eventos: [], prem: null, sol: null, cargando: false };
+const st = { yo: null, t: null, insc: [], partidos: [], nombres: {}, eventos: [], prem: null, sol: null, auto: null, link: [], cargando: false };
 
 const nombresEq = (a, b) => String(a ?? '').toLowerCase() === String(b ?? '').toLowerCase();
 const dins = () => st.t?.config?.dinamicas ?? [];
@@ -42,6 +43,8 @@ function filaPartido(p) {
   if (dins().includes('ruleta-partido') && !p.jugado && p.a_nombre && p.b_nombre) extras.push(`<span class="to-extra"><i class="fa-solid fa-dice" aria-hidden="true"></i> Regla: ${esc(reglaDelPartido(st.t.id, p.clave, REGLAS_RULETA))}</span>`);
   if (dins().includes('castigo') && p.jugado && p.ganador) extras.push(`<span class="to-extra"><i class="fa-solid fa-skull" aria-hidden="true"></i> Castigo para ${esc(p.ganador === 'a' ? p.b_nombre : p.a_nombre)}: ${esc(castigoDelPartido(st.t.id, p.clave))}</span>`);
   if (p.jugado && !p.ganador) extras.push('<span class="to-extra">Empate</span>');
+  const prop = !p.jugado ? propuestas().get(p.clave) : null;
+  if (prop) extras.push(`<span class="to-extra to-extra-link${prop.estado === 'disputa' ? ' to-disputa' : ''}"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Link: ${esc(vistaPropuesta(prop, p).marcador)} · por confirmar</span>`);
   const botones = puedeAnotar(p)
     ? `<button type="button" class="btn btn-ghost to-btn" data-anotar="${esc(p.clave)}">${p.jugado ? 'Editar' : 'Anotar resultado'}</button>${p.jugado && gestiona() ? `<button type="button" class="btn btn-ghost to-btn" data-quitar="${esc(p.clave)}" aria-label="Quitar resultado"><i class="fa-solid fa-rotate-left"></i></button>` : ''}` : '';
   return `<li class="to-partido${p.jugado ? ' to-hecho' : ''}" data-clave="${esc(p.clave)}"><span class="to-id">${esc(p.clave)}</span>
@@ -151,7 +154,7 @@ function cabecera() {
   const t = st.t; const f = formatoFicha(t.formato); const e = ESTADO_TXT[t.estado];
   const enlace = safeUrl(t.config?.enlace ?? '');
   return `<header class="glass-panel to-cab"><div class="to-cab-top"><span class="tn-pill"><i class="fa-solid ${esc(e?.icono ?? 'fa-circle')}" aria-hidden="true"></i> ${esc(e?.nombre ?? t.estado)}</span>
-    <span class="tn-pill"><i class="fa-solid ${esc(f?.icono ?? 'fa-trophy')}" aria-hidden="true"></i> ${esc(f?.nombre ?? t.formato)}</span>${t.oculto ? '<span class="tn-pill tn-alerta">Oculto por el staff</span>' : ''}${st.prem?.premium ? '<span class="tn-pill" title="Torneo premium"><i class="fa-solid fa-crown" aria-hidden="true"></i> Premium</span>' : ''}</div>
+    <span class="tn-pill"><i class="fa-solid ${esc(f?.icono ?? 'fa-trophy')}" aria-hidden="true"></i> ${esc(f?.nombre ?? t.formato)}</span>${t.oculto ? '<span class="tn-pill tn-alerta">Oculto por el staff</span>' : ''}${st.prem?.premium ? '<span class="tn-pill" title="Torneo premium"><i class="fa-solid fa-crown" aria-hidden="true"></i> Premium</span>' : ''}${etiquetaPermiso(origenAuto()) ? `<span class="tn-pill to-pill-auto" title="Los resultados los manda Phoenix Link y se confirman aquí"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> ${esc(etiquetaPermiso(origenAuto()))}</span>` : ''}</div>
     <h1>${esc(t.nombre)}</h1><p class="to-por">Organiza <b>${esc(st.nombres[t.creador] ?? 'un jugador')}</b>${t.inicia ? ` · Empieza ${esc(new Date(t.inicia).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }))}` : ''}</p>
     ${t.descripcion ? `<p class="to-desc">${esc(t.descripcion)}</p>` : ''}
     ${t.config?.premio ? `<p class="to-premio"><i class="fa-solid fa-gift" aria-hidden="true"></i> Premio: ${esc(t.config.premio)}</p>` : ''}
@@ -169,20 +172,49 @@ function oficialHTML() {
   return pedidoStaffHTML() + pedidoCreadorHTML() + botonStaffHTML();
 }
 const esStaffLiga = () => Boolean(st.yo) && can('editarLiga');
+// Resultados automáticos de Phoenix Link (migración 145).
+const origenAuto = () => st.auto?.origen ?? null;
+const propuestas = () => porClave(st.link);
+const confirmoYo = () => puedeConfirmar({ origen: origenAuto(), esOrganizador: Boolean(st.yo) && st.t?.creador === st.yo, esStaff: esStaffLiga(), esModerador: Boolean(st.yo) && can('gestionarTorneos') });
+/** Caja «Resultados de Phoenix Link por confirmar» (#res-link: ahí lleva el aviso de la campana). */
+function resultadosLinkHTML() {
+  if (!st.link.length || !origenAuto()) return '';
+  const puedo = confirmoYo();
+  const quien = quienConfirma(origenAuto()) === 'staff' ? 'el staff' : 'el organizador';
+  const filas = st.link.map((r) => {
+    const p = st.partidos.find((x) => x.clave === r.clave); if (!p) return '';
+    const v = vistaPropuesta(r, p);
+    const elegir = v.faltaGanador && puedo ? `<label class="to-si-empate">Pasa: <select data-ganador-link="${r.id}"><option value="a">${esc(p.a_nombre)}</option><option value="b">${esc(p.b_nombre)}</option></select></label>` : '';
+    const botones = puedo ? `<div class="to-cab-acc">${elegir}<button type="button" class="btn btn-primary to-btn" data-link-ok="${r.id}"><i class="fa-solid fa-check"></i> Confirmar</button><button type="button" class="btn btn-ghost to-btn" data-link-no="${r.id}"><i class="fa-solid fa-xmark"></i> Rechazar</button></div>` : '';
+    return `<li class="to-link${v.disputa ? ' to-disputa' : ''}"><p><b>${esc(p.a_nombre)} ${esc(v.marcador)} ${esc(p.b_nombre)}</b> <span class="tn-ayuda">${esc(p.ronda ?? '')}</span></p><p class="tn-ayuda">${esc(v.texto)}</p>${botones}</li>`;
+  }).join('');
+  return `<section class="glass-panel to-panel" id="res-link"><h2 class="to-h2"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Resultados de Phoenix Link por confirmar</h2>
+    <p class="tn-ayuda">Los mandó el juego al terminar cada partido. No cuentan hasta que ${quien} los confirme. ${puedo ? 'Si uno está mal, recházalo y anótalo a mano.' : ''}</p><ul class="to-links">${filas}</ul></section>`;
+}
+/** Staff: hacer oficial (o quitarlo) un torneo que NO es liga, sin pedido (145). Las ligas siguen con «Hacer oficial» → Liga oficial. */
+function botonStaffAutoHTML() {
+  if (!st.auto) return '';   // sin la migración 145 no existe el permiso oficial dentro de Torneos
+  if (!esStaffLiga() || !st.t || st.t.oculto || esLiga(st.t.formato) || !formatoAuto(st.t.formato) || ['terminado', 'cancelado'].includes(st.t.estado)) return '';
+  if (origenAuto() === 'oficial') return '<p class="tn-ayuda"><button type="button" class="btn btn-ghost" data-auto-staff="no"><i class="fa-solid fa-shield-halved"></i> Quitar oficial</button></p>';
+  if (staffVePedido(st.sol, true)) return '';
+  return '<p class="tn-ayuda"><button type="button" class="btn btn-ghost" data-auto-staff="si"><i class="fa-solid fa-shield-halved"></i> Hacer oficial (resultados por Phoenix Link)</button></p>';
+}
 function botonStaffHTML() {
-  if (!esStaffLiga() || !ligaApta(st.t) || staffVePedido(st.sol, true)) return '';
+  if (!esStaffLiga() || !esLiga(st.t.formato)) return botonStaffAutoHTML();
+  if (!ligaApta(st.t, origenAuto()) || staffVePedido(st.sol, true)) return '';
   return '<p class="tn-ayuda"><button type="button" class="btn btn-ghost" data-hacer-oficial><i class="fa-solid fa-shield-halved"></i> Hacer oficial (resultados por Phoenix Link)</button></p>';
 }
 // Pedido para hacer oficial (migración 144). El creador lo pide; el staff lo acepta o rechaza aquí mismo o desde Moderación.
 function pedidoCreadorHTML() {
   if (esStaffLiga()) return '';   // el staff no necesita pedir: tiene el botón directo
-  const v = vistaCreador({ t: st.t, yo: st.yo, solicitud: st.sol });
+  if (!st.auto && !esLiga(st.t.formato)) return '';   // sin la migración 145 solo las ligas pueden pedirlo (como en la 144)
+  const v = vistaCreador({ t: st.t, yo: st.yo, solicitud: st.sol, autoOrigen: origenAuto() });
   if (v.modo === 'nada') return '';
   const icono = v.modo === 'pendiente' ? 'fa-hourglass-half' : v.modo === 'pedir' ? 'fa-shield-halved' : 'fa-circle-info';
   const boton = v.modo === 'pedir' || v.modo === 'rechazada'
     ? '<button type="button" class="btn btn-ghost" data-pedir-oficial><i class="fa-solid fa-paper-plane"></i> Pedir que sea oficial</button>'
     : v.modo === 'pendiente' ? '<button type="button" class="btn btn-ghost" data-retirar-pedido><i class="fa-solid fa-xmark"></i> Retirar el pedido</button>' : '';
-  return `<div class="to-premio to-oficial-pedido" data-modo="${esc(v.modo)}"><p><i class="fa-solid ${icono}" aria-hidden="true"></i> <b>Liga casual.</b> ${esc(v.texto)}</p>${boton}</div>`;
+  return `<div class="to-premio to-oficial-pedido" data-modo="${esc(v.modo)}"><p><i class="fa-solid ${icono}" aria-hidden="true"></i> <b>${esLiga(st.t.formato) ? 'Liga casual' : 'Torneo casual'}.</b> ${esc(v.texto)}</p>${boton}</div>`;
 }
 function pedidoStaffHTML() {
   if (!staffVePedido(st.sol, esStaffLiga())) return '';
@@ -206,11 +238,12 @@ function premiumHTML() {
     return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b>
     <p class="tn-ayuda"><b>Overlay de transmisión:</b> en OBS o TikTok LIVE Studio añade una «fuente de navegador» de 1080 × 1920 con este enlace. Se actualiza solo cada 15 segundos con el último resultado, los próximos partidos y el campeón.</p>
     <div class="to-fila"><input class="field" readonly value="${esc(ov)}" aria-label="Enlace del overlay"><button type="button" class="btn btn-ghost" data-copiar-overlay="${esc(ov)}"><i class="fa-solid fa-copy"></i> Copiar</button><a class="btn btn-ghost" href="${esc(ov)}" target="_blank" rel="noopener">Ver</a></div>
+    <p class="tn-ayuda"><b>Resultados automáticos:</b> cuando el host juega con Phoenix Link, el marcador llega solo aquí y tú solo lo confirmas${formatoAuto(st.t.formato) ? '' : ' (este formato todavía no: solo llaves, doble eliminación, todos contra todos, ida y vuelta, grupos y suizo)'}.</p>
     <p class="tn-ayuda">Llaves de pantalla completa, estadísticas y página propia llegan después.</p></div>`;
   }
   if (!p.puede) return '';
   return `<div class="to-premium"><b><i class="fa-solid fa-crown" aria-hidden="true"></i> Torneo premium</b>
-    <p class="tn-ayuda">Una sola vez por torneo, con gemas. Desbloquea el overlay de transmisión, las llaves de pantalla completa, las estadísticas y una página propia. Es solo presentación: no cambia las reglas ni da ventajas.</p>
+    <p class="tn-ayuda">Una sola vez por torneo, con gemas. Desbloquea los <b>resultados automáticos con Phoenix Link</b> (el marcador llega solo y tú lo confirmas), el overlay de transmisión, las llaves de pantalla completa, las estadísticas y una página propia. No cambia las reglas ni da ventajas en el juego.</p>
     <button type="button" class="btn btn-primary" data-hacer-premium><i class="fa-solid fa-gem" aria-hidden="true"></i> Hacer premium · ${p.precioGemas.toLocaleString('es-PE')} gemas</button></div>`;
 }
 function panelOrganizador() {
@@ -237,7 +270,7 @@ function pintar() {
   const cuerpo = t.estado === 'inscripcion' ? cuerpoInscripcion() : (t.estado === 'cancelado' ? '<p class="tn-vacio">Este torneo fue cancelado.</p>' : `<section class="glass-panel to-panel">${prog}${cuerpoEnCurso()}</section>`);
   const reglas = t.config?.reglas_extra ? plegable('Reglas del organizador', 'fa-scroll', '', `<p class="to-reglas">${esc(t.config.reglas_extra)}</p>`) : '';
   const bit = (gestiona() && st.eventos.length) ? plegable('Bitácora', 'fa-clock-rotate-left', 'Quién hizo qué', `<ul class="to-hist">${st.eventos.map((e) => `<li>${esc(new Date(e.creado_en).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' }))} · ${esc(st.nombres[e.usuario] ?? '—')} · ${esc(e.tipo)}</li>`).join('')}</ul>`) : '';
-  raiz.innerHTML = `${cabecera()}${bloqueCampeon()}${cuerpo}
+  raiz.innerHTML = `${cabecera()}${bloqueCampeon()}${resultadosLinkHTML()}${cuerpo}
     ${plegable('¿Cómo funciona este formato?', 'fa-circle-question', formatoFicha(t.formato)?.nombre ?? '', guiaFormatoHTML(t.formato))}
     ${plegable('Dinámicas de este torneo', 'fa-face-grin-squint-tears', `${dins().length} activas`, dinamicasActivasHTML(dins()))}
     ${reglas}${panelOrganizador()}${bit}${plegable('Leyenda', 'fa-book', 'Estados y visibilidad', leyendaHTML())}`;
@@ -253,7 +286,8 @@ async function cargar({ silencioso = false } = {}) {
       [st.insc, st.partidos] = await Promise.all([api.inscritosDe([id]), api.partidosDe(id)]);
       st.prem = await api.premiumInfo(id);
       st.eventos = (st.yo && (st.t.creador === st.yo || can('gestionarTorneos'))) ? await api.eventosDe(id).catch(() => []) : [];
-      st.sol = (st.yo && ligaApta(st.t) && (st.t.creador === st.yo || can('editarLiga'))) ? await api.solicitudOficialDe(id) : null;
+      [st.auto, st.link] = await Promise.all([api.autoDe(id), api.resultadosLinkDe(id)]);
+      st.sol = (st.yo && ligaApta(st.t, st.auto?.origen ?? null) && (st.t.creador === st.yo || can('editarLiga'))) ? await api.solicitudOficialDe(id) : null;
       st.nombres = await api.nombresDe([st.t.creador, ...st.eventos.map((e) => e.usuario), ...(st.sol?.solicitante ? [st.sol.solicitante] : [])]);
     }
     const abiertos = [...raiz.querySelectorAll('details[open]')].map((d) => d.querySelector('summary b')?.textContent);
@@ -357,8 +391,31 @@ raiz.addEventListener('click', async (e) => {
   else if (b.dataset.pedirOficial !== undefined) await pedirOficial();
   else if (b.dataset.retirarPedido !== undefined) { if (await confirmar('¿Retirar el pedido? La liga sigue casual y podrás volver a pedirlo cuando quieras.', { aceptar: 'Retirar', cancelar: 'Volver' })) await hacer(() => api.cancelarSolicitudOficial(id), 'Pedido retirado.'); }
   else if (b.dataset.resolverPedido) await resolverPedido(b.dataset.resolverPedido === 'si');
+  else if (b.dataset.linkOk) await confirmarLink(Number(b.dataset.linkOk));
+  else if (b.dataset.linkNo) await rechazarLink(Number(b.dataset.linkNo));
+  else if (b.dataset.autoStaff) await autoStaff(b.dataset.autoStaff === 'si');
   else if (b.dataset.copiar !== undefined) { try { await navigator.clipboard.writeText(location.href); toast('Enlace copiado.', 'ok'); } catch { toast('No se pudo copiar. Copia la dirección de la barra.', 'warn'); } }
 });
+// ── Resultados de Phoenix Link (migración 145) ─────────────────────────────────────────────────────────────────────────
+async function confirmarLink(propId) {
+  const r = st.link.find((x) => x.id === propId); const p = r && st.partidos.find((x) => x.clave === r.clave); if (!r || !p) return;
+  const sel = raiz.querySelector(`[data-ganador-link="${propId}"]`);
+  const v = vistaPropuesta(r, p);
+  if (!(await confirmar(`¿Confirmar ${p.a_nombre} ${v.marcador} ${p.b_nombre}? Se guarda en el cuadro como si lo hubieras anotado tú.`, { titulo: 'Confirmar resultado', aceptar: 'Confirmar' }))) return;
+  await hacer(() => api.resolverResultadoLink(propId, true, sel ? sel.value : null), 'Resultado confirmado.');
+}
+async function rechazarLink(propId) {
+  const m = await pedirTexto('¿Por qué no vale? (opcional). Luego puedes anotar el resultado correcto a mano.', { titulo: 'Rechazar resultado de Link', maximo: MAX_TEXTO, obligatorio: false, aceptar: 'Rechazar' });
+  if (m === null) return;
+  await hacer(() => api.resolverResultadoLink(propId, false, null, m.trim() || null), 'Resultado rechazado. Anótalo a mano si hace falta.');
+}
+async function autoStaff(activar) {
+  const texto = activar
+    ? 'El torneo queda OFICIAL: Phoenix Link manda los resultados y el staff los confirma. Sigue en esta página.'
+    : '¿Quitar el carácter oficial? Los resultados vuelven a anotarse a mano (lo ya jugado no cambia).';
+  if (!(await confirmar(texto, { titulo: activar ? 'Hacer oficial' : 'Quitar oficial', aceptar: activar ? 'Hacer oficial' : 'Quitar', peligro: !activar }))) return;
+  await hacer(() => api.staffResultadosAuto(id, activar), activar ? 'Ahora es oficial.' : 'Ya no es oficial.');
+}
 // ── Pedido para hacer oficial (migración 144) ──────────────────────────────────────────────────────────────────────────
 async function pedirOficial() {
   const nota = await pedirTexto('Si quieres, cuéntale al staff algo de tu liga (cuántos son, cuándo juegan). Puedes dejarlo vacío.', { titulo: 'Pedir que sea oficial', maximo: MAX_TEXTO, obligatorio: false, aceptar: 'Enviar pedido' });

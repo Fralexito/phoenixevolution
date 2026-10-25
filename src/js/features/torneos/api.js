@@ -111,3 +111,8 @@ export const cancelarSolicitudOficial = (id) => rpc('torneo_cancelar_solicitud_o
 export const solicitudOficialDe = async (id) => { try { return (await rpc('torneo_solicitud_oficial_de', { p_torneo: id })) ?? null; } catch { return null; } };
 export const staffSolicitudesOficial = async (estado = 'pendiente') => (await rpc('staff_solicitudes_oficial', { p_estado: estado, p_limite: 50 })) ?? [];
 export const staffResolverSolicitud = (solicitud, aceptar, motivo = null) => rpc('staff_solicitud_oficial_resolver', { p_id: solicitud, p_aceptar: aceptar, p_motivo: motivo });
+// Resultados automáticos de Phoenix Link (migración 145). Si la 145 falta o falla, la página sigue igual (sin permiso ni propuestas).
+export const autoDe = async (id) => { try { return (await rpc('torneo_auto_de', { p_torneo: id })) ?? null; } catch { return null; } };
+export const resultadosLinkDe = async (id) => { try { return (await rpc('torneo_resultados_link_de', { p_torneo: id })) ?? []; } catch { return []; } };
+export const resolverResultadoLink = (propuesta, aceptar, ganador = null, motivo = null) => rpc('torneo_resultado_link_resolver', { p_id: propuesta, p_aceptar: aceptar, p_ganador: ganador, p_motivo: motivo });
+export const staffResultadosAuto = (id, activar) => rpc('staff_torneo_resultados_auto', { p_torneo: id, p_activar: activar });

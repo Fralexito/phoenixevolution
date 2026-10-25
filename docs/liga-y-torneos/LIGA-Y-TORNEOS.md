@@ -15,6 +15,7 @@ Se dejan aparte, porque son documentos vivos de una sola pieza:
 - [Parte 3 · Informe maestro · «La mejor web para organizar torneos» (informe aparte del de cada ronda)](#parte-3-informe-maestro-la-mejor-web-para-organizar-torneos-informe-aparte-del-de-cada-ronda) — origen `docs/liga-y-torneos/PLAN-TORNEOS-LIBRES.md` (01e6efc 2026-10-18)
 - [Parte 4 · Torneos propios (ronda 215 · migración 097)](#parte-4-torneos-propios-ronda-215-migracion-097) — origen `docs/liga-y-torneos/TORNEOS-LIBRES.md` (801bae3 2026-10-18)
 - [Parte 5 · Casual u oficial, y pedir que una liga sea oficial (ronda 368 · migración 144)](#parte-5-casual-u-oficial-y-pedir-que-una-liga-sea-oficial-ronda-368-migracion-144) — escrita el 25-oct-2026 (Cuenta 2)
+- [Parte 6 · Resultados automáticos con Phoenix Link en torneos premium y oficiales (ronda 369 · migración 145)](#parte-6-resultados-automaticos-con-phoenix-link-en-torneos-premium-y-oficiales-ronda-369-migracion-145) — escrita el 25-oct-2026 (Cuenta 2)
 
 ---
 
@@ -252,4 +253,65 @@ Avisos al Buzón del juego cuando te toca jugar · Realtime en el detalle (hoy r
 - En PL/pgSQL, una variable con el **mismo nombre que una columna** (`nota`, `motivo`) da «ambiguo». Se usaron `v_nota` y `v_motivo` (mismo fallo que la 109).
 - El enlace de los avisos solo acepta rutas simples (`notificaciones_enlace_ok`): por eso el aviso lleva a `torneo/?id=N` y no al id de la edición oficial (lleva «:»). La página del torneo ya enlaza a su Liga oficial.
 - El conector MCP de Supabase se cuelga con `DELETE`: la prueba no borra nada; se deshace con un error a propósito al final.
+
+---
+
+## Parte 6 · Resultados automáticos con Phoenix Link en torneos premium y oficiales (ronda 369 · migración 145)
+
+> Escrita el 25-oct-2026 por la **Cuenta 2**. Web beta **1.18.0**. **Migración 145 ESCRITA y PROBADA en seco (15 casos, TODO_OK_REVERTIDO), pero SIN APLICAR**: Supabase pidió permiso dos veces y quedó cancelado. Función `torneos` **SIN DESPLEGAR**. Mientras tanto la web se comporta como en la 1.17.0 (todo degrada solo).
+
+### 1. La decisión (Fralex, 25-oct)
+
+> «Cómo hacemos lo del resultado automático con opción premium» → «Recuerda que no solo las ligas serán premium, también torneos oficiales, campeonatos rápidos y etc.» → «Sí, mejor B, hazlo».
+
+- **Camino A (descartado):** pasar las ligas premium al motor de la Liga oficial. Solo servía para ligas todos contra todos.
+- **Camino B (elegido):** que Phoenix Link aprenda a llenar los partidos de **Torneos** directamente. Sirve para llaves, doble eliminación, todos contra todos, ida y vuelta, grupos y suizo. Colina, escalera, circuito y libre guardan su estado de otra forma: quedan para después.
+
+### 2. Cómo queda
+
+| Tipo de torneo | Quién pone los resultados | Quién los confirma |
+|---|---|---|
+| Casual (sin nada) | El organizador / jugadores, a mano | — |
+| **Premium** (pagó 300 gemas, migración 123) | Phoenix Link los propone | **El organizador** (o un moderador) |
+| **Oficial** dentro de Torneos (staff lo aprobó) | Phoenix Link los propone | **El staff** |
+| Liga oficial (`/liga-amigos/`, 142/143) | Phoenix Link (ruta `liga`, sin cambios) | El staff |
+
+- «Pedir que sea oficial» (144) ahora vale para **cualquier formato automático**: las ligas siguen pasando a «Liga oficial»; el resto queda **oficial dentro de Torneos**. El staff también tiene «Hacer oficial / Quitar oficial» en la página del torneo.
+- Lo que manda Link queda **«por confirmar»**: en la página sale «Link: 2 – 1 · por confirmar» al lado del partido y la caja **«Resultados de Phoenix Link por confirmar»** (`#res-link`). Al confirmar, el cuadro avanza como si se hubiera anotado a mano. Si llega otro marcador distinto: **disputa**. Si alguien lo anota a mano: la propuesta queda **reemplazada**.
+- Aviso en la campana (`RESULTADO_PROPUESTO`, enlace `torneo/?id=N#res-link`) al organizador (premium) o al staff (oficial).
+- El premium ahora lo anuncia: «Desbloquea los resultados automáticos con Phoenix Link…».
+
+### 3. Fases
+
+| Fase | Qué | Estado |
+|---|---|---|
+| 1 · Base y servidor | Migración 145 + función `supabase/functions/torneos` | **Escritas y probadas; falta aplicar la 145 y desplegar `torneos`** |
+| 2 · Web | Página del torneo, premium, pedido, campana | **Hecha** (se activa sola cuando la 145 está aplicada) |
+| 3 · Phoenix Link | Usar `GET /v1/torneos/partidos` y `POST /v1/torneos/resultado` | Para quien tenga el candado de Link. Contrato: `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` |
+| 4 · Prueba real | Un torneo premium jugado en PES | Fralex + quien lleve Link |
+
+### 4. Cómo terminar la fase 1 (quien tenga permiso en Supabase)
+
+1. Aplicar `supabase/migrations/145_torneos_resultados_link.sql` (SQL Editor o MCP `apply_migration`, nombre `145_torneos_resultados_link`).
+2. Correr `supabase/tests/145_torneos_resultados_link_test.sql` → debe terminar en **TODO_OK_REVERTIDO**.
+3. Desplegar la función `torneos` desde `supabase/functions/torneos/index.ts` con **`verify_jwt = false`** (MCP `deploy_edge_function` o `supabase functions deploy torneos --no-verify-jwt`).
+4. Anotar en `REGISTRO.md` y `TRASPASO.md`.
+
+### 5. Piezas
+
+| Pieza | Archivo |
+|---|---|
+| Base | `supabase/migrations/145_torneos_resultados_link.sql` (cabecera con cómo deshacer) |
+| Prueba de la base (15 casos) | `supabase/tests/145_torneos_resultados_link_test.sql` |
+| Servidor para Link | `supabase/functions/torneos/index.ts` |
+| Reglas puras + pruebas | `src/js/core/competicion/resultadosLink.js` · `tests/resultadosLink.test.mjs`; `solicitudOficial.js` ampliado |
+| Llamadas | `src/js/features/torneos/api.js` (`autoDe`, `resultadosLinkDe`, `resolverResultadoLink`, `staffResultadosAuto`) |
+| Página | `src/js/pages/torneo.js` (`resultadosLinkHTML`, `botonStaffAutoHTML`, `confirmarLink`, `rechazarLink`, `autoStaff`) · estilos en `src/styles/torneos.css` |
+| Contrato para Link | `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` |
+
+### 6. Trampas
+
+- Supabase pide confirmación para `execute_sql`/`apply_migration` grandes: dos veces quedó **cancelado** sin respuesta. Si pasa, no reintentar en bucle: pedir a Fralex que acepte, o que pegue el SQL él.
+- Para quitar el permiso oficial se usa `activo = false` (no se borran filas: el conector MCP se cuelga con borrados).
+- `goles_a` / `goles_b` son del lado **a/b del partido**, no del local/visitante del juego: Link debe traducirlo.
 

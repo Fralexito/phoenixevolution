@@ -6,10 +6,13 @@ const YO = 'u1';
 const liga = (x = {}) => ({ id: 1, creador: YO, formato: 'liguilla', estado: 'inscripcion', oculto: false, meta: {}, ...x });
 const AHORA = new Date('2026-10-25T12:00:00Z');
 
-test('ligaApta: solo ligas todos contra todos, en inscripción, visibles y aún no oficiales', () => {
+test('ligaApta: formatos automáticos (145), en inscripción, visibles y aún no oficiales', () => {
   assert.equal(ligaApta(liga()), true);
   assert.equal(ligaApta(liga({ formato: 'idavuelta' })), true);
-  assert.equal(ligaApta(liga({ formato: 'eliminacion' })), false);
+  assert.equal(ligaApta(liga({ formato: 'eliminacion' })), true);
+  assert.equal(ligaApta(liga({ formato: 'colina' })), false);
+  assert.equal(ligaApta(liga({ formato: 'grupos' }), 'oficial'), false);
+  assert.equal(ligaApta(liga({ formato: 'grupos' }), 'premium'), true);
   assert.equal(ligaApta(liga({ estado: 'en_curso' })), false);
   assert.equal(ligaApta(liga({ oculto: true })), false);
   assert.equal(ligaApta(liga({ meta: { oficial: 'amigos:x' } })), false);
@@ -26,7 +29,8 @@ test('horasParaVolver: 24 h tras un rechazo; 0 si no hay rechazo o ya pasó', ()
 test('vistaCreador: cada estado muestra lo suyo y solo al creador', () => {
   assert.equal(vistaCreador({ t: liga(), yo: 'otro', solicitud: null }).modo, 'nada');
   assert.equal(vistaCreador({ t: liga(), yo: null, solicitud: null }).modo, 'nada');
-  assert.equal(vistaCreador({ t: liga({ formato: 'eliminacion' }), yo: YO, solicitud: null }).modo, 'nada');
+  assert.equal(vistaCreador({ t: liga({ formato: 'colina' }), yo: YO, solicitud: null }).modo, 'nada');
+  assert.match(vistaCreador({ t: liga({ formato: 'eliminacion' }), yo: YO, solicitud: null }).texto, /el staff los confirma/);
   assert.equal(vistaCreador({ t: liga(), yo: YO, solicitud: null }).modo, 'pedir');
   assert.equal(vistaCreador({ t: liga(), yo: YO, solicitud: { estado: 'pendiente' } }).modo, 'pendiente');
   assert.equal(vistaCreador({ t: liga(), yo: YO, solicitud: { estado: 'cancelada' } }).modo, 'pedir');

@@ -158,3 +158,13 @@ html[data-tema='sudario'] .to-barra span { background: linear-gradient(90deg, #f
 .to-oficial-pedido .btn { align-self: flex-start; }
 .to-oficial-pedido[data-modo="staff"] { border-color: rgba(56, 189, 248, .35); background: rgba(56, 189, 248, .07); color: #e0f2fe; }
 .to-oficial-pedido[data-modo="pendiente"] { border-style: dashed; }
+
+/* Resultados automáticos de Phoenix Link (migración 145). */
+.to-pill-auto { border-color: rgba(56, 189, 248, .45); color: #bae6fd; }
+.to-links { display: grid; gap: .6rem; list-style: none; margin: 0; padding: 0; }
+.to-link { display: grid; gap: .35rem; padding: .75rem .9rem; border-radius: 14px; border: 1px solid rgba(56, 189, 248, .3); background: rgba(56, 189, 248, .06); }
+.to-link p { margin: 0; }
+.to-link.to-disputa, .to-extra-link.to-disputa { border-color: rgba(251, 146, 60, .55); background: rgba(251, 146, 60, .08); }
+.to-extra-link { color: #bae6fd; }
+#res-link { scroll-margin-top: 6rem; }
+.to-h2 { font-family: var(--font-display, inherit); font-weight: 800; font-size: 1.05rem; text-transform: uppercase; letter-spacing: .04em; color: #fff; display: flex; gap: .5rem; align-items: center; }

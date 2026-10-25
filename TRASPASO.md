@@ -66,12 +66,12 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 
 | Frente | Dónde | Lo tiene | Desde |
 |---|---|---|---|
-| Web (Astro) | `phoenixevolution@borrador` · PC `C:\dev\pes-liga-automatica` | **Cuenta 2** (resultados automáticos en torneos: fases 1 y 2) | 2026-10-25 |
+| Web (Astro) | `phoenixevolution@borrador` · PC `C:\dev\pes-liga-automatica` | libre | — |
 | Phoenix Link (C++) | `smash-soda-fork@plan-ux` · PC `C:\dev\smash-soda-fork\_phoenix-link` | **Cuenta 1** (hilo 1: integrar el paquete de mandos cuando el coordinador avise) | 2026-10-21 |
 | Phoenix Sync / Mercado | `smash-soda-fork@mercado-fase0` · PC `C:\dev\smash-soda-fork` | libre | — |
 | PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | **Cuenta 1** (hilo 4; necesita la PC conectada: la Cuenta 2 por navegador no puede tocarlo) — siguiente: pantalla Local/Visitante nativa de 16 | 2026-10-21 |
 | PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — en espera hasta acabar la pantalla nativa de 16 | — |
-| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | **Cuenta 2** — 145 RESERVADA (resultados automáticos en torneos); siguiente libre: **146** | 2026-10-25 |
+| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **145 escrita y probada pero SIN APLICAR** (ver entrada 05:40 de la Cuenta 2); siguiente libre: **146** | — |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
 
@@ -207,3 +207,12 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Fralex:** probar con sesión real: con una cuenta de jugador crear en Torneos una liga «Todos contra todos» → «Pedir que sea oficial» → con la cuenta admin mirar la campana, `/control/` y Moderación → Aceptar o Rechazar. Idea suya sin hacer: resultados automáticos como **función premium** para ligas no oficiales (esperar a que lo pida).
 - **Siguiente paso:** quien entre, leer `docs/liga-y-torneos/LIGA-Y-TORNEOS.md` parte 5 si va a tocar ligas/torneos.
 - **Candados:** solté Web y Supabase (libres). Link y «PES: mandos» siguen con la Cuenta 1.
+
+### 2026-10-25 05:40 (Lima) · Cuenta 2 · Resultados automáticos en torneos (camino B) — 145 SIN APLICAR
+- **Hecho:** web beta **1.18.0**, ronda 369. Decisión de Fralex: los resultados automáticos con Phoenix Link no son solo para ligas, también torneos oficiales, copas rápidas, etc. → **camino B**: Link llenará los partidos de Torneos directamente. Torneo **premium** → confirma el organizador; **oficial** (dentro de Torneos) → confirma el staff. «Pedir que sea oficial» vale ya para cualquier formato automático (llaves, doble, todos contra todos, ida y vuelta, grupos, suizo).
+- **Commits/ramas:** `phoenixevolution@borrador` (este commit).
+- **Supabase:** **145 escrita y probada en seco (15 casos, TODO_OK_REVERTIDO) pero NO APLICADA** — el permiso de Supabase se canceló dos veces. **Función `torneos` NO desplegada.** La web degrada sola (sin la 145 se comporta como la 1.17.0). Siguiente libre **146**.
+- **A medias / siguiente paso (quien tenga permiso en Supabase):** (1) aplicar `supabase/migrations/145_torneos_resultados_link.sql`; (2) correr `supabase/tests/145_torneos_resultados_link_test.sql` → TODO_OK_REVERTIDO; (3) desplegar `supabase/functions/torneos` con `verify_jwt=false`. Pasos en `docs/liga-y-torneos/LIGA-Y-TORNEOS.md` parte 6 §4.
+- **Para la Cuenta 1 (candado de Link) — fase 3:** implementar en Phoenix Link `GET /v1/torneos/partidos` y `POST /v1/torneos/resultado` según `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md`. Ojo: `goles_a/goles_b` son del lado a/b del partido, no local/visitante del juego.
+- **Esperando a Fralex:** aceptar el permiso de Supabase (o pegar él el SQL de la 145 en el SQL Editor).
+- **Candados:** solté Web y Supabase.
