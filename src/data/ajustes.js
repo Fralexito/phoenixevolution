@@ -76,6 +76,7 @@ export const SECCIONES = [
       { valor: 'America/Mexico_City', etiqueta: 'Ciudad de México' }, { valor: 'America/Santiago', etiqueta: 'Santiago (Chile)' }, { valor: 'America/Argentina/Buenos_Aires', etiqueta: 'Buenos Aires (Argentina)' }, { valor: 'Europe/Madrid', etiqueta: 'Madrid (España)' }] },
   ] },
   { id: 'datos', grupo: 'privacidad', vista: true, titulo: 'Datos', icono: 'fa-database', texto: 'Copia, traslada o limpia tus ajustes.', ajustes: [], acciones: [
+    { id: 'tutorial', etiqueta: 'Ver el tutorial otra vez', icono: 'fa-route' },
     { id: 'exportar', etiqueta: 'Exportar mis ajustes', icono: 'fa-file-export' },
     { id: 'importar', etiqueta: 'Importar ajustes', icono: 'fa-file-import' },
     { id: 'restablecer', etiqueta: 'Restablecer ajustes', icono: 'fa-rotate-left' },

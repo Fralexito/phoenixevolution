@@ -1,0 +1,26 @@
+/* Tutorial de bienvenida (js/features/tutorial.js). Encima de todo, incluso de los diálogos (2000). Sin animaciones con «menos movimiento». */
+.tut { position: fixed; inset: 0; z-index: 2100; opacity: 0; transition: opacity .2s ease; }
+.tut.tut-on { opacity: 1; }
+.tut[data-quieto], .tut[data-quieto] * { transition: none !important; animation: none !important; }
+.tut-velo { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tut-velo path { fill: rgba(4, 6, 18, .72); }
+.tut-foco { position: fixed; border-radius: 14px; box-shadow: 0 0 0 2px #f5c542, 0 0 24px 4px rgba(245, 197, 66, .45);
+  pointer-events: none; transition: top .25s cubic-bezier(.22, 1, .36, 1), left .25s cubic-bezier(.22, 1, .36, 1), width .25s, height .25s; }
+.tut-tarjeta { position: fixed; width: min(340px, calc(100vw - 24px)); padding: 1rem 1.1rem; border-radius: 18px; outline: none;
+  background: linear-gradient(160deg, rgba(30, 27, 75, .97), rgba(12, 14, 38, .98)); border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .55); color: #e5e7eb; transition: top .25s cubic-bezier(.22, 1, .36, 1), left .25s cubic-bezier(.22, 1, .36, 1); }
+.tut .tut-tarjeta:focus, .tut .tut-tarjeta:focus-visible { outline: none !important; box-shadow: 0 18px 50px rgba(0, 0, 0, .55); }
+.tut-cab { display: flex; align-items: center; gap: .6rem; }
+.tut-ico { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 12px; background: rgba(245, 197, 66, .15); color: #f5c542; flex: none; }
+.tut-prog { margin: 0; font-size: 12px; color: #a5b4fc; flex: 1; }
+.tut-x { width: 2.25rem; height: 2.25rem; border-radius: 10px; color: #9ca3af; display: grid; place-items: center; }
+.tut-x:hover, .tut-x:focus-visible { color: #fff; background: rgba(255, 255, 255, .08); }
+.tut-t { margin: .6rem 0 .25rem; font-family: var(--font-display, inherit); font-weight: 800; font-size: 1.15rem; color: #fff; }
+.tut-txt { margin: 0; font-size: 14px; line-height: 1.5; color: #d1d5db; }
+.tut-puntos { display: flex; gap: .3rem; margin: .8rem 0 .2rem; }
+.tut-puntos i { width: .45rem; height: .45rem; border-radius: 99px; background: rgba(255, 255, 255, .2); transition: width .2s, background .2s; }
+.tut-puntos i.on { width: 1.2rem; background: #f5c542; }
+.tut-acc { display: flex; align-items: center; gap: .4rem; margin-top: .6rem; }
+.tut-acc .btn { min-height: 2.5rem; }
+.tut-esp { flex: 1; }
+@media (max-width: 380px) { .tut-saltar { padding-inline: .5rem; } }

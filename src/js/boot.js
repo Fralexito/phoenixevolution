@@ -37,6 +37,8 @@ const despues = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { ti
 // Y su CÓDIGO también se descarga después (import() = archivo aparte): así no se descarga ni se ejecuta junto con lo visible
 // (el buscador, por ejemplo, trae fuse.js, 26 KB). Medido el 19-oct-2026.
 const luego = (nombre, cargar) => despues(() => cargar().catch((e) => console.error("[boot] " + nombre + ":", e)));
+// Tutorial de bienvenida: solo la primera vez en la portada (o con ?tutorial=1). Su código se descarga aparte y después.
+if (document.querySelector('[data-vt-grid]') || location.search.includes('tutorial=1')) luego('tutorial', () => import('./features/tutorial.js').then((m) => m.initTutorial()));
 luego('ticker', () => import('./features/ticker.js').then((m) => m.initTicker()));
 luego('en vivo', () => Promise.all([import('./features/liveFeed.js'), import('./features/liveDock.js')]).then(([a, b]) => { a.initLiveFeed(); b.initLiveDock(); }));
 luego('buscador', () => import('./features/buscadorGlobal.js').then((m) => m.initBuscadorGlobal()));

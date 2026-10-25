@@ -46,6 +46,7 @@ const ACCIONES = {
   'borrar-historial-vivo': () => { quitar('pes-live-hist'); toast('Historial de «En vivo» borrado.', 'info'); },
   'restablecer-vivo-pos': () => { quitar('pes-live-dock'); toast('El botón «En vivo» volverá a su sitio al recargar la página.', 'info'); },
   'borrar-zoom': () => { quitar('pes-zoom-pc'); quitar('pes-zoom-movil'); toast('Zoom olvidado: volverá al tamaño predeterminado.', 'info'); },
+  tutorial: () => import('../features/tutorial.js').then((m) => { if (!m.abrirTutorial({ forzado: true })) location.href = href('?tutorial=1'); }).catch(() => toast('No se pudo abrir el tutorial.', 'error')),
   exportar: () => { descargar('ajustes-phoenix.json', exportarAjustes(leerAjustes())); avisar('Archivo descargado.'); },
   importar: () => document.getElementById('aj-archivo')?.click(),
   restablecer: () => { reemplazarAjustes(AJUSTES_DEFECTO); pintar(); avisar('Ajustes restablecidos.'); },

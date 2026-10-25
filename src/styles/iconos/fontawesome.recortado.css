@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 284 nombres que usa la web. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 285 nombres que usa la web. */
 /*!
  * Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -1776,6 +1776,10 @@
 
 .fa-hand-holding-dollar {
   --fa: "\f4c0";
+}
+
+.fa-route {
+  --fa: "\f4d7";
 }
 
 .fa-seedling {
