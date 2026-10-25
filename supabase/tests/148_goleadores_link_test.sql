@@ -1,5 +1,5 @@
 -- Prueba en seco de la 148 (correr DESPUÉS de aplicarla; termina con TODO_OK_REVERTIDO = todo bien y nada guardado).
--- Cambia a y b por dos perfiles reales (b = cualquier otro). Aún NO ejecutada: Supabase canceló el permiso el 25-oct-2026.
+-- Cambia a y b por dos perfiles reales (b = cualquier otro). Ejecutada el 25-oct-2026 en la base real: OK.
 do $t$
 declare a uuid := '7f1abba3-07f3-4c66-ba1e-327e29e83371'; b uuid := '9c910092-4a0a-4554-bbba-e7f7fe2af64b';
   rid integer; dev uuid; j jsonb;

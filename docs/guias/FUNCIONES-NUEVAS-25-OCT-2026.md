@@ -207,3 +207,11 @@ empieza un draft · se acepta una serie entre clanes · resumen semanal del prod
 **Blindaje:** ningún aviso puede romper la acción que lo dispara (cada disparador atrapa sus errores); en las cadenas de turnos
 vencidos del draft no se avisa a quien ya perdió el turno; Discord nunca repite un mensaje (clave única); textos limpiados sin
 menciones; si la 149 (prode) no está, la parte del prode se salta sola. El webhook de Discord **aún no está configurado**.
+
+---
+
+> **Actualización 13:50 (Lima):** con el permiso de Fralex se aplicaron **145, 148, 149 y 152** (y la nueva 153) y se desplegaron las
+> Edge Functions **`torneos`** y **`goles`**. Pruebas en seco en la base real: 145 (15 casos), 148 (7), 149 (8: pagó 10 ascuas una sola
+> vez), 152 (avisos de MVP, prode y draft). Todo lo marcado arriba como «SIN APLICAR» ya está activo.
+> Cambio técnico para que Supabase no pida el permiso aparte: `create or replace trigger` en vez de `drop trigger`, y en goleadores
+> los envíos repetidos marcan los goles viejos como `vigente = false` en vez de borrarlos.

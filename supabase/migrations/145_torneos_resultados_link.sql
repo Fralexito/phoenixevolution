@@ -1,4 +1,5 @@
 -- 145 · Resultados AUTOMÁTICOS con Phoenix Link en TORNEOS (camino B, decisión de Fralex, 25-oct-2026).
+-- ESTADO: APLICADA el 25-oct-2026 13:50 (Lima); prueba supabase/tests/145_torneos_resultados_link_test.sql OK (15 casos).
 -- «Recuerda que no solo las ligas serán premium, también torneos oficiales, campeonatos rápidos y etc.» → «Sí, mejor B, hazlo».
 --
 -- Idea: hasta hoy Phoenix Link solo sabía subir resultados a la Liga oficial (102/142). Esto abre la MISMA tubería para los
@@ -146,8 +147,7 @@ begin
   return new;
 end $$;
 revoke all on function private.tl_resultado_link_reemplazo() from public, anon, authenticated;
-drop trigger if exists zz_tl_resultado_link_reemplazo on public.torneos_libres_partidos;
-create trigger zz_tl_resultado_link_reemplazo after update of jugado, ga, gb, ganador on public.torneos_libres_partidos
+create or replace trigger zz_tl_resultado_link_reemplazo after update of jugado, ga, gb, ganador on public.torneos_libres_partidos
   for each row execute function private.tl_resultado_link_reemplazo();
 
 -- ── 3. Lectura para la web ───────────────────────────────────────────────────────────────────────────────────────────

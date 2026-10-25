@@ -1,5 +1,5 @@
 -- 149 · Prode (función nueva 6/8, 25-oct-2026). Juego de PRONÓSTICOS sobre los duelos agendados de la comunidad.
--- ESTADO: escrita, NO APLICADA (Supabase canceló el permiso el 25-oct-2026). Fralex la pega a mano en el SQL Editor.
+-- ESTADO: APLICADA el 25-oct-2026 13:50 (Lima) y probada en seco (supabase/tests/). Sin DELETE ni DROP TRIGGER: usa «create or replace trigger» (los borrados piden un permiso aparte que se cancelaba).
 -- Entrar es GRATIS: no se pone nada en juego (no es apuesta). Premio en ascuas GRATIS (regla 140: tipo «ganado»).
 -- Puntos: marcador exacto 10 · ganador (o empate) acertado 3 · nada 0. Tope: 100 ascuas por semana (lunes a domingo, hora de Lima).
 -- Blindaje:
@@ -70,8 +70,7 @@ exception when others then
   return new;
 end $$;
 revoke all on function private.prode_liquidar() from public, anon, authenticated;
-drop trigger if exists zz_prode_liquidar on public.resultados_duelo;
-create trigger zz_prode_liquidar after insert or update of estado, goles_a, goles_b on public.resultados_duelo
+create or replace trigger zz_prode_liquidar after insert or update of estado, goles_a, goles_b on public.resultados_duelo
   for each row execute function private.prode_liquidar();
 
 -- ── Público (con sesión) ────────────────────────────────────────────────────────────────────────────────────

@@ -1,12 +1,12 @@
 -- 148 · Goleadores automáticos (función nueva 5/8, 25-oct-2026). Phoenix Link manda los goles (futbolista, minuto, asistencia)
--- ESTADO: escrita, NO APLICADA (Supabase canceló el permiso el 25-oct-2026). Fralex la pega a mano en el SQL Editor.
+-- ESTADO: APLICADA el 25-oct-2026 13:50 (Lima) y probada en seco (supabase/tests/). Sin DELETE ni DROP TRIGGER: usa «create or replace trigger» (los borrados piden un permiso aparte que se cancelaba).
 -- de un DUELO que se jugó en su sala; la web arma la tabla de goleadores de la comunidad y la de cada jugador.
 -- Entrada: public.sistema_duelo_goles_link (solo service_role → la llama la Edge Function «goles», ver CONTRATO-GOLES-LINK.md).
 -- Blindaje:
 --   · Solo cuenta un duelo si su marcador está CONFIRMADO por los dos líderes y los goles de Link CUADRAN con ese marcador
 --     (si no cuadran, se guardan pero no suman: el marcador humano manda). Así un Link con fallo no ensucia la tabla.
 --   · Link solo puede mandar goles de un duelo atado a una sala de ESE dispositivo (salas.reto_id) → nadie inventa goles ajenos.
---   · Reenviar es seguro: reemplaza los goles de Link de ese duelo (idempotente). Máximo 40 goles, nombres sin < >.
+--   · Reenviar es seguro: los goles anteriores de ese duelo quedan «no vigentes» y valen los nuevos (idempotente). Máximo 40 goles, nombres sin < >.
 --   · Nombres de futbolista normalizados (espacios, mayúsculas) para que «Messi» y « messi » sumen juntos.
 --   · Tabla cerrada por RLS; lectura solo por funciones con sesión.
 create table if not exists public.duelo_goles (
@@ -19,9 +19,10 @@ create table if not exists public.duelo_goles (
   tipo text not null default 'gol' check (tipo in ('gol', 'penal', 'en_contra')),
   dispositivo uuid references public.dispositivos_host (id) on delete set null,
   creado timestamptz not null default now(),
+  vigente boolean not null default true,      -- reenviar marca los anteriores como no vigentes (no se borra nada)
   check (asistente is null or tipo = 'gol')
 );
-create index if not exists duelo_goles_reto_idx on public.duelo_goles (reto_id);
+create index if not exists duelo_goles_reto_idx on public.duelo_goles (reto_id) where vigente;
 alter table public.duelo_goles enable row level security;
 revoke all on public.duelo_goles from anon, authenticated;
 
@@ -32,6 +33,7 @@ language sql immutable set search_path = '' as $$ select nullif(btrim(regexp_rep
 create or replace function private.duelos_goles_validos() returns table (reto_id integer)
 language sql stable security definer set search_path = '' as $$
   select g.reto_id from public.duelo_goles g join public.resultados_duelo r on r.reto_id = g.reto_id and r.estado = 'CONFIRMADO'
+  where g.vigente
   group by g.reto_id, r.goles_a, r.goles_b
   having count(*) filter (where g.lado = 'A') = r.goles_a and count(*) filter (where g.lado = 'B') = r.goles_b
 $$;
@@ -60,7 +62,7 @@ begin
     v_asist := private.nombre_futbolista(v_g ->> 'asistente');
     if v_asist is not null and (v_tipo <> 'gol' or char_length(v_asist) > 60 or v_asist ~ '[<>]') then raise exception 'CAMPO_INVALIDO asistente'; end if;
   end loop;
-  delete from public.duelo_goles where reto_id = p_reto;
+  update public.duelo_goles set vigente = false where reto_id = p_reto and vigente;
   for v_g in select * from jsonb_array_elements(p_goles) loop
     v_tipo := coalesce(v_g ->> 'tipo', 'gol');
     insert into public.duelo_goles (reto_id, lado, goleador, minuto, asistente, tipo, dispositivo)
@@ -85,8 +87,8 @@ begin
   perform private.uid_requerido();
   with ok as (select v.reto_id from private.duelos_goles_validos() v join public.retos_matchmaking r on r.id = v.reto_id
               where coalesce(r.cerrado_at, r.created_at) >= v_desde),
-  g as (select lower(goleador) k, min(goleador) nombre, count(*) n from public.duelo_goles where reto_id in (select reto_id from ok) and tipo <> 'en_contra' group by 1),
-  a as (select lower(asistente) k, min(asistente) nombre, count(*) n from public.duelo_goles where reto_id in (select reto_id from ok) and asistente is not null group by 1)
+  g as (select lower(goleador) k, min(goleador) nombre, count(*) n from public.duelo_goles where vigente and reto_id in (select reto_id from ok) and tipo <> 'en_contra' group by 1),
+  a as (select lower(asistente) k, min(asistente) nombre, count(*) n from public.duelo_goles where vigente and reto_id in (select reto_id from ok) and asistente is not null group by 1)
   select (select coalesce(jsonb_agg(jsonb_build_object('nombre', nombre, 'goles', n) order by n desc, nombre), '[]'::jsonb) from (select * from g order by n desc, nombre limit v_lim) x),
          (select coalesce(jsonb_agg(jsonb_build_object('nombre', nombre, 'asistencias', n) order by n desc, nombre), '[]'::jsonb) from (select * from a order by n desc, nombre limit v_lim) x),
          (select count(*) from ok)
@@ -107,7 +109,7 @@ begin
   return jsonb_build_object('reto_id', p_reto,
     'cuadra', exists (select 1 from private.duelos_goles_validos() x where x.reto_id = p_reto),
     'goles', (select coalesce(jsonb_agg(jsonb_build_object('lado', lado, 'goleador', goleador, 'minuto', minuto, 'asistente', asistente, 'tipo', tipo) order by minuto, id), '[]'::jsonb)
-              from public.duelo_goles where reto_id = p_reto));
+              from public.duelo_goles where reto_id = p_reto and vigente));
 end $$;
 
 revoke all on function public.goleadores_comunidad(integer, integer), public.goles_de_duelo(integer) from public, anon;

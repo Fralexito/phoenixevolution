@@ -1,5 +1,5 @@
 -- 152 · Avisos de las funciones nuevas (25-oct-2026, Cuenta 2). Campana de la web + canal de Discord.
--- ESTADO: escrita, NO APLICADA (Supabase canceló el permiso el 25-oct-2026). Va en docs/sql-pendiente/PEGAR-145-148-149.sql, después de la 149.
+-- ESTADO: APLICADA el 25-oct-2026 13:50 (Lima) y probada en seco (supabase/tests/). Sin DELETE ni DROP TRIGGER: usa «create or replace trigger» (los borrados piden un permiso aparte que se cancelaba).
 -- Orden: aplicar DESPUÉS de 147, 149, 150 y 151. Si la 149 (prode) aún no está, la parte del prode se salta sola y se puede
 -- volver a correr esta migración después (todo es «create or replace» / «if not exists»).
 --
@@ -73,8 +73,7 @@ begin
 exception when others then raise warning '[draft_avisos] draft %: %', new.id, sqlerrm; return new;
 end $$;
 revoke all on function private.draft_avisos() from public, anon, authenticated;
-drop trigger if exists zz_draft_avisos on public.drafts;
-create trigger zz_draft_avisos after update of estado, turno on public.drafts for each row execute function private.draft_avisos();
+create or replace trigger zz_draft_avisos after update of estado, turno on public.drafts for each row execute function private.draft_avisos();
 
 -- ── 3. Clan contra clan ──────────────────────────────────────────────────────────────────────────────────────────────
 create or replace function private.clan_serie_avisos() returns trigger
@@ -102,8 +101,7 @@ begin
 exception when others then raise warning '[clan_serie_avisos] serie %: %', new.id, sqlerrm; return new;
 end $$;
 revoke all on function private.clan_serie_avisos() from public, anon, authenticated;
-drop trigger if exists zz_clan_serie_avisos on public.clan_series;
-create trigger zz_clan_serie_avisos after insert or update of estado on public.clan_series for each row execute function private.clan_serie_avisos();
+create or replace trigger zz_clan_serie_avisos after insert or update of estado on public.clan_series for each row execute function private.clan_serie_avisos();
 
 -- ── 4. MVP: «vota al MVP» al confirmarse el duelo ────────────────────────────────────────────────────────────────────
 create or replace function private.mvp_avisos() returns trigger
@@ -120,8 +118,7 @@ begin
 exception when others then raise warning '[mvp_avisos] reto %: %', new.reto_id, sqlerrm; return new;
 end $$;
 revoke all on function private.mvp_avisos() from public, anon, authenticated;
-drop trigger if exists zz_mvp_avisos on public.resultados_duelo;
-create trigger zz_mvp_avisos after insert or update of estado on public.resultados_duelo for each row execute function private.mvp_avisos();
+create or replace trigger zz_mvp_avisos after insert or update of estado on public.resultados_duelo for each row execute function private.mvp_avisos();
 
 -- ── 5. Prode (solo si la 149 ya está aplicada) ───────────────────────────────────────────────────────────────────────
 do $prode$
@@ -143,8 +140,7 @@ begin
     end $b$;
   $f$;
   execute 'revoke all on function private.prode_avisos() from public, anon, authenticated';
-  execute 'drop trigger if exists zz_prode_avisos on public.prode_pronosticos';
-  execute 'create trigger zz_prode_avisos after update of liquidado on public.prode_pronosticos for each row execute function private.prode_avisos()';
+  execute 'create or replace trigger zz_prode_avisos after update of liquidado on public.prode_pronosticos for each row execute function private.prode_avisos()';
 
   execute $f$
     create or replace function private.prode_resumen_semana() returns text
@@ -163,6 +159,5 @@ begin
   $f$;
   execute 'revoke all on function private.prode_resumen_semana() from public, anon, authenticated';
   -- lunes 9:00 Lima = 14:00 UTC
-  perform cron.unschedule(jobid) from cron.job where jobname = 'prode-resumen-semana';
   perform cron.schedule('prode-resumen-semana', '0 14 * * 1', 'select private.prode_resumen_semana()');
 end $prode$;
