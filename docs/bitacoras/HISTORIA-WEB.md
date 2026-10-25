@@ -1983,6 +1983,13 @@ Hoy todo lo que se aplica en Supabase va directo a producción (no hay rama de p
 3. Poner su URL y su clave publicable en las variables de la vista previa de Cloudflare (`PUBLIC_SUPABASE_URL` y la clave), no en el código.
 4. Costumbre: toda migración nueva se prueba primero en `phoenix-pruebas`; si va bien, se aplica a producción.
 
+**Actualización 25-oct-2026: la copia quedó aplazada (decisión de Fralex: opción B).** Al intentar crearla salieron 3 bloqueos:
+- **Los 2 huecos gratis ya estaban ocupados**: «Galaxy League» (producción) y «Fotos Jefferson» (creado el 22-oct). El límite de 2 proyectos activos es por cuenta y cuenta en todas las organizaciones donde Fralex es dueño o administrador. Los proyectos pausados no cuentan. Para crear la copia habría que pausar uno.
+- **La herramienta de Supabase de Claude no puede confirmar el costo** (`confirm_cost` rechaza el importe 0 porque le llega como texto), así que `create_project` no se puede usar. El proyecto lo tendría que crear Fralex en el panel.
+- **Replicar las migraciones del repo NO reproduce producción**: hay desfase y mucho se pegó a mano (ver `supabase/migrations/REGISTRO_DESFASES.md`). Producción tenía 205 tablas, 733 funciones, 208 políticas, 126 disparadores y 19 tareas de `pg_cron` (unos 770 KB solo de funciones). La copia fiel exige `pg_dump` (cliente de PostgreSQL 17, unos 300 MB, no instalado). `supabase db dump` no sirve sin Docker. Pasar ese SQL por la herramienta de Claude sería lento y propenso a errores.
+
+Mientras tanto, los cambios se siguen probando con el patrón `DO … raise exception 'PRUEBA_OK'`, que deshace todo. **Cuándo retomarla:** antes de abrir la web a mucha gente o de mover dinero real. Pasos entonces: liberar un hueco, que Fralex cree el proyecto en el panel, pedir permiso para instalar el cliente de PostgreSQL 17 y usar `pg_dump --schema-only` de producción → `psql` en la copia, con las cadenas de conexión en un archivo local (nunca en el chat ni en el repo).
+
 ### 6. Costumbre contra los cambios sin commit
 
 Script nuevo: `tools/revisar-sin-commit.ps1` (solo **lee**; no hace commit, no borra, no cambia de rama ni permisos).
