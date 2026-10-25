@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Prode" active="prode">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Comunidad · Gratis</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-bullseye text-galaxy-400 mr-2"></i>Prode</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Adivina el marcador de los duelos agendados. <b>Es gratis: no pones nada en juego.</b> Marcador exacto = 10 ascuas, acertar al ganador (o el empate) = 3. Máximo 100 ascuas por semana. No puedes pronosticar tus propios duelos. Se paga cuando los dos líderes confirman el marcador.</p>
+    </header>
+
+    <div id="pr-aviso" hidden role="status" class="rounded-xl border border-galaxy-border bg-galaxy-panel px-4 py-3 text-sm text-gray-300"></div>
+
+    <section id="pr-semana" hidden class="glass-panel rounded-2xl p-4 space-y-2" aria-labelledby="pr-semana-t">
+      <div class="flex items-center gap-2"><h2 id="pr-semana-t" class="font-display font-bold text-white text-sm uppercase tracking-wider">Tu semana</h2><span id="pr-semana-txt" class="ml-auto text-[12px] text-amber-300"></span></div>
+      <div class="h-2 rounded-full bg-white/10 overflow-hidden" role="progressbar" aria-labelledby="pr-semana-t" aria-valuemin="0" aria-valuemax="100" id="pr-barra"><i class="block h-full bg-amber-300 rounded-full" style="width:0%"></i></div>
+    </section>
+
+    <section id="pr-abiertos-s" hidden class="space-y-2" aria-labelledby="pr-abiertos-t">
+      <h2 id="pr-abiertos-t" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-pen-to-square text-galaxy-400 mr-2"></i>Para pronosticar</h2>
+      <div id="pr-abiertos" class="grid gap-2"></div>
+    </section>
+
+    <section id="pr-mios-s" hidden class="space-y-2" aria-labelledby="pr-mios-t">
+      <h2 id="pr-mios-t" class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2"><i class="fa-solid fa-list-check text-galaxy-400 mr-2"></i>Mis pronósticos</h2>
+      <div id="pr-mios" class="grid gap-2"></div>
+    </section>
+
+    <section id="pr-ranking-s" hidden class="glass-panel rounded-2xl p-4 space-y-2" aria-labelledby="pr-ranking-t">
+      <h2 id="pr-ranking-t" class="font-display font-bold text-white text-sm uppercase tracking-wider"><i class="fa-solid fa-ranking-star text-galaxy-400 mr-1"></i>Mejores de la semana</h2>
+      <ol id="pr-ranking" class="space-y-1"></ol>
+    </section>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/prode.js';
+</script>

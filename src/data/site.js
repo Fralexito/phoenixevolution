@@ -64,6 +64,7 @@ const ACCOUNT_NAV_BASE = [
   { id: 'tienda',   label: 'Tienda',       path: 'tienda/',        icon: 'fa-store', grupo: 'comunidad' },
   { id: 'manager',  label: FX.clubUnificado ? 'Mi club' : 'Liga Máster', path: 'manager/',       icon: 'fa-user-tie', grupo: 'jugar' },
   { id: 'formatos', label: 'Formatos',     path: 'formatos/',      icon: 'fa-sitemap', grupo: 'comunidad' },
+  { id: 'prode',    label: 'Prode',        path: 'prode/',         icon: 'fa-bullseye', grupo: 'comunidad' },   // 25-oct-2026: pronósticos gratis (migración 149)
   { id: 'torneos',  label: 'Torneos',      path: 'torneos/',       icon: 'fa-trophy', grupo: 'comunidad' },
   { id: 'miclub',   label: 'Mi club',      path: 'mi-club/',       icon: 'fa-shirt', grupo: 'jugar', ...(FX.clubUnificado ? { menu: false } : {}) },
   // `staff: '<permiso>'` = solo lo ve quien tenga ese permiso (ver PERMISOS en core/sistema/roles.js); se muestra u oculta al iniciar sesión.

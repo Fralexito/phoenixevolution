@@ -124,3 +124,22 @@ sección `#rk-goleadores` en `src/pages/ranking.astro`.
 (un Link con fallo no ensucia la tabla); Link solo puede mandar goles de un duelo jugado en una sala de **esa** PC; se valida
 3 veces (Link → Edge Function → BD) antes de borrar nada; reenviar reemplaza (idempotente); máx. 40 goles; nombres limpios
 y sin `< >`; los autogoles no suman al goleador; interruptor del staff `phoenix_config.goles_link`.
+
+---
+
+## 6. Prode (beta 1.24.0 · migración 149 ESCRITA, SIN APLICAR)
+
+**Qué es:** página nueva **/prode/** (menú Comunidad). Adivinas el marcador de los duelos agendados. **Entrar es gratis: no se
+pone nada en juego** (no es apuesta). Marcador exacto = **10 ascuas**, ganador o empate acertado = **3**. Tope **100 ascuas por
+semana** (lunes a domingo, hora de Lima). Se paga solo cuando los dos líderes confirman el marcador. Ranking de la semana por puntos.
+
+**Por qué no se aplicó:** Supabase pidió permiso y se canceló → Fralex la pega a mano. Sin la 149 la página dice «llega muy pronto».
+
+**Piezas:** `supabase/migrations/149_prode.sql` (tabla `prode_pronosticos`; `prode_pronosticar`, `prode_tablero`,
+`prode_ranking_semana`; trigger `zz_prode_liquidar` en `resultados_duelo`) · `src/js/core/competicion/prode.js` +
+`tests/prode.test.mjs` (4 pruebas) · `src/pages/prode.astro` + `src/js/pages/prode.js` · entrada en `src/data/site.js`.
+
+**Blindaje:** respeta la regla 140 (ascuas solo gratis: tipo `ganado`, fuente `prode`); no puedes pronosticar un duelo donde
+juegas o eres host; se cierra al empezar el duelo; clave única por pronóstico → nunca se paga dos veces; tope semanal sobre lo
+ya pagado; si el prode falla, **nunca** impide confirmar un marcador (el trigger atrapa el error y deja un aviso); interruptor
+del staff `phoenix_config.prode = false`; tabla cerrada por RLS.
