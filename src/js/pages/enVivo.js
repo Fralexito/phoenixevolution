@@ -10,6 +10,9 @@ import { MODOS, modoDe, accionPara, clampMax } from '../core/competicion/especta
 import * as api from '../features/espectadores/api.js';
 import { regionAhora } from '../features/ajustes.js';
 import { montarTarjetasSalas } from '../features/salas/tarjetas.js';
+import { montarEstadoHosts } from '../features/salas/estadoHosts.js';
+
+const HOSTS = montarEstadoHosts({ seccion: document.getElementById('bloque-hosts'), lista: document.getElementById('lista-hosts'), resumen: document.getElementById('hosts-resumen') });
 
 const $ = (id) => document.getElementById(id);
 const S = { partidos: [], salas: [], enlaces: new Map(), ocupado: false };
@@ -107,11 +110,11 @@ $('lista-mis-salas').addEventListener('click', (e) => {
   })[b.dataset.act]?.();
 });
 
-onSession(() => cargar());
+onSession(() => { cargar(); if (getState().session) HOSTS.recargar(); });
 let t; const soon = () => { clearTimeout(t); t = setTimeout(cargar, 300); };
 supabase.channel('en-vivo').on('postgres_changes', { event: '*', schema: 'public', table: 'reto_espectadores' }, soon)
   .on('postgres_changes', { event: '*', schema: 'public', table: 'retos_matchmaking' }, soon).subscribe();
-setInterval(() => { if (!document.hidden) cargar(); }, 60000);
+setInterval(() => { if (!document.hidden) { cargar(); if (getState().session) HOSTS.recargar(); } }, 60000);
 
 // Salas de Smash Soda que admiten espectadores (migración 067).
 montarTarjetasSalas({ contenedor: document.getElementById('lista-salas-vivo'), tipo: 'vivo',

@@ -61,3 +61,26 @@ avanza con flechas, ilumina el botón correcto en cada tamaño, y Esc lo cierra 
 **Cómo se probó:** 6 pruebas puras; en el navegador real, la página Eventos con un evento simulado (título con «», comas y
 punto y coma, descripción con salto de línea): la ventana sale, el enlace de Google es correcto y el `.ics` descargado tiene
 `UID`, `DTSTART`/`DTEND` en UTC, el texto escapado y el `VALARM` de 30 min.
+
+---
+
+## 3. Estado de los hosts (beta 1.21.0 · migración 146 APLICADA)
+
+**Qué es:** nueva sección en **Salas en vivo** con cada host aprobado que tiene Phoenix Link: **Sala abierta**, **En partida**,
+**Encendido** o **Apagado (visto hace X)**, su región y su **ping típico** (mediana de los últimos 7 días, con semáforo:
+menos de 60 ms bien, menos de 110 regular, más = alto). Se actualiza sola cada minuto.
+
+**Piezas:** `supabase/migrations/146_estado_hosts.sql` (función `hosts_estado()`, solo lectura, sin tablas nuevas) ·
+`src/js/core/comunidad/estadoHosts.js` + `tests/estadoHosts.test.mjs` (4 pruebas) · `src/js/features/salas/estadoHosts.js` ·
+sección `#bloque-hosts` en `src/pages/en-vivo.astro`, conectada en `src/js/pages/enVivo.js`.
+
+**Cómo sabe si está encendido:** Phoenix Link actualiza `dispositivos_host.ultimo_uso` en cada llamada → encendido si fue
+hace menos de 5 min; la sala cuenta si su latido tiene menos de 3 min (igual que el resto de Salas en vivo).
+
+**Blindaje / privacidad:** solo hosts aprobados o staff; nunca sale el token ni el nombre de la PC; «visto» redondeado a 5 min;
+apagados hace más de 30 días no salen; ping solo con 5 muestras o más; si hay bloqueo entre tú y el host, no te sale;
+sesión obligatoria; tope 100. En la web: sin sesión no pide nada; si la base no tuviera la 146, la sección se oculta sola;
+otros fallos → mensaje con «Reintentar»; no se encima un pedido sobre otro.
+
+**Cómo se probó:** 4 pruebas puras; la función se ejecutó en la base real como admin (devolvió el host de Hugo, apagado,
+visto redondeado, sin ping por falta de muestras); la página carga sin errores y sin sesión la sección queda oculta.
