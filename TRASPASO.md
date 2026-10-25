@@ -71,7 +71,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Phoenix Sync / Mercado | `smash-soda-fork@mercado-fase0` · PC `C:\dev\smash-soda-fork` | libre | — |
 | PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | **Cuenta 1** (hilo 4; necesita la PC conectada: la Cuenta 2 por navegador no puede tocarlo) — siguiente: pantalla Local/Visitante nativa de 16 | 2026-10-21 |
 | PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — en espera hasta acabar la pantalla nativa de 16 | — |
-| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **todas aplicadas hasta 157** (145–157 el 25-oct, probadas en seco); Edge Functions `torneos` y `goles` desplegadas; siguiente libre: **158** | 2026-10-25 |
+| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 158; **159 (limpieza) escrita SIN APLICAR** (145–158 el 25-oct, probadas en seco); Edge Functions `torneos` y `goles` desplegadas; siguiente libre: **160** | 2026-10-25 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
 

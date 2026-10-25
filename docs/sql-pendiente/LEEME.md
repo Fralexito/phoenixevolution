@@ -1,5 +1,13 @@
-# SQL pendiente — NADA (actualizado 25-oct-2026 13:50, Lima)
+# SQL pendiente — solo la 159 (actualizado 25-oct-2026 14:25, Lima)
 
+## Pendiente: 159 · limpieza automática diaria
+Supabase canceló el permiso (esta sí borra filas viejas). Para activarla: Supabase → **SQL Editor** → pegar todo
+`supabase/migrations/159_limpieza_automatica.sql` → **Run**. Es seguro correrla dos veces.
+Qué borra cada día: goles de Link reemplazados (>30 días), chat de duelos viejos (>90 días), chat y repeticiones ocultos (>180 días),
+predicciones de duelos viejos (>180 días) y el registro de tareas programadas (>3 días; hoy es la tabla más grande, ~10 MB).
+Nunca toca resultados, votos, ascuas ni dinero.
+
+## Lo demás
 Todo quedó aplicado por Claude con el permiso de Fralex: **145, 148, 149, 152 y 153**, con sus pruebas en seco OK
 (`supabase/tests/`), y desplegadas las Edge Functions **`torneos`** y **`goles`** (verify_jwt = false).
 

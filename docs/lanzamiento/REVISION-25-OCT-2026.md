@@ -25,3 +25,16 @@ Recorrido automático de las **63 páginas** en celular (390 px) y PC (1440 px),
 ## Cómo repetir esta revisión
 `npm run build` y luego los scripts de la carpeta de pruebas de la sesión (auditar todas las páginas y medir peso con red lenta);
 la versión fija para el repositorio es `npm run test:paginas` (arranque de cada página).
+
+---
+
+## Optimización · 25-oct-2026 14:25 (beta 1.31.1)
+| Qué | Resultado |
+|---|---|
+| Claves foráneas sin índice (asesor de Supabase) | 110 → **0** (migración 158, se genera sola desde el catálogo) |
+| Tamaño de la base | 43 MB; la tabla más grande es el registro de tareas programadas (~10 MB) |
+| Limpieza automática diaria (159) | **Escrita, falta el permiso de Fralex** (borra filas viejas: ver `docs/sql-pendiente/LEEME.md`) |
+| App del celular (service worker) | Antes guardaba sin límite (y también respuestas con error). Ahora: máx. **400 archivos** y **80 páginas**, solo respuestas OK; caché nueva `pes-v3` (las viejas se borran solas) |
+| Imágenes de `public/` | Ya estaban optimizadas (la más pesada, el ícono de 512 px, no baja más sin perder calidad) |
+| Índices «sin uso» (56) | No se tocan: «sin uso» es porque aún hay poco tráfico; borrarlos podría volver lenta la web cuando crezca |
+| CSS global de 100 KB comprimido | No se partió: las hojas que quedan en global se usan en casi todas las páginas; partirlo es una reforma con riesgo de romper estilos (regla de Fralex) |
