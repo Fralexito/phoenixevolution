@@ -1,0 +1,4 @@
+-- Prueba en seco de la 150 (termina con TODO_OK_REVERTIDO: no guarda nada). Ejecutada el 25-oct-2026 en la base real: OK.
+-- Casos: miembro no propone · no retarse a sí mismo · «mejor de 4» rechazado · no duplicar serie viva · quien propone no responde ·
+-- el retado ve «puedo_responder» · aceptar → en_juego · duelo A gana, duelo B gana (retador del lado B) → 1-1 · duelo dentro del
+-- mismo clan no cuenta · tercer duelo → B llega a la mayoría → terminada con ganador B · lista pública con series aceptadas.

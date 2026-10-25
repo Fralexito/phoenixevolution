@@ -11,6 +11,8 @@ import { buscarPersonas } from '../features/social/api.js';
 import * as api from '../features/clanes/api.js';
 import { rellenarPatrocinios } from '../features/patrocinios.js';
 import { LIMITES, ROLES, validarClan, puede, restante, textoMotivo } from '../core/comunidad/clan.js';
+import { montarSeries } from '../features/clanes/series.js';
+const SERIES = montarSeries(document.getElementById('cl-series'));
 
 const $ = (id) => document.getElementById(id);
 // S.req = «versión» de la última carga (descarta respuestas viejas); S.busy = acción en curso (evita dobles clics).
@@ -97,7 +99,7 @@ async function cargar() {
   try {
     const [mi, lista] = await Promise.all([S.yo ? api.miClan() : Promise.resolve(null), api.listarClanes(S.busqueda)]);
     if (mia !== S.req) return;
-    S.mi = mi; S.lista = lista; avisoError(''); pintar();
+    S.mi = mi; S.lista = lista; avisoError(''); pintar(); SERIES.cargar(mi, lista);
   } catch (e) { if (mia !== S.req) return; console.error('[clanes] página:', e); avisoError(e?.message || 'Algo salió mal. Inténtalo de nuevo.'); pintar(); }
 }
 /** Ejecuta una acción protegida contra dobles clics; recarga al terminar. */

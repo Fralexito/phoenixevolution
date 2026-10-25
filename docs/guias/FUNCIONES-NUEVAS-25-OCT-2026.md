@@ -143,3 +143,23 @@ semana** (lunes a domingo, hora de Lima). Se paga solo cuando los dos líderes c
 juegas o eres host; se cierra al empezar el duelo; clave única por pronóstico → nunca se paga dos veces; tope semanal sobre lo
 ya pagado; si el prode falla, **nunca** impide confirmar un marcador (el trigger atrapa el error y deja un aviso); interruptor
 del staff `phoenix_config.prode = false`; tabla cerrada por RLS.
+
+---
+
+## 7. Clan contra clan (beta 1.25.0 · migración 150 APLICADA)
+
+**Qué es:** en **/clanes/**, el capitán o subcapitán reta a otro clan a una **serie al mejor de 1, 3, 5 o 7**, con plazo de
+7 a 30 días. El otro clan tiene 7 días para aceptar. **Se cuenta sola:** valen los primeros N duelos 1v1 con marcador
+confirmado entre un miembro de cada clan, jugados después de aceptar y antes del plazo. Gana el duelo quien hizo más goles
+(empate = nadie suma). Gana la serie quien llega a la mayoría; si vence el plazo, quien tenga más puntos (igual = empate).
+Sin clan se ven las últimas series de la comunidad.
+
+**Piezas:** `supabase/migrations/150_clan_contra_clan.sql` (tabla `clan_series`; `clan_serie_proponer`, `clan_serie_responder`,
+`clan_serie_cancelar`, `clan_series_de`) · `supabase/tests/150_clan_contra_clan_test.sql` · `src/js/core/comunidad/clanSeries.js`
++ `tests/clanSeries.test.mjs` (3 pruebas) · `src/js/features/clanes/series.js` · sección `#cl-series` en `src/pages/clanes.astro`.
+
+**Blindaje:** solo líderes; no retarse a sí mismo; una serie viva por pareja de clanes y máx. 3 por clan; **solo cuentan
+jugadores que ya estaban en el clan cuando se creó el duelo** (nada de fichar refuerzos al final); un duelo cuenta para una sola
+serie; una serie aceptada no se cancela (solo el staff); propuestas caducan solas a los 7 días (sin cron: se calcula al leer).
+
+**Cómo se probó:** 3 pruebas puras; prueba en seco en la base real (13 casos, OK, nada guardado); página en navegador sin errores.
