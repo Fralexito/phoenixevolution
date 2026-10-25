@@ -1,5 +1,5 @@
 // Campana de notificaciones · lógica PURA (sin DOM ni red → `npm test`): categorías, filtros, grupos por día y «hace 5 min».
-// ESPEJO de private.categoria_notif (migraciones 033/042/043/059/064): si allí se añade un tipo, se añade aquí.
+// ESPEJO de private.categoria_notif (migraciones 033/042/043/059/064/144): si allí se añade un tipo, se añade aquí.
 
 /** Tipo de aviso → categoría (la misma que el usuario puede apagar en Amigos → Avisos). */
 export function categoriaDe(tipo) {
@@ -9,7 +9,7 @@ export function categoriaDe(tipo) {
   if (tipo === 'LOGRO') return 'logros';
   if (tipo === 'EVENTO') return 'eventos';
   if (tipo === 'SALA_ABIERTA' || tipo === 'INVITACION_SALA') return 'salas';
-  if (tipo === 'MODERACION') return 'sistema';
+  if (tipo === 'MODERACION' || tipo === 'LIGA_OFICIAL') return 'sistema';
   return 'duelos';
 }
 

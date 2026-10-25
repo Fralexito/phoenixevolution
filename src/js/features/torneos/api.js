@@ -104,3 +104,10 @@ export const staffTopes = (t) => rpc('staff_torneos_config', { p_habilitado: t.h
 
 /** Staff: convierte una liga todos contra todos (aún en inscripción) en OFICIAL (migración 143). Devuelve el id de la edición. */
 export const hacerOficial = (id) => rpc('staff_torneo_hacer_oficial', { p_torneo: id });
+// Pedidos para hacer oficial una liga casual (migración 144). El creador pide; el staff acepta (llama a la 143) o rechaza con motivo.
+export const solicitarOficial = (id, nota = null) => rpc('torneo_solicitar_oficial', { p_torneo: id, p_nota: nota });
+export const cancelarSolicitudOficial = (id) => rpc('torneo_cancelar_solicitud_oficial', { p_torneo: id });
+/** Último pedido de la liga (o null). Solo lo devuelve al creador y al staff; si la 144 falta o falla, null (la página sigue igual). */
+export const solicitudOficialDe = async (id) => { try { return (await rpc('torneo_solicitud_oficial_de', { p_torneo: id })) ?? null; } catch { return null; } };
+export const staffSolicitudesOficial = async (estado = 'pendiente') => (await rpc('staff_solicitudes_oficial', { p_estado: estado, p_limite: 50 })) ?? [];
+export const staffResolverSolicitud = (solicitud, aceptar, motivo = null) => rpc('staff_solicitud_oficial_resolver', { p_id: solicitud, p_aceptar: aceptar, p_motivo: motivo });

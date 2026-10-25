@@ -31,6 +31,8 @@ const TARJETAS = [
     cargar: async () => { const d = filas(await rpc('resultados_disputados')); return { n: d.length, vencidos: vencidos(d.map(cuando), PLAZOS.disputa) }; } },
   { id: 'torneos', grupo: 'Competición', titulo: 'Torneos propios nuevos (24 h)', icono: 'fa-trophy', ver: 'gestionarTorneos', destino: 'moderacion/#tls-card', plazo: 'Mirar nombre, reglas y enlaces',
     cargar: async () => { const desde = new Date(Date.now() - 24 * 3600e3).toISOString(); const { count, error } = await supabase.from('torneos_libres').select('id', { count: 'exact', head: true }).gte('creado_en', desde); if (error) throw error; return { n: count ?? 0 }; } },
+  { id: 'oficial-pedidos', grupo: 'Competición', titulo: 'Ligas que piden ser oficiales', icono: 'fa-shield-halved', ver: 'gestionarTorneos', destino: 'moderacion/#tls-oficial', plazo: `Responder en ${PLAZOS.oficial} h`,
+    cargar: async () => { const d = filas(await rpc('staff_solicitudes_oficial', { p_estado: 'pendiente', p_limite: 100 })); return { n: d.length, vencidos: vencidos(d.map((x) => x.creado_en), PLAZOS.oficial) }; } },
   { id: 'reportes', grupo: 'Comunidad', titulo: 'Reportes abiertos', icono: 'fa-flag', ver: 'verReportes', destino: 'moderacion/', plazo: `Atender en ${PLAZOS.reporte} h`,
     cargar: async () => { const d = filas(await rpc('reportes_listar', { p_estado: 'abierto', p_antes: null, p_limite: 100 })); return { n: d.length, vencidos: vencidos(d.map(cuando), PLAZOS.reporte), detalle: d.length >= 100 ? 'Más de 100' : '' }; } },
   { id: 'privacidad', grupo: 'Comunidad', titulo: 'Solicitudes de privacidad', icono: 'fa-user-shield', ver: 'resolverReportes', destino: 'moderacion/#mod-privacidad', plazo: `Responder en ${PLAZOS.privacidad} h`,

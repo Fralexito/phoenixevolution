@@ -14,6 +14,7 @@ Se dejan aparte, porque son documentos vivos de una sola pieza:
 - [Parte 2 · Liga automática: calendario oficial, resultados del juego y marcador en vivo](#parte-2-liga-automatica-calendario-oficial-resultados-del-juego-y-marcador-en-vivo) — origen `docs/liga-y-torneos/LIGA-AUTOMATICA.md` (01e6efc 2026-10-18)
 - [Parte 3 · Informe maestro · «La mejor web para organizar torneos» (informe aparte del de cada ronda)](#parte-3-informe-maestro-la-mejor-web-para-organizar-torneos-informe-aparte-del-de-cada-ronda) — origen `docs/liga-y-torneos/PLAN-TORNEOS-LIBRES.md` (01e6efc 2026-10-18)
 - [Parte 4 · Torneos propios (ronda 215 · migración 097)](#parte-4-torneos-propios-ronda-215-migracion-097) — origen `docs/liga-y-torneos/TORNEOS-LIBRES.md` (801bae3 2026-10-18)
+- [Parte 5 · Casual u oficial, y pedir que una liga sea oficial (ronda 368 · migración 144)](#parte-5-casual-u-oficial-y-pedir-que-una-liga-sea-oficial-ronda-368-migracion-144) — escrita el 25-oct-2026 (Cuenta 2)
 
 ---
 
@@ -195,3 +196,60 @@ No hay borrados: «retirado», «oculto» y «cancelado» conservan la evidencia
 Avisos al Buzón del juego cuando te toca jugar · Realtime en el detalle (hoy refresca cada 30 s) · llave visual con líneas · palmarés y logros automáticos al coronar · torneos por clanes · apuestas con tokens (requiere decisión legal).
 
 ---
+
+---
+
+## Parte 5 · Casual u oficial, y pedir que una liga sea oficial (ronda 368 · migración 144)
+
+> Escrita el 25-oct-2026 por la **Cuenta 2**, a pedido de Fralex. Web beta **1.17.0**. Migración **144 aplicada y probada**.
+
+### 1. La regla (decisión de Fralex, 25-oct)
+
+> «Yo quiero que los demás puedan crear sus ligas pero los resultados serán ingresados manualmente por los encargados de dicha liga; solo cuando es oficial, el Lua leerá los resultados y los subirá automáticamente.» · «Si alguien crea una liga casual puede solicitar al staff hacerla oficial y el staff debe aceptarlo.» · Idea a futuro: «o en todo caso eso lo haré una función premium».
+
+| Tipo | Página | Quién la crea | Quién pone los resultados |
+|---|---|---|---|
+| **Casual** | `/torneos/` y `/torneo/?id=N` | Cualquiera | El creador, a mano |
+| **Oficial** | `/liga-amigos/` (se muestra como **«Liga oficial»**) | El staff (o al aceptar un pedido) | Phoenix Link / el Lua, solo |
+
+- Nombre: la página `/liga-amigos/` se llamó «Liga de amigos» → «Liga Phoenix» (1.16.2) → «Liga casual» (1.16.3) → **«Liga oficial» (1.16.4, definitivo)**. Solo cambió el texto visible; la dirección, los id y la base siguen iguales. Motivo: «Liga de amigos» sonaba a casual y es justo lo contrario.
+- **Idea pendiente (no hecha):** resultados automáticos con Link como **beneficio premium** para ligas no oficiales (encajaría en el «torneo premium» de la 123). Hace falta que Fralex lo pida.
+
+### 2. Cómo funciona el pedido (lo que ve cada uno)
+
+1. **El creador** de una liga casual **todos contra todos** (`liguilla` o `idavuelta`) que siga **en inscripción** ve en su página una caja «Liga casual» con el botón **«Pedir que sea oficial»**. Puede añadir una nota (hasta 300 letras).
+2. **Todo el staff** (ayudante, moderador, admin) recibe un aviso **LIGA_OFICIAL** que lleva a la liga.
+3. **El staff** responde desde **la página de la liga** (caja azul «X pide que sea oficial» con Aceptar / Rechazar) **o** desde **Moderación › Torneos propios › Pedidos para hacer oficial**. En `/control/` hay una tarjeta «Ligas que piden ser oficiales» (plazo 48 h).
+   - **Aceptar** → se llama a la 143 (`staff_torneo_hacer_oficial`): la liga pasa a Liga oficial con sus inscritos. Al creador le llega «¡Tu liga ya es oficial!».
+   - **Rechazar** → motivo obligatorio (5–300 letras). Al creador le llega «Tu liga sigue siendo casual» con el motivo. Puede volver a pedirlo **a las 24 h**.
+4. **El creador** puede **retirar** su pedido mientras está pendiente (y volver a pedir sin esperar).
+5. Casos automáticos (disparador): si el staff pulsa el botón directo «Hacer oficial», el pedido se marca **aceptado** y se avisa igual; si la liga empieza, se cancela o se oculta, el pedido pasa a **cancelada**.
+6. Las ligas por **llaves** (eliminación, grupos, suizo…) **no** se pueden pedir: Phoenix Link aún no las entiende.
+
+### 3. Piezas (para replicarlo o tocarlo)
+
+| Pieza | Archivo |
+|---|---|
+| Base | `supabase/migrations/144_solicitudes_liga_oficial.sql` (cabecera con cómo deshacer) |
+| Prueba de la base (12 casos, se deshace sola: «TODO_OK_REVERTIDO») | `supabase/tests/144_solicitudes_oficial_test.sql` |
+| Reglas puras (qué mostrar) + pruebas | `src/js/core/competicion/solicitudOficial.js` · `tests/solicitudOficial.test.mjs` |
+| Llamadas a la base | `src/js/features/torneos/api.js` (`solicitarOficial`, `cancelarSolicitudOficial`, `solicitudOficialDe`, `staffSolicitudesOficial`, `staffResolverSolicitud`) |
+| Página de la liga | `src/js/pages/torneo.js` (`oficialHTML`, `pedidoCreadorHTML`, `pedidoStaffHTML`, `pedirOficial`, `resolverPedido`) · estilos `.to-oficial-pedido` en `src/styles/torneos.css` |
+| Moderación | `src/pages/moderacion.astro` (`#tls-oficial`) · `src/js/features/torneos/staff.js` (`pintarPedidos`) |
+| Centro de control | `src/js/pages/control.js` (tarjeta `oficial-pedidos`) · `PLAZOS.oficial = 48` en `src/js/core/sistema/centroControl.js` |
+| Campana | `LIGA_OFICIAL` en `src/js/features/notifications.js` (icono) y `src/js/core/sistema/notifs.js` (categoría «sistema», espejo de `private.categoria_notif`) |
+
+**Base de datos (144):** tabla cerrada `torneo_solicitudes_oficial` (RLS sin políticas; solo por funciones; un único pedido pendiente por liga). Funciones: `torneo_solicitar_oficial`, `torneo_cancelar_solicitud_oficial`, `torneo_solicitud_oficial_de` (solo creador y staff), `staff_solicitudes_oficial`, `staff_solicitud_oficial_resolver`; privadas `tl_avisar_staff_solicitud` y `tl_solicitud_sync` (disparador `zz_solicitud_oficial_sync`). Aviso nuevo `LIGA_OFICIAL` (la lista de tipos solo crece) en categoría **sistema** (no se apaga). El rechazo queda en la auditoría del staff.
+
+### 4. Cómo se probó
+
+- Prueba en seco (migración + 12 casos en una transacción deshecha) y otra vez contra la base real tras aplicarla: **TODO_OK_REVERTIDO** las dos veces; comprobado después que no quedó ninguna liga de prueba.
+- `npm test` 653/653 · `npm run build` OK. La prueba que abre todas las páginas (`npm run test:paginas`) **no se pudo correr en la nube** (sin Chrome); la corre GitHub en `pruebas.yml` al subir.
+- **No probado con sesión real en el navegador.** Para probarlo (Fralex): con una cuenta de jugador, crea en Torneos una liga «Todos contra todos» → «Pedir que sea oficial» → con tu cuenta de admin, mira la campana, `/control/` y Moderación → Aceptar o Rechazar.
+
+### 5. Errores y trampas
+
+- En PL/pgSQL, una variable con el **mismo nombre que una columna** (`nota`, `motivo`) da «ambiguo». Se usaron `v_nota` y `v_motivo` (mismo fallo que la 109).
+- El enlace de los avisos solo acepta rutas simples (`notificaciones_enlace_ok`): por eso el aviso lleva a `torneo/?id=N` y no al id de la edición oficial (lleva «:»). La página del torneo ya enlaza a su Liga oficial.
+- El conector MCP de Supabase se cuelga con `DELETE`: la prueba no borra nada; se deshace con un error a propósito al final.
+

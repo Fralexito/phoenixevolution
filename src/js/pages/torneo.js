@@ -13,10 +13,11 @@ import * as api from '../features/torneos/api.js';
 import { rellenarPatrocinios } from '../features/patrocinios.js';
 import { formatoFicha, guiaFormatoHTML, dinamicasActivasHTML, leyendaHTML, ESTADO_TXT } from '../features/torneos/guia.js';
 import { rafaga } from '../features/dopamina.js';
+import { ligaApta, vistaCreador, staffVePedido, validarMotivo, limpiarNota, MAX_TEXTO } from '../core/competicion/solicitudOficial.js';
 
 const raiz = document.getElementById('to-raiz');
 const id = Number(new URLSearchParams(location.search).get('id'));
-const st = { yo: null, t: null, insc: [], partidos: [], nombres: {}, eventos: [], prem: null, cargando: false };
+const st = { yo: null, t: null, insc: [], partidos: [], nombres: {}, eventos: [], prem: null, sol: null, cargando: false };
 
 const nombresEq = (a, b) => String(a ?? '').toLowerCase() === String(b ?? '').toLowerCase();
 const dins = () => st.t?.config?.dinamicas ?? [];
@@ -159,15 +160,37 @@ function cabecera() {
     <div class="to-cab-acc"><button type="button" class="btn btn-ghost" data-copiar><i class="fa-solid fa-link"></i> Copiar enlace</button>${enlace ? `<a class="btn btn-ghost" href="${esc(enlace)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-video"></i> Sala / transmisión</a>` : ''}</div></header>`;
 }
 // Un solo creador (migración 143): el staff hace OFICIAL una liga todos contra todos; desde ahí la inscripción, el calendario y
-// los resultados (que manda Phoenix Link) viven en la Liga de amigos. Las casuales siguen aquí con resultados a mano.
+// los resultados (que manda Phoenix Link) viven en «Liga oficial» (/liga-amigos/). Las casuales siguen aquí con resultados a mano.
+// Desde la 144 el creador puede PEDIRLO y el staff lo acepta o rechaza (core/competicion/solicitudOficial.js).
 const oficialId = () => st.t?.meta?.oficial ?? null;
 function oficialHTML() {
   const ed = oficialId();
   if (ed) return `<p class="to-premio"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <b>Liga oficial:</b> Phoenix Link manda los resultados solos. Inscripción, calendario y tabla en <a class="underline" href="${esc(href(`liga-amigos/?liga=${encodeURIComponent(ed)}`))}">Liga oficial</a>.</p>`;
-  if (st.yo && can('editarLiga') && ['liguilla', 'idavuelta'].includes(st.t.formato) && st.t.estado === 'inscripcion') {
-    return '<p class="tn-ayuda"><button type="button" class="btn btn-ghost" data-hacer-oficial><i class="fa-solid fa-shield-halved"></i> Hacer oficial (resultados por Phoenix Link)</button></p>';
-  }
-  return '';
+  return pedidoStaffHTML() + pedidoCreadorHTML() + botonStaffHTML();
+}
+const esStaffLiga = () => Boolean(st.yo) && can('editarLiga');
+function botonStaffHTML() {
+  if (!esStaffLiga() || !ligaApta(st.t) || staffVePedido(st.sol, true)) return '';
+  return '<p class="tn-ayuda"><button type="button" class="btn btn-ghost" data-hacer-oficial><i class="fa-solid fa-shield-halved"></i> Hacer oficial (resultados por Phoenix Link)</button></p>';
+}
+// Pedido para hacer oficial (migración 144). El creador lo pide; el staff lo acepta o rechaza aquí mismo o desde Moderación.
+function pedidoCreadorHTML() {
+  if (esStaffLiga()) return '';   // el staff no necesita pedir: tiene el botón directo
+  const v = vistaCreador({ t: st.t, yo: st.yo, solicitud: st.sol });
+  if (v.modo === 'nada') return '';
+  const icono = v.modo === 'pendiente' ? 'fa-hourglass-half' : v.modo === 'pedir' ? 'fa-shield-halved' : 'fa-circle-info';
+  const boton = v.modo === 'pedir' || v.modo === 'rechazada'
+    ? '<button type="button" class="btn btn-ghost" data-pedir-oficial><i class="fa-solid fa-paper-plane"></i> Pedir que sea oficial</button>'
+    : v.modo === 'pendiente' ? '<button type="button" class="btn btn-ghost" data-retirar-pedido><i class="fa-solid fa-xmark"></i> Retirar el pedido</button>' : '';
+  return `<div class="to-premio to-oficial-pedido" data-modo="${esc(v.modo)}"><p><i class="fa-solid ${icono}" aria-hidden="true"></i> <b>Liga casual.</b> ${esc(v.texto)}</p>${boton}</div>`;
+}
+function pedidoStaffHTML() {
+  if (!staffVePedido(st.sol, esStaffLiga())) return '';
+  const quien = st.nombres[st.sol.solicitante] ?? 'El organizador';
+  return `<div class="to-premio to-oficial-pedido" data-modo="staff"><p><i class="fa-solid fa-inbox" aria-hidden="true"></i> <b>${esc(quien)} pide que sea oficial.</b>${st.sol.nota ? ` «${esc(st.sol.nota)}»` : ''}</p>
+    <p class="tn-ayuda">Al aceptar, pasa a Liga oficial con sus inscritos y Phoenix Link sube los resultados solo.</p>
+    <div class="to-cab-acc"><button type="button" class="btn btn-primary" data-resolver-pedido="si"><i class="fa-solid fa-check"></i> Aceptar</button>
+    <button type="button" class="btn btn-ghost" data-resolver-pedido="no"><i class="fa-solid fa-xmark"></i> Rechazar</button></div></div>`;
 }
 function bloqueCampeon() {
   const t = st.t; const s = campeonSugerido(t, st.partidos);
@@ -230,7 +253,8 @@ async function cargar({ silencioso = false } = {}) {
       [st.insc, st.partidos] = await Promise.all([api.inscritosDe([id]), api.partidosDe(id)]);
       st.prem = await api.premiumInfo(id);
       st.eventos = (st.yo && (st.t.creador === st.yo || can('gestionarTorneos'))) ? await api.eventosDe(id).catch(() => []) : [];
-      st.nombres = await api.nombresDe([st.t.creador, ...st.eventos.map((e) => e.usuario)]);
+      st.sol = (st.yo && ligaApta(st.t) && (st.t.creador === st.yo || can('editarLiga'))) ? await api.solicitudOficialDe(id) : null;
+      st.nombres = await api.nombresDe([st.t.creador, ...st.eventos.map((e) => e.usuario), ...(st.sol?.solicitante ? [st.sol.solicitante] : [])]);
     }
     const abiertos = [...raiz.querySelectorAll('details[open]')].map((d) => d.querySelector('summary b')?.textContent);
     pintar();
@@ -330,8 +354,30 @@ raiz.addEventListener('click', async (e) => {
   else if (b.dataset.hacerPremium !== undefined) { if (await confirmar(`¿Hacer premium este torneo por ${st.prem?.precioGemas ?? ''} gemas? Se paga una sola vez y no se devuelve automáticamente.`, { aceptar: 'Hacer premium', cancelar: 'Volver' })) await hacer(() => api.hacerPremium(id), '¡Tu torneo ahora es premium!'); }
   else if (b.dataset.cancelarTorneo !== undefined) { if (await confirmar('¿Cancelar el torneo? Ya no se podrá seguir jugando.', { aceptar: 'Cancelar torneo', cancelar: 'Volver', peligro: true })) await hacer(() => api.cancelar(id), 'Torneo cancelado.'); }
   else if (b.dataset.hacerOficial !== undefined) { if (await confirmar('Se pasa a la liga oficial con sus inscritos. Desde ahí sigue la inscripción, se genera el calendario y Phoenix Link manda los resultados (los valida el staff). Aquí ya no se podrá empezar ni anotar.', { titulo: 'Hacer oficial', aceptar: 'Hacer oficial' })) await hacer(() => api.hacerOficial(id), 'Ahora es oficial. Sigue en Liga oficial.'); }
+  else if (b.dataset.pedirOficial !== undefined) await pedirOficial();
+  else if (b.dataset.retirarPedido !== undefined) { if (await confirmar('¿Retirar el pedido? La liga sigue casual y podrás volver a pedirlo cuando quieras.', { aceptar: 'Retirar', cancelar: 'Volver' })) await hacer(() => api.cancelarSolicitudOficial(id), 'Pedido retirado.'); }
+  else if (b.dataset.resolverPedido) await resolverPedido(b.dataset.resolverPedido === 'si');
   else if (b.dataset.copiar !== undefined) { try { await navigator.clipboard.writeText(location.href); toast('Enlace copiado.', 'ok'); } catch { toast('No se pudo copiar. Copia la dirección de la barra.', 'warn'); } }
 });
+// ── Pedido para hacer oficial (migración 144) ──────────────────────────────────────────────────────────────────────────
+async function pedirOficial() {
+  const nota = await pedirTexto('Si quieres, cuéntale al staff algo de tu liga (cuántos son, cuándo juegan). Puedes dejarlo vacío.', { titulo: 'Pedir que sea oficial', maximo: MAX_TEXTO, obligatorio: false, aceptar: 'Enviar pedido' });
+  if (nota === null) return;
+  try { await hacer(() => api.solicitarOficial(id, limpiarNota(nota)), 'Pedido enviado. Te llegará un aviso cuando el staff responda.'); } catch (err) { toast(err.message, 'error'); }
+}
+async function resolverPedido(aceptar) {
+  const sol = st.sol; if (!sol) return;
+  if (aceptar) {
+    if (!(await confirmar('Se pasa a Liga oficial con sus inscritos. Desde ahí sigue la inscripción, se genera el calendario y Phoenix Link manda los resultados. Aquí ya no se podrá empezar ni anotar.', { titulo: 'Aceptar el pedido', aceptar: 'Hacerla oficial' }))) return;
+    await hacer(() => api.staffResolverSolicitud(sol.id, true), 'Ahora es oficial. Sigue en Liga oficial.');
+    return;
+  }
+  const motivo = await pedirTexto('¿Por qué no? Lo leerá quien lo pidió (por ejemplo: faltan reglas, pocos inscritos).', { titulo: 'Rechazar el pedido', maximo: MAX_TEXTO, aceptar: 'Rechazar' });
+  if (motivo === null) return;
+  let limpio; try { limpio = validarMotivo(motivo); } catch (err) { toast(err.message, 'warn'); return; }
+  await hacer(() => api.staffResolverSolicitud(sol.id, false, limpio), 'Pedido rechazado. Se le avisó con tu motivo.');
+}
+
 raiz.addEventListener('submit', async (e) => {
   e.preventDefault(); const f = e.target;
   if (f.dataset.formRes) await guardarResultado(f);

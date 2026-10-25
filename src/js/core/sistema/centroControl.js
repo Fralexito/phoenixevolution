@@ -3,7 +3,7 @@
 // con un color según los plazos del manual (reportes 24 h, resultados y disputas 48 h), y «Hoy toca» sigue la semana tipo del staff.
 
 /** Horas de plazo de cada tipo de pendiente (las del manual de gestión). */
-export const PLAZOS = Object.freeze({ resultado: 48, disputa: 48, reporte: 24, privacidad: 72, pago: 24 });
+export const PLAZOS = Object.freeze({ resultado: 48, disputa: 48, reporte: 24, privacidad: 72, pago: 24, oficial: 48 });
 
 /**
  * Estado de una tarjeta: 'sin-dato' (no se pudo leer), 'ok' (nada pendiente), 'urgente' (algo pasó su plazo) o 'atencion'.

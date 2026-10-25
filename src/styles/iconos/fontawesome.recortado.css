@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 283 nombres que usa la web. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 284 nombres que usa la web. */
 /*!
  * Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -1644,6 +1644,10 @@
 
 .fa-tv {
   --fa: "\f26c";
+}
+
+.fa-calendar-plus {
+  --fa: "\f271";
 }
 
 .fa-calendar-xmark {

@@ -66,12 +66,12 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 
 | Frente | Dónde | Lo tiene | Desde |
 |---|---|---|---|
-| Web (Astro) | `phoenixevolution@borrador` · PC `C:\dev\pes-liga-automatica` | **Cuenta 2** (solicitudes para hacer oficial una liga) | 2026-10-25 |
+| Web (Astro) | `phoenixevolution@borrador` · PC `C:\dev\pes-liga-automatica` | libre | — |
 | Phoenix Link (C++) | `smash-soda-fork@plan-ux` · PC `C:\dev\smash-soda-fork\_phoenix-link` | **Cuenta 1** (hilo 1: integrar el paquete de mandos cuando el coordinador avise) | 2026-10-21 |
 | Phoenix Sync / Mercado | `smash-soda-fork@mercado-fase0` · PC `C:\dev\smash-soda-fork` | libre | — |
 | PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | **Cuenta 1** (hilo 4; necesita la PC conectada: la Cuenta 2 por navegador no puede tocarlo) — siguiente: pantalla Local/Visitante nativa de 16 | 2026-10-21 |
 | PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — en espera hasta acabar la pantalla nativa de 16 | — |
-| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | **Cuenta 2** — 144 RESERVADA (solicitudes oficial); siguiente libre: **145** | 2026-10-25 |
+| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **siguiente número libre: 145** (reservar en `REGISTRO.md` antes de usarlo) | — |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
 
@@ -198,3 +198,12 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - Hecho: Fralex corrió en la PC `git pull` en `C:\dev\pes-liga-automatica` (ya tiene `TRASPASO.md` y todo hasta c84f74e) y `RESPALDAR_A_DRIVE.ps1` (331 archivos a «Respaldo automático (GitHub y PC) — no editar»). La Cuenta 2 ya trabajó (beta **1.16.4**, «Liga oficial», reserva de la migración **144**): la entrada de cierre de arriba decía beta 1.16.1; **manda 1.16.4**.
 - A medias: en la PC, `C:\dev\smash-soda-fork\_phoenix-link` aún no tiene e25e1a6 (Parte 13 de MANDOS.md, libro-pes, paquete): hace falta `git pull` allí y repetir el respaldo a Drive.
 - Candados: sin cambios.
+### 2026-10-25 01:40 (Lima) · Cuenta 2 · Pedir que una liga casual sea oficial (144)
+- **Hecho:** web beta **1.17.0**, ronda 368. Regla de Fralex: **casual** = Torneos (cualquiera crea; el creador anota a mano) · **oficial** = `/liga-amigos/`, que ahora se muestra como **«Liga oficial»** (Phoenix Link sube los resultados solo). Nuevo: el creador de una liga casual todos contra todos pulsa «Pedir que sea oficial»; el staff acepta (se llama a la 143) o rechaza con motivo; aviso `LIGA_OFICIAL` en la campana; lista en Moderación › Torneos propios y tarjeta en `/control/`.
+- **Commits/ramas:** `phoenixevolution@borrador` (este commit). Link, Sync y overlay sin cambios.
+- **Solo en la PC (sin git):** nada.
+- **Supabase:** **144 APLICADA** y probada (12 casos, `supabase/tests/144_solicitudes_oficial_test.sql` → TODO_OK_REVERTIDO antes y después). Siguiente libre **145**.
+- **A medias:** nada de código. `npm run test:paginas` no se pudo correr en la nube (sin Chrome): lo corre GitHub al subir.
+- **Esperando a Fralex:** probar con sesión real: con una cuenta de jugador crear en Torneos una liga «Todos contra todos» → «Pedir que sea oficial» → con la cuenta admin mirar la campana, `/control/` y Moderación → Aceptar o Rechazar. Idea suya sin hacer: resultados automáticos como **función premium** para ligas no oficiales (esperar a que lo pida).
+- **Siguiente paso:** quien entre, leer `docs/liga-y-torneos/LIGA-Y-TORNEOS.md` parte 5 si va a tocar ligas/torneos.
+- **Candados:** solté Web y Supabase (libres). Link y «PES: mandos» siguen con la Cuenta 1.

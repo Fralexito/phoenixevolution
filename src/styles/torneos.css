@@ -150,3 +150,11 @@ html[data-tema='sudario'] .to-barra span { background: linear-gradient(90deg, #f
 /* Torneo premium (Fase E): bloque del panel del organizador */
 .to-premium { display: grid; gap: .5rem; padding: .85rem 1rem; margin-bottom: .75rem; border-radius: .9rem; border: 1px solid rgba(255, 200, 40, .45); background: linear-gradient(135deg, rgba(255, 200, 40, .10), rgba(0, 229, 255, .06)); }
 .to-premium > b { color: #ffc828; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
+
+/* Pedido para hacer oficial una liga casual (migración 144). Caja suave bajo la cabecera del torneo. */
+.to-oficial-pedido { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; padding: .75rem .9rem; border-radius: 14px;
+  border: 1px solid rgba(253, 230, 138, .25); background: rgba(253, 230, 138, .06); }
+.to-oficial-pedido p { margin: 0; }
+.to-oficial-pedido .btn { align-self: flex-start; }
+.to-oficial-pedido[data-modo="staff"] { border-color: rgba(56, 189, 248, .35); background: rgba(56, 189, 248, .07); color: #e0f2fe; }
+.to-oficial-pedido[data-modo="pendiente"] { border-style: dashed; }

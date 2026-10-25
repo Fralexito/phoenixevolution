@@ -93,6 +93,11 @@ import '../styles/torneos.css';
           <label class="text-xs text-gray-300">Máx. jugadores por torneo <input id="tls-jug" type="number" min="2" max="2048" class="field !w-24"></label>
           <button class="btn btn-primary !min-h-10">Guardar topes</button>
         </form>
+        <div id="tls-oficial" class="space-y-1.5 rounded-xl border border-sky-400/30 bg-sky-400/5 p-3">
+          <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-shield-halved text-sky-300 mr-1.5"></i>Pedidos para hacer oficial <span id="tls-oficial-n" class="text-xs text-gray-400"></span></h3>
+          <p class="text-xs text-gray-400">Ligas casuales cuyo creador pide que Phoenix Link suba los resultados solo. Al aceptar pasan a «Liga oficial» con sus inscritos; al rechazar, el motivo le llega como aviso.</p>
+          <div id="tls-oficial-lista" class="space-y-1.5"></div>
+        </div>
         <div id="tls-lista" class="space-y-1.5"></div>
       </section>
 

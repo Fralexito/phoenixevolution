@@ -8,6 +8,8 @@ Documento único del frente «primera noche de liga real» (empezado el 21-oct-2
 3. Hay fichajes con Sync.
 4. El resultado vuelve solo a la web.
 
+> **25-oct-2026:** la página `/liga-amigos/` ahora se llama **«Liga oficial»** (la dirección no cambió). Las ligas que crea la gente en Torneos son las **casuales** y su creador puede pedir que sean oficiales (migración 144, ver `LIGA-Y-TORNEOS.md` parte 5).
+
 **Índice**
 1. Estado y qué falta
 2. Guía de una página para los amigos (para copiar y mandar)
