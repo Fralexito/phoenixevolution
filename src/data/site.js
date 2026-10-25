@@ -25,7 +25,7 @@ export const NAV_EXTRA = [
   { id: 'historial', label: 'Historial', path: 'historial/', icon: 'fa-clock-rotate-left' },
   { id: 'premios', label: 'Premios', path: 'premios/', icon: 'fa-award' },
   { id: 'unirme', label: 'Unirme a la liga', path: 'unirme/', icon: 'fa-door-open' },
-  { id: 'ligaamigos', label: 'Liga de amigos', path: 'liga-amigos/', icon: 'fa-people-group' },   // 21-oct-2026: liga oficial armada desde la web (migración 142)
+  { id: 'ligaamigos', label: 'Liga Phoenix', path: 'liga-amigos/', icon: 'fa-people-group' },   // 21-oct-2026: liga oficial armada desde la web (migración 142)
   { id: 'hosts', label: 'Alquilar host', path: 'alquilar-host/', icon: 'fa-server' },
 ];
 
