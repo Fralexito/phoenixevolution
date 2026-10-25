@@ -189,3 +189,21 @@ el reloj de la pantalla se corrige con la hora del servidor; confirmación antes
 
 **Cómo se probó:** 4 pruebas puras; prueba en seco en la base real (18 casos, OK, nada guardado); sala en navegador con sesión
 y datos simulados (390 px): reloj, «¡Te toca!», lista para elegir y tablero sin errores.
+
+---
+
+## 9. Avisos de las funciones nuevas (beta 1.27.0 · migración 152 ESCRITA, SIN APLICAR)
+
+**Campana** (cada persona; respeta lo que apaga en Amigos → Avisos): **DRAFT** «¡Te toca elegir!» (categoría Duelos) · **MVP**
+«Vota al MVP del partido» a jugadores y espectadores al confirmarse el duelo (Logros) · **PRODE** «Ganaste N ascuas» (Logros) ·
+**CLAN** reto recibido (líderes del clan retado), aceptado o rechazado (líderes del que retó).
+**Discord** (canal de la comunidad, solo con el webhook configurado — `select vault.create_secret('URL', 'discord_webhook');`):
+empieza un draft · se acepta una serie entre clanes · resumen semanal del prode (lunes 9:00 Lima, top 5).
+
+**Piezas:** `supabase/migrations/152_avisos_funciones_nuevas.sql` (tipos nuevos, `private.aviso_nuevo`, disparadores `zz_draft_avisos`,
+`zz_clan_serie_avisos`, `zz_mvp_avisos`, `zz_prode_avisos`, tarea `prode-resumen-semana`) · iconos y destinos en
+`src/js/features/notifications.js` · categorías en `src/js/core/sistema/notifs.js` + `tests/notifsTipos.test.mjs`.
+
+**Blindaje:** ningún aviso puede romper la acción que lo dispara (cada disparador atrapa sus errores); en las cadenas de turnos
+vencidos del draft no se avisa a quien ya perdió el turno; Discord nunca repite un mensaje (clave única); textos limpiados sin
+menciones; si la 149 (prode) no está, la parte del prode se salta sola. El webhook de Discord **aún no está configurado**.

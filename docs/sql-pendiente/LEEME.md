@@ -5,7 +5,7 @@ Mientras falten, la web **no se rompe**: esas secciones se ocultan o dicen «lle
 
 ## Paso 1 · Pegar el SQL (2 minutos)
 1. Abre Supabase → tu proyecto → **SQL Editor** → **New query**.
-2. Copia y pega **todo** `docs/sql-pendiente/PEGAR-145-148-149.sql` → **Run**.
+2. Copia y pega **todo** `docs/sql-pendiente/PEGAR-PENDIENTES.sql` → **Run**.
 3. Debe decir *Success*. Es seguro correrlo dos veces.
 
 | Migración | Qué activa |
@@ -13,6 +13,14 @@ Mientras falten, la web **no se rompe**: esas secciones se ocultan o dicen «lle
 | 145 | Resultados automáticos de Phoenix Link en torneos oficiales y premium |
 | 148 | Goleadores automáticos de los duelos (sección en /ranking/) |
 | 149 | Prode (página /prode/) |
+| 152 | Avisos en la campana (te toca en el draft, vota al MVP, ganaste en el prode, retos de clan) y mensajes al canal de Discord |
+
+## Paso 1b · Activar los mensajes a Discord (opcional, 1 minuto)
+En Discord: canal → Editar canal → Integraciones → Webhooks → Nuevo webhook → Copiar URL. En Supabase → SQL Editor:
+```
+select vault.create_secret('PEGA_AQUI_LA_URL_DEL_WEBHOOK', 'discord_webhook');
+```
+Sin esto todo funciona igual; solo no se publica nada en Discord (resumen diario, eventos, draft, clan contra clan, prode semanal).
 
 ## Paso 2 · Comprobar (opcional, recomendado)
 Pega y corre cada prueba: `supabase/tests/145_torneos_resultados_link_test.sql`, `148_goleadores_link_test.sql`, `149_prode_test.sql`.

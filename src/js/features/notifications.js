@@ -24,9 +24,9 @@ const ICON = {
   AMISTAD_SOLICITUD: 'fa-user-plus', AMISTAD_ACEPTADA: 'fa-user-group', SEGUIDOR_NUEVO: 'fa-heart',
   ESPECTADOR_SOLICITUD: 'fa-eye', ESPECTADOR_APROBADO: 'fa-eye', MURO_RESPUESTA: 'fa-comment', MENCION: 'fa-at', LOGRO: 'fa-medal', EVENTO: 'fa-calendar-day', CLAN: 'fa-shield-halved',
   RESULTADO_PROPUESTO: 'fa-clipboard-check', RESULTADO_CONFIRMADO: 'fa-circle-check', RESULTADO_DISPUTADO: 'fa-scale-balanced',
-  SALA_ABIERTA: 'fa-tower-broadcast', INVITACION_SALA: 'fa-envelope-open-text', MODERACION: 'fa-gavel', LIGA_OFICIAL: 'fa-shield-halved',
+  SALA_ABIERTA: 'fa-tower-broadcast', INVITACION_SALA: 'fa-envelope-open-text', MODERACION: 'fa-gavel', LIGA_OFICIAL: 'fa-shield-halved', DRAFT: 'fa-list-ol', MVP: 'fa-star', PRODE: 'fa-bullseye',
 };
-const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/', ESPECTADOR_SOLICITUD: 'en-vivo/', ESPECTADOR_APROBADO: 'en-vivo/', MURO_RESPUESTA: 'perfil/', LOGRO: 'logros/', EVENTO: 'eventos/', CLAN: 'clanes/', RESULTADO_PROPUESTO: 'mis-partidos/', RESULTADO_CONFIRMADO: 'mis-partidos/', RESULTADO_DISPUTADO: 'mis-partidos/', LIGA_OFICIAL: 'torneos/' };   // el resto de avisos son de retos → Duelos
+const DESTINO = { AMISTAD_SOLICITUD: 'amigos/', AMISTAD_ACEPTADA: 'amigos/', SEGUIDOR_NUEVO: 'amigos/', ESPECTADOR_SOLICITUD: 'en-vivo/', ESPECTADOR_APROBADO: 'en-vivo/', MURO_RESPUESTA: 'perfil/', LOGRO: 'logros/', EVENTO: 'eventos/', CLAN: 'clanes/', RESULTADO_PROPUESTO: 'mis-partidos/', RESULTADO_CONFIRMADO: 'mis-partidos/', RESULTADO_DISPUTADO: 'mis-partidos/', LIGA_OFICIAL: 'torneos/', DRAFT: 'draft/', MVP: 'mis-partidos/', PRODE: 'prode/' };   // el resto de avisos son de retos → Duelos
 const fmt = (iso) => new Date(iso).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', ...regionAhora() });
 const LIMIT = 30;
 const DESHACER_MS = 5000;
