@@ -14,6 +14,7 @@ Cómo trabajan a la vez varias cuentas y chats de Claude sobre la web sin pisars
 - [Parte 2 · Prompt para cambiar de cuenta (sirve siempre)](#parte-2-prompt-para-cambiar-de-cuenta-sirve-siempre) — origen `docs/trabajo-en-equipo/PROMPT-CAMBIO-DE-CUENTA.md` (01e6efc 2026-10-18)
 - [Parte 3 · Reorganización del código · 18 oct 2026](#parte-3-reorganizacion-del-codigo-18-oct-2026) — origen `docs/trabajo-en-equipo/REORGANIZACION-CODIGO-18-OCT.md` (801bae3 2026-10-18)
 - [Parte 4 · Phoenix Evolution — Estado de la web y la base de datos (8 oct 2026, noche)](#parte-4-phoenix-evolution-estado-de-la-web-y-la-base-de-datos-8-oct-2026-noche) — origen `docs/trabajo-en-equipo/RESUMEN-WEB.md` (01e6efc 2026-10-18)
+- [Parte 5 · Dos cuentas de Claude a la par: el cuaderno TRASPASO.md (24-oct-2026)](#parte-5-dos-cuentas-de-claude-a-la-par-el-cuaderno-traspasomd-24-oct-2026) — nuevo, ronda 367
 
 ---
 
@@ -218,3 +219,32 @@ Un chat no toca la pieza de otro: le pasa un prompt. Endpoints publicados no se 
 - Web: pantalla del staff para cargar traspasos reales (Capa 1); ordenar el interior de páginas con capturas de Fralex. (Ya hechos: salto de Liga, selector de club CPU, «sin_motivo».)
 
 ---
+
+---
+
+## Parte 5 · Dos cuentas de Claude a la par: el cuaderno TRASPASO.md (24-oct-2026)
+
+**Qué se logró.** Fralex trabaja Phoenix con **dos cuentas de Claude a la vez** (la de siempre, «Cuenta 1», con plan Max y proyecto de Claude Code con hilos; y una segunda, «Cuenta 2», con plan Pro, para cuando a la primera se le acaban los tokens). Ahora las dos se enteran de lo que hizo la otra con un **cuaderno compartido en GitHub**: `TRASPASO.md`, en la raíz del repo de la web, rama `borrador`. Cubre **todo Phoenix** (web, Link, Sync, PES/mandos, Supabase), no solo la web.
+
+**Qué contiene `TRASPASO.md`:** las 4 reglas cortas; cómo saber qué cambió desde la última nota (`git log --since` y el revisor `tools/traspaso-cuentas.ps1`); la plantilla de entrada de cierre; la **tabla de candados** (un frente, una cuenta); el mapa completo de carpetas de la PC de Fralex; dónde está cada documento que manda; cómo montar la Cuenta 2; y las entradas, que solo se AÑADEN.
+
+**Paso a paso (para replicarlo o retomarlo):**
+1. Al empezar, en cada repo: `git fetch` y `git pull --rebase` en su rama (web `borrador`, Link `plan-ux`, Sync `mercado-fase0`, overlay `main`).
+2. Leer la **última entrada** de la sección 8 de `TRASPASO.md` y la tabla de candados.
+3. Mirar qué entró después de esa entrada: `git log --since="AAAA-MM-DD HH:MM" origin/<rama>` por repo. Con la PC conectada, correr `powershell -ExecutionPolicy Bypass -File C:\dev\pes-liga-automatica\tools\traspaso-cuentas.ps1` (solo LEE: hace `git fetch`, nunca `pull`; lista commits nuevos y archivos cambiados fuera de git en los módulos de Sider, `PRUEBA_CANCHA`, instaladores y el hub).
+4. Al terminar, al cambiar de cuenta o con pocos tokens: añadir una entrada con la plantilla (hecho, commits, lo que solo está en la PC, Supabase, a medias, lo que espera a Fralex, siguiente paso, candados) y `git push origin borrador`.
+5. Montar la Cuenta 2 (una vez): kit en la PC en `C:\dev\TRASPASO-CUENTAS` y copia en la carpeta del escritorio «PHOENIX - CUENTA 2». En la cuenta Pro **no hay «Proyectos»** (la función de proyectos de Claude Code está en beta y no la tiene): se trabaja con sesiones sueltas de Claude Code web, eligiendo el repo `Fralexito/phoenixevolution` y pegando al empezar el texto corto del archivo «5 - SI NO HAY PROYECTOS…». Claude Code lee solo el `CLAUDE.md` del repo, que ya manda leer `TRASPASO.md`.
+
+**Errores e intentos fallidos:**
+- Se intentó crear el proyecto de la Cuenta 2 como «proyecto de chat» normal (la pantalla «Crear un proyecto» con Contexto): no sirve para esto, porque no tiene GitHub ni PC. Se descartó.
+- El proyecto de Claude Code («Proyectos Beta») solo aparece en la cuenta Max. No se puede activar desde aquí; si algún día aparece en la Pro, se crea con los archivos 1 a 4 de la carpeta del escritorio.
+- Desde la nube no se puede ejecutar `git` ni PowerShell en la PC (el puente es Linux y el `.git` de la web es un worktree con ruta de Windows). Por eso el `.ps1` del revisor **no se probó en Windows**.
+- El zip del paquete de contexto (`para-proyecto-24-oct-2026.zip`) **no** se sube a GitHub: el repo es público y trae notas personales y datos de la PC.
+
+**Cosas a tener en cuenta:**
+- Un frente, una cuenta. Los frentes del juego (mandos 9–16, modo street) y de Link los lleva la Cuenta 1 con acceso a la PC; web, Link y documentos pueden ir en cualquiera.
+- Antes de usar un número de migración o de ronda: revisar `REGISTRO.md`, `MAPA.md` y Supabase. **Siguiente migración libre: 144.**
+- Los 5 límites no se flexibilizan (no borrar trabajo ajeno sin commit, no compilar Link con `COMPILAR_PHOENIX.bat`, no tocar ajustes de seguridad, nada de apuestas con dinero real, pedir permiso antes de algo irreversible).
+- Si ninguna cuenta escribió su entrada (se acabaron los tokens de golpe), la otra reconstruye con el paso 3.
+
+**Cómo comprobar y revertir:** comprobar con `git log --oneline -- TRASPASO.md` y leyendo la última entrada. Revertir es borrar el archivo y las líneas de «dos cuentas» en `CLAUDE.md` y `REGLAS-ECOSISTEMA.md` §7; no toca código ni base de datos.

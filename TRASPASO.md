@@ -67,13 +67,13 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Frente | Dónde | Lo tiene | Desde |
 |---|---|---|---|
 | Web (Astro) | `phoenixevolution@borrador` · PC `C:\dev\pes-liga-automatica` | libre | — |
-| Phoenix Link (C++) | `smash-soda-fork@plan-ux` · PC `C:\dev\smash-soda-fork\_phoenix-link` | libre | — |
+| Phoenix Link (C++) | `smash-soda-fork@plan-ux` · PC `C:\dev\smash-soda-fork\_phoenix-link` | **Cuenta 1** (hilo 1: integrar el paquete de mandos cuando el coordinador avise) | 2026-10-21 |
 | Phoenix Sync / Mercado | `smash-soda-fork@mercado-fase0` · PC `C:\dev\smash-soda-fork` | libre | — |
-| PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | libre — último: Cuenta 1, hilo 4, esperando la prueba de Fralex con v0.9.40 | — |
-| PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — último: Cuenta 1, hilo «modo street», en pausa hasta acabar mandos | — |
+| PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | **Cuenta 1** (hilo 4; necesita la PC conectada: la Cuenta 2 por navegador no puede tocarlo) — siguiente: pantalla Local/Visitante nativa de 16 | 2026-10-21 |
+| PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — en espera hasta acabar la pantalla nativa de 16 | — |
 | Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **siguiente número libre: 144** (reservar en `REGISTRO.md` antes de usarlo) | — |
 | Overlay | `phoenix-overlay@main` | libre | — |
-| Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre | — |
+| Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
 
 **Juego (PES) y Sider:** solo una cuenta a la vez puede pedir pruebas en el juego o instalar módulos, porque es una sola PC y un solo PES. Si la otra cuenta tiene un candado de PES, no instales nada en `SiderAddons`.
 
@@ -158,3 +158,23 @@ Conectores opcionales en la Cuenta 2 (solo si un trabajo los necesita): Supabase
 - A medias: la copia de la web en la PC (`C:\dev\pes-liga-automatica`) aún no tiene este archivo: hace falta un `git pull` ahí (desde la nube no se puede correr git en la PC). El revisor `.ps1` no se pudo probar en Windows; la primera cuenta que lo use en la PC, que lo compruebe.
 - Siguiente paso: Fralex monta la Cuenta 2 con `C:\dev\TRASPASO-CUENTAS\LEEME-KIT.txt`.
 - Candados: sin cambios (todo libre).
+
+### 2026-10-25 00:00 (Lima) · Cuenta 1 · Cierre antes de pasar a la Cuenta 2
+Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. Lo que sigue es el estado de TODO al cerrar.
+- **Hecho hoy:**
+  - Mandos 9–16 en PES: módulo **v0.9.58** CONFIRMADO por Fralex (nombres, L2/R2, □, ○, jugar con su usuario, «Tipo de cursor» y barra de potencia también en 13–16, «Usuario N»). Paquete instalable sin Link: `D:\Frank\Games_\PRUEBA_CANCHA\paquetes\phoenix_mandos_9a16_v0.9.58.zip`.
+  - Documentación subida a GitHub: Link `plan-ux` e25e1a6 (Parte 13 de `docs/MANDOS.md`, `docs/libro-pes/` con bitácora viva, cap. 60 k, 60 n y 62/90 al día, y `paquetes/phoenix_mandos_9a16/` con módulo, instalador y LEEME) y web `borrador` (este cierre, `docs/trabajo-en-equipo/TRABAJO-EN-EQUIPO.md` parte 5, `MAPA.md` rondas 365–367, `docs/INDICE.md`).
+- **Commits/ramas:** `phoenixevolution@borrador` (este cierre encima de 5ba8db7) · `smash-soda-fork@plan-ux` e25e1a6 · `smash-soda-fork@mercado-fase0` 5bd051a (sin cambios) · `phoenix-overlay@main` 30470fe (sin cambios) · `App-galaxy-` vacío.
+- **Solo en la PC (sin git):** módulo vivo `SiderAddons\modules\phoenix_mandos_fase1.lua` v0.9.58 y respaldos `RESPALDO_v0.9.*.lua` en `PRUEBA_CANCHA\modulo_sider`; zips por versión en `PRUEBA_CANCHA\paquetes`; los `.raw` de la réplica de pantalla (≈9 MB, no se suben: salen de pantallas de PES); el libro completo en `PRUEBA_CANCHA\informes\LIBRO_PERSONAL` (el original manda sobre la copia de `docs/libro-pes/`).
+- **Web:** beta **1.16.1**, ronda 367 (solo documentación), migraciones hasta **143** aplicadas, siguiente **144**. Nada a medias. **Verificado:** los documentos de la web de la PC (`C:\dev\pes-liga-automatica`) son idénticos a los de GitHub; a la PC solo le faltan los cambios de documentación de las Cuentas 1/2 de esta semana → hace falta `git pull` allí.
+- **Estado de cada hilo:**
+  - **1 · Link:** vincular cuenta y Sync, terminado (0.3.4x). Espera a que el coordinador avise para integrar el paquete de mandos v0.9.58 en el instalador de Link (copiar `modules\phoenix_mandos_fase1.lua`, `content\phoenix\lados_replica\` y `livecpk\PhoenixMandos\`; en `sider.ini`: `luajit.ext.enabled=1`, `overlay.enabled=1`, `cpk.root=".\livecpk\PhoenixMandos"` primero y `lua.module="phoenix_mandos_fase1.lua"` último). **No verificado:** si en `C:\dev\smash-soda-fork\_phoenix-link` hay commits o cambios sin subir (GitHub `plan-ux` no tenía commits de código desde el 21-oct); correr `tools\revisar-sin-commit.ps1` antes de trabajar en Link.
+  - **2 · Carpetas y permisos, 3 · Web (pase, jugadores, caras), 5 · Documentación, 7 · Dinero y apuestas:** terminados.
+  - **4 · Mandos 9–16:** v0.9.58 confirmado (arriba). **Siguiente (26-oct):** pantalla Local/Visitante **nativa de 16 filas** dentro de PES (hoy es una réplica encima); diseño en `docs/libro-pes/cap_60_n_diseno_16_asientos.md`. Riesgo conocido: crear dibujos nuevos dentro de PES puede cerrar el juego al empezar o terminar un partido; si pasa, el HUD de 16 se desactiva.
+  - **6 · Seguridad y repos públicos:** en pausa, espera a Fralex: activar él mismo 2FA y la protección de contraseñas filtradas, y decidir el Supabase de pruebas (staging). Claude no toca ajustes de seguridad.
+  - **8 · Primera noche de liga real:** listo del lado de Claude. **Espera a Fralex:** web › Competiciones › Ligas › Liga de amigos › «Crear una liga» › «Copiar enlace» y mandarlo a sus amigos (guía en `docs/liga-y-torneos/NOCHE-DE-LIGA-CON-AMIGOS.md`, sección 2). Instalador nuevo de Link: en espera de su decisión.
+  - **Modo street con menos jugadores:** viable (roja invisible + quitar la regla de «menos de 7 termina el partido»). Solo investigación estática; empieza al acabar la pantalla nativa de 16 y con permiso para leer `PRUEBA_CANCHA`.
+- **A medias:** la pantalla Local/Visitante nativa de 16 (sin empezar). Drive: **pendiente de correr en la PC** `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` (desde la nube no se puede). Antes, `git pull` en `C:\dev\pes-liga-automatica` para que el respaldo lleve lo nuevo.
+- **Esperando a Fralex:** (1) crear la liga real y mandar el enlace; (2) en la PC: `git pull` en la web y luego `RESPALDAR_A_DRIVE.ps1`; (3) 2FA y contraseñas filtradas; (4) si la v0.9.58 cierra PES al empezar o terminar un partido, avisar.
+- **Siguiente paso para quien entre (Cuenta 2, desde el navegador):** web, Link-docs y Sync se pueden llevar desde allí; lo del juego (mandos, modo street) necesita la PC y lo lleva la Cuenta 1 o una sesión local con acceso a `D:\Frank\Games_\PRUEBA_CANCHA`. Lo más útil ahora: preguntarle a Fralex qué frente quiere, tomar el candado en la tabla y empezar.
+- **Candados:** Link y «PES: mandos» quedan con la Cuenta 1 (ver tabla). Todo lo demás, libre.

@@ -22,7 +22,9 @@ La ordenación anterior, del 18-oct, se hacía con `node tools/reorganizar/actua
 | Reglas del ecosistema | [`liga-y-torneos/REGLAS-ECOSISTEMA.md`](liga-y-torneos/REGLAS-ECOSISTEMA.md) | (norma viva) |
 | Web ↔ PES ↔ Link | [`web-pes-link/WEB-PES-LINK.md`](web-pes-link/WEB-PES-LINK.md) | PROMPT-SISTEMA-DATOS-WEB-PES, SYNC-COMPARTIDO, SYNC-AUTOMATICO, TRASPASOS-EN-VIVO, MINIFACES, TRASPASO-17-OCT-WEB-PES |
 | Comunidad | [`comunidad/COMUNIDAD.md`](comunidad/COMUNIDAD.md) | CHAT-GENERAL, PLAN-IA-WEB |
-| Trabajo en equipo | [`trabajo-en-equipo/TRABAJO-EN-EQUIPO.md`](trabajo-en-equipo/TRABAJO-EN-EQUIPO.md) | PROTOCOLO-MULTICUENTA, PROMPT-CAMBIO-DE-CUENTA, REORGANIZACION-CODIGO-18-OCT, RESUMEN-WEB |
+| Trabajo en equipo | [`trabajo-en-equipo/TRABAJO-EN-EQUIPO.md`](trabajo-en-equipo/TRABAJO-EN-EQUIPO.md) | PROTOCOLO-MULTICUENTA, PROMPT-CAMBIO-DE-CUENTA, REORGANIZACION-CODIGO-18-OCT, RESUMEN-WEB, y la parte 5 (24-oct): cuaderno `TRASPASO.md` entre dos cuentas |
+
+Cuaderno vivo entre cuentas (raíz del repo): [`../TRASPASO.md`](../TRASPASO.md) — léelo primero al empezar y escribe tu entrada al terminar.
 
 ## Contratos y referencias (se quedan aparte porque el código los cita)
 

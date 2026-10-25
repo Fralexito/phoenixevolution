@@ -310,6 +310,7 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Letras nuevas alojadas en la web: @fontsource anton, oswald, permanent-marker, press-start-2p. 577 pruebas, build 53, revisado en PC y celular con datos simulados (0 errores, 0 textos <12 px, descarga PNG ok).
 
 ## RETOMAR EN UNA CONVERSACIÓN NUEVA (resumen de estado · ronda 209)
+> **Actualización 2026-10-25 (dos cuentas):** el estado vivo de TODO Phoenix (web, Link, Sync, mandos de PES) y qué cuenta lleva cada frente está en **`TRASPASO.md`** (raíz). Web: beta **1.16.1**, ronda 367, migraciones hasta **143** aplicadas (siguiente **144**), nada a medias; pendiente de Fralex: crear la liga real y mandar el enlace.
 > **Actualización 2026-10-16 (cuenta WEB):** rondas 340–347 (React isla, radar FIFA, orden visual, modo ligero, anti-lag) y pendientes en **`docs/bitacoras/HISTORIA-WEB.md («BITACORA-16-OCT-2026-CUENTA-WEB»)`**; siguiente ronda 348.
 > **Actualización 2026-10-16 (cuenta Opus):** esta sección es vieja. Para el estado actual leer **`docs/bitacoras/HISTORIA-WEB.md («BITACORA-16-OCT-2026-CUENTA-OPUS»)`** (cómo retomar, qué se hizo 13–16 oct, pendientes de FRALEX, siguiente migración 119 / ronda 347) y la última línea **TRASPASO** de `REGISTRO.md`.
 > **Actualización 2026-10-08 (Cuenta A):** hay dos cuentas trabajando a la vez. Leer primero el final de `REGISTRO.md` (bitácora, solo se añade) y `docs/liga-y-torneos/REGLAS-ECOSISTEMA.md` §7. Estado real de la BD: migraciones hasta **089** aplicadas (hay choque de números 088/089 entre cuentas: ver `supabase/migrations/REGISTRO_DESFASES.md`); siguiente libre **100** (hechas hasta la 099; 097 = torneos propios, 098 = Phoenix Sync compartido, 099 = chat general). Nuevo en `borrador` sin publicar: Liga Máster / Modo Mánager (078–089), Mercado (Edge Function `mercado` v10), páginas `/legal/*`, privacidad en Configuración y Moderación, manifest/OG. Economía al día en `ECONOMIA.md`. La línea «Estado de la BD: migraciones 001–057» de abajo está desactualizada.
@@ -497,3 +498,14 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - Web: `pase.js` (mensaje «Ya tenías…»), `pase-demo.js`, `alquiler.js` (sin gemas). 648/648 pruebas, build OK.
 - `docs/economia/RIESGOS-LEGALES.md`: apuestas en Perú, venta de gemas, Konami/PES, caras/parches, Parsec (no es asesoría legal).
 - Documentación unificada (regla de Fralex: pocos documentos largos): auditoría + riesgos legales → `docs/economia/BITACORA-DINERO-APUESTAS-Y-LEGAL.md` (paso a paso, errores, medidas).
+
+### Ronda 365 (hilo «Noche de liga real con amigos», borrador): Beta 1.16.0 · Liga de amigos
+- La liga oficial (la única que recibe resultados de Link) se crea, se inscribe y genera calendario desde la web; tabla desde `liga_tabla` con Realtime. Migración 142; `src/pages/liga-amigos.astro`, `src/js/pages/ligaAmigos.js`. Documento único con guía para amigos, guion de la noche y qué medir: `docs/liga-y-torneos/NOCHE-DE-LIGA-CON-AMIGOS.md`.
+
+### Ronda 366 (mismo hilo, borrador): Beta 1.16.1 · un solo creador de ligas y torneos
+- El staff hace OFICIAL una liga todos contra todos de /torneos/ y pasa a la Liga de amigos con sus inscritos (migración 143, `torneo.js`, `torneos/api.js`); las casuales siguen con resultados a mano.
+- Migraciones 142 y 143 APLICADAS por MCP y probadas en transacción deshecha (crear, inscribir, calendario, hacer oficial, finalizar); base limpia. Siguiente migración libre: **144**.
+- Pendiente de Fralex: web › Competiciones › Ligas › Liga de amigos › «Crear una liga» › «Copiar enlace» y mandarlo a sus amigos (guía en NOCHE-DE-LIGA-CON-AMIGOS.md, sección 2).
+
+### Ronda 367 (hilo «Trabajar a la par con otra cuenta», borrador): solo documentación · dos cuentas de Claude
+- Nuevo cuaderno compartido `TRASPASO.md` (raíz) con reglas, candados por frente, mapa de carpetas de la PC y estado de cada hilo; revisor de solo lectura `tools/traspaso-cuentas.ps1` (sin probar en Windows). Detalle y paso a paso: `docs/trabajo-en-equipo/TRABAJO-EN-EQUIPO.md` (parte 5). `VERSION_BETA` sin cambio (1.16.1).
