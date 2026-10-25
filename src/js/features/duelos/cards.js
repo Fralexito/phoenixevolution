@@ -1,6 +1,7 @@
 // Pinta las tarjetas de reto. Solo devuelve HTML (no toca la red); todo dato de la BD pasa por escapeHTML.
 import { escapeHTML, safeUrl, parsecDirecto, abrirParsec } from '../../core/sistema/dom.js';
 import { regionAhora } from '../ajustes.js';
+import { href } from '../../core/sistema/config.js';
 import { confirmPhase } from '../../core/competicion/schedule.js';
 import { CONFIRM_OPEN_MIN, CONFIRM_CLOSE_MIN } from '../../core/sistema/rules.js';
 import { seats } from '../../core/competicion/teams.js';
@@ -132,6 +133,7 @@ export function card(r, id) {
     <div class="grid grid-cols-2 gap-2">${teamColumn(r, 'A', id)}${teamColumn(r, 'B', id)}</div>
     ${id ? inviteBanner(r, id) + agreementBlock(r, id) + confirmBlock(r, id) + linkBlock(r, id) : ''}
     ${actions ? `<div class="mt-4 pt-3 border-t border-galaxy-border/60 flex gap-2">${actions}</div>` : ''}
+    ${id && ['ACEPTADO', 'EN_JUEGO'].includes(r.estado) && (r.retador_id === id || r.rival_id === id || r.host_id === id || myPart(r, id)) ? `<a href="${escapeHTML(href(`sala-vivo/?reto=${Number(r.id)}`))}" class="btn btn-ghost !min-h-9 !text-[12px] w-full mt-3"><i class="fa-solid fa-comments"></i> Sala en vivo: chat y predicción</a>` : ''}
   </article>`;
 }
 

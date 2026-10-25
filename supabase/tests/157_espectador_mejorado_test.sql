@@ -1,0 +1,4 @@
+-- Prueba en seco de la 157 (TODO_OK_REVERTIDO = todo bien, nada guardado). Ejecutada el 25-oct-2026 en la base real: OK (2 bloques).
+-- Bloque 1: el jugador escribe (espacios limpiados) · anti-spam 3 s · un jugador no predice · lee su chat · el staff ve y modera · ocultar.
+-- Bloque 2 (con 2 usuarios temporales): un ajeno no ve ni escribe · el espectador predice y cambia · al confirmarse 0-2 gana B y
+--   «acertaron» = 1 · después del marcador ya no se predice.

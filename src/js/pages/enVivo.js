@@ -9,6 +9,7 @@ import { data, loadPerfiles } from '../features/duelos/data.js';
 import { MODOS, modoDe, accionPara, clampMax } from '../core/competicion/espectadores.js';
 import * as api from '../features/espectadores/api.js';
 import { regionAhora } from '../features/ajustes.js';
+import { href } from '../core/sistema/config.js';
 import { montarTarjetasSalas } from '../features/salas/tarjetas.js';
 import { montarEstadoHosts } from '../features/salas/estadoHosts.js';
 
@@ -41,7 +42,7 @@ function tarjetaPartido(p) {
       ${badge(escapeHTML(p.plataforma), 'text-galaxy-400 border-galaxy-400/40')}${badge(`${p.tam_a} vs ${p.tam_b}`)}${badge(`<i class="fa-solid ${m.icono} mr-1"></i>${m.corto}`)}</div>
     <p class="font-display font-bold text-white uppercase text-sm leading-tight">${titulo(p)}</p>
     <p class="text-[12px] text-gray-400"><i class="fa-solid fa-eye mr-1"></i>${p.aprobados}/${p.max} espectadores${p.host_id ? ` · Host: ${escapeHTML(nm(p.host_id))}` : ''}${p.estado === 'ACEPTADO' && p.fecha ? ` · ${escapeHTML(fecha(p.fecha))}` : ''}</p>
-    <div class="flex flex-wrap items-center gap-2">${boton}</div>${revelado}</article>`;
+    <div class="flex flex-wrap items-center gap-2">${boton}</div>${revelado}${['EN_JUEGO', 'ACEPTADO'].includes(p.estado) ? `<a href="${escapeHTML(href(`sala-vivo/?reto=${Number(p.id)}`))}" class="btn btn-ghost !min-h-9 !text-[12px] w-full"><i class="fa-solid fa-comments"></i> Chat y predicción</a>` : ''}</article>`;
 }
 function pintarPartidos() {
   $('cnt-en-vivo').textContent = S.partidos.length ? `(${S.partidos.length})` : '';

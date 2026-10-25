@@ -263,3 +263,20 @@ nadie borra: se oculta; privacidad de todos los jugadores del duelo respetada.
 Afectaba a `resultado_de_reto` (036: un ajeno podía ver el marcador propuesto de un duelo sin host), `goles_de_duelo` (148) y las
 repeticiones (155). Se corrigió con `coalesce(…, false)` y se comprobó en la base real que ahora un ajeno no ve nada.
 **Probado:** pruebas puras; prueba en seco 155+156 (12 casos, OK); página y ventana en el navegador.
+
+---
+
+## 13. Modo espectador mejorado: sala en vivo (beta 1.31.0 · migración 157 APLICADA)
+
+**Qué es:** página **/sala-vivo/?reto=…** de cada duelo aceptado o en juego: **chat** para jugadores, host, espectadores aprobados y staff,
+y **predicción** «¿quién gana?» (lado A, empate o lado B) solo para los espectadores, con barra de porcentajes; al confirmarse el
+marcador muestra quién ganó y cuántos acertaron. **Sin premio** (no es apuesta). Se entra desde **Salas en vivo → Chat y predicción**
+y desde la tarjeta del duelo agendado (**Sala en vivo: chat y predicción**).
+**Piezas:** `supabase/migrations/157_espectador_mejorado.sql` (`reto_chat`, `reto_predicciones`; `sala_chat_enviar`, `sala_en_vivo`,
+`sala_prediccion`, `sala_chat_ocultar`) · `src/js/core/competicion/salaVivo.js` + `tests/salaVivo.test.mjs` · `src/pages/sala-vivo.astro`
++ `src/js/pages/salaVivo.js` · enlaces en `features/duelos/cards.js` y `pages/enVivo.js`.
+**Blindaje:** mismas reglas que el chat general (sancionados y cuentas bloqueadas no escriben; **menores y adultos no se leen entre sí**,
+el staff ve todo); 1 mensaje cada 3 s y máx. 60 por persona y duelo; textos escapados (probado con `<b>`); el host o un moderador
+ocultan (nada se borra); el chat cierra 2 h después del partido; la predicción cierra al haber marcador; un ajeno no ve nada;
+la pantalla pide solo los mensajes nuevos cada 3 s. Página marcada `noindex`.
+**Probado:** 2 pruebas puras; 2 pruebas en seco en la base real (OK); página en el navegador con datos simulados.
