@@ -47,7 +47,6 @@ luego('efectos', () => Promise.all([import('./features/dopamina.js'), import('./
 if (FX.sinIconosWeb) initSinIconosWeb();
 // Temas (ronda 387): probador y luz del puntero; archivo aparte y después de lo visible
 if (FX.pruebaJuego && document.documentElement.hasAttribute('data-prueba-juego')) luego('prueba juego', () => import('./features/pruebaJuego.js').then((m) => m.initPruebaJuego()));
-if (FX.temas) luego('temas', () => import('./features/temas.js').then((m) => m.initTemas()));
 if (FX.pwa) initPwa();
 if (FX.scrollSuave) initScrollSuave();
 initMarco();

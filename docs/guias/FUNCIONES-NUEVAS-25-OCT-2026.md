@@ -424,3 +424,8 @@ menú desplegable, el relleno morado de «Social» era tan alto como «Chat gene
   `backdrop-filter` (vidrio esmerilado: en Jugadores son unas 37 piezas, una por carta) tenía que volver a calcular su desenfoque **en cada
   cuadro**. Medido al bajar la página: 8–15 cuadros contra 38–48 ahora. Las luces siguen, quietas. Sin estilo elegido no cambiaba nada.
   **Regla:** no animar nada que quede detrás de paneles con `backdrop-filter`.
+- **1.38.0 · se quitan los 4 estilos (Fralex: «quita esos modos, ya elegí lo que me sirve»):** fuera `styles/temas.css`, `styles/vivo.css`,
+  `js/features/temas.js`, `js/features/vivo.js`, el script de la cabecera, `FX.temas` y los avisos `pes:logro` / `pes:gol`. `?estilo=…` ya no
+  hace nada y lo que quedó guardado (`pes-tema`) se borra solo. **Se quedan:** botones y cartas de juego (`pruebaJuego`, `?prueba=no` para
+  apagarlos), el 3D, los arreglos de celular, los colores de marca como variables y las muestras de `/demo/`. Los estilos de
+  Configuración (`ajustes`, botones con `data-estilo`) son otra cosa y siguen igual.

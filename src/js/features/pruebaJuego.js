@@ -29,6 +29,7 @@ function inclinar() {
 
 export function initPruebaJuego() {
   try {
+    try { localStorage.removeItem('pes-tema'); localStorage.removeItem('pes-tema-probar'); } catch {}   // 1.38.0: los 4 estilos se quitaron; borra lo que quedó guardado
     if (!document.documentElement.hasAttribute('data-prueba-juego')) return;
     inclinar();   // (el aviso «Quitar prueba» se quitó en la 392: ahora viene encendido; para apagarlo: ?prueba=no)
   } catch (e) { console.warn('[prueba juego]', e?.message ?? e); }

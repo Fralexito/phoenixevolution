@@ -246,6 +246,11 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-26 01:10 (Lima) · Cuenta 2 · Fuera los 4 estilos de prueba — beta 1.38.0
+- **Hecho:** borrados temas.css, vivo.css, temas.js y vivo.js (y su script de cabecera, `FX.temas`, eventos `pes:logro`/`pes:gol`). Fralex eligió
+  los botones y cartas de juego; eso se queda. Ojo: el `data-estilo` de los botones de Configuración es otra función y sigue.
+- **Candados:** todos libres. Siguiente migración: **161**.
+
 ### 2026-10-26 (Lima) · Cuenta 2 · Jugadores más fluido — beta 1.37.2
 - **Hecho:** luces de estadio de `vivo.css` quietas y sin `filter: blur` (moverlas recalculaba cada cuadro los ~37 `backdrop-filter` de Jugadores).
   Regla: no animar nada detrás de paneles con `backdrop-filter`.

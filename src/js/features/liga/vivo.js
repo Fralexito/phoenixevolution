@@ -81,7 +81,6 @@ function pintar(previas = new Map()) {
       const card = cont.querySelector(`[data-sala="${CSS.escape(x.sala_id)}"]`);
       const marcador = card?.querySelector('.vivo-marcador');
       if (marcador) { salto(marcador); rafaga(marcador, ['⚽', '🔥', '✨'], { n: 10 }); }
-      dispatchEvent(new CustomEvent('pes:gol', { detail: { card } }));   // capa «vivo» (ronda 388): sello ¡GOL! y sonido, solo con un estilo elegido
     }
   }
 }

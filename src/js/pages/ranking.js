@@ -87,7 +87,7 @@ $('rk-tabs').addEventListener('click', (e) => { const b = e.target.closest('[dat
 $('rk-retos-lista').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-cobrar]'); if (!b || S.busy) return;
   S.busy = true; pintarRetos();
-  try { const p = await api.cobrarReto(b.dataset.cobrar); toast(`¡Reto cobrado! +${p} puntos.`, 'ok'); dispatchEvent(new CustomEvent('pes:logro', { detail: { titulo: '¡Reto cobrado!', sub: `+${p} puntos` } })); rafaga(b, ['🏆', '⚡', '✨', '🔥'], { n: 14 }); S.busy = false; await cargar(); }
+  try { const p = await api.cobrarReto(b.dataset.cobrar); toast(`¡Reto cobrado! +${p} puntos.`, 'ok'); rafaga(b, ['🏆', '⚡', '✨', '🔥'], { n: 14 }); S.busy = false; await cargar(); }
   catch (err) { console.error('[ranking] cobrar:', err); toast(err?.message || 'No se pudo cobrar el reto.', 'error'); }
   finally { S.busy = false; pintarRetos(); }
 });

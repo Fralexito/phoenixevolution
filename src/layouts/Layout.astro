@@ -65,11 +65,9 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
       <script is:inline>document.documentElement.classList.add('js');</script>
-    {/* Ronda 387: tema de diseño elegido (styles/temas.css), ANTES de pintar para que no parpadee. Sin tema = el diseño de siempre. */}
     {/* Ronda 391/392: «botones y cartas de juego» (styles/pruebaJuego.css). Desde la 392 vienen ENCENDIDOS (Fralex: «así me gusta más, aplícalo a toda la página»).
          ?prueba=no los apaga en ese navegador (se recuerda); ?prueba=juego los vuelve a encender. FX.pruebaJuego = false los quita para todos. */}
     {FX.pruebaJuego && <script is:inline set:html={"try{var q=new URLSearchParams(location.search).get('prueba'),k='pes-prueba-juego';if(q==='juego')localStorage.removeItem(k);if(q==='no')localStorage.setItem(k,'0');if(localStorage.getItem(k)!=='0')document.documentElement.setAttribute('data-prueba-juego','')}catch(e){document.documentElement.setAttribute('data-prueba-juego','')}"} />}
-    {FX.temas && <script is:inline set:html={"try{var q=new URLSearchParams(location.search).get('estilo'),T=['champions','neon','fc','mezcla'],t=q!==null?q:localStorage.getItem('pes-tema');if(T.indexOf(t)>=0)document.documentElement.setAttribute('data-estilo',t)}catch(e){}"} />}
     {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','si');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
     {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }`}</style>}
     {/* Ronda 243: «Animaciones» de Ajustes, ANTES de pintar (así nada se mueve un instante si debe estar quieto, y «Siempre activas» manda sobre el sistema).
