@@ -14,6 +14,14 @@ export const TEMAS = [
 ];
 const CLAVE = 'pes-tema';
 const CLAVE_PROBAR = 'pes-tema-probar';
+const sonidoSi = () => leer('pes-sonido') === '1';
+// Capa de efectos dinámicos (js/features/vivo.js): se descarga solo si hay un estilo elegido.
+let vivoPedido = false;
+function cargarVivo() {
+  if (vivoPedido || !document.documentElement.hasAttribute('data-estilo')) return;
+  vivoPedido = true;
+  import('./vivo.js').then((m) => m.initVivo()).catch((e) => { vivoPedido = false; console.warn('[temas] vivo:', e?.message ?? e); });
+}
 const valido = (t) => TEMAS.some((x) => x.id === t);
 const leer = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const guardar = (k, v) => { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch { /* sin almacenamiento */ } };
@@ -39,13 +47,17 @@ function montarProbador() {
   const pintar = () => {
     const act = temaActual();
     el.innerHTML = `<b>Estilo</b>${TEMAS.map((t) => `<button type="button" data-tp="${t.id}" aria-pressed="${t.id === act}">${t.nombre}</button>`).join('')}
+      <button type="button" data-tp-efecto title="Ver la celebración que sale al confirmar un marcador o cobrar un reto">✨ Probar efecto</button>
+      <button type="button" data-tp-sonido aria-pressed="${sonidoSi()}" title="Sonidos de clic, gol y logro">${sonidoSi() ? '🔊' : '🔈'} Sonido</button>
       <button type="button" class="tp-cerrar" data-tp-cerrar aria-label="Cerrar el probador de estilos" title="Cerrar (el estilo elegido se queda)">✕</button>`;
   };
   pintar();
   el.addEventListener('click', (e) => {
     if (e.target.closest('[data-tp-cerrar]')) { guardar(CLAVE_PROBAR, ''); el.remove(); return; }
+    if (e.target.closest('[data-tp-efecto]')) { dispatchEvent(new CustomEvent('pes:logro', { detail: { titulo: '¡Golazo!', sub: 'Así se celebra un logro en Phoenix' } })); return; }
+    if (e.target.closest('[data-tp-sonido]')) { guardar('pes-sonido', sonidoSi() ? '' : '1'); pintar(); return; }
     const b = e.target.closest('[data-tp]'); if (!b) return;
-    aplicarTema(b.dataset.tp); pintar();
+    aplicarTema(b.dataset.tp); pintar(); cargarVivo();
   });
   document.body.appendChild(el);
 }
@@ -79,5 +91,6 @@ export function initTemas() {
     if (q.has('probar-temas')) guardar(CLAVE_PROBAR, '1');
     if (leer(CLAVE_PROBAR) === '1') montarProbador();
     montarLuz();
+    cargarVivo();
   } catch (e) { console.warn('[temas]', e?.message ?? e); }
 }

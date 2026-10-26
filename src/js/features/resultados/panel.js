@@ -56,7 +56,7 @@ export function crearPanelMarcadores(el, ctx) {
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-resp]'); if (!b) return;
     const si = b.dataset.resp === 'si';
-    accion(async () => { await api.responder(b.dataset.reto, si); toast(si ? 'Marcador confirmado.' : 'Marcador disputado.', si ? 'ok' : 'info'); });
+    accion(async () => { await api.responder(b.dataset.reto, si); toast(si ? 'Marcador confirmado.' : 'Marcador disputado.', si ? 'ok' : 'info'); if (si) dispatchEvent(new CustomEvent('pes:logro', { detail: { titulo: '¡Confirmado!', sub: 'El marcador ya cuenta para el ranking' } })); });
   });
   return { cargar };
 }

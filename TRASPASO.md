@@ -246,6 +246,11 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-25 21:00 (Lima) · Cuenta 2 · Capa «vivo» — beta 1.34.0
+- **Hecho:** `styles/vivo.css` + `js/features/vivo.js` (solo con `?estilo=…`). Para celebrar algo nuevo desde cualquier página:
+  `dispatchEvent(new CustomEvent('pes:logro', { detail: { titulo, sub } }))`; para el sello de gol: `pes:gol` con `{ card }`.
+- **Candados:** todos libres. Siguiente migración: **161**.
+
 ### 2026-10-25 20:45 (Lima) · Cuenta 2 · Estilos para probar — beta 1.33.0
 - **Hecho:** fase 1 del rediseño («sistema base»): `styles/temas.css` + `js/features/temas.js`; 4 estilos con `?estilo=champions|neon|fc|mezcla`
   (probador abajo a la izquierda). Atributo `<html data-estilo>` (NO `data-tema`: ese es Galaxy/Sudario). Sin estilo elegido = web igual que antes

@@ -151,7 +151,9 @@
 }
 
 /* ───────────────────────── 2 · LIENZO ───────────────────────── */
-:root[data-estilo] body { background-color: var(--t-bg); background-image: var(--t-bg-img); background-attachment: fixed; color: var(--t-ink); }
+:root[data-estilo] { background-color: var(--t-bg); background-image: var(--t-bg-img); background-attachment: fixed; }
+/* El fondo va en <html> y el body queda transparente: así las luces de estadio (vivo.css, body::before con z-index -1) se ven detrás. */
+:root[data-estilo] body { background: transparent; color: var(--t-ink); }
 :root[data-estilo] ::selection { background: color-mix(in oklab, var(--t-acc-2) 40%, transparent); color: var(--t-ink); }
 :root[data-estilo] { accent-color: var(--t-acc-2); scrollbar-color: color-mix(in oklab, var(--t-ink) 22%, transparent) transparent; }
 :root[data-estilo] :focus-visible { outline: 2px solid var(--t-acc-2); outline-offset: 2px; }
@@ -244,6 +246,7 @@
 :root[data-estilo] [role='tab'][aria-selected='true'] { color: var(--t-ink); }
 :root[data-estilo] [role='tab'][aria-selected='true']::after { transform: scaleX(1); }
 :root[data-estilo] [role='tab']:is(.adv-chip, .chip, .sxr-chip)::after { display: none; }   /* los chips ya marcan con el fondo */
+:root[data-estilo] [role='tab']:is(.adv-chip, .chip)[aria-selected='true'] { color: var(--t-acc-ink); }   /* chip-pestaña elegido: texto oscuro sobre el acento */
 
 /* ───────────────────────── 7 · PLEGABLES, VENTANAS Y AVISOS ───────────────────────── */
 :root[data-estilo] .plegable { background: var(--t-surface); border-color: var(--t-line); border-radius: var(--t-r); }

@@ -342,3 +342,22 @@ donde una franja que quedaba cian ahora sale dorada como el resto de Sudario.
 estaban ocultos en Duelos y Formatos (y la Liga se ensanchaba 4 px). Se quitó del mapa global; la ficha usa `data-ico-keep`.
 **Siguiente fase (cuando Fralex elija estilo):** pasar el estilo elegido a las piezas propias de cada página (portada, tarjetas de duelo,
 ranking, perfil, Mi club) y retirar las capas viejas que ya no hagan falta.
+
+## 17. Capa «vivo»: la web con movimiento de verdad (beta 1.34.0 · solo con un estilo elegido)
+**Por qué:** Fralex vio la 1.33.0 y dijo «¿solo cambiaste colores?». Tenía razón. Esta capa agrega lo dinámico y divertido.
+**Qué hace (solo con `?estilo=…`; sin estilo no existe):**
+- **Celebración a pantalla completa** al confirmar un marcador («¡Confirmado!») o cobrar un reto («¡Reto cobrado! +N puntos»): destello,
+  texto grande que cae, la página tiembla un instante y confeti. Se prueba con el botón **«✨ Probar efecto»** del probador.
+- **¡GOL!** como sello sobre la tarjeta del marcador en vivo cuando entra un gol.
+- **Números que cuentan solos** (puntos, ELO, cifras en letra de marcador) al aparecer o al cambiar de pestaña, y «golpean» cuando cambian.
+- **Brillo holográfico** en cartas de jugador, duelo y tienda que sigue al mouse.
+- **Luces de estadio** detrás de todo: dos focos grandes y borrosos que se mueven muy lento.
+- **Barra de luz** que barre la base de la cabecera de cada página al entrar (estilo transmisión).
+- **Cambio de página tipo consola:** la página sale hacia la izquierda y la nueva entra desde la derecha.
+- **Sonidos opcionales** (apagados): clic, gol y logro, sintetizados en el navegador (sin archivos). Botón «Sonido» del probador.
+**Probado y descartado:** la entrada en cascada de los bloques por JS: el código llega cuando la página ya se ve y producía un parpadeo.
+**Seguridad:** el contenido siempre está visible; solo se mueven transform/opacidad/filtros; con «Animaciones reducidas» no se mueve nada;
+modo ligero → fondo quieto. Piezas: `styles/vivo.css`, `js/features/vivo.js` (se descarga solo con estilo elegido), eventos
+`pes:logro` y `pes:gol` (en `resultados/panel.js`, `pages/ranking.js` y `liga/vivo.js`). El fondo de la página pasa a `<html>` con un estilo
+elegido (el body transparente) para que las luces se vean.
+**Verificado:** videos de Ranking (Champions, EA FC, Mezcla) y Torneos (Neón); sin estilo, capturas iguales a las de antes.

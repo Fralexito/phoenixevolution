@@ -49,4 +49,5 @@ main.flex-grow { min-height: 100vh; }
 @import './modoDemo.css';   /* píldora «Modo demostración» (js/features/demo/aviso.js) */
 @import './tutorial.css';   /* tutorial de bienvenida (js/features/tutorial.js) */
 @import './calendario.css';   /* ventana «Añadir a mi calendario» */
-@import './temas.css';   /* ronda 387: 4 temas de diseño para probar; solo actúan con <html data-tema> (ver el archivo) */
+@import './temas.css';   /* ronda 387: 4 temas de diseño para probar; solo actúan con <html data-estilo> (ver el archivo) */
+@import './vivo.css';   /* ronda 388: efectos dinámicos (solo con <html data-estilo>) */
