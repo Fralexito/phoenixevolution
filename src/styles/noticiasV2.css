@@ -25,7 +25,7 @@
    ================================================================================================================ */
 /* Mientras El Fénix carga, ocupa al menos la pantalla: así lo de abajo ya está fuera de la vista y no «salta» al llegar (antes CLS 0,07 en PC). */
 #nv-fenix:empty { min-height: 100vh; }
-#nv-fenix { padding: 1.5rem 0 2rem; background: radial-gradient(900px 500px at 20% 0%, rgb(128 0 255 / .22), transparent 60%); }
+#nv-fenix { padding: 1.5rem 0 2rem; background: radial-gradient(900px 500px at 20% 0%, color-mix(in srgb, var(--color-galaxy-600, var(--color-galaxy-600, #8000ff)) 22%, transparent), transparent 60%); }
 .fx-zona { max-width: 80rem; margin: 0 auto; padding: 0 1rem; display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: flex-start; }
 .fx-lienzo { flex: 0 1 820px; min-width: 0; container-type: inline-size; }
 
@@ -123,7 +123,7 @@
 @media (hover: hover) { .fx-ediciones button:hover, .fx-dos button:hover { transform: translateY(-2px); } }
 
 /* Marco para la imagen 9:16 (historias / TikTok): se arma fuera de pantalla solo al descargar */
-.fx-marco-historia { position: fixed; left: -99999px; top: 0; width: 1080px; height: 1920px; box-sizing: border-box; padding: 180px 70px 0; display: flex; flex-direction: column; align-items: center; gap: 60px; background: radial-gradient(900px 600px at 50% 0%, rgb(128 0 255 / .4), transparent 60%), #03010f; container-type: inline-size; }
+.fx-marco-historia { position: fixed; left: -99999px; top: 0; width: 1080px; height: 1920px; box-sizing: border-box; padding: 180px 70px 0; display: flex; flex-direction: column; align-items: center; gap: 60px; background: radial-gradient(900px 600px at 50% 0%, color-mix(in srgb, var(--color-galaxy-600, var(--color-galaxy-600, #8000ff)) 40%, transparent), transparent 60%), #03010f; container-type: inline-size; }
 .fx-marco-historia .fx-portada { width: 940px; }
 .fx-marco-pie { margin: 0; font: 700 36px var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: #fff; text-align: center; }
 
@@ -173,7 +173,7 @@ main[data-sia] .fx-titular::before, main[data-sia] .fx-intro h2::before, main[da
 .nv-secciones { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; padding: .9rem 0; border-top: 1px solid var(--nv-linea); border-bottom: 1px solid var(--nv-linea); }
 .nv-secciones .nv-et { margin-right: .3rem; }
 .nv-secciones button { min-height: 2.5rem; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--nv-borde); background: transparent; color: rgb(203 213 225); font: 700 13px var(--font-display); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
-.nv-secciones button[aria-pressed='true'] { border-color: var(--nv-cian); background: rgb(0 229 255 / .12); color: #fff; }
+.nv-secciones button[aria-pressed='true'] { border-color: var(--nv-cian); background: color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 12%, transparent); color: #fff; }
 .nv-abajo { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
 .nv-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: .9rem; }
 .nv-tribunas { display: flex; flex-direction: column; gap: 1.6rem; padding-top: .8rem; }

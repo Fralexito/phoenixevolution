@@ -1,0 +1,311 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+   TEMAS · sistema base de componentes (ronda 387, 25-oct-2026). Pedido de Fralex: «que cada cosa sea estética, dinámica,
+   divertida, premium, profesional». Cuatro estilos para PROBAR y elegir: champions · neon · fc · mezcla.
+   ─ Solo actúa si <html data-estilo="…"> existe. Sin el atributo, la web queda EXACTAMENTE como antes (riesgo cero).
+     El atributo lo pone el script de la cabecera (Layout.astro) leyendo localStorage «pes-tema» o ?estilo=… en la URL. (No es «data-tema»: ese ya lo usan Galaxy/Sudario.)
+     Interruptor general: FX.temas en data/experimento.js. Probador: js/features/temas.js (?probar-temas).
+   ─ Dos capas:
+     1) TOKENS: cada tema redefine los colores «galaxy» de Tailwind (--color-galaxy-*) → todas las clases text-/bg-/border-galaxy-*
+        cambian solas en las 69 páginas. Más variables propias --t-* para forma, tipografía y movimiento.
+     2) COMPONENTES: botones, paneles, campos, etiquetas, chips, pestañas, plegables, ventanas, avisos, esqueletos y barras.
+   ─ Especificidad: «:root[data-estilo] …» (0,2,0 + el componente) va por encima de las capas viejas (dopamina, estiloPro, pasada,
+     premium, sinIA) sin !important, salvo donde una capa vieja ya usa !important.
+   ─ Movimiento «medio»: responde al tocar, pasar el mouse y enfocar; nada se mueve solo mientras lees. Curvas ease-out exponenciales,
+     sin rebotes. Con «Animaciones reducidas» (sistema o Configuración) todo pasa a cambios instantáneos.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* ───────────────────────── 1 · TOKENS POR TEMA ───────────────────────── */
+:root[data-estilo] {
+  --t-ease: cubic-bezier(.22, 1, .36, 1);      /* ease-out-quint */
+  --t-ease-fast: cubic-bezier(.16, 1, .3, 1);  /* ease-out-expo */
+  --t-dur: .32s;
+  --t-dur-fast: .16s;
+  --t-shine: rgb(255 255 255 / .28);
+  --t-panel-blur: none;
+  --t-btn-clip: none;
+  --t-spot: transparent;                          /* luz que sigue al puntero en paneles (solo neón y mezcla) */
+}
+
+/* Transmisión de Champions: noche azul marino, plata y un toque de oro. Elegante, letras condensadas, movimiento lento. */
+:root[data-estilo='champions'] {
+  --color-galaxy-400: oklch(0.86 0.06 235);     /* acento frío: azul hielo */
+  --color-galaxy-500: oklch(0.78 0.08 240);
+  --color-galaxy-600: oklch(0.48 0.15 263);     /* azul real */
+  --color-galaxy-700: oklch(0.41 0.14 263);
+  --color-galaxy-900: oklch(0.2 0.06 263);
+  --color-galaxy-dark: oklch(0.13 0.035 263);
+  --color-galaxy-deep: oklch(0.11 0.03 263);
+  --color-galaxy-card: oklch(0.17 0.04 263);
+  --color-galaxy-panel: oklch(0.16 0.04 263);
+  --color-galaxy-border: oklch(0.36 0.04 255);
+  --color-galaxy-line: oklch(0.24 0.04 260);
+  --t-bg: oklch(0.13 0.035 263);
+  --t-bg-img: radial-gradient(120% 60% at 50% -10%, oklch(0.32 0.1 260 / .55), transparent 60%), radial-gradient(80% 50% at 50% 110%, oklch(0.22 0.07 263 / .5), transparent 70%);
+  --t-surface: oklch(0.18 0.04 262 / .86);
+  --t-surface-hi: oklch(0.22 0.045 262);
+  --t-field: oklch(0.15 0.035 262);
+  --t-line: oklch(0.85 0.02 250 / .14);
+  --t-line-hi: oklch(0.9 0.03 240 / .42);
+  --t-ink: oklch(0.96 0.008 250);
+  --t-muted: oklch(0.78 0.02 255);
+  --t-acc: oklch(0.95 0.01 250);                /* botón principal: plata */
+  --t-acc-hover: #fff;
+  --t-acc-ink: oklch(0.2 0.06 263);
+  --t-acc-2: oklch(0.82 0.12 85);               /* oro: foco, seleccionado, en vivo */
+  --t-r: 8px; --t-r-sm: 6px; --t-r-btn: 999px;
+  --t-font-d: 'Oswald', var(--font-display);
+  --t-d-weight: 500; --t-d-track: .06em;
+  --t-dur: .42s;
+  --t-glow: 0 10px 30px -12px oklch(0.05 0.03 263 / .9);
+  --t-shine: rgb(255 255 255 / .55);
+  --color-ok: oklch(0.82 0.15 155);
+}
+
+/* eSports neón: la identidad Galaxy actual, con más energía: bordes que se encienden, luz que sigue al puntero. */
+:root[data-estilo='neon'] {
+  --t-bg: #03010f;
+  --t-bg-img: radial-gradient(90% 55% at 15% -5%, rgb(128 0 255 / .28), transparent 60%), radial-gradient(70% 45% at 100% 0%, rgb(0 229 255 / .14), transparent 60%);
+  --t-surface: rgb(12 6 32 / .78);
+  --t-surface-hi: rgb(24 10 58 / .9);
+  --t-field: rgb(8 4 22 / .9);
+  --t-line: rgb(128 0 255 / .28);
+  --t-line-hi: rgb(0 229 255 / .65);
+  --t-ink: #f1f5ff;
+  --t-muted: #b4bccd;
+  --t-acc: var(--color-galaxy-600);
+  --t-acc-hover: var(--color-galaxy-700);
+  --t-acc-ink: #fff;
+  --t-acc-2: var(--color-galaxy-400);
+  --t-r: 12px; --t-r-sm: 8px; --t-r-btn: 10px;
+  --t-font-d: var(--font-display);
+  --t-d-weight: 700; --t-d-track: .08em;
+  --t-panel-blur: blur(10px);
+  --t-glow: 0 0 0 1px rgb(0 229 255 / .35), 0 12px 34px -10px rgb(128 0 255 / .55);
+  --t-spot: rgb(0 229 255 / .10);
+}
+
+/* EA FC / videojuego: negro carbón neutro, un solo acento verde lima, esquinas rectas y botones inclinados. Rápido y seco. */
+:root[data-estilo='fc'] {
+  --color-galaxy-400: oklch(0.89 0.2 150);      /* lima eléctrico */
+  --color-galaxy-500: oklch(0.82 0.19 150);
+  --color-galaxy-600: oklch(0.47 0.13 158);     /* verde profundo: aguanta texto blanco encima (botones propios de cada página) */
+  --color-galaxy-700: oklch(0.41 0.12 158);
+  --color-galaxy-900: oklch(0.2 0.01 150);
+  --color-galaxy-dark: oklch(0.12 0.004 150);
+  --color-galaxy-deep: oklch(0.1 0.003 150);
+  --color-galaxy-card: oklch(0.17 0.005 150);
+  --color-galaxy-panel: oklch(0.16 0.005 150);
+  --color-galaxy-border: oklch(0.32 0.008 150);
+  --color-galaxy-line: oklch(0.22 0.006 150);
+  --t-bg: oklch(0.12 0.004 150);
+  --t-bg-img: linear-gradient(180deg, oklch(0.16 0.01 150 / .9), transparent 420px);
+  --t-surface: oklch(0.17 0.005 150);
+  --t-surface-hi: oklch(0.22 0.008 150);
+  --t-field: oklch(0.14 0.004 150);
+  --t-line: oklch(1 0 0 / .1);
+  --t-line-hi: oklch(0.89 0.2 150 / .7);
+  --t-ink: oklch(0.97 0 0);
+  --t-muted: oklch(0.78 0.005 150);
+  --t-acc: oklch(0.89 0.2 150);
+  --t-acc-hover: oklch(0.94 0.17 150);
+  --t-acc-ink: oklch(0.15 0.02 150);
+  --t-acc-2: oklch(0.89 0.2 150);
+  --t-r: 3px; --t-r-sm: 2px; --t-r-btn: 0;
+  --t-font-d: 'Oswald', var(--font-display);
+  --t-d-weight: 600; --t-d-track: .04em;
+  --t-dur: .2s; --t-dur-fast: .12s;
+  --t-btn-clip: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  --t-glow: 0 0 0 1px oklch(0.89 0.2 150 / .55);
+  --t-shine: oklch(1 0 0 / .45);
+}
+
+/* Mezcla: base sobria de transmisión (azul noche, letras condensadas) y el neón Galaxy solo en lo importante. */
+:root[data-estilo='mezcla'] {
+  --color-galaxy-600: oklch(0.52 0.2 285);
+  --color-galaxy-700: oklch(0.45 0.19 285);
+  --color-galaxy-900: oklch(0.19 0.05 275);
+  --color-galaxy-dark: oklch(0.13 0.03 270);
+  --color-galaxy-deep: oklch(0.11 0.025 270);
+  --color-galaxy-card: oklch(0.17 0.035 270);
+  --color-galaxy-panel: oklch(0.16 0.035 270);
+  --color-galaxy-border: oklch(0.34 0.05 275);
+  --color-galaxy-line: oklch(0.23 0.04 272);
+  --t-bg: oklch(0.13 0.03 270);
+  --t-bg-img: radial-gradient(110% 55% at 50% -12%, oklch(0.3 0.1 280 / .5), transparent 62%);
+  --t-surface: oklch(0.18 0.035 270 / .88);
+  --t-surface-hi: oklch(0.22 0.045 272);
+  --t-field: oklch(0.15 0.03 270);
+  --t-line: oklch(0.85 0.03 270 / .13);
+  --t-line-hi: rgb(0 229 255 / .55);
+  --t-ink: oklch(0.96 0.01 270);
+  --t-muted: oklch(0.78 0.025 270);
+  --t-acc: var(--color-galaxy-400);
+  --t-acc-hover: oklch(0.92 0.12 205);
+  --t-acc-ink: oklch(0.18 0.05 270);
+  --t-acc-2: var(--color-galaxy-400);
+  --t-r: 10px; --t-r-sm: 7px; --t-r-btn: 999px;
+  --t-font-d: 'Oswald', var(--font-display);
+  --t-d-weight: 500; --t-d-track: .05em;
+  --t-glow: 0 0 0 1px rgb(0 229 255 / .3), 0 12px 30px -14px rgb(0 229 255 / .4);
+  --t-spot: rgb(0 229 255 / .07);
+}
+
+/* ───────────────────────── 2 · LIENZO ───────────────────────── */
+:root[data-estilo] body { background-color: var(--t-bg); background-image: var(--t-bg-img); background-attachment: fixed; color: var(--t-ink); }
+:root[data-estilo] ::selection { background: color-mix(in oklab, var(--t-acc-2) 40%, transparent); color: var(--t-ink); }
+:root[data-estilo] { accent-color: var(--t-acc-2); scrollbar-color: color-mix(in oklab, var(--t-ink) 22%, transparent) transparent; }
+:root[data-estilo] :focus-visible { outline: 2px solid var(--t-acc-2); outline-offset: 2px; }
+
+/* Títulos: la tipografía del tema. Balance para que no queden palabras sueltas. */
+:root[data-estilo] main :is(h1, h2, h3) { text-wrap: balance; }
+:root[data-estilo] main :is(h1, h2).font-display,
+:root[data-estilo] main :is(h1, h2):is(.uppercase) { font-family: var(--t-font-d); font-weight: var(--t-d-weight); letter-spacing: var(--t-d-track); }
+:root[data-estilo] .font-display { font-family: var(--t-font-d); }
+
+/* ───────────────────────── 3 · PANELES ───────────────────────── */
+:root[data-estilo] .glass-panel {
+  background-color: var(--t-surface);
+  background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), var(--t-spot), transparent 60%);
+  border: 1px solid var(--t-line);
+  border-radius: var(--t-r);
+  box-shadow: none;
+  -webkit-backdrop-filter: var(--t-panel-blur);
+  backdrop-filter: var(--t-panel-blur);
+  transition: border-color var(--t-dur) var(--t-ease), box-shadow var(--t-dur) var(--t-ease), translate var(--t-dur) var(--t-ease), background-color var(--t-dur) var(--t-ease);
+}
+:root[data-estilo] main .glass-panel { border-left-width: 1px; border-left-color: var(--t-line); }   /* quita la franja lateral de estiloPro */
+:root[data-estilo] :is(a, button, [role='button'], [tabindex='0']).glass-panel:hover,
+:root[data-estilo] .glass-panel:has(> a:only-child):hover {
+  border-color: var(--t-line-hi); box-shadow: var(--t-glow); translate: 0 -2px;
+}
+:root[data-estilo] :is(a, button, [role='button'], [tabindex='0']).glass-panel:active { translate: 0 0; transition-duration: var(--t-dur-fast); }
+:root[data-estilo] .premium-glass { background: var(--t-surface); -webkit-backdrop-filter: var(--t-panel-blur); backdrop-filter: var(--t-panel-blur); }
+
+/* Cabecera de cada página (FX.premium): título grande con la letra del tema y una línea de luz arriba. */
+:root[data-estilo] main header.glass-panel:has(h1) { background-color: var(--t-surface-hi); border-color: var(--t-line); }
+:root[data-estilo] main header.glass-panel:has(h1) h1 { font-family: var(--t-font-d); font-weight: var(--t-d-weight); letter-spacing: var(--t-d-track); color: var(--t-ink); text-shadow: none; }
+:root[data-estilo] main header.glass-panel:has(h1) h1 > i:first-child { color: var(--t-acc-2); background: color-mix(in oklab, var(--t-acc-2) 12%, transparent); border-color: color-mix(in oklab, var(--t-acc-2) 35%, transparent); box-shadow: none; }
+:root[data-estilo] main header.glass-panel:has(h1) :is(p) { color: var(--t-muted); }
+
+/* ───────────────────────── 4 · BOTONES ───────────────────────── */
+:root[data-estilo] .btn {
+  position: relative; isolation: isolate; overflow: hidden;
+  font-family: var(--t-font-d); font-weight: var(--t-d-weight); letter-spacing: var(--t-d-track);
+  border-radius: var(--t-r-btn); clip-path: var(--t-btn-clip);
+  transition: background-color var(--t-dur-fast) var(--t-ease), color var(--t-dur-fast) var(--t-ease), box-shadow var(--t-dur) var(--t-ease), scale var(--t-dur-fast) var(--t-ease-fast), opacity .2s;
+  text-shadow: none;
+}
+:root[data-estilo] .btn:not(:disabled):active { scale: .96; translate: 0 0; }
+:root[data-estilo] .btn:disabled { opacity: .45; filter: saturate(.3); }
+:root[data-estilo] .btn-primary { background: var(--t-acc); color: var(--t-acc-ink); box-shadow: none; border: 0; }
+:root[data-estilo] .btn-primary:hover:not(:disabled) { background: var(--t-acc-hover); box-shadow: 0 8px 24px -10px color-mix(in oklab, var(--t-acc) 80%, transparent); }
+/* Brillo que cruza el botón principal al pasar el mouse (reemplaza el de la capa «dopamina»). */
+:root[data-estilo] .btn-primary::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; display: block; opacity: 1; animation: none;
+  background: linear-gradient(105deg, transparent 30%, var(--t-shine) 50%, transparent 70%);
+  transform: translateX(-130%); transition: transform .7s var(--t-ease);
+}
+:root[data-estilo] .btn-primary:hover:not(:disabled)::after { transform: translateX(130%); }
+:root[data-estilo] .btn-ghost { background: color-mix(in oklab, var(--t-ink) 5%, transparent); color: var(--t-ink); border: 0; box-shadow: inset 0 0 0 1px var(--t-line); }
+:root[data-estilo] .btn-ghost:hover:not(:disabled) { background: color-mix(in oklab, var(--t-acc-2) 12%, transparent); color: var(--t-ink); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--t-acc-2) 55%, transparent); }
+:root[data-estilo] .btn-cyan { background: color-mix(in oklab, var(--t-acc-2) 14%, transparent); color: var(--t-acc-2); border: 0; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--t-acc-2) 45%, transparent); }
+:root[data-estilo] .btn-cyan:hover:not(:disabled) { background: color-mix(in oklab, var(--t-acc-2) 24%, transparent); }
+/* FC: los botones inclinados no llevan esquinas redondeadas ni sombra (la recorta el clip-path) */
+:root[data-estilo='fc'] .btn { padding-inline: 1.35rem; text-transform: uppercase; }
+:root[data-estilo='fc'] .btn-primary:hover:not(:disabled) { box-shadow: none; }
+
+/* ───────────────────────── 5 · CAMPOS Y ETIQUETAS ───────────────────────── */
+:root[data-estilo] .field {
+  background: var(--t-field); color: var(--t-ink); border: 1px solid var(--t-line); border-radius: var(--t-r-sm);
+  transition: border-color var(--t-dur-fast) var(--t-ease), box-shadow var(--t-dur) var(--t-ease), background-color var(--t-dur-fast);
+}
+:root[data-estilo] .field:hover:not(:focus):not(:disabled) { border-color: color-mix(in oklab, var(--t-ink) 28%, transparent); }
+:root[data-estilo] .field:focus { border-color: var(--t-acc-2); box-shadow: 0 0 0 3px color-mix(in oklab, var(--t-acc-2) 22%, transparent); outline: none; }
+:root[data-estilo] .field::placeholder { color: color-mix(in oklab, var(--t-muted) 85%, transparent); }
+:root[data-estilo] .label { font-family: var(--t-font-d); font-weight: var(--t-d-weight); color: var(--t-muted); letter-spacing: var(--t-d-track); }
+
+/* ───────────────────────── 6 · CHIPS, SEGMENTOS Y PESTAÑAS ───────────────────────── */
+:root[data-estilo] :is(.adv-chip, .chip) {
+  font-family: var(--t-font-d); border-radius: var(--t-r-btn); border-color: var(--t-line); background: color-mix(in oklab, var(--t-ink) 4%, transparent); color: var(--t-muted);
+  transition: background-color var(--t-dur-fast) var(--t-ease), color var(--t-dur-fast), border-color var(--t-dur-fast), scale var(--t-dur-fast) var(--t-ease-fast);
+}
+:root[data-estilo='fc'] :is(.adv-chip, .chip) { border-radius: var(--t-r-sm); }
+:root[data-estilo] :is(.adv-chip, .chip):hover { color: var(--t-ink); border-color: color-mix(in oklab, var(--t-acc-2) 55%, transparent); }
+:root[data-estilo] :is(.adv-chip, .chip):active { scale: .95; }
+:root[data-estilo] :is(.adv-chip, .chip):is([aria-pressed='true'], [aria-selected='true'], [aria-current='page']) {
+  background: var(--t-acc); color: var(--t-acc-ink); border-color: transparent; box-shadow: none;
+}
+/* Pestañas reales (role=tab): la elegida con una línea del acento debajo que entra deslizando. */
+:root[data-estilo] [role='tab'] { position: relative; transition: color var(--t-dur-fast) var(--t-ease); }
+:root[data-estilo] [role='tab']::after {
+  content: ''; position: absolute; left: 12%; right: 12%; bottom: 0; height: 2px; border-radius: 2px; background: var(--t-acc-2);
+  transform: scaleX(0); transition: transform var(--t-dur) var(--t-ease); pointer-events: none;
+}
+:root[data-estilo] [role='tab'][aria-selected='true'] { color: var(--t-ink); }
+:root[data-estilo] [role='tab'][aria-selected='true']::after { transform: scaleX(1); }
+:root[data-estilo] [role='tab']:is(.adv-chip, .chip, .sxr-chip)::after { display: none; }   /* los chips ya marcan con el fondo */
+
+/* ───────────────────────── 7 · PLEGABLES, VENTANAS Y AVISOS ───────────────────────── */
+:root[data-estilo] .plegable { background: var(--t-surface); border-color: var(--t-line); border-radius: var(--t-r); }
+:root[data-estilo] .plegable:hover { border-color: color-mix(in oklab, var(--t-acc-2) 40%, transparent); }
+:root[data-estilo] .plegable[open] { border-color: color-mix(in oklab, var(--t-acc-2) 50%, transparent); box-shadow: none; }
+:root[data-estilo] .plegable-ico { background: color-mix(in oklab, var(--t-acc-2) 12%, transparent); border-color: color-mix(in oklab, var(--t-acc-2) 35%, transparent); color: var(--t-acc-2); border-radius: var(--t-r-sm); }
+:root[data-estilo] .plegable-t b { font-family: var(--t-font-d); font-weight: var(--t-d-weight); letter-spacing: var(--t-d-track); }
+:root[data-estilo] .plegable-flecha { color: var(--t-acc-2); transition: transform var(--t-dur) var(--t-ease); }
+
+:root[data-estilo] .modal-backdrop { background: color-mix(in oklab, var(--t-bg) 72%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+:root[data-estilo] .modal-card {
+  background: var(--t-surface-hi); border: 1px solid var(--t-line); border-radius: calc(var(--t-r) + 4px);
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / .85);
+  animation: t-ventana .38s var(--t-ease) both;
+}
+@keyframes t-ventana { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+
+:root[data-estilo] .toast {
+  background: var(--t-surface-hi); color: var(--t-ink); border: 1px solid var(--t-line); border-radius: var(--t-r);
+  box-shadow: 0 16px 40px -18px rgb(0 0 0 / .9); font-family: var(--font-sans);
+  animation: t-aviso .42s var(--t-ease) both;
+}
+@keyframes t-aviso { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* Esqueletos de carga: el brillo con el color del tema */
+:root[data-estilo] .esqueleto { background-color: color-mix(in oklab, var(--t-ink) 7%, transparent); border-radius: var(--t-r-sm); }
+
+/* ───────────────────────── 8 · CABECERA, MENÚ Y BARRA INFERIOR (solo color y letra) ───────────────────────── */
+:root[data-estilo] .nav-link { font-family: var(--t-font-d); letter-spacing: var(--t-d-track); transition: color var(--t-dur-fast) var(--t-ease); }
+:root[data-estilo] .nav-link[aria-current='page'] { color: var(--t-ink); border-bottom-color: var(--t-acc-2); text-shadow: none; }
+:root[data-estilo] .text-shadow-glow { text-shadow: none; }
+:root[data-estilo='neon'] .text-shadow-glow { text-shadow: 0 0 22px rgb(0 229 255 / .55); }
+
+/* ───────────────────────── 9 · NEÓN: bordes que se encienden ───────────────────────── */
+:root[data-estilo='neon'] :is(a, button, [role='button'], [tabindex='0']).glass-panel:hover { border-color: var(--t-line-hi); }
+:root[data-estilo='neon'] .btn-primary { box-shadow: 0 0 0 1px rgb(0 229 255 / .35), 0 0 18px -2px rgb(128 0 255 / .7); }
+:root[data-estilo='neon'] .btn-primary:hover:not(:disabled) { box-shadow: 0 0 0 1px rgb(0 229 255 / .7), 0 0 28px -2px rgb(128 0 255 / .9); }
+:root[data-estilo='neon'] .field:focus { box-shadow: 0 0 0 3px rgb(0 229 255 / .2), 0 0 18px -4px rgb(0 229 255 / .6); }
+
+/* ───────────────────────── 10 · MOVIMIENTO REDUCIDO ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-estilo] * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  :root[data-estilo] .btn-primary::after { display: none; }
+  :root[data-estilo] .glass-panel:hover { translate: 0 0 !important; }
+}
+:root[data-estilo][data-aj-mov-efectivo='reducido'] * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+:root[data-estilo][data-aj-mov-efectivo='reducido'] .btn-primary::after { display: none; }
+:root[data-estilo][data-aj-mov-efectivo='reducido'] .glass-panel:hover { translate: 0 0 !important; }
+/* Pantallas táctiles: sin «levantar» al pasar (no hay mouse) */
+@media (hover: none) { :root[data-estilo] .glass-panel:hover { translate: 0 0; box-shadow: none; } }
+
+/* ───────────────────────── 11 · PROBADOR DE ESTILOS (js/features/temas.js) ───────────────────────── */
+.tp-probador {
+  position: fixed; left: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60;
+  display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px;
+  background: rgb(8 8 16 / .92); border: 1px solid rgb(255 255 255 / .14); box-shadow: 0 12px 30px -12px rgb(0 0 0 / .9);
+  font: 600 12px/1 var(--font-sans); color: #e5e7eb; max-width: calc(100vw - 24px); overflow-x: auto; scrollbar-width: none;
+}
+@media (min-width: 1024px) { .tp-probador { bottom: 16px; } }
+.tp-probador::-webkit-scrollbar { display: none; }
+.tp-probador b { padding: 0 6px 0 8px; font-weight: 700; color: #9ca3af; white-space: nowrap; }
+.tp-probador button { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 0; background: transparent; color: inherit; cursor: pointer; white-space: nowrap; transition: background-color .15s, color .15s; }
+.tp-probador button:hover { background: rgb(255 255 255 / .08); }
+.tp-probador button[aria-pressed='true'] { background: #f5f5f5; color: #0a0a12; }
+.tp-probador .tp-cerrar { width: 32px; padding: 0; color: #9ca3af; }

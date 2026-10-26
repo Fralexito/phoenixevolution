@@ -4,7 +4,7 @@
 .cg-lista { display: grid; align-content: start; gap: .45rem; height: min(58vh, 520px); overflow-y: auto; padding: .25rem; scroll-behavior: auto; overscroll-behavior: contain; }
 .cg-vacio { margin: auto; font-size: 14px; color: #9ca3af; text-align: center; padding: 1rem; }
 .cg-msg { border: 1px solid rgba(255,255,255,.08); border-left: 3px solid rgba(255,255,255,.2); border-radius: .7rem; padding: .4rem .65rem; background: rgba(255,255,255,.03); }
-.cg-msg.cg-mio { border-left-color: #00e5ff; background: rgba(0,229,255,.06); }
+.cg-msg.cg-mio { border-left-color: var(--color-galaxy-400, #00e5ff); background: color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 6%, transparent); }
 html[data-tema='sudario'] .cg-msg.cg-mio { border-left-color: #f5c542; background: rgba(245,197,66,.07); }
 .cg-cab { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
 .cg-cab b { color: #fff; font-size: 14px; } .cg-cab small { color: #9ca3af; font-size: 12px; margin-left: auto; }

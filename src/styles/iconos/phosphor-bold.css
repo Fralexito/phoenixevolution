@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Phosphor Bold recortado a 186 iconos. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Phosphor Bold recortado a 180 iconos. */
 @font-face { font-family: "Phosphor-Bold"; src: url("./phosphor-bold.recortado.woff2") format("woff2"); font-weight: normal; font-style: normal; font-display: block; }
 .ph-bold {
   /* use !important to prevent issues with browser extensions that change fonts */
@@ -32,7 +32,6 @@
 .ph-bold.ph-arrows-clockwise:before { content: "\e094"; }
 .ph-bold.ph-arrows-left-right:before { content: "\e0a0"; }
 .ph-bold.ph-at:before { content: "\e0ac"; }
-.ph-bold.ph-bank:before { content: "\e0b4"; }
 .ph-bold.ph-barbell:before { content: "\e0b6"; }
 .ph-bold.ph-bell:before { content: "\e0ce"; }
 .ph-bold.ph-bell-slash:before { content: "\e0d4"; }
@@ -62,7 +61,6 @@
 .ph-bold.ph-clipboard-text:before { content: "\e198"; }
 .ph-bold.ph-clock:before { content: "\e19a"; }
 .ph-bold.ph-clock-counter-clockwise:before { content: "\e1a0"; }
-.ph-bold.ph-cloud-rain:before { content: "\e1b4"; }
 .ph-bold.ph-coins:before { content: "\e78e"; }
 .ph-bold.ph-columns:before { content: "\e546"; }
 .ph-bold.ph-copy:before { content: "\e1ca"; }
@@ -118,7 +116,6 @@
 .ph-bold.ph-image:before { content: "\e2ca"; }
 .ph-bold.ph-info:before { content: "\e2ce"; }
 .ph-bold.ph-key:before { content: "\e2d6"; }
-.ph-bold.ph-leaf:before { content: "\e2da"; }
 .ph-bold.ph-lightbulb:before { content: "\e2dc"; }
 .ph-bold.ph-lightning:before { content: "\e2de"; }
 .ph-bold.ph-link-break:before { content: "\e2e4"; }
@@ -135,7 +132,6 @@
 .ph-bold.ph-medal:before { content: "\e320"; }
 .ph-bold.ph-medal-military:before { content: "\ecfc"; }
 .ph-bold.ph-megaphone:before { content: "\e324"; }
-.ph-bold.ph-moon:before { content: "\e330"; }
 .ph-bold.ph-newspaper:before { content: "\e344"; }
 .ph-bold.ph-note-pencil:before { content: "\e34c"; }
 .ph-bold.ph-palette:before { content: "\e6c8"; }
@@ -182,14 +178,12 @@
 .ph-bold.ph-sticker:before { content: "\e5ac"; }
 .ph-bold.ph-stop:before { content: "\e46c"; }
 .ph-bold.ph-storefront:before { content: "\e470"; }
-.ph-bold.ph-sun:before { content: "\e472"; }
 .ph-bold.ph-sword:before { content: "\e5ba"; }
 .ph-bold.ph-t-shirt:before { content: "\e670"; }
 .ph-bold.ph-table:before { content: "\e476"; }
 .ph-bold.ph-tag:before { content: "\e478"; }
 .ph-bold.ph-target:before { content: "\e47c"; }
 .ph-bold.ph-television:before { content: "\e754"; }
-.ph-bold.ph-timer:before { content: "\e492"; }
 .ph-bold.ph-trash:before { content: "\e4a6"; }
 .ph-bold.ph-tray:before { content: "\e4aa"; }
 .ph-bold.ph-tree-structure:before { content: "\e67c"; }

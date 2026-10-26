@@ -1,7 +1,7 @@
 /* CAMBIOS OFICIALES (/cambios-oficiales/) y USUARIOS EN PES (/usuarios-pes/): prefijos cfx-/cf- y up-. Reutiliza sy- de sync.css. Texto ≥ 12 px.
    Diseño cfx-: una sola superficie (borde fino, sin sombras de adorno), control segmentado con «pulgar» que se desliza, vista previa en vivo
    y línea de tiempo en el historial. El acento sigue el tema (cian; dorado en «sudario»). */
-.cfx { --a: #00e5ff; --linea: rgba(255,255,255,.09); --tx2: #aab0c6; --fondo-in: rgba(0,0,0,.28); --curva: cubic-bezier(.16, 1, .3, 1); }
+.cfx { --a: var(--color-galaxy-400, #00e5ff); --linea: rgba(255,255,255,.09); --tx2: #aab0c6; --fondo-in: rgba(0,0,0,.28); --curva: cubic-bezier(.16, 1, .3, 1); }
 html[data-tema='sudario'] .cfx { --a: #f5c542; }
 .cfx ::selection { background: color-mix(in srgb, var(--a) 35%, transparent); color: #fff; }
 
@@ -141,7 +141,7 @@ html[data-tema='sudario'] .cfx { --a: #f5c542; }
 .up-tabla td { padding: .5rem; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: middle; }
 .up-tabla td small { color: #9ca3af; font-size: 12px; }
 .up-tabla tr[data-pc] { cursor: pointer; }
-.up-tabla tr[aria-selected='true'] td { background: rgba(0,229,255,.08); }
+.up-tabla tr[aria-selected='true'] td { background: color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 8%, transparent); }
 @media (hover: hover) { .up-tabla tr[data-pc]:hover td { background: rgba(255,255,255,.04); } }
 .up-evento { font-size: 13px; color: #d1d5db; display: flex; flex-wrap: wrap; gap: .4rem; align-items: baseline; }
 

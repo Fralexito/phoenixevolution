@@ -4,7 +4,7 @@
 main[data-sia] { --sia: 1; }
 /* Sin resplandor en textos, salvo un halo suave en el título principal */
 main[data-sia] :is(.btn, .hero-cta, .nav-link, .liga-sello, .pc-chip, .adv-chip, .text-shadow-glow) { text-shadow: none; }
-main[data-sia] h1 { text-shadow: 0 0 16px rgb(0 229 255 / .22); }
+main[data-sia] h1 { text-shadow: 0 0 16px color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 22%, transparent); }
 /* Sin sombras de neón en botones, chips y podio */
 main[data-sia] :is(.btn, .hero-cta, .liga-sello, .pc-chip, .adv-chip, .liga-podio, .liga-podio-fila) { box-shadow: none !important; }
 /* Tarjetas: cristal oscuro de Galaxy, un poco más plano (menos desenfoque) y con su borde púrpura */

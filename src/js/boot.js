@@ -45,6 +45,8 @@ luego('buscador', () => import('./features/buscadorGlobal.js').then((m) => m.ini
 luego('efectos', () => Promise.all([import('./features/dopamina.js'), import('./features/prof3d.js'), import('./features/cartasEfecto.js'), import('./features/efectosCarta.js'), import('./features/premium.js')])
   .then(([d, p3, ce, ec, pr]) => { for (const [n, f] of [['dopamina', d.initDopamina], ['3d', p3.initProf3d], ['cartas', ce.initCartasEfecto], ['efectos carta', ec.initEfectosCarta], ['premium', pr.initPremium]]) { try { f(); } catch (e) { console.error("[boot] " + n + ":", e); } } }));
 if (FX.sinIconosWeb) initSinIconosWeb();
+// Temas (ronda 387): probador y luz del puntero; archivo aparte y después de lo visible
+if (FX.temas) luego('temas', () => import('./features/temas.js').then((m) => m.initTemas()));
 if (FX.pwa) initPwa();
 if (FX.scrollSuave) initScrollSuave();
 initMarco();

@@ -3,10 +3,10 @@
 .pat-tira:empty { display: none; }
 .pat-et { font-family: var(--font-display, inherit); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: #aab0c6; }
 .pat-item { display: inline-flex; align-items: center; gap: .45rem; min-height: 2rem; padding: .2rem .7rem .2rem .25rem; border-radius: 999px; font-size: 13px; color: #fff;
-  border: 1px solid color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 30%, transparent); background: rgb(0 0 0 / .25);
+  border: 1px solid color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 30%, transparent); background: rgb(0 0 0 / .25);
   transition: border-color .16s cubic-bezier(.22, 1, .36, 1), transform .16s cubic-bezier(.22, 1, .36, 1); }
 html[data-tema='sudario'] .pat-item { border-color: rgb(245 197 66 / .35); }
 .pat-item img { width: 1.6rem; height: 1.6rem; object-fit: contain; border-radius: 999px; background: rgb(255 255 255 / .9); padding: 2px; }
 .pat-item:not(:has(img)) { padding-left: .7rem; }
 a.pat-item:active { transform: scale(.97); }
-@media (hover: hover) { a.pat-item:hover { border-color: var(--color-galaxy-400, #00e5ff); } }
+@media (hover: hover) { a.pat-item:hover { border-color: var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)); } }

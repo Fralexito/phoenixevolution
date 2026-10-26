@@ -3,7 +3,7 @@
 .pr-ligas { flex-wrap: wrap; }
 
 .pr-sec { display: flex; align-items: baseline; gap: .6rem; font-family: var(--font-display, inherit); text-transform: uppercase; letter-spacing: .14em; font-size: 13px; font-weight: 800; color: #e5e7eb; }
-.pr-sec::before { content: ''; width: .25rem; height: 1em; align-self: center; border-radius: 99px; background: var(--color-galaxy-400, #00e5ff); box-shadow: 0 0 12px var(--color-galaxy-400, #00e5ff); }
+.pr-sec::before { content: ''; width: .25rem; height: 1em; align-self: center; border-radius: 99px; background: var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)); box-shadow: 0 0 12px var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)); }
 .pr-sec b { font-size: 12px; font-weight: 600; letter-spacing: .08em; color: #9ca3af; }
 
 .pr-grid { display: grid; gap: .875rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); align-content: start; }
@@ -16,7 +16,7 @@
 }
 
 .pr-trofeo {
-  --c: #00e5ff; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .55rem;
+  --c: var(--color-galaxy-400, #00e5ff); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: .55rem;
   padding: 1rem 1rem .9rem; border-radius: 1rem; isolation: isolate;
   background: linear-gradient(160deg, color-mix(in srgb, var(--c) 14%, transparent), rgba(8, 10, 24, .72) 55%);
   border: 1px solid color-mix(in srgb, var(--c) 32%, transparent);

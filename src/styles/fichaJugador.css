@@ -1,6 +1,6 @@
 /* FICHA RÁPIDA DE UN JUGADOR (js/features/fichaJugadorModal.js): cuadro por encima con su cara, sus datos y todo lo que dice el juego. Prefijo fj-.
    Reutiliza el campo de fútbol (ft-juego / ft-punto) de cambiosOficiales.css. Texto ≥ 12 px; entrada con curva exponencial; respeta «reducir movimiento». */
-.fj { --a: #00e5ff; --linea: rgba(255,255,255,.1); --tx2: #aab0c6; --curva: cubic-bezier(.16, 1, .3, 1); position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: clamp(.4rem, 2vw, 1.5rem); opacity: 0; transition: opacity .25s ease; }
+.fj { --a: var(--color-galaxy-400, #00e5ff); --linea: rgba(255,255,255,.1); --tx2: #aab0c6; --curva: cubic-bezier(.16, 1, .3, 1); position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: clamp(.4rem, 2vw, 1.5rem); opacity: 0; transition: opacity .25s ease; }
 html[data-tema='sudario'] .fj { --a: #f5c542; }
 .fj-visible { opacity: 1; } .fj-saliendo { opacity: 0; }
 .fj ::selection { background: color-mix(in srgb, var(--a) 35%, transparent); color: #fff; }

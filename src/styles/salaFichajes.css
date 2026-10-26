@@ -1,6 +1,6 @@
 /* SALA DE FICHAJES (js/features/cambios/salaFichajes.js): panel a pantalla completa con escudos, plantillas y destino. Prefijo sf-.
    Una sola superficie (borde fino), entrada con curva exponencial, tarjetas que aparecen en cascada y control por teclado. Texto ≥ 12 px. */
-.sf { --a: #00e5ff; --linea: rgba(255,255,255,.1); --tx2: #aab0c6; --curva: cubic-bezier(.16, 1, .3, 1); position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: clamp(.4rem, 2vw, 1.5rem); opacity: 0; transition: opacity .25s ease; }
+.sf { --a: var(--color-galaxy-400, #00e5ff); --linea: rgba(255,255,255,.1); --tx2: #aab0c6; --curva: cubic-bezier(.16, 1, .3, 1); position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: clamp(.4rem, 2vw, 1.5rem); opacity: 0; transition: opacity .25s ease; }
 html[data-tema='sudario'] .sf { --a: #f5c542; }
 .sf-visible { opacity: 1; } .sf-saliendo { opacity: 0; }
 .sf ::selection { background: color-mix(in srgb, var(--a) 35%, transparent); color: #fff; }
@@ -185,7 +185,7 @@ html[data-tema='sudario'] .sf { --a: #f5c542; }
 .sf-jug span.sf-dueno { display: inline-flex; } .sf-jug span.sf-dueno-av { display: grid; }
 
 /* Sala en el Modo Mánager (modo mercado, features/mercado/salaMercado.js). */
-.mg-sala { --a: #00e5ff; --curva: cubic-bezier(.16, 1, .3, 1); --tx2: #aab0c6; }
+.mg-sala { --a: var(--color-galaxy-400, #00e5ff); --curva: cubic-bezier(.16, 1, .3, 1); --tx2: #aab0c6; }
 .mg-sala .cfx-sala-escudos { width: 2.6rem; height: 2.6rem; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--a) 14%, transparent); color: var(--a); font-size: 1.1rem; }
 .sf-mk-cifras { display: flex; gap: .5rem; margin-left: auto; margin-right: .6rem; }
 .sf-mk-cifra { display: grid; padding: .3rem .75rem; border-radius: 12px; border: 1px solid var(--linea); background: rgba(255,255,255,.04); line-height: 1.15; }

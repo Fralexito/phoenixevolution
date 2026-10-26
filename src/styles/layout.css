@@ -28,7 +28,7 @@
 .live-msg.live-in { opacity: .92; transform: none; }
 .live-msg b { color: #fff; font-weight: 700; }
 .live-ok { border-left-color: #00ff88; } .live-ok .live-ico { color: #00ff88; }
-.live-cyan { border-left-color: #00e5ff; } .live-cyan .live-ico { color: #00e5ff; }
+.live-cyan { border-left-color: var(--color-galaxy-400, #00e5ff); } .live-cyan .live-ico { color: var(--color-galaxy-400, #00e5ff); }
 .live-ico { font-size: .75rem; flex: none; }
 .live-dim { color: #94a3b8; }
 .live-demo { flex: none; font-style: normal; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); border-radius: 9999px; padding: 0 .35rem; }
@@ -55,13 +55,13 @@
 .live-msg { max-width: 100%; }
 .live-msg .live-txt { min-width: 0; }
 .live-row { display: flex; align-items: center; gap: .5rem; padding: .4rem .55rem; font-size: .75rem; line-height: 1.25; color: #cbd5e1; border-left: 3px solid; border-radius: .4rem; background: rgba(255, 255, 255, .03); }
-.live-row.live-ok { border-left-color: #00ff88; } .live-row.live-cyan { border-left-color: #00e5ff; }
+.live-row.live-ok { border-left-color: #00ff88; } .live-row.live-cyan { border-left-color: var(--color-galaxy-400, #00e5ff); }
 .live-row b { color: #fff; }
 .live-empty { padding: 1rem; text-align: center; font-size: .75rem; color: #6b7280; }
 
 /* Pulso movible: asa de arrastre y reglas según el lado donde quede. */
 .live-movible { touch-action: none; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }   /* none: si no, el navegador empieza a hacer scroll y cancela el arrastre. El botón es pequeño, el scroll de la página sigue funcionando en el resto de la pantalla */
-.live-movible.live-grab { cursor: grabbing; color: #fff; border-color: var(--color-galaxy-400); box-shadow: 0 0 0 3px rgba(0, 229, 255, .25), 0 8px 22px rgba(0, 0, 0, .6); transform: scale(1.06); }
+.live-movible.live-grab { cursor: grabbing; color: #fff; border-color: var(--color-galaxy-400); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 25%, transparent), 0 8px 22px rgba(0, 0, 0, .6); transform: scale(1.06); }
 #live-wrap[data-movido][data-h='l'], #live-wrap[data-movido][data-h='l'] #live-feed { align-items: flex-start; }
 #live-wrap[data-movido][data-h='r'], #live-wrap[data-movido][data-h='r'] #live-feed { align-items: flex-end; }
 #live-wrap[data-movido] #live-feed { flex-direction: inherit; }
@@ -71,8 +71,8 @@
 @media (hover: hover) and (pointer: fine) { #ticker-view { cursor: grab; user-select: none; } #ticker-view.ticker-arrastrando { cursor: grabbing; } }
 .ticker-ctl { position: absolute; right: .4rem; top: 50%; transform: translateY(-50%); z-index: 5; gap: .25rem; opacity: 0; transition: opacity .2s; pointer-events: none; }
 #ticker-view:hover .ticker-ctl, .ticker-ctl:focus-within { opacity: 1; pointer-events: auto; }
-.ticker-ctl button { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; border-radius: .4rem; font-size: .75rem; color: #e5e7eb; background: rgb(3 1 15 / .85); border: 1px solid rgb(0 229 255 / .4); }
-.ticker-ctl button:hover { color: #fff; background: rgb(0 229 255 / .25); }
+.ticker-ctl button { width: 1.5rem; height: 1.5rem; display: grid; place-items: center; border-radius: .4rem; font-size: .75rem; color: #e5e7eb; background: rgb(3 1 15 / .85); border: 1px solid color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 40%, transparent); }
+.ticker-ctl button:hover { color: #fff; background: color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 25%, transparent); }
 
 /* AJUSTES: features/ajustes.js escribe data-aj-* en <html>; aquí SOLO se leen. Catálogo: data/ajustes.js */
 html[data-aj-vivo='no'] #live-wrap { display: none !important; }

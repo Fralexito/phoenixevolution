@@ -1,6 +1,6 @@
 /* JUGADORES CON PANEL LATERAL (FX.jugadoresRiel, ronda 362). Lo arma js/features/jugadoresRiel.js; la vista «Lista» la pinta pages/database.js.
    Mismo lenguaje que la Sala de fichajes (salaFichajes.css): una superficie de borde fino, filas que se iluminan con el acento y un color por línea. Texto ≥ 12 px. */
-html[data-fx-jriel] .jr-cuerpo { --a: var(--color-galaxy-400, #00e5ff); --linea: rgb(255 255 255 / .1); --tx2: #aab0c6; display: grid; gap: 1rem; }
+html[data-fx-jriel] .jr-cuerpo { --a: var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)); --linea: rgb(255 255 255 / .1); --tx2: #aab0c6; display: grid; gap: 1rem; }
 html[data-tema='sudario'][data-fx-jriel] .jr-cuerpo { --a: #f5c542; }
 .jr-main { min-width: 0; }
 .jr-riel { min-width: 0; }
@@ -41,7 +41,7 @@ html[data-tema='sudario'][data-fx-jriel] .jr-cuerpo { --a: #f5c542; }
   box-shadow: inset 3px 0 0 var(--aura); transition: transform .18s cubic-bezier(.22, 1, .36, 1), border-color .18s cubic-bezier(.22, 1, .36, 1); }
 @media (hover: hover) { .jr-fila:hover { transform: translate3d(4px, 0, 0); border-color: color-mix(in srgb, var(--aura) 45%, transparent); } }
 .jr-fila:active { transform: scale(.99); }
-.jr-fila.cmp-sel { border-color: var(--color-galaxy-400, #00e5ff); }
+.jr-fila.cmp-sel { border-color: var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)); }
 .jr-n { font-size: 12px; font-variant-numeric: tabular-nums; color: #7d839a; text-align: right; }
 .jr-posc { justify-self: start; padding: .15rem .45rem; border-radius: 6px; font-family: var(--font-display, inherit); font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--aura);
   background: color-mix(in srgb, var(--aura) 14%, transparent); border: 1px solid color-mix(in srgb, var(--aura) 40%, transparent); }
@@ -51,7 +51,7 @@ html[data-tema='sudario'][data-fx-jriel] .jr-cuerpo { --a: #f5c542; }
 .jr-club { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--tx2, #aab0c6); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .jr-media { font-family: var(--font-display, inherit); font-weight: 800; font-size: 20px; text-align: center; color: #fff; text-shadow: 0 0 12px color-mix(in srgb, var(--aura) 55%, transparent); font-variant-numeric: tabular-nums; }
 .jr-cmp { width: 2.25rem; height: 2.25rem; display: grid; place-items: center; border-radius: 50%; color: var(--tx2, #aab0c6); border: 1px solid var(--linea, rgb(255 255 255 / .1)); transition: color .16s, border-color .16s, transform .16s cubic-bezier(.22, 1, .36, 1); }
-.jr-cmp[aria-pressed='true'] { color: #000; background: var(--color-galaxy-400, #00e5ff); border-color: transparent; }
+.jr-cmp[aria-pressed='true'] { color: #000; background: var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)); border-color: transparent; }
 .jr-cmp:active { transform: scale(.92); }
 @media (max-width: 639px) {
   .jr-fila { grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem 2.25rem; gap: .5rem; padding: .5rem .6rem; }

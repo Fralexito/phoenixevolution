@@ -1,7 +1,7 @@
 /* OVERLAY DE TRANSMISIÓN (ronda 363). Lienzo vertical 9:16 (1080×1920 en OBS/TikTok LIVE Studio) con fondo transparente.
    Todo en vw para que escale con el tamaño de la fuente de navegador. Galaxy = cian + púrpura; ?tema=sudario = azul + dorado. */
 html, body { margin: 0; background: transparent; }
-.ov { --a: #00e5ff; --b: #a855f7; --tx2: #c9cde0; font-family: 'Inter', system-ui, sans-serif; color: #fff; }
+.ov { --a: var(--color-galaxy-400, #00e5ff); --b: #a855f7; --tx2: #c9cde0; font-family: 'Inter', system-ui, sans-serif; color: #fff; }
 html[data-tema='sudario'] .ov { --a: #f5c542; --b: #2563eb; }
 .ov-lienzo { box-sizing: border-box; min-height: 100vh; padding: 4vw; display: flex; flex-direction: column; justify-content: space-between; gap: 3vw; }
 .ov-cab, .ov-ultimo, .ov-prox, .ov-campeon, .ov-aviso { border-radius: 3vw; padding: 3vw 4vw; background: linear-gradient(135deg, rgb(12 10 31 / .88), rgb(20 10 40 / .82));

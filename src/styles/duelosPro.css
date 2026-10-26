@@ -124,9 +124,9 @@ html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content
   html[data-fx-duelos-pro][data-duelos-plegado] .dp-cab .dp-lanzar { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%; min-height: 3rem;
     padding: .7rem 1rem; border-radius: .9rem; position: relative; overflow: hidden; isolation: isolate;
     font-family: var(--font-display, inherit); font-weight: 800; font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; color: #fff;
-    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 22px rgb(128 0 255 / .45); transition: transform .2s, box-shadow .2s; }
+    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 22px color-mix(in srgb, var(--color-galaxy-600, var(--color-galaxy-600, #8000ff)) 45%, transparent); transition: transform .2s, box-shadow .2s; }
   html[data-fx-duelos-pro] .dp-cab .dp-lanzar > span { display: none; }
-  html[data-fx-duelos-pro] .dp-cab .dp-lanzar:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgb(128 0 255 / .65); }
+  html[data-fx-duelos-pro] .dp-cab .dp-lanzar:hover { transform: translateY(-2px); box-shadow: 0 0 32px color-mix(in srgb, var(--color-galaxy-600, var(--color-galaxy-600, #8000ff)) 65%, transparent); }
   html[data-fx-duelos-pro] .dp-cab .dp-lanzar:active { transform: scale(.98); }
   html[data-fx-duelos-pro] .dp-cab .dp-lanzar::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / .2) 50%, transparent 65%); transform: translateX(-120%); }
@@ -139,6 +139,6 @@ html[data-fx-duelos-pro] #form-crear-reto button[type='submit']::after { content
 @media (max-width: 1023.98px) {
   .dp-cab #seg-vista { padding: 0; border: 0; background: none; }
   .dp-cab #seg-vista > button { min-height: 2.9rem; border-radius: .9rem; color: #fff; font-size: .85rem;
-    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 18px rgb(128 0 255 / .4); }
+    background: linear-gradient(90deg, var(--color-galaxy-600, #7c3aed), var(--color-galaxy-700, #6d28d9)); box-shadow: 0 0 18px color-mix(in srgb, var(--color-galaxy-600, var(--color-galaxy-600, #8000ff)) 40%, transparent); }
   .dp-cab #seg-vista > button[aria-pressed='true'] { background: rgb(255 255 255 / .06); box-shadow: inset 0 0 0 1px var(--color-galaxy-400); color: var(--color-galaxy-400); }
 }

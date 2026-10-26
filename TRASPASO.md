@@ -246,6 +246,14 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-25 20:45 (Lima) · Cuenta 2 · Estilos para probar — beta 1.33.0
+- **Hecho:** fase 1 del rediseño («sistema base»): `styles/temas.css` + `js/features/temas.js`; 4 estilos con `?estilo=champions|neon|fc|mezcla`
+  (probador abajo a la izquierda). Atributo `<html data-estilo>` (NO `data-tema`: ese es Galaxy/Sudario). Sin estilo elegido = web igual que antes
+  (verificado con capturas de las 69 páginas). Colores de marca del CSS a `var(--color-galaxy-400/600, <mismo color>)`: **si escribes CSS nuevo,
+  usa las variables, no `#00e5ff` a mano**, para que los estilos lo alcancen.
+- **Esperando:** que Fralex elija estilo; después, fase 2 = aplicarlo a las piezas propias de cada página.
+- **Candados:** todos libres. Siguiente migración: **161**.
+
 ### 2026-10-25 19:45 (Lima) · Cuenta 2 · Ficha del partido (pedido de Link 0.3.51) + optimización — beta 1.32.0
 - **Hecho (web):** pedido Parte 15 de Link: migración **160** APLICADA y probada en seco; función `liga` **1.7.0** desplegada (guarda `anadido`,
   `pk_local/pk_visita` y `ficha` en `liga_vivo`; en `resultado` copia la ficha del último `partida_fin` de la sala a `detalle.ficha` y las

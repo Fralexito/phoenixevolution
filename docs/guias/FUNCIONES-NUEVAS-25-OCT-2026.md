@@ -316,3 +316,29 @@ y un partido real (lo dice el pedido de Link).
 - **No se movieron** (documentado para no romper): `salasVivo`, `jugadoresBarra`, `portada`, `elite` y los bloques de Mánager/Mi club de
   `pages.css`, porque otras hojas globales o funciones de todas las páginas usan sus clases y cambiaría el orden de la cascada.
 - **Iconos:** iconos nuevos de la ficha añadidos al recorte de Font Awesome y a los iconos finos (`data/iconosFinos.js`).
+
+## 16. Estilos para probar: Champions · Neón · EA FC · Mezcla (beta 1.33.0 · fase 1 «sistema base»)
+**Qué es:** pedido de Fralex («que cada cosa sea estética, dinámica, divertida, premium…»). Fase 1 = el **sistema base**: los mismos
+componentes en toda la web (botones, paneles, campos, etiquetas, chips, pestañas, plegables, ventanas, avisos, esqueletos, menú) con
+4 estilos para elegir, y movimiento **medio** (responde al tocar, pasar el mouse y enfocar; nada se mueve solo mientras lees).
+**Cómo probar:** abrir cualquier página con `?estilo=champions`, `?estilo=neon`, `?estilo=fc` o `?estilo=mezcla`. Aparece abajo a la
+izquierda el **probador** para cambiar en vivo; la ✕ lo cierra y el estilo elegido se queda (se recuerda en ese navegador).
+`?estilo=actual` vuelve al diseño de siempre. **Sin elegir, la web se ve exactamente igual que antes.**
+**Los 4 estilos:**
+- **Champions:** noche azul marino, botón principal plateado en cápsula, oro para lo elegido y el foco, letras condensadas (Oswald), movimiento lento.
+- **Neón:** el Galaxy de siempre con más energía: bordes que se encienden, botón con brillo, luz que sigue al mouse en los paneles.
+- **EA FC:** negro carbón, un solo acento verde lima, esquinas rectas, botones inclinados, transiciones rápidas.
+- **Mezcla:** base sobria de transmisión y el cian neón solo en lo importante (botón principal, foco, elegido).
+**Movimiento:** brillo que cruza el botón principal al pasar el mouse; botones que se hunden al tocar; paneles que se levantan 2 px;
+línea de la pestaña elegida que entra deslizando; ventanas y avisos que aparecen subiendo; anillo de foco del color del tema.
+Con «Animaciones reducidas» (celular o Configuración) todo cambia sin movimiento.
+**Cómo funciona por dentro:** `styles/temas.css` (todo bajo `<html data-estilo>`; **no** `data-tema`, que ya usan Galaxy/Sudario) +
+`js/features/temas.js` (probador y luz del mouse) + script en la cabecera de `Layout.astro` (pone el estilo antes de pintar: sin
+parpadeo) + interruptor `FX.temas`. Para que los estilos lleguen a TODO, los colores de marca escritos a mano en 262 líneas de CSS
+(`rgb(0 229 255 …)`, `#00e5ff`, `rgb(128 0 255 …)`, `#8000ff`) pasaron a `var(--color-galaxy-400/600, <el mismo color>)`: mismo color
+por defecto. **Verificado:** capturas de las 69 páginas (celular y PC) antes y después, píxel a píxel: iguales, salvo Divisiones de Sudario,
+donde una franja que quedaba cian ahora sale dorada como el resto de Sudario.
+**Arreglo incluido:** en la 1.32.0 los iconos de la ficha se añadieron al mapa global de iconos finos y aparecieron iconos que antes
+estaban ocultos en Duelos y Formatos (y la Liga se ensanchaba 4 px). Se quitó del mapa global; la ficha usa `data-ico-keep`.
+**Siguiente fase (cuando Fralex elija estilo):** pasar el estilo elegido a las piezas propias de cada página (portada, tarjetas de duelo,
+ranking, perfil, Mi club) y retirar las capas viejas que ya no hagan falta.

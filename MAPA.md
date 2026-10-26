@@ -532,3 +532,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 384 · 1.31.0 sala en vivo: chat + predicción (157)
 
 - 386 · 1.32.0 ficha del partido de Link 0.3.51 (160, función liga 1.7.0), Social en paralelo, 5 hojas CSS por página
+- 387 · 1.33.0 estilos para probar (Champions · Neón · EA FC · Mezcla) con ?estilo=…; colores de marca del CSS a variables

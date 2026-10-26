@@ -8,6 +8,9 @@ import '@fontsource/rajdhani/600.css';
 import '@fontsource/rajdhani/700.css';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/600.css';
+// Temas (ronda 387): Oswald solo se DESCARGA si un tema la usa (champions, fc, mezcla); aquí solo se declara.
+import '@fontsource/oswald/latin-500.css';
+import '@fontsource/oswald/latin-600.css';
 // Font Awesome SIN «brands» (113 KB menos por visita): las marcas van como máscaras SVG en styles/marcas.css.
 // Reglas base + SOLO los nombres de iconos usados (antes las ~2.000 de fontawesome.min.css, 70 KB por página). Lo genera tools/iconos/recortar-iconos.mjs.
 import '../styles/iconos/fontawesome.recortado.css';
@@ -62,6 +65,8 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
       <script is:inline>document.documentElement.classList.add('js');</script>
+    {/* Ronda 387: tema de diseño elegido (styles/temas.css), ANTES de pintar para que no parpadee. Sin tema = el diseño de siempre. */}
+    {FX.temas && <script is:inline set:html={"try{var q=new URLSearchParams(location.search).get('estilo'),T=['champions','neon','fc','mezcla'],t=q!==null?q:localStorage.getItem('pes-tema');if(T.indexOf(t)>=0)document.documentElement.setAttribute('data-estilo',t)}catch(e){}"} />}
     {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','si');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
     {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }`}</style>}
     {/* Ronda 243: «Animaciones» de Ajustes, ANTES de pintar (así nada se mueve un instante si debe estar quieto, y «Siempre activas» manda sobre el sistema).

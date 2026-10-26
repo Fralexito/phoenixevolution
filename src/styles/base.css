@@ -3,8 +3,8 @@ html { background-color: var(--color-galaxy-dark); }
 body {
   background-color: var(--color-galaxy-dark);
   background-image:
-    radial-gradient(circle at 15% 50%, rgba(128, 0, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--color-galaxy-600, var(--color-galaxy-600, #8000ff)) 8%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 5%, transparent) 0%, transparent 50%);
   background-attachment: fixed;
   color: var(--color-galaxy-100);
   font-family: var(--font-sans);

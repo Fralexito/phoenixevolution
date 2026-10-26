@@ -14,7 +14,7 @@
 @media (min-width: 1024px) {
   .portada-fc .tx-fila { position: relative; }
   .portada-fc .tx-fila::before { content: ''; position: absolute; z-index: -1; top: -4.5rem; bottom: -2.5rem; right: -2rem; width: 52%; pointer-events: none;
-    background: linear-gradient(104deg, transparent 0 calc(16% - 1px), rgb(0 229 255 / .28) calc(16% - 1px) 16%, rgb(255 255 255 / .022) 16%); }
+    background: linear-gradient(104deg, transparent 0 calc(16% - 1px), color-mix(in srgb, var(--color-galaxy-400, var(--color-galaxy-400, #00e5ff)) 28%, transparent) calc(16% - 1px) 16%, rgb(255 255 255 / .022) 16%); }
 }
 .tx-imagen { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; opacity: .16; pointer-events: none;
   -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 92%); mask-image: linear-gradient(to bottom, #000 30%, transparent 92%); }
