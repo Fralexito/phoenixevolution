@@ -47,7 +47,7 @@ export default function CentroPartido({ partido }) {
       <nav className="flex gap-1 glass-panel rounded-xl p-1" role="tablist" aria-label="Secciones del partido">
         {PESTANAS.map(([id, t]) => (
           <button key={id} type="button" role="tab" aria-selected={pestana === id} onClick={() => setPestana(id)}
-            className={`flex-1 px-3 py-2 rounded-lg text-xs uppercase tracking-widest font-bold transition-colors ${pestana === id ? 'bg-purple-600 text-white' : 'text-gray-300 hover:text-white'}`}>{t}</button>
+            className={`flex-1 min-w-0 px-2 sm:px-3 py-2 rounded-lg text-xs uppercase tracking-wide sm:tracking-widest font-bold transition-colors ${pestana === id ? 'bg-purple-600 text-white' : 'text-gray-300 hover:text-white'}`}>{t}</button>
         ))}
       </nav>
 

@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════
-   PRUEBA «botones y cartas de juego» (ronda 391). EXPERIMENTAL, no es diseño definitivo. Pedido de Fralex: de la muestra de
+   «Botones y cartas de juego» (ronda 391 como prueba; ronda 392 encendido en toda la beta). Aún experimental, no definitivo. Pedido de Fralex: de la muestra de
    videojuego le gustaron (1) cómo funcionan los botones y (2) la carta grande con el nombre, pero en SU estilo.
-   ─ Solo actúa con <html data-prueba-juego> (se enciende con ?prueba=juego, se apaga con ?prueba=no). Sin eso: nada cambia.
+   ─ Solo actúa con <html data-prueba-juego>, que desde la 392 viene puesto (Layout.astro). ?prueba=no lo quita en ese navegador.
    ─ Botones: al pasar el mouse, enfocar o estar en la página actual, se LLENAN de izquierda a derecha con el degradado
      púrpura → cian de Galaxy, se corren un poco a la derecha y aparece la flecha. Se usa background-size (no ::before), así no
      choca con los ::before que ya usan otras capas (monograma de la barra lateral).
@@ -9,42 +9,67 @@
    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 
 /* ───────── 1 · Botones tipo juego ───────── */
-:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary) {
+/* Dónde: portada (dorso de las ventanas), menú desplegable, menú del celular (.red-*), barra lateral, listas de opciones y filas que son enlaces
+   (a.glass-panel en fila: ranking, listas de jugadores…). Ronda 392: viene encendido en toda la web y se corrigió el tamaño en celular. */
+:root[data-prueba-juego] {
   --pj-fill: linear-gradient(90deg, color-mix(in srgb, var(--color-galaxy-600, #8000ff) 92%, transparent), color-mix(in srgb, var(--color-galaxy-600, #8000ff) 45%, var(--color-galaxy-400, #00e5ff)));
+  --pj-ease: cubic-bezier(.16, 1, .3, 1);
+}
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center) {
   position: relative;
   background-image: var(--pj-fill);
   background-repeat: no-repeat;
   background-size: 0% 100%;
   background-position: left center;
-  transition: background-size .32s cubic-bezier(.16, 1, .3, 1), translate .25s cubic-bezier(.16, 1, .3, 1), color .2s, filter .25s, box-shadow .25s;
+  transition: background-size .32s var(--pj-ease), translate .25s var(--pj-ease), color .2s, filter .25s, box-shadow .25s;
 }
-:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary):is(:hover, :focus-visible, [aria-current='page']) {
+/* Lleno: la página actual, el enfocado con teclado y mientras se toca; además, con mouse, al pasar por encima */
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):is(:focus-visible, [aria-current='page'], :active) {
   background-size: 100% 100%;
   color: #fff;
   translate: 6px 0;
   filter: drop-shadow(0 0 12px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 55%, transparent));
 }
-/* Los grandes van inclinados, como en la muestra */
-:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .accion, .tx-link) {
-  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
-  border-radius: 0;
-  padding-right: 2rem;
+/* El llenado solo ocupa lo que ocupa el botón: en las rejillas (menú desplegable, accesos) cada uno mide lo que su texto,
+   no lo que mide el vecino más alto (antes se veía un bloque morado enorme junto a «Chat general»). */
+:root[data-prueba-juego] :is(.pilar-item, .accion) { align-self: start; }
+/* Los grandes van inclinados, como en la muestra (solo en pantallas anchas; en el celular, rectos: entra más texto) */
+@media (min-width: 1024px) {
+  :root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .accion, .tx-link) { clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); border-radius: 0; }
+  :root[data-prueba-juego] :is(.pilar-item, .red-club-link, .accion, .tx-link) { padding-left: max(.85rem, 14px); }
 }
-:root[data-prueba-juego] :is(.pilar-item, .red-club-link, .accion, .tx-link) { padding-left: max(.85rem, 14px); }
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .accion, .tx-link, .vt-atajos a) { padding-right: max(1.9rem, 30px); }
 /* Flecha que aparece (dibujada con bordes: no depende de la fuente de iconos) */
-:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .accion, .tx-link, .vt-atajos a)::after {
-  content: ''; position: absolute; right: 14px; top: 50%; width: 8px; height: 8px; margin-top: -4px; pointer-events: none;
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .accion, .tx-link, .vt-atajos a)::after {
+  content: ''; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; pointer-events: none;
   border-top: 2px solid currentColor; border-right: 2px solid currentColor; rotate: 45deg;
-  opacity: 0; translate: -8px 0; transition: opacity .2s, translate .25s cubic-bezier(.16, 1, .3, 1);
+  opacity: 0; translate: -8px 0; transition: opacity .2s, translate .25s var(--pj-ease);
 }
-:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .accion, .tx-link, .vt-atajos a):is(:hover, :focus-visible, [aria-current='page'])::after { opacity: 1; translate: 0 0; }
-/* Los íconos y textos de adentro toman el blanco al llenarse */
-:root[data-prueba-juego] :is(.pilar-item, .red-club-link, .accion, .tx-link, .barra-item):is(:hover, :focus-visible, [aria-current='page']) :is(i, b, small, span) { color: inherit; }
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .accion, .tx-link, .vt-atajos a):is(:focus-visible, [aria-current='page'], :active)::after { opacity: 1; translate: 0 0; }
+/* Íconos y textos de adentro toman el blanco al llenarse */
+:root[data-prueba-juego] :is(.pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .accion, .tx-link, .barra-item, a.glass-panel.flex.items-center):is(:focus-visible, [aria-current='page'], :active) :is(i, b, small, .text-gray-400, .text-gray-300) { color: inherit; }
+:root[data-prueba-juego] :is(.pilar-item):is(:focus-visible, [aria-current='page'], :active) > i { background: rgb(0 0 0 / .22); }
 :root[data-prueba-juego] .accion-flecha, :root[data-prueba-juego] .vt-principal > .fa-arrow-right { display: none; }   /* la flecha nueva reemplaza a la vieja */
 /* Al tocar: se hunde */
-:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary):active { scale: .98; }
-/* Barra lateral (angosta): sin correrse tanto para no salirse */
-:root[data-prueba-juego] .barra-item:is(:hover, :focus-visible, [aria-current='page']) { translate: 3px 0; }
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):active { scale: .98; }
+/* Lo que no debe salirse de su caja: se corre menos (barra lateral angosta, filas, menú del celular, ventanas pequeñas) */
+:root[data-prueba-juego] :is(.barra-item, a.glass-panel.flex.items-center, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .vt-atajos a, .plegable > summary):is(:focus-visible, [aria-current='page'], :active) { translate: 3px 0; }
+:root[data-prueba-juego] .plegable > summary { border-radius: inherit; }
+/* Al pasar el mouse (en el celular, al tocar un enlace se navega enseguida, así que no queda «pegado») */
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .accion, .tx-link, .vt-atajos a):hover::after { opacity: 1; translate: 0 0; }
+:root[data-prueba-juego] :is(.pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .accion, .tx-link, .barra-item, a.glass-panel.flex.items-center):hover :is(i, b, small, .text-gray-400, .text-gray-300) { color: inherit; }
+:root[data-prueba-juego] :is(.pilar-item):hover > i { background: rgb(0 0 0 / .22); }
+:root[data-prueba-juego] :is(.barra-item, a.glass-panel.flex.items-center, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .vt-atajos a, .plegable > summary):hover { translate: 3px 0; }
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):hover {
+  background-size: 100% 100%; color: #fff; translate: 6px 0;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 55%, transparent));
+}
+:root[data-prueba-juego] :is(.barra-item, a.glass-panel.flex.items-center, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .vt-atajos a, .plegable > summary):hover { translate: 3px 0; }
+/* Celular: nada se corre de lado (así nada se sale del borde de la pantalla) ni brilla */
+@media (hover: none) {
+  :root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):hover,
+  :root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):is(:focus-visible, [aria-current='page'], :active) { translate: 0 0; filter: none; }
+}
 
 /* ───────── 2 · Carta grande con el nombre ───────── */
 .cj-zona { display: block; width: min(280px, 76vw); margin-inline: auto; perspective: 900px; -webkit-tap-highlight-color: transparent; }
@@ -95,7 +120,7 @@
 .pj-aviso button:hover { background: rgb(255 255 255 / .16); }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-prueba-juego] :is(.vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary) { transition: none; translate: 0 0 !important; }
+  :root[data-prueba-juego] :is(.vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary) { transition: none; translate: 0 0 !important; }
   .cj { animation: none; transition: none; }
 }
 :root[data-aj-mov-efectivo='reducido'] .cj { animation: none; transition: none; }

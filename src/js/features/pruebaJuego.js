@@ -1,7 +1,6 @@
 // PRUEBA «botones y cartas de juego» (ronda 391, experimental). Estilos en styles/pruebaJuego.css; HTML de la carta en core/sistema/cartaJuego.js.
-// Aquí: (1) la carta se inclina en 3D hacia el mouse/dedo con un brillo que lo sigue; (2) aviso flotante con «Quitar prueba».
-// Se enciende con ?prueba=juego y se apaga con ?prueba=no (el script de la cabecera de Layout.astro pone <html data-prueba-juego>).
-const CLAVE = 'pes-prueba-juego';
+// Aquí: la carta se inclina en 3D hacia el mouse/dedo con un brillo que lo sigue.
+// Desde la 392 viene encendido; ?prueba=no lo apaga y ?prueba=juego lo vuelve a encender (el script de la cabecera de Layout.astro pone <html data-prueba-juego>).
 const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.getAttribute('data-aj-mov-efectivo') === 'reducido';
 
 function inclinar() {
@@ -28,21 +27,9 @@ function inclinar() {
   document.addEventListener('pointercancel', soltar, { passive: true });
 }
 
-function aviso() {
-  if (document.querySelector('.pj-aviso') || document.querySelector('.tp-probador')) return;   // con el probador de estilos abierto, no se encima
-  const el = document.createElement('div');
-  el.className = 'pj-aviso'; el.setAttribute('role', 'status');
-  el.innerHTML = '<span>Prueba: botones y cartas de juego</span><button type="button">Quitar</button>';
-  el.querySelector('button').addEventListener('click', () => {
-    try { localStorage.removeItem(CLAVE); } catch { /* sin almacenamiento */ }
-    document.documentElement.removeAttribute('data-prueba-juego'); el.remove(); location.reload();
-  });
-  document.body.appendChild(el);
-}
-
 export function initPruebaJuego() {
   try {
     if (!document.documentElement.hasAttribute('data-prueba-juego')) return;
-    inclinar(); aviso();
+    inclinar();   // (el aviso «Quitar prueba» se quitó en la 392: ahora viene encendido; para apagarlo: ?prueba=no)
   } catch (e) { console.warn('[prueba juego]', e?.message ?? e); }
 }

@@ -398,3 +398,19 @@ ventanas), **ganadores**: MVP del partido, campeón de la última temporada con 
 **Piezas:** `styles/pruebaJuego.css`, `js/core/sistema/cartaJuego.js` (+ `tests/cartaJuego.test.mjs`: escapa todo, rechaza enlaces y
 colores raros), `js/features/pruebaJuego.js` (inclinación y aviso), script en `Layout.astro`, carga en `boot.js`; cambios en
 `pages/ranking.js`, `features/resultados/mvp.js`, `features/ranking/temporadas.js`, `pages/repeticiones.js` y `pages/index.astro`.
+
+## 20. Botones y cartas de juego en toda la web + arreglos responsivos (beta 1.37.0)
+**Por qué:** Fralex vio la prueba: «así me gusta más, aplícalo a toda la página, pero corrige el diseño responsivo» (mandó captura: en el
+menú desplegable, el relleno morado de «Social» era tan alto como «Chat general», que tiene 3 líneas).
+**Cambios:**
+- Ahora **vienen encendidos** (Layout.astro). `?prueba=no` los apaga en ese navegador; `?prueba=juego` los vuelve a encender; `FX.pruebaJuego`
+  = false los quita para todos. Se quitó el aviso «Quitar prueba».
+- **El relleno ocupa solo el botón:** en las rejillas (menú desplegable, accesos) cada botón mide lo que su texto (`align-self: start`).
+- **Más lugares:** filas que son enlaces (`a.glass-panel` en fila: ranking, listas) y el menú del celular completo (`.red-fila`, `.red-item`,
+  `.red-grupo > summary`).
+- **Celular:** nada se corre de lado ni brilla al tocar; los botones grandes van rectos (inclinados solo desde 1024 px, donde entra el texto).
+- **Arreglos responsivos** (`styles/responsivo.css`, encontrados con un barrido de las 69 páginas a 360, 390 y 768 px):
+  cabecera sin sesión a 360 px (la página se ensanchaba 26 px en TODAS las páginas); «Tu club» de la portada (el botón baja a su línea);
+  campeones de la portada («Copa Galaxy» y «Campeón de liga» se pisaban); los efectos 3D al aparecer dejaban arrastrar la página de lado
+  (`main { overflow-x: clip }`); pestañas del Laboratorio a 360 px. Barrido final: 0 páginas que se ensanchan, 0 contenidos cortados
+  (salvo una luz decorativa de Palmarés).

@@ -246,6 +246,11 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-25 23:55 (Lima) · Cuenta 2 · Botones y cartas de juego en toda la web — beta 1.37.0
+- **Hecho:** `data-prueba-juego` viene puesto por defecto (`?prueba=no` lo quita). Arreglos de celulares chicos en `styles/responsivo.css`
+  (si encuentras otro desborde, agrégalo ahí con un comentario de qué arregla). `main.flex-grow { overflow-x: clip }`.
+- **Candados:** todos libres. Siguiente migración: **161**.
+
 ### 2026-10-25 23:20 (Lima) · Cuenta 2 · PRUEBA botones y cartas de juego — beta 1.36.0
 - **Hecho (experimental):** `?prueba=juego` → `<html data-prueba-juego>`. Botones que se llenan (portada, menú, barra lateral, listas) y carta
   grande (`core/sistema/cartaJuego.js`, pura y probada) en ranking, portada, MVP, campeón de temporada y mejor gol. Fralex dijo: «todo es

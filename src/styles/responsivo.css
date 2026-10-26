@@ -1,0 +1,29 @@
+/* RESPONSIVO (ronda 392): arreglos de cosas que se salían de la pantalla o ocupaban más de lo necesario en celulares chicos.
+   Pedido de Fralex: «corrige el diseño responsivo». Encontrado con un barrido de las 69 páginas a 360, 390 y 768 px. Cada regla dice qué arregla. */
+
+/* Cabecera sin sesión a 360 px: «Entrar» + «Registrarse» + buscar + campana + menú no entraban (la página se ensanchaba 26 px en TODAS las páginas). */
+@media (max-width: 400px) {
+  body > header nav > div:first-child, nav.glass-panel > div:first-child { padding-left: .75rem; padding-right: .6rem; }
+  nav.glass-panel > div:first-child > div.shrink-0 { gap: .5rem; }
+  #nav-auth { gap: .5rem; }
+  #nav-auth .btn { padding-inline: .6rem !important; letter-spacing: .04em; }
+  nav.glass-panel .logo-group { gap: .5rem; }
+}
+@media (max-width: 340px) { #nav-auth [data-act='login'] { display: none; } }   /* en los más angostos, «Registrarse» ya lleva a entrar */
+
+/* Portada · «Tu club» a 360–390 px: escudo + texto + botón en una fila no cabían (se salía 3–6 px). Ahora el botón baja a su propia línea. */
+@media (max-width: 480px) {
+  .tuclub-caja { flex-wrap: wrap; gap: .85rem 1rem; padding: 1rem; }
+  .tuclub-txt { flex: 1 1 0; }
+  .tuclub-btn { width: 100%; justify-content: center; }
+  .tuclub-escudo { width: 3.6rem; height: 3.6rem; } .tuclub-escudo img { width: 2.9rem; height: 2.9rem; }
+}
+
+/* Toda la web: los efectos 3D al aparecer (capa «prof3d») agrandan un instante las secciones y en el celular la página se podía
+   arrastrar de lado 5–25 px. «clip» recorta solo lo que se sale por los costados, sin crear una barra de desplazamiento propia
+   (las cosas pegajosas siguen funcionando). */
+main.flex-grow { overflow-x: clip; }
+
+/* Portada · campeones (360–400 px): «COPA GALAXY» y «CAMPEÓN DE LIGA» se pisaban: el texto no tenía tope de ancho dentro de su columna. */
+.campeon a > span { max-width: 100%; }
+@media (max-width: 420px) { .campeon small { white-space: normal; line-height: 1.2; font-size: .7rem; letter-spacing: .06em; } }
