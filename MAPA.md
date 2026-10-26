@@ -541,3 +541,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 393 · 1.37.1 vuelven el 3D y los movimientos (los botones de juego los tapaban)
 - 394 · 1.37.2 Jugadores fluido: luces de estadio quietas (no animar detrás de backdrop-filter)
 - 395 · 1.38.0 fuera los 4 estilos de prueba y la capa vivo (quedan botones y cartas de juego)
+- 396 · 1.38.1 tarjetas de Jugadores fluidas (halo y modo foco sin blur)

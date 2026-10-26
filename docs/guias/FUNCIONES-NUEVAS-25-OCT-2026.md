@@ -429,3 +429,10 @@ menú desplegable, el relleno morado de «Social» era tan alto como «Chat gene
   hace nada y lo que quedó guardado (`pes-tema`) se borra solo. **Se quedan:** botones y cartas de juego (`pruebaJuego`, `?prueba=no` para
   apagarlos), el 3D, los arreglos de celular, los colores de marca como variables y las muestras de `/demo/`. Los estilos de
   Configuración (`ajustes`, botones con `data-estilo`) son otra cosa y siguen igual.
+- **1.38.1 · arreglo (Fralex: «lag al darle clic a las tarjetas y al volverlas» en Jugadores):** medido con 21 jugadores, la página quieta va
+  perfecta (60 cuadros por segundo); el lag era SOLO al abrir/cerrar la tarjeta ampliada (`.pcw-replica`). Dos culpables en `components.css`:
+  (1) el **halo** de la tarjeta (`.pcw-replica::before`) tenía `filter: blur(18px)` y cambiaba de tamaño: una capa enorme desenfocada que se
+  redibujaba en cada cuadro mientras la carta viaja y crece (~40 % del trabajo de dibujo); (2) en «modo foco» las otras ~20 cartas se
+  desenfocaban (`blur(3px)`) con su escudo flotando, así que también se redibujaban sin parar. Ahora: el halo solo «respira» con la opacidad y
+  sin blur (se ve casi igual), las demás cartas se apagan sin blur y sus escudos se quedan quietos. Resultado: de ~40 a ~78 cuadros en 3 s.
+  Sirve también para el podio de Destacados (usa la misma tarjeta). **Regla:** no animar ni mover nada con `filter: blur` encima o dentro.

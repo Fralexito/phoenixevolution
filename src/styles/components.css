@@ -281,13 +281,18 @@ html[data-sesion='si'] .hero-socio { display: inline-flex; }
 .pcw-replica-in { position: relative; width: 100%; height: 100%; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .18s ease-out; transform-style: preserve-3d; }
 .pcw-replica .pcw-replica-in > article[class] { box-shadow: 0 0 0 1px var(--aura, var(--color-galaxy-400, #00e5ff)), 0 0 28px 6px color-mix(in srgb, var(--aura, var(--color-galaxy-400, #00e5ff)) 65%, transparent), 0 0 80px 18px color-mix(in srgb, var(--aura, var(--color-galaxy-400, #00e5ff)) 35%, transparent), 0 24px 60px rgba(0,0,0,.7); border-color: var(--aura, var(--color-galaxy-400, #00e5ff)); }
 /* Aura: halo de luz del color de la posición que respira alrededor de la réplica. */
-.pcw-replica::before { content: ''; position: absolute; inset: -16%; z-index: -1; border-radius: 2rem; pointer-events: none; filter: blur(20px); animation: pcw-aura 2.8s ease-in-out infinite alternate;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--aura, var(--color-galaxy-400, #00e5ff)) 70%, transparent), color-mix(in srgb, var(--aura, var(--color-galaxy-400, #00e5ff)) 25%, transparent) 55%, transparent 100%); filter: blur(18px); }
+.pcw-replica::before { content: ''; position: absolute; inset: -16%; z-index: -1; border-radius: 2rem; pointer-events: none; animation: pcw-aura 2.8s ease-in-out infinite alternate;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--aura, var(--color-galaxy-400, #00e5ff)) 70%, transparent), color-mix(in srgb, var(--aura, var(--color-galaxy-400, #00e5ff)) 25%, transparent) 55%, transparent 100%); }
+/* 1.38.1 (Fralex: «lag al darle clic a las tarjetas y al volverlas»): el aura ya NO lleva filter: blur ni cambia de tamaño. Desenfocar una capa
+   tan grande mientras la carta viaja y crece obligaba a redibujarla en cada cuadro (medido: ~40 % del trabajo de dibujo). El degradado radial ya
+   es suave y ahora solo «respira» con la opacidad, que es gratis. */
 .pcw-replica-sale::before { opacity: 0; transition: opacity .3s ease; }
-@keyframes pcw-aura { from { transform: scale(.94); opacity: .8; } to { transform: scale(1.08); opacity: 1; } }   /* rendimiento: el blur es fijo (filter: blur(20px) en .pcw-replica::before) */
+@keyframes pcw-aura { from { opacity: .7; } to { opacity: 1; } }
 /* Sin :has() en html/body: obligaba a recalcular el estilo de TODA la página con cualquier cambio del DOM (Inicio lo hacía ~15 veces al cargar). El JS marca el estado en <html>. */
 body.pg-jugadores { overflow-x: clip; }   /* la pone js/pages/database.js */
-#players-container[data-foco='true'] .pcw:not(.pcw-origen) { filter: blur(3px) saturate(.65); opacity: .5; }
+/* 1.38.1: las demás cartas se apagan sin blur (desenfocar ~20 cartas, con su escudo flotando, se redibujaba en cada cuadro). Escudos quietos mientras tanto. */
+#players-container[data-foco='true'] .pcw:not(.pcw-origen) { filter: saturate(.6); opacity: .4; }
+#players-container[data-foco='true'] .escudo { animation-play-state: paused; }
 #players-container[data-foco='true'] .pcw:not(.pcw-origen):hover { transform: none; }
 @media (prefers-reduced-motion: reduce) { #players-container .pcw { transition: none; } .pcw-replica::before { animation: none; } .pcw-replica-in { transition: none; } }
 
