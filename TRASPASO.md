@@ -246,6 +246,10 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-25 22:20 (Lima) · Cuenta 2 · Tres muestras de portada — beta 1.35.0
+- **Hecho:** `/demo/` con 3 portadas rediseñadas desde cero (juego, tv, app), páginas aparte y `noindex`. La portada real no cambió.
+- **Esperando:** que Fralex elija dirección. **Candados:** todos libres. Siguiente migración: **161**.
+
 ### 2026-10-25 21:00 (Lima) · Cuenta 2 · Capa «vivo» — beta 1.34.0
 - **Hecho:** `styles/vivo.css` + `js/features/vivo.js` (solo con `?estilo=…`). Para celebrar algo nuevo desde cualquier página:
   `dispatchEvent(new CustomEvent('pes:logro', { detail: { titulo, sub } }))`; para el sello de gol: `pes:gol` con `{ card }`.

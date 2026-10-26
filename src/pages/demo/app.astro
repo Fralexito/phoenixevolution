@@ -1,0 +1,246 @@
+---
+// MUESTRA 3 · «Como una app moderna de deportes» (ronda 389). Clara, limpia y pensada para el celular: tarjeta del líder con los
+// colores de su club, pestañas Partidos · Tabla · Datos con un indicador que se desliza, fechas que se recorren con flechas y cambio
+// entre Galaxy y Sudario. Página APARTE para comparar; datos reales (data/ligaResultados.js).
+import Layout from '../../layouts/Layout.astro';
+import { EDICIONES } from '../../data/ligaResultados.js';
+import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
+import { resumenEdicion, forma } from '../../js/core/portada/demoDatos.js';
+import { escudoDe } from '../../js/core/sistema/escudos.js';
+const base = import.meta.env.BASE_URL;
+const ligas = [
+  { id: 'galaxy', nombre: 'Galaxy League', juego: 'PES 2021', ed: EDICIONES.galaxy[0] },
+  { id: 'sudario', nombre: 'Liga Sudario', juego: 'Football Life', ed: EDICIONES.sudario[0] },
+].map((l) => ({ ...l, r: resumenEdicion(l.ed) }));
+const vis = (club) => CLUBES_VISUAL[club] ?? { a: '#475569', b: '#1e293b' };
+const dg = (n) => (n > 0 ? `+${n}` : String(n));
+const esc = (c, px) => (escudoDe(c) ? `<img src="${escudoDe(c)}" alt="" width="${px}" height="${px}" loading="lazy" decoding="async">` : `<span class="ap-sinesc" style="width:${px}px;height:${px}px"></span>`);
+---
+<Layout title="Muestra · App" active="" privada description="Muestra de diseño: la portada como una app moderna de deportes.">
+  <div class="ap" data-ap>
+    <div class="ap-cont">
+      <div class="ap-top">
+        <a class="ap-volver" href={`${base}demo/`}><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Las 3 muestras</a>
+        <div class="ap-ligas" role="tablist" aria-label="Liga">
+          {ligas.map((l, i) => <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ap-liga={l.id}>{l.nombre}</button>)}
+        </div>
+      </div>
+
+      {ligas.map((l, li) => {
+        const lid = l.r.lider; const v = vis(lid?.club);
+        const fechas = (l.ed.fechas ?? []).filter((f) => (f.partidos ?? []).length);
+        const actual = l.r.ultima?.n ?? fechas[0]?.n ?? 0;
+        return (
+          <div class="ap-liga" data-ap-panel={l.id} hidden={li !== 0}>
+            {lid && (
+              <a class="ap-hero" href={`${base}liga/`} style={`--ca:${v.a};--cb:${v.b}`}>
+                <div class="ap-hero-tx">
+                  <p class="ap-hero-et">{l.juego} · Líder</p>
+                  <p class="ap-hero-nom">{lid.nombre}</p>
+                  <p class="ap-hero-club">{lid.club}</p>
+                  <div class="ap-hero-cifras"><span><b>{lid.pts}</b> pts</span><span><b>{lid.g}</b> victorias</span><span><b>{dg(lid.dg)}</b> DG</span></div>
+                </div>
+                <span class="ap-hero-esc" set:html={esc(lid.club, 96)} />
+              </a>
+            )}
+
+            <div class="ap-seg" role="tablist" aria-label="Sección" data-ap-seg>
+              <span class="ap-seg-ind" aria-hidden="true"></span>
+              {['Partidos', 'Tabla', 'Datos'].map((t, i) => <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ap-tab={i}>{t}</button>)}
+            </div>
+
+            <section class="ap-vista" data-ap-vista="0" aria-label="Partidos">
+              {fechas.length ? (
+                <div class="ap-fechas" data-ap-fechas data-actual={actual}>
+                  <div class="ap-fechas-cab">
+                    <button type="button" class="ap-flecha" data-ap-mover="-1" aria-label="Fecha anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                    <p><b data-ap-fecha-t>Fecha {actual}</b><small data-ap-fecha-s></small></p>
+                    <button type="button" class="ap-flecha" data-ap-mover="1" aria-label="Fecha siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+                  </div>
+                  {fechas.map((f) => (
+                    <ul class="ap-partidos" data-ap-fecha={f.n} hidden={f.n !== actual}>
+                      {f.partidos.map((m) => {
+                        const ok = Number.isInteger(m.gl) && Number.isInteger(m.gv);
+                        return (
+                          <li class="ap-p">
+                            <span class="ap-p-eq"><span set:html={esc(l.ed.clubes?.[m.l], 24)} /><b class={ok && m.gl > m.gv ? 'g' : ''}>{m.l}</b></span>
+                            <span class={`ap-p-res${ok ? '' : ' ap-p-pend'}`}>{ok ? `${m.gl} - ${m.gv}` : 'Por jugar'}</span>
+                            <span class="ap-p-eq ap-p-v"><b class={ok && m.gv > m.gl ? 'g' : ''}>{m.v}</b><span set:html={esc(l.ed.clubes?.[m.v], 24)} /></span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ))}
+                </div>
+              ) : <p class="ap-vacio">{l.ed.aviso ?? 'Aún no hay partidos cargados.'}</p>}
+            </section>
+
+            <section class="ap-vista" data-ap-vista="1" aria-label="Tabla" hidden>
+              <table class="ap-tabla">
+                <thead><tr><th scope="col">#</th><th scope="col">Jugador</th><th scope="col">PJ</th><th scope="col">DG</th><th scope="col">Pts</th><th scope="col" class="ap-col-forma">Forma</th></tr></thead>
+                <tbody>
+                  {l.r.tabla.map((f) => (
+                    <tr>
+                      <td class="ap-pos">{f.pos}</td>
+                      <td><span class="ap-tj"><span set:html={esc(f.club, 20)} /><b>{f.nombre}</b></span></td>
+                      <td>{f.pj}</td><td>{dg(f.dg)}</td><td class="ap-pts">{f.pts}</td>
+                      <td class="ap-col-forma"><span class="ap-forma">{forma(l.ed, f.nombre).map((x) => <i class={`fm-${x}`} title={x === 'V' ? 'Victoria' : x === 'E' ? 'Empate' : 'Derrota'}></i>)}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+
+            <section class="ap-vista" data-ap-vista="2" aria-label="Datos" hidden>
+              <div class="ap-datos">
+                <div class="ap-dato"><p>Goles en la temporada</p><b>{l.r.cifras.goles || '—'}</b><small>{l.r.cifras.promedio ? `${l.r.cifras.promedio} por partido` : 'Sin partidos cargados'}</small></div>
+                {l.r.masGoles && <div class="ap-dato"><p>Más goleador</p><b>{l.r.masGoles.nombre}</b><small>{l.r.masGoles.gf} goles a favor</small></div>}
+                {l.r.muro && <div class="ap-dato"><p>Mejor defensa</p><b>{l.r.muro.nombre}</b><small>{l.r.muro.gc} goles en contra</small></div>}
+                {l.r.goleada && <div class="ap-dato"><p>Mayor goleada</p><b>{l.r.goleada.gl}-{l.r.goleada.gv}</b><small>{l.r.goleada.l} vs {l.r.goleada.v} · fecha {l.r.goleada.fecha}</small></div>}
+              </div>
+            </section>
+          </div>
+        );
+      })}
+
+      <nav class="ap-atajos" aria-label="Atajos" data-ico-keep>
+        <a href={`${base}duelos/`}><i class="fa-solid fa-gamepad" aria-hidden="true"></i><span>Jugar</span></a>
+        <a href={`${base}en-vivo/`}><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i><span>En vivo</span></a>
+        <a href={`${base}ranking/`}><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><span>Ranking</span></a>
+        <a href={`${base}social/`}><i class="fa-solid fa-users" aria-hidden="true"></i><span>Social</span></a>
+      </nav>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Pestañas (liga y sección), indicador deslizante y fechas con flechas o deslizando el dedo. Todo ya está en la página: solo se muestra/oculta.
+  const raiz = document.querySelector<HTMLElement>('[data-ap]');
+  if (raiz) {
+    const anim = (el: Element) => { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' }); };
+    const moverInd = (seg: HTMLElement) => {
+      const b = seg.querySelector<HTMLElement>('[aria-selected="true"]'); const ind = seg.querySelector<HTMLElement>('.ap-seg-ind'); if (!b || !ind) return;
+      ind.style.width = `${b.offsetWidth}px`; ind.style.transform = `translateX(${b.offsetLeft - 4}px)`;
+    };
+    raiz.querySelectorAll<HTMLElement>('[data-ap-seg]').forEach((seg) => {
+      moverInd(seg);
+      seg.addEventListener('click', (e) => {
+        const b = (e.target as Element).closest<HTMLElement>('[data-ap-tab]'); if (!b) return;
+        seg.querySelectorAll('[data-ap-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+        moverInd(seg);
+        const panel = seg.closest('[data-ap-panel]')!;
+        panel.querySelectorAll<HTMLElement>('[data-ap-vista]').forEach((v) => { const ver = v.dataset.apVista === b.dataset.apTab; v.hidden = !ver; if (ver) anim(v); });
+      });
+    });
+    addEventListener('resize', () => raiz.querySelectorAll<HTMLElement>('[data-ap-seg]').forEach(moverInd));
+    raiz.querySelector('.ap-ligas')?.addEventListener('click', (e) => {
+      const b = (e.target as Element).closest<HTMLElement>('[data-ap-liga]'); if (!b) return;
+      raiz.querySelectorAll('[data-ap-liga]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+      raiz.querySelectorAll<HTMLElement>('[data-ap-panel]').forEach((p) => { const ver = p.dataset.apPanel === b.dataset.apLiga; p.hidden = !ver; if (ver) { anim(p); p.querySelectorAll<HTMLElement>('[data-ap-seg]').forEach(moverInd); } });
+    });
+    raiz.querySelectorAll<HTMLElement>('[data-ap-fechas]').forEach((caja) => {
+      const listas = [...caja.querySelectorAll<HTMLElement>('[data-ap-fecha]')];
+      let i = Math.max(0, listas.findIndex((l) => !l.hidden));
+      const pintar = (dir = 0) => {
+        listas.forEach((l, k) => { l.hidden = k !== i; });
+        const l = listas[i];
+        const jugados = l.querySelectorAll('.ap-p-res:not(.ap-p-pend)').length; const total = l.children.length;
+        caja.querySelector('[data-ap-fecha-t]')!.textContent = `Fecha ${l.dataset.apFecha}`;
+        caja.querySelector('[data-ap-fecha-s]')!.textContent = jugados === total ? 'Jugada' : jugados ? `${jugados} de ${total} jugados` : 'Por jugar';
+        if (dir && !matchMedia('(prefers-reduced-motion: reduce)').matches) l.animate([{ opacity: 0, transform: `translateX(${dir * 24}px)` }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.22,1,.36,1)' });
+        caja.querySelector<HTMLButtonElement>('[data-ap-mover="-1"]')!.disabled = i === 0;
+        caja.querySelector<HTMLButtonElement>('[data-ap-mover="1"]')!.disabled = i === listas.length - 1;
+      };
+      caja.addEventListener('click', (e) => { const b = (e.target as Element).closest<HTMLElement>('[data-ap-mover]'); if (!b) return; const d = Number(b.dataset.apMover); i = Math.min(listas.length - 1, Math.max(0, i + d)); pintar(d); });
+      let x0: number | null = null;
+      caja.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+      caja.addEventListener('touchend', (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) < 50) return; const d = dx < 0 ? 1 : -1; const n = Math.min(listas.length - 1, Math.max(0, i + d)); if (n !== i) { i = n; pintar(d); } });
+      pintar();
+    });
+  }
+</script>
+
+<style>
+  /* Clara a propósito: así se nota que es otra forma de ver la web (app de deportes moderna). */
+  .ap { --fondo: oklch(0.965 0.005 270); --carta: #fff; --tinta: oklch(0.2 0.02 270); --suave: oklch(0.48 0.02 270); --linea: oklch(0.9 0.008 270); --acento: oklch(0.5 0.23 290); --ok: oklch(0.62 0.17 150); --mal: oklch(0.6 0.2 25);
+        background: var(--fondo); color: var(--tinta); min-height: calc(100svh - 120px); font-family: var(--font-sans); padding: 14px 16px 40px; }
+  .ap-cont { max-width: 720px; margin: 0 auto; }
+  .ap-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .ap-volver { font-size: 13px; color: var(--suave); display: inline-flex; gap: .5rem; align-items: center; }
+  .ap-ligas { display: inline-flex; gap: 4px; padding: 4px; background: var(--carta); border-radius: 999px; box-shadow: 0 1px 2px oklch(0 0 0 / .06); }
+  .ap-ligas button { min-height: 36px; padding: 0 14px; border-radius: 999px; font: 600 13px/1 var(--font-sans); color: var(--suave); transition: background-color .2s, color .2s; }
+  .ap-ligas button[aria-selected='true'] { background: var(--tinta); color: #fff; }
+
+  /* Tarjeta del líder con los colores de su club */
+  .ap-hero { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px; border-radius: 16px; color: #fff;
+             background: linear-gradient(130deg, var(--ca), var(--cb)); box-shadow: 0 14px 30px -18px oklch(0.2 0.05 270 / .7); transition: transform .3s cubic-bezier(.22, 1, .36, 1), box-shadow .3s; }
+  .ap-hero:hover { transform: translateY(-2px); box-shadow: 0 20px 36px -18px oklch(0.2 0.05 270 / .8); }
+  .ap-hero:active { transform: scale(.99); }
+  .ap-hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; background: oklch(1 0 0 / .12); pointer-events: none; }
+  .ap-hero-et { font: 600 12px/1 var(--font-sans); opacity: .85; }
+  .ap-hero-nom { margin-top: 6px; font: 800 clamp(1.8rem, 8vw, 2.4rem)/1 var(--font-sans); letter-spacing: -.01em; }
+  .ap-hero-club { font-size: 14px; opacity: .9; margin-top: 2px; }
+  .ap-hero-cifras { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .ap-hero-cifras span { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: oklch(0 0 0 / .2); }
+  .ap-hero-cifras b { font-size: 14px; }
+  .ap-hero-esc { position: relative; z-index: 1; flex: none; }
+  .ap-hero-esc :global(img) { width: 96px; height: 96px; object-fit: contain; filter: drop-shadow(0 8px 16px oklch(0 0 0 / .3)); }
+
+  /* Pestañas con indicador que se desliza */
+  .ap-seg { position: sticky; top: 64px; z-index: 5; display: flex; margin: 16px 0 12px; padding: 4px; background: oklch(0.92 0.006 270); border-radius: 12px; }
+  .ap-seg-ind { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 9px; background: var(--carta); box-shadow: 0 1px 3px oklch(0 0 0 / .1); transition: transform .35s cubic-bezier(.22, 1, .36, 1), width .35s cubic-bezier(.22, 1, .36, 1); }
+  .ap-seg button { position: relative; flex: 1; min-height: 38px; font: 600 14px/1 var(--font-sans); color: var(--suave); transition: color .2s; }
+  .ap-seg button[aria-selected='true'] { color: var(--tinta); }
+
+  .ap-fechas, .ap-tabla, .ap-dato { background: var(--carta); border-radius: 14px; box-shadow: 0 1px 2px oklch(0 0 0 / .05); }
+  .ap-fechas { padding: 6px 4px 8px; overflow: hidden; }
+  .ap-fechas-cab { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 10px; border-bottom: 1px solid var(--linea); }
+  .ap-fechas-cab p { text-align: center; display: grid; }
+  .ap-fechas-cab b { font: 700 15px/1.2 var(--font-sans); }
+  .ap-fechas-cab small { font-size: 12px; color: var(--suave); }
+  .ap-flecha { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: var(--tinta); transition: background-color .2s; }
+  .ap-flecha:hover:not(:disabled) { background: oklch(0.94 0.006 270); }
+  .ap-flecha:disabled { opacity: .3; }
+  .ap-p { display: grid; grid-template-columns: minmax(0, 1fr) 86px minmax(0, 1fr); align-items: center; gap: 8px; padding: 12px 10px; border-bottom: 1px solid var(--linea); }
+  .ap-p:last-child { border-bottom: 0; }
+  .ap-p-eq { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .ap-p-eq b { font: 500 14px/1.2 var(--font-sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--suave); }
+  .ap-p-eq b.g { color: var(--tinta); font-weight: 700; }
+  .ap-p-eq :global(img), .ap-tj :global(img) { object-fit: contain; flex: none; }
+  .ap-p-v { justify-content: flex-end; }
+  .ap-p-res { text-align: center; font: 700 16px/1 var(--font-sans); font-variant-numeric: tabular-nums; padding: 7px 0; border-radius: 8px; background: oklch(0.95 0.005 270); }
+  .ap-p-pend { font-size: 12px; font-weight: 600; color: var(--acento); background: oklch(0.95 0.03 290); }
+  .ap-vacio { padding: 24px; text-align: center; color: var(--suave); background: var(--carta); border-radius: 14px; }
+  .ap-sinesc { display: inline-block; border-radius: 50%; background: oklch(0.9 0.008 270); flex: none; }
+
+  .ap-tabla { width: 100%; border-collapse: collapse; overflow: hidden; font-variant-numeric: tabular-nums; }
+  .ap-tabla th { font: 600 12px/1 var(--font-sans); color: var(--suave); text-align: center; padding: 12px 6px; border-bottom: 1px solid var(--linea); }
+  .ap-tabla th:nth-child(2) { text-align: left; }
+  .ap-tabla td { padding: 11px 6px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--linea); }
+  .ap-tabla tr:last-child td { border-bottom: 0; }
+  .ap-tabla tbody tr { transition: background-color .15s; }
+  .ap-tabla tbody tr:hover { background: oklch(0.975 0.004 270); }
+  .ap-pos { width: 34px; font-weight: 700; color: var(--suave); }
+  .ap-tabla tbody tr:nth-child(-n + 4) .ap-pos { color: var(--acento); }
+  .ap-tj { display: flex; align-items: center; gap: 8px; text-align: left; }
+  .ap-tj b { font-weight: 600; }
+  .ap-pts { font-weight: 800; }
+  .ap-forma { display: inline-flex; gap: 3px; }
+  .ap-forma i { width: 8px; height: 8px; border-radius: 50%; }
+  .fm-V { background: var(--ok); } .fm-E { background: oklch(0.75 0.01 270); } .fm-D { background: var(--mal); }
+  @media (max-width: 420px) { .ap-col-forma { display: none; } }
+
+  .ap-datos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .ap-dato { padding: 16px; }
+  .ap-dato p { font-size: 13px; color: var(--suave); }
+  .ap-dato b { display: block; margin-top: 6px; font: 800 1.7rem/1.1 var(--font-sans); letter-spacing: -.01em; }
+  .ap-dato small { display: block; margin-top: 4px; font-size: 13px; color: var(--suave); }
+
+  .ap-atajos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px; }
+  .ap-atajos a { display: grid; justify-items: center; gap: 6px; padding: 14px 6px; background: var(--carta); border-radius: 14px; font: 600 12px/1 var(--font-sans); color: var(--tinta); box-shadow: 0 1px 2px oklch(0 0 0 / .05); transition: transform .2s cubic-bezier(.22, 1, .36, 1), box-shadow .2s; }
+  .ap-atajos a:hover { transform: translateY(-2px); box-shadow: 0 8px 18px -10px oklch(0.2 0.05 270 / .4); }
+  .ap-atajos a:active { transform: scale(.97); }
+  .ap-atajos i { font-size: 18px; color: var(--acento); }
+
+  @media (prefers-reduced-motion: reduce) { .ap * { transition: none !important; } }
+</style>

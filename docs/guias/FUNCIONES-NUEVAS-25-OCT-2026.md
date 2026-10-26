@@ -361,3 +361,19 @@ modo ligero → fondo quieto. Piezas: `styles/vivo.css`, `js/features/vivo.js` (
 `pes:logro` y `pes:gol` (en `resultados/panel.js`, `pages/ranking.js` y `liga/vivo.js`). El fondo de la página pasa a `<html>` con un estilo
 elegido (el body transparente) para que las luces se vean.
 **Verificado:** videos de Ranking (Champions, EA FC, Mezcla) y Torneos (Neón); sin estilo, capturas iguales a las de antes.
+
+## 18. Tres muestras de la portada rediseñada (beta 1.35.0 · `/demo/`)
+**Por qué:** Fralex: «no veo gran cosa» → pidió ver cada idea «como algo aparte». En vez de ramas (cada rama necesita su propia
+publicación), son **páginas aparte** dentro de la beta: se abren con un link, no tocan la portada real y se borran fácil.
+**Links (beta):** `/fase-beta-1-0/demo/` (elegir) · `/demo/juego/` · `/demo/tv/` · `/demo/app/`. Todas `noindex`.
+- **Videojuego:** fondo de estadio con haces de luz y la cancha en perspectiva; título enorme (Anton); menú de 4 tarjetas inclinadas
+  que se llenan de lima (se recorre con las flechas del teclado); carta del líder con los colores de su club que se inclina en 3D con
+  brillo; resultados como fichas deslizables; clasificación tipo juego.
+- **TV:** rótulo «En directo» con reloj de Lima; título que entra como gráfico de televisión; marcadores tipo «score bug»; tabla de
+  estudio con puestos de clasificación en oro; datos de la temporada como rótulos inferiores; próxima fecha; cinta de resultados que corre.
+- **App:** clara (a propósito, para que se note la diferencia); cambio Galaxy/Sudario; tarjeta del líder; pestañas Partidos · Tabla ·
+  Datos con indicador que se desliza; fechas que se recorren con flechas o deslizando el dedo; forma (V/E/D) en la tabla; atajos.
+**Datos:** reales, de `data/ligaResultados.js`, con `js/core/portada/demoDatos.js` (tabla, última y próxima fecha, cifras, mayor
+goleada, mejor ataque y defensa; `tests/demoDatos.test.mjs`).
+**Movimiento:** solo transform/opacidad/recorte; con «Animaciones reducidas» todo queda quieto.
+**Siguiente:** Fralex elige una (o mezcla partes) y esa dirección se lleva a la portada real y luego al resto de páginas.

@@ -534,3 +534,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 386 · 1.32.0 ficha del partido de Link 0.3.51 (160, función liga 1.7.0), Social en paralelo, 5 hojas CSS por página
 - 387 · 1.33.0 estilos para probar (Champions · Neón · EA FC · Mezcla) con ?estilo=…; colores de marca del CSS a variables
 - 388 · 1.34.0 capa «vivo»: celebración, ¡GOL!, contadores, brillo holográfico, luces, transición de página, sonidos (solo con ?estilo=…)
+- 389 · 1.35.0 tres muestras de portada en /demo/ (juego, tv, app)
