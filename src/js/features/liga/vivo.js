@@ -7,6 +7,7 @@ import { escapeHTML } from '../../core/sistema/dom.js';
 import { aplicarCambioVivo, limpiarVivos, normalizarVivo, ordenarVivos, huboGol, textoGol, textoEstado } from '../../core/competicion/ligaVivo.js';
 import { rafaga, salto } from '../dopamina.js';
 import { crearTablero } from './campoVivo.js';
+import { lineaFicha, textoPenales } from '../../core/competicion/fichaPartido.js';
 
 let lista = [];
 let iniciado = false;
@@ -32,6 +33,8 @@ function tarjeta(x, abierto) {
   const enJuego = x.fase === 'en_juego' && !x.terminado;
   const previa = x.fase === 'previa' && !x.terminado;   // antes del pitazo: eligiendo equipos, saliendo al campo…
   const reloj = textoEstado(x);
+  const pen = textoPenales(x.pk_local, x.pk_visita);   // Link 0.3.51
+  const ficha = lineaFicha(x.ficha);                   // «Estadio n.º 12 · Lluvia · De noche»
   return `<div class="vivo-item${abierto ? ' vivo-abierto' : ''}" data-item="${escapeHTML(x.sala_id)}"><article class="glass-panel rounded-xl p-4 vivo-card${x.terminado ? ' vivo-fin' : ''}" data-sala="${escapeHTML(x.sala_id)}" role="button" tabindex="0" aria-expanded="${abierto ? 'true' : 'false'}" aria-label="${escapeHTML(`${x.local} contra ${x.visitante}: ${abierto ? 'plegar' : 'ver'} el campo en vivo`)}">
     <div class="flex items-center justify-between gap-2 mb-3">
       ${chipTipo(x)}
@@ -42,7 +45,9 @@ function tarjeta(x, abierto) {
       ${previa ? '<p class="vivo-marcador vivo-vs">VS</p>' : `<p class="vivo-marcador" aria-label="${escapeHTML(`${x.local} ${x.goles_local}, ${x.visitante} ${x.goles_visita}`)}"><span data-gl>${x.goles_local}</span><span class="text-gray-500">-</span><span data-gv>${x.goles_visita}</span></p>`}
       <p class="vivo-nombre text-right">${escapeHTML(x.visitante)}</p>
     </div>
+    ${pen ? `<p class="vivo-penales">${escapeHTML(pen)}</p>` : ''}
     ${x.goles.length ? `<div class="grid grid-cols-2 gap-3 mt-3">${listaGoles(x, 'l') || '<span></span>'}${listaGoles(x, 'v')}</div>` : ''}
+    ${ficha ? `<p class="vivo-ficha">${escapeHTML(ficha)}</p>` : ''}
     <p class="vivo-mas" aria-hidden="true">${abierto ? 'Plegar campo ▲' : 'Ver campo en vivo ▼'}</p>
   </article><div data-panel></div></div>`;
 }

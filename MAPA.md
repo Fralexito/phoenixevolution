@@ -531,3 +531,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 381 · 1.28.0 ficha de rivalidad (153) · 382 · 1.29.0 temporadas con premios (154) · 383 · 1.30.0 repeticiones + mejor gol (155) y arreglo de nulos con host (156)
 - 384 · 1.31.0 sala en vivo: chat + predicción (157)
 
+- 386 · 1.32.0 ficha del partido de Link 0.3.51 (160, función liga 1.7.0), Social en paralelo, 5 hojas CSS por página

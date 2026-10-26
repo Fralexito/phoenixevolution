@@ -6,6 +6,7 @@ import { escapeHTML as esc } from '../../core/sistema/dom.js';
 import { toast } from '../../core/sistema/toast.js';
 import { openModal, closeModal } from '../../core/sistema/modal.js';
 import { validarUrlVideo, sitioDe } from '../../core/competicion/repeticiones.js';
+import { cargarFichaDuelo } from './fichaDuelo.js';
 
 function fila(x) {
   const s = sitioDe(x.url);
@@ -38,6 +39,7 @@ export async function abrirRepeticiones(retoId, titulo = 'Repeticiones del duelo
     } catch (e) { console.error('[repeticiones]', e); caja.innerHTML = '<p class="text-sm text-gray-300">No se pudieron cargar.</p>'; }
   }
   openModal(`<div class="p-5 sm:p-6 space-y-3"><h2 class="text-lg font-display font-bold text-white"><i class="fa-solid fa-film text-galaxy-400 mr-2"></i>${esc(titulo)}</h2>
+    <div id="rep-ficha"></div>
     <div id="rep-cuerpo" class="space-y-2"><p class="text-sm text-gray-400">Cargando…</p></div>
     <div class="flex justify-end"><button type="button" class="btn btn-ghost" data-close>Cerrar</button></div></div>`, { id: 'modal-repeticiones' });
   const raiz = document.getElementById('modal-repeticiones');
@@ -65,5 +67,6 @@ export async function abrirRepeticiones(retoId, titulo = 'Repeticiones del duelo
     finally { ocupado = false; pintar(); }
   });
   pintar();
+  cargarFichaDuelo(id).then((html) => { const el = document.getElementById('rep-ficha'); if (el) el.innerHTML = html; });   // extra: si falla, no se ve
   return { cerrar: closeModal };
 }

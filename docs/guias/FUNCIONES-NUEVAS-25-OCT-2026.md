@@ -280,3 +280,39 @@ el staff ve todo); 1 mensaje cada 3 s y máx. 60 por persona y duelo; textos esc
 ocultan (nada se borra); el chat cierra 2 h después del partido; la predicción cierra al haber marcador; un ajeno no ve nada;
 la pantalla pide solo los mensajes nuevos cada 3 s. Página marcada `noindex`.
 **Probado:** 2 pruebas puras; 2 pruebas en seco en la base real (OK); página en el navegador con datos simulados.
+
+## 14. Ficha del partido de Phoenix Link 0.3.51 (beta 1.32.0 · migración 160 APLICADA · función `liga` 1.7.0 desplegada)
+**Qué es:** pedido de Link (smash-soda-fork `docs/PEDIDOS-A-LA-WEB.md`, Parte 15). Con el módulo opcional `phoenix_sonda.lua`, Link manda
+cómo se configuró el partido: estadio, clima, hora, estación, duración, dificultad, prórroga, penales y cambios; además los minutos añadidos
+y la tanda de penales. **Si el host no tiene la sonda, no llega nada y todo sigue igual que antes.**
+**Dónde se ve:**
+- **Marcador en vivo** (Inicio, En vivo, Ahora): «90+3′ · 2.º tiempo», «Penales 4-3» y una línea «Estadio n.º 12 · Lluvia · De noche · 10 min».
+- **Duelos:** «Ficha del partido» en la ventana Repeticiones (Mis partidos) y en la Sala en vivo cuando el duelo terminó.
+- **Moderación › Liga:** la ficha en cada resultado y, si no coincide con las reglas de la edición, un aviso amarillo **«Revisar»** con lo distinto
+  («Duración: se jugó con 10 min; la edición pide 8 min»). **Nunca se rechaza solo:** el staff decide.
+- **Moderación › Liga › «Reglas del partido por edición»:** el staff fija duración, dificultad, cambios, prórroga y penales. Vacío = no se controla.
+**Códigos de Sider** (se traducen en `core/competicion/fichaPartido.js`): clima 0 despejado · 1 lluvia · 2 nieve; hora 0 día · 1 noche;
+estación 0 verano · 1 invierno. Un código desconocido se muestra «código X» (no se inventa). El estadio es un número; si Link manda
+`estadio_nombre`, se usa ese. La dificultad se compara como número (el que da Sider).
+**Piezas:** `supabase/migrations/160_ficha_partido.sql` (columnas `liga_vivo.anadido/pk_local/pk_visita/ficha`, `liga_ediciones.reglas_partido`;
+`private.ficha_limpia`, `private.ficha_revisar`, `private.partida_fin_de_sala`; `public.sistema_ficha_liga` solo service_role;
+`public.ficha_de_duelo`; `public.staff_liga_reglas_partido`) · `supabase/functions/liga/index.ts` 1.7.0 · `core/competicion/fichaPartido.js`
++ `tests/fichaPartido.test.mjs` · `features/liga/reglasPartido.js` · `features/resultados/fichaDuelo.js` · cambios en `ligaVivo.js`, `liga/vivo.js`,
+`liga/validar.js`, `resultados/repeticiones.js`, `pages/salaVivo.js`, `pages/moderacion.astro`.
+**Blindaje:** la ficha se limpia dos veces (función `liga` y base): solo 11 claves conocidas, valores simples, textos de 60 letras como máximo;
+`liga_vivo.ficha` máx. 1 KB; añadido 0–30; reglas validadas en la base; solo moderadores fijan reglas; la ficha de un duelo respeta la misma
+privacidad que sus repeticiones.
+**Probado:** 4 pruebas puras + 1 de `ligaVivo`; 2 pruebas en seco en la base real (`supabase/tests/160_ficha_partido_test.sql`, OK);
+capturas en celular de la sala en vivo, el marcador en vivo y Moderación con datos simulados. **Falta:** probarlo con la sonda instalada en PES
+y un partido real (lo dice el pedido de Link).
+
+## 15. Optimización de la tarde (beta 1.32.0)
+- **Social:** los 4 datos extra del feed (mis reacciones, encuestas, vistas y guardados) se piden **a la vez** y no uno tras otro. Medido con
+  internet lento simulado: el primer contenido aparece ~0,6 s antes (5,6 s → 5,0 s; con sesión gana más). Las ventanas de historias se
+  descargan al primer toque.
+- **Estilos:** 5 hojas que solo usaba una página salieron del CSS global (transmision, estilofc y escenario → Inicio; jugadoresRiel → Base
+  de datos; noticiaSocial → Noticias y Bandeja IA). CSS global: 100 KB → 94 KB comprimido. **Verificado:** capturas de las 69 páginas
+  (celular y PC) antes y después, comparadas píxel a píxel: sin cambios (solo el reloj y el ping de la cabecera).
+- **No se movieron** (documentado para no romper): `salasVivo`, `jugadoresBarra`, `portada`, `elite` y los bloques de Mánager/Mi club de
+  `pages.css`, porque otras hojas globales o funciones de todas las páginas usan sus clases y cambiaría el orden de la cascada.
+- **Iconos:** iconos nuevos de la ficha añadidos al recorte de Font Awesome y a los iconos finos (`data/iconosFinos.js`).

@@ -1,4 +1,4 @@
-// Edge Function «liga» (1.6.1: fases detenido/descanso del campo; 1.6.0: estadísticas derivadas «est» en campo; 1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
+// Edge Function «liga» (1.7.0: ficha del partido, añadido y penales en vivo (Link 0.3.51, migración 160); 1.6.1: fases detenido/descanso del campo; 1.6.0: estadísticas derivadas «est» en campo; 1.5.0: campo con poseedor «p», hora «ts» y autenticación en caché; 1.4.0: ruta mirando; 1.3.1: colores de equipo en campo; 1.3.0: ruta campo; 1.2.0: goleador en los goles y pantalla del juego) · Partidos oficiales y marcador EN VIVO desde Phoenix Link.
 // URL base: https://fiibiyijojkxqlsrhcil.supabase.co/functions/v1/liga/v1/<ruta>
 // Desplegar con verify_jwt = false: Phoenix Link usa su token de dispositivo (Authorization: Bearer phx_…), igual que «phoenix».
 // Rutas:
@@ -85,6 +85,20 @@ const golesJuego = (v: unknown) => (Array.isArray(v) ? v : []).slice(0, 60)
     if (g.pp === true) r.pp = true;
     return r;
   });
+
+/** Ficha del partido (Link 0.3.51, sonda de Sider): solo claves conocidas y valores simples; null si no queda nada. */
+const CLAVES_FICHA = ["estadio", "estadio_nombre", "clima", "hora", "estacion", "duracion", "dificultad", "prorroga", "penales", "cambios", "zona"];
+function fichaLimpia(v: unknown): Record<string, number | boolean | string> | null {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return null;
+  const r: Record<string, number | boolean | string> = {};
+  for (const k of CLAVES_FICHA) {
+    const x = (v as Record<string, unknown>)[k];
+    if (typeof x === "boolean" || (typeof x === "number" && Number.isFinite(x) && Math.abs(x) < 1e6)) r[k] = x;
+    else if (typeof x === "string") { const t = texto(x, 60).trim(); if (t) r[k] = t; }
+  }
+  return Object.keys(r).length ? r : null;
+}
+const opcional = (v: unknown, min: number, max: number) => (typeof v === "number" && Number.isInteger(v) && v >= min && v <= max ? v : null);
 
 type Dispositivo = { id: string; usuario: string };
 
@@ -186,6 +200,10 @@ async function vivo(req: Request) {
     minuto: entero(j.minuto ?? 0, "minuto", 0, 200), periodo: entero(j.periodo ?? 0, "periodo", 0, 5),
     fase, goles: golesJuego(j.goles), actualizado: new Date().toISOString(),
     pantalla: typeof j.pantalla === "string" && PANTALLAS.includes(j.pantalla) ? j.pantalla : null,
+    // Link 0.3.51: minutos añadidos, tanda de penales (solo si la hubo) y ficha del partido. Un Link viejo no los manda.
+    anadido: opcional(j.anadido, 0, 30) ?? 0,
+    pk_local: opcional(j.pk_local, 0, 99), pk_visita: opcional(j.pk_visita, 0, 99),
+    ficha: fichaLimpia(j.ficha),
   };
   const { error } = await sb.from("liga_vivo").upsert(fila, { onConflict: "sala_id" });
   db(error, "vivo.guardar");
@@ -308,6 +326,23 @@ async function resultado(req: Request) {
     },
     doctor: (j.doctor && typeof j.doctor === "object") ? j.doctor : null,   // solo informativo hasta que exista el parche oficial
   };
+  // Ficha del partido (Link 0.3.51): se toma del último «partida_fin» de la sala y se compara con las reglas de la edición.
+  // Si algo no coincide queda en detalle.revisar para el staff; NUNCA se rechaza el resultado por esto.
+  let salaFicha = sala;
+  if (!salaFicha && uuid(j.sala_id)) {   // la sala ya cerró: vale igual si es de esta PC
+    const { data: sx } = await sb.from("salas").select("id").eq("id", uuid(j.sala_id)!).eq("dispositivo", d.id).maybeSingle();
+    salaFicha = sx?.id ?? null;
+  }
+  if (salaFicha) {
+    const { data: f, error: ef } = await sb.rpc("sistema_ficha_liga", { p_sala: salaFicha, p_partido: id });
+    if (ef) log("warn", "resultado.ficha", { mensaje: ef.message });
+    else if (f && typeof f === "object") {
+      const x = f as { ficha?: unknown; anadido?: unknown; revisar?: unknown };
+      if (x.ficha) (detalle as Record<string, unknown>).ficha = x.ficha;
+      if (Number.isInteger(x.anadido)) (detalle.juego as Record<string, unknown>).anadido = x.anadido;
+      (detalle as Record<string, unknown>).revisar = Array.isArray(x.revisar) ? x.revisar : [];
+    }
+  }
 
   let estado = "propuesto";
   let repetido = false;

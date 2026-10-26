@@ -26,6 +26,8 @@ export const PANTALLAS = {
   final: 'Final',
 };
 
+import { minutoConAnadido } from './fichaPartido.js';
+
 const PERIODOS = { 1: '1.er tiempo', 2: '2.º tiempo', 3: 'Prórroga 1', 4: 'Prórroga 2', 5: 'Penales' };
 
 /** Texto del estado para la tarjeta: «Eligiendo equipos», «Saliendo al campo», «34′ · 2.º tiempo», «67′ · En pausa», «Final». */
@@ -34,8 +36,9 @@ export function textoEstado(x) {
   if (x.terminado || x.fase === 'final') return 'Final';
   if (x.fase === 'previa') return PANTALLAS[x.pantalla] ?? 'Previa';
   if (x.fase === 'descanso') return 'Descanso';
-  if (x.fase === 'pausado') return `${x.minuto}′ · En pausa`;
-  return `${x.minuto}′ · ${PERIODOS[x.periodo] ?? 'En juego'}`;
+  const m = minutoConAnadido(x.minuto, x.periodo, x.anadido ?? 0);   // «45+2′» con Link 0.3.51
+  if (x.fase === 'pausado') return `${m} · En pausa`;
+  return `${m} · ${PERIODOS[x.periodo] ?? 'En juego'}`;
 }
 
 export const ESTADOS_LIGA = {
@@ -86,6 +89,11 @@ export function normalizarVivo(f) {
     goles: golesVivo(f.goles),
     actualizado: f.actualizado ?? null,
     pantalla: Object.hasOwn(PANTALLAS, f.pantalla) ? f.pantalla : null,
+    // Link 0.3.51 (migración 160): añadido, tanda de penales y ficha del partido. Un Link viejo no los manda.
+    anadido: entero(f.anadido, 0, 30),
+    pk_local: Number.isInteger(f.pk_local) ? entero(f.pk_local, 0, 99) : null,
+    pk_visita: Number.isInteger(f.pk_visita) ? entero(f.pk_visita, 0, 99) : null,
+    ficha: f.ficha && typeof f.ficha === 'object' && !Array.isArray(f.ficha) ? f.ficha : null,
     terminado: f.terminado === true,
     quitarEn: Number.isFinite(f.quitarEn) ? f.quitarEn : null,
   };

@@ -21,8 +21,9 @@ import { tarjetaComunidadHTML } from '../features/muro/tarjeta.js';
 import { pieSocialHTML } from '../features/muro/pieSocial.js';
 import { montarCompositor } from '../features/muro/compositor.js';
 import { rafaga, salto, entrada } from '../features/dopamina.js';
-import { abrirNuevaHistoria } from '../features/muro/historiasUI.js';
-import { abrirHistorias } from '../features/muro/visor.js';
+// Ventanas de historias: se descargan al primer toque (no hacen falta para pintar el feed; ronda 386).
+const abrirNuevaHistoria = (o) => import('../features/muro/historiasUI.js').then((m) => m.abrirNuevaHistoria(o)).catch((e) => { console.error('[social] historias:', e); toast('No se pudo abrir. Revisa tu conexión.', 'error'); });
+const abrirHistorias = (o) => import('../features/muro/visor.js').then((m) => m.abrirHistorias(o)).catch((e) => { console.error('[social] visor:', e); toast('No se pudo abrir. Revisa tu conexión.', 'error'); });
 import { abrirReportar, abrirOcultar } from '../features/moderacion/acciones.js';
 import { alternar, cargarEstado } from '../features/social/guardados.js';
 import { cargarEncuestas } from '../features/encuestas/estado.js';
@@ -156,12 +157,20 @@ async function cargar({ mas = false } = {}) {
   try {
     const m = await pedir(mas); if (req !== S.req) return;
     let nuevos = m.items ?? [];
-    if (S.yo && nuevos.length) { try { nuevos = conMisReacciones(nuevos, mapaMisReacciones(await api.misReacciones(nuevos.map((x) => x.id)))); } catch (e) { console.warn('[social] mis reacciones:', e?.message); } }   // sin esto solo se pierde el resaltado
+    // Rendimiento (ronda 386): los 4 extras del feed van EN PARALELO (antes, uno tras otro: 4 viajes a la base antes de pintar).
+    // Cada uno falla por su cuenta: sin él solo se pierde un detalle (resaltado, encuestas, vistas o guardados), nunca el feed.
+    const ids = [...(mas ? S.items : []), ...nuevos].map((x) => x.id);
+    const [mias, , social] = await Promise.all([
+      S.yo && nuevos.length ? api.misReacciones(nuevos.map((x) => x.id)).catch((e) => { console.warn('[social] mis reacciones:', e?.message); return null; }) : null,
+      Promise.resolve().then(() => cargarEncuestas(ids)).catch((e) => console.warn('[social] encuestas:', e?.message)),
+      Promise.resolve().then(() => api.socialDe(ids)).catch((e) => { console.warn('[social] datos sociales:', e?.message); return null; }),
+      S.yo ? Promise.resolve().then(() => cargarEstado('publicacion', ids)).catch((e) => console.warn('[social] guardados:', e?.message)) : null,
+    ]);
+    if (req !== S.req) return;
+    if (mias) nuevos = conMisReacciones(nuevos, mapaMisReacciones(mias));
     S.items = mas ? [...S.items, ...nuevos] : nuevos; S.hayMas = !!m.hay_mas;
-    await cargarEncuestas(S.items.map((x) => x.id));
-    try { Object.assign(S.social, (await api.socialDe(S.items.map((x) => x.id))) ?? {}); } catch (e) { console.warn('[social] datos sociales:', e?.message); }   // sin esto solo faltan vistas y compartidas
-    if (S.yo) await cargarEstado('publicacion', S.items.map((x) => x.id));
-    if (req === S.req) pintar();
+    Object.assign(S.social, social ?? {});
+    pintar();
   } catch (e) {
     console.error('[social] carga:', e);
     if (mas) toast('No se pudo cargar más. Intenta de nuevo.', 'error'); else feedEl.innerHTML = '<div class="sxr-vacio"><span class="sxr-vacio-ic is-error" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span><b>No se pudo cargar el feed</b><p>Revisa tu conexión e inténtalo de nuevo.</p><button type="button" class="sxr-crear" data-sxr-recargar><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Reintentar</button></div>';

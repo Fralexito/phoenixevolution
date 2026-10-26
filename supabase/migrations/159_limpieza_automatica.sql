@@ -1,5 +1,5 @@
 -- 159 · Limpieza automática de lo que ya no sirve (25-oct-2026, Cuenta 2). Pedido de Fralex: «Optimiza todo».
--- ESTADO: escrita, NO APLICADA (Supabase canceló el permiso de borrado). Fralex la pega en el SQL Editor: ver docs/sql-pendiente/LEEME.md.
+-- ESTADO: APLICADA el 25-oct-2026 (Fralex la pegó en el SQL Editor; tarea «limpieza-diaria» activa, verificada).
 -- Esta migración SÍ borra filas viejas (por eso Supabase pide permiso una vez). Cada día a las 04:40 (Lima):
 --   · duelo_goles NO vigentes (envíos repetidos de Link ya reemplazados) de más de 30 días;
 --   · reto_chat de duelos con más de 90 días (el chat de la sala solo tiene sentido cerca del partido);

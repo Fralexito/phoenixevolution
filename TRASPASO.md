@@ -71,7 +71,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Phoenix Sync / Mercado | `smash-soda-fork@mercado-fase0` · PC `C:\dev\smash-soda-fork` | libre | — |
 | PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | **Cuenta 1** (hilo 4; necesita la PC conectada: la Cuenta 2 por navegador no puede tocarlo) — siguiente: pantalla Local/Visitante nativa de 16 | 2026-10-21 |
 | PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — en espera hasta acabar la pantalla nativa de 16 | — |
-| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 158; **159 (limpieza) escrita SIN APLICAR** (145–158 el 25-oct, probadas en seco); Edge Functions `torneos` y `goles` desplegadas; siguiente libre: **160** | 2026-10-25 |
+| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 160** (145–160 el 25-oct; 159 la pegó Fralex); Edge Functions `torneos`, `goles` y `liga` 1.7.0 desplegadas; siguiente libre: **161** | 2026-10-25 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
 
@@ -245,6 +245,18 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   contraseñas filtradas y 2FA del staff (seguridad: lo hace él). Probar con cuentas reales.
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
+
+### 2026-10-25 19:45 (Lima) · Cuenta 2 · Ficha del partido (pedido de Link 0.3.51) + optimización — beta 1.32.0
+- **Hecho (web):** pedido Parte 15 de Link: migración **160** APLICADA y probada en seco; función `liga` **1.7.0** desplegada (guarda `anadido`,
+  `pk_local/pk_visita` y `ficha` en `liga_vivo`; en `resultado` copia la ficha del último `partida_fin` de la sala a `detalle.ficha` y las
+  diferencias con `liga_ediciones.reglas_partido` a `detalle.revisar` — nunca rechaza). Se ve en el marcador en vivo, en los duelos
+  (Repeticiones y Sala en vivo) y en Moderación › Liga (aviso «Revisar» + formulario «Reglas del partido por edición»).
+- **Para la cuenta de Link:** el pedido de la Parte 15 está **hecho del lado de la web**; falta la prueba con la sonda instalada en PES y un
+  partido real. Si Link cambia los nombres de los campos de la ficha, avisar (la web solo acepta: estadio, estadio_nombre, clima, hora,
+  estacion, duracion, dificultad, prorroga, penales, cambios, zona). Anotarlo en `docs/PEDIDOS-A-LA-WEB.md` de smash-soda-fork (esta sesión
+  no tiene permiso de escritura en ese repositorio).
+- **Optimización:** Social pide sus 4 extras en paralelo; 5 hojas CSS salieron del global (100 → 94 KB), verificado con capturas píxel a píxel.
+- **Candados:** todos libres. Siguiente migración: **161**. Rama `borrador`; nada en `main`.
 
 ### 2026-10-25 16:50 (Lima) · Cuenta 1 · Migración 159 aplicada y pedido nuevo de Link 0.3.51
 - **Supabase:** la **159** (`limpieza_diaria`, tarea `limpieza-diaria` a las 04:40 Lima) quedó **APLICADA y verificada** el 25-oct (Fralex pegó el SQL; función y tarea activas). Siguiente migración libre: **160**. La fila de Supabase de la tabla de candados todavía dice «159 sin aplicar»: corregirla al tocar el archivo.

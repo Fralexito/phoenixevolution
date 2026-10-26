@@ -139,3 +139,14 @@ test('ligaVivo: pantalla del juego y texto del estado (Phoenix Referee v1.2)', a
   assert.equal(textoEstado(null), '');
   for (const p of ['menu', 'equipos', 'ajustes', 'cargando', 'saliendo', 'en_juego', 'descanso', 'pausa', 'final']) assert.ok(PANTALLAS[p]);
 });
+
+test('ligaVivo: añadido, penales y ficha de Link 0.3.51', async () => {
+  const { textoEstado, normalizarVivo } = await import('../src/js/core/competicion/ligaVivo.js');
+  const n = normalizarVivo({ sala_id: 's', minuto: 47, periodo: 1, fase: 'en_juego', anadido: 3, pk_local: 4, pk_visita: 3, ficha: { clima: 1 } });
+  assert.equal(textoEstado(n), '45+2′ · 1.er tiempo');
+  assert.equal(n.pk_local, 4); assert.equal(n.pk_visita, 3); assert.deepEqual(n.ficha, { clima: 1 });
+  const viejo = normalizarVivo({ sala_id: 's', minuto: 47, periodo: 1, fase: 'en_juego' });   // Link viejo: como antes
+  assert.equal(textoEstado(viejo), '47′ · 1.er tiempo');
+  assert.equal(viejo.anadido, 0); assert.equal(viejo.pk_local, null); assert.equal(viejo.ficha, null);
+  assert.equal(normalizarVivo({ sala_id: 's', ficha: [1] }).ficha, null);
+});

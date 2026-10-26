@@ -5,6 +5,7 @@ import { onSession } from '../core/sistema/session.js';
 import { supabase } from '../core/sistema/supabase.js';
 import { escapeHTML as esc } from '../core/sistema/dom.js';
 import { toast } from '../core/sistema/toast.js';
+import { cargarFichaDuelo } from '../features/resultados/fichaDuelo.js';
 import { porcentajes, unirMensajes, ultimoId, ETIQUETA_ROL } from '../core/competicion/salaVivo.js';
 
 const $ = (id) => document.getElementById(id);
@@ -46,6 +47,10 @@ async function cargar(inicial = false) {
     const antes = ultimoId(S.msgs);
     S.msgs = unirMensajes(inicial ? [] : S.msgs, data.mensajes, data.ocultos);
     $('sv-titulo').innerHTML = `<i class="fa-solid fa-comments text-galaxy-400 mr-2"></i>${esc(data.a?.nombre ?? '—')} vs ${esc(data.b?.nombre ?? '—')}`;
+    if (data.estado === 'FINALIZADO' && !S.fichaPedida) {   // ficha del partido (Link 0.3.51): una sola vez, al terminar
+      S.fichaPedida = true;
+      cargarFichaDuelo(RETO).then((html) => { if (html && !$('sv-ficha')) $('sv-pred').insertAdjacentHTML('beforebegin', `<div id="sv-ficha">${html}</div>`); });
+    }
     $('sv-chat').hidden = false; pintarPred(); pintarChat(ultimoId(S.msgs) > antes);
   } catch (e) { console.error('[sala vivo]', e); }
   finally { S.cargando = false; }

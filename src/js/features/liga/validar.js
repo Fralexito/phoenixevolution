@@ -10,6 +10,8 @@ import { escapeHTML } from '../../core/sistema/dom.js';
 import { toast } from '../../core/sistema/toast.js';
 import { confirmar, pedirTexto, elegir } from '../../core/sistema/dialogo.js';
 import { openModal, closeModal } from '../../core/sistema/modal.js';
+import { lineaFicha, frasesRevisar } from '../../core/competicion/fichaPartido.js';
+import { montarReglasPartido } from './reglasPartido.js';
 import { ESTADOS_LIGA, golesVivo, textoGol, validarMarcador, colaValidacion, puedeReclamar, resumenDoctor } from '../../core/competicion/ligaVivo.js';
 
 const COLS = 'id, edicion_id, fecha, local, visitante, goles_local, goles_visita, estado, origen, detalle, arbitro, propuesto_en, resuelto_en';
@@ -55,6 +57,16 @@ function doctorHTML(p) {
     <p class="mt-1">Parche: <b>${escapeHTML(d.parche || '—')}</b> · huella <b>${escapeHTML(d.huella || '—')}</b></p>${avisos}</details>`;
 }
 
+/** Ficha del partido (Link 0.3.51) y, si no coincide con las reglas de la edición, el aviso «Revisar» (nunca bloquea). */
+function fichaHTML(p) {
+  const linea = lineaFicha(p.detalle?.ficha);
+  const frases = frasesRevisar(p.detalle?.revisar);
+  const anadido = Number.isInteger(p.detalle?.juego?.anadido) && p.detalle.juego.anadido > 0 ? ` · +${p.detalle.juego.anadido}′ de añadido` : '';
+  const revisar = frases.length ? `<div class="lv-revisar" role="note"><p><i class="fa-solid fa-triangle-exclamation mr-1" aria-hidden="true"></i><b>Revisar:</b> la configuración del juego no coincide con las reglas de la edición.</p>
+    <ul class="list-disc pl-5 mt-1">${frases.map((f) => `<li>${escapeHTML(f)}</li>`).join('')}</ul></div>` : '';
+  return `${linea ? `<p class="lv-dato"><i class="fa-solid fa-clipboard-list mr-1" aria-hidden="true"></i>${escapeHTML(linea + anadido)}</p>` : ''}${revisar}`;
+}
+
 /** Tarjeta de un partido. `acciones`: 'staff' | 'arbitro' | 'dt'. */
 function tarjeta(p, acciones, arbitros) {
   const est = ESTADOS_LIGA[p.estado] ?? ESTADOS_LIGA.pendiente;
@@ -81,7 +93,7 @@ function tarjeta(p, acciones, arbitros) {
     <p class="font-display font-bold text-white uppercase tracking-wide">${escapeHTML(p.local)}
       <span class="px-2 py-0.5 mx-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-extrabold tabular-nums">${hay ? `${Number(p.goles_local)}-${Number(p.goles_visita)}` : 'vs'}</span>
       ${escapeHTML(p.visitante)}${penales}</p>
-    ${golesHTML(p)}${reclamo}${arbitro}${doctorHTML(p)}
+    ${golesHTML(p)}${fichaHTML(p)}${reclamo}${arbitro}${doctorHTML(p)}
     ${botones ? `<div class="flex flex-wrap gap-2 pt-1">${botones}</div>` : ''}
   </article>`;
 }
@@ -215,6 +227,7 @@ export function montarPanelStaff(section) {
     });
     panelProx.cargar();
   }
+  montarReglasPartido(section.querySelector('[data-reglas-partido]'));
   return panel;
 }
 
