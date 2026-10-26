@@ -246,6 +246,11 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-26 (Lima) · Cuenta 2 · Jugadores más fluido — beta 1.37.2
+- **Hecho:** luces de estadio de `vivo.css` quietas y sin `filter: blur` (moverlas recalculaba cada cuadro los ~37 `backdrop-filter` de Jugadores).
+  Regla: no animar nada detrás de paneles con `backdrop-filter`.
+- **Candados:** todos libres. Siguiente migración: **161**.
+
 ### 2026-10-25 23:55 (Lima) · Cuenta 2 · Botones y cartas de juego en toda la web — beta 1.37.0
 - **Hecho:** `data-prueba-juego` viene puesto por defecto (`?prueba=no` lo quita). Arreglos de celulares chicos en `styles/responsivo.css`
   (si encuentras otro desborde, agrégalo ahí con un comentario de qué arregla). `main.flex-grow { overflow-x: clip }`.

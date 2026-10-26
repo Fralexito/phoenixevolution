@@ -13,9 +13,8 @@
   background:
     radial-gradient(38vmax 30vmax at 22% 18%, color-mix(in oklab, var(--t-acc-2) 24%, transparent), transparent 70%),
     radial-gradient(34vmax 28vmax at 82% 30%, color-mix(in oklab, var(--color-galaxy-600, #8000ff) 30%, transparent), transparent 70%);
-  filter: blur(10px);
-  animation: v-focos 26s var(--t-ease) infinite alternate;
-  will-change: transform;
+  /* 1.37.2: quietas y sin filter:blur. Moverlas obligaba a recalcular CADA cuadro todos los paneles con backdrop-filter
+     (en Jugadores: ~25 cartas) → la página se sentía pesada al bajar. Los degradados ya son suaves; el efecto se ve igual. */
 }
 :root[data-estilo='fc'] body::before { opacity: .55; }
 @keyframes v-focos {

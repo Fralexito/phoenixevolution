@@ -419,3 +419,8 @@ menú desplegable, el relleno morado de «Social» era tan alto como «Chat gene
   pasaba de golpe, y el «levantarse» de los botones de la portada y el «hundirse» del menú del celular perdían su suavidad. Además, en los
   accesos con 3D se recortaba la forma inclinada y se tapaba su sombra. Ahora la lista **suma** (transform, sombra, borde, opacidad) y,
   donde hay 3D, el 3D manda (sin recorte, sin correrse de lado, sin sombra extra; solo el relleno y la flecha).
+- **1.37.2 · arreglo (Fralex: «siento muy pesada la parte de Jugadores»):** con un estilo elegido (`?estilo=…`, se guarda en el navegador
+  en `pes-tema`), las luces de estadio del fondo (`vivo.css`, `body::before`) se movían sin parar y tenían `filter: blur`. Todo lo que tiene
+  `backdrop-filter` (vidrio esmerilado: en Jugadores son unas 37 piezas, una por carta) tenía que volver a calcular su desenfoque **en cada
+  cuadro**. Medido al bajar la página: 8–15 cuadros contra 38–48 ahora. Las luces siguen, quietas. Sin estilo elegido no cambiaba nada.
+  **Regla:** no animar nada que quede detrás de paneles con `backdrop-filter`.
