@@ -20,7 +20,7 @@ const esc = (c, px) => (escudoDe(c) ? `<img src="${escudoDe(c)}" alt="" width="$
   <div class="ap" data-ap>
     <div class="ap-cont">
       <div class="ap-top">
-        <a class="ap-volver" href={`${base}demo/`}><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Las 3 muestras</a>
+        <a class="ap-volver" href={`${base}demo/`}><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Las 4 muestras</a>
         <div class="ap-ligas" role="tablist" aria-label="Liga">
           {ligas.map((l, i) => <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ap-liga={l.id}>{l.nombre}</button>)}
         </div>

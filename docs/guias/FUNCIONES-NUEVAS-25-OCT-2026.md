@@ -377,3 +377,7 @@ publicación), son **páginas aparte** dentro de la beta: se abren con un link, 
 goleada, mejor ataque y defensa; `tests/demoDatos.test.mjs`).
 **Movimiento:** solo transform/opacidad/recorte; con «Animaciones reducidas» todo queda quieto.
 **Siguiente:** Fralex elige una (o mezcla partes) y esa dirección se lleva a la portada real y luego al resto de páginas.
+- **Muestra 4 · `/demo/phoenix/` (beta 1.35.1):** Fralex: «me gustó mucho el de videojuego, pero siento que pierde identidad». Misma estructura
+  del videojuego con lo que hace reconocible a la web: galaxia de estrellas en dos capas (profundidad) y nebulosa que respira, el **fénix**
+  del logo grande y casi transparente detrás, **cian #00e5ff y púrpura #8000ff**, letra **Rajdhani** (la de toda la web), el logo junto al
+  título y el brillo neón; menú que se llena de púrpura a cian; carta del líder con marco degradado cian→púrpura.

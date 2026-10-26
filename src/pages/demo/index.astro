@@ -7,12 +7,13 @@ const base = import.meta.env.BASE_URL;
 const muestras = [
   { href: 'demo/juego/', t: 'Como un videojuego', d: 'Menú de tarjetas grandes como EA FC o PES, la carta del líder que se inclina en 3D y resultados como fichas.', c: 'dm-juego' },
   { href: 'demo/tv/', t: 'Como una transmisión de TV', d: 'Rótulo «En directo» con reloj, marcadores tipo televisión, tabla de estudio y cinta de resultados que corre.', c: 'dm-tv' },
+  { href: 'demo/phoenix/', t: 'Videojuego con identidad Phoenix', d: 'La muestra de videojuego con la cara de siempre: galaxia de estrellas, cian y púrpura, letra Rajdhani, el fénix de fondo y el brillo neón.', c: 'dm-phoenix' },
   { href: 'demo/app/', t: 'Como una app de deportes', d: 'Clara y limpia para el celular: tarjeta del líder, pestañas Partidos · Tabla · Datos y fechas que se recorren deslizando.', c: 'dm-app' },
 ];
 ---
-<Layout title="Muestras de diseño" active="" privada description="Tres formas distintas de rediseñar la portada de Phoenix Evolution Series.">
+<Layout title="Muestras de diseño" active="" privada description="Cuatro formas distintas de rediseñar la portada de Phoenix Evolution Series.">
   <div class="dm">
-    <h1>Tres muestras de la portada</h1>
+    <h1>Cuatro muestras de la portada</h1>
     <p class="dm-intro">Cada una es la portada rediseñada desde cero con un estilo distinto, con los datos reales de la Galaxy League. Son páginas aparte: la web de siempre no cambia. Ábrelas, juega con ellas y dime cuál te gusta más (o qué tomar de cada una).</p>
     <ul class="dm-lista">
       {muestras.map((m, i) => (
@@ -37,6 +38,8 @@ const muestras = [
   .dm-juego b { font-family: 'Anton', 'Oswald', sans-serif; font-weight: 400; text-transform: uppercase; color: oklch(0.91 0.21 128); font-size: 1.6rem; }
   .dm-tv { background: linear-gradient(140deg, oklch(0.32 0.12 262), oklch(0.15 0.05 265)); color: oklch(0.93 0.01 250); }
   .dm-tv b { font-family: 'Oswald', sans-serif; text-transform: uppercase; font-weight: 600; }
+  .dm-phoenix { background: radial-gradient(120% 90% at 0% 0%, rgb(128 0 255 / .45), transparent 60%), #07020d; color: #fff; box-shadow: inset 0 0 0 2px #00e5ff, 0 0 24px -6px rgb(0 229 255 / .6); }
+  .dm-phoenix b { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; color: #00e5ff; font-size: 1.5rem; text-shadow: 0 0 18px rgb(0 229 255 / .5); }
   .dm-app { background: #fff; color: oklch(0.2 0.02 270); }
   .dm-app .dm-ir { color: oklch(0.5 0.23 290); }
 </style>
