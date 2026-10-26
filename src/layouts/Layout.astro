@@ -66,6 +66,8 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
       <script is:inline>document.documentElement.classList.add('js');</script>
     {/* Ronda 387: tema de diseño elegido (styles/temas.css), ANTES de pintar para que no parpadee. Sin tema = el diseño de siempre. */}
+    {/* Ronda 391: PRUEBA «botones y cartas de juego» (styles/pruebaJuego.css). ?prueba=juego la enciende y se recuerda; ?prueba=no la apaga. */}
+    {FX.pruebaJuego && <script is:inline set:html={"try{var q=new URLSearchParams(location.search).get('prueba'),k='pes-prueba-juego';if(q==='juego')localStorage.setItem(k,'1');if(q==='no')localStorage.removeItem(k);if(localStorage.getItem(k)==='1'||q==='juego')document.documentElement.setAttribute('data-prueba-juego','')}catch(e){}"} />}
     {FX.temas && <script is:inline set:html={"try{var q=new URLSearchParams(location.search).get('estilo'),T=['champions','neon','fc','mezcla'],t=q!==null?q:localStorage.getItem('pes-tema');if(T.indexOf(t)>=0)document.documentElement.setAttribute('data-estilo',t)}catch(e){}"} />}
     {FX.contactos && <script is:inline set:html={"try{var h=document.documentElement,l=localStorage;for(var i=0;i<l.length;i++){if(/^sb-.*-auth-token$/.test(l.key(i))){h.setAttribute('data-sesion','si');break}}if(l.getItem('pes-contactos-compacto')==='1')h.setAttribute('data-cf-compacto','')}catch(e){}"} />}
     {FX.transiciones && <style is:inline>{`@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }`}</style>}

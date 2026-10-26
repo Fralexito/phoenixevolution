@@ -46,6 +46,7 @@ luego('efectos', () => Promise.all([import('./features/dopamina.js'), import('./
   .then(([d, p3, ce, ec, pr]) => { for (const [n, f] of [['dopamina', d.initDopamina], ['3d', p3.initProf3d], ['cartas', ce.initCartasEfecto], ['efectos carta', ec.initEfectosCarta], ['premium', pr.initPremium]]) { try { f(); } catch (e) { console.error("[boot] " + n + ":", e); } } }));
 if (FX.sinIconosWeb) initSinIconosWeb();
 // Temas (ronda 387): probador y luz del puntero; archivo aparte y después de lo visible
+if (FX.pruebaJuego && document.documentElement.hasAttribute('data-prueba-juego')) luego('prueba juego', () => import('./features/pruebaJuego.js').then((m) => m.initPruebaJuego()));
 if (FX.temas) luego('temas', () => import('./features/temas.js').then((m) => m.initTemas()));
 if (FX.pwa) initPwa();
 if (FX.scrollSuave) initScrollSuave();

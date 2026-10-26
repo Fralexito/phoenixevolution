@@ -381,3 +381,20 @@ goleada, mejor ataque y defensa; `tests/demoDatos.test.mjs`).
   del videojuego con lo que hace reconocible a la web: galaxia de estrellas en dos capas (profundidad) y nebulosa que respira, el **fénix**
   del logo grande y casi transparente detrás, **cian #00e5ff y púrpura #8000ff**, letra **Rajdhani** (la de toda la web), el logo junto al
   título y el brillo neón; menú que se llena de púrpura a cian; carta del líder con marco degradado cian→púrpura.
+
+## 19. PRUEBA «botones y cartas de juego» en la web real (beta 1.36.0 · EXPERIMENTAL)
+**Por qué:** Fralex: la muestra de videojuego «no pega» con su identidad, pero le gustan **cómo funcionan los botones** y **la carta
+grande con el nombre**. Se tomaron solo esas 2 piezas y se pusieron en la web real con su estilo (sus colores, su letra, sus paneles).
+**No es diseño definitivo:** solo se ve con `?prueba=juego` (se recuerda en ese navegador); `?prueba=no` o el botón «Quitar» del aviso
+flotante la apagan. Sin eso, la web no cambia (comprobado con capturas). Interruptor general: `FX.pruebaJuego`.
+**Botones tipo juego** (al pasar el mouse, enfocar o estar en esa página: se llenan de izquierda a derecha con el degradado púrpura → cian,
+se corren un poco y aparece la flecha; los grandes van inclinados): portada (dorso de las 4 ventanas: botón principal y atajos), menú
+desplegable de arriba (`.pilar-item`), menú del celular (`.red-club-link`, `.red-club-sec`), barra lateral (`.barra-item`) y listas de
+opciones (`.accion`, `.tx-link`, `.plegable > summary`). Técnica: `background-size` de 0 % a 100 % (no usa `::before`, que la barra
+lateral ya usa para el monograma) y una flecha dibujada con bordes.
+**Carta grande con el nombre** (marco cian → púrpura, colores del club si los hay, cifra grande, puesto, foto/escudo o iniciales,
+estadísticas y forma; se inclina en 3D con brillo): **Ranking** (líder de la pestaña elegida), **Portada** (líder de la Galaxy bajo las
+ventanas), **ganadores**: MVP del partido, campeón de la última temporada con premios y mejor gol de la semana pasada.
+**Piezas:** `styles/pruebaJuego.css`, `js/core/sistema/cartaJuego.js` (+ `tests/cartaJuego.test.mjs`: escapa todo, rechaza enlaces y
+colores raros), `js/features/pruebaJuego.js` (inclinación y aviso), script en `Layout.astro`, carga en `boot.js`; cambios en
+`pages/ranking.js`, `features/resultados/mvp.js`, `features/ranking/temporadas.js`, `pages/repeticiones.js` y `pages/index.astro`.

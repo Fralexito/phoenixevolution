@@ -5,6 +5,7 @@ import { supabase } from '../../core/sistema/supabase.js';
 import { escapeHTML as esc } from '../../core/sistema/dom.js';
 import { toast } from '../../core/sistema/toast.js';
 import { vistaMvp, cierreTexto, mvpPerfil } from '../../core/competicion/mvp.js';
+import { cartaJuegoHTML, pruebaJuego } from '../../core/sistema/cartaJuego.js';
 
 const sinFuncion = (e) => e?.code === 'PGRST202' || /could not find the function|schema cache/i.test(e?.message ?? '');
 
@@ -31,7 +32,9 @@ export function crearPanelMvp(el, ctx) {
       cuerpo = `<p class="text-[12px] text-gray-400 mt-1">${x.tipo === 'votar' ? (x.yaVote ? 'Ya votaste. Puedes cambiar tu voto hasta que cierre.' : '¿Quién jugó mejor? No puedes votarte a ti mismo.') : 'Solo votan jugadores y espectadores aprobados.'} · ${esc(x.progreso)}</p>
         <div class="flex flex-wrap gap-2 mt-2">${botones}</div>`;
     } else if (x.tipo === 'ganador') {
-      cuerpo = `<p class="text-sm mt-1 ${x.soyMvp ? 'text-amber-300' : 'text-gray-200'}"><i class="fa-solid fa-star text-amber-300" aria-hidden="true"></i> MVP: <b>${esc(x.mvp.nombre ?? 'Jugador')}</b>${x.soyMvp ? ' · ¡eres tú!' : ''}</p>`;
+      cuerpo = pruebaJuego()   // PRUEBA «carta de juego» (ronda 391): el MVP como carta
+        ? `<div class="pj-carta-caja">${cartaJuegoHTML({ chica: true, etiqueta: 'MVP del partido', nombre: x.mvp.nombre ?? 'Jugador', sub: x.soyMvp ? '¡Eres tú!' : titulo, puesto: '⭐' })}</div>`
+        : `<p class="text-sm mt-1 ${x.soyMvp ? 'text-amber-300' : 'text-gray-200'}"><i class="fa-solid fa-star text-amber-300" aria-hidden="true"></i> MVP: <b>${esc(x.mvp.nombre ?? 'Jugador')}</b>${x.soyMvp ? ' · ¡eres tú!' : ''}</p>`;
     } else {
       cuerpo = `<p class="text-[12px] text-gray-400 mt-1">${x.tipo === 'empate' ? 'Hubo empate en votos: este partido no tiene MVP.' : 'Nadie votó: este partido no tiene MVP.'}</p>`;
     }

@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+   PRUEBA «botones y cartas de juego» (ronda 391). EXPERIMENTAL, no es diseño definitivo. Pedido de Fralex: de la muestra de
+   videojuego le gustaron (1) cómo funcionan los botones y (2) la carta grande con el nombre, pero en SU estilo.
+   ─ Solo actúa con <html data-prueba-juego> (se enciende con ?prueba=juego, se apaga con ?prueba=no). Sin eso: nada cambia.
+   ─ Botones: al pasar el mouse, enfocar o estar en la página actual, se LLENAN de izquierda a derecha con el degradado
+     púrpura → cian de Galaxy, se corren un poco a la derecha y aparece la flecha. Se usa background-size (no ::before), así no
+     choca con los ::before que ya usan otras capas (monograma de la barra lateral).
+   ─ Carta: js/core/sistema/cartaJuego.js (HTML) + js/features/pruebaJuego.js (inclinación 3D).
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* ───────── 1 · Botones tipo juego ───────── */
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary) {
+  --pj-fill: linear-gradient(90deg, color-mix(in srgb, var(--color-galaxy-600, #8000ff) 92%, transparent), color-mix(in srgb, var(--color-galaxy-600, #8000ff) 45%, var(--color-galaxy-400, #00e5ff)));
+  position: relative;
+  background-image: var(--pj-fill);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  background-position: left center;
+  transition: background-size .32s cubic-bezier(.16, 1, .3, 1), translate .25s cubic-bezier(.16, 1, .3, 1), color .2s, filter .25s, box-shadow .25s;
+}
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary):is(:hover, :focus-visible, [aria-current='page']) {
+  background-size: 100% 100%;
+  color: #fff;
+  translate: 6px 0;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 55%, transparent));
+}
+/* Los grandes van inclinados, como en la muestra */
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .accion, .tx-link) {
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  border-radius: 0;
+  padding-right: 2rem;
+}
+:root[data-prueba-juego] :is(.pilar-item, .red-club-link, .accion, .tx-link) { padding-left: max(.85rem, 14px); }
+/* Flecha que aparece (dibujada con bordes: no depende de la fuente de iconos) */
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .accion, .tx-link, .vt-atajos a)::after {
+  content: ''; position: absolute; right: 14px; top: 50%; width: 8px; height: 8px; margin-top: -4px; pointer-events: none;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor; rotate: 45deg;
+  opacity: 0; translate: -8px 0; transition: opacity .2s, translate .25s cubic-bezier(.16, 1, .3, 1);
+}
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .pilar-item, .red-club-link, .red-club-sec, .accion, .tx-link, .vt-atajos a):is(:hover, :focus-visible, [aria-current='page'])::after { opacity: 1; translate: 0 0; }
+/* Los íconos y textos de adentro toman el blanco al llenarse */
+:root[data-prueba-juego] :is(.pilar-item, .red-club-link, .accion, .tx-link, .barra-item):is(:hover, :focus-visible, [aria-current='page']) :is(i, b, small, span) { color: inherit; }
+:root[data-prueba-juego] .accion-flecha, :root[data-prueba-juego] .vt-principal > .fa-arrow-right { display: none; }   /* la flecha nueva reemplaza a la vieja */
+/* Al tocar: se hunde */
+:root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary):active { scale: .98; }
+/* Barra lateral (angosta): sin correrse tanto para no salirse */
+:root[data-prueba-juego] .barra-item:is(:hover, :focus-visible, [aria-current='page']) { translate: 3px 0; }
+
+/* ───────── 2 · Carta grande con el nombre ───────── */
+.cj-zona { display: block; width: min(280px, 76vw); margin-inline: auto; perspective: 900px; -webkit-tap-highlight-color: transparent; }
+.cj { --cj-a: var(--color-galaxy-600, #8000ff); --cj-b: var(--color-galaxy-900, #12002b); --rx: 0deg; --ry: 0deg; --hx: 50%; --hy: 30%;
+      position: relative; display: block; overflow: hidden; padding: 16px 16px 18px; border-radius: 14px 14px 36px 36px; color: #fff; text-align: center;
+      border: 2px solid transparent;
+      background: linear-gradient(160deg, var(--cj-a), var(--cj-b) 72%) padding-box, linear-gradient(160deg, var(--color-galaxy-400, #00e5ff), var(--color-galaxy-600, #8000ff)) border-box;
+      box-shadow: 0 26px 50px -22px rgb(0 0 0 / .9), 0 0 30px -6px color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 45%, transparent);
+      transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .5s cubic-bezier(.16, 1, .3, 1), box-shadow .3s;
+      animation: cj-entra .9s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes cj-entra { from { transform: rotateY(-30deg) translateY(24px); opacity: 0; } }
+.cj-zona:hover .cj { box-shadow: 0 30px 60px -22px rgb(0 0 0 / .95), 0 0 42px -4px color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 65%, transparent); }
+.cj-holo { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay;
+           background: radial-gradient(circle at var(--hx) var(--hy), rgb(255 255 255 / .55), transparent 45%), linear-gradient(115deg, transparent 35%, rgb(255 255 255 / .22) 50%, transparent 65%); }
+.cj-cab { display: flex; justify-content: space-between; align-items: flex-start; text-align: left; }
+.cj-cifra { font: 700 3rem/.85 var(--font-display); text-shadow: 0 2px 10px rgb(0 0 0 / .35); }
+.cj-cifra-et { display: block; margin-top: 4px; font: 700 12px/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+.cj-puesto { font: 700 1.25rem/1 var(--font-display); padding: 6px 10px; background: rgb(0 0 0 / .3); border-radius: 8px; }
+.cj-et { display: block; margin-top: 8px; font: 700 12px/1.2 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--color-galaxy-50, #ccffff); }
+.cj-img { display: grid; place-items: center; height: 130px; margin: 6px 0; }
+.cj-img img { width: 110px; height: 110px; object-fit: contain; border-radius: 12px; filter: drop-shadow(0 10px 20px rgb(0 0 0 / .5)); }
+.cj-ini { display: grid; place-items: center; width: 100px; height: 100px; border-radius: 50%; background: rgb(0 0 0 / .25); font: 700 2.6rem/1 var(--font-display); }
+.cj-nombre { display: block; font: 700 clamp(1.6rem, 7vw, 2rem)/1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; overflow-wrap: anywhere; }
+.cj-sub { display: block; margin-top: 4px; font-size: 13px; opacity: .88; }
+.cj-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgb(255 255 255 / .25); }
+.cj-stats small { display: block; font: 700 12px/1 var(--font-display); letter-spacing: .08em; opacity: .8; text-transform: uppercase; }
+.cj-stats b { display: block; font: 700 1.25rem/1.15 var(--font-display); }
+.cj-forma { display: flex !important; justify-content: center; gap: 2px; }
+.cj-forma i { font: 700 11px/18px var(--font-sans); width: 16px; border-radius: 4px; font-style: normal; }
+.cj-fV { background: #16a34a; } .cj-fE { background: #6b7280; } .cj-fD { background: #dc2626; }
+/* Versión chica (MVP, mejor gol) */
+.cj-chica.cj { padding: 12px 12px 14px; border-radius: 12px 12px 28px 28px; }
+.cj-zona:has(.cj-chica) { width: min(220px, 70vw); }
+.cj-chica .cj-cifra { font-size: 2.2rem; }
+.cj-chica .cj-img { height: 90px; } .cj-chica .cj-img img { width: 76px; height: 76px; } .cj-chica .cj-ini { width: 72px; height: 72px; font-size: 1.9rem; }
+.cj-chica .cj-nombre { font-size: 1.4rem; }
+
+/* Contenedores donde va la carta en cada página */
+.pj-carta-caja { padding: 6px 0 10px; }
+.pj-solo { display: none; }
+:root[data-prueba-juego] .pj-solo { display: block; }
+
+/* Aviso flotante «Prueba encendida» (js/features/pruebaJuego.js) */
+.pj-aviso { position: fixed; left: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 60; display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 12px; border-radius: 999px;
+            background: rgb(8 8 16 / .92); border: 1px solid rgb(0 229 255 / .35); font: 600 12px/1 var(--font-sans); color: #e5e7eb; box-shadow: 0 12px 30px -12px #000; }
+@media (min-width: 1024px) { .pj-aviso { bottom: 16px; } }
+.pj-aviso button { min-height: 30px; padding: 0 12px; border-radius: 999px; background: rgb(255 255 255 / .08); color: #fff; }
+.pj-aviso button:hover { background: rgb(255 255 255 / .16); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-prueba-juego] :is(.vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .barra-item, .accion, .tx-link, .plegable > summary) { transition: none; translate: 0 0 !important; }
+  .cj { animation: none; transition: none; }
+}
+:root[data-aj-mov-efectivo='reducido'] .cj { animation: none; transition: none; }

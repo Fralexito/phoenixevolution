@@ -13,6 +13,7 @@ import { montarTemporadas } from '../features/ranking/temporadas.js';
 const GOLEADORES = montarGoleadores(document.getElementById('rk-goleadores'));
 const TEMPORADAS = montarTemporadas(document.getElementById('rk-temporadas'));
 import { rangoChip } from '../features/rango.js';
+import { cartaJuegoHTML, pruebaJuego } from '../core/sistema/cartaJuego.js';
 import { mesesDisponibles, mesValido, diferencia, textoFinSemana } from '../core/competicion/rankingComunidad.js';
 
 const $ = (id) => document.getElementById(id);
@@ -28,8 +29,24 @@ function fila(r, extra) {
     <span class="flex-1 min-w-0"><b class="font-display uppercase text-white text-sm truncate block">${escapeHTML(r.nombre)}${yo ? ' <span class="text-galaxy-400 text-[12px]">(tú)</span>' : ''}</b><span class="text-[12px] text-gray-400">${extra}</span></span>
     ${r.elo !== undefined ? `<span class="flex flex-col items-end gap-0.5">${rangoChip(r.rango)}<b class="font-display text-galaxy-400 text-lg leading-none">${r.elo}<span class="text-[12px] text-gray-400 ml-0.5">ELO</span></b></span>` : `<b class="font-display text-galaxy-400 text-lg">${r.puntos}<span class="text-[12px] text-gray-400 ml-0.5">pts</span></b>`}</a>`;
 }
+// PRUEBA «carta de juego» (ronda 391): el líder de la pestaña elegida como carta grande arriba de la lista. Solo con ?prueba=juego.
+function pintarCartaLider(l) {
+  let caja = $('rk-carta');
+  if (!pruebaJuego() || !l.length) { if (caja) caja.hidden = true; return; }
+  if (!caja) { caja = document.createElement('div'); caja.id = 'rk-carta'; caja.className = 'pj-carta-caja'; $('rk-lista').before(caja); }
+  const r = l[0];
+  const datos = S.tab === 'elo'
+    ? { cifra: r.elo, cifraEt: 'ELO', etiqueta: 'Número 1 del ELO', stats: [['PJ', r.jugados]] }
+    : S.tab === 'retos'
+      ? { cifra: r.puntos, cifraEt: 'Pts', etiqueta: 'Líder de retos', stats: [['Retos', r.retos]] }
+      : { cifra: r.puntos, cifraEt: 'Pts', etiqueta: 'Líder del mes', stats: [['PJ', r.jugados], ['G', r.victorias], ['E', r.empates], ['GF', r.gf], ['GC', r.gc], ['DG', diferencia(r)]] };
+  const foto = typeof r.avatar === 'string' && /^https?:\/\//.test(r.avatar) ? r.avatar : null;
+  caja.hidden = false;
+  caja.innerHTML = cartaJuegoHTML({ ...datos, nombre: r.nombre, sub: r.username ? `@${r.username}` : '', puesto: '1°', escudo: foto, href: href(`perfil/?u=${encodeURIComponent(r.username ?? '')}`) });
+}
 function pintarLista() {
   const l = S.filas;
+  pintarCartaLider(l);
   $('rk-lista').innerHTML = l.length ? l.map((r) => (S.tab === 'competitivo'
       ? fila(r, `${r.jugados} PJ · ${r.victorias}G ${r.empates}E ${r.derrotas}P · ${r.gf}-${r.gc} (${diferencia(r)})`)
       : S.tab === 'elo' ? fila(r, `${r.jugados} amistoso${r.jugados === 1 ? '' : 's'} 1v1${r.delta ? ` · ${r.delta > 0 ? '▲' : '▼'}${Math.abs(r.delta)} en el último` : ''}`)

@@ -4,6 +4,7 @@ import { supabase } from '../core/sistema/supabase.js';
 import { escapeHTML as esc } from '../core/sistema/dom.js';
 import { toast } from '../core/sistema/toast.js';
 import { sitioDe } from '../core/competicion/repeticiones.js';
+import { cartaJuegoHTML, pruebaJuego } from '../core/sistema/cartaJuego.js';
 
 const $ = (id) => document.getElementById(id);
 let ocupado = false;
@@ -26,7 +27,9 @@ async function cargar() {
     const goles = Array.isArray(data?.goles) ? data.goles : [];
     const conSesion = Boolean(getState().session);
     const ant = data?.ganador_anterior;
-    c.innerHTML = `${ant ? `<section class="glass-panel rounded-2xl p-4"><p class="text-[12px] text-amber-300 uppercase font-display font-bold">🏆 Ganador de la semana pasada</p>
+    // PRUEBA «carta de juego» (ronda 391): el ganador de la semana pasada como carta (lleva al video)
+    const cartaAnt = ant && pruebaJuego() ? `<div class="pj-carta-caja">${cartaJuegoHTML({ etiqueta: 'Mejor gol de la semana', nombre: ant.autor ?? 'Jugador', sub: ant.titulo || 'Gol', cifra: Number(ant.votos), cifraEt: 'Votos', puesto: '🏆', href: ant.url, externo: true })}</div>` : '';
+    c.innerHTML = `${cartaAnt}${ant && !cartaAnt ? `<section class="glass-panel rounded-2xl p-4"><p class="text-[12px] text-amber-300 uppercase font-display font-bold">🏆 Ganador de la semana pasada</p>
         <a class="block text-white font-bold mt-1 hover:underline" href="${esc(ant.url)}" target="_blank" rel="noopener noreferrer">${esc(ant.titulo || 'Gol')}</a>
         <p class="text-[12px] text-gray-400">${esc(ant.autor ?? '')} · ${Number(ant.votos)} votos</p></section>` : ''}
       <section class="space-y-2"><h2 class="text-base font-display font-bold text-white uppercase tracking-wider border-b border-galaxy-border pb-2">Candidatos de esta semana</h2>

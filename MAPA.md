@@ -536,3 +536,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 388 · 1.34.0 capa «vivo»: celebración, ¡GOL!, contadores, brillo holográfico, luces, transición de página, sonidos (solo con ?estilo=…)
 - 389 · 1.35.0 tres muestras de portada en /demo/ (juego, tv, app)
 - 390 · 1.35.1 muestra 4: videojuego con identidad Phoenix (/demo/phoenix/)
+- 391 · 1.36.0 PRUEBA ?prueba=juego: botones tipo juego y carta grande con el nombre

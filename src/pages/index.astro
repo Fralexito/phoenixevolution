@@ -16,7 +16,9 @@ import { EDICIONES } from '../data/ligaResultados.js';
 import { PODIO } from '../data/palmares.js';
 import { calcularTabla } from '../js/core/competicion/tabla.js';
 import { liderDe } from '../js/core/portada/pase.js';
-import { escudoHTML } from '../js/core/sistema/escudos.js';
+import { escudoHTML, escudoDe } from '../js/core/sistema/escudos.js';
+import { cartaJuegoHTML } from '../js/core/sistema/cartaJuego.js';
+import { forma } from '../js/core/portada/demoDatos.js';
 import { titularesPortada, lineaEstado } from '../js/core/portada/titulares.js';
 import { estadoLiga } from '../js/core/competicion/pulso.js';
 import { PORTADA } from '../data/portada.js';
@@ -161,6 +163,9 @@ const VENTANAS = [
           </a>
         ))}
       </div></div>
+      {/* PRUEBA «carta de juego» (ronda 391): líder de la Galaxy como carta grande. Solo se ve con ?prueba=juego (styles/pruebaJuego.css → .pj-solo). */}
+      {FX.pruebaJuego && lider && <div class="pj-solo pj-carta-caja" set:html={cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', nombre: lider.nombre, sub: liderClub, cifra: lider.pts, cifraEt: 'Pts', puesto: '1°',
+        escudo: escudoDe(liderClub), colores: CLUBES_VISUAL[liderClub], stats: [['PJ', lider.pj], ['G', lider.g ?? '—'], ['GF', lider.gf ?? '—'], ['GC', lider.gc ?? '—']], forma: forma(edGalaxy, lider.nombre), href: `${base}liga/` })} />}
     </div>
     </Fragment>) : ESC ? (<Fragment>
     <!-- ESCENARIO (FX.escenario): titular + marcador + los 4 mundos. Lo mueve js/features/escenario.js. Todos los titulares vienen en el HTML. -->
