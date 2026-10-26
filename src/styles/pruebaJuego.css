@@ -21,7 +21,10 @@
   background-repeat: no-repeat;
   background-size: 0% 100%;
   background-position: left center;
-  transition: background-size .32s var(--pj-ease), translate .25s var(--pj-ease), color .2s, filter .25s, box-shadow .25s;
+  /* Ronda 393: la lista SUMA a lo que ya se movía (antes la reemplazaba y se perdían las animaciones de cada lugar: la inclinación 3D
+     de las tarjetas, el «levantarse» de los botones de la portada, el hundirse del menú del celular). */
+  transition: background-size .32s var(--pj-ease), translate .25s var(--pj-ease), transform .5s var(--p3-ease, var(--pj-ease)), box-shadow .5s var(--p3-ease, var(--pj-ease)),
+              border-color .25s, color .2s, filter .25s, opacity .25s;
 }
 /* Lleno: la página actual, el enfocado con teclado y mientras se toca; además, con mouse, al pasar por encima */
 :root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):is(:focus-visible, [aria-current='page'], :active) {
@@ -70,6 +73,11 @@
   :root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):hover,
   :root[data-prueba-juego] :is(.vt-dorso .vt-principal, .vt-atajos a, .pilar-item, .red-club-link, .red-club-sec, .red-fila, .red-item, .red-grupo > summary, .barra-item, .accion, .tx-link, .plegable > summary, a.glass-panel.flex.items-center):is(:focus-visible, [aria-current='page'], :active) { translate: 0 0; filter: none; }
 }
+
+/* Lo que tiene inclinación 3D hacia el mouse (capa «prof3d»: filas-enlace y accesos): el 3D manda. Se llenan de color y muestran la flecha,
+   pero no se corren de lado, no se recortan inclinados ni llevan sombra extra (eso tapaba la inclinación y su sombra) — ronda 393. */
+html[data-fx-3d][data-prueba-juego] main :is(.accion, a.glass-panel.flex.items-center) { clip-path: none !important; translate: none !important; filter: none !important; }
+html[data-fx-3d][data-prueba-juego] main :is(.accion, a.glass-panel.flex.items-center)[data-p3] { transition-duration: .32s, .25s, .14s, .4s, .25s, .2s, .25s, .25s; }
 
 /* ───────── 2 · Carta grande con el nombre ───────── */
 .cj-zona { display: block; width: min(280px, 76vw); margin-inline: auto; perspective: 900px; -webkit-tap-highlight-color: transparent; }

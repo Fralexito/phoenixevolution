@@ -538,3 +538,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 390 · 1.35.1 muestra 4: videojuego con identidad Phoenix (/demo/phoenix/)
 - 391 · 1.36.0 PRUEBA ?prueba=juego: botones tipo juego y carta grande con el nombre
 - 392 · 1.37.0 botones y cartas de juego en toda la web + arreglos responsivos (styles/responsivo.css)
+- 393 · 1.37.1 vuelven el 3D y los movimientos (los botones de juego los tapaban)

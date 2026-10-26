@@ -414,3 +414,8 @@ menú desplegable, el relleno morado de «Social» era tan alto como «Chat gene
   campeones de la portada («Copa Galaxy» y «Campeón de liga» se pisaban); los efectos 3D al aparecer dejaban arrastrar la página de lado
   (`main { overflow-x: clip }`); pestañas del Laboratorio a 360 px. Barrido final: 0 páginas que se ensanchan, 0 contenidos cortados
   (salvo una luz decorativa de Palmarés).
+- **1.37.1 · arreglo (Fralex: «¿por qué le quitaste los movimientos dinámicos y 3D?»):** los botones de juego definían su propia lista de
+  animaciones (`transition`) y **reemplazaban** la de cada lugar: la inclinación 3D hacia el mouse de las filas y accesos (capa «prof3d»)
+  pasaba de golpe, y el «levantarse» de los botones de la portada y el «hundirse» del menú del celular perdían su suavidad. Además, en los
+  accesos con 3D se recortaba la forma inclinada y se tapaba su sombra. Ahora la lista **suma** (transform, sombra, borde, opacidad) y,
+  donde hay 3D, el 3D manda (sin recorte, sin correrse de lado, sin sombra extra; solo el relleno y la flecha).
