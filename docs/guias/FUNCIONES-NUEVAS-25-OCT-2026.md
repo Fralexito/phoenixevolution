@@ -436,3 +436,20 @@ menú desplegable, el relleno morado de «Social» era tan alto como «Chat gene
   desenfocaban (`blur(3px)`) con su escudo flotando, así que también se redibujaban sin parar. Ahora: el halo solo «respira» con la opacidad y
   sin blur (se ve casi igual), las demás cartas se apagan sin blur y sus escudos se quedan quietos. Resultado: de ~40 a ~78 cuadros en 3 s.
   Sirve también para el podio de Destacados (usa la misma tarjeta). **Regla:** no animar ni mover nada con `filter: blur` encima o dentro.
+
+## Portada con jerarquía visual (rondas 397–401, betas 1.39.0 → 1.40.0) — pedido de Frank
+Solo CSS/HTML de la portada (más 1 línea: el botón nuevo «Crear mi cuenta» abre el mismo registro que el de abajo).
+1. **Botón principal** bajo el saludo (`.vt-cta`): sin sesión «Crear mi cuenta» (`[data-crear-cuenta]` → `openAuthModal('register')`),
+   con sesión «Jugar un reto» → duelos/; «Ver la tabla» → liga/ para todos. Se alternan con `solo-invitado` / `solo-cuenta`.
+2. **Título** `.vt-tit` clamp(2rem, 4.6vw, 3.5rem); `.vt-sub` 1rem #b4bac6. **Ventanas a la altura del contenido**: medido, la cara de ATRÁS
+   (botones, 220–294 px) estiraba la ventana; se compactó. 290 → 193 px en PC.
+3. **Mi Club primero**: escritorio 2fr 1fr 1fr, Mi Club 2 filas, dorado al 15 %, título 1.5rem y su botón «Entrar a mi club» al frente.
+   Las otras: título 1.05rem; Competencia ocupa el ancho de abajo (`grid-auto-flow: dense`, sin hueco). Vacías = una línea con enlace
+   («Publica la primera jugada →», «Crea el primer reto →»; si llegan datos, ventanas.js las reemplaza). Celular: Mi Club a lo ancho;
+   la cara de atrás de las de apoyo va encima del frente con su misma altura (antes 239 px con una sola línea).
+4. **Un solo ancho**: ventanas, «Empieza en 3 pasos» y «Tu club» = 72rem (max-w-6xl); `.portada-abajo` a max-w-6xl.
+5. **Títulos en 3 niveles**: tokens `--tit-n1/2/3` (tokens.css) y clases `.tit-n1/2/3` (pages.css). N1 28px (Central de partidos, Tu club de PES),
+   N2 20px (Jugadores destacados, plegables, Ranking de la semana), N3 12px cian (Campeones vigentes, Competiciones, Empieza en 3 pasos).
+   Carta del líder: al costado de la tabla de posiciones, colores del club al 55 %. «Jugadores destacados» sin jugadores = no se muestra
+   (CSS `:has(.podio-slot)`). Estilos de la portada en `styles/portadaJerarquia.css`.
+

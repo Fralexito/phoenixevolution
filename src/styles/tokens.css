@@ -42,3 +42,13 @@
   @keyframes glow { 0% { filter: drop-shadow(0 0 10px rgba(245,158,11,0.4)); } 100% { filter: drop-shadow(0 0 20px rgba(245,158,11,0.8)); } }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 }
+
+/* Escala de títulos de sección (ronda 401, Frank). 3 niveles; las clases están en pages.css (.tit-n1 · .tit-n2 · .tit-n3).
+   N1 = secciones principales (Central de partidos, Tu club de PES) · N2 = secundarias (Jugadores destacados, Highlights) · N3 = rótulos chicos. */
+:root {
+  --tit-n1: 700 1.75rem/1.1 var(--font-display);
+  --tit-n2: 700 1.25rem/1.2 var(--font-display);
+  --tit-n3: 700 12px/1.2 var(--font-display);
+  --tit-n3-track: .18em;
+  --tit-n3-color: var(--color-galaxy-400);
+}

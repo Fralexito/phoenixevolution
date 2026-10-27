@@ -1,0 +1,28 @@
+/* Portada · jerarquía visual (rondas 397–401, pedido de Frank). Solo la importa src/pages/index.astro.
+   Niveles de título: tokens en tokens.css (--tit-n1/2/3) y clases en pages.css (.tit-n1/2/3). Aquí se aplican a lo que
+   no lleva la clase en el HTML (títulos que pinta JS o que vienen de otros componentes). */
+
+/* Nivel 1 · «Tu club de PES» (lo pinta js/features/portada/tuClub.js) */
+.tuclub-pitch h2 { font: var(--tit-n1); text-transform: uppercase; letter-spacing: .04em; }
+
+/* Nivel 2 · títulos de los plegables de la portada (Highlights, Estadísticas de la liga) */
+details.plegable > summary .plegable-t b { font: var(--tit-n2); letter-spacing: .06em; }
+
+/* Nivel 2 · «Ranking de la semana» (lo pinta js/features/enganche.js dentro de #inicio-semanal) */
+#inicio-semanal h2 { font: var(--tit-n2); letter-spacing: .06em; }
+
+/* Nivel 3 · rótulos chicos: «Campeones vigentes» (elite.css le daba .8rem y otro tracking) y «Empieza en 3 pasos» */
+.campeones-tit.tit-n3 { font: var(--tit-n3); letter-spacing: var(--tit-n3-track); color: var(--tit-n3-color); }
+.pasos3-t { font: var(--tit-n3); letter-spacing: var(--tit-n3-track); color: var(--tit-n3-color); }
+
+/* Carta del líder junto a la tabla: colores del club al 55 % (antes a pleno: competía con todo lo demás) */
+.pos-lider { display: grid; justify-items: center; padding: 0; }
+.pos-lider .cj { background: linear-gradient(160deg, color-mix(in srgb, var(--cj-a) 55%, var(--color-galaxy-deep, #07020d)), color-mix(in srgb, var(--cj-b) 55%, var(--color-galaxy-deep, #07020d)) 72%) padding-box,
+  linear-gradient(160deg, var(--color-galaxy-400, #00e5ff), var(--color-galaxy-600, #8000ff)) border-box; }
+.pos-lider .cj-forma i { font-size: 12px; }   /* mínimo 12 px */
+
+/* «Jugadores destacados»: si no hay jugadores (o aún no cargan), la sección no se muestra (antes: 3 huecos o un aviso vacío). */
+#destacados-seccion:not(:has(.podio-slot)) { display: none; }
+
+/* «Solo en Phoenix» (rótulo de Tu club): mínimo 12 px; se queda dorado porque vive dentro de la tarjeta dorada */
+.tuclub-kicker { font-size: 12px; }

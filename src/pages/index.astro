@@ -6,6 +6,7 @@ import '../styles/ahoraPortada.css';   // «Ahora en Phoenix» (js/features/port
 import '../styles/transmision.css';   // portada: transmisión (antes en global.css; ronda 386)
 import '../styles/estilofc.css';     // portada: estilo FC
 import '../styles/escenario.css';    // portada: escenario
+import '../styles/portadaJerarquia.css';   // portada: jerarquía visual (rondas 397–401, Frank)
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
 import { DEMO_CLIPS } from '../data/demo.js';
@@ -175,9 +176,6 @@ const VENTANAS = [
           </a>
         ))}
       </div></div>
-      {/* PRUEBA «carta de juego» (ronda 391): líder de la Galaxy como carta grande. Solo se ve con ?prueba=juego (styles/pruebaJuego.css → .pj-solo). */}
-      {FX.pruebaJuego && lider && <div class="pj-solo pj-carta-caja" set:html={cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', nombre: lider.nombre, sub: liderClub, cifra: lider.pts, cifraEt: 'Pts', puesto: '1°',
-        escudo: escudoDe(liderClub), colores: CLUBES_VISUAL[liderClub], stats: [['PJ', lider.pj], ['G', lider.g ?? '—'], ['GF', lider.gf ?? '—'], ['GC', lider.gc ?? '—']], forma: forma(edGalaxy, lider.nombre), href: `${base}liga/` })} />}
     </div>
     </Fragment>) : ESC ? (<Fragment>
     <!-- ESCENARIO (FX.escenario): titular + marcador + los 4 mundos. Lo mueve js/features/escenario.js. Todos los titulares vienen en el HTML. -->
@@ -422,7 +420,7 @@ const VENTANAS = [
     {ELITE && (<Fragment>
     <!-- CAMPEONES VIGENTES (FX.elite): la pared de trofeos de la entrada. Datos: data/palmares.js (PODIO). -->
     <section class:list={['campeones', FC && 'campeones-fc']} aria-labelledby="campeones-t">
-      <h2 id="campeones-t" class="campeones-tit"><i class="fa-solid fa-trophy"></i> Campeones vigentes</h2>
+      <h2 id="campeones-t" class="campeones-tit tit-n3"><i class="fa-solid fa-trophy"></i> Campeones vigentes</h2>
       <ul class="campeones-lista">
         {CAMPEONES.map((c) => (
           <li class:list={['campeon', c.oro && 'campeon-oro']}>
@@ -477,7 +475,7 @@ const VENTANAS = [
     <!-- 1b. COMPETICIONES: solo aparece cuando hay más de una liga (data/ligas.js); cada tarjeta lleva a la página «Liga». -->
     {LIGAS.filter((l) => l.enCentral !== false).length > 1 && (
       <section aria-label="Competiciones" class="space-y-3">
-        <h2 class="font-display font-bold text-xs text-gray-400 uppercase tracking-widest">Competiciones</h2>
+        <h2 class="tit-n3">Competiciones</h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {LIGAS.filter((l) => l.enCentral !== false).map((l) => (
             <a href={`${base}liga/#liga-${l.id}`} class="liga-card group min-h-[170px] block">
@@ -502,7 +500,7 @@ const VENTANAS = [
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
       <section id="central-partidos" class="lg:col-span-2 space-y-4 scroll-mt-32">
         <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-galaxy-border pb-2">
-          <h2 class="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Central de Partidos</h2>
+          <h2 class="tit-n1">Central de Partidos</h2>
           <div id="fecha-nav" hidden class="order-3 sm:order-none w-full sm:w-auto sm:flex-1 sm:max-w-[19rem] sm:mx-auto min-w-0"></div>
           <div class="seg adv-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
             <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
@@ -521,6 +519,9 @@ const VENTANAS = [
       </section>
 
       <aside class="space-y-5">
+        {/* Carta del líder (ronda 391; desde la 401 va junto a la tabla y no flotando sola en la portada). Colores del club al 55 % (portadaJerarquia.css). */}
+        {FX.pruebaJuego && lider && <div class="pj-solo pj-carta-caja pos-lider" set:html={cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', nombre: lider.nombre, sub: liderClub, cifra: lider.pts, cifraEt: 'Pts', puesto: '1°',
+          escudo: escudoDe(liderClub), colores: CLUBES_VISUAL[liderClub], stats: [['PJ', lider.pj], ['G', lider.g ?? '—'], ['GF', lider.gf ?? '—'], ['GC', lider.gc ?? '—']], forma: forma(edGalaxy, lider.nombre), href: `${base}liga/` })} />}
         <section id="pos-seccion" class="glass-panel rounded-xl overflow-hidden scroll-mt-40">
           <div class="bg-gradient-to-r from-galaxy-900 to-black px-4 py-3 border-b border-galaxy-border flex justify-between items-center">
             <div><h3 id="pos-titulo" class="font-display font-bold text-lg uppercase tracking-wider text-white">Posiciones</h3><p id="pos-sub" hidden class="text-[12px] text-gray-400"></p></div><i class="fa-solid fa-trophy text-galaxy-400"></i>
@@ -563,7 +564,7 @@ const VENTANAS = [
     <!-- 4. JUGADORES DESTACADOS: en celular, carrusel que se desliza de lado -->
     <section id="destacados-seccion" class="space-y-4 scroll-mt-40" hidden={FX.cartasPortada}>
       <div class="flex items-center justify-between">
-        <h2 class="text-lg sm:text-xl font-display font-bold text-white uppercase tracking-wider text-shadow-glow">Jugadores Destacados</h2>
+        <h2 class="tit-n2">Jugadores Destacados</h2>
         <a href={`${base}database/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1.5 border border-galaxy-400/30 bg-galaxy-400/10 px-3 py-1.5 rounded hover:bg-galaxy-400/20 transition-colors">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
       </div>
       <div class="podio" id="featured-players-container"><div class="grid grid-cols-3 gap-3 w-full" role="status" aria-label="Cargando jugadores"><div class="esqueleto h-56"></div><div class="esqueleto h-64"></div><div class="esqueleto h-56"></div></div></div>
