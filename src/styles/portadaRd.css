@@ -39,7 +39,7 @@
 .rd-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 1.5rem; border: 1px solid transparent; cursor: pointer;
   font: 700 .9375rem/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; transition: background-color .2s, border-color .2s, color .2s; }
 .rd-btn-prim { --rd-corte-t: 10px; clip-path: var(--rd-corte); background: var(--rd-purpura); color: #fff; }
-.rd-btn-prim:hover { background: color-mix(in oklab, var(--rd-purpura) 82%, white); }
+.rd-btn-prim:hover { background-color: color-mix(in oklab, var(--rd-purpura) 82%, white); }
 .rd-btn-sec { border-color: var(--rd-linea-fuerte); color: var(--rd-texto); background: transparent; }
 .rd-btn-sec:hover { border-color: var(--rd-texto-2); }
 .rd-btn:focus-visible { outline: 2px solid var(--rd-cian); outline-offset: 3px; }
@@ -63,10 +63,6 @@
 .rd-liga-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
 .rd-liga-partidos { display: grid; gap: 1rem; min-width: 0; }
 .rd-destacado { position: relative; overflow: hidden; min-height: 9rem; background: var(--rd-capa-2); }
-/* lo que pinta central.js trae brillos de la versión anterior: aquí se apagan */
-.rd-destacado :is([class*='drop-shadow'], .text-shadow-glow) { filter: none !important; text-shadow: none !important; }
-.rd-destacado [class*='bg-gradient-to'] { display: none; }
-.rd-destacado [style*='box-shadow'] { box-shadow: none !important; }
 .rd-destacado > .absolute.top-0.right-0 { background: var(--rd-capa-3); color: var(--rd-cian); border-radius: 0; }
 .rd-partidos { display: grid; gap: .5rem; }
 .rd-partidos > .glass-panel { border-radius: var(--rd-radio); }
@@ -156,4 +152,34 @@
 .rd-jugadores .podio { width: 100%; }                            /* dentro de una grilla, margin:auto lo encogía a 0 (cartas como rayitas) */
 .rd-seg.seg { border: 0 !important; border-bottom: 1px solid var(--rd-linea) !important; background: none !important; border-radius: 0 !important; padding: 0 !important; }
 @media (max-width: 1023px) { html .rd-inicio .rd-hero-carta { display: none !important; } }
-.rd-tuclub .tuclub-caja { box-shadow: none !important; }
+
+/* Carta del líder junto a la tabla (columna derecha de la Galaxy League) */
+.rd-liga-lado { display: grid; gap: 1.25rem; align-content: start; min-width: 0; }
+.rd-lider { justify-self: center; width: min(100%, 300px); }
+@media (max-width: 1023px) { .rd-liga-lado { grid-template-columns: 1fr; } }
+
+/* ── MOVIMIENTO (27-oct, Fralex: «le quitaste los efectos 3D, movimiento y dinamismo») ──
+   · las piezas .rd-p3 se inclinan en 3D hacia el mouse (js/features/prof3d.js) y aparecen levantándose al bajar (prof3d.css)
+   · tarjetas de la tira y noticias: suben al pasar el mouse · botones: relleno púrpura → cian que entra de izquierda a derecha (como los botones de juego) */
+@media (prefers-reduced-motion: no-preference) {
+  .rd-p a { transition: transform .35s cubic-bezier(.22, 1, .36, 1), background-color .25s; }
+  .rd-p a:hover { transform: translateY(-3px); }
+  .rd-notas a { transition: transform .35s cubic-bezier(.22, 1, .36, 1); }
+  .rd-notas a:hover { transform: translateX(6px); }
+  .rd-notas img { transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+  .rd-notas a:hover img { transform: scale(1.06); }
+  .rd-campeon { transition: transform .4s cubic-bezier(.22, 1, .36, 1), box-shadow .4s; }
+  .rd-campeon:hover { box-shadow: 0 18px 40px -20px color-mix(in oklab, var(--rd-cian) 60%, transparent); }
+  .rd-btn { background-image: linear-gradient(90deg, var(--rd-purpura), var(--rd-cian)); background-repeat: no-repeat; background-size: 0% 100%;
+    transition: background-size .35s cubic-bezier(.22, 1, .36, 1), translate .25s cubic-bezier(.22, 1, .36, 1), border-color .2s, color .2s; }
+  .rd-btn:hover { background-size: 100% 100%; translate: 0 -2px; }
+  .rd-btn-prim { background-color: var(--rd-purpura); }
+  .rd-btn-sec:hover { color: #fff; border-color: transparent; }
+  .rd-btn:active { translate: 0 0; transition-duration: .1s; }
+  .rd-tira-carril .rd-p { animation: rd-entra .6s cubic-bezier(.22, 1, .36, 1) both; }
+  .rd-tira-carril .rd-p:nth-child(2) { animation-delay: .04s; } .rd-tira-carril .rd-p:nth-child(3) { animation-delay: .08s; } .rd-tira-carril .rd-p:nth-child(4) { animation-delay: .12s; }
+  .rd-tira-carril .rd-p:nth-child(5) { animation-delay: .16s; } .rd-tira-carril .rd-p:nth-child(6) { animation-delay: .2s; } .rd-tira-carril .rd-p:nth-child(n + 7) { animation-delay: .24s; }
+  .rd-p-prox small::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 5px; vertical-align: 1px; background: currentColor; transform: rotate(45deg); animation: rd-late 1.6s ease-in-out infinite; }
+}
+@keyframes rd-entra { from { opacity: 0; transform: translateY(10px); } }
+@keyframes rd-late { 50% { opacity: .35; } }

@@ -78,7 +78,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     {import.meta.env.PUBLIC_PREVIEW && <div class="fase-beta-cinta" role="note" aria-label={`Fase beta ${VERSION_BETA}: versión privada de pruebas, generada el ${HORA_BUILD}`} title={`Generada el ${HORA_BUILD} (hora de Lima)`}><i class="fa-solid fa-flask"></i> <b>Fase beta {VERSION_BETA}</b><span class="fbc-largo"> · {HORA_BUILD}</span></div>}
     <div class="sticky top-0 z-50 flex flex-col pointer-events-none">
       <Header active={active} />
-      {!FX.rediseno && <Ticker />}
+      <Ticker />
     </div>
     <Sidebar active={active} />
     {FX.barraLateral && <BarraLateral active={active} />}

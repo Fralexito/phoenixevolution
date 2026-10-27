@@ -109,7 +109,7 @@ const VENTANAS = [
 ];
 ---
 <Layout title="Inicio" active="central" description="Phoenix Evolution Series: liga competitiva de PES 2021 y Football Life 2026 por Parsec, con torneos, duelos, Liga Máster y comunidad.">
-  {FX.rediseno ? (<PortadaRd edGalaxy={edGalaxy} clubesG={clubesG} lider={lider} liderClub={liderClub} campeones={CAMPEONES} discord={discord} />) : (<Fragment>
+  {FX.rediseno && <PortadaRd parte="tira" edGalaxy={edGalaxy} clubesG={clubesG} />}
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
   <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', ESC && 'portada-esc', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx', FX.limpio && FX.portada && FX.elite && FX.transmision && FX.estiloFC && 'portada-fc']} data-portada>
     <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-galaxy-600/20 rounded-full blur-[130px] pointer-events-none"></div>
@@ -394,6 +394,7 @@ const VENTANAS = [
   </section>
   </Fragment>)}
   </header>
+  {FX.rediseno ? (<PortadaRd parte="cuerpo" edGalaxy={edGalaxy} clubesG={clubesG} lider={lider} liderClub={liderClub} campeones={CAMPEONES} discord={discord} />) : (<Fragment>
 
   <!-- TU CLUB (19-oct-2026): lo más exclusivo de la web, a la vista nada más entrar. Con club: tu escudo, presupuesto, ofertas y atajos;
        con sesión sin club: invitación a elegir uno; sin sesión: qué puedes hacer con tu club de PES. Lo pinta js/features/portada/tuClub.js. -->

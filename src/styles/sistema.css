@@ -38,30 +38,13 @@
   color-scheme: dark;
 }
 
-/* ── 1 · LIENZO: noche azul con UNA luz arriba (la «luz» de la Champions, quieta) ── */
-:root[data-rediseno], :root[data-rediseno] body { background-color: var(--rd-noche); }
-:root[data-rediseno] body {
-  background-image: radial-gradient(70rem 26rem at 50% -8rem, color-mix(in oklab, var(--rd-purpura) 26%, transparent), transparent 70%),
-    radial-gradient(40rem 18rem at 78% -4rem, color-mix(in oklab, var(--rd-cian) 12%, transparent), transparent 70%);
-  background-attachment: scroll; background-repeat: no-repeat;
-  color: var(--rd-texto);
-}
-
-/* ── 2 · FUERA LO «GENÉRICO / DE IA»: brillos, vidrio, texto degradado, orbes borrosos, estrellas ── */
-:root[data-rediseno] .text-shadow-glow { text-shadow: none; }
-:root[data-rediseno] .bg-clip-text.text-transparent { background: none !important; color: var(--rd-cian) !important; -webkit-text-fill-color: currentColor; }
-:root[data-rediseno] :is(.hero-brillo, .hero-aurora, .esc-luz, .vt-estrellas) { display: none !important; }
-:root[data-rediseno] .glass-panel {
-  background: var(--rd-capa-1); border: 1px solid var(--rd-linea); box-shadow: none;
-  -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: var(--rd-radio);
-}
-:root[data-rediseno] .premium-glass { background: var(--rd-capa-1); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* ── 1 y 2 · AMBIENTE GALAXIA: se queda el de siempre (27-oct, Fralex: «le quitaste cosas que le daban identidad»).
+   El fondo con luces púrpura/cian, los brillos neón, el cielo de estrellas, la aurora, el vidrio y «Galaxy» en degradado son de la marca. ── */
 
 /* ── 3 · CABECERA (estilo Champions: barra sólida, logo a la izquierda, 5 destinos en mayúsculas con raya debajo) ── */
 :root[data-rediseno] body > .sticky > nav.glass-panel {
   background: color-mix(in oklab, var(--rd-noche) 94%, transparent); border: 0; border-bottom: 1px solid var(--rd-linea); border-radius: 0; box-shadow: none;
 }
-:root[data-rediseno] .logo-group > span:first-child { border-color: var(--rd-linea-fuerte); box-shadow: none; }
 :root[data-rediseno] .nav-link {
   position: relative; display: inline-flex; align-items: center; gap: .45rem; height: var(--rd-cab); padding: 0 .9rem;
   font: 600 .95rem/1 var(--font-display); letter-spacing: .08em; color: var(--rd-texto-2);
@@ -72,7 +55,6 @@
 :root[data-rediseno] .nav-link[aria-current='page']::after { content: ''; position: absolute; left: .9rem; right: .9rem; bottom: 0; height: 3px; background: var(--rd-cian); }
 :root[data-rediseno] .nav-joya, :root[data-rediseno] .nav-joya[aria-current='page'] { color: var(--rd-oro); }
 :root[data-rediseno] .nav-joya[aria-current='page']::after { background: var(--rd-oro); }
-:root[data-rediseno] .nav-joya-brillo { display: none; }
 :root[data-rediseno] .nav-inicio-txt { display: inline; }
 /* Desplegables: panel sólido de capa 2, sin vidrio */
 :root[data-rediseno] .pilar-panel { background: var(--rd-capa-2); border: 1px solid var(--rd-linea); box-shadow: 0 24px 48px -16px rgb(0 0 0 / .7); -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -95,13 +77,10 @@
   :root[data-rediseno] .bi-item { color: var(--rd-texto-3); text-transform: none; letter-spacing: .02em; font-size: 12px; }
   :root[data-rediseno] .bi-item i { font-size: 1.4rem; }
   :root[data-rediseno] .bi-item[aria-current='page'] { color: var(--rd-texto); }
-  :root[data-rediseno] .bi-item.bi-joya { color: var(--rd-oro); }
-  :root[data-rediseno] .bi-item.bi-joya i { width: 1em; height: 1em; margin: 0; font-size: 1.4rem; color: var(--rd-oro); background: currentColor; border: 0; box-shadow: none; }
-  :root[data-rediseno] .bi-item.bi-joya[aria-current='page']::before { display: block; background: var(--rd-oro); }
+    /* Mi club conserva su moneda dorada (identidad); solo cambia el icono por el propio */
 }
 
-/* ── 6 · MENOS CAPAS FIJAS: el botón flotante «En vivo» se va (lo en vivo vive en Jugar → En vivo y en la tira de partidos) ── */
-:root[data-rediseno] #live-wrap { display: none !important; }
+/* ── 6 · El botón flotante «En vivo» y la cinta «Última hora» se quedan (identidad). ── */
 
 /* ── 7 · TÍTULO DE PÁGINA: uno, igual en toda la web ── */
 :root[data-rediseno] main h1:not(.vt-tit):not(.rd-libre) { font: var(--rd-t-pagina); letter-spacing: .02em; text-transform: uppercase; color: var(--rd-texto); text-shadow: none; }

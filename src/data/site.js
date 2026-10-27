@@ -37,7 +37,7 @@ export const BARRA_INFERIOR = [
   { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts', 'draft', 'prode', 'repeticiones'], t: 'Jugar', path: 'duelos/', ph: 'game-controller', px: 'jugar' },
   { id: ['liga', 'ligaamigos', 'competiciones', 'unirme', 'torneos', 'formatos', 'palmares', 'premios', 'historial', 'ranking', 'database'], t: 'Liga', path: 'liga/', ph: 'trophy', px: 'liga' },
   { id: ['social', 'chatgeneral', 'noticias', 'jugadas', 'clanes', 'eventos', 'creadores', 'tienda', 'organizadores'], t: 'Comunidad', path: 'social/', ph: 'users', px: 'comunidad' },
-  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', px: 'club', joya: true },
+  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true }   // sin icono propio: conserva la moneda dorada,
 ];
 
 // Apoyo voluntario a la comunidad (tipo «invítanos un café»). Vacío = no se muestra el botón. Pon aquí el enlace cuando lo tengas (solo https).

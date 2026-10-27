@@ -10,7 +10,7 @@ import { FX } from '../../data/experimento.js';
 import { hayMovimientoReducido } from './ajustes.js';
 import { inclinacion } from '../core/sistema/inclinacion.js';
 
-const OBJETIVOS = '.glass-panel, .liga-card, .player-card, .match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido, .accion, .campeones, .cierre, [data-pub], .cat-item, .lanza';
+const OBJETIVOS = '.glass-panel, .liga-card, .player-card, .match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido, .accion, .campeones, .cierre, [data-pub], .cat-item, .lanza, .rd-p3';   // .rd-p3 = piezas del rediseño
 const FUERA = '.vt, .pilar-tabs, .mundos-tabs, [data-no3d], [role="dialog"], dialog, .modal';
 
 export function initProf3d() {

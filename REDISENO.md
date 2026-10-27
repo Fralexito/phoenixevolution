@@ -8,6 +8,16 @@
 - **Inspiración:** la web de la UEFA Champions League (base) + F1, NBA, Linear, Stripe, Netflix, FACEIT, Battlefy, LoL Esports, EA FC.
   Identidad propia: noche Galaxy, Rajdhani, el «corte» a 45° y los iconos propios «Corte» (`data/iconosPhoenix.js` → `node scripts/iconos-phoenix.mjs`).
 
+## 27-oct 15:35 · Vuelve la identidad (pedido de Fralex)
+«Le quitaste cosas que le daban mucha identidad» y «también los efectos 3D y el dinamismo». Vuelven: «Bienvenido a la Galaxy» con
+Galaxy en degradado, las 4 ventanas que giran (con «Empieza en 3 pasos»), el ambiente galaxia (fondo con luces, brillos neón, estrellas,
+vidrio, logo con brillo), la cinta Última hora, el botón flotante En vivo, la moneda dorada de Mi club, la barra lateral (accesos rápidos,
+ligas y amigos) y el chat. Lo nuevo se queda: menú de 5 destinos, tira de partidos ARRIBA de la portada y, DEBAJO de las ventanas,
+los bloques nuevos (Galaxy League con la carta del líder junto a la tabla, Tu club, Campeones, Jugadores, Lo último, Cierre).
+Movimiento: los bloques nuevos se inclinan en 3D con el mouse (clase .rd-p3 en prof3d), aparecen al bajar, la tira entra en cascada,
+los botones se llenan de púrpura a cian y las tarjetas suben al pasar el mouse.
+**Regla para lo que sigue:** NO quitar efectos, brillos ni piezas de identidad; reordenar y sumar, no restar.
+
 ## Fases
 1. **Sistema base** — HECHO: tokens (noche, capas, textos, corte), cabecera estilo Champions con 5 destinos (Inicio · Jugar · Liga ·
    Comunidad · Mi club), sub-menú subrayado, barra de abajo con los mismos 5, iconos propios, fuera brillos/vidrio/texto degradado,

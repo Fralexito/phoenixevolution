@@ -14,7 +14,9 @@ import { tiraPartidos, sigla } from '../../js/core/portada/tira.js';
 import { estadoLiga } from '../../js/core/competicion/pulso.js';
 import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
 import { NOTICIAS } from '../../data/noticias.js';
-const { edGalaxy, clubesG, lider, liderClub, campeones, discord } = Astro.props;
+// parte = 'tira' (va ARRIBA de la portada de siempre) · 'cuerpo' (va DEBAJO de «Bienvenido a la Galaxy» y las 4 ventanas).
+// 27-oct (Fralex: «le quitaste cosas que le daban identidad»): el saludo y las ventanas vuelven; el héroe nuevo se quitó.
+const { parte = 'cuerpo', edGalaxy, clubesG, lider, liderClub, campeones = [], discord } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const fechas = edGalaxy?.fechas ?? [];
 const TIRA = tiraPartidos(fechas, clubesG, { jugados: 6, pendientes: 6 });
@@ -26,9 +28,9 @@ const otras = resto.slice(0, 3);
 const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', nombre: lider.nombre, sub: liderClub, cifra: lider.pts, cifraEt: 'Pts', puesto: '1°',
   escudo: escudoDe(liderClub), colores: CLUBES_VISUAL[liderClub], stats: [['PJ', lider.pj], ['G', lider.g ?? '—'], ['GF', lider.gf ?? '—'], ['GC', lider.gc ?? '—']], forma: forma(edGalaxy, lider.nombre), href: `${base}liga/` }) : '';
 ---
+{parte === 'tira' && TIRA.length > 0 && (
 <div class="rd-inicio">
   <!-- 1 · TIRA DE PARTIDOS: últimos resultados y lo que viene (como la barra de partidos de la Champions) -->
-  {TIRA.length > 0 && (
   <section class="rd-tira" aria-label="Partidos de la Galaxy League">
     <div class="rd-tira-in">
       <a class="rd-tira-liga" href={`${base}liga/`}><b>Galaxy League</b><small>{E.actual ? `Fecha ${E.actual}` : 'Partidos'}</small></a>
@@ -46,25 +48,10 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
       <a class="rd-tira-ver" href={`${base}liga/`}>Ver todo</a>
     </div>
   </section>
-  )}
-
-  <!-- 2 · SALUDO + UNA ACCIÓN (la única pieza púrpura de la pantalla) + la carta del líder como pieza central -->
-  <section class="rd-hero" aria-labelledby="rd-hero-t">
-    <div class="rd-ancho rd-hero-in">
-      <div class="rd-hero-txt">
-        <p class="rd-kicker">Phoenix Evolution Series</p>
-        <h1 id="rd-hero-t" class="rd-hero-tit rd-libre">La liga de <span>PES 2021</span> y Football Life</h1>
-        <p class="rd-hero-sub">Duelos por Parsec, tabla en vivo, torneos y tu club de PES en la web.</p>
-        <div class="rd-cta">
-          <button type="button" class="rd-btn rd-btn-prim solo-invitado" data-crear-cuenta>Crear mi cuenta</button>
-          <a href={`${base}duelos/`} class="rd-btn rd-btn-prim solo-cuenta">Jugar un reto</a>
-          <a href={`${base}liga/`} class="rd-btn rd-btn-sec">Ver la tabla</a>
-        </div>
-        {nota.length > 0 && <p class="rd-hero-nota">{nota.map((t, i) => (<Fragment>{i > 0 && <i aria-hidden="true"></i>}<span>{t}</span></Fragment>))}</p>}
-      </div>
-      {carta && <div class="rd-hero-carta pj-solo" set:html={carta} />}
-    </div>
-  </section>
+</div>
+)}
+{parte === 'cuerpo' && (
+<div class="rd-inicio">
 
   <div class="rd-ancho rd-cuerpo">
     <!-- 3 · GALAXY LEAGUE: partido destacado + fechas (izquierda) y la tabla top 5 (derecha) -->
@@ -79,13 +66,15 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
       </header>
       <div class="rd-liga-grid">
         <div class="rd-liga-partidos">
-          <article id="destacado" class="rd-destacado rd-corte" aria-live="polite">
+          <article id="destacado" class="rd-destacado rd-corte rd-p3" aria-live="polite">
             <div class="p-6 space-y-3" role="status" aria-label="Cargando el partido destacado"><div class="esqueleto h-5 w-1/3 mx-auto"></div><div class="esqueleto h-16"></div></div>
           </article>
           <div id="fecha-nav" hidden></div>
           <div class="rd-partidos" id="matches-container" aria-live="polite"></div>
         </div>
-        <aside class="rd-tabla" id="pos-seccion" aria-labelledby="pos-titulo">
+        <div class="rd-liga-lado">
+        {carta && <div class="rd-lider pj-solo" set:html={carta} />}
+        <aside class="rd-tabla rd-p3" id="pos-seccion" aria-labelledby="pos-titulo">
           <div class="rd-tabla-cab"><div><h3 id="pos-titulo" class="tit-n2">Posiciones</h3><p id="pos-sub" hidden></p></div></div>
           <table>
             <thead><tr><th>Pos</th><th>DT / Club</th><th class="text-center">PJ</th><th class="text-center">Pts</th></tr></thead>
@@ -93,6 +82,7 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
           </table>
           <a class="rd-tabla-ver" href={`${base}liga/`}>Ver tabla completa <i class="fa-solid fa-arrow-right"></i></a>
         </aside>
+        </div>
       </div>
     </section>
 
@@ -104,7 +94,7 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
       <header class="rd-bloque-cab"><div><p class="rd-kicker">Palmarés</p><h2 id="rd-dest-t" class="tit-n1">Campeones vigentes</h2></div><a class="rd-ver" href={`${base}palmares/`}>Ver palmarés <i class="fa-solid fa-arrow-right"></i></a></header>
       <ul class="rd-campeones">
         {campeones.map((c) => (
-          <li class:list={['rd-campeon rd-corte', c.oro && 'oro']}>
+          <li class:list={['rd-campeon rd-corte rd-p3', c.oro && 'oro']}>
             <span class="rd-campeon-esc"><Fragment set:html={escudoHTML(c.club, 56)} /></span>
             <span><small>{c.copa}</small><b>{c.dt}</b><em>{c.club}</em></span>
           </li>
@@ -121,7 +111,7 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
       <header class="rd-bloque-cab"><div><p class="rd-kicker">Comunidad</p><h2 id="rd-com-t" class="tit-n1">Lo último</h2></div><a class="rd-ver" href={`${base}noticias/`}>Todas las noticias <i class="fa-solid fa-arrow-right"></i></a></header>
       {principal && (
       <div class="rd-noticias">
-        <a class="rd-nota-grande rd-corte" href={`${base}noticias/#n-${principal.id}`}>
+        <a class="rd-nota-grande rd-corte rd-p3" href={`${base}noticias/#n-${principal.id}`}>
           {principal.imagen && <img src={principal.imagen} alt="" loading="lazy" decoding="async" />}
           <span class="rd-nota-txt"><small>{principal.categoria} · {principal.fecha}</small><b>{principal.titulo}</b><span>{principal.resumen}</span></span>
         </a>
@@ -139,7 +129,7 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
     </section>
 
     <!-- 7 · CIERRE -->
-    <section class="rd-cierre rd-corte" aria-labelledby="rd-cierre-t">
+    <section class="rd-cierre rd-corte rd-p3" aria-labelledby="rd-cierre-t">
       <div>
         <p class="rd-kicker">Únete</p>
         <h2 id="rd-cierre-t" class="tit-n1">Tu próximo partido empieza aquí</h2>
@@ -153,3 +143,4 @@ const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', n
     </section>
   </div>
 </div>
+)}

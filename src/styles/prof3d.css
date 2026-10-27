@@ -22,7 +22,7 @@ html[data-fx-3d][data-fx-reveal].js main [data-reveal]:has(table):not(.visto) { 
 
 /* …y las tarjetas de adentro se levantan una tras otra (las demoras por posición vienen de dopamina.css) */
 @keyframes p3-tarjeta { from { opacity: 0; transform: perspective(900px) translate3d(0, 34px, -40px) rotateX(-22deg); } }
-html[data-fx-3d] [data-reveal].visto :is(.match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org, .player-card, .accion, .liga-card) {
+html[data-fx-3d] [data-reveal].visto :is(.rd-p3, .match-card, .liga-partido, .item-tienda, .lanza, .cat-item, .pulse-tile, a.slide-card, .liga-org, .player-card, .accion, .liga-card) {
   transform-origin: 50% 100%; animation: p3-tarjeta .75s var(--p3-ease) backwards; }
 
 /* «Unirme»: los pasos del camino también se levantan uno tras otro */
@@ -47,7 +47,7 @@ html[data-fx-3d] .camino-paso:nth-child(n+5) { animation-delay: .55s; }
 
 /* 3 · Inclinación hacia el mouse (--p3x/--p3y y [data-p3] los pone js/features/prof3d.js; solo con mouse) */
 @media (hover: hover) and (pointer: fine) {
-  html[data-fx-3d] main :is(.glass-panel, .liga-card, .player-card, .match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido, .accion, .campeones, .cierre, [data-pub], .cat-item, .lanza) {
+  html[data-fx-3d] main :is(.glass-panel, .liga-card, .player-card, .match-card, .pulse-tile, a.slide-card, .liga-org, .item-tienda, .liga-partido, .accion, .campeones, .cierre, [data-pub], .cat-item, .lanza, .rd-p3) {
     transition: transform .5s var(--p3-ease), box-shadow .5s var(--p3-ease), border-color .25s; }
   html[data-fx-3d] main [data-p3] { transform: perspective(1000px) rotateX(var(--p3x, 0deg)) rotateY(var(--p3y, 0deg)) translate3d(0, -3px, 0); transition-duration: .14s, .4s, .25s;
     box-shadow: 0 22px 44px -22px rgb(0 0 0 / .75), 0 0 0 1px color-mix(in srgb, var(--color-galaxy-400) 16%, transparent); }
