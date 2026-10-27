@@ -246,6 +246,14 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Para la Cuenta 1 (Link):** contratos `docs/web-pes-link/CONTRATO-TORNEOS-LINK.md` y `CONTRATO-GOLES-LINK.md` (las dos rutas ya están en línea).
 - **Candados:** Web y Supabase libres.
 
+### 2026-10-27 15:30 (Lima) · Cuenta 2 · Rediseño completo en rama aparte (rediseno-web)
+- **Hecho:** rama `rediseno-web` (copia de borrador) publicada en `/phoenixevolution/fase-rediseno/`. `deploy.yml` de borrador la compila
+  si existe (si falla, lo demás se publica igual). Para publicar un cambio de esa rama: `gh workflow run deploy.yml --ref borrador`.
+  OJO: ya existía una rama vieja `rediseno` (ronda ~223); NO se tocó.
+- **En la rama:** fases 1 y 2 del plan (sistema base estilo Champions con identidad Phoenix, menú de 5 destinos, iconos propios «Corte»,
+  Inicio nuevo). Detalle en `REDISENO.md` de esa rama. Nada pasa a borrador/main sin «Súbelo».
+- **Candados:** Web: el rediseño lo lleva la Cuenta 2 en `rediseno-web`; `borrador` libre. Siguiente migración: **161**.
+
 ### 2026-10-27 00:20 (Lima) · Cuenta 2 · Jerarquía visual de la portada (pedido de Frank) — betas 1.39.0 → 1.40.0
 - **Hecho:** rondas 397–401, una por paso (botón principal, título/altura, Mi Club primero, un solo ancho, títulos en 3 niveles). Detalle en
   FUNCIONES-NUEVAS (sección «Portada con jerarquía visual»). Capturas enviadas para que Frank apruebe; cada paso es un commit aparte (se puede revertir solo).
