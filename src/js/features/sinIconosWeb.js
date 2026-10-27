@@ -2,6 +2,7 @@
 // flechas, chevrones, ✕, ✓, +, − y los iconos de botones que no tienen texto. En la barra lateral, el icono pasa a ser un monograma (2 letras).
 // Se apaga con FX.sinIconosWeb = false (reconstruir). Excluir algo a propósito: data-ico-keep.
 import { FA_A_PH } from '../../data/iconosFinos.js';
+import { FA_A_PHX } from '../../data/iconosPhoenix.js';   // rediseño 27-oct-2026: iconos propios «Corte» primero
 const MANTENER = /fa-(chevron|arrow|angle|caret|xmark|check|plus|minus|spinner|circle-notch|rotate|ellipsis|bars|eye|eye-slash|grip|heart)\b/;
 const SELECTOR = 'i.fa-solid:not([data-ico]), i.fa-regular:not([data-ico])';
 // ¿Tiene texto VISIBLE? (el texto solo para lectores de pantalla, .sr-only, no cuenta: ese botón es de solo icono)
@@ -15,8 +16,10 @@ function revisar(raiz) {
   raiz.querySelectorAll(SELECTOR).forEach((i) => {
     i.dataset.ico = '1';
     if (i.closest('[data-ico-keep]')) return;
-    if (MANTENER.test(i.className)) return;                                // flechas, ✕, ✓…: se quedan como están
     const fa = [...i.classList].find((c) => c.startsWith('fa-') && c !== 'fa-solid' && c !== 'fa-regular');
+    const px = fa && FA_A_PHX[fa.slice(3)];
+    if (px) { i.classList.remove('fa-solid', 'fa-regular', fa); i.classList.add('pxi', `pxi-${px}`); return; }   // icono propio de Phoenix
+    if (MANTENER.test(i.className)) return;                                // flechas, ✕, ✓… sin equivalente propio: se quedan como están
     const ph = fa && FA_A_PH[fa.slice(3)];
     if (ph) { i.classList.remove('fa-solid', 'fa-regular', fa); i.classList.add('ph-bold', `ph-${ph}`, 'ico-fino'); return; }  // cambio por icono fino
     const item = i.closest('.barra-item');

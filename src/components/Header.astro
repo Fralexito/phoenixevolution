@@ -19,7 +19,7 @@ const pilarActual = pilarDe(active)?.id;
     </a>
 
     <div class="hidden lg:flex items-center gap-1 font-display text-[0.95rem] xl:text-[1.05rem] ml-auto">
-      {FX.pilares && <a href={base} class="nav-link" aria-current={active === 'central' ? 'page' : undefined} title="Inicio"><i class="fa-solid fa-house text-[.85em]"></i><span class="sr-only">Inicio</span></a>}
+      {FX.pilares && <a href={base} class="nav-link" aria-current={active === 'central' ? 'page' : undefined} title="Inicio"><i class="fa-solid fa-house text-[.85em]"></i><span class:list={[FX.rediseno ? "nav-inicio-txt" : "sr-only"]}>Inicio</span></a>}
       {FX.pilares ? PILARES.map((p) => (
         p.destacado
           // Mi club (19-oct-2026): la joya de la web. Va directo a su ecosistema (sin desplegable) y con su propio brillo dorado.

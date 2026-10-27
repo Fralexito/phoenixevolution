@@ -7,7 +7,7 @@ const base = import.meta.env.BASE_URL;
 <nav class="barra-inf" aria-label="Navegación rápida">
   {ITEMS.map((n) => (
     <a href={`${base}${n.path}`} class:list={['bi-item', n.joya && 'bi-joya']} aria-current={n.id.includes(active) ? 'page' : undefined}>
-      <i class={`ph-bold ph-${n.ph}`} aria-hidden="true"></i><span>{n.t}</span>
+      <i class={n.px ? `pxi pxi-${n.px}` : `ph-bold ph-${n.ph}`} aria-hidden="true"></i><span>{n.t}</span>
     </a>
   ))}
 </nav>

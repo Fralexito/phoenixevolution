@@ -38,6 +38,7 @@
 @import './sinIconosWeb.css';
 /* Phosphor Bold RECORTADO a los iconos de data/iconosFinos.js (147 KB → ~20 KB). Icono nuevo: node tools/iconos/recortar-iconos.mjs */
 @import './iconos/phosphor-bold.css';
+@import './iconos/phoenix.css';   /* rediseño: iconos propios «Corte» (scripts/iconos-phoenix.mjs) */
 @import './modoLigero.css';
 @import './pasada.css';
 
@@ -51,3 +52,4 @@ main.flex-grow { min-height: 100vh; }
 @import './calendario.css';   /* ventana «Añadir a mi calendario» */
 @import './pruebaJuego.css';   /* ronda 391: PRUEBA botones y cartas de juego (solo con <html data-prueba-juego>) */
 @import './responsivo.css';   /* ronda 392: arreglos de pantallas chicas (cabecera sin sesión, «Tu club»…) */
+@import './sistema.css';   /* REDISEÑO (rama rediseno-web): sistema base inspirado en la Champions; todo bajo html[data-rediseno]. Va el ÚLTIMO. */

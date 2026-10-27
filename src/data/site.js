@@ -31,12 +31,13 @@ export const NAV_EXTRA = [
 
 // Barra fija de abajo en el celular (components/BarraInferior.astro). 19-oct-2026 (Fralex): por lo que más importa en la web. MI CLUB en el centro
 // y destacado (la joya: gestionar a los jugadores de tu PES), a sus lados la red social y jugar. La Red de enlaces del celular NO repite estos accesos.
+// REDISEÑO (27-oct-2026): los MISMOS 5 destinos y en el MISMO orden que el menú de arriba (lo personal va en el avatar de la cabecera).
 export const BARRA_INFERIOR = [
-  { id: ['central'], t: 'Inicio', path: '', ph: 'house' },
-  { id: ['social', 'chatgeneral', 'noticias', 'jugadas'], t: 'Social', path: 'social/', ph: 'globe-hemisphere-west' },
-  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true },
-  { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts'], t: 'Jugar', path: 'duelos/', ph: 'game-controller' },
-  { id: ['muro', 'perfil'], t: 'Yo', path: 'perfil/', ph: 'user' },
+  { id: ['central'], t: 'Inicio', path: '', ph: 'house', px: 'inicio' },
+  { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts', 'draft', 'prode', 'repeticiones'], t: 'Jugar', path: 'duelos/', ph: 'game-controller', px: 'jugar' },
+  { id: ['liga', 'ligaamigos', 'competiciones', 'unirme', 'torneos', 'formatos', 'palmares', 'premios', 'historial', 'ranking', 'database'], t: 'Liga', path: 'liga/', ph: 'trophy', px: 'liga' },
+  { id: ['social', 'chatgeneral', 'noticias', 'jugadas', 'clanes', 'eventos', 'creadores', 'tienda', 'organizadores'], t: 'Comunidad', path: 'social/', ph: 'users', px: 'comunidad' },
+  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', px: 'club', joya: true },
 ];
 
 // Apoyo voluntario a la comunidad (tipo «invítanos un café»). Vacío = no se muestra el botón. Pon aquí el enlace cuando lo tengas (solo https).
@@ -154,30 +155,25 @@ const conBloques = (id, label, icon, bloques, extra = {}) => {
   return { id, label, icon, ...extra, bloques: bs, items: bs.flatMap((b) => b.items) };
 };
 const PILARES_REPARTO = [
-  // 19-oct-2026 (Fralex): orden del menú por lo que más importa en la web. Primero MI CLUB (gestionar a los jugadores de tu PES desde la web:
-  // «lo más exclusivo que tengo»), destacado con su propio estilo (`destacado`); luego la red social, jugar en vivo y las competiciones.
-  // «Competiciones» queda organizada igual (le gusta así). Mi club tiene su propio ecosistema (manager.astro) con su navegación interna.
-  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>miclub', 'mercado'] : ['manager', 'miclub', 'mercado'], { lema: 'Tu club, tus fichajes, tu vestuario', destacado: true }),
-  conBloques('comunidad', 'Comunidad', 'fa-people-group', [
-    ['Conversar', ['social', 'chatgeneral', 'noticias']],
-    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda', 'organizadores']],
-  ], { lema: 'La gente y lo que se dice' }),
+  // REDISEÑO (27-oct-2026, inspiración Champions): 5 destinos iguales en PC y celular — Inicio · Jugar · Liga · Comunidad · Mi club.
+  // «Competiciones» pasa a llamarse «Liga» y absorbe «Jugadores» (la tabla, los jugadores y los campeones viven juntos, como en UEFA).
   conBloques('jugar', 'Jugar', 'fa-gamepad', [
     ['Partidos', ['duelos', 'ahora>envivo', 'hosts', 'missalas']],
-    ['Juegos de la comunidad', ['prode', 'draft', 'repeticiones']],   // 25-oct-2026: funciones nuevas 6 y 8
+    ['Juegos de la comunidad', ['prode', 'draft', 'repeticiones']],
   ], { lema: 'Lo que haces tú, ahora' }),
-  // Ronda 250 (pedido de Fralex): UNA sola sección «Competiciones» con Ligas, Torneos, Palmarés, Formatos y Crear.
-  // «Ligas» abarca la página de Liga y la de copas oficiales (competiciones). Debajo, las estadísticas.
-  // Ronda 302: el menú muestra solo 3 entradas (cada una abre un GRUPO) y las pestañas de abajo enseñan las páginas de ese grupo.
-  conBloques('competir', 'Competiciones', 'fa-trophy', [
+  conBloques('competir', 'Liga', 'fa-trophy', [
     ['Ligas', ['liga', 'ligaamigos', 'competiciones', 'unirme'], { compacto: true, icon: 'fa-crown', desc: 'Tablas, todas las ligas y cómo unirte' }],
     ['Torneos', ['torneos>formatos',
       { id: 'crearliga', label: 'Crear', path: 'crear-liga/', icon: 'fa-circle-plus', desc: 'Tu liga lista en 30 segundos', staff: 'editarLiga' },
       { id: 'crear', label: 'Crear', path: 'torneos/#crear', icon: 'fa-circle-plus', desc: 'Arma tu propia competición en minutos', noStaff: 'editarLiga' }], { compacto: true, icon: 'fa-sitemap', desc: 'Juega uno, crea el tuyo o mira los formatos' }],
-    ['Campeones', ['palmares', ...(FX.premios ? ['premios'] : []), 'historial', 'ranking', ...(FX.carruseles ? [] : ['database'])], { compacto: true, icon: 'fa-medal', desc: 'Palmarés, premios, historial y ranking' }],
-  ], { lema: 'Ligas, torneos y campeones' }),
-  // Ronda 252: «Jugadores» (las cartas y estadísticas de todos) sube a botón propio del menú: es de lo más visitado.
-  ...(FX.carruseles ? [pilar('jugadores', 'Jugadores', 'fa-id-card', ['database'], { lema: 'Las cartas de todos los jugadores' })] : []),
+    ['Jugadores', ['database'], { compacto: true, icon: 'fa-id-card', desc: 'Las cartas y estadísticas de todos' }],
+    ['Campeones', ['palmares', ...(FX.premios ? ['premios'] : []), 'historial', 'ranking'], { compacto: true, icon: 'fa-medal', desc: 'Palmarés, premios, historial y ranking' }],
+  ], { lema: 'Ligas, torneos, jugadores y campeones' }),
+  conBloques('comunidad', 'Comunidad', 'fa-people-group', [
+    ['Conversar', ['social', 'chatgeneral', 'noticias']],
+    ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda', 'organizadores']],
+  ], { lema: 'La gente y lo que se dice' }),
+  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>miclub', 'mercado'] : ['manager', 'miclub', 'mercado'], { lema: 'Tu club, tus fichajes, tu vestuario', destacado: true }),
 ];
 const PILARES_ANTES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),

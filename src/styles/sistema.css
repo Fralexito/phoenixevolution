@@ -1,0 +1,117 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+   SISTEMA DEL REDISEÑO (rama rediseno-web, 27-oct-2026). Todo vive bajo <html data-rediseno> (FX.rediseno en data/experimento.js):
+   si se apaga, la web vuelve a ser la de borrador tal cual.
+   Inspiración principal: la web de la UEFA Champions League (noche azul, luz en vez de brillos, títulos grandes y espaciados,
+   tira de partidos, tablas limpias, mucho aire). Identidad propia de Phoenix:
+     · colores Galaxy (cian = datos y enlaces, púrpura = LA acción principal, dorado = Mi club y campeones)
+     · letra Rajdhani para títulos, Inter para leer
+     · el «CORTE»: esquinas en 45° (como los botones inclinados y los iconos propios) en vez del «starball» de UEFA
+   Reglas (ver el informe «Investigación y plan de reestructuración»): 1 acción fuerte por pantalla, 3 niveles de título,
+   anchos de 72rem, espacios de 8 en 8, superficies por capas de tono (sin brillos, sin vidrio, sin texto degradado).
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+:root[data-rediseno] {
+  /* Noche: capas de tono, de la más profunda a la más cercana */
+  --rd-noche: #080a22;
+  --rd-capa-1: #0e1233;
+  --rd-capa-2: #151a42;
+  --rd-capa-3: #1d2353;
+  --rd-linea: rgb(170 180 255 / .12);
+  --rd-linea-fuerte: rgb(170 180 255 / .22);
+  /* Texto */
+  --rd-texto: #f2f3ff;
+  --rd-texto-2: #b8bde3;
+  --rd-texto-3: #8b91c0;
+  /* Marca */
+  --rd-cian: var(--color-galaxy-400, #00e5ff);
+  --rd-purpura: var(--color-galaxy-600, #8000ff);
+  --rd-oro: var(--color-gold-400, #fbbf24);
+  /* Corte: esquinas a 45° (firma visual de Phoenix) */
+  --rd-corte-t: 14px;
+  --rd-corte: polygon(0 0, calc(100% - var(--rd-corte-t)) 0, 100% var(--rd-corte-t), 100% 100%, var(--rd-corte-t) 100%, 0 calc(100% - var(--rd-corte-t)));
+  /* Medidas */
+  --rd-ancho: 72rem;
+  --rd-radio: 10px;
+  --rd-cab: 64px;
+  /* Títulos de página (los 3 niveles de sección están en tokens.css: --tit-n1/2/3) */
+  --rd-t-pagina: 700 clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem)/1.05 var(--font-display);
+  color-scheme: dark;
+}
+
+/* ── 1 · LIENZO: noche azul con UNA luz arriba (la «luz» de la Champions, quieta) ── */
+:root[data-rediseno], :root[data-rediseno] body { background-color: var(--rd-noche); }
+:root[data-rediseno] body {
+  background-image: radial-gradient(70rem 26rem at 50% -8rem, color-mix(in oklab, var(--rd-purpura) 26%, transparent), transparent 70%),
+    radial-gradient(40rem 18rem at 78% -4rem, color-mix(in oklab, var(--rd-cian) 12%, transparent), transparent 70%);
+  background-attachment: scroll; background-repeat: no-repeat;
+  color: var(--rd-texto);
+}
+
+/* ── 2 · FUERA LO «GENÉRICO / DE IA»: brillos, vidrio, texto degradado, orbes borrosos, estrellas ── */
+:root[data-rediseno] .text-shadow-glow { text-shadow: none; }
+:root[data-rediseno] .bg-clip-text.text-transparent { background: none !important; color: var(--rd-cian) !important; -webkit-text-fill-color: currentColor; }
+:root[data-rediseno] :is(.hero-brillo, .hero-aurora, .esc-luz, .vt-estrellas) { display: none !important; }
+:root[data-rediseno] .glass-panel {
+  background: var(--rd-capa-1); border: 1px solid var(--rd-linea); box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: var(--rd-radio);
+}
+:root[data-rediseno] .premium-glass { background: var(--rd-capa-1); -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* ── 3 · CABECERA (estilo Champions: barra sólida, logo a la izquierda, 5 destinos en mayúsculas con raya debajo) ── */
+:root[data-rediseno] body > .sticky > nav.glass-panel {
+  background: color-mix(in oklab, var(--rd-noche) 94%, transparent); border: 0; border-bottom: 1px solid var(--rd-linea); border-radius: 0; box-shadow: none;
+}
+:root[data-rediseno] .logo-group > span:first-child { border-color: var(--rd-linea-fuerte); box-shadow: none; }
+:root[data-rediseno] .nav-link {
+  position: relative; display: inline-flex; align-items: center; gap: .45rem; height: var(--rd-cab); padding: 0 .9rem;
+  font: 600 .95rem/1 var(--font-display); letter-spacing: .08em; color: var(--rd-texto-2);
+}
+:root[data-rediseno] .nav-link :is(i, .pxi) { opacity: 1; margin: 0; font-size: 1.05rem; }
+:root[data-rediseno] .nav-link:hover { color: var(--rd-texto); }
+:root[data-rediseno] .nav-link[aria-current='page'] { color: var(--rd-texto); }
+:root[data-rediseno] .nav-link[aria-current='page']::after { content: ''; position: absolute; left: .9rem; right: .9rem; bottom: 0; height: 3px; background: var(--rd-cian); }
+:root[data-rediseno] .nav-joya, :root[data-rediseno] .nav-joya[aria-current='page'] { color: var(--rd-oro); }
+:root[data-rediseno] .nav-joya[aria-current='page']::after { background: var(--rd-oro); }
+:root[data-rediseno] .nav-joya-brillo { display: none; }
+:root[data-rediseno] .nav-inicio-txt { display: inline; }
+/* Desplegables: panel sólido de capa 2, sin vidrio */
+:root[data-rediseno] .pilar-panel { background: var(--rd-capa-2); border: 1px solid var(--rd-linea); box-shadow: 0 24px 48px -16px rgb(0 0 0 / .7); -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* ── 4 · SUB-MENÚ de cada destino (como las pestañas de la Champions: Partidos · Tabla · Estadísticas…) ── */
+:root[data-rediseno] .pilar-tabs { max-width: none; margin: 0; padding: 0 max(1rem, calc((100% - var(--rd-ancho)) / 2)); gap: 0; border-bottom: 1px solid var(--rd-linea); background: var(--rd-capa-1); }
+:root[data-rediseno] .pilar-tabs-tit { display: none; }
+:root[data-rediseno] .pilar-tabs-lista { gap: 0; }
+:root[data-rediseno] .pilar-tabs-lista a { position: relative; display: inline-flex; align-items: center; gap: .4rem; height: 48px; padding: 0 1rem; border: 0; border-radius: 0; background: none;
+  font: 600 .875rem/1 var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: var(--rd-texto-2); white-space: nowrap; }
+:root[data-rediseno] .pilar-tabs-lista a :is(i, .pxi) { display: none; }
+:root[data-rediseno] .pilar-tabs-lista a:hover { color: var(--rd-texto); background: none; }
+:root[data-rediseno] .pilar-tabs-lista a[aria-current='page'] { color: var(--rd-texto); background: none; }
+:root[data-rediseno] .pilar-tabs-lista a[aria-current='page']::after { content: ''; position: absolute; left: 1rem; right: 1rem; bottom: 0; height: 3px; background: var(--rd-cian); }
+:root[data-rediseno] .pilar-sep { width: 1px; height: 20px; margin: 0 .25rem; background: var(--rd-linea); }
+
+/* ── 5 · BARRA DE ABAJO (celular): los mismos 5 destinos; Mi club dorado pero sin «moneda» flotante ── */
+@media (max-width: 767.98px) {
+  :root[data-rediseno] .barra-inf { background: var(--rd-noche); -webkit-backdrop-filter: none; backdrop-filter: none; border-top: 1px solid var(--rd-linea); }
+  :root[data-rediseno] .bi-item { color: var(--rd-texto-3); text-transform: none; letter-spacing: .02em; font-size: 12px; }
+  :root[data-rediseno] .bi-item i { font-size: 1.4rem; }
+  :root[data-rediseno] .bi-item[aria-current='page'] { color: var(--rd-texto); }
+  :root[data-rediseno] .bi-item.bi-joya { color: var(--rd-oro); }
+  :root[data-rediseno] .bi-item.bi-joya i { width: 1em; height: 1em; margin: 0; font-size: 1.4rem; color: var(--rd-oro); background: currentColor; border: 0; box-shadow: none; }
+  :root[data-rediseno] .bi-item.bi-joya[aria-current='page']::before { display: block; background: var(--rd-oro); }
+}
+
+/* ── 6 · MENOS CAPAS FIJAS: el botón flotante «En vivo» se va (lo en vivo vive en Jugar → En vivo y en la tira de partidos) ── */
+:root[data-rediseno] #live-wrap { display: none !important; }
+
+/* ── 7 · TÍTULO DE PÁGINA: uno, igual en toda la web ── */
+:root[data-rediseno] main h1:not(.vt-tit):not(.rd-libre) { font: var(--rd-t-pagina); letter-spacing: .02em; text-transform: uppercase; color: var(--rd-texto); text-shadow: none; }
+
+/* ── 8 · ICONOS: los propios («Corte») heredan el color del texto; los de Phosphor que quedan, más finos de peso ── */
+:root[data-rediseno] .pxi { vertical-align: -0.14em; }
+
+/* ── 9 · Utilidades del sistema (las usan las plantillas nuevas) ── */
+:root[data-rediseno] .rd-ancho { width: 100%; max-width: var(--rd-ancho); margin-inline: auto; padding-inline: 1rem; }
+:root[data-rediseno] .rd-corte { clip-path: var(--rd-corte); }
+:root[data-rediseno] .rd-kicker { font: var(--tit-n3); letter-spacing: var(--tit-n3-track); text-transform: uppercase; color: var(--rd-cian); }
+/* El botón del destino actual no lleva relleno ni forma: solo la raya de abajo */
+:root[data-rediseno] .nav-link[aria-current='page'], :root[data-rediseno] .pilar-btn[aria-current='page'] { background: none !important; background-image: none !important; clip-path: none !important; }

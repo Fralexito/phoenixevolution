@@ -1,0 +1,155 @@
+---
+// INICIO del rediseño (rama rediseno-web, fase 2). Plantilla «Portada»: 7 bloques en el mismo orden en PC y celular.
+//   1 Tira de partidos · 2 Saludo + UNA acción · 3 Galaxy League (partido destacado, fechas y tabla top 5) · 4 Tu club
+//   5 Destacados (campeones y jugadores) · 6 Comunidad (noticia grande + 3 chicas + lo vivo de hoy) · 7 Cierre
+// Inspiración: la portada de la Champions (tira de partidos, héroe con una sola pieza grande, tabla limpia, mucho aire),
+// con identidad Phoenix (noche Galaxy, Rajdhani, el «corte» a 45°). Estilos: styles/portadaRd.css.
+// IMPORTANTE: los id de este archivo los usa js/pages/central.js (destacado, matches-container, seg-partidos, fecha-nav,
+// mini-table-container, pos-titulo, pos-sub, featured-players-container). No cambiarlos sin cambiar central.js.
+import '../../styles/portadaRd.css';
+import { escudoHTML, escudoDe } from '../../js/core/sistema/escudos.js';
+import { cartaJuegoHTML } from '../../js/core/sistema/cartaJuego.js';
+import { forma } from '../../js/core/portada/demoDatos.js';
+import { tiraPartidos, sigla } from '../../js/core/portada/tira.js';
+import { estadoLiga } from '../../js/core/competicion/pulso.js';
+import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
+import { NOTICIAS } from '../../data/noticias.js';
+const { edGalaxy, clubesG, lider, liderClub, campeones, discord } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const fechas = edGalaxy?.fechas ?? [];
+const TIRA = tiraPartidos(fechas, clubesG, { jugados: 6, pendientes: 6 });
+const E = estadoLiga(fechas);
+const nJugadores = Object.keys(clubesG ?? {}).length;
+const nota = [nJugadores ? `${nJugadores} jugadores` : null, E.actual ? (E.estado === 'terminada' ? 'Temporada terminada' : `Fecha ${E.actual} en juego`) : null, E.jugados ? `${E.jugados} partidos jugados` : null].filter(Boolean);
+const [principal, ...resto] = NOTICIAS;
+const otras = resto.slice(0, 3);
+const carta = lider ? cartaJuegoHTML({ etiqueta: 'Líder de la Galaxy League', nombre: lider.nombre, sub: liderClub, cifra: lider.pts, cifraEt: 'Pts', puesto: '1°',
+  escudo: escudoDe(liderClub), colores: CLUBES_VISUAL[liderClub], stats: [['PJ', lider.pj], ['G', lider.g ?? '—'], ['GF', lider.gf ?? '—'], ['GC', lider.gc ?? '—']], forma: forma(edGalaxy, lider.nombre), href: `${base}liga/` }) : '';
+---
+<div class="rd-inicio">
+  <!-- 1 · TIRA DE PARTIDOS: últimos resultados y lo que viene (como la barra de partidos de la Champions) -->
+  {TIRA.length > 0 && (
+  <section class="rd-tira" aria-label="Partidos de la Galaxy League">
+    <div class="rd-tira-in">
+      <a class="rd-tira-liga" href={`${base}liga/`}><b>Galaxy League</b><small>{E.actual ? `Fecha ${E.actual}` : 'Partidos'}</small></a>
+      <ol class="rd-tira-carril" data-tira>
+        {TIRA.map((p) => (
+          <li class:list={['rd-p', p.estado === 'pendiente' && 'rd-p-prox']}>
+            <a href={`${base}liga/`} aria-label={p.estado === 'final' ? `${p.l} ${p.gl}, ${p.v} ${p.gv}, fecha ${p.fecha}` : `${p.l} contra ${p.v}, fecha ${p.fecha}, por jugar`}>
+              <span class="rd-p-eq"><Fragment set:html={escudoHTML(p.clubL, 20)} /><b>{sigla(p.l)}</b>{p.estado === 'final' && <em class:list={[p.gl > p.gv && 'gana']}>{p.gl}</em>}</span>
+              <span class="rd-p-eq"><Fragment set:html={escudoHTML(p.clubV, 20)} /><b>{sigla(p.v)}</b>{p.estado === 'final' && <em class:list={[p.gv > p.gl && 'gana']}>{p.gv}</em>}</span>
+              <small>{p.estado === 'final' ? `F${p.fecha} · Final` : `F${p.fecha} · Por jugar`}</small>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <a class="rd-tira-ver" href={`${base}liga/`}>Ver todo</a>
+    </div>
+  </section>
+  )}
+
+  <!-- 2 · SALUDO + UNA ACCIÓN (la única pieza púrpura de la pantalla) + la carta del líder como pieza central -->
+  <section class="rd-hero" aria-labelledby="rd-hero-t">
+    <div class="rd-ancho rd-hero-in">
+      <div class="rd-hero-txt">
+        <p class="rd-kicker">Phoenix Evolution Series</p>
+        <h1 id="rd-hero-t" class="rd-hero-tit rd-libre">La liga de <span>PES 2021</span> y Football Life</h1>
+        <p class="rd-hero-sub">Duelos por Parsec, tabla en vivo, torneos y tu club de PES en la web.</p>
+        <div class="rd-cta">
+          <button type="button" class="rd-btn rd-btn-prim solo-invitado" data-crear-cuenta>Crear mi cuenta</button>
+          <a href={`${base}duelos/`} class="rd-btn rd-btn-prim solo-cuenta">Jugar un reto</a>
+          <a href={`${base}liga/`} class="rd-btn rd-btn-sec">Ver la tabla</a>
+        </div>
+        {nota.length > 0 && <p class="rd-hero-nota">{nota.map((t, i) => (<Fragment>{i > 0 && <i aria-hidden="true"></i>}<span>{t}</span></Fragment>))}</p>}
+      </div>
+      {carta && <div class="rd-hero-carta pj-solo" set:html={carta} />}
+    </div>
+  </section>
+
+  <div class="rd-ancho rd-cuerpo">
+    <!-- 3 · GALAXY LEAGUE: partido destacado + fechas (izquierda) y la tabla top 5 (derecha) -->
+    <section class="rd-bloque" id="central-partidos" aria-labelledby="rd-liga-t">
+      <header class="rd-bloque-cab">
+        <div><p class="rd-kicker">Liga</p><h2 id="rd-liga-t" class="tit-n1">Galaxy League</h2></div>
+        <div class="seg adv-seg rd-seg" id="seg-partidos" role="group" aria-label="Tipo de partidos">
+          <button type="button" data-v="proximos" aria-pressed="true">Próximos</button>
+          <button type="button" data-v="resultados" aria-pressed="false">Resultados</button>
+          <button type="button" data-v="porfecha" aria-pressed="false">Por fecha</button>
+        </div>
+      </header>
+      <div class="rd-liga-grid">
+        <div class="rd-liga-partidos">
+          <article id="destacado" class="rd-destacado rd-corte" aria-live="polite">
+            <div class="p-6 space-y-3" role="status" aria-label="Cargando el partido destacado"><div class="esqueleto h-5 w-1/3 mx-auto"></div><div class="esqueleto h-16"></div></div>
+          </article>
+          <div id="fecha-nav" hidden></div>
+          <div class="rd-partidos" id="matches-container" aria-live="polite"></div>
+        </div>
+        <aside class="rd-tabla" id="pos-seccion" aria-labelledby="pos-titulo">
+          <div class="rd-tabla-cab"><div><h3 id="pos-titulo" class="tit-n2">Posiciones</h3><p id="pos-sub" hidden></p></div></div>
+          <table>
+            <thead><tr><th>Pos</th><th>DT / Club</th><th class="text-center">PJ</th><th class="text-center">Pts</th></tr></thead>
+            <tbody id="mini-table-container"></tbody>
+          </table>
+          <a class="rd-tabla-ver" href={`${base}liga/`}>Ver tabla completa <i class="fa-solid fa-arrow-right"></i></a>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 4 · TU CLUB (lo pinta js/features/portada/tuClub.js: con club, sin club o sin sesión) -->
+    <section class="tuclub rd-tuclub" data-tuclub aria-label="Tu club"></section>
+
+    <!-- 5 · DESTACADOS: campeones vigentes y los mejores jugadores (si no hay jugadores, esa parte no sale) -->
+    <section class="rd-bloque" aria-labelledby="rd-dest-t">
+      <header class="rd-bloque-cab"><div><p class="rd-kicker">Palmarés</p><h2 id="rd-dest-t" class="tit-n1">Campeones vigentes</h2></div><a class="rd-ver" href={`${base}palmares/`}>Ver palmarés <i class="fa-solid fa-arrow-right"></i></a></header>
+      <ul class="rd-campeones">
+        {campeones.map((c) => (
+          <li class:list={['rd-campeon rd-corte', c.oro && 'oro']}>
+            <span class="rd-campeon-esc"><Fragment set:html={escudoHTML(c.club, 56)} /></span>
+            <span><small>{c.copa}</small><b>{c.dt}</b><em>{c.club}</em></span>
+          </li>
+        ))}
+      </ul>
+      <div id="destacados-seccion" class="rd-jugadores">
+        <header class="rd-sub-cab"><h3 class="tit-n2">Jugadores destacados</h3><a class="rd-ver" href={`${base}database/`}>Ver todos <i class="fa-solid fa-arrow-right"></i></a></header>
+        <div class="podio" id="featured-players-container"></div>
+      </div>
+    </section>
+
+    <!-- 6 · COMUNIDAD: noticia grande + 3 chicas (estilo portada de la Premier) y lo vivo de hoy (historias, salas, lo más reaccionado) -->
+    <section class="rd-bloque" aria-labelledby="rd-com-t">
+      <header class="rd-bloque-cab"><div><p class="rd-kicker">Comunidad</p><h2 id="rd-com-t" class="tit-n1">Lo último</h2></div><a class="rd-ver" href={`${base}noticias/`}>Todas las noticias <i class="fa-solid fa-arrow-right"></i></a></header>
+      {principal && (
+      <div class="rd-noticias">
+        <a class="rd-nota-grande rd-corte" href={`${base}noticias/#n-${principal.id}`}>
+          {principal.imagen && <img src={principal.imagen} alt="" loading="lazy" decoding="async" />}
+          <span class="rd-nota-txt"><small>{principal.categoria} · {principal.fecha}</small><b>{principal.titulo}</b><span>{principal.resumen}</span></span>
+        </a>
+        <ul class="rd-notas">
+          {otras.map((n) => (
+            <li><a href={`${base}noticias/#n-${n.id}`}>
+              {n.imagen && <img src={n.imagen} alt="" loading="lazy" decoding="async" width="96" height="72" />}
+              <span><small>{n.categoria} · {n.fecha}</small><b>{n.titulo}</b></span>
+            </a></li>
+          ))}
+        </ul>
+      </div>
+      )}
+      <section class="ahora rd-ahora" data-ahora hidden aria-labelledby="ahora-t"></section>
+    </section>
+
+    <!-- 7 · CIERRE -->
+    <section class="rd-cierre rd-corte" aria-labelledby="rd-cierre-t">
+      <div>
+        <p class="rd-kicker">Únete</p>
+        <h2 id="rd-cierre-t" class="tit-n1">Tu próximo partido empieza aquí</h2>
+        <p>Crea tu cuenta gratis y entra al Discord: ahí se pactan los partidos y se avisa cada novedad.</p>
+      </div>
+      <div class="rd-cta">
+        <button type="button" id="cierre-registro" class="rd-btn rd-btn-prim solo-invitado">Crear mi cuenta</button>
+        <a href={`${base}perfil/`} class="rd-btn rd-btn-prim solo-cuenta">Ir a mi perfil</a>
+        <a href={discord} target="_blank" rel="noopener" class="rd-btn rd-btn-sec">Entrar al Discord</a>
+      </div>
+    </section>
+  </div>
+</div>
