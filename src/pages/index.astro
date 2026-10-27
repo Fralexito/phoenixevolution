@@ -10,7 +10,8 @@ import '../styles/versiones.css';   // rediseño: 3 versiones de la portada para
 import '../styles/portadaJerarquia.css';   // portada: jerarquía visual (rondas 397–401, Frank)
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
-import PortadaRd from '../components/rediseno/PortadaRd.astro';   // rediseño (FX.rediseno): Inicio nuevo en 7 bloques
+import PortadaRd from '../components/rediseno/PortadaRd.astro';
+import EscenarioVivo from '../components/rediseno/EscenarioVivo.astro';   // «Portada viva» (?version=viva)   // rediseño (FX.rediseno): Inicio nuevo en 7 bloques
 import { DEMO_CLIPS } from '../data/demo.js';
 import { miniatura, etiquetaFuente } from '../js/core/comunidad/clips.js';
 import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
@@ -110,7 +111,7 @@ const VENTANAS = [
 ];
 ---
 <Layout title="Inicio" active="central" description="Phoenix Evolution Series: liga competitiva de PES 2021 y Football Life 2026 por Parsec, con torneos, duelos, Liga Máster y comunidad.">
-  {FX.rediseno && <script is:inline set:html={"try{var v=new URLSearchParams(location.search).get('version');if(/^[abc]$/.test(v||''))document.documentElement.setAttribute('data-version',v)}catch(e){}"} />}
+  {FX.rediseno && <script is:inline set:html={"try{var v=new URLSearchParams(location.search).get('version');if(/^(a|b|c|viva)$/.test(v||''))document.documentElement.setAttribute('data-version',v)}catch(e){}"} />}
   {FX.rediseno && <PortadaRd parte="tira" edGalaxy={edGalaxy} clubesG={clubesG} />}
   <!-- 1. PORTADA de Central (la original de la base). La ficha completa de cada liga vive en la página «Liga». -->
   <header class:list={['relative flex flex-col justify-center overflow-hidden pt-4 pb-10 sm:pt-6 sm:pb-12 px-4 sm:px-6 lg:px-8 border-b border-galaxy-border/40', ELITE && 'portada-elite', ESC && 'portada-esc', FX.limpio && FX.portada && FX.elite && FX.transmision && 'portada-tx', FX.limpio && FX.portada && FX.elite && FX.transmision && FX.estiloFC && 'portada-fc']} data-portada>
@@ -135,6 +136,7 @@ const VENTANAS = [
         <a href={`${base}duelos/`} class="cierre-btn cierre-btn-prim solo-cuenta"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
         <a href={`${base}liga/`} class="cierre-btn cierre-btn-sec"><i class="fa-solid fa-table-list"></i> Ver la tabla</a>
       </div>
+      {FX.rediseno && <EscenarioVivo parte="escenario" edGalaxy={edGalaxy} clubesG={clubesG} />}
       <div class="vt-escena"><div class="vt-grid" data-vt-grid>
         {INTER ? VENTANAS.map((v, n) => (
           <div class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id}>
@@ -396,6 +398,7 @@ const VENTANAS = [
   </section>
   </Fragment>)}
   </header>
+  {FX.rediseno && <EscenarioVivo parte="clips" />}
   <Fragment>
 
   <!-- TU CLUB (19-oct-2026): lo más exclusivo de la web, a la vista nada más entrar. Con club: tu escudo, presupuesto, ofertas y atajos;

@@ -32,12 +32,12 @@ export const NAV_EXTRA = [
 // Barra fija de abajo en el celular (components/BarraInferior.astro). 19-oct-2026 (Fralex): por lo que más importa en la web. MI CLUB en el centro
 // y destacado (la joya: gestionar a los jugadores de tu PES), a sus lados la red social y jugar. La Red de enlaces del celular NO repite estos accesos.
 // REDISEÑO (27-oct-2026): los MISMOS 5 destinos y en el MISMO orden que el menú de arriba (lo personal va en el avatar de la cabecera).
-export const BARRA_INFERIOR = [
+export const BARRA_INFERIOR = [   // 27-oct (Fralex): Mi club vuelve al MEDIO, con su moneda dorada
   { id: ['central'], t: 'Inicio', path: '', ph: 'house', px: 'inicio' },
   { id: ['duelos', 'ahora', 'envivo', 'missalas', 'hosts', 'draft', 'prode', 'repeticiones'], t: 'Jugar', path: 'duelos/', ph: 'game-controller', px: 'jugar' },
+  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true },   // sin icono propio: conserva la moneda dorada
   { id: ['liga', 'ligaamigos', 'competiciones', 'unirme', 'torneos', 'formatos', 'palmares', 'premios', 'historial', 'ranking', 'database'], t: 'Liga', path: 'liga/', ph: 'trophy', px: 'liga' },
   { id: ['social', 'chatgeneral', 'noticias', 'jugadas', 'clanes', 'eventos', 'creadores', 'tienda', 'organizadores'], t: 'Comunidad', path: 'social/', ph: 'users', px: 'comunidad' },
-  { id: ['manager', 'miclub', 'mercado'], t: 'Mi club', path: 'manager/', ph: 'soccer-ball', joya: true }   // sin icono propio: conserva la moneda dorada,
 ];
 
 // Apoyo voluntario a la comunidad (tipo «invítanos un café»). Vacío = no se muestra el botón. Pon aquí el enlace cuando lo tengas (solo https).
@@ -161,6 +161,7 @@ const PILARES_REPARTO = [
     ['Partidos', ['duelos', 'ahora>envivo', 'hosts', 'missalas']],
     ['Juegos de la comunidad', ['prode', 'draft', 'repeticiones']],
   ], { lema: 'Lo que haces tú, ahora' }),
+  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>miclub', 'mercado'] : ['manager', 'miclub', 'mercado'], { lema: 'Tu club, tus fichajes, tu vestuario', destacado: true }),
   conBloques('competir', 'Liga', 'fa-trophy', [
     ['Ligas', ['liga', 'ligaamigos', 'competiciones', 'unirme'], { compacto: true, icon: 'fa-crown', desc: 'Tablas, todas las ligas y cómo unirte' }],
     ['Torneos', ['torneos>formatos',
@@ -173,7 +174,6 @@ const PILARES_REPARTO = [
     ['Conversar', ['social', 'chatgeneral', 'noticias']],
     ['Grupos y extras', ['clanes', 'creadores', 'eventos', 'tienda', 'organizadores']],
   ], { lema: 'La gente y lo que se dice' }),
-  pilar('miclub', 'Mi club', 'fa-futbol', FX.clubUnificado ? ['manager>miclub', 'mercado'] : ['manager', 'miclub', 'mercado'], { lema: 'Tu club, tus fichajes, tu vestuario', destacado: true }),
 ];
 const PILARES_ANTES = [
   pilar('competir', 'Competir', 'fa-trophy', ['liga', 'competiciones', 'torneos', 'formatos', 'historial', 'palmares', 'ranking', 'database'], { lema: 'La liga y sus jugadores' }),
