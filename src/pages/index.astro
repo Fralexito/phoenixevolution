@@ -136,7 +136,7 @@ const VENTANAS = [
         <a href={`${base}duelos/`} class="cierre-btn cierre-btn-prim solo-cuenta"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
         <a href={`${base}liga/`} class="cierre-btn cierre-btn-sec"><i class="fa-solid fa-table-list"></i> Ver la tabla</a>
       </div>
-      {FX.rediseno && <EscenarioVivo parte="escenario" edGalaxy={edGalaxy} clubesG={clubesG} />}
+      {FX.rediseno && <EscenarioVivo parte="escenario" edGalaxy={edGalaxy} clubesG={clubesG} campeones={CAMPEONES} />}
       <div class="vt-escena"><div class="vt-grid" data-vt-grid>
         {INTER ? VENTANAS.map((v, n) => (
           <div class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id}>

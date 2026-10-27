@@ -13,7 +13,9 @@ import { calcularTabla } from '../../js/core/competicion/tabla.js';
 import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
 import { DEMO_CLIPS } from '../../data/demo.js';
 import { miniatura, etiquetaFuente } from '../../js/core/comunidad/clips.js';
-const { parte = 'escenario', edGalaxy, clubesG = {} } = Astro.props;
+import { escenasPortada } from '../../js/core/portada/relevancia.js';
+import { NOTICIAS } from '../../data/noticias.js';
+const { parte = 'escenario', edGalaxy, clubesG = {}, campeones = [] } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const fechas = edGalaxy?.fechas ?? [];
 const E = estadoLiga(fechas);
@@ -23,29 +25,40 @@ const pts = (n) => tabla.find((t) => t.nombre === n)?.pts ?? null;
 const todos = tiraPartidos(fechas, clubesG, { jugados: 2, pendientes: 5 });
 const proximos = todos.filter((p) => p.estado === 'pendiente');
 const ultimos = todos.filter((p) => p.estado === 'final').reverse();
-// Escenas del carrusel: los próximos partidos (ordenados por lo «grande» del cruce: los mejor ubicados primero) y el último resultado.
-const peso = (p) => (pos(p.l) ?? 99) + (pos(p.v) ?? 99);
-const ESCENAS = [...proximos].sort((a, b) => peso(a) - peso(b)).slice(0, 4).concat(ultimos.slice(0, 1));
+// «LO MÁS IMPORTANTE AHORA» (27-oct): el escenario ya no muestra solo partidos. Junta partido grande de la fecha, noticia oficial,
+// líder, otro partido, último resultado y campeón vigente; los ordena por prioridad (js/core/portada/relevancia.js) y los rota.
+// Si hay un partido EN VIVO, el script lo pone primero (escena «vivo», oculta hasta que lleguen las salas).
+const ESCENAS = escenasPortada({ proximos, resultados: ultimos, tabla, noticias: NOTICIAS, campeones }, 6);
+const ETIQ = { partido: 'Partido', noticia: 'Noticia', lider: 'Líder', resultado: 'Resultado', campeon: 'Campeón' };
 const col = (club) => CLUBES_VISUAL[club] ?? { a: '#00e5ff', b: '#8000ff' };
 const CLIPS = (DEMO_CLIPS ?? []).slice(0, 10);
 const RESULTADOS = tiraPartidos(fechas, clubesG, { jugados: 5, pendientes: 0 }).filter((p) => p.estado === 'final').reverse();
 const TOP = tabla.slice(0, 5);
 ---
 {parte === 'escenario' && ESCENAS.length > 0 && (
-<section class="ev" data-ev aria-roledescription="carrusel" aria-label="Lo que viene en la Galaxy League">
+<section class="ev" data-ev aria-roledescription="carrusel" aria-label="Lo más importante ahora en Phoenix">
   <div class="ev-escenario" data-ev-escenario>
-    {ESCENAS.map((p, i) => { const ca = col(p.clubL), cb = col(p.clubV); return (
-      <article class="ev-escena" data-ev-escena data-on={i === 0 ? '' : undefined} aria-hidden={i === 0 ? undefined : 'true'}
-        style={`--ev-a:${ca.a};--ev-b:${cb.a}`} aria-roledescription="escena" aria-label={`${i + 1} de ${ESCENAS.length}`}>
+    <!-- Escena EN VIVO: la llena el script si hay una sala jugando (prioridad 100: va primera) -->
+    <article class="ev-escena ev-escena-vivo" data-ev-escena data-ev-vivo hidden aria-hidden="true" style="--ev-a:#ff2d55;--ev-b:#8000ff" aria-roledescription="escena">
+      <span class="ev-luz" aria-hidden="true"></span>
+      <header class="ev-cab"><span class="ev-sello ev-sello-vivo"><i aria-hidden="true"></i>En vivo</span><span class="ev-meta" data-ev-vivo-meta>Galaxy League · Parsec</span></header>
+      <div class="ev-foco"><b class="ev-foco-tit" data-ev-vivo-tit>Partido en juego</b><span class="ev-foco-txt" data-ev-vivo-txt></span></div>
+      <footer class="ev-acc"><a class="ev-btn ev-btn-prim" href={`${base}en-vivo/`}>Mirar en vivo</a><a class="ev-btn" href={`${base}liga/`}>Ver la tabla</a></footer>
+    </article>
+    {ESCENAS.map(({ tipo, dato: p }, i) => {
+      const on = i === 0;
+      const comun = { 'data-ev-escena': '', 'data-on': on ? '' : undefined, 'aria-hidden': on ? undefined : 'true', 'aria-roledescription': 'escena', 'data-ev-tipo': tipo };
+      if (tipo === 'partido' || tipo === 'resultado') { const ca = col(p.clubL), cb = col(p.clubV); return (
+      <article class="ev-escena" {...comun} style={`--ev-a:${ca.a};--ev-b:${cb.a}`}>
         <span class="ev-luz" aria-hidden="true"></span>
         <header class="ev-cab">
-          {p.estado === 'final' ? <span class="ev-sello ev-sello-final">Final</span> : <span class="ev-sello ev-sello-prox"><i aria-hidden="true"></i>Próximo partido</span>}
+          {p.estado === 'final' ? <span class="ev-sello ev-sello-final">Final</span> : <span class="ev-sello ev-sello-prox"><i aria-hidden="true"></i>{i === 0 ? 'Partido de la fecha' : 'Próximo partido'}</span>}
           <span class="ev-meta">Galaxy League · Fecha {p.fecha} · Parsec</span>
         </header>
         <div class="ev-duelo">
           {[[p.l, p.clubL, p.gl], [p.v, p.clubV, p.gv]].map(([n, c, g], k) => (
             <div class:list={['ev-eq', k === 1 && 'ev-eq-der']}>
-              <span class="ev-escudo" data-ev-par={k === 0 ? '1' : '-1'}>{escudoDe(c) ? <img src={escudoDe(c)} alt="" width="120" height="120" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" /> : <b>{String(n).slice(0, 2)}</b>}</span>
+              <span class="ev-escudo" data-ev-par={k === 0 ? '1' : '-1'}>{escudoDe(c) ? <img src={escudoDe(c)} alt="" width="120" height="120" loading={on ? 'eager' : 'lazy'} decoding="async" /> : <b>{String(n).slice(0, 2)}</b>}</span>
               <span class="ev-nombre"><b>{n}</b><small>{c}</small>{pos(n) && <em>{pos(n)}.º · {pts(n)} pts</em>}</span>
             </div>
           ))}
@@ -55,10 +68,44 @@ const TOP = tabla.slice(0, 5);
           <a class="ev-btn ev-btn-prim" href={`${base}en-vivo/`}>{p.estado === 'final' ? 'Ver la repetición' : 'Ir a la sala'}</a>
           <a class="ev-btn" href={`${base}liga/`}>Ver la tabla</a>
         </footer>
-      </article>
-    ); })}
+      </article>); }
+      if (tipo === 'noticia') return (
+      <article class="ev-escena ev-escena-nota" {...comun} style="--ev-a:#8000ff;--ev-b:#00e5ff">
+        {p.imagen && <img class="ev-fondo" src={p.imagen} alt="" loading="lazy" decoding="async" />}
+        <span class="ev-luz" aria-hidden="true"></span>
+        <header class="ev-cab"><span class="ev-sello ev-sello-oro">{p.categoria === 'OFICIAL' ? 'Oficial' : p.categoria}</span><span class="ev-meta">{p.tag} · {p.fecha}</span></header>
+        <div class="ev-foco"><b class="ev-foco-tit">{p.titulo}</b><span class="ev-foco-txt">{p.resumen}</span></div>
+        <footer class="ev-acc"><a class="ev-btn ev-btn-prim" href={`${base}noticias/#n-${p.id}`}>Leer la noticia</a><a class="ev-btn" href={`${base}noticias/`}>Todas las noticias</a></footer>
+      </article>);
+      const esLider = tipo === 'lider';
+      const club = esLider ? clubesG[p.nombre] : p.club; const c = col(club);
+      return (
+      <article class:list={['ev-escena ev-escena-carta', !esLider && 'ev-escena-oro']} {...comun} style={`--ev-a:${c.a};--ev-b:${esLider ? '#00e5ff' : '#fbbf24'}`}>
+        <span class="ev-luz" aria-hidden="true"></span>
+        <header class="ev-cab">
+          <span class:list={['ev-sello', esLider ? 'ev-sello-prox' : 'ev-sello-oro']}>{esLider ? 'Líder de la Galaxy' : 'Campeón vigente'}</span>
+          <span class="ev-meta">{esLider ? (E.actual ? `Galaxy League · Fecha ${E.actual}` : 'Galaxy League') : p.copa}</span>
+        </header>
+        <div class="ev-carta">
+          <span class="ev-escudo ev-escudo-xl" data-ev-par="1">{escudoDe(club) ? <img src={escudoDe(club)} alt="" width="160" height="160" loading="lazy" decoding="async" /> : <b>{String(esLider ? p.nombre : p.dt).slice(0, 2)}</b>}</span>
+          <span class="ev-nombre">
+            <b>{esLider ? p.nombre : p.dt}</b><small>{club}</small>
+            {esLider
+              ? <em>{p.pts} pts · {p.pj} PJ{p.ventaja !== null && p.segundo ? ` · ${p.ventaja > 0 ? `+${p.ventaja}` : 'empatado'} sobre ${p.segundo}` : ''}</em>
+              : <em>Defiende el título de {p.copa}</em>}
+          </span>
+          {esLider && <span class="ev-cifra" aria-hidden="true">1<small>°</small></span>}
+          {!esLider && <span class="ev-cifra ev-cifra-oro" aria-hidden="true"><i class="fa-solid fa-trophy"></i></span>}
+        </div>
+        <footer class="ev-acc">
+          <a class="ev-btn ev-btn-prim" href={esLider ? `${base}liga/` : `${base}palmares/`}>{esLider ? 'Ver la tabla' : 'Ver el palmarés'}</a>
+          {esLider && <a class="ev-btn" href={`${base}database/`}>Ver jugadores</a>}
+        </footer>
+      </article>);
+    })}
     <div class="ev-barras" role="tablist" aria-label="Elegir escena">
-      {ESCENAS.map((_, i) => (<button type="button" role="tab" class="ev-barra" data-ev-ir={i} aria-selected={i === 0 ? 'true' : 'false'} aria-label={`Escena ${i + 1}`}><i></i></button>))}
+      <button type="button" role="tab" class="ev-barra ev-barra-vivo" data-ev-ir hidden aria-selected="false" aria-label="En vivo"><i></i><span>En vivo</span></button>
+      {ESCENAS.map(({ tipo }, i) => (<button type="button" role="tab" class="ev-barra" data-ev-ir aria-selected={i === 0 ? 'true' : 'false'} aria-label={`${ETIQ[tipo]} (${i + 1} de ${ESCENAS.length})`}><i></i><span>{ETIQ[tipo]}</span></button>))}
     </div>
     <button type="button" class="ev-flecha ev-flecha-izq" data-ev-paso="-1" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
     <button type="button" class="ev-flecha ev-flecha-der" data-ev-paso="1" aria-label="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
@@ -124,7 +171,10 @@ const TOP = tabla.slice(0, 5);
   const raiz = document.querySelector('[data-ev]');
   try {
     if (raiz && document.documentElement.getAttribute('data-version') === 'viva') {
-      const esc = [...raiz.querySelectorAll('[data-ev-escena]')]; const barras = [...raiz.querySelectorAll('[data-ev-ir]')];
+      // Escenas y barras visibles (la escena «en vivo» empieza oculta y se suma si hay salas jugando)
+      let esc = []; let barras = [];
+      const leer = () => { esc = [...raiz.querySelectorAll('[data-ev-escena]:not([hidden])')]; barras = [...raiz.querySelectorAll('[data-ev-ir]:not([hidden])')]; };
+      leer();
       const quieto = hayMovimientoReducido(); const SEG = 6000; let i = 0; let t0 = performance.now(); let pausa = false; let raf = 0;
       const ir = (n) => {
         i = (n + esc.length) % esc.length; t0 = performance.now();
@@ -133,7 +183,7 @@ const TOP = tabla.slice(0, 5);
       };
       const tic = (t) => { raf = requestAnimationFrame(tic); if (pausa || quieto) return; const p = Math.min(1, (t - t0) / SEG); barras[i]?.style.setProperty('--ev-p', p.toFixed(3)); if (p >= 1) ir(i + 1); };
       raf = requestAnimationFrame(tic);
-      raiz.addEventListener('click', (e) => { const b = e.target.closest('[data-ev-ir]'); if (b) ir(Number(b.dataset.evIr)); const f = e.target.closest('[data-ev-paso]'); if (f) ir(i + Number(f.dataset.evPaso)); });
+      raiz.addEventListener('click', (e) => { const b = e.target.closest('[data-ev-ir]'); if (b) ir(barras.indexOf(b)); const f = e.target.closest('[data-ev-paso]'); if (f) ir(i + Number(f.dataset.evPaso)); });
       const pon = (v) => () => { pausa = v; if (!v) t0 = performance.now() - (Number(barras[i]?.style.getPropertyValue('--ev-p')) || 0) * SEG; };
       raiz.addEventListener('pointerenter', pon(true)); raiz.addEventListener('pointerleave', pon(false));
       raiz.addEventListener('focusin', pon(true)); raiz.addEventListener('focusout', pon(false));
@@ -155,6 +205,14 @@ const TOP = tabla.slice(0, 5);
         const esc2 = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         lista.insertAdjacentHTML('afterbegin', salas.slice(0, 3).map((s) => `<li class="ev-vivo"><a href="${esc2(new URL('en-vivo/', document.baseURI).pathname)}"><span class="ev-rojo" aria-hidden="true"></span><span class="ev-li-txt"><b>${esc2(s.host?.nombre ?? 'Sala')}${s.rival?.nombre ? ` vs ${esc2(s.rival.nombre)}` : ''}</b><small>${s.marcador ? `${Number(s.marcador.goles_local) || 0} – ${Number(s.marcador.goles_visita) || 0} · ${esc2(s.marcador.minuto ?? '')}′` : 'En partido'}</small></span></a></li>`).join(''));
         raiz.classList.add('ev-hay-vivo'); if (tit) tit.textContent = 'En vivo ahora';
+        // Prioridad 100: el partido en vivo pasa a ser la PRIMERA escena del escenario
+        const s0 = salas[0]; const ev = raiz.querySelector('[data-ev-vivo]'); const bv = raiz.querySelector('.ev-barra-vivo');
+        if (ev && bv) {
+          ev.querySelector('[data-ev-vivo-tit]').textContent = `${s0.host?.nombre ?? 'Sala'}${s0.rival?.nombre ? ` vs ${s0.rival.nombre}` : ''}`;
+          ev.querySelector('[data-ev-vivo-txt]').textContent = s0.marcador ? `${Number(s0.marcador.goles_local) || 0} – ${Number(s0.marcador.goles_visita) || 0} · minuto ${s0.marcador.minuto ?? '—'}` : 'Se está jugando ahora mismo';
+          if (salas.length > 1) ev.querySelector('[data-ev-vivo-meta]').textContent = `Galaxy League · ${salas.length} salas en juego`;
+          ev.hidden = false; bv.hidden = false; leer(); ir(0);
+        }
       }).catch((e) => console.warn('[portada viva] salas:', e?.message ?? e));
     }
     // Pestañas del costado: Lo que viene · Resultados · Tabla (en la primera pantalla, como el panel lateral de la Champions)
