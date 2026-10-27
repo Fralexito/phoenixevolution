@@ -1,8 +1,12 @@
 name: Desplegar a GitHub Pages
-# Publica DOS cosas en el mismo sitio:
+# Publica TRES cosas en el mismo sitio:
 #   · /phoenixevolution/            → la rama `main`      (web oficial)
 #   · /phoenixevolution/fase-beta-1-0/  → la rama `borrador`  (FASE BETA 1.0: vista previa privada; no sale en Google)
-# Se ejecuta al subir cambios a cualquiera de las dos ramas, y siempre reconstruye ambas.
+#   · /phoenixevolution/fase-rediseno/  → la rama `rediseno`  (27-oct-2026: laboratorio del rediseño completo; OPCIONAL)
+# Se ejecuta al subir cambios a main o borrador. Para publicar un cambio de `rediseno`: gh workflow run deploy.yml --ref borrador
+# (o «Run workflow» en GitHub, rama borrador). Si `rediseno` no existe o falla al armarse, las otras dos se publican igual.
+# OJO: la copia de este archivo que vive en `main` no conoce `rediseno`; si se publica desde main, fase-rediseno/ desaparece
+# hasta la siguiente publicación desde borrador.
 on:
   push:
     branches: [main, borrador]
@@ -28,6 +32,13 @@ jobs:
         with:
           ref: borrador
           path: previa
+      - name: Rediseño (rama rediseno, opcional)
+        id: rediseno
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: rediseno
+          path: rediseno
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -41,12 +52,21 @@ jobs:
           PUBLIC_PREVIEW: "1"
         # Red de seguridad (18-oct-2026): si alguna prueba falla, NO se publica nada y la web se queda con la última versión buena.
         run: npm ci && npm test && npm run build
-      - name: Juntar ambas
+      - name: Compilar rediseño (si falla, se omite)
+        if: steps.rediseno.outcome == 'success'
+        continue-on-error: true
+        working-directory: rediseno
+        env:
+          PES_BASE: /phoenixevolution/fase-rediseno
+          PUBLIC_PREVIEW: "1"
+        run: npm ci && npm test && npm run build
+      - name: Juntar todo
         run: |
           mkdir site
           cp -r oficial/dist/. site/
           mkdir site/fase-beta-1-0
           cp -r previa/dist/. site/fase-beta-1-0/
+          if [ -f rediseno/dist/index.html ]; then mkdir site/fase-rediseno && cp -r rediseno/dist/. site/fase-rediseno/; else echo "Rediseño no publicado (no existe o falló)"; fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
