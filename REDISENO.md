@@ -18,6 +18,13 @@ Movimiento: los bloques nuevos se inclinan en 3D con el mouse (clase .rd-p3 en p
 los botones se llenan de púrpura a cian y las tarjetas suben al pasar el mouse.
 **Regla para lo que sigue:** NO quitar efectos, brillos ni piezas de identidad; reordenar y sumar, no restar.
 
+## 27-oct 15:45 · Segunda corrección (Fralex: «le quitaste demasiadas cosas; los iconos se ven aún más genéricos»)
+- Iconos propios «Corte» APAGADOS (`FX.iconosPropios = false`): vuelven exactamente los de borrador. Los archivos quedan por si se retoman.
+- Inicio: debajo de «Bienvenido a la Galaxy» y las ventanas vuelve TODO el contenido de borrador con sus efectos. El cuerpo nuevo
+  (`PortadaRd parte="cuerpo"`) queda guardado pero sin usarse. Lo único nuevo en Inicio: la tira de partidos arriba.
+- Medido: en Liga, Duelos y Social el movimiento es idéntico al de borrador (mismas animaciones y transiciones 3D).
+- Siguiente: no tocar nada visual sin una muestra aprobada antes.
+
 ## Fases
 1. **Sistema base** — HECHO: tokens (noche, capas, textos, corte), cabecera estilo Champions con 5 destinos (Inicio · Jugar · Liga ·
    Comunidad · Mi club), sub-menú subrayado, barra de abajo con los mismos 5, iconos propios, fuera brillos/vidrio/texto degradado,
