@@ -177,3 +177,9 @@
   .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso[data-vista='mosaico'] :is(.vt-principal, .vt-atajos a) { justify-content: center; text-align: center; letter-spacing: 0; min-width: 0; padding-inline: .2rem; font-size: .75rem; }
 }
 @media (max-width: 639px) { html .vt-limpio .vt-v[data-girada] .vt-dorso .vt-cab::before { width: .9rem; } .vt-plus .vt-dorso .vt-cab { gap: .4rem; } }
+
+/* ── Ronda 400 (Frank): un solo ancho. La portada (.vt) mide max-w-6xl (72rem); la banda «Empieza en 3 pasos» va dentro de .vt
+   (la mete js/features/primerosPasos.js) y ahora usa ese mismo ancho, sin su tope de 64rem ni su margen lateral.
+   .portada-abajo pasó a max-w-6xl (index.astro) y «Tu club» (tuClub.css) a 72rem de contenido. */
+.vt { max-width: 72rem; }
+.vt .pasos3 { width: 100%; max-width: none; padding: 0; margin-top: .75rem; }

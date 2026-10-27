@@ -1,6 +1,6 @@
 /* INICIO · banda «Tu club» (19-oct-2026): lo más exclusivo de la web, en dorado (la misma familia que «Mi club» del menú y El Estadio).
    Lo importa solo src/pages/index.astro; lo pinta js/features/portada/tuClub.js. */
-.tuclub { max-width: 80rem; margin: 1.5rem auto 0; padding: 0 1rem; }
+.tuclub { max-width: calc(72rem + 2rem); margin: 1.5rem auto 0; padding: 0 1rem; }   /* ronda 400: mismo ancho que la portada (.vt = max-w-6xl, 72rem) */
 .tuclub:empty { display: none; }
 .tuclub-caja { position: relative; overflow: hidden; display: flex; align-items: center; gap: 1.25rem; padding: 1.1rem 1.25rem; border-radius: 1.4rem; text-decoration: none;
   background: radial-gradient(120% 160% at 0% 0%, rgb(251 191 36 / .16), transparent 55%), linear-gradient(160deg, rgb(26 18 6 / .85), rgb(12 10 26 / .9));

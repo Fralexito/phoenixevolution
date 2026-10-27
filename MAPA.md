@@ -545,3 +545,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 397 · 1.39.0 portada paso 1: botón principal (Crear mi cuenta / Jugar un reto) + «Ver la tabla» bajo el saludo
 - 398 · 1.39.1 portada paso 2: título más chico (clamp 2–3.5rem), subtítulo más claro, ventanas a la altura de su contenido (290 → 193 px)
 - 399 · 1.39.2 portada paso 3: Mi Club primero (2fr 1fr 1fr, 2 filas, dorado, botón al frente); ventanas vacías en una línea con enlace; celular sin alto de más
+- 400 · 1.39.3 portada paso 4: un solo ancho (72rem / max-w-6xl) para ventanas, «Empieza en 3 pasos», Tu club y .portada-abajo
