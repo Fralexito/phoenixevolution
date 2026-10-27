@@ -1,0 +1,52 @@
+/* 3 VERSIONES DE LA PORTADA para que Fralex elija (27-oct-2026). Se ven con ?version=a | b | c (sin nada = la de siempre).
+   Las tres conservan TODO: colores, brillos, 3D, ventanas que giran, iconos, cinta, botón En vivo y barra lateral.
+   Solo cambian el ORDEN de las secciones y el PULIDO (mismo ancho, mismo aire entre secciones, nada vacío a la vista).
+     A · «Competición» (como la Champions): tira de partidos arriba, la liga justo después del saludo.
+     B · «Mi club primero»: tu club de PES justo después del saludo; la liga y los campeones después.
+     C · «Comunidad viva»: lo que pasa hoy (historias, salas, lo más reaccionado) primero, luego la liga. */
+
+/* ── Pulido común a las 3 ── */
+html[data-version] main[data-activa='central'] { display: flex; flex-direction: column; gap: 4rem; padding-bottom: 4rem; }
+html[data-version] main[data-activa='central'] > div.max-w-7xl { display: contents; }
+html[data-version] main[data-activa='central'] > :is(.tuclub, .ahora, div, section, nav, details, a.estado-liga):not(header):not(.rd-inicio):not(.max-w-7xl), html[data-version] main[data-activa='central'] > div.max-w-7xl > :is(div, section, nav, details, a.estado-liga, p) { width: 100%; max-width: calc(72rem + 2rem); margin-inline: auto; padding-inline: 1rem; }
+html[data-version] main[data-activa='central'] > :is(details, section, nav, div):not(header), html[data-version] main[data-activa='central'] > div.max-w-7xl > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+html[data-version] main[data-activa='central'] > header { padding-bottom: 2rem; }
+html[data-version] main[data-activa='central'] > .esc-pulso, html[data-version] main[data-activa='central'] > div.max-w-7xl > .esc-pulso { display: none; }          /* la línea de cifras repite lo de la tira y el saludo */
+html[data-version] main[data-activa='central'] > nav.anclas, html[data-version] main[data-activa='central'] > div.max-w-7xl > nav.anclas { display: none; }         /* las anclas sobran cuando el orden ya es claro */
+html[data-version] main[data-activa='central'] > [hidden], html[data-version] main[data-activa='central'] > div.max-w-7xl > [hidden] { display: none !important; }
+html[data-version] main[data-activa='central'] > .tuclub:empty, html[data-version] main[data-activa='central'] > div.max-w-7xl > .tuclub:empty { display: none; }
+@media (max-width: 639px) { html[data-version] main[data-activa='central'] { gap: 2.5rem; padding-bottom: 2.5rem; } }
+
+/* ── Orden de cada versión (número más chico = más arriba) ── */
+html[data-version] main[data-activa='central'] > *, html[data-version] main[data-activa='central'] > div.max-w-7xl > * { order: 50; }
+html[data-version] main[data-activa='central'] > .rd-inicio { order: 0; }
+html[data-version] main[data-activa='central'] > header { order: 1; }
+html[data-version] main[data-activa='central'] > section.cierre, html[data-version] main[data-activa='central'] > div.max-w-7xl > section.cierre, html[data-version] main[data-activa='central'] > section.glass-panel:last-child, html[data-version] main[data-activa='central'] > div.max-w-7xl > section.glass-panel:last-child { order: 99; }
+
+/* A · Competición */
+html[data-version='a'] main[data-activa='central'] > [data-sec='liga'], html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > [data-sec='liga'] { order: 2; }
+html[data-version='a'] main[data-activa='central'] > section.campeones, html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > section.campeones { order: 3; }
+html[data-version='a'] main[data-activa='central'] > .tuclub, html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > .tuclub { order: 4; }
+html[data-version='a'] main[data-activa='central'] > #destacados-seccion, html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > #destacados-seccion { order: 5; }
+html[data-version='a'] main[data-activa='central'] > .ahora, html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > .ahora { order: 6; }
+html[data-version='a'] main[data-activa='central'] > #rank-liga, html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > #rank-liga { order: 7; }
+html[data-version='a'] main[data-activa='central'] > #highlights, html[data-version='a'] main[data-activa='central'] > div.max-w-7xl > #highlights { order: 8; }
+
+/* B · Mi club primero (sin tira arriba: el saludo y tu club mandan) */
+html[data-version='b'] main[data-activa='central'] > .rd-inicio { display: none; }
+html[data-version='b'] main[data-activa='central'] > .tuclub, html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > .tuclub { order: 2; }
+html[data-version='b'] main[data-activa='central'] > [data-sec='liga'], html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > [data-sec='liga'] { order: 3; }
+html[data-version='b'] main[data-activa='central'] > section.campeones, html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > section.campeones { order: 4; }
+html[data-version='b'] main[data-activa='central'] > #destacados-seccion, html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > #destacados-seccion { order: 5; }
+html[data-version='b'] main[data-activa='central'] > .ahora, html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > .ahora { order: 6; }
+html[data-version='b'] main[data-activa='central'] > #rank-liga, html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > #rank-liga { order: 7; }
+html[data-version='b'] main[data-activa='central'] > #highlights, html[data-version='b'] main[data-activa='central'] > div.max-w-7xl > #highlights { order: 8; }
+
+/* C · Comunidad viva */
+html[data-version='c'] main[data-activa='central'] > .ahora, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > .ahora { order: 2; }
+html[data-version='c'] main[data-activa='central'] > [data-sec='liga'], html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > [data-sec='liga'] { order: 3; }
+html[data-version='c'] main[data-activa='central'] > .tuclub, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > .tuclub { order: 4; }
+html[data-version='c'] main[data-activa='central'] > #destacados-seccion, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > #destacados-seccion { order: 5; }
+html[data-version='c'] main[data-activa='central'] > section.campeones, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > section.campeones { order: 6; }
+html[data-version='c'] main[data-activa='central'] > #rank-liga, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > #rank-liga { order: 7; }
+html[data-version='c'] main[data-activa='central'] > #highlights, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > #highlights { order: 8; }
