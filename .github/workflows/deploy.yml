@@ -2,10 +2,10 @@ name: Desplegar a GitHub Pages
 # Publica TRES cosas en el mismo sitio:
 #   · /phoenixevolution/            → la rama `main`      (web oficial)
 #   · /phoenixevolution/fase-beta-1-0/  → la rama `borrador`  (FASE BETA 1.0: vista previa privada; no sale en Google)
-#   · /phoenixevolution/fase-rediseno/  → la rama `rediseno`  (27-oct-2026: laboratorio del rediseño completo; OPCIONAL)
-# Se ejecuta al subir cambios a main o borrador. Para publicar un cambio de `rediseno`: gh workflow run deploy.yml --ref borrador
-# (o «Run workflow» en GitHub, rama borrador). Si `rediseno` no existe o falla al armarse, las otras dos se publican igual.
-# OJO: la copia de este archivo que vive en `main` no conoce `rediseno`; si se publica desde main, fase-rediseno/ desaparece
+#   · /phoenixevolution/fase-rediseno/  → la rama `rediseno-web`  (27-oct-2026: laboratorio del rediseño completo; OPCIONAL)
+# Se ejecuta al subir cambios a main o borrador. Para publicar un cambio de `rediseno-web`: gh workflow run deploy.yml --ref borrador
+# (o «Run workflow» en GitHub, rama borrador). Si `rediseno-web` no existe o falla al armarse, las otras dos se publican igual.
+# OJO: la copia de este archivo que vive en `main` no conoce `rediseno-web`; si se publica desde main, fase-rediseno/ desaparece
 # hasta la siguiente publicación desde borrador.
 on:
   push:
@@ -32,12 +32,12 @@ jobs:
         with:
           ref: borrador
           path: previa
-      - name: Rediseño (rama rediseno, opcional)
+      - name: Rediseño (rama rediseno-web, opcional)
         id: rediseno
         continue-on-error: true
         uses: actions/checkout@v4
         with:
-          ref: rediseno
+          ref: rediseno-web
           path: rediseno
       - uses: actions/setup-node@v4
         with:
