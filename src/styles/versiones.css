@@ -50,3 +50,17 @@ html[data-version='c'] main[data-activa='central'] > #destacados-seccion, html[d
 html[data-version='c'] main[data-activa='central'] > section.campeones, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > section.campeones { order: 6; }
 html[data-version='c'] main[data-activa='central'] > #rank-liga, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > #rank-liga { order: 7; }
 html[data-version='c'] main[data-activa='central'] > #highlights, html[data-version='c'] main[data-activa='central'] > div.max-w-7xl > #highlights { order: 8; }
+
+/* VIVA · neutral para todos (27-oct, Fralex: «cada uno tiene su rincón; algo neutral para todos»).
+   Lo personal vive en el rincón de cada uno (su perfil / avatar). Orden: tira → saludo + escenario (con Lo que viene · Resultados · Tabla)
+   + ventanas → jugadas → tu club → lo de hoy en la comunidad → la liga (en vivo, estado) → estadísticas → destacados → campeones → highlights → cierre.
+   «Central de partidos» completa no se repite aquí: vive en la página Liga (el escenario y sus pestañas ya la resumen). */
+html[data-version='viva'] main[data-activa='central'] > .ev-clips { order: 2; }
+html[data-version='viva'] main[data-activa='central'] > .tuclub { order: 3; }
+html[data-version='viva'] main[data-activa='central'] > .ahora { order: 4; }
+html[data-version='viva'] main[data-activa='central'] > div.max-w-7xl > [data-sec='liga'] { order: 5; }
+html[data-version='viva'] main[data-activa='central'] > div.max-w-7xl > #rank-liga { order: 6; }
+html[data-version='viva'] main[data-activa='central'] > div.max-w-7xl > #destacados-seccion { order: 7; }
+html[data-version='viva'] main[data-activa='central'] > div.max-w-7xl > section.campeones { order: 8; }
+html[data-version='viva'] main[data-activa='central'] > div.max-w-7xl > #highlights { order: 9; }
+html[data-version='viva'] [data-sec='liga'] > .grid:has(#central-partidos) { display: none; }

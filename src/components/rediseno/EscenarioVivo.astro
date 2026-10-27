@@ -28,6 +28,8 @@ const peso = (p) => (pos(p.l) ?? 99) + (pos(p.v) ?? 99);
 const ESCENAS = [...proximos].sort((a, b) => peso(a) - peso(b)).slice(0, 4).concat(ultimos.slice(0, 1));
 const col = (club) => CLUBES_VISUAL[club] ?? { a: '#00e5ff', b: '#8000ff' };
 const CLIPS = (DEMO_CLIPS ?? []).slice(0, 10);
+const RESULTADOS = tiraPartidos(fechas, clubesG, { jugados: 5, pendientes: 0 }).filter((p) => p.estado === 'final').reverse();
+const TOP = tabla.slice(0, 5);
 ---
 {parte === 'escenario' && ESCENAS.length > 0 && (
 <section class="ev" data-ev aria-roledescription="carrusel" aria-label="Lo que viene en la Galaxy League">
@@ -62,9 +64,15 @@ const CLIPS = (DEMO_CLIPS ?? []).slice(0, 10);
     <button type="button" class="ev-flecha ev-flecha-der" data-ev-paso="1" aria-label="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
   </div>
 
-  <aside class="ev-lado" aria-labelledby="ev-lado-t">
-    <header><h2 id="ev-lado-t"><span class="ev-punto" aria-hidden="true"></span><span data-ev-lado-t>Lo que viene</span></h2><a href={`${base}en-vivo/`}>Ver todo</a></header>
-    <ol class="ev-lista" data-ev-lista>
+  <aside class="ev-lado" aria-label="Partidos y tabla de la Galaxy League">
+    <header>
+      <div class="ev-tabs" role="tablist" aria-label="Ver">
+        <button type="button" role="tab" id="ev-t-prox" aria-controls="ev-p-prox" aria-selected="true" data-ev-tab="prox"><span class="ev-punto" aria-hidden="true"></span><span data-ev-lado-t>Lo que viene</span></button>
+        <button type="button" role="tab" id="ev-t-res" aria-controls="ev-p-res" aria-selected="false" data-ev-tab="res">Resultados</button>
+        <button type="button" role="tab" id="ev-t-tabla" aria-controls="ev-p-tabla" aria-selected="false" data-ev-tab="tabla">Tabla</button>
+      </div>
+    </header>
+    <ol class="ev-lista" id="ev-p-prox" role="tabpanel" aria-labelledby="ev-t-prox" data-ev-lista data-ev-panel="prox">
       {proximos.slice(0, 5).map((p) => (
         <li><a href={`${base}liga/`}>
           <span class="ev-mini"><img src={escudoDe(p.clubL) ?? ''} alt="" width="28" height="28" loading="lazy" /><img src={escudoDe(p.clubV) ?? ''} alt="" width="28" height="28" loading="lazy" /></span>
@@ -72,7 +80,25 @@ const CLIPS = (DEMO_CLIPS ?? []).slice(0, 10);
         </a></li>
       ))}
     </ol>
-    <p class="ev-lado-pie">{E.actual ? `Fecha ${E.actual} · ${E.jugadosActual} de ${E.totalActual} jugados` : 'Galaxy League'}</p>
+    <ol class="ev-lista" id="ev-p-res" role="tabpanel" aria-labelledby="ev-t-res" data-ev-panel="res" hidden>
+      {RESULTADOS.map((p) => (
+        <li><a href={`${base}liga/`}>
+          <span class="ev-mini"><img src={escudoDe(p.clubL) ?? ''} alt="" width="28" height="28" loading="lazy" /><img src={escudoDe(p.clubV) ?? ''} alt="" width="28" height="28" loading="lazy" /></span>
+          <span class="ev-li-txt"><b>{p.l} <span class="ev-res">{p.gl} – {p.gv}</span> {p.v}</b><small>Fecha {p.fecha} · final</small></span>
+        </a></li>
+      ))}
+    </ol>
+    <ol class="ev-lista ev-top" id="ev-p-tabla" role="tabpanel" aria-labelledby="ev-t-tabla" data-ev-panel="tabla" hidden>
+      {TOP.map((t, k) => (
+        <li><a href={`${base}liga/`}>
+          <span class:list={['ev-pos', k === 0 && 'oro']}>{k + 1}</span>
+          <span class="ev-mini"><img src={escudoDe(clubesG[t.nombre]) ?? ''} alt="" width="28" height="28" loading="lazy" /></span>
+          <span class="ev-li-txt"><b>{t.nombre}</b><small>{clubesG[t.nombre] ?? ''} · {t.pj} PJ</small></span>
+          <span class="ev-pts">{t.pts}<small>pts</small></span>
+        </a></li>
+      ))}
+    </ol>
+    <a class="ev-lado-pie" href={`${base}liga/`}>{E.actual ? `Fecha ${E.actual} · ${E.jugadosActual} de ${E.totalActual} jugados` : 'Galaxy League'} · <b>Ver todo en Liga</b></a>
   </aside>
 </section>
 )}
@@ -131,6 +157,12 @@ const CLIPS = (DEMO_CLIPS ?? []).slice(0, 10);
         raiz.classList.add('ev-hay-vivo'); if (tit) tit.textContent = 'En vivo ahora';
       }).catch((e) => console.warn('[portada viva] salas:', e?.message ?? e));
     }
+    // Pestañas del costado: Lo que viene · Resultados · Tabla (en la primera pantalla, como el panel lateral de la Champions)
+    document.querySelectorAll('[data-ev-tab]').forEach((b) => b.addEventListener('click', () => {
+      const lado = b.closest('.ev-lado'); const id = b.dataset.evTab;
+      lado.querySelectorAll('[data-ev-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+      lado.querySelectorAll('[data-ev-panel]').forEach((p) => { p.hidden = p.dataset.evPanel !== id; });
+    }));
     // Fila de jugadas: flechas que avanzan una «página»
     document.querySelectorAll('[data-ev-clips]').forEach((b) => b.addEventListener('click', () => { const f = document.querySelector('[data-ev-fila]'); f?.scrollBy({ left: Number(b.dataset.evClips) * f.clientWidth * 0.9, behavior: 'smooth' }); }));
   } catch (e) { console.warn('[portada viva]', e?.message ?? e); }

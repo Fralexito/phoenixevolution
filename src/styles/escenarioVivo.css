@@ -147,3 +147,22 @@ html[data-version='viva'] .ev-clips { display: grid; }
 }
 /* orden visual: local · VS · visitante (en el HTML el centro va al final) */
 .ev-duelo > .ev-eq { order: 1; } .ev-duelo > .ev-centro { order: 2; } .ev-duelo > .ev-eq-der { order: 3; }
+
+/* Pestañas del costado: Lo que viene · Resultados · Tabla */
+.ev-tabs { display: flex; gap: .25rem; width: 100%; border-bottom: 1px solid rgb(255 255 255 / .1); }
+.ev-tabs button { position: relative; display: inline-flex; align-items: center; gap: .45rem; padding: .55rem .6rem; border: 0; background: none; cursor: pointer;
+  font: 700 .8125rem/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: #9ea3c0; transition: color .2s; }
+.ev-tabs button:hover { color: #fff; }
+.ev-tabs button[aria-selected='true'] { color: #fff; }
+.ev-tabs button[aria-selected='true']::after { content: ''; position: absolute; left: .6rem; right: .6rem; bottom: -1px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--color-galaxy-400, #00e5ff), var(--color-galaxy-600, #8000ff)); box-shadow: 0 0 10px var(--color-galaxy-400, #00e5ff); }
+.ev-lista[hidden] { display: none; }
+.ev-lista:not([hidden]) { animation: ev-panel .35s cubic-bezier(.22, 1, .36, 1); }
+@keyframes ev-panel { from { opacity: 0; transform: translateY(6px); } }
+.ev-res { color: var(--color-galaxy-400, #00e5ff); font-variant-numeric: tabular-nums; }
+.ev-top a { gap: .6rem; }
+.ev-pos { width: 1.5rem; text-align: center; font: 700 .9375rem/1 var(--font-display); color: #9ea3c0; }
+.ev-pos.oro { color: var(--color-gold-400, #fbbf24); text-shadow: 0 0 10px color-mix(in srgb, var(--color-gold-400, #fbbf24) 60%, transparent); }
+.ev-pts { margin-left: auto; display: grid; justify-items: end; font: 700 1.125rem/1 var(--font-display); color: #fff; }
+.ev-pts small { font-size: 12px; font-weight: 600; color: #9ea3c0; }
+a.ev-lado-pie { display: block; text-decoration: none; }
+a.ev-lado-pie b { color: var(--color-galaxy-400, #00e5ff); font-weight: 600; }

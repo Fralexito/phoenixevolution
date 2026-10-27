@@ -106,7 +106,7 @@ const atajosDe = (id) => accionesDe(id).filter((a) => a.href !== PRINCIPAL[id]?.
 const VENTANAS = [
   { id: 'club', nombre: 'Mi Club', icono: 'fa-shield-halved', href: 'manager/', color: 'var(--color-gold-400)', vacio: { titulo: 'Gestiona tu club de PES', meta: 'Fichajes, plantilla y tu partida' } },
   { id: 'social', nombre: 'Zona Social', icono: 'fa-users', href: 'social/', color: 'var(--color-galaxy-600)', vacio: { titulo: 'Sé el primero en publicar hoy', meta: 'Historias, fotos y jugadas', cta: 'Publica la primera jugada' } },
-  { id: 'competencia', nombre: 'Competencia', icono: 'fa-trophy', href: 'liga/', color: 'var(--color-ok)', items: itemsCompetencia(edGalaxy?.fechas ?? [], clubesG), vacio: { titulo: 'La liga arranca pronto', meta: 'Tabla, fechas y torneos' } },
+  { id: 'competencia', nombre: 'Competencia', icono: 'fa-trophy', href: 'liga/', color: 'var(--color-ok)', items: FX.rediseno ? tablaG.slice(0, 4).map((t, k) => ({ titulo: `${k + 1}.º ${t.nombre} · ${t.pts} pts`, meta: `${clubesG[t.nombre] ?? ''} · ${t.pj} PJ`, escudos: [clubesG[t.nombre] ?? ''] })) : itemsCompetencia(edGalaxy?.fechas ?? [], clubesG), vacio: { titulo: 'La liga arranca pronto', meta: 'Tabla, fechas y torneos' } },
   { id: 'duelos', nombre: 'Duelos', icono: 'fa-gamepad', href: 'duelos/', color: 'var(--color-galaxy-400)', vacio: { titulo: 'Nadie espera rival ahora', meta: 'Crea el primer reto', cta: 'Crea el primer reto' } },
 ];
 ---
@@ -128,7 +128,7 @@ const VENTANAS = [
         <span class="esc-l1">{palabras('Bienvenido a la').map((w, k) => (<Fragment><span class="esc-w" style={`--i:${k}`}>{w}</span>{' '}</Fragment>))}</span>
         <span class="esc-l2 esc-marca" data-vt-galaxy><span class="esc-w" style="--i:3">Galaxy</span></span>
       </h1>
-      <p class="vt-sub">{INTER ? 'Esto está pasando ahora en la comunidad. Toca una ventana para girarla y ver más.' : 'Esto está pasando ahora en la comunidad.'}</p>
+      <p class="vt-sub">{INTER ? FX.rediseno ? 'La liga de PES 2021 y Football Life por Parsec. Toca una ventana para girarla y ver más.' : 'Esto está pasando ahora en la comunidad. Toca una ventana para girarla y ver más.' : 'Esto está pasando ahora en la comunidad.'}</p>
       {/* Ronda 397 (Frank): UNA acción principal arriba. Sin sesión: crear cuenta; con sesión: jugar un reto. «Ver la tabla» para todos.
            solo-invitado / solo-cuenta los alterna components.css según <html data-sesion>. */}
       <div class="vt-cta">
@@ -149,7 +149,7 @@ const VENTANAS = [
                     <span class:list={['vt-item', !v.items?.length && 'vt-vacio', !v.items?.length && it.cta && 'vt-vacio-linea']} data-on={k === 0 ? '' : undefined}>
                       {/* Ronda 399 (Frank): ventana vacía = UNA línea con enlace, no un bloque alto. Si llegan datos, ventanas.js reemplaza esto. */}
                       {!v.items?.length && it.cta ? <a class="vt-vacio-cta" href={`${base}${v.href}`}>{it.cta} <span aria-hidden="true">→</span></a> : <Fragment>
-                      {it.escudos ? <span class="vt-media vt-escudos"><Fragment set:html={escudoHTML(it.escudos[0], 30) + escudoHTML(it.escudos[1], 30)} /></span> : <span class="vt-media vt-media-ico"><i class={`fa-solid ${v.icono}`}></i></span>}
+                      {it.escudos ? <span class="vt-media vt-escudos"><Fragment set:html={escudoHTML(it.escudos[0], 30) + (it.escudos.length > 1 ? escudoHTML(it.escudos[1], 30) : '')} /></span> : <span class="vt-media vt-media-ico"><i class={`fa-solid ${v.icono}`}></i></span>}
                       <span class="vt-txt"><b>{it.titulo}</b><small>{it.meta}</small></span>
                       </Fragment>}
                     </span>
@@ -174,7 +174,7 @@ const VENTANAS = [
             <span class="vt-items" data-vt-items aria-live="off">
               {(v.items?.length ? v.items : [v.vacio]).map((it, k) => (
                 <span class:list={['vt-item', !v.items?.length && 'vt-vacio']} data-on={k === 0 ? '' : undefined}>
-                  {it.escudos ? <span class="vt-media vt-escudos"><Fragment set:html={escudoHTML(it.escudos[0], 30) + escudoHTML(it.escudos[1], 30)} /></span> : <span class="vt-media vt-media-ico"><i class={`fa-solid ${v.icono}`}></i></span>}
+                  {it.escudos ? <span class="vt-media vt-escudos"><Fragment set:html={escudoHTML(it.escudos[0], 30) + (it.escudos.length > 1 ? escudoHTML(it.escudos[1], 30) : '')} /></span> : <span class="vt-media vt-media-ico"><i class={`fa-solid ${v.icono}`}></i></span>}
                   <span class="vt-txt"><b>{it.titulo}</b><small>{it.meta}</small></span>
                 </span>
               ))}
