@@ -123,6 +123,13 @@ const VENTANAS = [
         <span class="esc-l2 esc-marca" data-vt-galaxy><span class="esc-w" style="--i:3">Galaxy</span></span>
       </h1>
       <p class="vt-sub">{INTER ? 'Esto está pasando ahora en la comunidad. Toca una ventana para girarla y ver más.' : 'Esto está pasando ahora en la comunidad.'}</p>
+      {/* Ronda 397 (Frank): UNA acción principal arriba. Sin sesión: crear cuenta; con sesión: jugar un reto. «Ver la tabla» para todos.
+           solo-invitado / solo-cuenta los alterna components.css según <html data-sesion>. */}
+      <div class="vt-cta">
+        <button type="button" class="cierre-btn cierre-btn-prim solo-invitado" data-crear-cuenta><i class="fa-solid fa-user-plus"></i> Crear mi cuenta</button>
+        <a href={`${base}duelos/`} class="cierre-btn cierre-btn-prim solo-cuenta"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
+        <a href={`${base}liga/`} class="cierre-btn cierre-btn-sec"><i class="fa-solid fa-table-list"></i> Ver la tabla</a>
+      </div>
       <div class="vt-escena"><div class="vt-grid" data-vt-grid>
         {INTER ? VENTANAS.map((v, n) => (
           <div class="vt-v" style={`--vt-c:${v.color};--n:${n}`} data-vt-ventana={v.id}>
@@ -623,5 +630,5 @@ const VENTANAS = [
   import('../js/features/portada/ahora.js').then((m) => m.montarAhora()).catch((e) => console.warn('[central] ahora:', e));
   import('../js/features/escenario.js').then((m) => m.montarEscenario()).catch((e) => console.warn('[central] escenario:', e));
   import('../js/features/transmision.js').then((m) => m.montarTransmision()).catch((e) => console.warn('[central] transmisión:', e));
-  document.getElementById('cierre-registro')?.addEventListener('click', () => openAuthModal('register'));
+  document.querySelectorAll('#cierre-registro, [data-crear-cuenta]').forEach((b) => b.addEventListener('click', () => openAuthModal('register')));   // + botón de arriba (ronda 397)
 </script>

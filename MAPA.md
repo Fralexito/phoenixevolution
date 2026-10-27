@@ -542,3 +542,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 394 · 1.37.2 Jugadores fluido: luces de estadio quietas (no animar detrás de backdrop-filter)
 - 395 · 1.38.0 fuera los 4 estilos de prueba y la capa vivo (quedan botones y cartas de juego)
 - 396 · 1.38.1 tarjetas de Jugadores fluidas (halo y modo foco sin blur)
+- 397 · 1.39.0 portada paso 1: botón principal (Crear mi cuenta / Jugar un reto) + «Ver la tabla» bajo el saludo

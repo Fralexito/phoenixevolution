@@ -7,6 +7,9 @@
 .vt-tit { display: grid; font-family: var(--font-display); font-weight: 700; line-height: .96; letter-spacing: -.01em; color: #fff; font-size: clamp(2.4rem, 6.4vw, 5.6rem); }
 .vt-tit .esc-l1, .vt-tit .esc-l2 { display: block; }
 .vt-sub { font-size: .95rem; color: #9ca3af; }
+/* Ronda 397: fila con la acción principal (crear cuenta / jugar un reto) y «Ver la tabla». Botones de portada.css (.cierre-btn). */
+.vt-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; }
+@media (max-width: 639px) { .vt-cta { width: 100%; } .vt-cta > * { flex: 1 1 9.5rem; justify-content: center; padding: .8rem 1rem; } }
 
 /* ── La cuadrícula: 4 ventanas iguales (2×2 en celular) ── */
 .vt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; width: 100%; margin-top: 1.25rem; text-align: left; }
