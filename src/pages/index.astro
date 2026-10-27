@@ -101,9 +101,9 @@ const atajosDe = (id) => accionesDe(id).filter((a) => a.href !== PRINCIPAL[id]?.
 // 19-oct-2026 (Fralex): por importancia. Mi Club primero y dorado (gestionar a los jugadores de tu PES es lo más exclusivo de la web).
 const VENTANAS = [
   { id: 'club', nombre: 'Mi Club', icono: 'fa-shield-halved', href: 'manager/', color: 'var(--color-gold-400)', vacio: { titulo: 'Gestiona tu club de PES', meta: 'Fichajes, plantilla y tu partida' } },
-  { id: 'social', nombre: 'Zona Social', icono: 'fa-users', href: 'social/', color: 'var(--color-galaxy-600)', vacio: { titulo: 'Sé el primero en publicar hoy', meta: 'Historias, fotos y jugadas' } },
+  { id: 'social', nombre: 'Zona Social', icono: 'fa-users', href: 'social/', color: 'var(--color-galaxy-600)', vacio: { titulo: 'Sé el primero en publicar hoy', meta: 'Historias, fotos y jugadas', cta: 'Publica la primera jugada' } },
   { id: 'competencia', nombre: 'Competencia', icono: 'fa-trophy', href: 'liga/', color: 'var(--color-ok)', items: itemsCompetencia(edGalaxy?.fechas ?? [], clubesG), vacio: { titulo: 'La liga arranca pronto', meta: 'Tabla, fechas y torneos' } },
-  { id: 'duelos', nombre: 'Duelos', icono: 'fa-gamepad', href: 'duelos/', color: 'var(--color-galaxy-400)', vacio: { titulo: 'Nadie espera rival ahora', meta: 'Crea el primer reto' } },
+  { id: 'duelos', nombre: 'Duelos', icono: 'fa-gamepad', href: 'duelos/', color: 'var(--color-galaxy-400)', vacio: { titulo: 'Nadie espera rival ahora', meta: 'Crea el primer reto', cta: 'Crea el primer reto' } },
 ];
 ---
 <Layout title="Inicio" active="central" description="Phoenix Evolution Series: liga competitiva de PES 2021 y Football Life 2026 por Parsec, con torneos, duelos, Liga Máster y comunidad.">
@@ -139,12 +139,17 @@ const VENTANAS = [
                 <span class="vt-cab"><span class="vt-ico"><i class={`fa-solid ${v.icono}`}></i></span><b>{v.nombre}</b><a class="vt-ir" href={`${base}${v.href}`} aria-label={`Ir a ${v.nombre}`}><i class="fa-solid fa-arrow-right vt-flecha"></i></a></span>
                 <span class="vt-items" data-vt-items aria-live="off">
                   {(v.items?.length ? v.items : [v.vacio]).map((it, k) => (
-                    <span class:list={['vt-item', !v.items?.length && 'vt-vacio']} data-on={k === 0 ? '' : undefined}>
+                    <span class:list={['vt-item', !v.items?.length && 'vt-vacio', !v.items?.length && it.cta && 'vt-vacio-linea']} data-on={k === 0 ? '' : undefined}>
+                      {/* Ronda 399 (Frank): ventana vacía = UNA línea con enlace, no un bloque alto. Si llegan datos, ventanas.js reemplaza esto. */}
+                      {!v.items?.length && it.cta ? <a class="vt-vacio-cta" href={`${base}${v.href}`}>{it.cta} <span aria-hidden="true">→</span></a> : <Fragment>
                       {it.escudos ? <span class="vt-media vt-escudos"><Fragment set:html={escudoHTML(it.escudos[0], 30) + escudoHTML(it.escudos[1], 30)} /></span> : <span class="vt-media vt-media-ico"><i class={`fa-solid ${v.icono}`}></i></span>}
                       <span class="vt-txt"><b>{it.titulo}</b><small>{it.meta}</small></span>
+                      </Fragment>}
                     </span>
                   ))}
                 </span>
+                {/* Ronda 399: Mi Club es la ventana principal → su botón va a la vista, sin tener que girarla. */}
+                {v.id === 'club' && <span class="vt-club-acc"><a class="vt-principal" href={`${base}${PRINCIPAL.club.href}`}><span>{PRINCIPAL.club.titulo}</span><i class="fa-solid fa-arrow-right"></i></a></span>}
                 <span class="vt-pista" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
               </div>
               <div class="vt-cara vt-dorso" id={`vt-dorso-${v.id}`} data-vista={VISTA[v.id]} inert>

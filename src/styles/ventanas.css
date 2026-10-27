@@ -125,3 +125,55 @@
 /* El espacio que sobra (si la otra cara o la vecina es más alta) va abajo, no repartido entre el título y el contenido. */
 .vt-v, .vt-plus .vt-cara { align-content: start; }
 .vt-plus .vt-frente { justify-content: flex-start; }
+
+/* ── Ronda 399 (Frank): Mi Club primero ──
+   Escritorio: 3 columnas (2fr 1fr 1fr); Mi Club ocupa 2 filas, dorado. Las otras 3 son de apoyo (una fila, título 1.05rem).
+   Celular: Mi Club a lo ancho (2 columnas) y las otras 3 debajo. */
+.vt-v[data-vt-ventana='club'] { grid-column: span 2; }
+@media (min-width: 1024px) {
+  .vt-grid { grid-template-columns: 2fr 1fr 1fr; }
+  .vt-v[data-vt-ventana='club'] { grid-column: auto; grid-row: span 2; }
+}
+.vt-v[data-vt-ventana='club'] .vt-frente, .vt-v[data-vt-ventana='club']:not(:has(.vt-frente)) {
+  border-color: color-mix(in srgb, var(--color-gold-400) 45%, transparent);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--color-gold-400) 15%, transparent), rgb(255 255 255 / .015) 70%), rgb(7 2 13 / .55); }
+.vt-v[data-vt-ventana='club'] .vt-txt b { font-size: 1.5rem; -webkit-line-clamp: 3; }
+.vt-v[data-vt-ventana='club'] .vt-txt small { white-space: normal; font-size: .875rem; color: #c9cdd6; }
+.vt-v:not([data-vt-ventana='club']) .vt-txt b { font-size: 1.05rem; }
+.vt-limpio .vt-v:not([data-vt-ventana='club']) .vt-txt b { font-size: 1.05rem; }
+.vt-limpio .vt-v[data-vt-ventana='club'] .vt-txt b { font-size: 1.5rem; }
+@media (max-width: 639px) { .vt-v[data-vt-ventana='club'] .vt-txt b, .vt-limpio .vt-v[data-vt-ventana='club'] .vt-txt b { font-size: 1.25rem; } }
+/* Ventana vacía: una sola línea con enlace (por encima del botón que gira la ventana) */
+.vt-vacio-linea { align-content: center; }
+.vt-vacio-cta { position: relative; z-index: 2; justify-self: start; display: inline-flex; gap: .35rem; padding: .35rem 0; font: 600 .95rem var(--font-display); color: var(--vt-c); text-decoration: none; }
+.vt-vacio-cta:hover, .vt-vacio-cta:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+/* Sin huecos: Competencia ocupa el ancho de las 2 columnas de apoyo (fila de abajo) y Duelos sube a llenar su lugar (dense). */
+.vt-grid { grid-auto-flow: row dense; }
+.vt-v[data-vt-ventana='competencia'] { grid-column: span 2; }
+/* Botón de Mi Club en el frente (abajo; por encima del botón que gira la ventana) */
+.vt-club-acc { position: relative; z-index: 2; margin-top: auto; padding-top: .75rem; }
+.vt-club-acc .vt-principal { font-size: .95rem; letter-spacing: .06em; text-transform: uppercase; }
+@media (min-width: 1024px) { .vt-club-acc .vt-principal { max-width: 22rem; } }
+
+/* Celular/tablet: la cara de atrás de las ventanas de apoyo ya no estira la ventana (iba a 239 px con una sola línea al frente).
+   Se monta encima del frente con su misma altura y sus botones van en filas bajas (icono al lado del texto). */
+@media (max-width: 1023px) {
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-frente { min-height: 10rem; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: .75rem; gap: .5rem; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso[data-vista='mosaico'] :is(.vt-principal, .vt-atajos a) { flex-direction: row; justify-content: flex-start; text-align: left; gap: .35rem; padding: .4rem .45rem; font-size: .75rem; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso[data-vista='mosaico'] :is(.vt-pico, .vt-atajos a i) { font-size: .85rem; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso :is(.vt-principal) { padding: .5rem .7rem; font-size: .8rem; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso .vt-atajos { gap: .3rem; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso .vt-atajos a { padding: .3rem .5rem; }
+}
+/* Escritorio: Mi Club mide 2 filas → el botón va abajo y el texto arriba (sin hueco al medio sin sentido). */
+@media (min-width: 1024px) {
+  .vt-plus .vt-v[data-vt-ventana='club'] .vt-frente { grid-template-rows: auto auto 1fr; }
+  .vt-plus .vt-v[data-vt-ventana='club'] .vt-club-acc { align-self: end; }
+}
+/* Celular: en el mosaico de atrás los botones son angostos → sin icono y letra más junta (antes se cortaba «MENSAJES»). */
+@media (max-width: 1023px) {
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso[data-vista='mosaico'] :is(.vt-pico, .vt-atajos a i) { display: none; }
+  .vt-plus .vt-v:not([data-vt-ventana='club']) .vt-dorso[data-vista='mosaico'] :is(.vt-principal, .vt-atajos a) { justify-content: center; text-align: center; letter-spacing: 0; min-width: 0; padding-inline: .2rem; font-size: .75rem; }
+}
+@media (max-width: 639px) { html .vt-limpio .vt-v[data-girada] .vt-dorso .vt-cab::before { width: .9rem; } .vt-plus .vt-dorso .vt-cab { gap: .4rem; } }
