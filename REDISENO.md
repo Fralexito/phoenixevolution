@@ -35,3 +35,10 @@ los botones se llenan de púrpura a cian y las tarjetas suben al pasar el mouse.
 5. Comunidad, fichas (perfil, jugador, rivalidad), cuenta y limpieza final — PENDIENTE.
 
 Nada de esto llega a `borrador` ni a `main` hasta que Fralex diga «Súbelo».
+
+## 27-oct · Regla para siempre: «Nunca listas nativas»
+- Fralex (captura de la lista gris de Android): «que la página nunca más tenga algo así, tan arcaico y feo».
+- Todo `<select>` de la web abre el **Selector Phoenix** (js/features/selectorPhoenix.js + styles/selectorPhoenix.css): panel Galaxy en PC, hoja desde abajo en celular. No hay que tocar cada página: funciona solo, también con los selectores creados por JavaScript.
+- Excepciones: `multiple`, `size>1` o `data-nativo` (solo si hay una razón fuerte).
+- Pendiente con la misma regla: los selectores de fecha/hora (`type="date"`, `time`, `datetime-local`, `month`; 12 en la web) aún abren el calendario del sistema.
+- Liga: vuelve el «Últimos» con flechas ‹ › y contador (5/11), como antes del 19-oct (pedido de Fralex).

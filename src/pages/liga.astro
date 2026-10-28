@@ -143,7 +143,7 @@ const datos = LIGAS.map((l) => ({
                   <thead><tr>
                     <th class="text-left w-8" title="Puesto y cuánto subió o bajó desde la fecha anterior">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
                     <th class="hidden sm:table-cell">G</th><th class="hidden sm:table-cell">E</th><th class="hidden sm:table-cell">P</th>
-                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th title="Últimos 5 partidos; el de la derecha es el más reciente">Últimos 5</th>
+                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th title="Últimos partidos; el de la derecha es el más reciente. Usa las flechas para ver los anteriores">Últimos</th>
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
@@ -154,10 +154,16 @@ const datos = LIGAS.map((l) => ({
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
                         <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
                         <td class:list={[f.dg > 0 ? 'text-emerald-400' : f.dg < 0 ? 'text-rose-400' : 'text-gray-400']}>{f.dg > 0 ? `+${f.dg}` : f.dg}</td>
+                        <!-- 27-oct (Fralex): vuelve el «Últimos» con flechas ‹ › para recorrer TODOS los partidos y el contador (5/11). JS: js/pages/liga.js -->
                         <td>
                           {e.formas[f.nombre].length === 0 ? <span class="text-gray-600">—</span> : (
-                            <div class="lf-forma" aria-label={`Últimos resultados de ${f.nombre}, del más antiguo al más reciente`}>
-                              {e.formas[f.nombre].slice(-5).map((h, k, arr) => <span class:list={['lf-f', `lf-${h.r}`, k === arr.length - 1 && 'lf-ult']} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
+                            <div class="forma" data-forma>
+                              <button type="button" class="forma-flecha" data-forma-paso="-1" aria-label={`Partidos anteriores de ${f.nombre}`}><i class="fa-solid fa-chevron-left"></i></button>
+                              <div class="forma-strip" data-forma-strip tabindex="0" aria-label={`Resultados de ${f.nombre}, del más antiguo al más reciente`}>
+                                {e.formas[f.nombre].map((h) => <span class:list={['liga-forma', CHIP[h.r]]} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
+                              </div>
+                              <button type="button" class="forma-flecha" data-forma-paso="1" aria-label={`Partidos más recientes de ${f.nombre}`}><i class="fa-solid fa-chevron-right"></i></button>
+                              <span class="forma-cont" data-forma-cont data-total={e.formas[f.nombre].length} title="Partidos que se ven, sobre el total jugado">{Math.min(5, e.formas[f.nombre].length)}/{e.formas[f.nombre].length}</span>
                             </div>
                           )}
                         </td>
@@ -181,7 +187,7 @@ const datos = LIGAS.map((l) => ({
               )}
               <details class="liga-guia">
                 <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none inline-flex items-center gap-1.5 min-h-9"><i class="fa-solid fa-circle-info"></i>¿Cómo se lee la tabla?</summary>
-                <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · ▲▼: cuántos puestos subió o bajó desde la fecha anterior · Últimos 5: G ganó, E empató, P perdió (el de la derecha es el más reciente; pasa el dedo o el mouse para ver el marcador). Toca un jugador para resaltar sus partidos en Resultados.</p>
+                <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · ▲▼: cuántos puestos subió o bajó desde la fecha anterior · Últimos: G ganó, E empató, P perdió (el de la derecha es el más reciente; flechas, rueda o arrastre para ver los anteriores; pasa el dedo o el mouse para ver el marcador). Toca un jugador para resaltar sus partidos en Resultados.</p>
               </details>
             </section>
 

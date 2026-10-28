@@ -20,6 +20,9 @@ import { interruptorDemo } from './core/sistema/modoDemo.js';
 
 initAjustes();
 initModoLigero();
+// Selector Phoenix (27-oct-2026): ninguna lista desplegable usa la ventana nativa del sistema. Se carga enseguida (alguien puede tocar
+// un selector al instante). Si fallara, queda la lista nativa.
+if (FX.rediseno) import('./features/selectorPhoenix.js').then((m) => m.initSelectorPhoenix()).catch((e) => console.error('[boot] selector:', e));
 initSitio();
 initSidebar();
 initNavbar();
