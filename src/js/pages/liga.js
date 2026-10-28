@@ -20,7 +20,20 @@ function mostrarFecha(caja, n) {
   if (!paneles.some((p) => p.dataset.fechaPanel === String(n))) { console.warn('[liga] fecha desconocida:', n); return; }
   paneles.forEach((p) => { p.hidden = p.dataset.fechaPanel !== String(n); });
   if (sel) sel.value = String(n);
+  // Rediseño: las pastillas de fechas siguen al selector (y la elegida queda a la vista)
+  $$('[data-fecha-ir]', caja).forEach((b) => { const on = b.dataset.fechaIr === String(n); b.setAttribute('aria-pressed', String(on)); if (on) centrarPastilla(b, true); });
 }
+/** Deja la pastilla elegida en el centro de su tira (solo mueve la tira, nunca la página). */
+function centrarPastilla(b, suave = false) {
+  const tira = b.closest('[data-lg-fechas]'); if (!tira) return;
+  try { tira.scrollTo({ left: b.offsetLeft - (tira.clientWidth - b.offsetWidth) / 2, behavior: suave ? 'smooth' : 'auto' }); } catch { tira.scrollLeft = b.offsetLeft - (tira.clientWidth - b.offsetWidth) / 2; }
+}
+// Al abrir: la fecha actual ya centrada en cada tira
+$$('[data-lg-fechas] [aria-pressed="true"]').forEach((b) => centrarPastilla(b));
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-fecha-ir]'); if (!b) return;
+  const caja = b.closest('[data-fechas]'); if (caja) mostrarFecha(caja, b.dataset.fechaIr);
+});
 document.addEventListener('change', (e) => {
   const s = e.target.closest('[data-fecha-select]'); if (s) mostrarFecha(s.closest('[data-fechas]'), s.value);
 });
