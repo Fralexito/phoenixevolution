@@ -209,3 +209,11 @@ a.ev-lado-pie b { color: var(--color-galaxy-400, #00e5ff); font-weight: 600; }
   .ev-barra span { font-size: 9.5px; letter-spacing: .06em; }
 }
 @media (prefers-reduced-motion: reduce) { .ev-escena[data-on] :is(.ev-fondo, .ev-foco > *, .ev-cifra) { animation: none; } }
+
+/* Apple design (27-oct): arrastre 1:1 de las escenas. El navegador deja los gestos horizontales a la web (los verticales siguen bajando la página). */
+.ev-escenario { touch-action: pan-y; }
+.ev.ev-arrastra .ev-escena { transition: none; }
+.ev.ev-arrastra .ev-escenario { cursor: grabbing; }
+.ev-escenario { cursor: grab; user-select: none; -webkit-user-select: none; }
+.ev-escenario :is(a, button) { cursor: pointer; }
+.ev-escenario img { -webkit-user-drag: none; }

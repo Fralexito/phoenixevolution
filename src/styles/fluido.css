@@ -1,0 +1,38 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════════
+   APPLE DESIGN en toda la web (27-oct-2026, skill «apple-design»: «Designing Fluid Interfaces», WWDC). Todo bajo html[data-rediseno].
+   No quita identidad (brillos, vidrio, 3D, Rajdhani): suma la SENSACIÓN de algo físico.
+     1 · Respuesta al instante: todo lo que se toca se «hunde» apenas lo apretás (no al soltar). Sin el recuadro gris del celular.
+     2 · Hojas del celular: se pueden bajar con el dedo para cerrarlas (js/features/fluido/hojas.js).
+     3 · Materiales: los paneles «se materializan» (desenfoque + escala), no solo aparecen.
+     4 · Accesibilidad: menos transparencia y más contraste si el sistema lo pide.
+     5 · Letras: títulos que se reparten en líneas parejas y tamaño óptico automático.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* 1 · Respuesta al tocar. «scale» es una propiedad aparte de «transform»: no pisa el 3D (prof3d) ni otras animaciones. */
+:root[data-rediseno] { -webkit-tap-highlight-color: transparent; }
+:root[data-rediseno] :is(a, button, [role='button'], summary, label, select, input) { touch-action: manipulation; }
+:root[data-rediseno] :is(button, [role='button'], .btn, .hero-cta, a[class*='btn'], .bi-item, .nav-link, .pilar-btn, .pilar-tabs-lista a,
+  .lg-f, .tc-club, .sx-op, .cal-dia, .cal-mes, .cal-anio, .rc-atajo, .ev-barra, .ev-flecha, .sx-x, .cal-flecha, .cal-listo, .cal-txt):not(:disabled):not([aria-disabled='true']):active { scale: .96; }
+:root[data-rediseno] :is(.lg-carta, .cg-club, .jr-p, .jr-sala, .liga-partido, .ev-clip, .rd-campeon, .player-card, .match-card):active { scale: .985; }
+@media (prefers-reduced-motion: reduce) { :root[data-rediseno] :active { scale: none !important; } }
+:root[data-rediseno][data-aj-mov-efectivo='reducido'] :active { scale: none !important; }
+
+/* 2 · Hojas arrastrables: sus estilos viven en styles/selectorPhoenix.css (se cargan con la hoja). */
+
+/* 3 · Materializar: el panel llega como un material (desenfoque + escala), no como un simple fundido */
+/* Los menús del encabezado ya llegan con su propia transición (components.css); el panel de las listas y calendarios llega como material (selectorPhoenix.css). */
+
+/* 4 · Accesibilidad de materiales */
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-rediseno] :is(.glass-panel, .sx-panel, .sx-cab, .pilar-panel, .barra-inf, body > .sticky > nav) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background-color: rgb(12 9 30) !important; }
+  .sx-velo.sx-hoja { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgb(3 1 10 / .85); }
+}
+@media (prefers-contrast: more) {
+  :root[data-rediseno] :is(.glass-panel, .sx-panel, .pilar-panel, .lg-carta, .cg-club, .jr-p, .rc) { border-color: rgb(255 255 255 / .55) !important; }
+  :root[data-rediseno] :is(.sx-op, .cal-dia, .lg-carta em, .rc-meta, .cg-dt) { color: #fff; }
+}
+
+/* 5 · Letras: títulos con líneas parejas; el tamaño óptico lo ajusta la fuente sola */
+:root[data-rediseno] body { font-optical-sizing: auto; }
+:root[data-rediseno] :is(h1, h2, h3, .ev-foco-tit, .cg-tit, .jr-tit) { text-wrap: balance; }
+:root[data-rediseno] p { text-wrap: pretty; }

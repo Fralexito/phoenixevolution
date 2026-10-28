@@ -53,3 +53,4 @@ main.flex-grow { min-height: 100vh; }
 @import './pruebaJuego.css';   /* ronda 391: PRUEBA botones y cartas de juego (solo con <html data-prueba-juego>) */
 @import './responsivo.css';   /* ronda 392: arreglos de pantallas chicas (cabecera sin sesión, «Tu club»…) */
 @import './sistema.css';   /* REDISEÑO (rama rediseno-web): sistema base inspirado en la Champions; todo bajo html[data-rediseno]. Va el ÚLTIMO. */
+@import './fluido.css';   /* APPLE DESIGN (rama rediseno-web): respuesta al tocar, materiales y accesibilidad; todo bajo html[data-rediseno]. */

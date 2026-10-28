@@ -168,6 +168,8 @@ const TOP = tabla.slice(0, 5);
   // Carrusel: avanza solo cada 6 s con barras de avance (como Twitch / historias), se pausa con el mouse, el foco o la pestaña oculta;
   // flechas, teclado y deslizar con el dedo. Las insignias se «parallaxean» con el mouse. Con «menos movimiento»: sin avance automático.
   import { hayMovimientoReducido } from '../../js/features/ajustes.js';
+  import { resorte as resorteA, agarrar as agarrarResorte, vibrar as vibrarCorto } from '../../js/features/fluido/animar.js';
+  import { velocidad as velocidadDe, proyectar } from '../../js/core/sistema/resorte.js';
   const raiz = document.querySelector('[data-ev]');
   try {
     if (raiz && document.documentElement.getAttribute('data-version') === 'viva') {
@@ -189,9 +191,39 @@ const TOP = tabla.slice(0, 5);
       raiz.addEventListener('focusin', pon(true)); raiz.addEventListener('focusout', pon(false));
       document.addEventListener('visibilitychange', () => { pausa = document.hidden; });
       raiz.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') ir(i + 1); if (e.key === 'ArrowLeft') ir(i - 1); });
-      let x0 = null; const tab = raiz.querySelector('[data-ev-escenario]');
-      tab.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
-      tab.addEventListener('pointerup', (e) => { if (x0 === null) return; const d = e.clientX - x0; x0 = null; if (Math.abs(d) > 40) ir(i + (d < 0 ? 1 : -1)); });
+      // Apple design (27-oct): la escena se ARRASTRA con el dedo 1:1 (desde donde la agarraste). Al soltar se mira hacia dónde iba
+      // el gesto (velocidad + impulso): pasa a la siguiente siguiendo esa misma velocidad, o vuelve a su lugar con un rebote suave.
+      // La nueva escena entra por el lado contrario (mismo camino de ida y vuelta). Funciona con dedo y con mouse.
+      const tab = raiz.querySelector('[data-ev-escenario]'); let d = null;
+      const ponX = (el, x) => { el.style.visibility = 'visible'; el.style.translate = `${x}px 0`; el.style.opacity = String(1 - Math.min(0.55, Math.abs(x) / (tab.offsetWidth * 1.4))); };
+      const limpiar = (el) => { el.style.translate = ''; el.style.opacity = ''; el.style.visibility = ''; };
+      tab.addEventListener('pointerdown', (e) => { if (e.button > 0 || e.target.closest('.ev-flecha, .ev-barra')) return; d = { x0: e.clientX, y0: e.clientY, id: e.pointerId, ok: false, m: [{ t: e.timeStamp, x: 0 }] }; });
+      tab.addEventListener('pointermove', (e) => {
+        if (!d || e.pointerId !== d.id) return; const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+        if (!d.ok) {
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+          if (Math.abs(dy) > Math.abs(dx)) { d = null; return; }   // gesto vertical: es para bajar la página
+          d.ok = true; d.x0 += Math.sign(dx) * 10; try { tab.setPointerCapture(e.pointerId); } catch { /* nada */ }
+          pausa = true; raiz.classList.add('ev-arrastra'); agarrarResorte(esc[i]);
+        }
+        const x = e.clientX - d.x0; ponX(esc[i], x); d.m.push({ t: e.timeStamp, x }); if (d.m.length > 12) d.m.shift();
+      });
+      const soltar = (e) => {
+        if (!d || e.pointerId !== d.id) return; const g = d; d = null; if (!g.ok) return;
+        const tapa = (ev) => { ev.preventDefault(); ev.stopPropagation(); }; tab.addEventListener('click', tapa, { capture: true, once: true }); setTimeout(() => tab.removeEventListener('click', tapa, true), 300);
+        const x = g.m.at(-1).x; const v = velocidadDe(g.m); const w = tab.offsetWidth; const lejos = x + proyectar(v, 0.99);
+        const actual = esc[i];
+        if (Math.abs(lejos) > w * 0.3 && esc.length > 1) {
+          const lado = lejos < 0 ? -1 : 1;   // hacia la izquierda = siguiente
+          vibrarCorto(6);
+          resorteA(actual, lado * w, { velocidad: v, amortiguacion: 1, respuesta: 0.3, poner: (px) => ponX(actual, px), alTerminar: () => limpiar(actual) });
+          ir(i - lado); const nueva = esc[i]; ponX(nueva, -lado * w * 0.35);
+          resorteA(nueva, 0, { velocidad: v * 0.5, amortiguacion: 1, respuesta: 0.35, poner: (px) => ponX(nueva, px), alTerminar: () => { limpiar(nueva); raiz.classList.remove('ev-arrastra'); pausa = false; t0 = performance.now(); } });
+        } else {
+          resorteA(actual, 0, { velocidad: v, amortiguacion: 0.8, respuesta: 0.3, poner: (px) => ponX(actual, px), alTerminar: () => { limpiar(actual); raiz.classList.remove('ev-arrastra'); pausa = false; } });
+        }
+      };
+      tab.addEventListener('pointerup', soltar); tab.addEventListener('pointercancel', soltar);
       if (!quieto && matchMedia('(hover: hover) and (pointer: fine)').matches) {
         let pend = null; let r2 = 0;
         tab.addEventListener('pointermove', (e) => { pend = e; if (r2) return; r2 = requestAnimationFrame(() => { r2 = 0; const r = tab.getBoundingClientRect(); const x = (pend.clientX - r.left) / r.width - 0.5; const y = (pend.clientY - r.top) / r.height - 0.5; tab.style.setProperty('--ev-mx', x.toFixed(3)); tab.style.setProperty('--ev-my', y.toFixed(3)); }); }, { passive: true });

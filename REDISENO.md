@@ -50,3 +50,11 @@ Nada de esto llega a `borrador` ni a `main` hasta que Fralex diga «Súbelo».
 - Mi club: «Los clubes de la Galaxy» (solo sin sesión) + arreglo del texto dorado de «Mi club» en el menú cuando está abierto.
 - Jugadores: tira de escudos para filtrar por club (js/features/jugadores/tiraClubes.js).
 - Perfil: «Tu rincón» en tu propio perfil: próximo partido, puesto y atajos (js/features/perfil/rincon.js, core/portada/rincon.js).
+
+## 27-oct (medianoche) · Apple design en toda la web (skill «apple-design»)
+- Física propia de resortes (core/sistema/resorte.js + js/features/fluido/animar.js): todo movimiento arranca desde donde está, con la velocidad que trae, y se puede interrumpir.
+- Respuesta al tocar en toda la web: lo que se toca se hunde al apretar (propiedad `scale`, no pisa el 3D); sin el recuadro gris del celular (styles/fluido.css).
+- Hojas del celular (listas y calendario): se cierran bajándolas con el dedo; si no, vuelven con un rebote suave (js/features/fluido/hojas.js).
+- Carrusel de la portada: se arrastra 1:1 con el dedo o el mouse; decide por velocidad e impulso; la nueva escena entra por el lado contrario.
+- Paneles que «se materializan» (desenfoque + escala); modo menos transparencia y más contraste del sistema; títulos en líneas parejas.
+- Regla: nada de esto quita identidad (brillos, vidrio, 3D, Rajdhani se quedan).

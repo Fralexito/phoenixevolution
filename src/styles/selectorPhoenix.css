@@ -23,7 +23,7 @@ html[data-selector-phoenix] select[aria-expanded='true'] { border-color: var(--c
   box-shadow: 0 24px 60px -18px rgb(0 0 0 / .85), 0 0 0 1px rgb(255 255 255 / .03) inset, 0 0 32px -10px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 70%, transparent);
   transform-origin: top center; animation: sx-cae .2s cubic-bezier(.22, 1, .36, 1) both; }
 .sx-panel[data-lado='arriba'] { transform-origin: bottom center; }
-@keyframes sx-cae { from { opacity: 0; transform: translateY(-6px) scale(.97); } }
+@keyframes sx-cae { from { opacity: 0; transform: translateY(-6px) scale(.96); filter: blur(6px); } }   /* Apple: llega como material (desenfoque + escala) */
 .sx-lista { list-style: none; margin: 0; padding: 6px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 40%, transparent) transparent; }
 
 /* Opciones */
@@ -67,3 +67,14 @@ html[data-aj-mov-efectivo='reducido'] :is(.sx-velo, .sx-panel, .sx-cab) { animat
 .sx-panel:focus, .sx-panel:focus-visible { outline: none !important; }
 html[data-selector-phoenix] .sx-velo .sx-panel:focus-visible { box-shadow: 0 24px 60px -18px rgb(0 0 0 / .85), 0 0 32px -10px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 70%, transparent); }
 .sx-lista { position: relative; }
+
+/* ── Apple design (27-oct): hojas que se bajan con el dedo (js/features/fluido/hojas.js) ── */
+/* La capa oscura se aclara a medida que bajas la hoja; mientras arrastras no corren animaciones de CSS */
+.sx-velo.sx-hoja { background: rgb(3 1 10 / calc(.62 * var(--sx-velo-op, 1))); }
+.sx-velo.sx-arrastrando :is(.sx-panel, .sx-cab) { animation: none !important; will-change: translate; }
+.sx-velo.sx-arrastrando .sx-asa { background: rgb(255 255 255 / .45); width: 48px; margin-left: -24px; }
+.sx-asa { transition: background .2s, width .2s cubic-bezier(.22, 1, .36, 1), margin .2s cubic-bezier(.22, 1, .36, 1); }
+/* Cerrada con el dedo: ya está abajo; solo se desvanece la capa (no vuelve a «salir» desde arriba) */
+.sx-velo[data-arrastrada].sx-sale { animation: sx-velo .16s ease-in reverse both !important; }
+.sx-velo[data-arrastrada].sx-sale :is(.sx-panel, .sx-cab) { animation: none !important; }
+
