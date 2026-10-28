@@ -93,4 +93,7 @@
 :root[data-rediseno] .rd-corte { clip-path: var(--rd-corte); }
 :root[data-rediseno] .rd-kicker { font: var(--tit-n3); letter-spacing: var(--tit-n3-track); text-transform: uppercase; color: var(--rd-cian); }
 /* El botón del destino actual no lleva relleno ni forma: solo la raya de abajo */
-:root[data-rediseno] .nav-link[aria-current='page'], :root[data-rediseno] .pilar-btn[aria-current='page'] { background: none !important; background-image: none !important; clip-path: none !important; }
+:root[data-rediseno] .nav-link[aria-current='page']:not(.nav-joya), :root[data-rediseno] .pilar-btn[aria-current='page'] { background: none !important; background-image: none !important; clip-path: none !important; }
+/* 27-oct: «Mi club» abierto perdía su texto (el dorado es un degradado recortado al texto; el «sin relleno» de arriba lo borraba).
+   Mi club conserva su dorado y su brillo; solo se quita la forma de fondo. */
+:root[data-rediseno] .nav-link.nav-joya[aria-current='page'] { clip-path: none !important; background: linear-gradient(90deg, #fbbf24, #fde68a 45%, #f59e0b) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent; border-bottom: 0; }

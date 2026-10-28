@@ -16,6 +16,7 @@ import '../styles/perfilJugador.css';
 import '../styles/miClubEstadio.css';
 import { FX } from '../data/experimento.js';
 import Plegable from '../components/Plegable.astro';
+import ClubesGalaxy from '../components/rediseno/ClubesGalaxy.astro';   // rediseño: vitrina de clubes para quien aún no entró
 const base = import.meta.env.BASE_URL;
 ---
 <Layout title="Liga Máster" active="manager" description="Tu carrera de DT en la Galaxy League: club, presupuesto y fichajes que llegan al juego.">
@@ -45,6 +46,7 @@ const base = import.meta.env.BASE_URL;
           <div><h2 class="mcg-h2">Activa tu carrera de DT</h2><p>Entra para elegir tu club y empezar a fichar.</p></div>
           <div class="flex flex-wrap gap-2"><button type="button" class="btn btn-primary" data-pr-auth="login"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button><button type="button" class="btn btn-ghost" data-pr-auth="register"><i class="fa-solid fa-user-plus"></i> Crear cuenta</button></div>
         </section>
+        {FX.rediseno && <ClubesGalaxy />}
       </Fragment>
     ) : (
       <Fragment>

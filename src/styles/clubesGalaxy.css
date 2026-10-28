@@ -1,0 +1,26 @@
+/* «Los clubes de la Galaxy» (components/rediseno/ClubesGalaxy.astro). Escudo grande bajo la luz del color de su club. */
+.cg { display: grid; gap: 1rem; padding: 1.25rem; border-radius: 1.25rem; border: 1px solid color-mix(in srgb, #fbbf24 22%, transparent);
+  background: radial-gradient(80% 60% at 50% 0%, rgb(251 191 36 / .08), transparent 70%), rgb(10 6 26 / .6); }
+.cg-cab { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .5rem 1rem; }
+.cg-kicker { font: 700 11px/1 var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: #fbbf24; }
+.cg-tit { margin-top: .35rem; font: 800 clamp(1.3rem, 1rem + 1vw, 1.8rem)/1 var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; text-shadow: 0 0 22px rgb(251 191 36 / .3); }
+.cg-sub { font-size: .875rem; color: #a6abcf; }
+.cg-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: .75rem; }
+.cg-club { position: relative; overflow: hidden; isolation: isolate; display: grid; justify-items: center; gap: .3rem; padding: 1.1rem .75rem .9rem; border-radius: 1rem; text-align: center;
+  border: 1px solid color-mix(in srgb, var(--cg-a) 30%, transparent); background: rgb(7 2 13 / .7); transition: border-color .25s, box-shadow .25s; }
+.cg-club:hover { border-color: color-mix(in srgb, var(--cg-a) 65%, transparent); box-shadow: 0 18px 40px -20px color-mix(in srgb, var(--cg-a) 90%, transparent); }
+.cg-luz { position: absolute; inset: 0; z-index: -1; opacity: .55; transition: opacity .3s;
+  background: radial-gradient(70% 55% at 50% 30%, color-mix(in srgb, var(--cg-a) 55%, transparent), transparent 70%), radial-gradient(60% 40% at 50% 100%, color-mix(in srgb, var(--cg-b) 35%, transparent), transparent 70%); }
+.cg-club:hover .cg-luz { opacity: .9; }
+.cg-pos { position: absolute; top: .55rem; left: .7rem; font: 800 .85rem/1 var(--font-display); color: rgb(255 255 255 / .7); }
+.cg-escudo { display: grid; place-items: center; width: 5.5rem; height: 5.5rem; margin-bottom: .25rem; transition: transform .35s cubic-bezier(.22, 1, .36, 1); }
+.cg-club:hover .cg-escudo { transform: translateY(-3px) scale(1.06); }
+.cg-escudo img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 18px rgb(0 0 0 / .55)) drop-shadow(0 0 16px color-mix(in srgb, var(--cg-a) 55%, transparent)); }
+.cg-escudo i { font-size: 3rem; color: #5d6290; }
+.cg-nombre { font: 700 .95rem/1.15 var(--font-display); letter-spacing: .05em; text-transform: uppercase; color: #fff; }
+.cg-dt { font-size: .8rem; color: #c9cbe3; }
+.cg-dt i { color: #fbbf24; font-size: .75em; }
+.cg-pts { font: 700 .75rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--color-galaxy-400); }
+.cg-ver { justify-self: start; font: 700 .78rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: #fbbf24; }
+.cg-ver:hover { color: #fff; }
+@media (max-width: 640px) { .cg-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cg-escudo { width: 4.5rem; height: 4.5rem; } }
