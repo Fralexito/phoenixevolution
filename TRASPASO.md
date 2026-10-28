@@ -368,3 +368,19 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Fralex:** crédito/cuenta para seguir, y avisar quién toma cada frente (con Antigravity incluido).
 - **Siguiente paso:** quien entre lee la sección 4b, hace `git pull --rebase`, toma su candado y su rama, y retoma por el frente que Fralex indique.
 - **Candados:** sin cambios (los de PES y Link siguen con Cuenta 1 pero en pausa; Web libre).
+
+### 2026-10-28 17:15 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.56: 8v8 manual, relevo en caliente (UI + combo Mando 1), limpieza 9–16 y barra de partido en Puestos
+- **Hecho:** Con autorización expresa de Fralex tras pasar Cuenta 1 a pausa por falta de crédito, se aplicaron las 4 mejoras acordadas en **Phoenix Link 0.3.56**:
+  1. **Propuesta A — 8v8 en `PARTIDO › Armar a mano`:** `SmashSoda/phoenix/web/ui/js/vistas/partido.js` (`ArmarManual` y `Columna` suben de 4 a 8 jugadores por lado con contador `N/8`), `SmashSoda/phoenix/web/AccionesPartidoWeb.cpp` (`lado()` acepta `1..8` jugadores) y `SmashSoda/phoenix/web/Arbitro.cpp` (`armarLadosSegunMandos` acepta hasta 8 por lado).
+  2. **Propuesta B — Relevo en caliente al caerse alguien a mitad de partido + combo del Mando 1 (completa el pendiente de la 0.3.55):**
+     - En `SmashSoda/phoenix/web/ui/js/vistas/puestos.js` (`Fila`), cuando hay un partido en juego o pausado y un puesto de Equipo A o B queda libre por caída de un titular, la fila se resalta en ámbar y muestra botones `⚡ Relevo en 1 clic` con quien reconectó o está en `Mirando` (`mandos.asignar` / `mandos.tomar`).
+     - En `SmashSoda/phoenix/web/Arbitro.cpp` (`tickArbitro`), pulsar **L3 + R3 + Select (Back)** (`0x0040 | 0x0080 | 0x0020`) en el mando físico del anfitrión (`botonesMandoPropio`) reasigna al instante el primer puesto libre del equipo incompleto (priorizando al titular que reconectó en `espectadores()`, o al primer suplente en `Mirando`) mediante `AccionesSala::asignarConectando` y lo anuncia en el chat con `mensajeDelBot`.
+  3. **Propuesta C — Limpieza visual de puestos 09–16 en `MANDOS › PUESTOS`:** en `SmashSoda/phoenix/web/ui/js/vistas/puestos.js`, se quitó el cartel amarillo de 2 líneas repetido en cada fila 09–16 y se reemplazó por una sola pastilla `MANDOS 9–16 · MÓDULO SIDER` en la cabecera `JUGANDO` más un chip corto `EXTRA` en cada fila.
+  4. **Propuesta D — Barra rápida `PARTIDO EN SALA` en `MANDOS › PUESTOS`:** componente `BarraPartidoEnSala` en `SmashSoda/phoenix/web/ui/js/vistas/puestos.js` arriba de `JUGANDO` que permite alternar entre `AMISTOSO`, `LIGA OFICIAL` y `TORNEO`, elegir el partido oficial (`partido.oficial` / `partido.torneo`), ver `✓ VINCULADO AL ACTA` y copiar el enlace de la sala (`sala.copiarEnlace`) sin salir de `MANDOS › PUESTOS`.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` (Link `0.3.56`) y `phoenixevolution@borrador` (este `TRASPASO.md`).
+- **Solo en la PC (sin git):** `C:\dev\smash-soda-fork\_phoenix-link\x64\Release\PhoenixLink.exe` compilado en `0.3.56` con `cmake --build` y `ui\` actualizada junto al `.exe`.
+- **Supabase:** nada nuevo (aplicadas hasta la **161**; siguiente libre: **162**).
+- **A medias:** nada en Link `0.3.56`; todo compilado y sincronizado.
+- **Esperando a Fralex:** probar `PhoenixLink.exe` `0.3.56` en sala real (barra de partido en Puestos, armado 8v8 y combo `L3+R3+Select` en partido).
+- **Siguiente paso:** cualquier cuenta de Claude (Cuenta 1 o Cuenta 2) que retome Link solo debe hacer `git pull --rebase origin plan-ux` y verá el commit de la `0.3.56` y la fila en `REGISTRO-LINK.md`.
+- **Candados:** Link vuelve a quedar libre / disponible para Cuenta 1 o Cuenta 2.
