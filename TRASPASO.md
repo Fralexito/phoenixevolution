@@ -71,7 +71,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Phoenix Sync / Mercado | `smash-soda-fork@mercado-fase0` · PC `C:\dev\smash-soda-fork` | libre | — |
 | PES: mandos 9–16 (módulo Sider) | PC `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` + `Conmegol Patch\SiderAddons\modules` | **Cuenta 1** (hilo 4; necesita la PC conectada: la Cuenta 2 por navegador no puede tocarlo) — siguiente: pantalla Local/Visitante nativa de 16 | 2026-10-21 |
 | PES: modo street | PC `D:\Frank\Games_\PRUEBA_CANCHA` (solo lectura/Ghidra) | libre — en espera hasta acabar la pantalla nativa de 16 | — |
-| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 160**; **161 escrita y probada** (`161_duelos_16_jugadores.sql`, falta pegar en SQL Editor); siguiente libre: **162** | 2026-10-28 |
+| Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 161** (`161_duelos_16_jugadores.sql` aplicada por Fralex el 28-oct); siguiente libre: **162** | 2026-10-28 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
 
@@ -251,7 +251,7 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   1. **Sala de Duelos (`/duelos/`):** tope ampliado de 8 a **16 jugadores** (`MAX_PLAYERS = 16`, `MAX_TEAM = 15` en `rules.js`); botones rápidos `1v1`, `2v2`, `3v3`, `4v4`, `5v5`, `8v8` y `Personalizar`/`Otro`; radar vacío ahora ofrece también «Agendar hora» y «Salas en vivo»; aviso claro en `duelos/actions.js` si aún no se pegó el SQL 161.
   2. **Liga Oficial (`/liga-amigos/`):** muestra el escudo real del club (`escudoHTML`) en los inscritos y en la tabla (`liga_tabla`), resalta tu propia fila y tus partidos («Tu partido»), resalta en negrita al ganador de cada cruce, añade botón «Invitar amigos» por WhatsApp y sube los 3 textos de `11px` a `12px`.
   3. **Pruebas:** `npm test` **720/720** en verde y `npm run build` OK.
-- **Supabase:** migración **161** (`supabase/migrations/161_duelos_16_jugadores.sql` + `supabase/tests/161_duelos_16_jugadores_test.sql`) escrita y lista; **pendiente de que Fralex pegue las 2 líneas en el SQL Editor**. Siguiente migración libre: **162**.
+- **Supabase:** migración **161 APLICADA** por Fralex el 28-oct (`supabase/migrations/161_duelos_16_jugadores.sql` + `supabase/tests/161_duelos_16_jugadores_test.sql`). Siguiente migración libre: **162**.
 - **Solo en la PC (sin git):** `C:\dev\pes-liga-automatica` actualizada con `git pull --ff-only` y sincronizada con `origin/borrador`.
 - **Candados:** todos libres (Web y Supabase libres). Siguiente migración libre: **162**.
 

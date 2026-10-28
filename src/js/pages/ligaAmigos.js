@@ -95,11 +95,11 @@ function fechasHTML(partidos, yo = null) {
   return `<div class="grid sm:grid-cols-2 gap-3">${[...porFecha].map(([f, ps]) => `<div class="rounded-xl border border-galaxy-border p-3">
     <h3 class="text-[12px] uppercase tracking-widest text-gray-400 mb-2">Fecha ${f}</h3>
     ${ps.map((p) => {
-      const marcador = p.goles_local == null ? 'vs' : `${p.goles_local} - ${p.goles_visita}`;
-      const est = ESTADOS_LIGA[p.estado] ?? ESTADOS_LIGA.pendiente;
-      const mio = yo && (p.local === yo.nombre || p.visitante === yo.nombre); const gl = p.goles_local; const gv = p.goles_visita; const jugado = gl != null && gv != null;
-      return `<p class="flex items-center justify-between gap-2 text-sm text-white py-1 px-2 rounded-lg ${mio ? 'bg-galaxy-400/10 border border-galaxy-400/30' : ''}"><span class="truncate"><span class="${jugado && gl > gv ? 'font-bold text-white' : jugado && gl < gv ? 'text-gray-400' : ''}">${escapeHTML(p.local)}</span> <b class="text-galaxy-400 mx-1">${marcador}</b> <span class="${jugado && gv > gl ? 'font-bold text-white' : jugado && gv < gl ? 'text-gray-400' : ''}">${escapeHTML(p.visitante)}</span></span><span class="text-[12px] ${mio ? 'text-galaxy-400 font-semibold' : 'text-gray-400'} shrink-0">${mio ? 'Tu partido · ' : ''}${est.texto}</span></p>`;
-    }).join('')}</div>`).join('')}</div>`;
+    const marcador = p.goles_local == null ? 'vs' : `${p.goles_local} - ${p.goles_visita}`;
+    const est = ESTADOS_LIGA[p.estado] ?? ESTADOS_LIGA.pendiente;
+    const mio = yo && (p.local === yo.nombre || p.visitante === yo.nombre); const gl = p.goles_local; const gv = p.goles_visita; const jugado = gl != null && gv != null;
+    return `<p class="flex items-center justify-between gap-2 text-sm text-white py-1 px-2 rounded-lg ${mio ? 'bg-galaxy-400/10 border border-galaxy-400/30' : ''}"><span class="truncate"><span class="${jugado && gl > gv ? 'font-bold text-white' : jugado && gl < gv ? 'text-gray-400' : ''}">${escapeHTML(p.local)}</span> <b class="text-galaxy-400 mx-1">${marcador}</b> <span class="${jugado && gv > gl ? 'font-bold text-white' : jugado && gv < gl ? 'text-gray-400' : ''}">${escapeHTML(p.visitante)}</span></span><span class="text-[12px] ${mio ? 'text-galaxy-400 font-semibold' : 'text-gray-400'} shrink-0">${mio ? 'Tu partido · ' : ''}${est.texto}</span></p>`;
+  }).join('')}</div>`).join('')}</div>`;
 }
 
 async function accion(btn) {
