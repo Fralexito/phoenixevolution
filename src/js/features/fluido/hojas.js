@@ -51,7 +51,7 @@ export function initHojasArrastrables() {
     const destinoProyectado = y + proyectar(v, 0.99);
     // Un clic «fantasma» al soltar no debe elegir una opción
     const tapa = (ev) => { ev.stopPropagation(); ev.preventDefault(); }; window.addEventListener('click', tapa, { capture: true, once: true }); setTimeout(() => window.removeEventListener('click', tapa, true), 350);
-    if (destinoProyectado > alto * 0.45 || v > 900) {
+    if (destinoProyectado > alto * 0.35 || v > 700) {
       vibrar(6);
       resorte(velo, alto + 40, { velocidad: Math.max(v, 600), amortiguacion: 1, respuesta: 0.28, poner: (x) => mover(velo, x),
         alTerminar: () => { window.removeEventListener('click', tapa, true); velo.setAttribute('data-arrastrada', ''); velo.querySelector('.sx-x')?.click(); } });
