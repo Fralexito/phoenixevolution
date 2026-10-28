@@ -1,0 +1,45 @@
+/* PÁGINA LIGA · funciones nuevas (27-oct-2026, FX.funcionesNuevas). Suma, no quita:
+   1 · pastillas de fechas (tira de jornadas de la Champions) · 2 · ganador resaltado en Resultados · 3 · «Lo destacado» (cartas de datos). */
+
+/* 1 · Fechas en pastillas: verde = jugada · cian que late = en juego · gris = por jugar. La elegida, rellena en púrpura. */
+.lg-fechas { position: relative; display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px; scroll-snap-type: x proximity; scrollbar-width: thin; mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent); }
+.lg-f { position: relative; flex: 0 0 auto; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px; scroll-snap-align: center; cursor: pointer;
+  border: 1px solid rgb(255 255 255 / .1); background: rgb(255 255 255 / .03); color: #9ca3c7; font: 700 .875rem/1 var(--font-display); font-variant-numeric: tabular-nums;
+  transition: background .2s, color .2s, border-color .2s, translate .2s cubic-bezier(.22, 1, .36, 1), box-shadow .2s; }
+.lg-f::after { content: ''; position: absolute; left: 50%; bottom: 4px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; opacity: .35; }
+.lg-f-jugada { color: #d1d5f0; }
+.lg-f-jugada::after { background: #34d399; opacity: 1; }
+.lg-f-en_juego { color: #fff; border-color: color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 55%, transparent); }
+.lg-f-en_juego::after { background: var(--color-galaxy-400, #00e5ff); opacity: 1; animation: lg-late 1.3s ease-in-out infinite; }
+@keyframes lg-late { 50% { opacity: .25; } }
+.lg-f:hover { translate: 0 -2px; border-color: rgb(255 255 255 / .25); color: #fff; }
+.lg-f[aria-pressed='true'] { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--color-galaxy-600, #8000ff), color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 70%, var(--color-galaxy-600, #8000ff)));
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 80%, transparent), 0 0 14px -4px color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 60%, transparent); }
+.lg-f[aria-pressed='true']::after { background: #fff; }
+.lg-f:focus-visible { outline: 2px solid var(--color-galaxy-400, #00e5ff); outline-offset: 2px; }
+
+/* 2 · Resultados: el que ganó queda en blanco y el que perdió se apaga un poco (como la Champions) */
+.liga-partido.lp-gl > span:last-child, .liga-partido.lp-gv > span:first-child { opacity: .5; }
+.liga-partido.lp-gl > span:first-child .text-gray-100, .liga-partido.lp-gv > span:last-child .text-gray-100 { color: #fff; text-shadow: 0 0 12px rgb(255 255 255 / .25); }
+
+/* 3 · Lo destacado: cartas con cifra grande, color propio de cada dato y el 3D de siempre (rd-p3) */
+.lg-dest { display: grid; gap: .9rem; }
+.lg-dest-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); gap: .75rem; }
+.lg-carta { --lg-c: var(--color-galaxy-400, #00e5ff); position: relative; overflow: hidden; isolation: isolate; display: grid; align-content: start; gap: .35rem; min-height: 9.5rem; padding: 1rem 1.1rem;
+  border-radius: 14px; border: 1px solid color-mix(in srgb, var(--lg-c) 30%, transparent);
+  background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--lg-c) 22%, transparent), transparent 60%), rgb(10 6 26 / .7);
+  box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--lg-c) 70%, transparent); transition: border-color .25s, box-shadow .25s; }
+.lg-carta:hover { border-color: color-mix(in srgb, var(--lg-c) 60%, transparent); box-shadow: 0 22px 46px -20px color-mix(in srgb, var(--lg-c) 85%, transparent); }
+.lg-carta small { font: 700 11px/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; color: var(--lg-c); }
+.lg-carta-cifra { font: 800 2.6rem/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px color-mix(in srgb, var(--lg-c) 55%, transparent); }
+.lg-carta-quien { display: inline-flex; align-items: center; gap: .45rem; min-width: 0; }
+.lg-carta-quien img { width: 22px; height: 22px; object-fit: contain; }
+.lg-carta-quien b { font: 700 1rem/1.1 var(--font-display); color: #fff; text-transform: uppercase; letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lg-carta em { font-style: normal; font-size: .8125rem; color: #a6abcf; }
+.lg-ataque { --lg-c: #fb7185; } .lg-defensa { --lg-c: #38bdf8; } .lg-racha { --lg-c: #fbbf24; }
+.lg-invicto { --lg-c: #34d399; } .lg-goleada { --lg-c: #c084fc; } .lg-goles { --lg-c: var(--color-galaxy-400, #00e5ff); }
+@media (max-width: 640px) {
+  .lg-dest-lista { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 72%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
+  .lg-carta { scroll-snap-align: start; }
+}
+@media (prefers-reduced-motion: reduce) { .lg-f-en_juego::after { animation: none; } .lg-f { transition: none; } }

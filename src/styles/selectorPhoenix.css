@@ -1,0 +1,70 @@
+/* SELECTOR PHOENIX (js/features/selectorPhoenix.js). Reemplaza la lista nativa del sistema por una con identidad Galaxy:
+   noche con vidrio, borde cian, brillo púrpura, Rajdhani, check cian en la elegida. PC = panel bajo el selector · celular = hoja desde abajo. */
+
+/* Cerrado: la flecha del sistema se cambia por un chevrón cian propio (igual en Android, Windows y iPhone) */
+html[data-selector-phoenix] select:not([multiple]):not([size]) {
+  -webkit-appearance: none; appearance: none; color-scheme: dark; cursor: pointer;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .7rem center; background-size: 14px;
+}
+html[data-selector-phoenix] select[aria-expanded='true'] { border-color: var(--color-galaxy-400, #00e5ff); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 22%, transparent); }
+
+/* Capa que cubre la página (invisible en PC; oscura en celular) */
+.sx-velo { position: fixed; inset: 0; z-index: 2147483000; }
+.sx-velo.sx-hoja { display: flex; flex-direction: column; justify-content: flex-end; background: rgb(3 1 10 / .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); animation: sx-velo .22s ease-out both; }
+@keyframes sx-velo { from { opacity: 0; } }
+
+/* Panel */
+.sx-panel { position: fixed; display: flex; flex-direction: column; overflow: hidden; outline: none; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 28%, transparent);
+  background: radial-gradient(120% 70% at 0% 0%, color-mix(in srgb, var(--color-galaxy-600, #8000ff) 22%, transparent), transparent 60%), rgb(12 8 30 / .96);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: 0 24px 60px -18px rgb(0 0 0 / .85), 0 0 0 1px rgb(255 255 255 / .03) inset, 0 0 32px -10px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 70%, transparent);
+  transform-origin: top center; animation: sx-cae .2s cubic-bezier(.22, 1, .36, 1) both; }
+.sx-panel[data-lado='arriba'] { transform-origin: bottom center; }
+@keyframes sx-cae { from { opacity: 0; transform: translateY(-6px) scale(.97); } }
+.sx-lista { list-style: none; margin: 0; padding: 6px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 40%, transparent) transparent; }
+
+/* Opciones */
+.sx-op { position: relative; display: flex; align-items: center; gap: .75rem; min-height: 40px; padding: .5rem .8rem .5rem 1rem; border-radius: 9px; cursor: pointer;
+  font: 600 .95rem/1.2 var(--font-display, system-ui); letter-spacing: .03em; color: #c9cbe3; transition: background .12s, color .12s; }
+.sx-op.sx-en-grupo { padding-left: 1.4rem; }
+.sx-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sx-check { flex-shrink: 0; font-size: .8rem; color: var(--color-galaxy-400, #00e5ff); opacity: 0; transform: scale(.6); transition: opacity .15s, transform .2s cubic-bezier(.22, 1, .36, 1); }
+.sx-op.sx-activa { background: rgb(255 255 255 / .07); color: #fff; }
+.sx-op[aria-selected='true'] { color: #fff; background: linear-gradient(90deg, color-mix(in srgb, var(--color-galaxy-600, #8000ff) 38%, transparent), color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 10%, transparent)); }
+.sx-op[aria-selected='true']::before { content: ''; position: absolute; left: 4px; top: 22%; bottom: 22%; width: 3px; border-radius: 3px; background: var(--color-galaxy-400, #00e5ff); box-shadow: 0 0 10px var(--color-galaxy-400, #00e5ff); }
+.sx-op[aria-selected='true'] .sx-check { opacity: 1; transform: none; }
+.sx-op[aria-selected='true'].sx-activa { background: linear-gradient(90deg, color-mix(in srgb, var(--color-galaxy-600, #8000ff) 50%, transparent), color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 16%, transparent)); }
+.sx-op[aria-disabled] { opacity: .38; cursor: default; }
+.sx-grupo { padding: .7rem 1rem .3rem; font: 700 11px/1 var(--font-display, system-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--color-galaxy-400, #00e5ff); }
+
+/* Celular: hoja que sube desde abajo */
+.sx-hoja .sx-panel, .sx-hoja .sx-cab { position: relative; }
+.sx-hoja .sx-cab { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .5rem; padding: 1.1rem 1rem .6rem 1.25rem; border-radius: 22px 22px 0 0;
+  border: 1px solid color-mix(in srgb, var(--color-galaxy-400, #00e5ff) 28%, transparent); border-bottom: 0;
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--color-galaxy-600, #8000ff) 30%, transparent), transparent 60%), rgb(12 8 30 / .98);
+  animation: sx-sube .32s cubic-bezier(.22, 1, .36, 1) both; }
+.sx-asa { position: absolute; left: 50%; top: 7px; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: rgb(255 255 255 / .22); }
+.sx-cab b { font: 700 1.05rem/1.2 var(--font-display, system-ui); letter-spacing: .1em; text-transform: uppercase; color: #fff; }
+.sx-x { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgb(255 255 255 / .12); background: rgb(255 255 255 / .05); color: #c9cbe3; }
+.sx-hoja .sx-panel { width: 100%; max-height: 68vh; border-radius: 0; border-top: 0; background: rgb(12 8 30 / .98); padding-bottom: env(safe-area-inset-bottom, 0); animation: sx-sube .32s cubic-bezier(.22, 1, .36, 1) both; }
+.sx-hoja .sx-lista { padding: 4px 10px 14px; }
+.sx-hoja .sx-op { min-height: 52px; font-size: 1.05rem; padding-left: 1.1rem; }
+.sx-hoja .sx-op + .sx-op { margin-top: 2px; }
+@keyframes sx-sube { from { transform: translateY(100%); } }
+
+/* Al cerrar */
+.sx-velo.sx-sale { animation: sx-velo .18s ease-in reverse both; }
+.sx-velo.sx-sale .sx-panel:not(.sx-hoja *) { animation: sx-cae .16s ease-in reverse both; }
+.sx-velo.sx-hoja.sx-sale :is(.sx-panel, .sx-cab) { animation: sx-sube .2s ease-in reverse both; }
+html.sx-bloqueo, html.sx-bloqueo body { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) { .sx-velo, .sx-panel, .sx-cab, .sx-check { animation: none !important; transition: none !important; } }
+html[data-aj-mov-efectivo='reducido'] :is(.sx-velo, .sx-panel, .sx-cab) { animation: none !important; }
+/* Sin el anillo de foco general de la web sobre el panel (el foco se ve en la opción marcada) */
+.sx-panel:focus, .sx-panel:focus-visible { outline: none !important; }
+html[data-selector-phoenix] .sx-velo .sx-panel:focus-visible { box-shadow: 0 24px 60px -18px rgb(0 0 0 / .85), 0 0 32px -10px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 70%, transparent); }
+.sx-lista { position: relative; }
+

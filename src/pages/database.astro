@@ -42,6 +42,8 @@ import { FX } from '../data/experimento.js';
     </details>
     <!-- Reconocimientos: formas de destacar que no dependen solo de la media -->
     <section id="reconocimientos" aria-label="Reconocimientos"></section>
+    <!-- Rediseño (FX.funcionesNuevas): escudos de los clubes para filtrar con un toque (js/features/jugadores/tiraClubes.js) -->
+    {FX.funcionesNuevas && <nav class="tc" data-tira-clubes hidden aria-label="Filtrar por club"></nav>}
     <!-- Vista y orden -->
     <div id="vista-bar" class="flex flex-wrap items-center gap-x-3 gap-y-2">
       <div id="vista-seg" class="flex gap-1 text-xs font-display font-bold uppercase tracking-wider bg-black/40 p-1 rounded-lg border border-galaxy-border/60" role="group" aria-label="Vista">
@@ -78,4 +80,6 @@ import { FX } from '../data/experimento.js';
 </Layout>
 <script>
   import '../js/pages/database.js';
+  import { montarTiraClubes } from '../js/features/jugadores/tiraClubes.js';
+  try { montarTiraClubes(document.querySelector('[data-tira-clubes]'), document.getElementById('player-filter-select')); } catch (e) { console.warn('[jugadores] tira de clubes:', e); }
 </script>

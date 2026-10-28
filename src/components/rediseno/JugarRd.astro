@@ -1,0 +1,80 @@
+---
+// JUGAR · rediseño (27-oct-2026). Se suma ARRIBA de la Sala de Duelos (no quita nada de lo que ya había).
+// Idea: «lo que haces tú, ahora». Dos piezas lado a lado, como la portada de Twitch/Kick y la tira de partidos de la Champions:
+//   1 · POR JUGAR: los partidos de la fecha actual de la Galaxy League que faltan, con escudos y hora pactada (si la hay).
+//   2 · EN VIVO AHORA: las salas que se están jugando (se piden al abrir; si no hay, lo dice y lleva a «En vivo»).
+// Datos: data/ligaResultados.js (al construir) · salas/api.js salasEnVivo() (en el navegador). Estilos: styles/jugarRd.css
+import '../../styles/jugarRd.css';
+import { EDICIONES } from '../../data/ligaResultados.js';
+import { estadoLiga } from '../../js/core/competicion/pulso.js';
+import { escudoDe } from '../../js/core/sistema/escudos.js';
+import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
+const base = import.meta.env.BASE_URL;
+const ed = EDICIONES.galaxy?.find((e) => e.estado === 'en_curso') ?? null;
+const fechas = ed?.fechas ?? [];
+const E = estadoLiga(fechas);
+const fa = fechas.find((f) => f.n === E.actual);
+const jugado = (m) => Number.isInteger(m.gl) && Number.isInteger(m.gv);
+const PEND = (fa?.partidos ?? []).filter((m) => !jugado(m)).map((m) => ({ ...m, cl: ed?.clubes?.[m.l], cv: ed?.clubes?.[m.v] }));
+const col = (c) => CLUBES_VISUAL[c]?.a ?? '#00e5ff';
+const DISCORD = 'https://discord.gg/jsxZ3mtfwe';
+---
+<div class="jr" data-jr>
+  <section class="jr-pend glass-panel" aria-labelledby="jr-pend-t">
+    <header class="jr-cab">
+      <div><p class="jr-kicker">Galaxy League{E.actual ? ` · Fecha ${E.actual}` : ''}</p><h2 id="jr-pend-t" class="jr-tit">Por jugar</h2></div>
+      {E.actual && <span class="jr-cont"><b>{E.jugadosActual}</b> de {E.totalActual} jugados</span>}
+    </header>
+    {PEND.length > 0 ? (
+      <ul class="jr-lista">
+        {PEND.map((m) => (
+          <li class="jr-p rd-p3" style={`--jr-a:${col(m.cl)};--jr-b:${col(m.cv)}`}>
+            <span class="jr-eq">{escudoDe(m.cl) ? <img src={escudoDe(m.cl)} alt="" width="34" height="34" loading="lazy" /> : <i class="fa-solid fa-shield-halved"></i>}<b>{m.l}</b></span>
+            <span class="jr-vs">{m.h ? <em>{m.h}</em> : <small>VS</small>}</span>
+            <span class="jr-eq jr-eq-der"><b>{m.v}</b>{escudoDe(m.cv) ? <img src={escudoDe(m.cv)} alt="" width="34" height="34" loading="lazy" /> : <i class="fa-solid fa-shield-halved"></i>}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="jr-vacio"><i class="fa-solid fa-circle-check"></i> {E.estado === 'terminada' ? 'La temporada terminó. ¡Mira el palmarés!' : 'No quedan partidos pendientes en esta fecha.'}</p>
+    )}
+    <footer class="jr-pie">
+      <a class="jr-btn jr-btn-prim" href={DISCORD} target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i> Pactar la hora en Discord</a>
+      <a class="jr-btn" href={`${base}liga/`}>Ver la fecha completa</a>
+    </footer>
+  </section>
+
+  <section class="jr-vivo glass-panel" aria-labelledby="jr-vivo-t" data-jr-vivo>
+    <header class="jr-cab">
+      <div><p class="jr-kicker jr-kicker-rojo"><span class="jr-punto" aria-hidden="true"></span>En vivo ahora</p><h2 id="jr-vivo-t" class="jr-tit">Salas jugando</h2></div>
+      <a class="jr-ver" href={`${base}en-vivo/`}>Ver todas <i class="fa-solid fa-arrow-right"></i></a>
+    </header>
+    <ul class="jr-salas" data-jr-salas hidden></ul>
+    <div class="jr-vacio jr-vacio-vivo" data-jr-sin>
+      <span class="jr-radar" aria-hidden="true"><i></i><i></i><i class="fa-solid fa-tower-broadcast"></i></span>
+      <p><b>Nadie está jugando en este momento.</b> Cuando empiece un partido en una sala, aparece aquí con su marcador.</p>
+      <a class="jr-btn" href="#col-lanzar" data-jr-lanzar>Lanzar un reto</a>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Salas EN VIVO (como los «canales en vivo» de Twitch/Kick). Sin sesión o sin salas: se queda el aviso tranquilo.
+  const caja = document.querySelector('[data-jr-vivo]');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  if (caja) import('../../js/features/salas/api.js').then(async (m) => {
+    const salas = (await m.salasEnVivo()).filter((s) => s?.estado === 'en_partida' || s?.estado === 'esperando');
+    if (!salas.length) return;
+    const ul = caja.querySelector('[data-jr-salas]'); const enVivo = new URL('en-vivo/', document.baseURI).pathname;
+    ul.innerHTML = salas.slice(0, 5).map((s) => {
+      const juega = s.estado === 'en_partida'; const mk = s.marcador;
+      return `<li><a class="jr-sala${juega ? ' is-juega' : ''}" href="${esc(enVivo)}"><span class="jr-sala-est">${juega ? '<span class="jr-punto"></span>En juego' : 'Espera rival'}</span><b>${esc(s.host?.nombre ?? 'Sala')}${s.rival?.nombre ? ` <i>vs</i> ${esc(s.rival.nombre)}` : ''}</b>${juega && mk ? `<span class="jr-sala-mk">${Number(mk.goles_local) || 0} – ${Number(mk.goles_visita) || 0}<small>${esc(mk.minuto ?? '')}′</small></span>` : ''}</a></li>`;
+    }).join('');
+    ul.hidden = false; caja.querySelector('[data-jr-sin]').hidden = true; caja.classList.add('hay-vivo');
+  }).catch((e) => console.warn('[jugar] salas en vivo:', e?.message ?? e));
+  // «Lanzar un reto»: en celular abre el formulario (el botón que ya existía) y baja hasta él.
+  document.querySelector('[data-jr-lanzar]')?.addEventListener('click', (e) => {
+    const b = document.querySelector('#seg-vista [data-v="lanzar"]'); const f = document.getElementById('col-lanzar');
+    if (b && f && b.offsetParent !== null && b.getAttribute('aria-pressed') !== 'true') { e.preventDefault(); b.click(); setTimeout(() => f.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); }
+  });
+</script>

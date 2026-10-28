@@ -11,6 +11,9 @@ import { calcularTabla, tablaEdicion } from '../js/core/competicion/tabla.js';
 import { escudoDe } from '../js/core/sistema/escudos.js';
 import { SISTEMA, SISTEMAS_LIGA } from '../data/temporada.js';
 import { zonasDivision, zonasLiga } from '../js/core/competicion/temporada.js';
+import { destacadosLiga } from '../js/core/competicion/destacadosLiga.js';
+import { FX } from '../data/experimento.js';
+import '../styles/ligaRd.css';   // rediseño (FX.funcionesNuevas): fechas en pastillas, ganador resaltado y «Lo destacado»
 import { estadoFecha, fechaActual, historial, resumenFecha, totalFechas, evolucionPuntos, golesPorFecha } from '../js/core/competicion/ligaStats.js';
 const base = import.meta.env.BASE_URL;
 // Clases completas (Tailwind solo detecta nombres escritos enteros).
@@ -46,6 +49,7 @@ const datos = LIGAS.map((l) => ({
     fechas: e.fechas.map((f) => ({ ...f, estado: estadoFecha(f), resumen: resumenFecha(f) })),
     evolucion: evolucionPuntos(e.fechas, tablaCompleta(e).slice(0, 4).map((f) => f.nombre)),
     goles: { ...golesPorFecha(e.fechas), nombre: 'Goles' },
+    dest: destacadosLiga(tablaCompleta(e), e.fechas),   // cartas de «Lo destacado» (rediseño)
   })).reverse(),   // la más reciente primero
 }));
 ---
@@ -139,7 +143,7 @@ const datos = LIGAS.map((l) => ({
                   <thead><tr>
                     <th class="text-left w-8" title="Puesto y cuánto subió o bajó desde la fecha anterior">#</th><th class="text-left">Jugador</th><th>PTS</th><th>PJ</th>
                     <th class="hidden sm:table-cell">G</th><th class="hidden sm:table-cell">E</th><th class="hidden sm:table-cell">P</th>
-                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th title="Últimos 5 partidos; el de la derecha es el más reciente">Últimos 5</th>
+                    <th class="hidden md:table-cell lg:hidden 2xl:table-cell">GF</th><th class="hidden md:table-cell lg:hidden 2xl:table-cell">GC</th><th>DIF</th><th title="Últimos partidos; el de la derecha es el más reciente. Usa las flechas para ver los anteriores">Últimos</th>
                   </tr></thead>
                   <tbody>
                     {e.tabla.map((f, i) => (
@@ -150,10 +154,16 @@ const datos = LIGAS.map((l) => ({
                         <td class="hidden sm:table-cell">{f.g}</td><td class="hidden sm:table-cell">{f.e}</td><td class="hidden sm:table-cell">{f.p}</td>
                         <td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gf}</td><td class="hidden md:table-cell lg:hidden 2xl:table-cell">{f.gc}</td>
                         <td class:list={[f.dg > 0 ? 'text-emerald-400' : f.dg < 0 ? 'text-rose-400' : 'text-gray-400']}>{f.dg > 0 ? `+${f.dg}` : f.dg}</td>
+                        <!-- 27-oct (Fralex): vuelve el «Últimos» con flechas ‹ › para recorrer TODOS los partidos y el contador (5/11). JS: js/pages/liga.js -->
                         <td>
                           {e.formas[f.nombre].length === 0 ? <span class="text-gray-600">—</span> : (
-                            <div class="lf-forma" aria-label={`Últimos resultados de ${f.nombre}, del más antiguo al más reciente`}>
-                              {e.formas[f.nombre].slice(-5).map((h, k, arr) => <span class:list={['lf-f', `lf-${h.r}`, k === arr.length - 1 && 'lf-ult']} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
+                            <div class="forma" data-forma>
+                              <button type="button" class="forma-flecha" data-forma-paso="-1" aria-label={`Partidos anteriores de ${f.nombre}`}><i class="fa-solid fa-chevron-left"></i></button>
+                              <div class="forma-strip" data-forma-strip tabindex="0" aria-label={`Resultados de ${f.nombre}, del más antiguo al más reciente`}>
+                                {e.formas[f.nombre].map((h) => <span class:list={['liga-forma', CHIP[h.r]]} title={`Fecha ${h.n} · ${{ G: 'Ganó', E: 'Empató', P: 'Perdió' }[h.r]} ${h.gf}-${h.gc} ${h.local ? 'vs' : 'en casa de'} ${h.rival}`}>{h.r}</span>)}
+                              </div>
+                              <button type="button" class="forma-flecha" data-forma-paso="1" aria-label={`Partidos más recientes de ${f.nombre}`}><i class="fa-solid fa-chevron-right"></i></button>
+                              <span class="forma-cont" data-forma-cont data-total={e.formas[f.nombre].length} title="Partidos que se ven, sobre el total jugado">{Math.min(5, e.formas[f.nombre].length)}/{e.formas[f.nombre].length}</span>
                             </div>
                           )}
                         </td>
@@ -177,7 +187,7 @@ const datos = LIGAS.map((l) => ({
               )}
               <details class="liga-guia">
                 <summary class="text-xs text-galaxy-400 font-display font-bold uppercase tracking-wider cursor-pointer select-none inline-flex items-center gap-1.5 min-h-9"><i class="fa-solid fa-circle-info"></i>¿Cómo se lee la tabla?</summary>
-                <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · ▲▼: cuántos puestos subió o bajó desde la fecha anterior · Últimos 5: G ganó, E empató, P perdió (el de la derecha es el más reciente; pasa el dedo o el mouse para ver el marcador). Toca un jugador para resaltar sus partidos en Resultados.</p>
+                <p class="text-xs text-gray-400 leading-relaxed mt-1 max-w-prose">{e.formato}. 3 puntos por victoria, 1 por empate; desempata el enfrentamiento directo. PJ: partidos jugados · DIF: diferencia de goles · ▲▼: cuántos puestos subió o bajó desde la fecha anterior · Últimos: G ganó, E empató, P perdió (el de la derecha es el más reciente; flechas, rueda o arrastre para ver los anteriores; pasa el dedo o el mouse para ver el marcador). Toca un jugador para resaltar sus partidos en Resultados.</p>
               </details>
             </section>
 
@@ -205,6 +215,12 @@ const datos = LIGAS.map((l) => ({
                 </select>
                 <button type="button" data-fecha-paso="1" aria-label="Fecha siguiente" class="adv-chip !min-h-10 !px-4"><i class="fa-solid fa-chevron-right"></i></button>
               </div>
+              <!-- Rediseño: todas las fechas a la vista, como la tira de jornadas de la Champions (verde = jugada · cian = en juego · gris = por jugar) -->
+              {FX.funcionesNuevas && (
+                <div class="lg-fechas" data-lg-fechas role="group" aria-label="Ir a una fecha">
+                  {e.fechas.map((f) => <button type="button" data-fecha-ir={f.n} class:list={['lg-f', `lg-f-${f.estado}`]} aria-pressed={f.n === e.actual ? 'true' : 'false'} aria-label={`Fecha ${f.n}, ${ESTADO_FECHA[f.estado]}`}><b>{f.n}</b></button>)}
+                </div>
+              )}
               {e.fechas.map((f) => (
                 <div data-fecha-panel={f.n} hidden={f.n !== e.actual} class="space-y-3">
                   <div class="flex flex-nowrap items-center justify-center gap-2 overflow-x-auto py-1" role="region" tabindex="0" aria-label="Escudos de la fecha">
@@ -212,7 +228,7 @@ const datos = LIGAS.map((l) => ({
                   </div>
                   <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                     {f.partidos.map((m) => (
-                      <li data-m-l={m.l} data-m-v={m.v} class="liga-partido rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                      <li data-m-l={m.l} data-m-v={m.v} class:list={['liga-partido rounded-xl border border-galaxy-border/60 bg-black/25 px-4 py-3.5 grid grid-cols-[1fr_auto_1fr] items-center gap-3', FX.funcionesNuevas && Number.isInteger(m.gl) && m.gl > m.gv && 'lp-gl', FX.funcionesNuevas && Number.isInteger(m.gl) && m.gv > m.gl && 'lp-gv']}>
                         <span class="flex items-center justify-end gap-2 min-w-0 flex-nowrap"><span class="text-right min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.l}</span>{e.clubes?.[m.l] && <span class="block text-[12px] text-gray-400 truncate uppercase">{e.clubes[m.l]}</span>}</span>{escudoDe(e.clubes?.[m.l]) && <img src={escudoDe(e.clubes[m.l])} alt="" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:28px;height:28px" onerror="this.style.display='none'" />}</span>
                         {Number.isInteger(m.gl) ? <span class="px-2.5 py-1 rounded-md bg-galaxy-900 border border-galaxy-600/50 font-display font-extrabold text-white tabular-nums">{m.gl} : {m.gv}</span> : <span class="px-2 text-center font-display uppercase leading-tight"><span class="block text-xs text-gray-500">vs</span>{m.h && <span class="block text-[12px] text-galaxy-400 normal-case tracking-wide">{m.h}</span>}</span>}
                         <span class="flex items-center justify-start gap-2 min-w-0 flex-nowrap">{escudoDe(e.clubes?.[m.v]) && <img src={escudoDe(e.clubes[m.v])} alt="" width="28" height="28" loading="lazy" referrerpolicy="no-referrer" class="escudo object-contain shrink-0" style="width:28px;height:28px" onerror="this.style.display='none'" />}<span class="text-left min-w-0"><span class="block text-gray-100 font-display font-bold truncate">{m.v}</span>{e.clubes?.[m.v] && <span class="block text-[12px] text-gray-400 truncate uppercase">{e.clubes[m.v]}</span>}</span></span>
@@ -226,6 +242,23 @@ const datos = LIGAS.map((l) => ({
             </section>
             )}
             </div>
+
+            <!-- Rediseño: LO DESTACADO (como las estadísticas de la Champions). Datos: js/core/competicion/destacadosLiga.js -->
+            {FX.funcionesNuevas && e.dest.length > 0 && (
+              <section class="lg-dest" aria-labelledby={`lg-dest-${l.id}-${e.id}`}>
+                <h2 id={`lg-dest-${l.id}-${e.id}`} class="font-display font-bold text-lg sm:text-xl text-white uppercase tracking-widest">Lo destacado</h2>
+                <ul class="lg-dest-lista">
+                  {e.dest.map((d) => (
+                    <li class:list={['lg-carta rd-p3', `lg-${d.id}`]}>
+                      <small>{d.titulo}</small>
+                      <span class="lg-carta-cifra">{d.cifra}</span>
+                      {d.nombre && <span class="lg-carta-quien">{escudoDe(e.clubes?.[d.nombre]) && <img src={escudoDe(e.clubes[d.nombre])} alt="" width="26" height="26" loading="lazy" />}<b>{d.nombre}</b></span>}
+                      <em>{d.detalle}</em>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </div>
         ))}
         </div>

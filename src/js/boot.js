@@ -20,6 +20,11 @@ import { interruptorDemo } from './core/sistema/modoDemo.js';
 
 initAjustes();
 initModoLigero();
+// Selector Phoenix (27-oct-2026): ninguna lista desplegable usa la ventana nativa del sistema. Se carga enseguida (alguien puede tocar
+// un selector al instante). Si fallara, queda la lista nativa.
+if (FX.funcionesNuevas) import('./features/selectorPhoenix.js').then((m) => m.initSelectorPhoenix()).catch((e) => console.error('[boot] selector:', e));
+// Calendario Phoenix (27-oct-2026): lo mismo para las casillas de fecha y hora (sin el calendario del sistema).
+if (FX.funcionesNuevas) import('./features/calendarioPhoenix.js').then((m) => m.initCalendarioPhoenix()).catch((e) => console.error('[boot] calendario:', e));
 initSitio();
 initSidebar();
 initNavbar();

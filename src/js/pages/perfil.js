@@ -46,6 +46,8 @@ import { banderaSVG } from '../../data/banderas.js';
 import { paisNombre } from '../../data/paises.js';
 import { stickerHTML, abrirSelectorStickers } from '../features/social/stickers.js';
 import { clubExacto, escudoUrl } from '../core/pes/clubesPes.js';
+import { FX } from '../../data/experimento.js';
+import { rinconHTML } from '../features/perfil/rincon.js';   // rediseño: «Tu rincón» (solo en tu perfil)
 
 initMencionAuto();
 const root = document.getElementById('muro-root');
@@ -359,7 +361,7 @@ function pintar() {
   // Ronda 226: tres grupos con espacio grande entre ellos → 1) quién es (cabecera + sus paneles de ajuste),
   // 2) «Resumen» (estadísticas, logros e historia juntos; en PC a dos columnas si hay historia), 3) «Muro» (historias + publicaciones/clips).
   root.innerHTML = `<div class="space-y-8">
-    <div class="space-y-3">${cabecera(p)}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}</div>
+    <div class="space-y-3">${cabecera(p)}${FX.funcionesNuevas ? rinconHTML(p) : ''}${p.soy_yo ? panelEstilo(p) + panelHostHTML() + panelPrivacidad(p) : ''}</div>
     <div class="pf-resumen" aria-label="Resumen del jugador"><div class="space-y-3 empty:hidden">${franjaEstadisticas()}${franjaLogros(p)}</div><div id="pf-historia" hidden></div></div>
     <div class="space-y-3 max-w-2xl mx-auto w-full">${barraHistorias(p)}${conExtras ? pestanas() : ''}${conExtras ? (filtroHTML() || '<span id="filtro-juego" hidden></span>') : ''}
       <div id="tab-pub" class="space-y-3" ${S.tab === 'pub' || !conExtras ? '' : 'hidden'}>${p.soy_yo ? composer() : ''}<div id="mu-feed" class="space-y-3">${feed(p)}</div></div>

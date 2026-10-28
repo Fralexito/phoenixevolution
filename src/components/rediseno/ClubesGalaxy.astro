@@ -1,0 +1,37 @@
+---
+// MI CLUB · rediseño (27-oct-2026). «Los clubes de la Galaxy»: la vitrina de clubes con su ESCUDO GRANDE y sus colores
+// (como las fichas de club de la Champions), para quien aún no entró. Con sesión no se ve: ahí manda «El Estadio» de tu club.
+// No quita nada de Mi club; se suma debajo de «Activa tu carrera de DT». Datos: data/ligaResultados.js. Estilos: styles/clubesGalaxy.css
+import '../../styles/clubesGalaxy.css';
+import { EDICIONES } from '../../data/ligaResultados.js';
+import { calcularTabla } from '../../js/core/competicion/tabla.js';
+import { escudoDe } from '../../js/core/sistema/escudos.js';
+import { CLUBES_VISUAL } from '../../data/clubesVisual.js';
+const base = import.meta.env.BASE_URL;
+const ed = EDICIONES.galaxy?.find((e) => e.estado === 'en_curso') ?? null;
+const tabla = calcularTabla((ed?.fechas ?? []).flatMap((f) => f.partidos)).tabla;
+const pos = new Map(tabla.map((t, i) => [t.nombre, { p: i + 1, pts: t.pts }]));
+const CLUBES = Object.entries(ed?.clubes ?? {}).map(([dt, club]) => ({ dt, club, ...(pos.get(dt) ?? { p: 99, pts: 0 }), c: CLUBES_VISUAL[club] ?? { a: '#00e5ff', b: '#8000ff' } }))
+  .sort((a, b) => a.p - b.p);
+---
+{CLUBES.length > 0 && (
+<section class="cg solo-invitado" aria-labelledby="cg-t">
+  <div class="cg-cab">
+    <div><p class="cg-kicker">Galaxy League · {CLUBES.length} clubes</p><p id="cg-t" class="cg-tit" role="heading" aria-level="2">Los clubes de la Galaxy</p></div>
+    <p class="cg-sub">Cada club tiene su DT. Entra y arma tu carrera con el tuyo.</p>
+  </div>
+  <ul class="cg-lista">
+    {CLUBES.map((x) => (
+      <li class="cg-club rd-p3" style={`--cg-a:${x.c.a};--cg-b:${x.c.b ?? x.c.a}`}>
+        <span class="cg-luz" aria-hidden="true"></span>
+        <span class="cg-pos">{x.p < 99 ? `${x.p}.º` : '—'}</span>
+        <span class="cg-escudo">{escudoDe(x.club) ? <img src={escudoDe(x.club)} alt="" width="96" height="96" loading="lazy" decoding="async" /> : <i class="fa-solid fa-shield-halved"></i>}</span>
+        <b class="cg-nombre">{x.club}</b>
+        <span class="cg-dt"><i class="fa-solid fa-user-tie" aria-hidden="true"></i> {x.dt}</span>
+        <span class="cg-pts">{x.pts} pts</span>
+      </li>
+    ))}
+  </ul>
+  <a class="cg-ver" href={`${base}liga/`}>Ver la tabla de la Galaxy <i class="fa-solid fa-arrow-right"></i></a>
+</section>
+)}
