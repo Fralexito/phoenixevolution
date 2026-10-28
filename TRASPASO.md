@@ -74,8 +74,26 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 161** (`161_duelos_16_jugadores.sql` aplicada por Fralex el 28-oct); siguiente libre: **162** | 2026-10-28 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
+| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | libre — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | — |
 
 **Juego (PES) y Sider:** solo una cuenta a la vez puede pedir pruebas en el juego o instalar módulos, porque es una sola PC y un solo PES. Si la otra cuenta tiene un candado de PES, no instales nada en `SiderAddons`.
+
+---
+
+## 4b. Reglas entre agentes (Claude Cuenta 1, Claude Cuenta 2 y Google Antigravity)
+
+Desde el 28-oct-2026 trabajan sobre el mismo proyecto **tres agentes**: **Claude Cuenta 1**, **Claude Cuenta 2** y **Google Antigravity** (Gemini; Fralex lo usa para algunas tareas, y ya dejó entradas aquí). Estas reglas valen para los tres, sin excepciones, y se suman a las 4 reglas de la sección 1 y a los 5 límites.
+
+1. **Un dueño por frente.** Mira la tabla de candados (sección 4) antes de empezar. Si el frente tiene dueño, no lo toques: pide a Fralex que te lo pase. Al tomarlo, escribe tu nombre (`Cuenta 1`, `Cuenta 2` o `Antigravity`) y la fecha en la tabla y haz push antes de tocar código; al soltarlo, ponlo «libre».
+2. **Leer antes de empezar.** Haz `git pull --rebase` (o `git fetch`) y lee la **última entrada** de la sección 8. Si hay commits nuevos que ninguna entrada menciona, léelos con `git show` antes de seguir.
+3. **Una rama propia por agente.** Trabaja en `agente/<quien>-<tema>` (ej. `cuenta2/rediseno-web`, `antigravity/duelos-16`). **Nunca dos agentes en la misma rama**, y nadie empuja a `main` ni a `borrador` sin pasar por un PR que Fralex apruebe. **Única excepción:** las entradas nuevas de este `TRASPASO.md` (solo se añaden al final de la sección 8, y se hace `git pull --rebase` antes del push).
+4. **Al terminar: entrada nueva y push.** Escribe la entrada de la plantilla (sección 3) y empuja, aunque solo hayas avanzado un poco. Quien no escribe su entrada deja a los otros a ciegas.
+5. **Solo un agente toca la PC o PES a la vez.** Es una sola PC y un solo PES. Antes de abrir PES, instalar módulos en `SiderAddons`, correr scripts de mandos o usar Ghidra/x64dbg, pon tu nombre en la fila **«PC / PES en uso»**; si ya tiene a alguien, espera o pregunta a Fralex. Suelta la fila al terminar. Quien no está en la fila **no cierra PES ni mata `sider.exe`**.
+6. **Migraciones de Supabase con número reservado.** Antes de crear un `.sql`, reserva el número en la fila «Supabase» de la tabla (ej. «162 reservada por Antigravity») y empuja. Nadie usa un número reservado por otro. Ningún agente cambia ajustes de seguridad del panel.
+7. **No editar archivos bloqueados.** Si una carpeta o archivo figura en un candado ajeno, no lo edites, ni «un arreglito». Pide el cambio en una entrada o en `docs/PEDIDOS-A-LA-WEB.md` (web) / el pedido que corresponda, y el dueño lo hace.
+8. **Los compartidos van con cuidado.** `TRASPASO.md` solo se añade; `REGISTRO.md`, `MAPA.md` y `src/data/versionWeb.js` (la versión beta) los toca solo el dueño del frente Web. Quien cambia código de la web sube `VERSION_BETA` y anota el cambio en su entrada.
+9. **Antigravity en particular.** No tiene la memoria de Claude: lo primero que lee es este archivo y `para-proyecto/00_LEEME_PRIMERO.md`. No compila Link con `COMPILAR_PHOENIX.bat`, no borra nada sin commit y no sube claves ni tokens a ningún sitio.
+10. **Conflicto o duda: para y avisa.** Si dos agentes tocaron lo mismo, el que lo nota no resuelve a ciegas: lo cuenta a Fralex en una línea y espera.
 
 ---
 
@@ -331,3 +349,22 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Pedido nuevo de Link 0.3.51** (en `smash-soda-fork`, `docs/PEDIDOS-A-LA-WEB.md`, Parte 15): Link ahora manda `ficha` (estadio, clima, hora, estacion, duracion, dificultad, prorroga, penales, cambios, zona) y `juego.anadido` en `partida_fin`, y `anadido`, `pk_local`/`pk_visita` y `ficha` en `liga/vivo`. Hoy la función de la web los ignora: hay que guardarlos y mostrarlos.
 - **Commits:** solo este `TRASPASO.md`. Web y Link sin otros cambios míos.
 - **Candados:** sin cambios (Web y Supabase libres).
+
+### 2026-10-28 16:45 (Lima) · Cuenta 1 · Estado de hoy de cada frente, respaldo a Drive y reglas entre agentes
+- **Hecho:**
+  - **Reglas nuevas:** sección **4b «Reglas entre agentes»** (Cuenta 1, Cuenta 2 y Google Antigravity) y fila «PC / PES en uso» en la tabla de candados. **Léelas antes de tocar nada.**
+  - **Drive:** respaldo completo en «Phoenix — Respaldo completo» (Core, Lua, módulos, herramientas propias y descargadas, MCP, docs y datos grandes) y copia de informes, bitácoras y guías en «Phoenix — Informes y traspaso 28-oct» (ver Solo en la PC).
+- **Estado de cada frente (todo en PAUSA por falta de crédito):**
+  - **PES: modo street (Phoenix Core 0.4.94):** panel F9/F10/F11 hecho; reloj 45→90 **sin probar**; final nativo **experimental y apagado**. Copias estables: `SiderAddons\phoenix_core\street_estable_*`.
+  - **PES: mandos 9–16 (módulo Sider v0.9.62):** `D:\Frank\Games_\PRUEBA_CANCHA\modulo_sider` y `SiderAddons\modules`.
+  - **Phoenix Link 0.3.55:** rama `plan-ux`; pedidos de la web en `docs/PEDIDOS-A-LA-WEB.md` de smash-soda-fork.
+  - **MCP phoenix-pes v0.2:** `D:\Frank\IA\CLAUDE\pes-mcp` (guía: `GUIA-MCP-PES.md`).
+  - **Phoenix Online v0.1:** `D:\Frank\IA\CLAUDE\pes-online`; 14 pruebas pasan; **falta la prueba real** con dos PCs. Ojo: ahí hay una llave (`nclmio_key.bin`); no se sube a Drive ni a git.
+  - **Web:** beta **1.43.1**; Supabase aplicado hasta la **161**, siguiente libre: **162**. Antigravity (Gemini) ya dejó dos entradas el 28-oct (Duelos hasta 16, enlace 404).
+- **Commits/ramas:** `phoenixevolution@borrador` — este `TRASPASO.md` (solo documentación).
+- **Solo en la PC (sin git):** todo lo de PES/Sider/MCP/Online de arriba. Copia en `para-proyecto/TRASPASO.md` (hub) y en Drive.
+- **Supabase:** nada nuevo.
+- **A medias:** reloj 45→90 de street sin probar; prueba real de Phoenix Online; mandos 9+ aún sin confirmar movimiento en partido.
+- **Esperando a Fralex:** crédito/cuenta para seguir, y avisar quién toma cada frente (con Antigravity incluido).
+- **Siguiente paso:** quien entre lee la sección 4b, hace `git pull --rebase`, toma su candado y su rama, y retoma por el frente que Fralex indique.
+- **Candados:** sin cambios (los de PES y Link siguen con Cuenta 1 pero en pausa; Web libre).
