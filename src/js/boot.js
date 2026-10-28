@@ -24,6 +24,8 @@ initModoLigero();
 // un selector al instante). Si fallara, queda la lista nativa.
 if (FX.funcionesNuevas) import('./features/selectorPhoenix.js').then((m) => m.initSelectorPhoenix()).catch((e) => console.error('[boot] selector:', e));
 // Calendario Phoenix (27-oct-2026): lo mismo para las casillas de fecha y hora (sin el calendario del sistema).
+// Apple design (FX.fluido, 28-oct-2026): las hojas del celular (listas y calendario) se cierran bajándolas con el dedo.
+if (FX.fluido) import('./features/fluido/hojas.js').then((m) => m.initHojasArrastrables()).catch((e) => console.error('[boot] hojas:', e));
 if (FX.funcionesNuevas) import('./features/calendarioPhoenix.js').then((m) => m.initCalendarioPhoenix()).catch((e) => console.error('[boot] calendario:', e));
 initSitio();
 initSidebar();

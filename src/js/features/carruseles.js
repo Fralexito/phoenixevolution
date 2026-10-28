@@ -3,6 +3,8 @@
 //   data-carrusel="3d" → las tarjetas de los costados se ven inclinadas y la del centro de frente (lo hace el CSS, styles/carrusel.css).
 // Se monta solo al cargar la página (boot.js) y también se puede montar a mano con montarCarrusel(lista).
 import { FX } from '../../data/experimento.js';
+import { resorte, agarrar } from './fluido/animar.js';
+import { velocidad, proyectar, elastico } from '../core/sistema/resorte.js';
 
 const MOVIMIENTO_MIN = 6;   // px: si arrastras menos que esto, cuenta como clic normal
 
@@ -52,22 +54,42 @@ export function montarCarrusel(pista) {
     if (e.key === 'ArrowLeft') { e.preventDefault(); mover(-1); }
   });
 
-  // Arrastrar con el mouse (con el dedo ya funciona solo, es scroll normal)
-  let x0 = 0; let s0 = 0; let arrastrando = false; let movio = false;
+  // Arrastrar con el mouse (con el dedo ya funciona solo, es scroll normal).
+  // Apple design (FX.fluido, 28-oct-2026): la pista sigue al mouse 1:1; en los bordes se resiste como un elástico; al soltar sigue con
+  // el IMPULSO que traía (misma velocidad) y frena con un resorte justo en la tarjeta más cercana a donde iba. Agarrarla la detiene.
+  let x0 = 0; let s0 = 0; let arrastrando = false; let movio = false; let muestras = []; let estiro = 0;
+  const ponEstiro = (x) => { estiro = x; pista.style.translate = x ? `${x}px 0` : ''; };
   pista.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    arrastrando = true; movio = false; x0 = e.clientX; s0 = pista.scrollLeft;
+    if (FX.fluido) { agarrar(pista); agarrar(caja); }
+    arrastrando = true; movio = false; x0 = e.clientX; s0 = pista.scrollLeft; muestras = [{ t: e.timeStamp, x: e.clientX }];
   });
   window.addEventListener('pointermove', (e) => {
     if (!arrastrando) return;
     const dx = e.clientX - x0;
     if (!movio && Math.abs(dx) > MOVIMIENTO_MIN) { movio = true; caja.setAttribute('data-arrastrando', ''); }
-    if (movio) pista.scrollLeft = s0 - dx;
+    if (!movio) return;
+    const max = Math.max(0, pista.scrollWidth - pista.clientWidth); const quiere = s0 - dx;
+    pista.scrollLeft = Math.min(max, Math.max(0, quiere));
+    if (FX.fluido) {
+      const fuera = quiere < 0 ? quiere : quiere > max ? quiere - max : 0;
+      ponEstiro(fuera ? -elastico(fuera, pista.clientWidth) : 0);
+      muestras.push({ t: e.timeStamp, x: e.clientX }); if (muestras.length > 12) muestras.shift();
+    }
   });
   window.addEventListener('pointerup', () => {
     if (!arrastrando) return;
     arrastrando = false;
-    if (movio) { caja.removeAttribute('data-arrastrando'); }
+    if (!movio) return;
+    if (!FX.fluido || document.documentElement.dataset.ajMovEfectivo === 'reducido') { ponEstiro(0); caja.removeAttribute('data-arrastrando'); return; }
+    const v = -velocidad(muestras);   // velocidad del desplazamiento (px/s): contraria a la del mouse
+    if (estiro) resorte(caja, 0, { leer: () => estiro, velocidad: 0, amortiguacion: 0.8, respuesta: 0.35, poner: ponEstiro });
+    // Dónde terminaría el impulso → la tarjeta cuyo centro queda más cerca de ese punto
+    const max = Math.max(0, pista.scrollWidth - pista.clientWidth); const lejos = pista.scrollLeft + proyectar(v, 0.995);
+    const pr = pista.getBoundingClientRect(); const centro = pr.left + pr.width / 2;
+    let destino = Math.min(max, Math.max(0, lejos)); let mejor = Infinity;
+    for (const t of pista.children) { const r = t.getBoundingClientRect(); const pos = pista.scrollLeft + (r.left + r.width / 2 - centro); const d = Math.abs(pos - lejos); if (d < mejor) { mejor = d; destino = Math.min(max, Math.max(0, pos)); } }
+    resorte(pista, destino, { leer: () => pista.scrollLeft, velocidad: v, amortiguacion: 1, respuesta: 0.45, poner: (x) => { pista.scrollLeft = x; }, alTerminar: () => caja.removeAttribute('data-arrastrando') });
   });
   // Si arrastraste, ese «soltar» no debe abrir la tarjeta
   pista.addEventListener('click', (e) => { if (movio) { e.preventDefault(); e.stopPropagation(); movio = false; } }, true);

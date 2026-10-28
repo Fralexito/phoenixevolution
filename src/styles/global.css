@@ -51,3 +51,4 @@ main.flex-grow { min-height: 100vh; }
 @import './calendario.css';   /* ventana «Añadir a mi calendario» */
 @import './pruebaJuego.css';   /* ronda 391: PRUEBA botones y cartas de juego (solo con <html data-prueba-juego>) */
 @import './responsivo.css';   /* ronda 392: arreglos de pantallas chicas (cabecera sin sesión, «Tu club»…) */
+@import './fluido.css';   /* APPLE DESIGN (28-oct-2026, FX.fluido): respuesta al tocar, materiales y accesibilidad; todo bajo html[data-fluido]. Va el ÚLTIMO. */
