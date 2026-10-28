@@ -9,6 +9,7 @@ import { toast } from '../core/sistema/toast.js';
 import { confirmar, pedirTexto } from '../core/sistema/dialogo.js';
 import { openAuthModal } from '../features/auth.js';
 import { ESTADOS_LIGA } from '../core/competicion/ligaVivo.js';
+import { escudoHTML } from '../core/sistema/escudos.js';
 
 const base = import.meta.env.BASE_URL;
 const caja = document.getElementById('la-ligas');
@@ -59,10 +60,10 @@ function tarjeta(e, participantes, partidos, tabla) {
     botones.push(`<a class="btn" href="${base}moderacion/#mod-liga"><i class="fa-solid fa-clipboard-check"></i> Validar resultados</a>`);
     botones.push(`<button class="btn" data-acc="finalizar" data-ed="${escapeHTML(e.id)}">Cerrar la liga</button>`);
   }
-  botones.push(`<button class="btn" data-acc="copiar" data-ed="${escapeHTML(e.id)}"><i class="fa-solid fa-link"></i> Copiar enlace</button>`);
+  botones.push(`<button class="btn" data-acc="copiar" data-ed="${escapeHTML(e.id)}"><i class="fa-solid fa-link"></i> Copiar enlace</button>`, `<button class="btn" data-acc="whatsapp" data-ed="${escapeHTML(e.id)}" data-nom="${escapeHTML(e.nombre)}"><i class="fa-solid fa-share-nodes"></i> Invitar amigos</button>`);
 
   const inscritos = participantes.length
-    ? `<ul class="flex flex-wrap gap-2">${participantes.map((p) => `<li class="px-2 py-1 rounded-lg bg-white/5 border border-galaxy-border text-sm text-white">${escapeHTML(p.nombre)}${p.club ? ` <span class="text-gray-400">· ${escapeHTML(p.club)}</span>` : ''}</li>`).join('')}</ul>`
+    ? `<ul class="flex flex-wrap gap-2">${participantes.map((p) => `<li class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${p.usuario && p.usuario === uid ? 'bg-galaxy-400/15 border-galaxy-400/60' : 'bg-white/5 border-galaxy-border'} border text-sm text-white">${p.club ? escudoHTML(p.club, 20) : ''}<b>${escapeHTML(p.nombre)}</b>${p.club ? ` <span class="text-gray-400 text-xs">· ${escapeHTML(p.club)}</span>` : ''}</li>`).join('')}</ul>`
     : '<p class="text-sm text-gray-400">Nadie inscrito todavía.</p>';
 
   return `<section id="ed-${escapeHTML(e.id)}" class="glass-panel rounded-2xl p-4 sm:p-5 space-y-4">
@@ -73,20 +74,21 @@ function tarjeta(e, participantes, partidos, tabla) {
       </div>
       <div class="flex flex-wrap gap-2">${botones.join('')}</div>
     </header>
-    ${e.estado === 'inscripcion' ? inscritos : `${tablaHTML(tabla)}${fechasHTML(partidos)}`}
+    ${e.estado === 'inscripcion' ? inscritos : `${tablaHTML(tabla, participantes, yo)}${fechasHTML(partidos, yo)}`}
   </section>`;
 }
 
-function tablaHTML(tabla) {
+function tablaHTML(tabla, participantes = [], yo = null) {
   if (!tabla.length) return '';
+  const clubDe = (nom) => participantes.find((p) => p.nombre === nom)?.club ?? '';
   const filas = [...tabla].sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || a.nombre.localeCompare(b.nombre));
   return `<div class="overflow-x-auto"><table class="w-full text-sm text-gray-200">
-    <thead class="text-[11px] uppercase tracking-wider text-gray-400"><tr><th class="text-left py-1">#</th><th class="text-left">DT</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
-    <tbody>${filas.map((f, i) => `<tr class="border-t border-galaxy-border text-center"><td class="text-left py-1">${i + 1}</td><td class="text-left text-white">${escapeHTML(f.nombre)}</td><td>${f.pj}</td><td>${f.g}</td><td>${f.e}</td><td>${f.p}</td><td>${f.gf}</td><td>${f.gc}</td><td>${f.dg}</td><td class="font-bold text-galaxy-400">${f.pts}</td></tr>`).join('')}</tbody>
-  </table><p class="text-[11px] text-gray-500 mt-1">Solo cuentan los resultados confirmados por el staff.</p></div>`;
+    <thead class="text-[12px] uppercase tracking-wider text-gray-400"><tr><th class="text-left py-1.5">#</th><th class="text-left">DT / Club</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+    <tbody>${filas.map((f, i) => { const cl = clubDe(f.nombre); const esYo = yo?.nombre === f.nombre; return `<tr class="border-t border-galaxy-border text-center ${esYo ? 'bg-galaxy-400/10' : ''}"><td class="text-left py-1.5 font-bold ${i === 0 ? 'text-amber-300' : ''}">${i + 1}</td><td class="text-left text-white"><span class="inline-flex items-center gap-1.5">${cl ? escudoHTML(cl, 20) : ''}<b>${escapeHTML(f.nombre)}</b>${cl ? `<span class="text-xs text-gray-400">· ${escapeHTML(cl)}</span>` : ''}</span></td><td>${f.pj}</td><td>${f.g}</td><td>${f.e}</td><td>${f.p}</td><td>${f.gf}</td><td>${f.gc}</td><td>${f.dg}</td><td class="font-bold text-galaxy-400">${f.pts}</td></tr>`; }).join('')}</tbody>
+  </table><p class="text-[12px] text-gray-500 mt-1">Solo cuentan los resultados confirmados por el staff.</p></div>`;
 }
 
-function fechasHTML(partidos) {
+function fechasHTML(partidos, yo = null) {
   if (!partidos.length) return '';
   const porFecha = new Map();
   for (const p of partidos) porFecha.set(p.fecha, [...(porFecha.get(p.fecha) ?? []), p]);
@@ -95,7 +97,8 @@ function fechasHTML(partidos) {
     ${ps.map((p) => {
       const marcador = p.goles_local == null ? 'vs' : `${p.goles_local} - ${p.goles_visita}`;
       const est = ESTADOS_LIGA[p.estado] ?? ESTADOS_LIGA.pendiente;
-      return `<p class="flex items-center justify-between gap-2 text-sm text-white py-0.5"><span class="truncate">${escapeHTML(p.local)} <b class="text-galaxy-400">${marcador}</b> ${escapeHTML(p.visitante)}</span><span class="text-[11px] text-gray-400 shrink-0">${est.texto}</span></p>`;
+      const mio = yo && (p.local === yo.nombre || p.visitante === yo.nombre); const gl = p.goles_local; const gv = p.goles_visita; const jugado = gl != null && gv != null;
+      return `<p class="flex items-center justify-between gap-2 text-sm text-white py-1 px-2 rounded-lg ${mio ? 'bg-galaxy-400/10 border border-galaxy-400/30' : ''}"><span class="truncate"><span class="${jugado && gl > gv ? 'font-bold text-white' : jugado && gl < gv ? 'text-gray-400' : ''}">${escapeHTML(p.local)}</span> <b class="text-galaxy-400 mx-1">${marcador}</b> <span class="${jugado && gv > gl ? 'font-bold text-white' : jugado && gv < gl ? 'text-gray-400' : ''}">${escapeHTML(p.visitante)}</span></span><span class="text-[12px] ${mio ? 'text-galaxy-400 font-semibold' : 'text-gray-400'} shrink-0">${mio ? 'Tu partido · ' : ''}${est.texto}</span></p>`;
     }).join('')}</div>`).join('')}</div>`;
 }
 
@@ -104,6 +107,7 @@ async function accion(btn) {
   const ed = btn.dataset.ed;
   try {
     if (acc === 'login') return openAuthModal('login');
+    if (acc === 'whatsapp') { const url = `${location.origin}${base}liga-amigos/?liga=${encodeURIComponent(ed)}`; window.open(`https://wa.me/?text=${encodeURIComponent(`⚽ ¡Inscríbete a nuestra liga oficial «${btn.dataset.nom ?? 'Phoenix'}» en Phoenix Evolution!\n👉 ${url}`)}`, '_blank', 'noopener'); return; }
     if (acc === 'copiar') {
       await navigator.clipboard.writeText(`${location.origin}${base}liga-amigos/?liga=${encodeURIComponent(ed)}`);
       return toast('Enlace copiado: pásalo a tus amigos.', 'success');

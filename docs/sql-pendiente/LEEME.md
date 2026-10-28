@@ -1,4 +1,6 @@
-# SQL pendiente — NADA (actualizado 25-oct-2026 19:45, Lima)
+# SQL pendiente — Migración 161 (actualizado 28-oct-2026 02:55, Lima)
+
+- **161 (`161_duelos_16_jugadores.sql`):** pendiente de pegar en el SQL Editor por Fralex (amplía `retos_tam_ok` a 16 jugadores / 8v8).
 
 - 159 (limpieza diaria): **aplicada** por Fralex el 25-oct; la tarea `limpieza-diaria` corre a las 04:40 (Lima).
 - 160 (ficha del partido): **aplicada** por Claude el 25-oct.

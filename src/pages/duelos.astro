@@ -80,11 +80,11 @@ import JugarRd from '../components/rediseno/JugarRd.astro';   // rediseño: «Po
           </div>
 
           <div>
-            <span class="label">Tamaño <span class="text-gray-500 normal-case">(máx. 8 en total)</span></span>
-            <div id="tam-presets" class="grid grid-cols-[1fr_1fr_1fr_auto] gap-1.5 mb-1.5" role="group" aria-label="Formatos rápidos (sin elegir = 1v1)">
-              <button type="button" class="chip" data-t="2-2" aria-pressed="false">2v2</button>
-              <button type="button" class="chip" data-t="3-3" aria-pressed="false">3v3</button>
-              <button type="button" class="chip" data-t="4-4" aria-pressed="false">4v4</button>
+            <span class="label">Tamaño <span class="text-gray-500 normal-case">(máx. 16 en total)</span></span>
+            <div id="tam-presets" class="flex flex-wrap gap-1.5 mb-1.5" role="group" aria-label="Formatos rápidos (sin elegir = 1v1)">
+              <button type="button" class="chip flex-1 min-w-[3.2rem]" data-t="1-1" aria-pressed="true">1v1</button><button type="button" class="chip flex-1 min-w-[3.2rem]" data-t="2-2" aria-pressed="false">2v2</button>
+              <button type="button" class="chip flex-1 min-w-[3.2rem]" data-t="3-3" aria-pressed="false">3v3</button>
+              <button type="button" class="chip flex-1 min-w-[3.2rem]" data-t="4-4" aria-pressed="false">4v4</button><button type="button" class="chip flex-1 min-w-[3.2rem]" data-t="5-5" aria-pressed="false">5v5</button><button type="button" class="chip flex-1 min-w-[3.2rem]" data-t="8-8" aria-pressed="false">8v8</button>
               <button type="button" id="tam-personal" class="chip !px-3 !text-[12px] !font-medium !normal-case !tracking-normal !text-gray-400 !border-dashed" aria-pressed="false" title="Elige cuántos jugadores por equipo">Personalizar</button>
             </div>
             <div id="tam-custom" class="grid grid-cols-2 gap-2">
@@ -105,7 +105,7 @@ import JugarRd from '../components/rediseno/JugarRd.astro';   // rediseño: «Po
                 </div>
               </div>
             </div>
-            <p class="text-[12px] text-gray-400 mt-1 leading-snug">Total: <b id="tam-total" class="text-galaxy-400">2/8</b> · <span id="hint-equipos"></span></p>
+            <p class="text-[12px] text-gray-400 mt-1 leading-snug">Total: <b id="tam-total" class="text-galaxy-400">2/16</b> · <span id="hint-equipos"></span></p>
             <button type="button" id="tam-reset" hidden class="mt-1.5 w-full min-h-9 rounded-lg border border-galaxy-400/60 bg-galaxy-400/10 text-galaxy-400 hover:bg-galaxy-400/20 hover:text-white transition-colors text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2"><i class="fa-solid fa-rotate-left"></i> Restablecer a 1 vs 1</button>
           </div>
 

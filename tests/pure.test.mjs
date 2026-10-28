@@ -83,15 +83,15 @@ test('isStale', () => {
   assert.equal(isStale({ estado: 'BUSCANDO', created_at: now.toISOString(), fecha_programada: null }, now), false);
 });
 
-test('equipos: máximo 8 en total y cada lado entre 1 y 7', () => {
-  assert.equal(validTeams(4, 4), true); assert.equal(validTeams(5, 4), false); assert.equal(validTeams(0, 1), false); assert.equal(validTeams(7, 1), true); assert.equal(validTeams(8, 1), false);
-  assert.equal(clampTeam('x'), 1); assert.equal(clampTeam(99), 7); assert.equal(maxFor(4), 4); assert.equal(maxFor(1), 7);
+test('equipos: máximo 16 en total y cada lado entre 1 y 15', () => {
+  assert.equal(validTeams(4, 4), true); assert.equal(validTeams(8, 8), true); assert.equal(validTeams(9, 8), false); assert.equal(validTeams(0, 1), false); assert.equal(validTeams(15, 1), true); assert.equal(validTeams(16, 1), false);
+  assert.equal(clampTeam('x'), 1); assert.equal(clampTeam(99), 15); assert.equal(maxFor(8), 8); assert.equal(maxFor(1), 15);
 });
 test('setTeamSize nunca produce un par inválido', () => {
-  assert.deepEqual(setTeamSize({ a: 4, b: 4 }, 'a', 6), { a: 4, b: 4 });
+  assert.deepEqual(setTeamSize({ a: 8, b: 8 }, 'a', 10), { a: 8, b: 8 });
   assert.deepEqual(setTeamSize({ a: 2, b: 3 }, 'b', 6), { a: 2, b: 6 });
   assert.deepEqual(setTeamSize({ a: 2, b: 3 }, 'a', 0), { a: 1, b: 3 });
-  for (let a = 0; a < 12; a++) for (let b = 0; b < 12; b++) { const r = setTeamSize({ a: 3, b: 3 }, 'a', a); assert.ok(validTeams(r.a, r.b)); const q = setTeamSize(r, 'b', b); assert.ok(validTeams(q.a, q.b)); }
+  for (let a = 0; a < 18; a++) for (let b = 0; b < 18; b++) { const r = setTeamSize({ a: 3, b: 3 }, 'a', a); assert.ok(validTeams(r.a, r.b)); const q = setTeamSize(r, 'b', b); assert.ok(validTeams(q.a, q.b)); }
 });
 test('seats: cuenta confirmados, invitados y libres; ignora a quien salió', () => {
   const parts = [{ equipo: 'A', estado: 'CONFIRMADO' }, { equipo: 'A', estado: 'INVITADO' }, { equipo: 'A', estado: 'SALIO' }, { equipo: 'B', estado: 'CONFIRMADO' }];

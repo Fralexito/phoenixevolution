@@ -25,7 +25,7 @@ export async function guard(fn) {
 }
 
 // Las reglas de negocio (P0001) ya vienen en español desde la BD; lo demás se resume.
-export const friendly = (e) => (e.code === 'P0001' ? e.message : e.code === '23505' ? 'Ya tienes un reto abierto. Cancélalo antes de lanzar otro.' : 'No se pudo completar la acción.');
+export const friendly = (e) => (e.code === 'P0001' ? e.message : e.code === '23505' ? 'Ya tienes un reto abierto. Cancélalo antes de lanzar otro.' : e.code === '23514' && /retos_tam_ok/i.test(e.message ?? '') ? 'Para retos de más de 8 jugadores, falta activar la migración 161 en Supabase.' : 'No se pudo completar la acción.');
 
 /** Llama a una función de la BD y refresca la pantalla. */
 export async function callRpc(name, params, okMsg) {

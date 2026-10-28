@@ -25,7 +25,7 @@ const FX_PRO = !!FX.duelosPro;
 
 const $ = (id) => document.getElementById(id);
 montarNumerosVivos();
-$('lista-retos').addEventListener('click', (e) => { if (!e.target.closest('[data-lanzar]')) return; const f = $('btn-abrir-form'); if (f && getComputedStyle(f).display !== 'none') f.click(); else { $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('form-crear-reto').querySelector('input, button')?.focus({ preventScroll: true }); } });
+$('lista-retos').addEventListener('click', (e) => { const ag = e.target.closest('[data-agendar]'); if (ag) { const m = document.querySelector('#presets [data-p="manual"]'); if (m) m.click(); } if (!e.target.closest('[data-lanzar], [data-agendar]')) return; const f = $('btn-abrir-form'); if (f && getComputedStyle(f).display !== 'none') f.click(); else { $('form-crear-reto').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('form-crear-reto').querySelector('input, button')?.focus({ preventScroll: true }); } });
 
 /* ---------- Vistas ----------
    PC: todo a la vista. Móvil: «Lanzar reto» se abre/cierra con su botón; «Retos en el radar» está siempre visible debajo.
@@ -46,7 +46,7 @@ function renderAll() {
   const pend = pendientes(mine);
   const vacio = (t, py = 'py-8') => `<div class="col-span-full text-center ${py} text-gray-400 text-xs bg-galaxy-panel rounded-xl border border-galaxy-border">${t}</div>`;
   $('lista-pend').innerHTML = !id ? vacio('Inicia sesión para ver los retos que lanzaste.', 'py-10') : pend.length ? pend.map((r) => card(r, id)).join('') : vacio('No tienes retos pendientes. Lanza uno desde el formulario.', 'py-10');
-  $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio(`<p class="text-sm text-gray-300 mb-3">Nadie espera rival ahora. ¡Sé el primero en lanzar un reto!</p><button type="button" data-lanzar class="btn btn-primary !min-h-10"><i class="ph-bold ph-sword"></i> Lanzar reto</button>`, 'py-10');
+  $('lista-retos').innerHTML = rest.length ? rest.map((r) => card(r, id)).join('') : vacio(`<p class="text-sm text-gray-300 mb-3">Nadie espera rival ahora. ¡Sé el primero en lanzar un reto o agenda uno para más tarde!</p><div class="flex flex-wrap items-center justify-center gap-2"><button type="button" data-lanzar class="btn btn-primary !min-h-10"><i class="ph-bold ph-sword"></i> Lanzar reto</button><button type="button" data-agendar class="btn !min-h-10"><i class="fa-regular fa-calendar"></i> Agendar hora</button><a href="${import.meta.env.BASE_URL}en-vivo/" class="btn !min-h-10"><i class="fa-solid fa-tower-broadcast"></i> Salas en vivo</a></div>`, 'py-10');
   $('cnt-pend').textContent = pend.length ? `(${pend.length})` : '';
   $('cnt-radar').textContent = rest.length ? `(${rest.length})` : '';
   // «Tu próximo partido» arriba (reutiliza la tarjeta de Duelos, con sus botones) y cifras en vivo

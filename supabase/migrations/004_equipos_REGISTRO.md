@@ -14,7 +14,7 @@ La fuente de verdad del SQL es la base de datos en vivo (Supabase → Database �
 ## Reglas en una tabla
 | Regla | Dónde vive |
 |---|---|
-| Máx. 8 jugadores; cada equipo 1..7 | BD (`retos_tam_ok`) + `src/js/core/rules.js` |
+| Máx. 16 jugadores; cada equipo 1..15 (migración 161, antes 8 y 1..7) | BD (`retos_tam_ok`) + `src/js/core/sistema/rules.js` |
 | Retador = líder A; quien acepta = líder B | BD (`aceptar_reto`) |
 | Solo el líder invita a su equipo | BD (`invitar_a_reto`) |
 | Reto privado: solo entran invitados | BD (`unirse_a_reto`, política `retos_select`) |

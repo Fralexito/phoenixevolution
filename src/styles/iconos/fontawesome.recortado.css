@@ -1,4 +1,4 @@
-/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 293 nombres que usa la web. */
+/* GENERADO por tools/iconos/recortar-iconos.mjs — no editar a mano. Reglas base de Font Awesome + solo los 294 nombres que usa la web. */
 /*!
  * Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -972,6 +972,10 @@
 
 .fa-head-side-virus {
   --fa: "\e064";
+}
+
+.fa-house-chimney-user {
+  --fa: "\e065";
 }
 
 .fa-people-arrows {

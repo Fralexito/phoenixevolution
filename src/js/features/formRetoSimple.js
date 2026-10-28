@@ -15,8 +15,8 @@ export function simplificarFormReto() {
 
     // 1 · Tamaño: chip 1v1 al inicio y «Personalizar» pasa a llamarse «Otro»
     const presets = $('tam-presets');
-    if (presets && !presets.querySelector('[data-t="1-1"]')) {
-      presets.insertAdjacentHTML('afterbegin', '<button type="button" class="chip" data-t="1-1" aria-pressed="true">1v1</button>');
+    if (presets && !presets.dataset.frListo) { presets.dataset.frListo = '1';
+      if (!presets.querySelector('[data-t="1-1"]')) presets.insertAdjacentHTML('afterbegin', '<button type="button" class="chip" data-t="1-1" aria-pressed="true">1v1</button>');
       const otro = $('tam-personal'); if (otro) { otro.textContent = 'Otro'; otro.title = 'Elige cuántos jugadores por equipo (contadores A y B)'; }
       const caja = presets.parentElement;
       presets.addEventListener('click', (e) => {
