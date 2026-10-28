@@ -66,3 +66,4 @@ html[data-aj-mov-efectivo='reducido'] :is(.sx-velo, .sx-panel, .sx-cab) { animat
 /* Sin el anillo de foco general de la web sobre el panel (el foco se ve en la opción marcada) */
 .sx-panel:focus, .sx-panel:focus-visible { outline: none !important; }
 html[data-selector-phoenix] .sx-velo .sx-panel:focus-visible { box-shadow: 0 24px 60px -18px rgb(0 0 0 / .85), 0 0 32px -10px color-mix(in srgb, var(--color-galaxy-600, #8000ff) 70%, transparent); }
+.sx-lista { position: relative; }
