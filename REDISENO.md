@@ -42,3 +42,11 @@ Nada de esto llega a `borrador` ni a `main` hasta que Fralex diga «Súbelo».
 - Excepciones: `multiple`, `size>1` o `data-nativo` (solo si hay una razón fuerte).
 - Pendiente con la misma regla: los selectores de fecha/hora (`type="date"`, `time`, `datetime-local`, `month`; 12 en la web) aún abren el calendario del sistema.
 - Liga: vuelve el «Últimos» con flechas ‹ › y contador (5/11), como antes del 19-oct (pedido de Fralex).
+
+## 27-oct (noche) · «Hazlo todo»
+- Calendario Phoenix: fecha/hora/mes sin el calendario del sistema (js/features/calendarioPhoenix.js, core/sistema/cuadriculaFechas.js). Ojo: `core/sistema/calendario.js` es OTRO archivo (añadir a mi calendario .ics); no confundir.
+- Social: las iniciales de los comentarios y de «Lo más reaccionado» tienen su círculo.
+- Jugar (Sala de Duelos): arriba «Por jugar» (fecha actual) y «Salas jugando» (en vivo). components/rediseno/JugarRd.astro
+- Mi club: «Los clubes de la Galaxy» (solo sin sesión) + arreglo del texto dorado de «Mi club» en el menú cuando está abierto.
+- Jugadores: tira de escudos para filtrar por club (js/features/jugadores/tiraClubes.js).
+- Perfil: «Tu rincón» en tu propio perfil: próximo partido, puesto y atajos (js/features/perfil/rincon.js, core/portada/rincon.js).
