@@ -255,6 +255,10 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Solo en la PC (sin git):** `C:\dev\pes-liga-automatica` actualizada con `git pull --ff-only` y sincronizada con `origin/borrador`.
 - **Candados:** todos libres (Web y Supabase libres). Siguiente migración libre: **162**.
 
+### 2026-10-28 15:15 (Lima) · Gemini (Antigravity) · Arreglo enlace 404 en «Salas jugando» de Duelos — beta 1.43.1
+- **Hecho:** ronda 403, beta **1.43.1**: en `src/components/rediseno/JugarRd.astro` las tarjetas de «Salas jugando» usaban `new URL('en-vivo/', document.baseURI).pathname`, que dentro de `/duelos/` abría `/duelos/en-vivo/` (404). Ahora usan `${import.meta.env.BASE_URL}en-vivo/`.
+- **Candados:** todos libres. Siguiente migración libre: **162**.
+
 ### 2026-10-27 15:30 (Lima) · Cuenta 2 · Rediseño completo en rama aparte (rediseno-web)
 - **Hecho:** rama `rediseno-web` (copia de borrador) publicada en `/phoenixevolution/fase-rediseno/`. `deploy.yml` de borrador la compila
   si existe (si falla, lo demás se publica igual). Para publicar un cambio de esa rama: `gh workflow run deploy.yml --ref borrador`.

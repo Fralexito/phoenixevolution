@@ -65,7 +65,7 @@ const DISCORD = 'https://discord.gg/jsxZ3mtfwe';
   if (caja) import('../../js/features/salas/api.js').then(async (m) => {
     const salas = (await m.salasEnVivo()).filter((s) => s?.estado === 'en_partida' || s?.estado === 'esperando');
     if (!salas.length) return;
-    const ul = caja.querySelector('[data-jr-salas]'); const enVivo = new URL('en-vivo/', document.baseURI).pathname;
+    const ul = caja.querySelector('[data-jr-salas]'); const enVivo = caja.querySelector('.jr-ver')?.getAttribute('href') || `${import.meta.env.BASE_URL}en-vivo/`;
     ul.innerHTML = salas.slice(0, 5).map((s) => {
       const juega = s.estado === 'en_partida'; const mk = s.marcador;
       return `<li><a class="jr-sala${juega ? ' is-juega' : ''}" href="${esc(enVivo)}"><span class="jr-sala-est">${juega ? '<span class="jr-punto"></span>En juego' : 'Espera rival'}</span><b>${esc(s.host?.nombre ?? 'Sala')}${s.rival?.nombre ? ` <i>vs</i> ${esc(s.rival.nombre)}` : ''}</b>${juega && mk ? `<span class="jr-sala-mk">${Number(mk.goles_local) || 0} – ${Number(mk.goles_visita) || 0}<small>${esc(mk.minuto ?? '')}′</small></span>` : ''}</a></li>`;

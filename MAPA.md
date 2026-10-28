@@ -548,3 +548,4 @@ Un anfitrión hace un traspaso en Editar de PES y lo guarda; su Link publica un 
 - 400 · 1.39.3 portada paso 4: un solo ancho (72rem / max-w-6xl) para ventanas, «Empieza en 3 pasos», Tu club y .portada-abajo
 - 401 · 1.40.0 portada paso 5: escala de títulos (tokens --tit-n1/2/3 + .tit-n1/2/3), carta del líder junto a la tabla y menos saturada, «Jugadores destacados» se oculta sin datos
 - 402 · 1.43.0 Sala de Duelos hasta 16 jugadores (8v8, botones 1v1/2v2/3v3/4v4/5v5/8v8, migración 161, radar vacío con «Agendar hora» y «Salas en vivo») + Liga oficial con escudos reales, fila propia y ganador resaltados, botón «Invitar amigos» por WhatsApp y textos de 11px subidos a 12px
+- 403 · 1.43.1 Duelos («Salas jugando»): corregido enlace que abría `/duelos/en-vivo/` (404) por usar `document.baseURI` en vez de `BASE_URL` (`en-vivo/`)
