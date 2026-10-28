@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import '../styles/retoAsistente.css';   // «Lanzar reto» por pasos (js/features/duelos/asistente.js). Después de Layout: gana a global.css
+import '../styles/retoAsistente.css';
+import { FX } from '../data/experimento.js';
+import JugarRd from '../components/rediseno/JugarRd.astro';   // rediseño: «Por jugar» + «En vivo ahora» arriba   // «Lanzar reto» por pasos (js/features/duelos/asistente.js). Después de Layout: gana a global.css
 ---
 <Layout title="Sala de Duelos" active="duelos" description="Lanza un reto 1v1 o en equipo, agenda tu partido y juega por Parsec o Smash Soda.">
   <div class="max-w-7xl 2xl:max-w-[1360px] mx-auto px-5 sm:px-8 lg:px-12 py-3 sm:py-4 w-full space-y-3 sm:space-y-4">
@@ -29,6 +31,9 @@ import '../styles/retoAsistente.css';   // «Lanzar reto» por pasos (js/feature
       <h2 class="text-xs font-display font-bold text-white uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-tower-broadcast text-galaxy-400"></i> Jugadores en el radar</h2>
       <div id="radar-list" class="flex flex-wrap gap-2"></div>
     </section>
+
+    <!-- Rediseño (FX.rediseno): lo que toca jugar en la fecha y las salas en vivo, antes del formulario y los retos -->
+    {FX.rediseno && <JugarRd />}
 
     <!-- Solo en móvil: botón que abre/cierra «Lanzar reto». «Retos en el radar» queda siempre visible. En PC no existe. -->
     <div class="seg lg:!hidden" id="seg-vista" role="group" aria-label="Secciones">
