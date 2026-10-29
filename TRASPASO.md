@@ -384,3 +384,22 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Fralex:** probar `PhoenixLink.exe` `0.3.56` en sala real (barra de partido en Puestos, armado 8v8 y combo `L3+R3+Select` en partido).
 - **Siguiente paso:** cualquier cuenta de Claude (Cuenta 1 o Cuenta 2) que retome Link solo debe hacer `git pull --rebase origin plan-ux` y verá el commit de la `0.3.56` y la fila en `REGISTRO-LINK.md`.
 - **Candados:** Link vuelve a quedar libre / disponible para Cuenta 1 o Cuenta 2.
+
+### 2026-10-28 20:45 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.57: Rediseño «Minimalismo Táctico» y reorganización visual (Sala, Mandos y Partido)
+- **Hecho:** Con autorización de Fralex, se aplicó y compiló el rediseño estético y de arquitectura visual **Phoenix Link 0.3.57 («Minimalismo Táctico»)**:
+  1. **Cápsula Unificada de Estado en la Barra Superior (`app.js`, `app.css`):** Las 3 pastillas sueltas (`SALA`, `WEB`, `JUEGO`) se unificaron en una sola cápsula interactiva (`.capsula-estado`: `🟢 SALA (N/M) | 🟢 WEB | 🟢 PES 2021`), conservando clic, tooltip y destello en cada segmento.
+  2. **Jerarquía Visual de la Gestalt (`app.css`):** Las tarjetas estándar (`.cut`) usan glassmorphism redondeado (`16px`, borde sutil `rgba(255,255,255,.09)`, `backdrop-filter: blur(12px)`), mientras que las tarjetas protagonistas (`.cut.heroe`, `.cut.vivo`) conservan el borde luminoso degradado.
+  3. **Carga Cognitiva Cero en `<QueHago>` (`vistas/quehago.js`):** La franja superior ya no se muestra cuando todo está normal; solo aparece cuando hay un aviso real (`warn`/`bad`) o un botón de acción pendiente, liberando ~56 px verticales en todas las vistas.
+  4. **Reestructuración de `SALA › RESUMEN` (`vistas/sala.js`):** Con la sala abierta se eliminó la franja repetida `FranjaJuego` superior y se integró una barra de **4 controles rápidos en 1 clic** dentro de `Heroe` (`VISIBILIDAD`, `PLAZAS EN SALA`, `JUEGO Y PARCHE`, `CALIDAD STREAM`) más globo compacto `?` (`.help-dot`).
+  5. **Reestructuración de `MANDOS › PUESTOS` (`vistas/puestos.js`, `vistas/mandos.js`, `grupos.js`):**
+     - **Formación en 1 clic (`1V1`, `2V2`, `3V3`, `4V4`, `8V8`)** y botón compacto **`⚡ SENTADO AUTO: TODOS / AMIGOS / NO`** integrados en la barra de herramientas (quitando la tarjeta apilada `AjustesSentado` superior).
+     - **Mini-mando en vivo (`MiniMandoFila` / `.mini-pad`)** integrado directamente dentro de cada fila ocupada (`01`..`16`) a ~30 Hz mediante `oirVivo`, mostrando sticks/botones pulsados ahora mismo y brillo en el avatar, con clic directo al mapeo.
+     - **`OrdenPes` plegado en 1 sola línea** al pie (`🟢 ORDEN EN PES · ✓ PUESTO N = JUGADOR N · Máx: 8/16 puestos · [⚙ CONFIGURAR (8–16) ▾]`) para que toda la pantalla `MANDOS › PUESTOS` quepa sin hacer scroll.
+  6. **Centro Táctico Unificado en `PARTIDO › MARCADOR` (`vistas/partido.js`):** `CampoTacticoIntegrado` muestra la **Cancha 2D en Vivo (`CampoSvg`)** con posesión y tiros en una rejilla de 2 columnas junto a `PartidoOficial` y `TorneoYDuelo` debajo del marcador.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` (Link `0.3.57`) y `phoenixevolution@borrador` (este `TRASPASO.md`).
+- **Solo en la PC (sin git):** `C:\dev\smash-soda-fork\_phoenix-link\x64\Release\PhoenixLink.exe` compilado en `0.3.57` con `cmake --build` y `ui\` sincronizada en `x64\Release\ui\`.
+- **Supabase:** nada nuevo (aplicadas hasta la **161**; siguiente libre: **162**).
+- **A medias:** nada; `0.3.57` compilada y lista.
+- **Esperando a Fralex:** abrir o recargar `PhoenixLink.exe` `0.3.57` para probar el nuevo diseño «Minimalismo Táctico».
+- **Siguiente paso:** cualquier cuenta de Claude (Cuenta 1 o Cuenta 2) que retome Link solo debe hacer `git pull --rebase origin plan-ux`.
+- **Candados:** Link queda libre / disponible para Cuenta 1 o Cuenta 2.
