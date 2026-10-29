@@ -438,3 +438,13 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; Fases 1, 2 y 3 concluidas.
 - **Esperando a Frank:** probar la navegación de Phoenix Link.
 - **Candados:** Link libre.
+
+### 2026-10-28 23:30 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Sentar a todos los espectadores y botón VARIAR
+- **Hecho:** Acciones tácticas por lotes añadidas en `MANDOS › PUESTOS` (`puestos.js`):
+  1. **Botón «⚡ SENTAR ESPECTADORES»:** En la barra superior de herramientas y en la cabecera de `MIRANDO · ESPECTADORES` («⚡ SENTAR A TODOS»). Sienta de una sola vez a todos los que están mirando en los puestos libres de la sala (dando prioridad a los puestos vacíos de los equipos A y B).
+  2. **Botón «⚡ VARIAR»:** Organiza de forma inmediata los puestos activos: manda los números pares al Equipo A y los impares al Equipo B. Si ya están distribuidos así, al volver a pulsar invierte los lados (impares a A y pares a B).
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commit `8df1389`. Desplegado a `x64\Release\ui\` sin recompilar el binario.
+- **Supabase:** nada nuevo.
+- **A medias:** nada.
+- **Esperando a Frank:** probar los nuevos botones de sentar espectadores y variar equipos en Phoenix Link.
+- **Candados:** Link libre.
