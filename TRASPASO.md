@@ -620,4 +620,5 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   - árbitro y faltas en el final nativo;
   - «estables avanzadas» probadas con la IA antes de dárselas a Frank;
   - integrar `claude/online-phoenix-core` (c8e3d9f) cuando street esté estable.
+- Online: ver smash-soda-fork rama claude/project-thread-9ciw66 phoenix_online/docs/ESTADO_TRASPASO.md. Bloqueo: error tras elegir país. OJO: hosts de la PC aún con 5 líneas 127.0.0.1 de Konami; Frank debe ejecutar RESTAURAR_HOSTS.ps1
 - **Candados:** PC/PES libre.
