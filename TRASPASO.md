@@ -413,3 +413,15 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Frank:** cerrar y abrir `PhoenixLink.exe` `0.3.58` y confirmar 8V8, colores y Sala abierta.
 - **Siguiente paso:** quien retome Link: `git pull --rebase origin plan-ux`.
 - **Candados:** Link libre.
+
+### 2026-10-28 22:50 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): SALA unificada en 3 núcleos tácticos
+- **Hecho:** Fase 2 de rediseño aplicada en `SALA` (aprobada por Frank en `propuesta_sala_3nucleos.md`). Se unificaron las 10 pestañas fragmentadas en 3 núcleos semánticos y directos:
+  1. `PANEL DE SALA` (`id: "panel"`): enlace con copia rápida, tiempo en vivo, resumen de pings de invitados, puestos en juego y franja de juego.
+  2. `INVITADOS Y ROLES` (`id: "gente"`): barra de conteo rápido (conectados, jugando vs mirando), silenciar chat en 1 clic y expulsar a todos; tarjetas completas de invitados separando jugadores con mando vs espectadores con dropdown para dar mando; panel derecho con Actividad en Vivo y Seguridad Rápida (visibilidad, espectadores, entrada directa Parsec).
+  3. `RED Y TRANSMISIÓN` (`id: "transmision"`): calidad de imagen (presets Ligero/Equilibrado/Máxima, selector FPS 30/60/120/144, auto-ancho), selector de pantalla/audio, Semáforo Phoenix, Diagnóstico del PC y resumen de Última Partida.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commits `7d0c90a` y `3871c26`. Sincronizado en `x64\Release\ui\` sin necesidad de recompilar el exe.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Fase 2 terminada.
+- **Esperando a Frank:** cambiar de pestaña en Link o abrirlo para ver los 3 núcleos de SALA.
+- **Siguiente paso:** Fase 3 (unificar `AJUSTES` en 2 paneles: General y Conexión/Avanzado).
+- **Candados:** Link libre.
