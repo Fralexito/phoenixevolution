@@ -74,7 +74,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 161** (`161_duelos_16_jugadores.sql` aplicada por Fralex el 28-oct); siguiente libre: **162** | 2026-10-28 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
-| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **Cuenta 1 · hilo modo street** (Core 0.4.94: pruebas en PES e instalaciones en `SiderAddons\phoenix_core`) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-10-29 00:23 UTC |
+| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **libre** (Cuenta 1 · hilo modo street la soltó; Frank juega con amigos) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-10-29 19:50 UTC |
 
 **Juego (PES) y Sider:** solo una cuenta a la vez puede pedir pruebas en el juego o instalar módulos, porque es una sola PC y un solo PES. Si la otra cuenta tiene un candado de PES, no instales nada en `SiderAddons`.
 
@@ -599,3 +599,25 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; restitución completada al 100%.
 - **Esperando a Frank:** verificar que la pantalla de Inicio está exactamente a su gusto.
 - **Candados:** Link libre.
+
+### 2026-10-29 14:50 (Lima) · Cuenta 1 · hilo «PES · Modo street (Phoenix Core)» · Core 0.4.97–0.4.100 + GhidraMCP
+- **Hecho:**
+  1. **Ghidra 12.0.4 + GhidraMCP funcionando.** Proyecto `PES_MCP_RECORTADO` en `D:\Frank\IA\CLAUDE\ghidra_proyectos`: exe recortado, ~85 min, sin la zona Denuvo `.impdata` y con los 61.091 nombres de PEStrim. Puerto 127.0.0.1:8765. `claude mcp add -s user ghidra` (hay que reiniciar Claude Code para ver las herramientas). La ventana CodeBrowser tiene que estar abierta. Para repetirlo: `ghidra_proyectos\COMO_REPETIR.md`.
+  2. **Core 0.4.97–0.4.99 (INSTALADA la 0.4.99):**
+     - `[LEE_STAT]`: el HUD lee los mismos bloques EQ que `goles_reinicio` pone a 0. En la revancha los contadores nativos quedaron a 0 y el juego marcaba 0-0 (verificado).
+     - `[GK_MODO]` y la opción `arquero_controla` (apagada) en FUN_142133950. Esa unidad corre siempre en modo 0, así que **no** es la fuente del despeje, que sigue sin encontrarse.
+  3. **Lua 621a6d4 instalado:** `marcador_free` se sincroniza cada segundo con el marcador del juego (antes la revancha mostraba los goles viejos, 4-8). Falta que Frank confirme si el HUD de PES también los mostraba.
+  4. **0.4.100 (commit 1da19f4, MD5 58184cf8…), NO INSTALADA.** Arreglo probable del cierre al volver al menú. Los 3 cierres (+0x3FD68B, +0x3FE920, +0x902B2, en el teardown FUN_1403fd360 → FUN_14009027a) ocurren 5-7 s después de `[IA_DATOS] restaurado`. Ahora `restaurarGrupoIA` solo escribe si los valores siguen siendo los nuestros, y al salir de la zona se olvidan los punteros EQ. Se instala cuando Frank cierre PES y escriba «cerré».
+- **Avisos:**
+  - **Modo seguro:** si PES se cierra antes de 60 s de abrirlo, el Core arranca en modo seguro (ajustes en gris y equipo parado). Hay que esperar 1 min en el menú.
+  - **hosts:** siguen activas 5 líneas `127.0.0.1 *.konami.net` de la prueba online. El hilo online le dio a Frank el paso para restaurarlo (como admin).
+  - **Antigravity:** su demonio `sync-sider-street.js` (puerto 38888) escribe `phoenix_core.json` en vivo. Si se usa a la vez que una instalación del Core, puede pisar claves (`goles_reinicio`, `arquero_controla`…). Coordinar antes de tocar ese json.
+- **Respaldos en `SiderAddons\phoenix_core`:** `street_estable_0486` (estable de 3 h), `street_0499_actual` y `*.pre-0497/0498/0499`.
+- **Pendiente:**
+  - instalar y probar 0.4.100;
+  - fuente del despeje del arquero (`[ARQUERO]`/`[GOLPE]` + GhidraMCP);
+  - rebote L2 en los muros laterales;
+  - árbitro y faltas en el final nativo;
+  - «estables avanzadas» probadas con la IA antes de dárselas a Frank;
+  - integrar `claude/online-phoenix-core` (c8e3d9f) cuando street esté estable.
+- **Candados:** PC/PES libre.
