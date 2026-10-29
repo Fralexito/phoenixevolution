@@ -448,3 +448,15 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada.
 - **Esperando a Frank:** probar los nuevos botones de sentar espectadores y variar equipos en Phoenix Link.
 - **Candados:** Link libre.
+
+### 2026-10-28 23:55 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Tanda 1 de Acciones Tácticas (Invertir, Sortear, Meter siguiente y Cola numerada)
+- **Hecho:** Tanda 1 de acciones tácticas en `MANDOS › PUESTOS` (`puestos.js`):
+  1. **Botón «⚡ INVERTIR (A ⇄ B)»:** Intercambia en 1 solo clic los lados completos (Equipo A ⇄ Equipo B) conservando números y mandos de los jugadores (ideal para el partido de vuelta de ida y vuelta).
+  2. **Botón «⚡ SORTEAR»:** Baraja con algoritmo Fisher-Yates a los jugadores en juego y los reparte al azar entre Equipo A y Equipo B de manera perfectamente equilibrada.
+  3. **Cola de Espera Numerada:** Cada espectador en `MIRANDO` lleva ahora su identificador visual de turno (`#1`, `#2`, `#3`…) según orden de llegada.
+  4. **Botón «⚡ METER SIGUIENTE»:** En la cabecera de Mirando, sienta de inmediato al primero en cola (`#1`) en el primer puesto libre disponible.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commit `2d11070`. Desplegado en caliente a `x64\Release\ui\` sin recompilar el ejecutable.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Tanda 1 finalizada.
+- **Esperando a Frank:** probar los nuevos botones en Mandos › Puestos y decidir la Tanda 2 (Dashboard dinámico en Inicio o Modo Rey de la Pista).
+- **Candados:** Link libre.
