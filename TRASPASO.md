@@ -403,3 +403,13 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Fralex:** abrir o recargar `PhoenixLink.exe` `0.3.57` para probar el nuevo diseño «Minimalismo Táctico».
 - **Siguiente paso:** cualquier cuenta de Claude (Cuenta 1 o Cuenta 2) que retome Link solo debe hacer `git pull --rebase origin plan-ux`.
 - **Candados:** Link queda libre / disponible para Cuenta 1 o Cuenta 2.
+
+### 2026-10-28 21:15 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58: arreglos de la 0.3.57 (8V8, colores vivos, Sala compacta)
+- **Hecho:** (1) 8V8 sin error «visitante debe estar entre 1 y 7» (`AccionesMandosWeb.cpp`, `AccionesSalaWeb.cpp` ahora 1..15; `vistas/puestos.js` `aplicarFormacion` sube puestos y mandos a 16 y asigna el 8.º de cada equipo con `mandos.equipo`). (2) Paleta viva original restaurada en `.cut` (`css/app.css`). (3) `SALA › RESUMEN` con sala abierta: se quitan las cajas altas, controles rápidos en fila compacta y `FranjaJuego` fina arriba (`vistas/sala.js`, `css/app.css`).
+- **Commits/ramas:** `smash-soda-fork@plan-ux` (Link `0.3.58`) y `phoenixevolution@borrador` (este archivo).
+- **Solo en la PC (sin git):** `PhoenixLink.exe` `0.3.58` compilado con `cmake --build` y `ui\` sincronizada en `x64\Release\ui\`. Si Link estaba abierto, el anterior quedó como `PhoenixLink.old.exe`.
+- **Supabase:** nada nuevo (siguiente libre: **162**).
+- **A medias:** nada.
+- **Esperando a Frank:** cerrar y abrir `PhoenixLink.exe` `0.3.58` y confirmar 8V8, colores y Sala abierta.
+- **Siguiente paso:** quien retome Link: `git pull --rebase origin plan-ux`.
+- **Candados:** Link libre.
