@@ -460,3 +460,16 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; Tanda 1 finalizada.
 - **Esperando a Frank:** confirmar y avanzar a la Tanda 2 (Dashboard dinámico en Inicio o Modo Rey de la Pista).
 - **Candados:** Link libre.
+
+### 2026-10-29 00:39 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Dashboard Dinámico en INICIO (Tanda 2)
+- **Hecho:** Tanda 2 aplicada en `inicio.js`:
+  1. **Heroe Dinámico en 3 Estados:**
+     - **Estado Sala Cerrada:** Experiencia de bienvenida limpia («¿A qué jugamos hoy?»), Semáforo Phoenix con barra de progreso interactiva, «JUGAR CON UN AMIGO» y «BUSCAR RIVAL».
+     - **Estado Sala Abierta (sin partido):** Se transforma en un Centro de Mando vivo con badge destellante de sala activa, caja de enlace con botón «Copiar enlace» (con animación de confirmación «✓ ¡COPIADO!»), tarjeta de métricas en tiempo real (invitados en sala, mandos ocupados vs libres) y accesos directos tácticos (Configurar puestos, Panel de sala, Red y cerrar sala con confirmación).
+     - **Estado Partido en Vivo en PES:** Si hay un partido en curso en PES (`partido.fase !== "libre"`), el Heroe muestra el marcador en vivo en tiempo real con cronómetro de juego (minuto), nombres de equipos y alineaciones, goles de ambos lados y botón de 1 clic para ir al Campo 2D y Marcador.
+  2. **Grid Inferior:** Mantiene el acceso directo a amigos conectados y salas abiertas de la comunidad.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commit `1227c1f`. Desplegado en caliente a `x64\Release\ui\` sin recompilar el binario.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Tanda 2 finalizada.
+- **Esperando a Frank:** probar el dashboard dinámico abriendo la sala o iniciando un partido y decidir la Tanda 3 (Modo Rey de la Pista o Atajos Globales).
+- **Candados:** Link libre.
