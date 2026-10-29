@@ -525,3 +525,31 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; LAS 5 TANDAS DE MEJORAS ESCOLTARES Y TÁCTICAS ESTÁN 100% COMPLETADAS Y DESPLEGADAS.
 - **Esperando a Frank:** probar las 5 tandas o revisar las nuevas propuestas/ideas para el siguiente nivel competitivo.
 - **Candados:** Link libre.
+
+### 2026-10-29 02:55 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Suite Esports Completa, Telemetría, Bracket de Copa y Overlay Streamer
+- **Hecho:** Implementada y desplegada la Suite Esports completa (las 4 propuestas):
+  1. **Sistema de Predicciones y Votaciones de Sala (`vistas/predicciones.js`):**
+     - Votaciones reactivas 3 vías (Equipo A, Empate, Equipo B) con barra de porcentajes animada estilo Twitch/Kick.
+     - Sistema de puntos de sala simbólicos (+100 pts a acertantes) y hook en `partido.js` (`finalizar()`) para resolución y anuncio en chat automático.
+     - Widget interactivo `WidgetPredicciones` en Marcador y Armar partido.
+  2. **Radar de Conexión & Alertas de Lagger (`vistas/radarconexion.js`):**
+     - Lectura en vivo de latencia y pérdida de paquetes. Clasificación: Óptimo (<45ms), Medio (45-85ms) y Crítico (>85ms / >3% pérdida).
+     - Componente `BadgeConexion` integrado en cada fila de puesto en `puestos.js`.
+     - Componente `AlertaLaggerSala`: banner proactivo en cabecera de Puestos que avisa si un jugador en mandos causa tirones en PES.
+  3. **Bracket / Copa Relámpago de la Sala (`vistas/bracket.js`):**
+     - Cuadro eliminatorio directo de 4 jugadores (Semis y Final) tomado de los miembros de sala (host + invitados) con soporte para BYE.
+     - Botón `⚡ CARGAR CRUCE EN MANDOS`: sienta automáticamente a los dos rivales en el Puesto 1 y Puesto 2 en 1 clic.
+     - Botón `🏆 COPA` en la barra de herramientas de `puestos.js` con modal interactivo `ModalBracket`.
+  4. **Overlay Transparente para OBS / TikTok Studio (`overlay.html`):**
+     - Página HTML/CSS independiente con fondo 100% transparente para Browser Source en OBS.
+     - HUD superior con marcador, nombres de equipos, reloj de partido y lower-third inferior de predicción sincronizado por eventos y `storage`.
+  5. **Documentación Maestra y Google Drive:**
+     - Guía técnica y pedagógica detallada paso a paso creada en `docs/GUIA_INFORME_PASO_A_PASO_ESPORTS_ANTIGRAVITY.md`.
+     - Subida directamente a Google Drive: `H:\Mi unidad\Phoenix Link — Guías y logros\33 · Nuevas Funciones Esports, Moderación y Telemetría en Vivo (Antigravity).md`.
+- **Commits/ramas:**
+  - `smash-soda-fork@plan-ux` commits `869ed94` y `5ba638b`.
+  - Desplegado en caliente a `x64\Release\ui\` sin recompilar el binario.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Suite Esports 100% terminada, desplegada y documentada.
+- **Esperando a Frank:** abrir Phoenix Link y probar las predicciones, el radar de ping, la copa o abrir el overlay en OBS.
+- **Candados:** Link libre.
