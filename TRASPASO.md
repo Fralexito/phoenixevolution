@@ -504,3 +504,24 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; Tanda 4 finalizada.
 - **Esperando a Frank:** probar la ficha MVP en un partido y el lanzador de PES en Inicio.
 - **Candados:** Link libre.
+
+### 2026-10-29 02:35 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Matriz de Atajos Globales de Moderador y Formaciones Tácticas (Tanda 5)
+- **Hecho:** Tanda 5 implementada y desplegada (cerrando las 5 tandas acordadas):
+  1. **Matriz de Atajos de Moderador (`atajos.js`, `app.js`, `puestos.js`):**
+     - Módulo `vistas/atajos.js` con el hook global `useMatrizAtajosModerador`: escucha combinaciones `Ctrl + Shift` en toda la app sin interferir con el juego en PES.
+     - Atajos incluidos:
+       - `Ctrl + Shift + M`: Silenciar / reactivar chat de invitados en toda la sala.
+       - `Ctrl + Shift + F`: Congelar / descongelar mandos de invitados (Árbitro).
+       - `Ctrl + Shift + E`: Todos a espectador en 1 toque.
+       - `Ctrl + Shift + I`: Invertir lados (A ⇄ B) para el partido de vuelta.
+       - `Ctrl + Shift + R`: Forzar rotación del Rey de la Pista (sienta al retador).
+       - `Ctrl + Shift + S`: Activar / desactivar Escudo Streamer (Anti-Doxxing).
+       - `Ctrl + Shift + K`: Abrir chuleta interactiva de atajos rápidos (`ModalAtajosModerador`).
+     - Botón `[Ctrl Shift]` en la cabecera principal (`Barra` en `app.js`) y botón directo `⌨ ATAJOS` en la barra de herramientas de `puestos.js`.
+  2. **Presets de Formaciones Tácticas Rápidas (`puestos.js`):**
+     - Botones `1V1`, `2V2`, `3V3`, `4V4`, `8V8` en `puestos.js` para reconfigurar al instante el tamaño de las plantillas con validación automática hasta 16 mandos.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commits `b255ea4` y `8fea0cc`. Desplegado a `x64\Release\ui\` sin recompilar el binario.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; LAS 5 TANDAS DE MEJORAS ESCOLTARES Y TÁCTICAS ESTÁN 100% COMPLETADAS Y DESPLEGADAS.
+- **Esperando a Frank:** probar las 5 tandas o revisar las nuevas propuestas/ideas para el siguiente nivel competitivo.
+- **Candados:** Link libre.
