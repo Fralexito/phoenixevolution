@@ -553,3 +553,21 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; Suite Esports 100% terminada, desplegada y documentada.
 - **Esperando a Frank:** abrir Phoenix Link y probar las predicciones, el radar de ping, la copa o abrir el overlay en OBS.
 - **Candados:** Link libre.
+
+### 2026-10-29 04:20 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Suite Viral Completa y Suite Modo Street
+- **Hecho:** Implementación, despliegue y documentación de 6 módulos virales y Modo Street:
+  1. **Locutor Deportivo & Soundboard IA (`locutor.js`):** Voz en español vía Web Speech API nativo y efectos de silbato, ovación de gol y sirena sintetizados en tiempo real con Web Audio API.
+  2. **El VAR de la Sala (`var.js`):** Modal de revisión con sirena, cuenta regresiva de 15 segundos y votación relámpago de la sala (Penal, Piscinazo, Roja).
+  3. **La Ruleta del Castigo / Penitencias (`penitencias.js`):** Ruleta animada con Canvas HTML5 y física de desaceleración para penitencias de perdedores.
+  4. **Sistema RPG de Sala (`rpgsala.js`):** Progresión de XP, niveles (Novato a Leyenda) e insignias (`BadgeNivelRPG` en filas de mandos).
+  5. **Modo «Pan y Queso» / Draft Callejero (`draft.js`):** Selección por turnos de dos capitanes con asignación automática directa a los mandos.
+  6. **Suite Modo Street (`street.js`):** Barra y panel de tuning para `phoenix_core.json` con Presets (La Jaula de Hierro, Futsal Técnico, Frenesí Arcade), regla «A 2 Goles se Queda» / «Gol de Oro» y botón «¡QUÉ CAÑO! / ¡HUACHA!» con banner gigante en overlay.
+  7. **Overlay OBS / TikTok Studio (`overlay.html`):** Banner animado de Caños/Huachas y sincronización reactiva con `localStorage`.
+  8. **Documentación:** Actualizada `docs/GUIA_INFORME_PASO_A_PASO_ESPORTS_ANTIGRAVITY.md` y respaldada en Google Drive «Phoenix Link — Guías y logros».
+- **Commits/ramas:**
+  - `smash-soda-fork@plan-ux` commits `c4b2d35` y `2c1f24e`.
+  - Desplegado en caliente a `x64\Release\ui\` sin recompilar el binario.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; todo 100% completado y probado.
+- **Esperando a Frank:** probar el Modo Street y las nuevas herramientas virales en Phoenix Link.
+- **Candados:** Link libre.
