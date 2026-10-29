@@ -425,3 +425,16 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Frank:** cambiar de pestaña en Link o abrirlo para ver los 3 núcleos de SALA.
 - **Siguiente paso:** Fase 3 (unificar `AJUSTES` en 2 paneles: General y Conexión/Avanzado).
 - **Candados:** Link libre.
+
+### 2026-10-28 23:18 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): AJUSTES en 2 paneles tácticos y PARTIDO unificado
+- **Hecho:** Fase 3 de rediseño aplicada en `AJUSTES` y corrección de navegación en `grupos.js`:
+  1. **Pastillas de `PARTIDO` (`grupos.js`):** Se eliminó la pestaña duplicada `[ CAMPO 2D ]` y se unificó con `[ MARCADOR ]` en una sola pastilla limpia `[ MARCADOR Y CAMPO ]` más `[ HISTORIAL ]`.
+  2. **`AJUSTES` unificado en 2 paneles (`ajustes.js`, `grupos.js`):**
+     - **`GENERAL Y SISTEMA` (`id: "general"`):** Lo fundamental (idioma y sentado automático), selector de tema (Galaxy vs Liga B), bot del chat y sonidos de chat (`!sfx`, volumen, cooldown, avisos de entrada).
+     - **`INTERFAZ Y OVERLAY` (`id: "overlay"`):** Overlay sobre el juego (selector de monitor, tema, posiciones y atajos), entrada y seguridad (desactivar botón Guía, auto-index mandos, bloqueo IP/VPN), avisos de ventana, herramientas de interfaz (tutorial, bienvenida, recargar) y servidor WebSocket/registros de desarrollo.
+  3. **Botón «En reposo» (`puestos.js`):** Eliminado definitivamente de cada fila de puestos.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commits `cffeb71`, `762c30c`, `c428687` y `cc8b511`. Sincronizado en `x64\Release\ui\` sin recompilar.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Fases 1, 2 y 3 concluidas.
+- **Esperando a Frank:** probar la navegación de Phoenix Link.
+- **Candados:** Link libre.
