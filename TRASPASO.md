@@ -571,3 +571,19 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; todo 100% completado y probado.
 - **Esperando a Frank:** probar el Modo Street y las nuevas herramientas virales en Phoenix Link.
 - **Candados:** Link libre.
+
+### 2026-10-29 04:50 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Hot-Sync de Físicas Sider en Vivo y Discord Webhooks
+- **Hecho:** Desarrollo, integración y despliegue del sincronizador de físicas en caliente y notificador Discord:
+  1. **Hot-Sync de Físicas Sider (`tools/sync-sider-street.js` y `tools/INICIAR_SYNC_SIDER.bat`):** Micro-demonio HTTP en puerto 38888 que lee y modifica `D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\phoenix_core.json` en tiempo real (muro_rebote, muro_friccion, pase_vel_k, etc.) sin reiniciar PES 2021.
+  2. **Integración en Modal Street Tuning (`street.js`):** Botón táctico «⚡ SINCRONIZAR YA» y autodisparo de sincronización al conmutar presets (La Jaula, Futsal Técnico, Frenesí Arcade).
+  3. **Módulo de Discord Webhooks (`js/servicios/discord.js`):** Emisión automatizada de embeds ricos con colores temáticos hacia servidores de Discord para Finales de Partido (goles, lados, ganador y MVP), Veredictos del VAR y Penitencias dictaminadas por la ruleta.
+  4. **Ajustes de Webhook en Sala (`ajustes.js`):** Nuevo campo interactivo en Ajustes › General con botón «🔔 Probar Webhook».
+  5. **Disparo en Partido y Vistas:** `partido.js`, `var.js` y `penitencias.js` conectados directamente a la emisión de eventos de Discord.
+  6. **Documentación Maestra Actualizada:** `docs/GUIA_INFORME_PASO_A_PASO_ESPORTS_ANTIGRAVITY.md` actualizada y sincronizada en Google Drive (`33 · Nuevas Funciones Esports, Moderación y Telemetría en Vivo (Antigravity).md`).
+- **Commits/ramas:**
+  - `smash-soda-fork@plan-ux` commit `0371a41`.
+  - Desplegado en caliente a `x64\Release\ui\` sin recompilar el binario C++.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; todo 100% operativo, probado con `node --check` y desplegado.
+- **Esperando a Frank:** validar sincronización en vivo con PES 2021 y disfrutar de las funciones comunitarias.
+- **Candados:** Link libre.
