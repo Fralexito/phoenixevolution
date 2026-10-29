@@ -587,3 +587,15 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; todo 100% operativo, probado con `node --check` y desplegado.
 - **Esperando a Frank:** validar sincronización en vivo con PES 2021 y disfrutar de las funciones comunitarias.
 - **Candados:** Link libre.
+
+### 2026-10-29 13:30 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Restauración Interfaz INICIO Original
+- **Hecho:** Frank solicitó mantener la interfaz de INICIO exactamente como era antes con los botones de abrir sala:
+  1. Se restituyó `SmashSoda/phoenix/web/ui/js/vistas/inicio.js` al estado original de `5150152`: tarjeta héroe con «¿A qué jugamos hoy?», semáforo con barra de progreso y los dos botones principales intactos («JUGAR CON UN AMIGO» y «BUSCAR RIVAL»), con la franja de sala y enlace tal como estaba antes.
+  2. Desplegado en caliente a `x64\Release\ui\` sin recompilar binarios.
+- **Commits/ramas:**
+  - `smash-soda-fork@plan-ux` commit `036395f`.
+  - Desplegado a `x64\Release\ui\js\vistas\inicio.js`.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; restitución completada al 100%.
+- **Esperando a Frank:** verificar que la pantalla de Inicio está exactamente a su gusto.
+- **Candados:** Link libre.
