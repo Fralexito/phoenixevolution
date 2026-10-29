@@ -489,3 +489,18 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; Tanda 3 finalizada.
 - **Esperando a Frank:** probar el Modo Rey de la Pista en un partido o activar el Escudo Streamer con `Ctrl+Shift+S`.
 - **Candados:** Link libre.
+
+### 2026-10-29 01:50 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Ficha MVP con Acta para WhatsApp/Discord y Monitor/Lanzador de PES en Inicio (Tanda 4)
+- **Hecho:** Tanda 4 implementada y desplegada:
+  1. **Ficha MVP y Acta Oficial para WhatsApp / Discord (`reportepartido.js`, `partido.js`):**
+     - Módulo `reportepartido.js` con cálculo automático del Jugador del Partido (MVP con insignia dorada 🌟 y valoración decimal según goles e impacto).
+     - Generador de acta oficial con formato Markdown y emojis listo para copiar en un solo clic y pegar en grupos de WhatsApp o canales de Discord de la liga.
+     - Modal esports interactivo `FichaPartidoModal` integrado en cada partido de `HISTORIAL` y en la tarjeta de resultado de `PARTIDO` (botón «🌟 ACTA OFICIAL»).
+  2. **Monitor y Lanzador de PES 2021 & Sider en Inicio (`inicio.js`):**
+     - Widget interactivo `MonitorJuegoLanzador` en la vista `INICIO`: detecta reactivamente si PES 2021 y Sider están en ejecución.
+     - Si está cerrado, ofrece botón directo «▶ ARRANCAR JUEGO (SIDER + PES)» con enlace a su configuración en Sync.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commits `d2ec90a` y `e802f4a`. Desplegado a `x64\Release\ui\` sin recompilar el binario.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Tanda 4 finalizada.
+- **Esperando a Frank:** probar la ficha MVP en un partido y el lanzador de PES en Inicio.
+- **Candados:** Link libre.
