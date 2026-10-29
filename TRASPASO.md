@@ -473,3 +473,19 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **A medias:** nada; Tanda 2 finalizada.
 - **Esperando a Frank:** probar el dashboard dinámico abriendo la sala o iniciando un partido y decidir la Tanda 3 (Modo Rey de la Pista o Atajos Globales).
 - **Candados:** Link libre.
+
+### 2026-10-29 01:35 (Lima) · Antigravity (Gemini) · Phoenix Link 0.3.58 (ui): Modo Rey de la Pista (Ganador se queda) y Escudo Streamer (Tanda 3)
+- **Hecho:** Tanda 3 implementada y desplegada:
+  1. **Modo Autónomo «Rey de la Pista» (Ganador se queda) (`reydelapista.js`, `puestos.js`, `partido.js`):**
+     - Módulo reactivo con persistencia en `localStorage` (`phoenix.reydelapista`) y sincronización por eventos (`phoenix:reydelapista`).
+     - Barra de control táctico en `puestos.js` con interruptor `[👑 REY DE LA PISTA: ACTIVO / OFF]`, selector de racha máxima (Sin límite, 2, 3 o 5 victorias), indicador de racha actual (`👑 Equipo A · 2V`) y botón de acción manual `⚡ ROTAR AHORA`.
+     - Integración automática en `partido.js`: al terminar el partido (`finalizar()`), si el modo está encendido, el ganador conserva sus puestos como Rey y suma +1 a su racha, el perdedor es expulsado a la cola de espectadores en Mirando, y los siguientes retadores de la cola entran de inmediato a los puestos vacíos. Si el rey alcanza la racha máxima, se retira invicto con honores.
+  2. **Escudo Streamer Anti-Doxxing (`app.js`, `app.css`):**
+     - Botón táctico en la barra superior `[ 🛡 STREAMER ]` y atajo global `Ctrl + Shift + S`.
+     - Al activarse, aplica desenfoque dinámico (`blur`) sobre IPs de invitados, IDs de Parsec, correos y enlaces directos de sala para proteger la privacidad del anfitrión durante transmisiones en vivo (Twitch, YouTube, TikTok). Se desvanece de forma segura al pasar el cursor si el anfitrión necesita copiarlo.
+  3. **Arreglos de sintaxis:** Removida llave de cierre redundante en `ajustes.js` que impedía el parseo en WebView2.
+- **Commits/ramas:** `smash-soda-fork@plan-ux` commits `b22466b` y `978d180`. Desplegado a `x64\Release\ui\` sin recompilar el ejecutable.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; Tanda 3 finalizada.
+- **Esperando a Frank:** probar el Modo Rey de la Pista en un partido o activar el Escudo Streamer con `Ctrl+Shift+S`.
+- **Candados:** Link libre.
