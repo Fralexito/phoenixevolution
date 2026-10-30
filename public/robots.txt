@@ -1,0 +1,24 @@
+# Phoenix Evolution Series · 30-oct-2026 (Fralex, «opción 2»)
+# Buscadores (Google, Bing…) SÍ pueden leer la web. Robots de IA NO.
+# OJO: los robots solo leen el robots.txt de la RAÍZ del dominio (https://fralexito.github.io/robots.txt).
+# Este archivo queda en /phoenixevolution/robots.txt; para que cuente hay que copiarlo a la raíz
+# (repositorio Fralexito/fralexito.github.io) o usar un dominio propio. Mientras tanto, cada página lleva etiquetas <meta> equivalentes.
+
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: CCBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Bytespider
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Amazonbot
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: *
+Allow: /

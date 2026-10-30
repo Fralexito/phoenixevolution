@@ -49,6 +49,11 @@ const canonica = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#03010f" />
     {(import.meta.env.PUBLIC_PREVIEW || privada) && <meta name="robots" content="noindex, nofollow" />}   {/* privada: páginas de staff o personales (25-oct-2026) */}
+    {/* 30-oct-2026 (Fralex, «opción 2»): Google y los buscadores SÍ pueden leer la web; las IA (ChatGPT, Claude, Common Crawl, Perplexity…) NO.
+        «noai/noimageai» lo respetan varios recolectores de IA; las etiquetas con nombre son para cada robot de IA. Es un PEDIDO, no un candado.
+        El robots.txt de la raíz (fralexito.github.io/robots.txt) haría lo mismo con más fuerza: ver public/robots.txt. */}
+    <meta name="robots" content="noai, noimageai" />
+    {['GPTBot', 'ChatGPT-User', 'OAI-SearchBot', 'ClaudeBot', 'Claude-Web', 'anthropic-ai', 'CCBot', 'PerplexityBot', 'Google-Extended', 'Bytespider', 'Applebot-Extended', 'meta-externalagent', 'Amazonbot', 'cohere-ai'].map((b) => <meta name={b} content="noindex, nofollow, noai, noimageai" />)}
     {[fRaj700, fRaj600, fInter400, fFaSolid].map((f) => <link rel="preload" as="font" type="font/woff2" href={f} crossorigin />)}
     <link rel="icon" type="image/png" href={`${base}favicon.png`} />
     <link rel="apple-touch-icon" href={`${base}icono-180.png`} />
