@@ -622,3 +622,25 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   - integrar `claude/online-phoenix-core` (c8e3d9f) cuando street esté estable.
 - Online: ver smash-soda-fork rama claude/project-thread-9ciw66 phoenix_online/docs/ESTADO_TRASPASO.md. Bloqueo: error tras elegir país. OJO: hosts de la PC aún con 5 líneas 127.0.0.1 de Konami; Frank debe ejecutar RESTAURAR_HOSTS.ps1
 - **Candados:** PC/PES libre.
+
+### 2026-10-30 18:55 (Lima) · Antigravity (Gemini) · PES 2021 Sider: Activación Modo Amigos (11v11) & Respaldo Street
+- **Hecho:** Frank reportó softlock (pantalla congelada en «Consejos para el juego» con marcador en 0:00) al entrar a un partido Amistoso convencional. El diagnóstico en `phoenix_core.log` confirmó que los ganchos de Street Mode en memoria (`cancha_chica_free`, `street_pantalla_descanso`, `street_dos_tiempos`, `ia_cancha_chica`, `suplentes_cero`) estaban activos, causando que la DLL interceptara los 22 jugadores en (0.0, 0.0) antes del spawn del partido.
+  1. Se respaldó la configuración completa de Street intacta en:
+     - `D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\phoenix_core.json.modo_street_activo`
+     - `D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\phoenix_core.json.respaldo-antigravity-street-20261030.bak`
+  2. Se activó la configuración limpia de Amistoso copiando `phoenix_core.json.modo_amigos` sobre `phoenix_core.json` (`ia_cancha_chica: false`, `street_pantalla_descanso: false`, `street_dos_tiempos: false`).
+  3. Se crearon dos lanzadores por lotes para conmutación instantánea en 1 clic:
+     - `ACTIVAR_MODO_AMISTOSO.bat`
+     - `ACTIVAR_MODO_STREET.bat`
+  4. Se documentó la bitácora técnica local en:
+     `D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\REGISTRO_CAMBIOS_ANTIGRAVITY.txt`.
+- **Commits/ramas:** `pes-liga-automatica` (registro en TRASPASO.md). Archivos del juego modificados directamente en PC (fuera de git).
+- **Solo en la PC (sin git):**
+  - `D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\phoenix_core.json` (ahora en modo_amigos).
+  - `ACTIVAR_MODO_AMISTOSO.bat` y `ACTIVAR_MODO_STREET.bat`.
+  - `REGISTRO_CAMBIOS_ANTIGRAVITY.txt`.
+- **Supabase:** nada nuevo.
+- **A medias:** nada; conmutación completada.
+- **Esperando a Frank:** verificar que el partido Amistoso 11v11 inicie de forma limpia sin congelarse.
+- **Cómo revertir a Modo Street:** Ejecutar `ACTIVAR_MODO_STREET.bat` o copiar `phoenix_core.json.modo_street_activo` sobre `phoenix_core.json`.
+- **Candados:** PES/Sider liberado.
