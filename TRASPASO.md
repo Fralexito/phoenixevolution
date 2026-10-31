@@ -663,3 +663,9 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   - REGISTRO_CAMBIOS_ANTIGRAVITY.txt actualizado.
 - **Esperando a Frank:** Cerrar PES 2021 por completo (Alt+F4 o Administrador de Tareas) y volverlo a abrir para entrar al Amistoso limpio sin el Core.
 - **Candados:** PES/Sider liberado.
+
+### 2026-10-31 17:30 (Lima) · Cuenta 1 · hilo «PES · Modo street» · traspaso a la otra cuenta
+- **Estado completo del street:** `smash-soda-fork` rama `claude/project-thread-p1p1qc` → `docs/pes/ESTADO_STREET_RETOMAR.md`.
+- **Instalada:** Core 0.4.99. **Lista sin instalar:** 0.4.100 (`1da19f4`, arreglo del cierre al volver al menú).
+- **Siguiente paso:** instalarla con PES cerrado y probar partido + revancha + vuelta al menú. Luego, con REA, la fuente del despeje del arquero.
+- **Candados:** PC/PES libre.
