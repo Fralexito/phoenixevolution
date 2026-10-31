@@ -644,3 +644,22 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Frank:** verificar que el partido Amistoso 11v11 inicie de forma limpia sin congelarse.
 - **Cómo revertir a Modo Street:** Ejecutar `ACTIVAR_MODO_STREET.bat` o copiar `phoenix_core.json.modo_street_activo` sobre `phoenix_core.json`.
 - **Candados:** PES/Sider liberado.
+
+### 2026-10-30 19:18 (Lima) · Antigravity (Gemini) · PES 2021 Sider: Diagnóstico y Solución Definitiva Softlock Amistoso (PHOENIX_CORE_OFF)
+- **Hecho:** Frank reportó que tras activar modo amigos el juego seguía congelándose en la pantalla de «Consejos para el juego» con 0:00 al entrar a un Amistoso 11v11.
+  1. Se analizó el log profundo (phoenix_core.log 19:08:23): la DLL seguía cargándose e inyectaba [cancha_chica_free] 2 bloque(s) parcheados (15.00 x 10.00) y forzaba el reloj a 0.0s.
+  2. Causa raíz 1: phoenix_core.json.modo_amigos original aún contenía "cancha_chica_free": true, "reloj_street_free": true, "sin_fin_tiempo_free": true y "jugadores_chica_free": true.
+  3. Causa raíz 2: En phoenix_core_loader.lua existe el flag oficial PHOENIX_CORE_OFF que anula la carga del Core (phx_core_iniciar retorna 0 y tick=nil). Sin este flag, la DLL siempre se inyecta en Sider.
+  4. Causa raíz 3: El proceso PES2021.exe (PID 17532) ya estaba en ejecución con los ganchos residentes en RAM; requiere reinicio para vaciar los hooks.
+  5. Solución aplicada:
+     - Se creó el flag D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\PHOENIX_CORE_OFF.
+     - Se sanearon phoenix_core.json y phoenix_core.json.modo_amigos (todos los hooks de cancha chica a false, dimensiones 52.5x34.0).
+     - Se actualizaron ACTIVAR_MODO_AMISTOSO.bat (crea el flag) y ACTIVAR_MODO_STREET.bat (elimina el flag y restaura Street al 100%).
+     - Se actualizó REGISTRO_CAMBIOS_ANTIGRAVITY.txt.
+- **Commits/ramas:** pes-liga-automatica (registro en TRASPASO.md).
+- **Solo en la PC (sin git):**
+  - D:\Frank\Games_\Conmegol Patch\SiderAddons\phoenix_core\PHOENIX_CORE_OFF.
+  - ACTIVAR_MODO_AMISTOSO.bat y ACTIVAR_MODO_STREET.bat actualizados.
+  - REGISTRO_CAMBIOS_ANTIGRAVITY.txt actualizado.
+- **Esperando a Frank:** Cerrar PES 2021 por completo (Alt+F4 o Administrador de Tareas) y volverlo a abrir para entrar al Amistoso limpio sin el Core.
+- **Candados:** PES/Sider liberado.
