@@ -74,7 +74,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 161** (`161_duelos_16_jugadores.sql` aplicada por Fralex el 28-oct); siguiente libre: **162** | 2026-10-28 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
-| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **Cuenta 2** (street: prueba 1v1/2v2 en el entrenamiento con REA/Frida) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-10-31 19:40 Lima |
+| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **libre** (la Cuenta 2 la soltó; PES cerrado) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-11-01 03:00 Lima |
 
 **Juego (PES) y Sider:** solo una cuenta a la vez puede pedir pruebas en el juego o instalar módulos, porque es una sola PC y un solo PES. Si la otra cuenta tiene un candado de PES, no instales nada en `SiderAddons`.
 
@@ -702,3 +702,39 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
   - Instalada en la PC con respaldo en `phoenix_core/street_0101_antes_0102/`. **Falta probarla en el juego** (§9.8).
 - **Para la Cuenta 1:** Frank quiere después un botón y una pantalla propios del modo Street; lo hablará contigo. Esto es la base: el interruptor ya existe en el Core y responde a la orden `street_activo=0|1` en `phoenix_core\ordenes.txt`.
 - **Candados:** PC/PES sigue con la Cuenta 2 hasta que Frank pruebe la 0.4.102.
+
+### 2026-11-01 03:00 (Lima) · Cuenta 2 (Claude en la extensión, PC de Fralex) · CIERRE DE SESIÓN: Street con interruptor y cancha que lo sigue; mando 1 administrador; usuarios sin repetir
+**Todo esto lo hizo la CUENTA 2.** Para la Cuenta 1, que sigue mañana: lee esta entrada y después las guías que se indican.
+
+**A. Street.** Rama `cuenta2/street-0.4.102` del repo `smash-soda-fork`, worktree `C:\dev\phoenix-core-wt`. Guía: `docs/pes/ESTADO_STREET_RETOMAR.md` §9.7–§9.9.
+1. **Core 0.4.102 instalado:** interruptor `street_activo` en el json y en el panel F9 de Sider (página «PHOENIX STREET», primera línea «MODO STREET»).
+   - Apagado, el Entrenamiento es el original: `hayTrainingWork`/`trainingWorkEstable` responden «no» y el gol nativo queda atado a una bandera en su cueva.
+   - Al salir del Street se devuelven las medidas del campo.
+   - **Probado por Fralex:** el Core se apaga bien (`[STREET] modo Street APAGADO`, `training=0`).
+2. **Panel:** RePag baja y AvPag sube los valores (en los interruptores, RePag = OFF y AvPag = ON). Commit `2ee84a1`.
+3. **La cancha DIBUJADA ya sigue al interruptor** (commit `91988a0`, §9.9).
+   - Estaba en el AddOn de StadiumServer `España\Spotify Camp Nou\AddOn\Goal Post Colour\Global`, así que salía siempre en el Camp Nou.
+   - Se movió a `SiderAddons\content\phoenix\cancha_visual\` y la sirve `phoenix_marcador_free.lua` solo en el Entrenamiento con el Street encendido.
+   - La carpeta original quedó en `phoenix_core\camp_nou_global_retirado\`, con copia en `phoenix_core\respaldo_camp_nou_global\`.
+   - **Falta probarlo:** si cambia en vivo o si el PES la guarda hasta reiniciar.
+4. Resultados de 1v1/2v2 con Frida en §9.7. El 2v2 funciona; el 1v1 falla en el saque: hay que conseguir que el portero sea el pateador y que el cursor vaya a él.
+
+**B. Módulo de mandos 9–16, v0.9.61 → v0.9.65** (instalado). Rama `cuenta2/mandos-admin` del worktree `_phoenix-link`. Guía: `docs/MANDOS.md` §13.2. Bitácora: `REGISTRO-LINK.md`.
+1. **Mando 1 administrador:** palanca abajo o arriba elige otra fila, izquierda o derecha la mueve, R3 vuelve. **Probado por Fralex: funciona.**
+2. **v0.9.65:** con la fila de otro elegida, L2/R2 le cambian el usuario y □ abre su «Editar Datos personales». **Sin probar.**
+3. **v0.9.63, sin usuarios repetidos:** PES solo conoce los usuarios de los mandos 1–8; si una fila 1–8 cae en el de un 9+, se salta. **Sin probar.**
+4. El □ de los 1–8 en la pausa («nombre en medio partido») está **apagado** (`V9.CUADRADO_PAUSA_1A8`) hasta investigar por qué se quitó el nombre encima de los jugadores.
+5. Direcciones nuevas en MANDOS §13.2: `FUN_140C67970` (poner lado), +0x1B8/+0x1C0 (usuario anterior/siguiente), `DAT_1436F5820` (usuario por mando 0–7).
+
+**C. Pendiente para la Cuenta 1.**
+1. Que Fralex pruebe, en este orden:
+   - Street OFF → Entrenamiento normal; Street ON → cancha chica, sin reiniciar el PES.
+   - L2/R2 y □ del mando 1 sobre la fila de otro.
+   - Usuarios sin repetir con un mando 9+.
+2. Investigar con REA la pérdida del nombre encima de los jugadores: registro del usuario (MANDOS Parte 10 §11) antes y después del □ de un 9+ en la pausa.
+3. 1v1 de porteros (pateador y cursor). Luego `street_jugadores_local/rival` en el Core.
+4. Fondo azul, despeje del arquero, rebote L2, árbitro y faltas.
+5. Decidir con Fralex si se fusionan `cuenta2/link-sin-street`, `cuenta2/mandos-admin` y `cuenta2/street-0.4.102` (por PR).
+6. Botón y pantalla propios del modo Street: Fralex lo hablará contigo. La base es la orden `street_activo=0|1` en `phoenix_core\ordenes.txt`.
+
+**Candados:** PC/PES **libre** (PES cerrado). **Respaldo a Drive:** lo ejecuta Fralex (`D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1`).
