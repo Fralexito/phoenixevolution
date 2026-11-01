@@ -74,7 +74,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 161** (`161_duelos_16_jugadores.sql` aplicada por Fralex el 28-oct); siguiente libre: **162** | 2026-10-28 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
-| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **libre** (la Cuenta 2 la soltó; PES cerrado) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-11-01 03:00 Lima |
+| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **Cuenta 1 · street 1v1** (rama `claude/street-1v1` desde `cuenta2/street-0.4.102`; Core 0.4.103, solo con PES cerrado) — quien la necesite pregunta a Fralex; se suelta al terminar | 2026-11-01 13:44 Lima |
 
 **Juego (PES) y Sider:** solo una cuenta a la vez puede pedir pruebas en el juego o instalar módulos, porque es una sola PC y un solo PES. Si la otra cuenta tiene un candado de PES, no instales nada en `SiderAddons`.
 
