@@ -689,3 +689,16 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Esperando a Fralex:** entrar al entrenamiento para la prueba en vivo. Pendiente para después: el fondo azul sin estadio en Street.
 - **Siguiente paso:** quien siga el street, que lea §9 de `ESTADO_STREET_RETOMAR.md` en `cuenta2/street-0.4.101`. **No instalar la 0.4.100 sola: ya está dentro de la 0.4.101 instalada.**
 - **Candados:** tomé «PC / PES en uso» (Cuenta 2) para la prueba 1v1/2v2. Lo suelto al terminar.
+
+### 2026-10-31 23:59 (Lima) · Cuenta 2 · 1v1/2v2 probados con Frida + Core 0.4.102 (interruptor del Street en Sider)
+- **1 contra 1 / 2 contra 2** (Frida cambia el límite de `FUN_140A59CA0`, sin escribir memoria):
+  - El portero cuenta dentro de N.
+  - 2 contra 2: funciona.
+  - 1 contra 1: en el saque entra a la fuerza el jugador de campo i10 como pateador, y el cursor queda en él mientras lo mandan fuera. Falta que saque el portero y que el cursor vaya a él.
+  - Detalle en `ESTADO_STREET_RETOMAR.md` §9.7.
+- **Core 0.4.102** (rama `cuenta2/street-0.4.102`, `b5c050f` + docs `863ad4d`):
+  - **Interruptor `street_activo`**, en el overlay de Sider → página del marcador → panel F9 → «MODO STREET» (F11). Apagado, el Entrenamiento es el original. Se aplica al salir del Entrenamiento.
+  - **La minicancha vuelve a 52.56 x 34.06** al salir del Street; antes quedaba cambiada en memoria.
+  - Instalada en la PC con respaldo en `phoenix_core/street_0101_antes_0102/`. **Falta probarla en el juego** (§9.8).
+- **Para la Cuenta 1:** Frank quiere después un botón y una pantalla propios del modo Street; lo hablará contigo. Esto es la base: el interruptor ya existe en el Core y responde a la orden `street_activo=0|1` en `phoenix_core\ordenes.txt`.
+- **Candados:** PC/PES sigue con la Cuenta 2 hasta que Frank pruebe la 0.4.102.
