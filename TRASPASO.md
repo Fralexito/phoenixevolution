@@ -74,7 +74,7 @@ Cambia solo tu fila al tomar o soltar. «libre» = cualquiera puede tomarlo.
 | Supabase (migraciones) | proyecto `fiibiyijojkxqlsrhcil` | libre — **aplicadas hasta 161** (`161_duelos_16_jugadores.sql` aplicada por Fralex el 28-oct); siguiente libre: **162** | 2026-10-28 |
 | Overlay | `phoenix-overlay@main` | libre | — |
 | Documentación / Drive | `docs/` de cada repo · `D:\Frank\IA\CLAUDE\RESPALDAR_A_DRIVE.ps1` | libre (el respaldo a Drive solo se corre en la PC) | — |
-| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **libre** (Cuenta 1 · hilo modo street la soltó; Frank juega con amigos) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-10-29 19:50 UTC |
+| **PC / PES en uso** | la PC de Fralex (PES, Sider, Ghidra, `SiderAddons`) | **Cuenta 2** (street: prueba 1v1/2v2 en el entrenamiento con REA/Frida) — quien la tome escribe aquí su nombre y la hora, y la suelta al terminar | 2026-10-31 19:40 Lima |
 
 **Juego (PES) y Sider:** solo una cuenta a la vez puede pedir pruebas en el juego o instalar módulos, porque es una sola PC y un solo PES. Si la otra cuenta tiene un candado de PES, no instales nada en `SiderAddons`.
 
@@ -669,3 +669,23 @@ Fralex sigue ahora en la Cuenta 2 porque a la Cuenta 1 se le acaban los tokens. 
 - **Instalada:** Core 0.4.99. **Lista sin instalar:** 0.4.100 (`1da19f4`, arreglo del cierre al volver al menú).
 - **Siguiente paso:** instalarla con PES cerrado y probar partido + revancha + vuelta al menú. Luego, con REA, la fuente del despeje del arquero.
 - **Candados:** PC/PES libre.
+
+### 2026-10-31 19:40 (Lima) · Cuenta 2 (Claude en la extensión, PC de Fralex) · Street reparado tras Antigravity + Core 0.4.101
+- **Hecho:**
+  1. **Pantalla negra al cargar el entrenamiento: CAUSA y ARREGLO.** Era `D:\Frank\Games_\Conmegol Patch\Data\dt18_all.cpk`, modificado el 30-oct 18:12 durante la sesión de Antigravity. Contiene los `constant_*.bin`, y la carga se colgaba tras `constant_match.bin`. Pasaba también con el Core apagado. Se restauró el original desde `D:\SP2026\Data\dt18_all.cpk` (SHA-256 `906cd7a3…`). Aislado con REA/Frida y `phoenix_core\peticiones.log`.
+  2. **Json del Core:** restaurado el de `street_0499_actual`. Antigravity había puesto `pase_rapido_preciso` y `tiro_fuerte` en `true`. La DLL, el Lua, `sider.ini` y los módulos no los había tocado.
+  3. **Jugadores fuera de la minicancha** (ya pasaba antes de Antigravity): con Frida se vio que `ActionBasePosition` (`FUN_140956C30`) manda a los de campo a destinos fuera. **Core 0.4.101**, función nueva `jugadores_dentro_free`, lo recorta: 0 fuera en 912 muestras. **Frank lo confirmó: «ahora sí está funcionando perfectamente».** Incluye la 0.4.100 (arreglo del cierre al volver al menú).
+  4. **Link:** se quitó SOLO lo de Street de Antigravity (`street.js`, el demonio `sync-sider-street.js` que reescribía el json, la barra/tuning y la regla de goles). El resto de sus funciones se conserva. `PhoenixLink.exe` está compilado desde esa rama.
+- **Commits/ramas:**
+  - `smash-soda-fork@cuenta2/street-0.4.101`: `ec06849` (código 0.4.101) y `6c4d824` (§9 de `docs/pes/ESTADO_STREET_RETOMAR.md`, **la guía paso a paso completa**). Parte de `claude/project-thread-p1p1qc`, que no se tocó.
+  - `smash-soda-fork@cuenta2/link-sin-street`: `560cab8`. Parte de `plan-ux`; **`plan-ux` NO se tocó**: Fralex decide si se fusiona.
+- **Solo en la PC (sin git):**
+  - `SiderAddons\phoenix_core\phoenix_core.dll` = 0.4.101 (MD5 `2b97e270…`), con `"jugadores_dentro_free": true` en el json.
+  - Respaldos en `phoenix_core\antigravity_20261031\` (lo que dejó Antigravity, incluido `dt18_all.cpk.modificado`) y en `phoenix_core\street_0499_antes_0101\`.
+  - `Data\dt18_all.cpk` original.
+  - Bitácora viva y cap_62 actualizados.
+- **Supabase:** nada.
+- **A medias:** pedido nuevo de Frank, **1 contra 1 (solo porteros) y 2 contra 2 (portero y un jugador por lado)** en el entrenamiento; el menú no deja bajar de 3. El plan está en §9.5: con Frida bajar `TW+0x3C/+0x40` en vivo y, si funciona, opción en el Core 0.4.102.
+- **Esperando a Fralex:** entrar al entrenamiento para la prueba en vivo. Pendiente para después: el fondo azul sin estadio en Street.
+- **Siguiente paso:** quien siga el street, que lea §9 de `ESTADO_STREET_RETOMAR.md` en `cuenta2/street-0.4.101`. **No instalar la 0.4.100 sola: ya está dentro de la 0.4.101 instalada.**
+- **Candados:** tomé «PC / PES en uso» (Cuenta 2) para la prueba 1v1/2v2. Lo suelto al terminar.
