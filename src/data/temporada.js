@@ -25,14 +25,4 @@ export const DEMO_SEGUNDA = [
 ];
 
 // SISTEMA PROPIO de las ligas independientes (no se mezcla con Galaxy/Segunda). Cada una tiene sus zonas y su propia escalera de divisiones.
-export const SISTEMAS_LIGA = {
-  sudario: {
-    nombre: 'Sistema de Divisiones · Sudario',
-    divisiones: [
-      { nivel: 1, nombre: 'División Sudario', corto: 'Div. 1', icono: 'fa-star' },
-      { nivel: 2, nombre: 'División de Ascenso Sudario', corto: 'Div. 2', icono: 'fa-seedling' },
-    ],
-    // suben: 0 → de momento no hay zona de ascenso (la División 2 de Sudario aún no existe); el descenso y la copa sí funcionan.
-    suben: 0, bajan: 2, copa: 4,
-  },
-};
+export const SISTEMAS_LIGA = {};   // (vacío: de momento ninguna liga independiente tiene sistema propio)

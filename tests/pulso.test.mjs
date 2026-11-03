@@ -111,7 +111,7 @@ test('historial global: aplanar, filtrar, paginar', () => {
   assert.deepEqual(filtrarPartidos(lista, { q: 'zzzzzzz' }), []); assert.deepEqual(filtrarPartidos(null), []);
   const p = paginar(lista, 2, 10); assert.equal(p.items.length, 10); assert.equal(p.pagina, 2); assert.equal(p.paginas, Math.ceil(lista.length / 10));
   assert.equal(paginar(lista, 9999, 10).pagina, p.paginas); assert.equal(paginar(lista, -3, 10).pagina, 1); assert.equal(paginar([], 1).paginas, 1);
-  const f = leerFiltros('?liga=galaxy&estado=raro&q=hugo&p=3', ['galaxy', 'sudario']);
+  const f = leerFiltros('?liga=galaxy&estado=raro&q=hugo&p=3', ['galaxy', 'otra']);
   assert.deepEqual(f, { liga: 'galaxy', estado: 'jugados', q: 'hugo', pagina: 3 });
   assert.equal(leerFiltros('?liga=xx', ['galaxy']).liga, ''); assert.equal(leerFiltros('', []).pagina, 1);
   const esp = aplanarPartidos([{ id: 'x', titulo: ['X'] }], { x: [{ id: 'e', nombre: 'E', clubes: {}, fechas: [{ n: 1, partidos: [{ l: 'A', v: 'B', gl: null, gv: null, estado: 'aplazado' }, { l: 'C', v: 'D', gl: 3, gv: 0, estado: 'wo' }] }] }] });

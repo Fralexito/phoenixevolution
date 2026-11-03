@@ -30,29 +30,5 @@ export const LIGAS = [
       { label: "Ver liga", href: "liga/" },
     ],
   },
-  {
-    // LIGA SUDARIO: competición aparte (sus partidos, tabla y clubes viven en EDICIONES.sudario y no se mezclan con la Galaxy).
-    // No aparece en Central (enCentral: false). Para volver SOLO a la Galaxy: en la página Liga pulsa «Galaxy League» (o borra este bloque).
-    id: 'sudario',
-    estado: 'activa',
-    enCentral: false,
-    titulo: ['LIGA', 'SUDARIO'],
-    division: '2da división',   // ronda 293: se muestra al lado del nombre
-    juego: 'SP Football Life 26',
-    icono: 'fa-star',
-    imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400&auto=format&fit=crop',
-    copafacil: '',
-    descripcion: 'Liga de 12 jugadores, una sola ronda (11 fechas), jugada por Parsec.',
-    sede: 'España',
-    organizador: 'Sudario17',
-    datos: [
-      { k: 'Participantes', icono: 'fa-users', v: '12 jugadores' },
-      { k: 'Formato', icono: 'fa-diagram-project', v: 'Todos contra todos, una sola ronda (11 fechas)' },
-      { k: 'Inscripción', icono: 'fa-pen-to-square', v: '' },
-      { k: 'Calendario', icono: 'fa-calendar-days', v: '' },
-      { k: 'Reglamento', icono: 'fa-scale-balanced', v: '' },
-    ],
-    acciones: [],
-  },
 ];
 export const ETIQUETA_ESTADO = { activa: 'Competición activa', proxima: 'Próximamente' };

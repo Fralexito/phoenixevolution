@@ -35,7 +35,6 @@ test('departamentoDe: detecta por etiqueta, categoría y liga', () => {
   assert.equal(departamentoDe(LISTA[4]), 'tribunal');
   assert.equal(departamentoDe(LISTA[5]), 'tribuna');
   assert.equal(departamentoDe(LISTA[6]), 'previa');
-  assert.equal(departamentoDe(n({ titulo: 'Fecha 3 de la Sudario', liga: 'sudario' })), 'sudario');
   assert.equal(departamentoDe({ ...LISTA[0], departamento: 'clanes' }), 'clanes');
   assert.equal(departamentoDe({ titulo: 'Algo sin pistas', categoria: 'OFICIAL' }), 'direccion');
   // la etiqueta manda sobre el título: «el muro aguantó» no debe llevarse la crónica a La Plaza

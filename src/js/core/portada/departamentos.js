@@ -21,7 +21,6 @@ export const DEPARTAMENTOS = [
   { id: 'escuela', nombre: 'La Escuela', bloque: 'club', color: '#14b8a6', firma: 'La Escuela', cubre: 'Guías para los que recién entran', fuente: 'Unirme · Ayuda', tono: 'serio', peso: 40 },
   // --- Competiciones ---
   { id: 'competiciones', nombre: 'Competiciones', bloque: 'competiciones', color: '#8b5cf6', firma: 'Competiciones', cubre: 'Torneos, copas y formatos', fuente: 'Torneos · Formatos', tono: 'serio', peso: 74 },
-  { id: 'sudario', nombre: 'Sudario', bloque: 'competiciones', color: '#fbbf24', firma: 'Corresponsalía Sudario', cubre: 'Todo lo de la Liga Sudario', fuente: 'Divisiones Sudario', tono: 'serio', peso: 70 },
   { id: 'agenda', nombre: 'La Agenda', bloque: 'competiciones', color: '#f59e0b', firma: 'La Agenda', cubre: 'Qué se juega esta semana', fuente: 'Eventos · Calendario', tono: 'serio', peso: 52 },
   { id: 'vitrina', nombre: 'La Vitrina', bloque: 'competiciones', color: '#fde047', firma: 'La Vitrina', cubre: 'Campeones, premios y logros', fuente: 'Palmarés · Premios', tono: 'serio', peso: 60 },
   // --- Comunidad ---
@@ -88,7 +87,6 @@ const PORCATEGORIA = { OFICIAL: 'direccion', TRIBUNAL: 'tribunal', TRIBUNA: 'tri
  */
 export function departamentoDe(n) {
   if (n?.departamento && MAPA.has(n.departamento)) return n.departamento;
-  if (n?.liga === 'sudario') return 'sudario';
   const tag = String(n?.tag ?? '');
   if (tag.trim()) for (const [id, re] of DETECTA) if (re.test(tag)) return id;
   const texto = `${tag} ${n?.titulo ?? ''}`;

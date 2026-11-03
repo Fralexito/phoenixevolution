@@ -92,7 +92,7 @@ document.addEventListener('click', async (e) => {   // «Compartir mi campaña»
   const [lid, eid] = b.dataset.compartirCamp.split('|'); const liga = LIGAS.find((l) => l.id === lid); const ed = (EDICIONES[lid] ?? []).find((x) => x.id === eid); if (!liga || !ed) return;
   try {
     const nombre = nombreEnEdicion(actual, ed); const [{ datosJugador }, { abrirTarjeta }] = await Promise.all([import('../core/comunidad/compartir.js'), import('../features/compartir.js')]);
-    abrirTarjeta(datosJugador({ liga: liga.titulo.join(' '), edicion: ed.nombre, nombre: actual.apodo || actual.nombre, campana: campana(ed, nombre), forma: forma(ed.fechas, nombre, 5) }), lid === 'sudario' ? 'sudario' : 'galaxy');
+    abrirTarjeta(datosJugador({ liga: liga.titulo.join(' '), edicion: ed.nombre, nombre: actual.apodo || actual.nombre, campana: campana(ed, nombre), forma: forma(ed.fechas, nombre, 5) }), 'galaxy');
   } catch (err) { console.error('[perfil] compartir:', err); }
 });
 

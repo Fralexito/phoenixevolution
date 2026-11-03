@@ -10,7 +10,6 @@ import { escudoDe } from '../../js/core/sistema/escudos.js';
 const base = import.meta.env.BASE_URL;
 const ligas = [
   { id: 'galaxy', nombre: 'Galaxy League', juego: 'PES 2021', ed: EDICIONES.galaxy[0] },
-  { id: 'sudario', nombre: 'Liga Sudario', juego: 'Football Life', ed: EDICIONES.sudario[0] },
 ].map((l) => ({ ...l, r: resumenEdicion(l.ed) }));
 const vis = (club) => CLUBES_VISUAL[club] ?? { a: '#475569', b: '#1e293b' };
 const dg = (n) => (n > 0 ? `+${n}` : String(n));

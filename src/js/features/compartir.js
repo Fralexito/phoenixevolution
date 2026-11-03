@@ -9,7 +9,6 @@ import { nombreArchivo } from '../core/comunidad/compartir.js';
 const W = 1080, H = 1350, ID = 'compartir-modal';
 const TEMAS = {
   galaxy: { fondoA: '#12002b', fondoB: '#03010f', acento: '#00e5ff', acento2: '#8000ff', borde: '#2a1660' },
-  sudario: { fondoA: '#081c4a', fondoB: '#020a1f', acento: '#f5c542', acento2: '#1d4ed8', borde: '#1e3a8a' },
 };
 const COL = { G: '#34d399', E: '#fbbf24', P: '#fb7185' };
 
@@ -63,7 +62,7 @@ async function dibujarJugador(c, d, t) {
   pie(c, t, d.forma.length ? 'Mis últimos partidos' : '');
 }
 
-/** Abre la ventana con la tarjeta ya dibujada. `d` sale de core/comunidad/compartir.js; `tema` = 'galaxy' | 'sudario'. */
+/** Abre la ventana con la tarjeta ya dibujada. `d` sale de core/comunidad/compartir.js; `tema` = 'galaxy'. */
 export async function abrirTarjeta(d, tema = 'galaxy') {
   if (!d) return;
   const t = TEMAS[tema] ?? TEMAS.galaxy;

@@ -1,11 +1,10 @@
 ---
 // Selector de liga para las páginas de «Sistema de divisiones». Son enlaces (cada liga tiene su propia página), con el mismo aspecto que el selector de /liga/.
-const { activa } = Astro.props;   // 'galaxy' | 'sudario'
+const { activa } = Astro.props;   // 'galaxy'
 const base = import.meta.env.BASE_URL;
 const inicio = `${base}liga/#liga-${activa}`;   // «inicio» de la liga activa
 const items = [
   { id: 'galaxy', icono: 'fa-crown', texto: 'Galaxy League', href: `${base}temporada/` },
-  { id: 'sudario', icono: 'fa-star', texto: 'Liga Sudario', href: `${base}sudario-divisiones/` },
 ];
 ---
 <div class="flex flex-wrap items-center gap-3">
