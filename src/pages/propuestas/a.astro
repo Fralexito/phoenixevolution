@@ -1,0 +1,145 @@
+---
+// PROPUESTA A · VITRINA DE LIGAS
+// La portada habla de la PLATAFORMA. Todas las ligas en tarjetas del mismo diseño; la Galaxy va primera,
+// un poco más ancha y con el sello «Liga fundadora». Debajo: jornada de todas las ligas y campeones por liga.
+import Layout from '../../layouts/Layout.astro';
+import Barra from './_Barra.astro';
+import { LIGAS_P, JORNADA, CAMPEONES_P } from './_datos.js';
+import { escudoHTML } from '../../js/core/sistema/escudos.js';
+const base = import.meta.env.BASE_URL;
+const marcador = (p) => `${p.gl} – ${p.gv}`;
+---
+<Layout title="Propuesta A · Vitrina de ligas" active="central" description="Propuesta: portada de plataforma con vitrina de ligas.">
+  <main class="flex-grow w-full" data-activa="central">
+    <Barra actual="a" />
+
+    <!-- 1. SALUDO DE PLATAFORMA (ya no «Bienvenido a la Galaxy») -->
+    <header class="relative overflow-hidden px-4 sm:px-8 pt-8 pb-10 border-b border-galaxy-border/50">
+      <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-galaxy-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+      <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="relative z-10 max-w-4xl mx-auto text-center space-y-4">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-galaxy-400/10 border border-galaxy-400/30 text-xs font-mono font-bold text-galaxy-400">
+          <i class="fa-solid fa-layer-group"></i> {LIGAS_P.length} LIGAS ACTIVAS · PES 2021 Y FOOTBALL LIFE
+        </span>
+        <h1 class="font-display font-black text-4xl sm:text-5xl text-white uppercase tracking-wide leading-tight">
+          La casa de las <span class="text-transparent bg-clip-text bg-gradient-to-r from-galaxy-400 to-galaxy-600">ligas online</span>
+        </h1>
+        <p class="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto">Elige tu liga, juega tus partidos con Phoenix Link y sigue todas las competiciones de la comunidad en un solo lugar.</p>
+        <div class="flex flex-wrap justify-center gap-3 pt-1">
+          <a href="#vitrina" class="cierre-btn cierre-btn-prim"><i class="fa-solid fa-trophy"></i> Ver las ligas</a>
+          <a href={`${base}duelos/`} class="cierre-btn cierre-btn-sec"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+      <!-- 2. VITRINA: una tarjeta por liga, mismo diseño. Fundadora = primera, 2 columnas y sello. -->
+      <section id="vitrina" class="space-y-4 scroll-mt-32" aria-labelledby="vitrina-t">
+        <div class="flex items-end justify-between border-b border-galaxy-border pb-2">
+          <h2 id="vitrina-t" class="tit-n1">Ligas</h2>
+          <a href={`${base}competiciones/`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase">Todas las ligas →</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {LIGAS_P.map((l) => (
+            <article class:list={['relative rounded-2xl overflow-hidden border bg-galaxy-card/80 flex flex-col', l.fundadora && 'md:col-span-2']} style={`border-color:${l.color}55;box-shadow:0 0 30px ${l.color}18`}>
+              <div class="relative h-28 sm:h-32">
+                <img src={l.imagen} alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-40" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+                <div class="absolute left-4 bottom-3 right-4 flex items-end justify-between gap-3">
+                  <div>
+                    {l.fundadora && <span class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded mb-1" style={`background:${l.color}25;color:${l.color};border:1px solid ${l.color}66`}><i class="fa-solid fa-crown"></i> LIGA FUNDADORA</span>}
+                    <h3 class="font-display font-black text-2xl sm:text-3xl text-white uppercase leading-none">{l.titulo[0]} <span style={`color:${l.color}`}>{l.titulo[1]}</span></h3>
+                    <p class="text-[11px] text-gray-300 mt-1">{l.juego}{l.division && ` · ${l.division}`}</p>
+                  </div>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">● {l.estado === 'activa' ? 'En juego' : 'Próximamente'}</span>
+                </div>
+              </div>
+              <div class:list={['p-4 grid gap-4 flex-1', l.fundadora ? 'sm:grid-cols-2' : 'grid-cols-1']}>
+                <div class="space-y-2">
+                  <p class="text-[11px] uppercase tracking-widest text-gray-500 font-bold">Arriba en la tabla</p>
+                  {l.tabla.slice(0, l.fundadora ? 4 : 3).map((t, i) => (
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="w-4 text-xs font-mono" style={`color:${l.color}`}>{i + 1}</span>
+                      <span class="w-5 h-5 inline-flex"><Fragment set:html={escudoHTML(l.clubes[t.nombre] ?? '', 20)} /></span>
+                      <span class="flex-1 truncate text-white">{t.nombre}</span>
+                      <b class="font-display" style={`color:${l.color}`}>{t.pts}</b>
+                    </div>
+                  ))}
+                </div>
+                {l.fundadora && (
+                  <div class="space-y-2">
+                    <p class="text-[11px] uppercase tracking-widest text-gray-500 font-bold">Últimos resultados</p>
+                    {l.resultados.slice(0, 4).map((p) => (
+                      <div class="flex items-center justify-between text-xs text-gray-300 bg-black/30 rounded px-2 py-1.5">
+                        <span class="truncate">{p.l}</span><b class="text-white font-display px-2">{marcador(p)}</b><span class="truncate text-right">{p.v}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div class="px-4 py-3 border-t border-white/5 flex items-center justify-between text-xs">
+                <span class="text-gray-400"><i class="fa-solid fa-location-dot mr-1"></i>{l.sede} · Org. {l.organizador}</span>
+                <a href={`${base}${l.href}`} class="font-bold hover:underline" style={`color:${l.color}`}>Entrar a la liga →</a>
+              </div>
+            </article>
+          ))}
+          <!-- Tarjeta abierta: invita a sumar ligas (la plataforma no es solo la Galaxy) -->
+          <a href={`${base}crear-liga/`} class="rounded-2xl border-2 border-dashed border-galaxy-border hover:border-galaxy-400 flex flex-col items-center justify-center text-center p-6 gap-2 text-gray-400 hover:text-white transition-colors min-h-[220px]">
+            <i class="fa-solid fa-circle-plus text-3xl text-galaxy-400"></i>
+            <b class="font-display text-lg uppercase">Tu liga aquí</b>
+            <span class="text-xs">Organiza tu liga en Phoenix Evolution</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 3. JORNADA DE TODAS LAS LIGAS -->
+      <section class="grid lg:grid-cols-2 gap-6" aria-label="Jornada">
+        <div class="glass-panel rounded-2xl p-5 space-y-3">
+          <h2 class="tit-n2">Resultados</h2>
+          {JORNADA.resultados.map((p) => (
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded w-[4.5rem] text-center shrink-0" style={`background:${p.liga.color}22;color:${p.liga.color}`}>{p.liga.titulo[p.liga.titulo.length - 1]}</span>
+              <span class="flex-1 truncate text-right text-white">{p.l}</span>
+              <b class="font-display text-galaxy-400 px-2">{marcador(p)}</b>
+              <span class="flex-1 truncate text-white">{p.v}</span>
+            </div>
+          ))}
+          {!JORNADA.resultados.length && <p class="text-sm text-gray-500">Sin resultados cargados.</p>}
+        </div>
+        <div class="glass-panel rounded-2xl p-5 space-y-3">
+          <h2 class="tit-n2">Próximos partidos</h2>
+          {JORNADA.proximos.map((p) => (
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded w-[4.5rem] text-center shrink-0" style={`background:${p.liga.color}22;color:${p.liga.color}`}>{p.liga.titulo[p.liga.titulo.length - 1]}</span>
+              <span class="flex-1 truncate text-right text-white">{p.l}</span>
+              <span class="text-gray-500 px-2 text-xs">vs</span>
+              <span class="flex-1 truncate text-white">{p.v}</span>
+              <small class="text-gray-500 shrink-0">F{p.fecha}</small>
+            </div>
+          ))}
+          {!JORNADA.proximos.length && <p class="text-sm text-gray-500">Sin partidos programados.</p>}
+        </div>
+      </section>
+
+      <!-- 4. CAMPEONES / LÍDERES POR LIGA -->
+      <section class="space-y-3" aria-labelledby="camp-t">
+        <h2 id="camp-t" class="tit-n3"><i class="fa-solid fa-trophy"></i> Lo más alto de cada liga</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {CAMPEONES_P.map((c) => (
+            <div class="glass-panel rounded-xl p-4 flex items-center gap-3" style={`border-color:${c.liga.color}44`}>
+              <span class="w-10 h-10 inline-flex shrink-0"><Fragment set:html={escudoHTML(c.club, 40)} /></span>
+              <div class="min-w-0">
+                <small class="block text-[10px] uppercase tracking-widest font-bold" style={`color:${c.liga.color}`}>{c.liga.nombre} · {c.copa}</small>
+                <b class="text-white font-display text-lg uppercase truncate block">{c.dt}</b>
+                <em class="text-xs text-gray-400 not-italic">{c.club}</em>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>
+

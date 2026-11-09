@@ -1,0 +1,133 @@
+---
+// PROPUESTA C · ELIGE TU LIGA
+// La portada se adapta a la liga que elige el visitante (se recuerda en su navegador).
+// Por defecto se abre la Galaxy (tu prioridad), pero con un toque cualquiera ve SU liga con el mismo protagonismo.
+// Abajo, una franja fija «También en Phoenix» para que ninguna liga quede escondida.
+import Layout from '../../layouts/Layout.astro';
+import Barra from './_Barra.astro';
+import { LIGAS_P } from './_datos.js';
+import { escudoHTML } from '../../js/core/sistema/escudos.js';
+const base = import.meta.env.BASE_URL;
+---
+<Layout title="Propuesta C · Elige tu liga" active="central" description="Propuesta: portada que se adapta a la liga elegida.">
+  <main class="flex-grow w-full" data-activa="central">
+    <Barra actual="c" />
+
+    <!-- 1. SELECTOR DE LIGA -->
+    <div class="border-b border-galaxy-border/60 bg-black/40">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 overflow-x-auto">
+        <span class="text-[11px] text-gray-500 font-bold uppercase tracking-widest shrink-0">Tu liga:</span>
+        {LIGAS_P.map((l, i) => (
+          <button type="button" data-elegir={l.id} aria-pressed={i === 0 ? 'true' : 'false'} class="liga-pill shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-display font-bold uppercase tracking-wider" style={`--c:${l.color}`}>
+            <i class={`fa-solid ${l.icono}`}></i>{l.nombre}
+            {l.fundadora && <i class="fa-solid fa-crown text-[10px] opacity-80" title="Liga fundadora"></i>}
+          </button>
+        ))}
+        <a href={`${base}competiciones/`} class="shrink-0 text-xs text-gray-400 hover:text-white ml-auto">+ Más ligas</a>
+      </div>
+    </div>
+
+    <!-- 2. ESCENARIO DE LA LIGA ELEGIDA (uno por liga; solo se ve el elegido) -->
+    {LIGAS_P.map((l, i) => (
+      <section data-escenario={l.id} hidden={i !== 0} style={`--c:${l.color}`}>
+        <header class="relative overflow-hidden border-b border-galaxy-border/50">
+          <img src={l.imagen} alt="" class="absolute inset-0 w-full h-full object-cover opacity-25" loading="lazy" />
+          <div class="absolute inset-0" style={`background:linear-gradient(90deg, #03010f 25%, ${l.color}25 100%)`}></div>
+          <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 py-10 grid lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7 space-y-3">
+              <p class="text-[11px] font-mono font-bold tracking-widest" style={`color:${l.color}`}>
+                {l.fundadora ? '👑 LIGA FUNDADORA DE PHOENIX EVOLUTION' : 'LIGA DE LA COMUNIDAD'} · {l.edicion}
+              </p>
+              <h1 class="font-display font-black text-4xl sm:text-6xl text-white uppercase leading-none">{l.titulo[0]} <span style={`color:${l.color}`}>{l.titulo[1]}</span></h1>
+              <p class="text-sm text-gray-300">{l.juego}{l.division && ` · ${l.division}`} · {l.fase} · Sede {l.sede} · Organiza {l.organizador}</p>
+              <div class="flex flex-wrap gap-3 pt-2">
+                <a href={`${base}${l.href}`} class="px-5 py-3 rounded-xl font-display font-bold text-sm uppercase tracking-wider text-black" style={`background:${l.color}`}>Entrar a la liga</a>
+                <a href={`${base}duelos/`} class="cierre-btn cierre-btn-sec"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
+              </div>
+            </div>
+            {l.lider && (
+              <div class="lg:col-span-5">
+                <div class="glass-panel rounded-2xl p-5 text-center" style={`border-color:${l.color}66`}>
+                  <p class="text-[11px] uppercase tracking-widest text-gray-400 font-bold">Líder</p>
+                  <div class="w-20 h-20 mx-auto my-3 inline-flex"><Fragment set:html={escudoHTML(l.clubes[l.lider.nombre] ?? '', 80)} /></div>
+                  <p class="font-display font-black text-3xl text-white uppercase">{l.lider.nombre}</p>
+                  <p class="text-xs text-gray-400">{l.clubes[l.lider.nombre] ?? ''}</p>
+                  <div class="flex justify-center gap-6 mt-3 text-sm">
+                    <span><b class="block font-display text-2xl" style={`color:${l.color}`}>{l.lider.pts}</b><small class="text-gray-500">PTS</small></span>
+                    <span><b class="block font-display text-2xl text-white">{l.lider.pj}</b><small class="text-gray-500">PJ</small></span>
+                    <span><b class="block font-display text-2xl text-white">{l.lider.gf - l.lider.gc > 0 ? '+' : ''}{l.lider.gf - l.lider.gc}</b><small class="text-gray-500">DG</small></span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-7 glass-panel rounded-2xl p-5">
+            <h2 class="tit-n2 mb-3">Posiciones</h2>
+            <table class="w-full text-sm">
+              <tbody>
+                {l.tabla.slice(0, 8).map((t, k) => (
+                  <tr class="border-t border-white/5">
+                    <td class="py-2 w-6 text-xs font-mono" style={`color:${l.color}`}>{k + 1}</td>
+                    <td class="py-2"><span class="inline-flex items-center gap-2"><span class="w-6 h-6 inline-flex"><Fragment set:html={escudoHTML(l.clubes[t.nombre] ?? '', 22)} /></span><span class="text-white">{t.nombre}</span></span></td>
+                    <td class="py-2 text-center text-gray-400 text-xs">{t.pj} PJ</td>
+                    <td class="py-2 text-right font-display font-bold text-base" style={`color:${l.color}`}>{t.pts}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div class="lg:col-span-5 glass-panel rounded-2xl p-5 space-y-2">
+            <h2 class="tit-n2 mb-3">{l.resultados.length ? 'Últimos resultados' : 'Próximos partidos'}</h2>
+            {(l.resultados.length ? l.resultados : l.proximos).slice(0, 6).map((p) => (
+              <div class="flex items-center gap-2 text-sm bg-black/30 rounded-lg px-3 py-2">
+                <span class="flex-1 truncate text-white">{p.l}</span>
+                <b class="font-display px-1" style={`color:${l.color}`}>{p.gl === null || p.gl === undefined ? 'vs' : `${p.gl} - ${p.gv}`}</b>
+                <span class="flex-1 truncate text-right text-white">{p.v}</span>
+              </div>
+            ))}
+            {!l.resultados.length && !l.proximos.length && <p class="text-sm text-gray-400">Los partidos de esta liga se cargan con su tabla oficial.</p>}
+          </div>
+        </div>
+      </section>
+    ))}
+
+    <!-- 3. «TAMBIÉN EN PHOENIX»: las otras ligas siempre visibles (nadie queda escondido) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+      <h2 class="tit-n3 mb-3">También en Phoenix Evolution</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {LIGAS_P.map((l) => (
+          <button type="button" data-elegir={l.id} data-tambien={l.id} class="text-left glass-panel rounded-xl p-4 flex items-center gap-3 hover:scale-[1.01] transition-transform" style={`border-color:${l.color}44`}>
+            <i class={`fa-solid ${l.icono} text-2xl`} style={`color:${l.color}`}></i>
+            <span class="min-w-0 flex-1">
+              <b class="block text-white font-display uppercase">{l.nombre}</b>
+              <small class="text-gray-400">Líder: {l.lider?.nombre ?? '—'} · {l.juego}</small>
+            </span>
+            <span class="text-xs font-bold" style={`color:${l.color}`}>Ver →</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  </main>
+</Layout>
+<style>
+  .liga-pill { color: rgb(209 213 219); border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.03); }
+  .liga-pill[aria-pressed='true'] { color: #03010f; background: var(--c); border-color: var(--c); box-shadow: 0 0 18px color-mix(in srgb, var(--c) 45%, transparent); }
+</style>
+<script>
+  const CLAVE = 'pes-propuesta-mi-liga';
+  const elegir = (id) => {
+    if (!document.querySelector(`[data-escenario="${id}"]`)) return;
+    document.querySelectorAll('[data-escenario]').forEach((s) => { s.hidden = s.getAttribute('data-escenario') !== id; });
+    document.querySelectorAll('.liga-pill').forEach((b) => b.setAttribute('aria-pressed', String(b.getAttribute('data-elegir') === id)));
+    document.querySelectorAll('[data-tambien]').forEach((b) => { b.hidden = b.getAttribute('data-tambien') === id; });
+    try { localStorage.setItem(CLAVE, id); } catch {}
+  };
+  document.querySelectorAll('[data-elegir]').forEach((b) => b.addEventListener('click', () => { elegir(b.getAttribute('data-elegir')); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+  let guardada = null;
+  try { guardada = localStorage.getItem(CLAVE); } catch {}
+  elegir(guardada || document.querySelector('[data-escenario]')?.getAttribute('data-escenario'));
+</script>
+

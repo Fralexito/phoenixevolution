@@ -1,0 +1,132 @@
+---
+// PROPUESTA B · MARCADOR GLOBAL (estilo portal deportivo tipo OneFootball / ESPN)
+// Arriba, una franja de marcadores de TODAS las ligas. El centro es la jornada mezclada.
+// Al costado, las tablas en pestañas: la Galaxy abierta por defecto (prioridad), las demás a un clic.
+import Layout from '../../layouts/Layout.astro';
+import Barra from './_Barra.astro';
+import { LIGAS_P, JORNADA, CAMPEONES_P } from './_datos.js';
+import { escudoHTML } from '../../js/core/sistema/escudos.js';
+const base = import.meta.env.BASE_URL;
+const corto = (l) => l.titulo[l.titulo.length - 1];
+const franja = [...JORNADA.resultados, ...JORNADA.proximos];
+---
+<Layout title="Propuesta B · Marcador global" active="central" description="Propuesta: portada tipo portal deportivo con todas las ligas.">
+  <main class="flex-grow w-full" data-activa="central">
+    <Barra actual="b" />
+
+    <!-- 1. FRANJA DE MARCADORES: todas las ligas, desliza de lado -->
+    <div class="border-b border-galaxy-border/60 bg-black/40">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex gap-3 overflow-x-auto" style="scrollbar-width:thin">
+        {franja.map((p) => (
+          <div class="shrink-0 w-48 rounded-lg bg-galaxy-card/80 border px-3 py-2 text-xs" style={`border-color:${p.liga.color}44`}>
+            <div class="flex justify-between mb-1">
+              <span class="font-mono font-bold text-[10px]" style={`color:${p.liga.color}`}>{corto(p.liga)}</span>
+              <span class="text-gray-500 text-[10px]">{p.gl === null || p.gl === undefined ? `F${p.fecha} · Por jugar` : `F${p.fecha} · Final`}</span>
+            </div>
+            <div class="flex justify-between text-white"><span class="truncate">{p.l}</span><b>{p.gl ?? ''}</b></div>
+            <div class="flex justify-between text-white"><span class="truncate">{p.v}</span><b>{p.gv ?? ''}</b></div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid lg:grid-cols-12 gap-6 items-start">
+
+      <!-- 2. COLUMNA PRINCIPAL -->
+      <div class="lg:col-span-8 space-y-6">
+        <!-- Titular compacto de plataforma -->
+        <section class="relative overflow-hidden rounded-2xl border border-galaxy-border p-6 bg-gradient-to-br from-galaxy-900 to-black">
+          <div class="hero-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="relative z-10 space-y-3">
+            <p class="text-[11px] font-mono font-bold text-galaxy-400 tracking-widest">PHOENIX EVOLUTION · HOY</p>
+            <h1 class="font-display font-black text-3xl sm:text-4xl text-white uppercase leading-tight">Toda la jornada de la comunidad, <span class="text-galaxy-400">en un solo lugar</span></h1>
+            <p class="text-sm text-gray-300 max-w-xl">{LIGAS_P.length} ligas, sus resultados, sus tablas y los retos abiertos. Elige qué seguir.</p>
+            <div class="flex flex-wrap gap-2 pt-1">
+              <a href={`${base}duelos/`} class="cierre-btn cierre-btn-prim"><i class="fa-solid fa-gamepad"></i> Jugar un reto</a>
+              <a href={`${base}competiciones/`} class="cierre-btn cierre-btn-sec"><i class="fa-solid fa-trophy"></i> Ligas</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Jornada agrupada por liga (la fundadora arriba) -->
+        {LIGAS_P.map((l) => (
+          <section class="glass-panel rounded-2xl overflow-hidden" style={`border-color:${l.color}40`}>
+            <header class="px-5 py-3 flex items-center justify-between border-b border-white/5" style={`background:linear-gradient(90deg, ${l.color}20, transparent)`}>
+              <h2 class="font-display font-bold text-lg text-white uppercase flex items-center gap-2">
+                <i class={`fa-solid ${l.icono}`} style={`color:${l.color}`}></i>{l.nombre}
+                {l.fundadora && <span class="text-[9px] font-mono px-1.5 py-0.5 rounded" style={`background:${l.color}25;color:${l.color}`}>FUNDADORA</span>}
+              </h2>
+              <a href={`${base}${l.href}`} class="text-xs font-bold hover:underline" style={`color:${l.color}`}>Ver liga →</a>
+            </header>
+            <div class="p-4 grid sm:grid-cols-2 gap-2">
+              {[...l.resultados.slice(0, 4), ...l.proximos.slice(0, l.resultados.length ? 0 : 4)].map((p) => (
+                <div class="flex items-center gap-2 text-sm bg-black/30 rounded-lg px-3 py-2">
+                  <span class="w-5 h-5 inline-flex"><Fragment set:html={escudoHTML(l.clubes[p.l] ?? '', 20)} /></span>
+                  <span class="flex-1 truncate text-white">{p.l}</span>
+                  <b class="font-display px-1" style={`color:${l.color}`}>{p.gl === null || p.gl === undefined ? 'vs' : `${p.gl}-${p.gv}`}</b>
+                  <span class="flex-1 truncate text-right text-white">{p.v}</span>
+                  <span class="w-5 h-5 inline-flex"><Fragment set:html={escudoHTML(l.clubes[p.v] ?? '', 20)} /></span>
+                </div>
+              ))}
+              {!l.resultados.length && !l.proximos.length && (
+                <p class="text-sm text-gray-400 sm:col-span-2">Esta liga carga su tabla oficial directamente. Líder: <b class="text-white">{l.lider?.nombre ?? '—'}</b> ({l.lider?.pts ?? 0} pts).</p>
+              )}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <!-- 3. COLUMNA LATERAL: tablas en pestañas -->
+      <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-32">
+        <section class="glass-panel rounded-2xl overflow-hidden" data-tabs>
+          <div class="flex border-b border-galaxy-border" role="tablist">
+            {LIGAS_P.map((l, i) => (
+              <button type="button" role="tab" data-tab={l.id} aria-selected={i === 0 ? 'true' : 'false'} class="flex-1 px-3 py-2.5 text-xs font-display font-bold uppercase tracking-wider border-b-2 transition-colors" style={`--c:${l.color}`}>{corto(l)}</button>
+            ))}
+          </div>
+          {LIGAS_P.map((l, i) => (
+            <div data-panel={l.id} hidden={i !== 0} class="p-4">
+              <table class="w-full text-sm">
+                <thead><tr class="text-gray-500 text-[11px]"><th class="text-left pb-2">#</th><th class="text-left pb-2">Jugador</th><th class="pb-2">PJ</th><th class="text-right pb-2">PTS</th></tr></thead>
+                <tbody>
+                  {l.tabla.slice(0, 8).map((t, k) => (
+                    <tr class="border-t border-white/5">
+                      <td class="py-1.5 text-xs font-mono" style={`color:${l.color}`}>{k + 1}</td>
+                      <td class="py-1.5"><span class="inline-flex items-center gap-2"><span class="w-5 h-5 inline-flex"><Fragment set:html={escudoHTML(l.clubes[t.nombre] ?? '', 18)} /></span><span class="text-white truncate">{t.nombre}</span></span></td>
+                      <td class="py-1.5 text-center text-gray-400 text-xs">{t.pj}</td>
+                      <td class="py-1.5 text-right font-display font-bold" style={`color:${l.color}`}>{t.pts}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <a href={`${base}${l.href}`} class="block text-center text-xs font-bold mt-3 hover:underline" style={`color:${l.color}`}>Tabla completa de {l.nombre} →</a>
+            </div>
+          ))}
+        </section>
+
+        <section class="glass-panel rounded-2xl p-4 space-y-3">
+          <h3 class="font-display font-bold text-sm text-white uppercase tracking-wider"><i class="fa-solid fa-crown text-amber-400 mr-1"></i> Líderes</h3>
+          {CAMPEONES_P.map((c) => (
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 inline-flex"><Fragment set:html={escudoHTML(c.club, 32)} /></span>
+              <div class="min-w-0 flex-1"><small class="block text-[10px] font-bold uppercase" style={`color:${c.liga.color}`}>{c.liga.nombre} · {c.copa}</small><b class="text-white text-sm truncate block">{c.dt}</b></div>
+            </div>
+          ))}
+        </section>
+      </aside>
+    </div>
+  </main>
+</Layout>
+<style>
+  [data-tabs] [role='tab'] { color: rgb(156 163 175); border-color: transparent; }
+  [data-tabs] [role='tab'][aria-selected='true'] { color: var(--c); border-color: var(--c); background: rgba(255,255,255,.03); }
+</style>
+<script>
+  document.querySelectorAll('[data-tabs]').forEach((caja) => {
+    caja.querySelectorAll('[role="tab"]').forEach((b) => b.addEventListener('click', () => {
+      caja.querySelectorAll('[role="tab"]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+      caja.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.getAttribute('data-panel') !== b.getAttribute('data-tab'); });
+    }));
+  });
+</script>
+

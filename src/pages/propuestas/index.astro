@@ -1,0 +1,26 @@
+---
+// Índice de propuestas: lleva a A, B y C. Página de prueba; la portada real no cambia.
+import Layout from '../../layouts/Layout.astro';
+import Barra from './_Barra.astro';
+import { PROPUESTAS } from './_datos.js';
+const base = import.meta.env.BASE_URL;
+---
+<Layout title="Propuestas · Descentralizar la Galaxy" active="central" description="Propuestas de portada multi-liga.">
+  <main class="flex-grow w-full" data-activa="central">
+    <Barra actual="" />
+    <div class="max-w-5xl mx-auto px-4 py-10 space-y-6">
+      <h1 class="font-display font-black text-3xl text-white uppercase">Descentralizar la Galaxy · 3 propuestas</h1>
+      <p class="text-gray-300 text-sm">Las tres usan tu Layout, tus estilos y tus datos reales. La barra lateral, los contactos y el botón «En vivo» son los de siempre.</p>
+      <div class="grid md:grid-cols-3 gap-4">
+        {PROPUESTAS.map((p) => (
+          <a href={`${base}propuestas/${p.id}/`} class="glass-panel rounded-2xl p-5 hover:border-galaxy-400 transition-colors block">
+            <b class="font-display text-xl text-white uppercase">{p.nombre}</b>
+            <p class="text-sm text-gray-400 mt-2">{p.lema}</p>
+            <span class="text-xs text-galaxy-400 font-bold mt-3 inline-block">Abrir →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+</Layout>
+

@@ -1,0 +1,20 @@
+---
+// Barra de navegación entre propuestas (solo en /propuestas/). No toca nada de la web real.
+import { PROPUESTAS } from './_datos.js';
+const { actual } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const p = PROPUESTAS.find((x) => x.id === actual);
+---
+<div class="bg-galaxy-900/90 border-b border-galaxy-400/40 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+  <div class="flex items-center gap-2 min-w-0">
+    <span class="px-2 py-0.5 rounded bg-galaxy-400/20 text-galaxy-400 font-mono font-bold border border-galaxy-400/40 shrink-0">PROPUESTA</span>
+    <span class="text-gray-300 truncate"><b class="text-white">{p?.nombre ?? 'Propuestas'}</b>{p && ` — ${p.lema}`}</span>
+  </div>
+  <nav class="flex items-center gap-1.5 flex-wrap" aria-label="Cambiar de propuesta">
+    <a href={`${base}`} class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/15 text-gray-300 font-bold">Portada actual</a>
+    {PROPUESTAS.map((x) => (
+      <a href={`${base}propuestas/${x.id}/`} class:list={['px-2.5 py-1 rounded font-bold', x.id === actual ? 'bg-galaxy-400 text-black' : 'bg-white/5 hover:bg-white/15 text-gray-300']}>{x.id.toUpperCase()}</a>
+    ))}
+  </nav>
+</div>
+

@@ -1,0 +1,473 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/tuClub.css';
+import '../styles/ahoraPortada.css';
+import '../styles/transmision.css';
+import '../styles/estilofc.css';
+import '../styles/escenario.css';
+import '../styles/portadaJerarquia.css';
+import { FX } from '../data/experimento.js';
+import Plegable from '../components/Plegable.astro';
+import { DEMO_CLIPS } from '../data/demo.js';
+import { miniatura, etiquetaFuente } from '../js/core/comunidad/clips.js';
+import { LIGAS, ETIQUETA_ESTADO } from '../data/ligas.js';
+import MarcadorVivo from '../components/MarcadorVivo.astro';
+import { EDICIONES } from '../data/ligaResultados.js';
+import { PODIO } from '../data/palmares.js';
+import { calcularTabla } from '../js/core/competicion/tabla.js';
+import { liderDe } from '../js/core/portada/pase.js';
+import { escudoHTML, escudoDe } from '../js/core/sistema/escudos.js';
+import { cartaJuegoHTML } from '../js/core/sistema/cartaJuego.js';
+import { forma } from '../js/core/portada/demoDatos.js';
+import { titularesPortada, lineaEstado } from '../js/core/portada/titulares.js';
+import { estadoLiga } from '../js/core/competicion/pulso.js';
+import { PORTADA } from '../data/portada.js';
+import { CLUBES_VISUAL } from '../data/clubesVisual.js';
+
+const base = import.meta.env.BASE_URL;
+
+// Datos de la Galaxy League (Liga oficial)
+const edGalaxy = EDICIONES.galaxy.find((e) => e.estado === 'en_curso') ?? EDICIONES.galaxy[0] ?? null;
+const partidosGalaxy = (edGalaxy?.fechas ?? []).flatMap((f) => f.partidos);
+const tablaCalculada = calcularTabla(partidosGalaxy).tabla;
+const tablaGalaxy = tablaCalculada.filter((t) => t.pj > 0).length ? tablaCalculada.filter((t) => t.pj > 0) : tablaCalculada.slice(0, 8);
+const liderGalaxy = liderDe(tablaCalculada);
+const clubesGalaxy = edGalaxy?.clubes ?? {};
+const liderClub = liderGalaxy ? (clubesGalaxy[liderGalaxy.nombre] ?? '') : '';
+
+// Datos de la Liga Sudario (Liga de la comunidad)
+const edSudario = EDICIONES.sudario[0] ?? null;
+const tablaSudario = edSudario?.tablaOficial ?? [];
+const clubesSudario = edSudario?.clubes ?? {};
+const liderSudario = tablaSudario[0] ?? null;
+
+const CAMPEONES = PODIO.map((c) => ({ copa: c.copa, dt: c.dt, club: c.club, oro: Boolean(c.gold) }));
+const discord = 'https://discord.gg/jsxZ3mtfwe';
+---
+<Layout title="Espejo · Los 4 Rincones de Phoenix" active="central" description="Diseño organizado en 4 rincones temáticos: 1. Zona Social, 2. Lo de Jugar, 3. Premios y Jugadores, 4. Liga Máster.">
+  <main class="flex-grow w-full space-y-12 pb-16" data-activa="central">
+
+    <!-- ========================================================================= -->
+    <!-- BARRA GUÍA DE LOS 4 RINCONES                                             -->
+    <!-- ========================================================================= -->
+    <div class="sticky top-12 z-50 bg-[#070214]/95 backdrop-blur-md border-b border-[#2a1660] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-xl">
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded bg-galaxy-400/20 text-galaxy-400 font-mono text-xs font-bold border border-galaxy-400/40">
+          ESTRUCTURA POR RINCONES
+        </span>
+        <span class="text-xs text-gray-300 hidden sm:inline">Tu secuencia personalizada:</span>
+      </div>
+
+      <nav class="flex items-center gap-1.5 flex-wrap font-display font-bold text-xs" aria-label="Navegar por los rincones">
+        <a href="#rincon-social" class="px-2.5 py-1 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30">1. Social</a>
+        <a href="#rincon-jugar" class="px-2.5 py-1 rounded bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/40 hover:bg-[#00e5ff]/30">2. Jugar</a>
+        <a href="#rincon-premios" class="px-2.5 py-1 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 hover:bg-yellow-500/30">3. Premios &amp; Jugadores</a>
+        <a href="#rincon-master" class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30">4. Liga Máster</a>
+      </nav>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. RINCÓN DE LA ZONA SOCIAL (Muro, Comunidad, Historias y Chat)            -->
+    <!-- ========================================================================= -->
+    <section id="rincon-social" class="scroll-mt-28 relative overflow-hidden pt-8 pb-10 px-4 sm:px-8 border-b border-purple-500/30 bg-gradient-to-b from-[#0e041d] to-[#04010b]">
+      <div class="hero-brillo absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-purple-600/20 rounded-full blur-[140px] pointer-events-none"></div>
+      
+      <div class="max-w-7xl mx-auto space-y-6 relative z-10">
+        
+        <!-- Cabecera del Rincón Social -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-purple-500/30 pb-4">
+          <div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-xs font-mono font-bold text-purple-300">
+              <i class="fa-solid fa-users"></i> 1. ZONA SOCIAL &bull; COMUNIDAD
+            </span>
+            <h1 class="font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight mt-1">
+              EL MURO DE LA <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-[#00e5ff]">GALAXY</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-300 mt-1 max-w-xl">
+              Historias, publicaciones de los jugadores, retos de honor y debates en tiempo real.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <a href={`${base}social/`} class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-display font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 flex items-center gap-2">
+              <i class="fa-solid fa-pen-to-square"></i> Publicar en el Muro
+            </a>
+            <a href={`${base}chat-general/`} class="px-4 py-2.5 rounded-xl bg-black/50 border border-purple-500/40 text-gray-200 font-display font-bold text-xs uppercase tracking-wider hover:border-purple-400 flex items-center gap-2">
+              <i class="fa-solid fa-comments text-purple-400"></i> Chat General
+            </a>
+          </div>
+        </div>
+
+        <!-- Mosaico Social Vivo -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+          
+          <!-- Columna 8: Muro de Publicaciones Recientes -->
+          <div class="md:col-span-8 glass-panel rounded-2xl p-5 border border-purple-500/30 space-y-4">
+            <div class="flex items-center justify-between text-xs border-b border-white/5 pb-2">
+              <span class="font-bold text-purple-300 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-fire text-amber-400"></i> Lo más comentado hoy
+              </span>
+              <a href={`${base}social/`} class="text-purple-400 font-bold hover:underline">Ver todo el muro →</a>
+            </div>
+
+            <!-- Post 1: Polémica del VAR en Street -->
+            <article class="p-4 rounded-xl bg-black/40 border border-purple-500/20 space-y-2 hover:border-purple-500/40 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-bold text-white text-xs border border-red-400">M</div>
+                  <div>
+                    <span class="text-xs font-bold text-white block leading-tight">Maurisgame</span>
+                    <span class="text-[10px] text-gray-400 font-mono">Hace 2 horas &bull; Modo Street 15x10</span>
+                  </div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-mono font-bold">VAR POLEMIC</span>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                ¡Increíble fallo del VAR en el último segundo! La sala votó penal unánime por el Discord bot y me clavaron gol de oro. ¿Opiniones de la jugada?
+              </p>
+              <div class="flex items-center gap-4 text-xs text-gray-400 pt-2 border-t border-white/5">
+                <span class="flex items-center gap-1.5 hover:text-red-400 cursor-pointer"><i class="fa-solid fa-heart text-red-400"></i> 14 reacciones</span>
+                <span class="flex items-center gap-1.5 hover:text-purple-400 cursor-pointer"><i class="fa-solid fa-comment text-purple-400"></i> 8 respuestas</span>
+              </div>
+            </article>
+
+            <!-- Post 2: Fichaje confirmado -->
+            <article class="p-4 rounded-xl bg-black/40 border border-purple-500/20 space-y-2 hover:border-purple-500/40 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-xs border border-blue-400">F</div>
+                  <div>
+                    <span class="text-xs font-bold text-white block leading-tight">Fralex (Boca Juniors)</span>
+                    <span class="text-[10px] text-gray-400 font-mono">Hace 4 horas &bull; Mercado Sider</span>
+                  </div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono font-bold">MERCADO</span>
+              </div>
+              <p class="text-xs text-gray-300 leading-relaxed">
+                Plantilla reforzada con sincronización directa al PES 2021 sin reiniciar el juego. El que quiera duelo amistoso que mande reto a la sala.
+              </p>
+              <div class="flex items-center gap-4 text-xs text-gray-400 pt-2 border-t border-white/5">
+                <span class="flex items-center gap-1.5 hover:text-red-400 cursor-pointer"><i class="fa-solid fa-heart text-red-400"></i> 22 reacciones</span>
+                <span class="flex items-center gap-1.5 hover:text-purple-400 cursor-pointer"><i class="fa-solid fa-comment text-purple-400"></i> 11 respuestas</span>
+              </div>
+            </article>
+          </div>
+
+          <!-- Columna 4: Accesos de Comunidad (Clanes, Creadores, Discord) -->
+          <div class="md:col-span-4 flex flex-col justify-between gap-3">
+            <a href={`${base}clanes/`} class="glass-panel p-4 rounded-xl border border-purple-500/30 hover:border-purple-400 transition-all flex items-center gap-3">
+              <span class="text-2xl text-purple-400"><i class="fa-solid fa-people-group"></i></span>
+              <div class="min-w-0">
+                <b class="text-sm font-display font-bold text-white uppercase block">Clanes &amp; Grupos</b>
+                <span class="text-[11px] text-gray-400">Arma tu clan y defiende a tu gente</span>
+              </div>
+            </a>
+
+            <a href={`${base}creadores/`} class="glass-panel p-4 rounded-xl border border-purple-500/30 hover:border-purple-400 transition-all flex items-center gap-3">
+              <span class="text-2xl text-red-400"><i class="fa-solid fa-video"></i></span>
+              <div class="min-w-0">
+                <b class="text-sm font-display font-bold text-white uppercase block">Creadores &amp; Directos</b>
+                <span class="text-[11px] text-gray-400">Streamers oficiales transmitiendo</span>
+              </div>
+            </a>
+
+            <a href={discord} target="_blank" rel="noopener" class="p-4 rounded-xl bg-[#5865F2]/20 border border-[#5865F2]/40 hover:bg-[#5865F2]/30 transition-all flex items-center gap-3">
+              <span class="text-2xl text-[#5865F2]"><i class="fa-brands fa-discord"></i></span>
+              <div class="min-w-0">
+                <b class="text-sm font-display font-bold text-white uppercase block">Comunidad en Discord</b>
+                <span class="text-[11px] text-gray-300">Voz, avisos de partidos y sala de espera</span>
+              </div>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 2. RINCÓN DE JUGAR (Duelos, Phoenix Link, Parsec y Salas en Vivo)          -->
+    <!-- ========================================================================= -->
+    <section id="rincon-jugar" class="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#00e5ff]/30 pb-3">
+        <div>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00e5ff]/10 border border-[#00e5ff]/30 text-xs font-mono font-bold text-[#00e5ff]">
+            <i class="fa-solid fa-gamepad"></i> 2. LO DE JUGAR &bull; ARENA &amp; MATCHMAKING
+          </span>
+          <h2 class="font-display font-black text-2xl sm:text-4xl text-white uppercase tracking-tight mt-1">
+            SALA DE DUELOS &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-cyan-200">PHOENIX LINK</span>
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Entra a la sala, conecta tu mando por Parsec y juega partidos oficiales o de honor.</p>
+        </div>
+
+        <a href={`${base}duelos/`} class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00e5ff] to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-display font-black text-xs uppercase tracking-wider shadow-lg shadow-[#00e5ff]/25 flex items-center gap-2">
+          <i class="fa-solid fa-bolt"></i> Abrir Reto de Duelo
+        </a>
+      </div>
+
+      <!-- Tarjetas de Juego Activo -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Sala Viva de Phoenix Link (8 cols) -->
+        <div class="lg:col-span-8 glass-panel rounded-2xl p-6 border border-[#00e5ff]/30 relative overflow-hidden bg-gradient-to-br from-[#02101e] to-black">
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-mono font-bold text-emerald-400 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> SALA EN VIVO POR PHOENIX LINK
+            </span>
+            <span class="text-[11px] px-2.5 py-0.5 rounded bg-[#00e5ff]/20 text-[#00e5ff] font-mono font-bold border border-[#00e5ff]/40">
+              Modo Street 15x10 &bull; Cancha Futsal
+            </span>
+          </div>
+
+          <!-- Marcador Digital -->
+          <div class="py-5 px-6 rounded-xl bg-black/70 border border-white/10 flex items-center justify-between gap-4">
+            <div class="flex-1 text-center min-w-0">
+              <span class="text-base sm:text-lg font-bold text-white truncate block">Boca Juniors (Frank)</span>
+              <span class="text-[11px] text-emerald-400 font-mono">Rey de la Pista (3 seguidas)</span>
+            </div>
+
+            <div class="px-4 text-center shrink-0">
+              <div class="font-display font-black text-3xl sm:text-4xl text-[#00e5ff] tracking-wider leading-none">2 &ndash; 1</div>
+              <span class="text-[10px] text-yellow-400 font-mono uppercase tracking-widest mt-1 block">Gol de Oro &bull; Final</span>
+            </div>
+
+            <div class="flex-1 text-center min-w-0">
+              <span class="text-base sm:text-lg font-bold text-white truncate block">Flamengo (Maurisgame)</span>
+              <span class="text-[11px] text-gray-400 font-mono">Retador</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between text-xs text-gray-300 pt-4 mt-4 border-t border-white/10 gap-3">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-microphone text-galaxy-400"></i> Locutor IA activado &bull; VAR de sala habilitado</span>
+            <div class="flex items-center gap-3">
+              <a href={`${base}ahora/`} class="text-[#00e5ff] font-bold hover:underline">Ver pantalla en vivo →</a>
+              <a href={`${base}mis-salas/`} class="text-gray-400 hover:text-white">Descargar Phoenix Link</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atajos Rápidos de Juego (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col justify-between gap-3">
+          <div class="glass-panel p-4 rounded-xl border border-galaxy-border space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <b class="text-white font-display uppercase tracking-wider">Hosts Disponibles</b>
+              <span class="text-emerald-400 font-mono font-bold">4 PCs listas</span>
+            </div>
+            <p class="text-[11px] text-gray-400">Servidores con Parsec optimizado para jugar sin delay.</p>
+            <a href={`${base}alquilar-host/`} class="text-xs text-galaxy-400 font-bold hover:underline block pt-1">Ver lista de hosts →</a>
+          </div>
+
+          <div class="glass-panel p-4 rounded-xl border border-galaxy-border space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <b class="text-white font-display uppercase tracking-wider">Torneos Abiertos</b>
+              <span class="text-yellow-400 font-mono font-bold">1 Copa en juego</span>
+            </div>
+            <p class="text-[11px] text-gray-400">Brackets de eliminación directa con llaves automáticas.</p>
+            <a href={`${base}torneos/`} class="text-xs text-yellow-400 font-bold hover:underline block pt-1">Entrar a un torneo →</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 3. RINCÓN DE PREMIOS, JUGADORES & COMPETICIÓN                              -->
+    <!-- ========================================================================= -->
+    <section id="rincon-premios" class="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-yellow-500/30 pb-3">
+        <div>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-xs font-mono font-bold text-yellow-400">
+            <i class="fa-solid fa-trophy"></i> 3. LOS PREMIOS &bull; JUGADORES &amp; LIGAS
+          </span>
+          <h2 class="font-display font-black text-2xl sm:text-4xl text-white uppercase tracking-tight mt-1">
+            CAMPEONES, <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500">CARTAS HOLOGRÁFICAS</span> &amp; TABLAS
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">El podio oficial de la historia, las fichas de los cracks y la tabla de posiciones de las ligas.</p>
+        </div>
+
+        <a href={`${base}palmares/`} class="text-xs font-display font-bold text-yellow-400 hover:text-white uppercase flex items-center gap-1.5 border border-yellow-500/40 bg-yellow-500/10 px-4 py-2 rounded-xl transition-colors">
+          <i class="fa-solid fa-medal"></i> Palmarés Completo →
+        </a>
+      </div>
+
+      <!-- Vitrina de Campeones Vigentes -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {CAMPEONES.map((c) => (
+          <div class:list={['glass-panel rounded-2xl p-4 flex items-center gap-3 border', c.oro ? 'border-yellow-400/50 bg-gradient-to-r from-yellow-950/20 to-black' : 'border-white/10']}>
+            <span class="w-12 h-12 inline-flex shrink-0 items-center justify-center">
+              <Fragment set:html={escudoHTML(c.club, 44)} />
+            </span>
+            <div class="min-w-0 flex-1">
+              <span class:list={['text-[10px] font-mono font-bold uppercase tracking-wider block', c.oro ? 'text-yellow-400' : 'text-gray-400']}>{c.copa}</span>
+              <b class="text-base font-display font-black text-white uppercase truncate block leading-tight">{c.dt}</b>
+              <span class="text-xs text-gray-400 truncate block">{c.club}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- El Salón de las Ligas (Galaxy como oficial + Sudario como asociada) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Galaxy League (Liga oficial de la casa con 7 cols) -->
+        <div class="lg:col-span-7 glass-panel rounded-2xl p-6 border border-galaxy-border space-y-4">
+          <div class="flex justify-between items-center border-b border-galaxy-border/50 pb-3">
+            <div>
+              <span class="text-[10px] font-mono font-bold text-galaxy-400 uppercase tracking-widest flex items-center gap-1.5">
+                <i class="fa-solid fa-crown"></i> LIGA OFICIAL DE LA CASA
+              </span>
+              <h3 class="font-display font-black text-2xl text-white uppercase tracking-wider mt-0.5">
+                Galaxy League &bull; Posiciones
+              </h3>
+            </div>
+            <a href={`${base}liga/#liga-galaxy`} class="text-xs font-display font-bold text-galaxy-400 hover:text-white uppercase flex items-center gap-1">
+              Ver fechas →
+            </a>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="text-gray-400 border-b border-galaxy-border/40 font-mono text-xs">
+                  <th class="py-2 px-2.5">#</th>
+                  <th class="py-2 px-2.5">DT / CLUB</th>
+                  <th class="py-2 px-2 text-center">PJ</th>
+                  <th class="py-2 px-2 text-center">DG</th>
+                  <th class="py-2 px-2 text-right text-galaxy-400 font-bold">PTS</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-galaxy-border/30">
+                {tablaGalaxy.slice(0, 5).map((fila, idx) => (
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-2 px-2.5 font-bold text-xs font-mono text-galaxy-400">{idx + 1}</td>
+                    <td class="py-2 px-2.5 font-medium text-white flex items-center gap-2.5">
+                      <span class="w-6 h-6 shrink-0 inline-flex items-center justify-center">
+                        <Fragment set:html={escudoHTML(clubesGalaxy[fila.nombre] ?? '', 22)} />
+                      </span>
+                      <span class="truncate">{fila.nombre}</span>
+                    </td>
+                    <td class="py-2 px-2 text-center text-gray-300 text-xs">{fila.pj}</td>
+                    <td class="py-2 px-2 text-center text-xs font-mono text-emerald-400 font-bold">
+                      {(fila.gf - fila.gc) > 0 ? `+${fila.gf - fila.gc}` : (fila.gf - fila.gc)}
+                    </td>
+                    <td class="py-2 px-2 text-right font-display font-black text-base text-galaxy-400">{fila.pts}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Liga Sudario (5 cols con tarjeta viva) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="glass-panel rounded-2xl p-6 border border-amber-500/40 bg-gradient-to-br from-amber-950/20 to-black space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                <i class="fa-solid fa-star"></i> LIGA DE LA COMUNIDAD
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">SP Football Life</span>
+            </div>
+
+            <div>
+              <h4 class="font-display font-black text-2xl text-white uppercase leading-none">
+                LIGA <span class="text-amber-400">SUDARIO</span>
+              </h4>
+              <p class="text-xs text-gray-300 mt-1">12 jugadores &bull; 11 fechas &bull; Sede España &bull; Organiza Sudario17</p>
+            </div>
+
+            <!-- Puntero de Sudario -->
+            <div class="p-3 rounded-xl bg-black/60 border border-amber-500/30 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-8 h-8 shrink-0 inline-flex items-center justify-center">
+                  <Fragment set:html={escudoHTML(clubesSudario[liderSudario?.nombre] ?? '', 32)} />
+                </span>
+                <div class="min-w-0">
+                  <span class="text-[10px] uppercase font-bold text-gray-400 block">Líder invicto</span>
+                  <span class="text-sm font-bold text-white truncate block">{liderSudario?.nombre ?? 'Victor'} ({clubesSudario[liderSudario?.nombre] ?? 'Liverpool'})</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-display font-black text-xl text-amber-400">{liderSudario?.pts ?? 15}</span>
+                <span class="text-[10px] text-gray-400 font-mono block">PTS</span>
+              </div>
+            </div>
+
+            <a href={`${base}liga/#liga-sudario`} class="w-full py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 font-display font-bold text-xs uppercase tracking-wider block text-center transition-colors">
+              Ver Tabla Completa de Sudario →
+            </a>
+          </div>
+
+          <!-- Acceso a Cartas de Jugadores -->
+          <a href={`${base}database/`} class="glass-panel p-4 rounded-xl border border-galaxy-border hover:border-galaxy-400 transition-colors flex items-center justify-between gap-3 block">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl text-galaxy-400"><i class="fa-solid fa-id-card"></i></span>
+              <div>
+                <b class="text-sm font-display font-bold text-white uppercase block">Fichas &amp; Cartas de Jugador</b>
+                <span class="text-[11px] text-gray-400">Ver todas las cartas holográficas y estadísticas</span>
+              </div>
+            </div>
+            <span class="text-xs text-galaxy-400 font-bold">Ver cartas →</span>
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 4. RINCÓN DE MI LIGA MÁSTER (Tu Club, Fichajes, Presupuesto y Plantilla)   -->
+    <!-- ========================================================================= -->
+    <section id="rincon-master" class="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-emerald-500/30 pb-3">
+        <div>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono font-bold text-emerald-400">
+            <i class="fa-solid fa-shield-halved"></i> 4. TU CLUB &bull; LIGA MÁSTER
+          </span>
+          <h2 class="font-display font-black text-2xl sm:text-4xl text-white uppercase tracking-tight mt-1">
+            GESTIÓN DE CLUB &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300">MERCADO SIDER</span>
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Controla tu plantilla de PES, revisa tu presupuesto de salarios y haz traspasos en vivo.</p>
+        </div>
+
+        <a href={`${base}manager/`} class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-display font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/25 flex items-center gap-2">
+          <i class="fa-solid fa-user-tie"></i> Entrar a Mi Despacho de DT
+        </a>
+      </div>
+
+      <!-- Módulo nativo de Tu Club (Cargado dinámicamente) -->
+      <section class="tuclub" data-tuclub aria-label="Tu club"></section>
+
+      <!-- Fila de Accesos Rápidos de Liga Máster -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href={`${base}mi-club/`} class="glass-panel p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400 transition-colors">
+          <span class="text-2xl text-emerald-400 mb-1 block"><i class="fa-solid fa-shield-halved"></i></span>
+          <b class="text-sm font-display font-bold text-white uppercase block">Mi Plantilla</b>
+          <span class="text-xs text-gray-400">Dorsales, posiciones y táctica</span>
+        </a>
+
+        <a href={`${base}mercado/`} class="glass-panel p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400 transition-colors">
+          <span class="text-2xl text-teal-400 mb-1 block"><i class="fa-solid fa-right-left"></i></span>
+          <b class="text-sm font-display font-bold text-white uppercase block">Mercado de Fichajes</b>
+          <span class="text-xs text-gray-400">Traspasos sincronizados con Sider</span>
+        </a>
+
+        <a href={`${base}mis-partidos/`} class="glass-panel p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-400 transition-colors">
+          <span class="text-2xl text-cyan-400 mb-1 block"><i class="fa-solid fa-clipboard-list"></i></span>
+          <b class="text-sm font-display font-bold text-white uppercase block">Historial de Partidos</b>
+          <span class="text-xs text-gray-400">Resultados, actas y goles anotados</span>
+        </a>
+      </div>
+
+    </section>
+
+  </main>
+</Layout>
+
+<script>
+  import '../js/pages/central.js';
+  import { openAuthModal } from '../js/features/auth.js';
+  import('../js/features/portada/tuClub.js').then((m) => m.montarTuClub()).catch((e) => console.warn('[central] tu club:', e));
+</script>
