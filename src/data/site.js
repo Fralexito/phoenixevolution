@@ -19,6 +19,7 @@ export const NAV_EXTRA = [
   { id: 'eventos', label: 'Eventos', path: 'eventos/', icon: 'fa-calendar-day' },
   { id: 'clanes', label: 'Clanes', path: 'clanes/', icon: 'fa-shield-halved' },
   { id: 'ranking', label: 'Ranking', path: 'ranking/', icon: 'fa-ranking-star' },
+  { id: 'online', label: 'Online', path: 'online/', icon: 'fa-globe' },
   { id: 'tienda', label: 'Tienda', path: 'tienda/', icon: 'fa-store' },
   { id: 'organizadores', label: 'Quiénes somos', path: 'organizadores/', icon: 'fa-users' },
   { id: 'competiciones', label: 'Competiciones', path: 'competiciones/', icon: 'fa-trophy' },
@@ -132,7 +133,7 @@ export const NOMBRE_APP = 'Phoenix Link';   // antes «Phoenix Soda» (renombrad
 const TODAS = () => [...NAV, ...NAV_EXTRA, ...ACCOUNT_NAV];
 const DESC = {
   liga: FX.reparto ? 'Tabla, fechas y resultados de cada liga' : 'Tabla, fechas y resultados de cada división', competiciones: FX.reparto ? 'Todas las ligas en tarjetas: sede, organizador y accesos' : 'Copas y torneos especiales', historial: 'Todos los partidos jugados',
-  palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre',
+  palmares: 'Campeones y vitrina de trofeos', ranking: 'Los mejores de la semana y de siempre', online: 'Vincula tu PES y mira las divisiones online',
   duelos: 'Reta a alguien y juega ya', envivo: 'Salas abiertas para entrar o mirar', ahora: 'Retos esperando rival y partidos para mirar',
   missalas: 'Vincula tu PC y abre salas', mercado: 'Conecta tu juego con la web', manager: FX.clubUnificado ? 'Tu club: carrera de DT, fichajes y vestuario del juego' : 'Tu club, tu presupuesto, tus fichajes', miclub: 'Edita la ficha de tus jugadores', formatos: 'Arma torneos, gira la ruleta y mira el reto del día', chatgeneral: 'El chat de todos, también dentro del juego con Phoenix Link', torneos: 'Crea tu torneo con el formato que quieras o apúntate a uno',
   noticias: 'Comunicados oficiales y la Tribuna', social: 'El muro de la comunidad', creadores: 'Streamers y directos verificados',
