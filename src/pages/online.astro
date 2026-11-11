@@ -1,0 +1,38 @@
+---
+// ONLINE (Phoenix Online): vincular mi PES con mi cuenta y ver las divisiones online D12…D1. Lo pinta js/pages/online.js.
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Online" active="online" description="Vincula tu PES con tu cuenta y mira las divisiones online de Phoenix, de la D12 a la D1.">
+  <div class="max-w-3xl mx-auto px-4 sm:px-8 py-4 sm:py-6 w-full space-y-4">
+    <header class="glass-panel px-4 py-3 rounded-2xl">
+      <span class="text-[12px] font-display font-bold text-galaxy-400 uppercase tracking-widest bg-galaxy-600/20 px-2 py-0.5 rounded border border-galaxy-400/30">Phoenix Online</span>
+      <h1 class="text-xl sm:text-2xl font-display font-extrabold text-white uppercase tracking-wider text-shadow-glow mt-1"><i class="fa-solid fa-globe text-galaxy-400 mr-2"></i>Online</h1>
+      <p class="text-gray-300 text-xs mt-0.5">Une tu PES con tu cuenta para que tus partidos online cuenten, y mira cómo van las divisiones.</p>
+    </header>
+
+    <section class="glass-panel rounded-2xl p-4 space-y-3" aria-labelledby="on-vinc-t">
+      <h2 id="on-vinc-t" class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-400">Vincular mi PES</h2>
+      <div id="on-sinsesion" hidden class="text-sm text-gray-400">Inicia sesión para vincular tu PES.</div>
+      <div id="on-form-caja" hidden class="space-y-2">
+        <p class="text-xs text-gray-300">Abre el online en tu PES, entra a tu club y escribe aquí el código de vinculación que te muestra.</p>
+        <form id="on-form" class="flex flex-wrap gap-2" autocomplete="off">
+          <input id="on-codigo" type="text" maxlength="12" inputmode="text" autocapitalize="characters" placeholder="CÓDIGO" aria-label="Código de vinculación" class="flex-1 min-w-[10rem] rounded-lg bg-black/40 border border-galaxy-border px-3 py-2 text-white tracking-[.25em] uppercase text-sm" />
+          <button type="submit" id="on-vincular" class="btn btn-primary"><i class="fa-solid fa-link"></i> Vincular mi PES</button>
+        </form>
+        <p id="on-ok" hidden role="status" class="text-xs text-ok"><i class="fa-solid fa-check"></i> <span id="on-ok-txt"></span></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="on-div-t" class="space-y-2">
+      <h2 id="on-div-t" class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-400">Divisiones online</h2>
+      <div id="on-error" hidden role="alert" class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 flex flex-wrap items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation"></i><span id="on-error-txt" class="flex-1 min-w-0"></span>
+        <button type="button" id="on-reintentar" class="btn btn-ghost !min-h-8 !px-3 !text-[12px]">Reintentar</button>
+      </div>
+      <div id="on-divs" class="space-y-2" aria-live="polite"><div class="esqueleto h-24"></div></div>
+    </section>
+  </div>
+</Layout>
+<script>
+  import '../js/pages/online.js';
+</script>
