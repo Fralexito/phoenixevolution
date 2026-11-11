@@ -14,9 +14,9 @@ import Layout from '../layouts/Layout.astro';
       <h2 id="on-vinc-t" class="text-[12px] font-display font-bold uppercase tracking-widest text-gray-400">Vincular mi PES</h2>
       <div id="on-sinsesion" hidden class="text-sm text-gray-400">Inicia sesión para vincular tu PES.</div>
       <div id="on-form-caja" hidden class="space-y-2">
-        <p class="text-xs text-gray-300">Abre el online en tu PES, entra a tu club y escribe aquí el código de vinculación que te muestra.</p>
+        <p class="text-xs text-gray-300">Entra al online del PES: el código de 6 números aparece en los avisos como «Tu código Phoenix». Escríbelo aquí.</p>
         <form id="on-form" class="flex flex-wrap gap-2" autocomplete="off">
-          <input id="on-codigo" type="text" maxlength="12" inputmode="text" autocapitalize="characters" placeholder="CÓDIGO" aria-label="Código de vinculación" class="flex-1 min-w-[10rem] rounded-lg bg-black/40 border border-galaxy-border px-3 py-2 text-white tracking-[.25em] uppercase text-sm" />
+          <input id="on-codigo" type="text" maxlength="7" inputmode="numeric" pattern="[0-9 ]*" placeholder="000000" aria-label="Código de vinculación" class="flex-1 min-w-[10rem] rounded-lg bg-black/40 border border-galaxy-border px-3 py-2 text-white tracking-[.25em] text-sm" />
           <button type="submit" id="on-vincular" class="btn btn-primary"><i class="fa-solid fa-link"></i> Vincular mi PES</button>
         </form>
         <p id="on-ok" hidden role="status" class="text-xs text-ok"><i class="fa-solid fa-check"></i> <span id="on-ok-txt"></span></p>

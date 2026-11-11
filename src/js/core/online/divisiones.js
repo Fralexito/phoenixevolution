@@ -15,8 +15,8 @@ export function agruparPorDivision(filas) {
   return [...mapa.entries()].sort((a, b) => numDivision(a[0]) - numDivision(b[0])).map(([division, jugadores]) => ({ division, jugadores }));
 }
 
-/** Código que escribe el jugador: solo 4–12 letras/números/guion, en mayúsculas. '' si no sirve. */
+/** Código del PES («Tu código Phoenix»): 6 dígitos, del 100000 al 999999. Quita espacios; '' si no sirve. */
 export function limpiarCodigo(txt) {
-  const c = String(txt ?? '').trim().toUpperCase().replace(/\s+/g, '');
-  return /^[A-Z0-9-]{4,12}$/.test(c) ? c : '';
+  const c = String(txt ?? '').replace(/\s+/g, '');
+  return /^[1-9]\d{5}$/.test(c) ? c : '';
 }

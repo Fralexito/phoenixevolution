@@ -9,4 +9,6 @@ test('agruparPorDivision ordena de D1 a D12 y conserva el orden interno', () => 
   assert.deepEqual(g.map((x) => x.division), ['D2', 'D10']);
   assert.deepEqual(g[1].jugadores.map((x) => x.n), ['a', 'c']);
 });
-test('limpiarCodigo', () => { assert.equal(limpiarCodigo(' ab12 cd '), 'AB12CD'); assert.equal(limpiarCodigo('x'), ''); assert.equal(limpiarCodigo("a'b;--"), ''); });
+test('limpiarCodigo: 6 dígitos 100000–999999', () => {
+  assert.equal(limpiarCodigo(' 482 913 '), '482913'); assert.equal(limpiarCodigo('012345'), ''); assert.equal(limpiarCodigo('12345'), ''); assert.equal(limpiarCodigo('48291a'), ''); assert.equal(limpiarCodigo(null), '');
+});

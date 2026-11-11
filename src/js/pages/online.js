@@ -32,7 +32,7 @@ $('on-reintentar').addEventListener('click', cargar);
 $('on-form').addEventListener('submit', async (ev) => {
   ev.preventDefault();
   const cod = limpiarCodigo($('on-codigo').value);
-  if (!cod) { toast('Escribe el código tal como sale en el juego (4 a 12 letras o números).', 'error'); return; }
+  if (!cod) { toast('El código tiene 6 números (sale en los avisos del PES como «Tu código Phoenix»).', 'error'); return; }
   const b = $('on-vincular'); b.disabled = true;
   try {
     const club = await vincularPES(cod);
